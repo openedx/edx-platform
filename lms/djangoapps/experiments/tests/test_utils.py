@@ -8,10 +8,11 @@ from unittest import TestCase
 
 from django.utils.timezone import now
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.partitions.partitions import Group
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
-from lms.djangoapps.courseware import courses  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.experiments.utils import (
     get_course_entitlement_price_and_sku,
     get_experiment_user_metadata_context,
@@ -19,7 +20,6 @@ from lms.djangoapps.experiments.utils import (
     get_unenrolled_courses,
     is_enrolled_in_course_run
 )
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
@@ -63,7 +63,7 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
 
     def test_unenrolled_courses_for_empty_courses(self):
         unenrolled_courses = get_unenrolled_courses([], [])
-        assert [] == unenrolled_courses
+        assert not unenrolled_courses
 
     def test_unenrolled_courses_for_single_course(self):
         course = {'key': 'UQx+ENGY1x'}
@@ -124,36 +124,39 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
         assert self.entitlement_a_sku in skus
 
     def test_get_experiment_user_metadata_context(self):
-        course = CourseFactory.create(start=now() - timedelta(days=30), pacing_type="instructor_paced", course_duration=None, upgrade_price='Free',  # lint-amnesty, pylint: disable=line-too-long
-                                      upgrade_link=None, enrollment_mode=None, audit_access_deadline=None, program_key_fields=None, schedule_start=None,  # lint-amnesty, pylint: disable=line-too-long
-                                      enrollment_time=None, dynamic_upgrade_deadline=None, course_upgrade_deadline=None, course_key_fields={'org': 'org.0', 'course': 'course_0', 'run': 'Run_0'})  # lint-amnesty, pylint: disable=line-too-long
+        course = CourseFactory.create(start=now() - timedelta(days=30))
         user = UserFactory()
+        enrollment = CourseEnrollmentFactory(course_id=course.id, user=user)
         context = get_experiment_user_metadata_context(course, user)
-        CourseEnrollmentFactory(course_id=course.id, user=user)
 
         user_metadata_expected_result = {'username': user.username,
                                          'user_id': user.id,
-                                         'course_id': course.id,
-                                         'enrollment_mode': course.enrollment_mode,
-                                         'upgrade_link': course.upgrade_link,
-                                         'upgrade_price': course.upgrade_price,
-                                         'audit_access_deadline': course.audit_access_deadline,
-                                         'course_duration': course.course_duration,
-                                         'pacing_type': course.pacing_type,
+                                         'course_id': str(course.id),
+                                         'course_display_name': course.display_name_with_default,
+                                         'enrollment_mode': enrollment.mode,
+                                         'upgrade_link': None,
+                                         'upgrade_price': 'Free',
+                                         'audit_access_deadline': None,
+                                         'course_duration': None,
+                                         'pacing_type': 'instructor_paced',
                                          'has_staff_access': False,
-                                         'forum_roles': [],
-                                         'partition_groups': {},
+                                         'forum_roles': [('Student',)],
+                                         'partition_groups': {'Enrollment Track Groups': Group(id=1, name='Audit')},
                                          'has_non_audit_enrollments': False,
-                                         'program_key_fields': course.program_key_fields,
+                                         'program_key_fields': None,
                                          'email': user.email,
-                                         'schedule_start': course.schedule_start,
-                                         'enrollment_time': course.enrollment_time,
-                                         'course_start': course.start,
+                                         'schedule_start': enrollment.schedule.start_date.isoformat(),
+                                         'enrollment_time': enrollment.created.isoformat(),
+                                         'course_start': course.start.isoformat(),
                                          'course_end': course.end,
-                                         'dynamic_upgrade_deadline': course.dynamic_upgrade_deadline,
-                                         'course_upgrade_deadline': course.course_upgrade_deadline,
-                                         'course_key_fields': course.course_key_fields}
+                                         'dynamic_upgrade_deadline': None,
+                                         'course_upgrade_deadline': None,
+                                         'course_key_fields': {
+                                             'org': course.id.org,
+                                             'course': course.id.course,
+                                             'run': course.id.run,
+                                         }}
 
         user_metadata = context.get('user_metadata')
 
-        assert user_metadata, user_metadata_expected_result
+        assert user_metadata == user_metadata_expected_result

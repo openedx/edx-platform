@@ -16,21 +16,22 @@ from this app, edx-when's set_dates_for_course).
 from datetime import datetime, timezone
 
 import ddt
-from edx_toggles.toggles.testutils import override_waffle_flag
-from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase, APIClient
 
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
 from ..api import replace_course_outline
 from ..api.tests.test_data import generate_sections
 from ..data import CourseOutlineData, CourseVisibility
-from ..toggles import USE_FOR_OUTLINES
 
 
-@override_waffle_flag(USE_FOR_OUTLINES, active=True)
+@skip_unless_lms
 class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):
     """
     General tests for the CourseOutline.
@@ -72,6 +73,14 @@ class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):
         result = self.client.get(outline_url(fake_course_key))
         assert result.status_code == 404
 
+    def test_non_existent_course_401_as_anonymous(self):
+        """
+        We should 401, not 404, when asking for a course that isn't there for an anonymous user.
+        """
+        fake_course_key = self.course_key.replace(run="not_real")
+        result = self.client.get(outline_url(fake_course_key))
+        assert result.status_code == 401
+
     def test_deprecated_course_key(self):
         """
         For now, make sure you need staff access bits to use the API.
@@ -110,28 +119,12 @@ class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):
         assert len(data['outline']['sections'][1]['sequence_ids']) == 2
         assert len(data['outline']['sequences']) == 4
 
-    @override_waffle_flag(USE_FOR_OUTLINES, active=False)
-    def test_override_rollout(self):
-        """
-        Test that we can still access the API by sending force_on
-
-        This lets us manually test the outline rendering on live courses that
-        haven't been rolled out to yet.
-
-        TODO: Remove this test entirely after rollout.
-        """
-        self.client.login(username='staff', password='staff_pass')
-        result = self.client.get(self.course_url)
-        assert result.status_code == 403
-
-        result = self.client.get(self.course_url, {'force_on': '1'})
-        assert result.status_code == 200
-
 
 @ddt.ddt
-class CourseOutlineViewMasqueradingTest(CacheIsolationTestCase, APITestCase):
+@skip_unless_lms
+class CourseOutlineViewTargetUserTest(CacheIsolationTestCase, APITestCase):
     """
-    Tests permissions of masquerading.
+    Tests permissions of specifying a target user via url parameter.
     """
     @classmethod
     def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
@@ -190,7 +183,6 @@ class CourseOutlineViewMasqueradingTest(CacheIsolationTestCase, APITestCase):
         super().setUp()
         self.client = APIClient()
 
-    @override_waffle_flag(USE_FOR_OUTLINES, active=True)
     def test_global_staff(self):
         """Global staff can successfuly masquerade in both courses."""
         self.client.login(username='global_staff', password='global_staff_pass')
@@ -199,7 +191,6 @@ class CourseOutlineViewMasqueradingTest(CacheIsolationTestCase, APITestCase):
             assert result.status_code == 200
             assert result.data['username'] == 'student'
 
-    @override_waffle_flag(USE_FOR_OUTLINES, active=True)
     @ddt.data(
         ('course_instructor', 'course_instructor_pass'),
         ('course_staff', 'course_staff_pass'),
@@ -230,7 +221,6 @@ class CourseOutlineViewMasqueradingTest(CacheIsolationTestCase, APITestCase):
         )
         assert other_course_as_student.status_code == 403
 
-    @override_waffle_flag(USE_FOR_OUTLINES, active=True)
     def test_student(self):
         """Students have no ability to masquerade."""
         self.client.login(username='student', password='student_pass')
@@ -251,6 +241,59 @@ class CourseOutlineViewMasqueradingTest(CacheIsolationTestCase, APITestCase):
         for username in ['idontexist', '', 'course_staff', 'global_staff']:
             masq_attempt_result = self.client.get(course_url, {'user': username})
             assert masq_attempt_result.status_code == 403
+
+
+@ddt.ddt
+@skip_unless_lms
+class CourseOutlineViewMasqueradingTest(MasqueradeMixin, CacheIsolationTestCase):
+    """
+    Tests permissions of session masquerading.
+    """
+    @classmethod
+    def setUpTestData(cls):
+        """Set up the basic course outline and our users."""
+        super().setUpTestData()
+
+        overview = CourseOverviewFactory()
+        cls.course_key = overview.id
+
+        outline = CourseOutlineData(
+            course_key=cls.course_key,
+            title="Views Test Course!",
+            published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
+            published_version="5ebece4b69dd593d82fe2020",
+            entrance_exam_id=None,
+            days_early_for_beta=None,
+            sections=generate_sections(cls.course_key, [2, 2]),
+            self_paced=False,
+            course_visibility=CourseVisibility.PUBLIC
+        )
+        replace_course_outline(outline)
+
+        # Users
+        cls.staff = UserFactory(is_staff=True, password='test')
+        cls.student = UserFactory(username='student')
+        UserFactory(username='student2')
+
+        CourseEnrollment.enroll(cls.student, cls.course_key)
+
+    def setUp(self):
+        super().setUp()
+        self.client.login(username=self.staff.username, password='test')
+
+    def test_masquerading_works(self):
+        """Confirm that session masquerading works as expected."""
+        self.update_masquerade(course_id=self.course_key, username='student')
+        result = self.client.get(outline_url(self.course_key))
+        assert result.status_code == 200
+        assert result.data['username'] == 'student'
+
+    def test_target_user_takes_precedence(self):
+        """Specifying a user should override any masquerading."""
+        self.update_masquerade(course_id=self.course_key, username='student')
+        result = self.client.get(outline_url(self.course_key), {'user': 'student2'})
+        assert result.status_code == 200
+        assert result.data['username'] == 'student2'
 
 
 def outline_url(course_key):

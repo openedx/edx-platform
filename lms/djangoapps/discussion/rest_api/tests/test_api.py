@@ -4,6 +4,7 @@ Tests for Discussion API internal interface
 
 
 import itertools
+import random
 from datetime import datetime, timedelta
 from unittest import mock
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
@@ -11,8 +12,10 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 import ddt
 import httpretty
 import pytest
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
@@ -23,10 +26,11 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 from common.djangoapps.student.tests.factories import (
+    AdminFactory,
     BetaTesterFactory,
     CourseEnrollmentFactory,
     StaffFactory,
-    UserFactory,
+    UserFactory
 )
 from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import MockSignalHandlerMixin, disable_signal
@@ -40,33 +44,41 @@ from lms.djangoapps.discussion.rest_api.api import (
     get_comment_list,
     get_course,
     get_course_topics,
+    get_course_topics_v2,
     get_thread,
     get_thread_list,
+    get_user_comments,
     update_comment,
-    update_thread,
+    update_thread
 )
 from lms.djangoapps.discussion.rest_api.exceptions import (
     CommentNotFoundError,
     DiscussionBlackOutException,
     DiscussionDisabledError,
-    ThreadNotFoundError,
+    ThreadNotFoundError
 )
+from lms.djangoapps.discussion.rest_api.serializers import TopicOrdering
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
     make_paginated_api_response,
+    parsed_body,
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_STUDENT,
-    Role,
+    Role
 )
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
+
+User = get_user_model()
 
 
 def _remove_discussion_tab(course, user_id):
@@ -142,7 +154,6 @@ def _set_course_discussion_blackout(course, user_id):
 @ddt.ddt
 class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_course"""
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -158,7 +169,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
 
     def test_nonexistent_course(self):
         with pytest.raises(CourseNotFoundError):
-            get_course(self.request, CourseLocator.from_string("non/existent/course"))
+            get_course(self.request, CourseLocator.from_string("course-v1:non+existent+course"))
 
     def test_not_enrolled(self):
         unenrolled_user = UserFactory.create()
@@ -174,10 +185,10 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         assert get_course(self.request, self.course.id) == {
             'id': str(self.course.id),
             'blackouts': [],
-            'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz',
+            'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=course-v1%3Ax%2By%2Bz',
             'following_thread_list_url':
-                'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&following=True',
-            'topics_url': 'http://testserver/api/discussion/v1/course_topics/x/y/z',
+                'http://testserver/api/discussion/v1/threads/?course_id=course-v1%3Ax%2By%2Bz&following=True',
+            'topics_url': 'http://testserver/api/discussion/v1/course_topics/course-v1:x+y+z',
             'allow_anonymous': True,
             'allow_anonymous_to_peers': False,
             'user_is_privileged': False,
@@ -205,7 +216,6 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
     """
     Tests of get_course for courses that have blackout dates.
     """
-
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
@@ -219,9 +229,9 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
         # A variety of formats is accepted
         self.course.discussion_blackouts = [
             ["2015-06-09T00:00:00Z", "6-10-15"],
-            [1433980800000, datetime(2015, 6, 12)],
+            [1433980800000, datetime(2015, 6, 12, tzinfo=UTC)],
         ]
-        modulestore().update_item(self.course, self.user.id)
+        self.update_course(self.course, self.user.id)
         result = get_course(self.request, self.course.id)
         assert result['blackouts'] == [
             {'start': '2015-06-09T00:00:00Z', 'end': '2015-06-10T00:00:00Z'},
@@ -328,7 +338,7 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
 
     def test_nonexistent_course(self):
         with pytest.raises(CourseNotFoundError):
-            get_course_topics(self.request, CourseLocator.from_string("non/existent/course"))
+            get_course_topics(self.request, CourseLocator.from_string("course-v1:non+existent+course"))
 
     def test_not_enrolled(self):
         unenrolled_user = UserFactory.create()
@@ -489,6 +499,7 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
             )
 
         with self.store.bulk_operations(self.course.id, emit_signals=False):
+            self.store.update_item(self.course, self.user.id)
             self.make_discussion_xblock("courseware-1", "First", "Everybody")
             self.make_discussion_xblock(
                 "courseware-2",
@@ -596,15 +607,15 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                         {
                             'children': [],
                             'id': 'topic_id_1',
-                            'thread_list_url':
-                                'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_1',
+                            'thread_list_url': 'http://testserver/api/discussion/v1/threads/'
+                                               '?course_id=course-v1%3Ax%2By%2Bz&topic_id=topic_id_1',
                             'name': 'test_target_1',
                             'thread_counts': {'discussion': 0, 'question': 0},
                         },
                     ],
                     'id': None,
-                    'thread_list_url':
-                        'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_1',
+                    'thread_list_url': 'http://testserver/api/discussion/v1/threads/'
+                                       '?course_id=course-v1%3Ax%2By%2Bz&topic_id=topic_id_1',
                     'name': 'test_category_1',
                     'thread_counts': None,
                 },
@@ -613,15 +624,15 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                         {
                             'children': [],
                             'id': 'topic_id_2',
-                            'thread_list_url':
-                                'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_2',
+                            'thread_list_url': 'http://testserver/api/discussion/v1/threads/'
+                                               '?course_id=course-v1%3Ax%2By%2Bz&topic_id=topic_id_2',
                             'name': 'test_target_2',
                             'thread_counts': {'discussion': 0, 'question': 0},
                         }
                     ],
                     'id': None,
-                    'thread_list_url':
-                        'http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=topic_id_2',
+                    'thread_list_url': 'http://testserver/api/discussion/v1/threads/'
+                                       '?course_id=course-v1%3Ax%2By%2Bz&topic_id=topic_id_2',
                     'name': 'test_category_2',
                     'thread_counts': None,
                 }
@@ -633,7 +644,6 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_thread_list"""
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -677,7 +687,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
 
     def test_nonexistent_course(self):
         with pytest.raises(CourseNotFoundError):
-            get_thread_list(self.request, CourseLocator.from_string("non/existent/course"), 1, 1)
+            get_thread_list(self.request, CourseLocator.from_string("course-v1:non+existent+course"), 1, 1)
 
     def test_not_enrolled(self):
         self.request.user = UserFactory.create()
@@ -1214,7 +1224,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
 
     def test_nonexistent_course(self):
         with pytest.raises(CourseNotFoundError):
-            self.get_comment_list(self.make_minimal_cs_thread({"course_id": "non/existent/course"}))
+            self.get_comment_list(self.make_minimal_cs_thread({"course_id": "course-v1:non+existent+course"}))
 
     def test_not_enrolled(self):
         self.request.user = UserFactory.create()
@@ -1588,6 +1598,119 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
 
 
 @ddt.ddt
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class GetUserCommentsTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModuleStoreTestCase):
+    """
+    Tests for get_user_comments.
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super().setUp()
+
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.reset)
+        self.addCleanup(httpretty.disable)
+
+        self.course = CourseFactory.create()
+
+        # create staff user so that we don't need to worry about
+        # permissions here
+        self.user = UserFactory.create(is_staff=True)
+        self.register_get_user_response(self.user)
+
+        self.request = RequestFactory().get(f'/api/discussion/v1/users/{self.user.username}/{self.course.id}')
+        self.request.user = self.user
+
+    def test_call_with_single_results_page(self):
+        """
+        Assert that a minimal call with valid inputs, and single result,
+        returns the expected response structure.
+        """
+        self.register_get_comments_response(
+            [make_minimal_cs_comment()],
+            page=1,
+            num_pages=1,
+        )
+        response = get_user_comments(
+            request=self.request,
+            author=self.user,
+            course_key=self.course.id,
+        )
+        assert "results" in response.data
+        assert "pagination" in response.data
+        assert response.data["pagination"]["count"] == 1
+        assert response.data["pagination"]["num_pages"] == 1
+        assert response.data["pagination"]["next"] is None
+        assert response.data["pagination"]["previous"] is None
+
+    @ddt.data(1, 2, 3)
+    def test_call_with_paginated_results(self, page):
+        """
+        Assert that paginated results return the correct pagination
+        information at the pagination boundaries.
+        """
+        self.register_get_comments_response(
+            [make_minimal_cs_comment() for _ in range(30)],
+            page=page,
+            num_pages=3,
+        )
+        response = get_user_comments(
+            request=self.request,
+            author=self.user,
+            course_key=self.course.id,
+            page=page,
+        )
+        assert "pagination" in response.data
+        assert response.data["pagination"]["count"] == 30
+        assert response.data["pagination"]["num_pages"] == 3
+
+        if page in (1, 2):
+            assert response.data["pagination"]["next"] is not None
+            assert f"page={page+1}" in response.data["pagination"]["next"]
+        if page in (2, 3):
+            assert response.data["pagination"]["previous"] is not None
+            assert f"page={page-1}" in response.data["pagination"]["previous"]
+        if page == 1:
+            assert response.data["pagination"]["previous"] is None
+        if page == 3:
+            assert response.data["pagination"]["next"] is None
+
+    def test_call_with_invalid_page(self):
+        """
+        Assert that calls for pages that exceed the existing number of
+        results pages raise PageNotFoundError.
+        """
+        self.register_get_comments_response([], page=2, num_pages=1)
+        with pytest.raises(PageNotFoundError):
+            get_user_comments(
+                request=self.request,
+                author=self.user,
+                course_key=self.course.id,
+                page=2,
+            )
+
+    def test_call_with_non_existent_course(self):
+        """
+        Assert that calls for comments in a course that doesn't exist
+        result in a CourseNotFoundError error.
+        """
+        self.register_get_comments_response(
+            [make_minimal_cs_comment()],
+            page=1,
+            num_pages=1,
+        )
+        with pytest.raises(CourseNotFoundError):
+            get_user_comments(
+                request=self.request,
+                author=self.user,
+                course_key=CourseKey.from_string("course-v1:x+y+z"),
+                page=2,
+            )
+
+
+@ddt.ddt
 @disable_signal(api, 'thread_created')
 @disable_signal(api, 'thread_voted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1676,7 +1799,7 @@ class CreateThreadTest(
             "read": True,
         })
         assert actual == expected
-        assert httpretty.last_request().parsed_body == {   # lint-amnesty, pylint: disable=no-member
+        assert parsed_body(httpretty.last_request()) == {
             'course_id': [str(self.course.id)],
             'commentable_id': ['test_topic'],
             'thread_type': ['discussion'],
@@ -1747,7 +1870,7 @@ class CreateThreadTest(
         })
         assert actual == expected
         self.assertEqual(
-            httpretty.last_request().parsed_body,   # lint-amnesty, pylint: disable=no-member
+            parsed_body(httpretty.last_request()),
             {
                 "course_id": [str(self.course.id)],
                 "commentable_id": ["test_topic"],
@@ -1865,7 +1988,7 @@ class CreateThreadTest(
         try:
             create_thread(self.request, data)
             assert not expected_error
-            actual_post_data = httpretty.last_request().parsed_body  # lint-amnesty, pylint: disable=no-member
+            actual_post_data = parsed_body(httpretty.last_request())
             if data_group_state == "group_is_set":
                 assert actual_post_data['group_id'] == [str(data['group_id'])]
             elif data_group_state == "no_group_set" and course_is_cohorted and topic_is_cohorted:
@@ -1886,7 +2009,7 @@ class CreateThreadTest(
         cs_request = httpretty.last_request()
         assert urlparse(cs_request.path).path == f"/api/v1/users/{self.user.id}/subscriptions"  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'POST'
-        assert cs_request.parsed_body == {'source_type': ['thread'], 'source_id': ['test_id']}  # lint-amnesty, pylint: disable=no-member
+        assert parsed_body(cs_request) == {'source_type': ['thread'], 'source_id': ['test_id']}
 
     def test_voted(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
@@ -1899,7 +2022,7 @@ class CreateThreadTest(
         cs_request = httpretty.last_request()
         assert urlparse(cs_request.path).path == '/api/v1/threads/test_id/votes'  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'PUT'
-        assert cs_request.parsed_body == {'user_id': [str(self.user.id)], 'value': ['up']}  # lint-amnesty, pylint: disable=no-member
+        assert parsed_body(cs_request) == {'user_id': [str(self.user.id)], 'value': ['up']}
 
     def test_abuse_flagged(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
@@ -1911,7 +2034,7 @@ class CreateThreadTest(
         cs_request = httpretty.last_request()
         assert urlparse(cs_request.path).path == '/api/v1/threads/test_id/abuse_flag'  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'PUT'
-        assert cs_request.parsed_body == {'user_id': [str(self.user.id)]}  # lint-amnesty, pylint: disable=no-member
+        assert parsed_body(cs_request) == {'user_id': [str(self.user.id)]}
 
     def test_course_id_missing(self):
         with pytest.raises(ValidationError) as assertion:
@@ -1925,7 +2048,7 @@ class CreateThreadTest(
 
     def test_nonexistent_course(self):
         with pytest.raises(CourseNotFoundError):
-            create_thread(self.request, {"course_id": "non/existent/course"})
+            create_thread(self.request, {"course_id": "course-v1:non+existent+course"})
 
     def test_not_enrolled(self):
         self.request.user = UserFactory.create()
@@ -2038,7 +2161,7 @@ class CreateCommentTest(
             "/api/v1/threads/test_thread/comments"
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # lint-amnesty, pylint: disable=no-member
-        assert httpretty.last_request().parsed_body == {   # lint-amnesty, pylint: disable=no-member
+        assert parsed_body(httpretty.last_request()) == {
             'course_id': [str(self.course.id)],
             'body': ['Test body'],
             'user_id': [str(self.user.id)],
@@ -2124,7 +2247,7 @@ class CreateCommentTest(
             "/api/v1/threads/test_thread/comments"
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # pylint: disable=no-member
-        assert httpretty.last_request().parsed_body == {  # pylint: disable=no-member
+        assert parsed_body(httpretty.last_request()) == {
             "course_id": [str(self.course.id)],
             "body": ["Test body"],
             "user_id": [str(self.user.id)],
@@ -2196,7 +2319,7 @@ class CreateCommentTest(
         )
         try:
             create_comment(self.request, data)
-            assert httpretty.last_request().parsed_body['endorsed'] == ['True']  # lint-amnesty, pylint: disable=no-member
+            assert parsed_body(httpretty.last_request())['endorsed'] == ['True']
             assert not expected_error
         except ValidationError:
             assert expected_error
@@ -2212,7 +2335,7 @@ class CreateCommentTest(
         cs_request = httpretty.last_request()
         assert urlparse(cs_request.path).path == '/api/v1/comments/test_comment/votes'  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'PUT'
-        assert cs_request.parsed_body == {'user_id': [str(self.user.id)], 'value': ['up']}  # lint-amnesty, pylint: disable=no-member
+        assert parsed_body(cs_request) == {'user_id': [str(self.user.id)], 'value': ['up']}
 
     def test_abuse_flagged(self):
         self.register_post_comment_response({"id": "test_comment", "username": self.user.username}, "test_thread")
@@ -2224,7 +2347,7 @@ class CreateCommentTest(
         cs_request = httpretty.last_request()
         assert urlparse(cs_request.path).path == '/api/v1/comments/test_comment/abuse_flag'  # lint-amnesty, pylint: disable=no-member
         assert cs_request.method == 'PUT'
-        assert cs_request.parsed_body == {'user_id': [str(self.user.id)]}  # lint-amnesty, pylint: disable=no-member
+        assert parsed_body(cs_request) == {'user_id': [str(self.user.id)]}
 
     def test_thread_id_missing(self):
         with pytest.raises(ValidationError) as assertion:
@@ -2238,7 +2361,7 @@ class CreateCommentTest(
 
     def test_nonexistent_course(self):
         self.register_get_thread_response(
-            make_minimal_cs_thread({"id": "test_thread", "course_id": "non/existent/course"})
+            make_minimal_cs_thread({"id": "test_thread", "course_id": "course-v1:non+existent+course"})
         )
         with pytest.raises(CourseNotFoundError):
             create_comment(self.request, self.minimal_data)
@@ -2378,7 +2501,7 @@ class UpdateThreadTest(
             'read': True,
             'title': 'Original Title'
         })
-        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+        assert parsed_body(httpretty.last_request()) == {
             'course_id': [str(self.course.id)],
             'commentable_id': ['original_topic'],
             'thread_type': ['discussion'],
@@ -2398,7 +2521,7 @@ class UpdateThreadTest(
             update_thread(self.request, "test_thread", {})
 
     def test_nonexistent_course(self):
-        self.register_thread({"course_id": "non/existent/course"})
+        self.register_thread({"course_id": "course-v1:non+existent+course"})
         with pytest.raises(CourseNotFoundError):
             update_thread(self.request, "test_thread", {})
 
@@ -2494,7 +2617,7 @@ class UpdateThreadTest(
             assert last_request_path == subscription_url
             assert httpretty.last_request().method == ('POST' if new_following else 'DELETE')
             request_data = (
-                httpretty.last_request().parsed_body if new_following else  # lint-amnesty, pylint: disable=no-member
+                parsed_body(httpretty.last_request()) if new_following else
                 parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
             )
             request_data.pop("request_id", None)
@@ -2528,7 +2651,7 @@ class UpdateThreadTest(
             assert last_request_path == votes_url
             assert httpretty.last_request().method == ('PUT' if new_vote_status else 'DELETE')
             actual_request_data = (
-                httpretty.last_request().parsed_body if new_vote_status else  # lint-amnesty, pylint: disable=no-member
+                parsed_body(httpretty.last_request()) if new_vote_status else
                 parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
             )
             actual_request_data.pop("request_id", None)
@@ -2649,7 +2772,7 @@ class UpdateThreadTest(
         else:
             assert last_request_path == (flag_url if new_flagged else unflag_url)
             assert httpretty.last_request().method == 'PUT'
-            assert httpretty.last_request().parsed_body == {'user_id': [str(self.user.id)]}  # lint-amnesty, pylint: disable=no-member
+            assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
 
     def test_invalid_field(self):
         self.register_thread()
@@ -2670,7 +2793,6 @@ class UpdateCommentTest(
         MockSignalHandlerMixin
 ):
     """Tests for update_comment"""
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -2758,7 +2880,7 @@ class UpdateCommentTest(
             "can_delete": True,
         }
         assert actual == expected
-        assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
+        assert parsed_body(httpretty.last_request()) == {
             'body': ['Edited body'],
             'course_id': [str(self.course.id)],
             'user_id': [str(self.user.id)],
@@ -2773,7 +2895,7 @@ class UpdateCommentTest(
             update_comment(self.request, "test_comment", {})
 
     def test_nonexistent_course(self):
-        self.register_comment(thread_overrides={"course_id": "non/existent/course"})
+        self.register_comment(thread_overrides={"course_id": "course-v1:non+existent+course"})
         with pytest.raises(CourseNotFoundError):
             update_comment(self.request, "test_comment", {})
 
@@ -2917,7 +3039,7 @@ class UpdateCommentTest(
             assert last_request_path == votes_url
             assert httpretty.last_request().method == ('PUT' if new_vote_status else 'DELETE')
             actual_request_data = (
-                httpretty.last_request().parsed_body if new_vote_status else  # lint-amnesty, pylint: disable=no-member
+                parsed_body(httpretty.last_request()) if new_vote_status else
                 parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
             )
             actual_request_data.pop("request_id", None)
@@ -3038,7 +3160,7 @@ class UpdateCommentTest(
         else:
             assert last_request_path == (flag_url if new_flagged else unflag_url)
             assert httpretty.last_request().method == 'PUT'
-            assert httpretty.last_request().parsed_body == {'user_id': [str(self.user.id)]}  # lint-amnesty, pylint: disable=no-member
+            assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
 
 
 @ddt.ddt
@@ -3099,7 +3221,7 @@ class DeleteThreadTest(
             delete_thread(self.request, "missing_thread")
 
     def test_nonexistent_course(self):
-        self.register_thread({"course_id": "non/existent/course"})
+        self.register_thread({"course_id": "course-v1:non+existent+course"})
         with pytest.raises(CourseNotFoundError):
             delete_thread(self.request, self.thread_id)
 
@@ -3242,7 +3364,7 @@ class DeleteCommentTest(
 
     def test_nonexistent_course(self):
         self.register_comment_and_thread(
-            thread_overrides={"course_id": "non/existent/course"}
+            thread_overrides={"course_id": "course-v1:non+existent+course"}
         )
         with pytest.raises(CourseNotFoundError):
             delete_comment(self.request, self.comment_id)
@@ -3447,3 +3569,169 @@ class RetrieveThreadTest(
             assert not expected_error
         except ThreadNotFoundError:
             assert expected_error
+
+
+@mock.patch('lms.djangoapps.discussion.rest_api.api._get_course', mock.Mock())
+class CourseTopicsV2Test(ModuleStoreTestCase):
+    """
+    Tests for discussions topic API v2 code.
+    """
+    def setUp(self) -> None:
+        super().setUp()
+        self.course = CourseFactory.create(
+            discussion_topics={f"Course Wide Topic {idx}": {"id": f'course-wide-topic-{idx}'} for idx in range(10)}
+        )
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location,
+            category='chapter',
+            display_name="Week 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        self.sequential = ItemFactory.create(
+            parent_location=self.chapter.location,
+            category='sequential',
+            display_name="Lesson 1",
+            start=datetime(2015, 3, 1, tzinfo=UTC),
+        )
+        self.verticals = [
+            ItemFactory.create(
+                parent_location=self.sequential.location,
+                category='vertical',
+                display_name=f'vertical-{idx}',
+                start=datetime(2015, 4, 1, tzinfo=UTC),
+            )
+            for idx in range(10)
+        ]
+        staff_only_unit = ItemFactory.create(
+            parent_location=self.sequential.location,
+            category='vertical',
+            display_name='staff-vertical-1',
+            metadata=dict(visible_to_staff_only=True),
+        )
+        self.course_key = course_key = self.course.id
+        self.config = DiscussionsConfiguration.objects.create(context_key=course_key, provider_type=Provider.OPEN_EDX)
+        topic_links = []
+        update_discussions_settings_from_course_task(str(self.course_key))
+        self.staff_only_id = DiscussionTopicLink.objects.filter(
+            usage_key__in=[staff_only_unit.location]
+        ).values_list(
+            'external_id', flat=True,
+        ).get()
+        topic_id_query = DiscussionTopicLink.objects.filter(context_key=course_key).values_list(
+            'external_id', flat=True,
+        )
+        topic_ids = list(topic_id_query.order_by('ordering'))
+        topic_ids.remove(self.staff_only_id)
+        topic_ids_by_name = list(topic_id_query.order_by('title'))
+        topic_ids_by_name.remove(self.staff_only_id)
+        deleted_topic_ids = [f'disabled-topic-{idx}' for idx in range(10)]
+        for idx, topic_id in enumerate(deleted_topic_ids):
+            usage_key = course_key.make_usage_key('vertical', topic_id)
+            topic_links.append(
+                DiscussionTopicLink(
+                    context_key=course_key,
+                    usage_key=usage_key,
+                    title=f"Discussion on {topic_id}",
+                    external_id=topic_id,
+                    provider_id=Provider.OPEN_EDX,
+                    ordering=idx,
+                    enabled_in_context=False
+                )
+            )
+        DiscussionTopicLink.objects.bulk_create(topic_links)
+        self.topic_ids = topic_ids
+        self.topic_ids_by_name = topic_ids_by_name
+        self.user = UserFactory.create()
+        self.staff = AdminFactory.create()
+        self.topic_stats = {
+            topic_id: dict(discussion=random.randint(0, 10), question=random.randint(0, 10))
+            for topic_id in self.topic_ids
+        }
+        patcher = mock.patch(
+            'lms.djangoapps.discussion.rest_api.api.get_course_commentable_counts',
+            mock.Mock(return_value=self.topic_stats),
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_default_response(self):
+        """
+        Test that the standard response contains the correct number of items
+        """
+        topics_list = get_course_topics_v2(course_key=self.course_key, user=self.user)
+        assert len(topics_list) == len(self.topic_ids)
+
+    def test_staff_response(self):
+        """
+        Test that the standard response contains the correct number of items
+        """
+        topics_list = get_course_topics_v2(course_key=self.course_key, user=self.staff)
+        assert len(topics_list) == len(self.topic_ids) + 1
+        assert any(topic_data.get('id') == self.staff_only_id for topic_data in topics_list)
+
+    def test_filtering(self):
+        """
+        Tests that filtering by topic id works
+        """
+        filter_ids = set(random.sample(self.topic_ids, 4))
+        topics_list = get_course_topics_v2(course_key=self.course_key, user=self.user, topic_ids=filter_ids)
+        assert len(topics_list) == 4
+        # All the filtered ids should be returned
+        assert filter_ids == set(topic_data.get('id') for topic_data in topics_list)
+
+    def test_sort_by_name(self):
+        """
+        Test sorting by name
+        """
+        topics_list = get_course_topics_v2(
+            course_key=self.course_key,
+            user=self.user,
+            order_by=TopicOrdering.NAME,
+        )
+        returned_topic_ids = [topic_data.get('id') for topic_data in topics_list]
+        assert returned_topic_ids == self.topic_ids_by_name
+
+    def test_sort_by_structure(self):
+        """
+        Test sorting by course structure
+        """
+        topics_list = get_course_topics_v2(
+            course_key=self.course_key,
+            user=self.user,
+            order_by=TopicOrdering.COURSE_STRUCTURE,
+        )
+        returned_topic_ids = [topic_data.get('id') for topic_data in topics_list]
+        # The topics are already sorted in their simulated course order
+        sorted_topic_ids = self.topic_ids
+        assert returned_topic_ids == sorted_topic_ids
+
+    def test_sort_by_activity(self):
+        """
+        Test sorting by activity
+        """
+        topics_list = get_course_topics_v2(
+            course_key=self.course_key,
+            user=self.user,
+            order_by=TopicOrdering.ACTIVITY,
+        )
+        returned_topic_ids = [topic_data.get('id') for topic_data in topics_list]
+        # The topics are already sorted in their simulated course order
+        sorted_topic_ids = sorted(
+            self.topic_ids,
+            key=lambda tid: sum(self.topic_stats.get(tid, {}).values()),
+            reverse=True,
+        )
+        assert returned_topic_ids == sorted_topic_ids
+
+    def test_other_providers_ordering_error(self):
+        """
+        Test that activity sorting raises an error for other providers
+        """
+        self.config.provider_type = 'other'
+        self.config.save()
+        with pytest.raises(ValidationError):
+            get_course_topics_v2(
+                course_key=self.course_key,
+                user=self.user,
+                order_by=TopicOrdering.ACTIVITY,
+            )

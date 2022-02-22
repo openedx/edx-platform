@@ -9,6 +9,7 @@ from unittest.mock import MagicMock
 
 import ddt
 from django.conf import settings
+from lxml import etree
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.tests.testutil import TestCase
@@ -17,6 +18,7 @@ from common.djangoapps.third_party_auth.utils import (
     get_user_from_email,
     is_enterprise_customer_user,
     is_oauth_provider,
+    parse_metadata_xml,
     user_exists,
     convert_saml_slug_provider_id,
 )
@@ -32,6 +34,7 @@ class TestUtils(TestCase):
     """
     Test the utility functions.
     """
+
     def test_user_exists(self):
         """
         Verify that user_exists function returns correct response.
@@ -128,3 +131,54 @@ class TestUtils(TestCase):
             else:
                 self.assertIsNone(association_response)
                 self.assertFalse(user_is_active_resonse)
+
+    def test_parse_metadata_uses_signing_cert(self):
+        entity_id = 'http://testid'
+        parser = etree.XMLParser(remove_comments=True)
+        xml_text = '''<?xml version="1.0"?>
+            <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="http://testid">
+                <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                    <md:KeyDescriptor use="signing">
+                        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                            <ds:X509Data>
+                            <ds:X509Certificate>abc+hkIuUktxkg=</ds:X509Certificate>
+                            </ds:X509Data>
+                        </ds:KeyInfo>
+                    </md:KeyDescriptor>
+                    <md:KeyDescriptor use="encryption">
+                        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                            <ds:X509Data>
+                            <ds:X509Certificate>blachabc+hkIuUktxkg=blaal;skdjf;ksd</ds:X509Certificate>
+                            </ds:X509Data>
+                        </ds:KeyInfo>
+                    </md:KeyDescriptor>
+                    <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp/SSOService.php"/>
+                </md:IDPSSODescriptor>
+            </md:EntityDescriptor>
+        '''
+        xml = etree.fromstring(xml_text, parser)
+        public_key, sso_url, _ = parse_metadata_xml(xml, entity_id)
+        assert public_key == 'abc+hkIuUktxkg='
+        assert sso_url == 'https://idp/SSOService.php'
+
+    def test_parse_metadata_with_use_attribute_missing(self):
+        entity_id = 'http://testid'
+        parser = etree.XMLParser(remove_comments=True)
+        xml_text = '''<?xml version="1.0"?>
+            <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="http://testid">
+                <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                    <md:KeyDescriptor>
+                        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                            <ds:X509Data>
+                            <ds:X509Certificate>abc+hkIuUktxkg=</ds:X509Certificate>
+                            </ds:X509Data>
+                        </ds:KeyInfo>
+                    </md:KeyDescriptor>
+                    <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp/SSOService.php"/>
+                </md:IDPSSODescriptor>
+            </md:EntityDescriptor>
+        '''
+        xml = etree.fromstring(xml_text, parser)
+        public_key, sso_url, _ = parse_metadata_xml(xml, entity_id)
+        assert public_key == 'abc+hkIuUktxkg='
+        assert sso_url == 'https://idp/SSOService.php'

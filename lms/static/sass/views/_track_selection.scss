@@ -12,6 +12,12 @@
         line-height: 1.8rem;
     }
 
+    .grid-single {
+        margin: auto;
+        width: 450px;
+        margin-bottom: 2rem;
+    }
+
     .track-selection-choice, .verified-note {
         margin: 0 1rem;
     }
@@ -269,10 +275,13 @@
         .choice-bullets {
             padding: 0 2rem 1rem 1rem;
         }
+        .grid-single {
+            width: 100%;
+        }
     }
 
     @media (min-width: map-get($grid-breakpoints, 'md')) {
-        .track-selection-options {
+        .grid-options {
             display: grid;
             grid-template-columns: 50% 50%;
         }

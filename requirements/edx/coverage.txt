@@ -4,13 +4,13 @@
 #
 #    make upgrade
 #
-coverage==6.1.2
+coverage==6.3.1
     # via -r requirements/edx/coverage.in
 diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/coverage.in
-inflect==5.3.0
+inflect==5.4.0
     # via jinja2-pluralize
 jinja2==3.0.3
     # via
@@ -22,5 +22,5 @@ markupsafe==2.0.1
     # via jinja2
 pluggy==1.0.0
     # via diff-cover
-pygments==2.10.0
+pygments==2.11.2
     # via diff-cover

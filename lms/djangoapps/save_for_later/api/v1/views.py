@@ -2,40 +2,35 @@
 Save for later views
 """
 
-
 import logging
 
 from django.conf import settings
 from django.utils.decorators import method_decorator
-from django.contrib.sites.models import Site
 from ratelimit.decorators import ratelimit
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
-from edx_ace import ace
-from edx_ace.recipient import Recipient
-from eventtracking import tracker
+from opaque_keys import InvalidKeyError
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.catalog.utils import get_programs
 
-from lms.djangoapps.save_for_later.message_types import SaveForLater
-from lms.djangoapps.save_for_later.models import SavedCourse
+from lms.djangoapps.save_for_later.helper import send_email
+from lms.djangoapps.save_for_later.models import SavedCourse, SavedProgram
 
 log = logging.getLogger(__name__)
 
-POST_EMAIL_KEY = 'post:email'
+POST_EMAIL_KEY = 'openedx.core.djangoapps.util.ratelimit.request_data_email'
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
-USER_SENT_EMAIL_SAVE_FOR_LATER = 'edx.bi.user.save.for.later.email.sent'
 
 
-class SaveForLaterApiView(APIView):
+class CourseSaveForLaterApiView(APIView):
     """
-    API VIEW
+    Save course API VIEW
     """
+
     @transaction.atomic
     @method_decorator(ratelimit(key=POST_EMAIL_KEY, rate=settings.SAVE_FOR_LATER_EMAIL_RATE_LIMIT, method='POST'))
     @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.SAVE_FOR_LATER_IP_RATE_LIMIT, method='POST'))
@@ -45,17 +40,20 @@ class SaveForLaterApiView(APIView):
 
             * Send favorite course through email to user for later learning.
 
-        **Example Request**
+        **Example Request for course**
 
             POST /api/v1/save/course/
 
-        **Example POST Request**
+        **Example POST Request for course**
 
             {
                 "email": "test@edx.org",
                 "course_id": "course-v1:edX+DemoX+2021",
                 "marketing_url": "https://test.com",
-                "org_img_url": "https://test.com/logo.png"
+                "org_img_url": "https://test.com/logo.png",
+                "weeks_to_complete": 7,
+                "min_effort": 4,
+                "max_effort": 5,
 
             }
         """
@@ -63,10 +61,6 @@ class SaveForLaterApiView(APIView):
         data = request.data
         course_id = data.get('course_id')
         email = data.get('email')
-        marketing_url = data.get('marketing_url')
-        org_img_url = data.get('org_img_url')
-
-        course_key = CourseKey.from_string(course_id)
 
         if getattr(request, 'limited', False):
             return Response({'error_code': 'rate-limited'}, status=403)
@@ -75,47 +69,81 @@ class SaveForLaterApiView(APIView):
             return Response({'error_code': 'incorrect-email'}, status=400)
 
         try:
-            course_overview = CourseOverview.get_from_id(course_key)
-            SavedCourse.objects.update_or_create(
-                user_id=user.id,
-                email=email,
-                course_id=course_id,
-            )
+            course_key = CourseKey.from_string(course_id)
+            course = CourseOverview.get_from_id(course_key)
+        except InvalidKeyError:
+            return Response({'error_code': 'invalid-course-key'}, status=400)
         except CourseOverview.DoesNotExist:
             return Response({'error_code': 'course-not-found'}, status=404)
 
-        site = Site.objects.get_current()
-        message_context = get_base_template_context(site)
-        message_context.update({
-            'course_image_url': course_overview.course_image_url,
-            'partner_image_url': org_img_url,
-            'enroll_course_url': '/register?course_id={course_key}&enrollment_action=enroll&email_opt_in=false&'
-                                 'save_for_later=true'.format(course_key=course_key),
-            'view_course_url': marketing_url + '?save_for_later=true' if marketing_url else '#',
-            'course_key': course_key,
-            'display_name': course_overview.display_name,
-            'short_description': course_overview.short_description,
-            'lms_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
-            'from_address': configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-        })
-
-        msg = SaveForLater().personalize(
-            recipient=Recipient(lms_user_id=0, email_address=email),
-            language=settings.LANGUAGE_CODE,
-            user_context=message_context,
+        SavedCourse.objects.update_or_create(
+            user_id=user.id,
+            email=email,
+            course_id=course_id,
         )
-        try:
-            ace.send(msg)
-            tracker.emit(
-                USER_SENT_EMAIL_SAVE_FOR_LATER,
-                {
-                    'user_id': user.id,
-                    'category': 'save-for-later',
-                    'type': 'course' if course_id else 'program'
-                }
-            )
-        except Exception:  # pylint: disable=broad-except
-            log.warning('Unable to send save for later email ', exc_info=True)
-            return Response({'error_code': 'email-not-send'}, status=400)
-        else:
+        course_data = {
+            'course': course,
+            'type': 'course',
+        }
+        if send_email(request, email, course_data):
             return Response({'result': 'success'}, status=200)
+        else:
+            return Response({'error_code': 'email-not-send'}, status=400)
+
+
+class ProgramSaveForLaterApiView(APIView):
+    """
+    API VIEW
+    """
+
+    @transaction.atomic
+    @method_decorator(ratelimit(key=POST_EMAIL_KEY, rate=settings.SAVE_FOR_LATER_EMAIL_RATE_LIMIT, method='POST'))
+    @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.SAVE_FOR_LATER_IP_RATE_LIMIT, method='POST'))
+    def post(self, request):
+        """
+        **Use Case**
+
+            * Send favorite program through email to user for later learning.
+
+        **Example Request for program**
+
+            POST /api/v1/save/program/
+
+        **Example POST Request for program**
+
+            {
+                "email": "test@edx.org",
+                "program_uuid": "587f6abe-bfa4-4125-9fbe-4789bf3f97f1"
+            }
+        """
+        user = request.user
+        data = request.data
+        program_uuid = data.get('program_uuid')
+        email = data.get('email')
+
+        if getattr(request, 'limited', False):
+            return Response({'error_code': 'rate-limited'}, status=403)
+
+        if get_email_validation_error(email):
+            return Response({'error_code': 'incorrect-email'}, status=400)
+
+        if not program_uuid:
+            return Response({'error_code': 'program-uuid-missing'}, status=400)
+
+        program = get_programs(uuid=program_uuid)
+        SavedProgram.objects.update_or_create(
+            user_id=user.id,
+            email=email,
+            program_uuid=program_uuid,
+        )
+        if program:
+            program_data = {
+                'program': program,
+                'type': 'program',
+            }
+            if send_email(request, email, program_data):
+                return Response({'result': 'success'}, status=200)
+            else:
+                return Response({'error_code': 'email-not-send'}, status=400)
+
+        return Response({'error_code': 'program-not-found'}, status=404)

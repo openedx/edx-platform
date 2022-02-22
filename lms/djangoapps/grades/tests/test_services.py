@@ -14,8 +14,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from lms.djangoapps.grades.services import GradesService
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..config.waffle import REJECTED_EXAM_OVERRIDES_GRADE
 from ..constants import ScoreDatabaseTableEnum
@@ -43,10 +43,10 @@ class GradesServiceTests(ModuleStoreTestCase):
         super().setUp()
         self.service = GradesService()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
-        self.subsection = ItemFactory.create(parent=self.course, category="subsection", display_name="Subsection")
+        self.subsection = ItemFactory.create(parent=self.course, category="sequential", display_name="Subsection")
         self.subsection_without_grade = ItemFactory.create(
             parent=self.course,
-            category="subsection",
+            category="sequential",
             display_name="Subsection without grade"
         )
         self.user = UserFactory()

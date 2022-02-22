@@ -102,6 +102,9 @@ class ProgressTabView(RetrieveAPIView):
                 learner_has_access: (bool) whether the learner has access to the subsection (could be FBE gated)
                 num_points_earned: (int) the amount of points the user has earned for the given subsection
                 num_points_possible: (int) the total amount of points possible for the given subsection
+                override: Optional object if grade has been overridden by proctor or grading change
+                    system: (str) either GRADING or PROCTORING
+                    reason: (str) a comment on the grading override
                 percent_graded: (float) the percentage of total points the user has received a grade for in a given
                                 subsection
                 problem_scores: List of objects that represent individual problem scores with the following fields:

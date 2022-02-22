@@ -866,7 +866,7 @@ FEATURES = {
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/24908'
     # .. toggle_warnings: Also set settings.AUTHN_MICROFRONTEND_URL for rollout. This temporary feature
     #   toggle does not have a target removal date.
-    'ENABLE_AUTHN_MICROFRONTEND': False,
+    'ENABLE_AUTHN_MICROFRONTEND': os.environ.get("EDXAPP_ENABLE_AUTHN_MFE", False),
 
     ### ORA Feature Flags ###
     # .. toggle_name: FEATURES['ENABLE_ORA_ALL_FILE_URLS']
@@ -948,6 +948,18 @@ FEATURES = {
     # .. toggle_target_removal_date: 2021-10-01
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
     'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
+
+    # .. toggle_name: FEATURES['ENABLE_INTEGRITY_SIGNATURE']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Whether to replace ID verification course/certificate requirement
+    # with an in-course Honor Code agreement
+    # (https://github.com/edx/edx-name-affirmation)
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2022-02-15
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
+    'ENABLE_INTEGRITY_SIGNATURE': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -1453,12 +1465,10 @@ COURSE_LISTINGS = {}
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-# pylint: disable=wrong-import-position
-from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
-from xmodule.x_module import XModuleMixin
-# pylint: enable=wrong-import-position
+from xmodule.modulestore.edit_info import EditInfoMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore.inheritance import InheritanceMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore import prefer_xmodules  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
@@ -1850,7 +1860,9 @@ STATICI18N_OUTPUT_DIR = "js/i18n"
 
 # Localization strings (e.g. django.po) are under these directories
 def _make_locale_paths(settings):  # pylint: disable=missing-function-docstring
-    locale_paths = [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/
+    locale_paths = list(settings.PREPEND_LOCALE_PATHS)
+    locale_paths += [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/
+
     if settings.ENABLE_COMPREHENSIVE_THEMING:
         # Add locale paths to settings for comprehensive theming.
         for locale_path in settings.COMPREHENSIVE_THEME_LOCALE_PATHS:
@@ -2008,10 +2020,10 @@ FOOTER_OPENEDX_URL = "https://open.edx.org"
 # We use logo images served from files.edx.org so we can (roughly) track
 # how many OpenEdX installations are running.
 # Site operators can choose from these logo options:
-# * https://files.edx.org/openedx-logos/open-edx-logo-tag.png
-# * https://files.edx.org/openedx-logos/open-edx-logo-tag-light.png"
-# * https://files.edx.org/openedx-logos/open-edx-logo-tag-dark.png
-FOOTER_OPENEDX_LOGO_IMAGE = "https://files.edx.org/openedx-logos/open-edx-logo-tag.png"
+# * https://logos.openedx.org/open-edx-logo-tag.png
+# * https://logos.openedx.org/open-edx-logo-tag-light.png"
+# * https://logos.openedx.org/open-edx-logo-tag-dark.png
+FOOTER_OPENEDX_LOGO_IMAGE = "https://logos.openedx.org/open-edx-logo-tag.png"
 
 # This is just a placeholder image.
 # Site operators can customize this with their organization's image.
@@ -3199,7 +3211,10 @@ INSTALLED_APPS = [
     'edx_ace',
 
     # For save for later
-    'lms.djangoapps.save_for_later'
+    'lms.djangoapps.save_for_later',
+
+    # TODO (EventBus): Make Kafka/event-bus optional
+    'openedx.core.djangoapps.kafka_consumer',
 ]
 
 ######################### CSRF #########################################
@@ -3230,11 +3245,26 @@ REST_FRAMEWORK = {
     },
 }
 
+# .. setting_name: REGISTRATION_VALIDATION_RATELIMIT
+# .. setting_default: 30/7d
+# .. setting_description: Whenver a user tries to register on edx, the data entered during registration
+#    is validated via RegistrationValidationView.
+#    It's POST endpoint is rate-limited up to 30 requests per IP Address in a week by default.
+#    It was introduced because an attacker can guess or brute force a series of names to enumerate valid users.
+# .. setting_tickets: https://github.com/edx/edx-platform/pull/24664
 REGISTRATION_VALIDATION_RATELIMIT = '30/7d'
+
+# .. setting_name: REGISTRATION_RATELIMIT
+# .. setting_default: 60/7d
+# .. setting_description: New users are registered on edx via RegistrationView.
+#    It's POST end-point is rate-limited up to 60 requests per IP Address in a week by default.
+#    Purpose of this setting is to restrict an attacker from registering numerous fake accounts.
+# .. setting_tickets: https://github.com/edx/edx-platform/pull/27060
 REGISTRATION_RATELIMIT = '60/7d'
 
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
+    'DEEP_LINKING': True,
 }
 
 # How long to cache OpenAPI schemas and UI, in seconds.
@@ -3882,6 +3912,7 @@ OPTIONAL_APPS = [
     ('openassessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.assessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.fileupload', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment.staffgrader', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.workflow', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.xblock', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
@@ -3992,6 +4023,21 @@ SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSea
 SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
 # Override to skip enrollment start date filtering in course search
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = False
+# .. toggle_name: SEARCH_SKIP_INVITATION_ONLY_FILTERING
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: If enabled, invitation-only courses will appear in search results.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-08-27
+SEARCH_SKIP_INVITATION_ONLY_FILTERING = True
+# .. toggle_name: SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: If enabled, courses with a catalog_visibility set to "none" will still
+#    appear in search results.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-08-27
+SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING = True
 
 # The configuration visibility of account fields.
 ACCOUNT_VISIBILITY_CONFIGURATION = {
@@ -4036,6 +4082,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
         "email",
         "id",
+        "verified_name",
         "extended_profile",
         "gender",
         "state",
@@ -4332,6 +4379,13 @@ COMPREHENSIVE_THEME_DIRS = []
 #   "COMPREHENSIVE_THEME_LOCALE_PATHS" : ["/edx/src/edx-themes/conf/locale"].
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
 
+
+# .. setting_name: PREPEND_LOCALE_PATHS
+# .. setting_default: []
+# .. setting_description: A list of the paths to locale directories to load first e.g.
+#   "PREPEND_LOCALE_PATHS" : ["/edx/my-locales/"].
+PREPEND_LOCALE_PATHS = []
+
 # .. setting_name: DEFAULT_SITE_THEME
 # .. setting_default: None
 # .. setting_description: Theme to use when no site or site theme is defined, for example
@@ -4552,7 +4606,26 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 COMPLETION_BY_VIEWING_DELAY_MS = 5000
 
 ############### Settings for Django Rate limit #####################
+
+# .. toggle_name: RATELIMIT_ENABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: When enabled, RATELIMIT_RATE is applied.
+#    When disabled, RATELIMIT_RATE is not applied.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2018-01-08
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/16951
 RATELIMIT_ENABLE = True
+
+# .. setting_name: RATELIMIT_RATE
+# .. setting_default: 120/m
+# .. setting_description: Due to some reports about attack on /oauth2/access_token/ which took LMS down,
+#    this setting was introduced to rate-limit all endpoints of AccessTokenView up to
+#    120 requests per IP Address in a minute by default.
+# .. setting_warning: RATELIMIT_ENABLE flag must also be enabled/set to True to use this RATELIMIT_RATE setting.
+# .. setting_use_cases: open_edx
+# .. setting_creation_date: 2018-01-08
+# .. setting_tickets: https://github.com/edx/edx-platform/pull/16951
 RATELIMIT_RATE = '120/m'
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
@@ -4569,7 +4642,10 @@ PASSWORD_RESET_EMAIL_RATE = '2/h'
 
 #### SAVE FOR LATER EMAIL RATE LIMIT SETTINGS ####
 SAVE_FOR_LATER_IP_RATE_LIMIT = '100/d'
-SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'
+SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/h'
+
+EDX_BRAZE_API_KEY = None
+EDX_BRAZE_API_SERVER = None
 
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
@@ -4694,13 +4770,23 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 # .. setting_name: LEARNING_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based courseware page.
-# .. setting_warning: Also set site's courseware.courseware_mfe waffle flag.
 LEARNING_MICROFRONTEND_URL = None
+# .. setting_name: ORA_GRADING_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based openassessment grading page.
+#     This is will be show in the open response tab list data.
+# .. setting_warning: Also set site's openresponseassessment.enhanced_staff_grader
+#     waffle flag.
+ORA_GRADING_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based discussions page.
 # .. setting_warning: Also set site's courseware.discussions_mfe waffle flag.
 DISCUSSIONS_MICROFRONTEND_URL = None
+# .. setting_name: DISCUSSIONS_MFE_FEEDBACK_URL = None
+# .. setting_default: None
+# .. setting_description: Base URL of the discussions micro-frontend google form based feedback.
+DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -4856,10 +4942,6 @@ SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/27661
 # .. toggle_creation_date: 2021-06-10
 SHOW_ACCOUNT_ACTIVATION_CTA = False
-
-################# Settings for Chrome-specific origin trials ########
-# Token for " Disable Different Origin Subframe Dialog Suppression" for http://localhost:18000
-CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = 'ArNBN7d1AkvMhJTGWXlJ8td/AN4lOokzOnqKRNkTnLqaqx0HpfYvmx8JePPs/emKh6O5fckx14LeZIGJ1AQYjgAAAABzeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjE4MDAwIiwiZmVhdHVyZSI6IkRpc2FibGVEaWZmZXJlbnRPcmlnaW5TdWJmcmFtZURpYWxvZ1N1cHByZXNzaW9uIiwiZXhwaXJ5IjoxNjM5NTI2Mzk5fQ=='  # pylint: disable=line-too-long
 
 ################# Documentation links for course apps #################
 

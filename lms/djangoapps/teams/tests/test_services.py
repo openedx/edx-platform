@@ -7,7 +7,7 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from lms.djangoapps.teams.services import TeamsService
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TeamsServiceTests(ModuleStoreTestCase):
@@ -44,3 +44,28 @@ class TeamsServiceTests(ModuleStoreTestCase):
         split_url = team_detail_url.split('/')
         assert split_url[1:] ==\
                ['courses', str(self.course_run['key']), 'teams', '#teams', self.team.topic_id, self.team.team_id]
+
+    def test_get_team_names(self):
+        """
+        get_team_names will return a dict mapping the team id to the team name for all teams in the given teamset
+        """
+        additional_teams = [
+            CourseTeamFactory.create(course_id=self.course_key, topic_id=self.team.topic_id)
+            for _ in range(3)
+        ]
+
+        result = self.service.get_team_names(self.course_key, self.team.topic_id)
+
+        assert result == {
+            self.team.team_id: self.team.name,
+            additional_teams[0].team_id: additional_teams[0].name,
+            additional_teams[1].team_id: additional_teams[1].name,
+            additional_teams[2].team_id: additional_teams[2].name,
+        }
+
+    def test_get_team_names__none(self):
+        """ If there are no teams in the teamset, the function will return an empty list"""
+        course_run = CourseRunFactory.create()
+        course_key = course_run['key']
+        result = self.service.get_team_names(course_key, "some-topic-id")
+        assert result == {}

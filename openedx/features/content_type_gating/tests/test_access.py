@@ -3,6 +3,7 @@ Test audit user's access to various content based on content-gating features.
 """
 import os
 from datetime import datetime, timedelta
+from unittest.mock import patch, Mock
 
 import ddt
 from django.conf import settings
@@ -11,8 +12,13 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from unittest.mock import patch, Mock  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_toggles.toggles.testutils import override_waffle_flag
 from pyquery import PyQuery as pq
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -24,6 +30,7 @@ from common.djangoapps.student.tests.factories import OrgStaffFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.courseware.module_render import load_single_xblock
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -42,9 +49,6 @@ from openedx.features.content_type_gating.services import ContentTypeGatingServi
 from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
 
 METADATA = {
     'group_access': {
@@ -161,6 +165,7 @@ def _assert_block_is_empty(block, user_id, course, request_factory):
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
 ))
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pylint: disable=missing-class-docstring
 
     PROBLEM_TYPES = ['problem', 'openassessment', 'drag-and-drop-v2', 'done', 'edx_sga']
@@ -205,16 +210,19 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
         cls.graded_score_weight_blocks = {}
         for graded, has_score, weight, gated in cls.GRADED_SCORE_WEIGHT_TEST_CASES:
             case_name = ' Graded: ' + str(graded) + ' Has Score: ' + str(has_score) + ' Weight: ' + str(weight)
-            block = ItemFactory.create(
-                parent=cls.blocks_dict['vertical'],
+            block_args = {
+                'parent': cls.blocks_dict['vertical'],
                 # has_score is determined by XBlock type. It is not a value set on an instance of an XBlock.
                 # Therefore, we create a problem component when has_score is True
                 # and an html component when has_score is False.
-                category='problem' if has_score else 'html',
-                graded=graded,
-                weight=weight,
-                metadata=METADATA if (graded and has_score and weight) else {},
-            )
+                'category': 'problem' if has_score else 'html',
+                'graded': graded,
+            }
+            if has_score:
+                block_args['weight'] = weight
+            if graded and has_score and weight:
+                block_args['metadata'] = METADATA
+            block = ItemFactory.create(**block_args)
             # Intersperse HTML so that the content-gating renders in all blocks
             ItemFactory.create(
                 parent=cls.blocks_dict['vertical'],
@@ -227,7 +235,6 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
         metadata_lti_xblock = {
             'lti_id': 'correct_lti_id',
             'launch_url': 'http://{}:{}/{}'.format(host, '8765', 'correct_lti_endpoint'),
-            'open_in_a_new_page': False
         }
 
         scored_lti_metadata = {}
@@ -778,6 +785,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
 ))
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class TestConditionalContentAccess(TestConditionalContent):
     """
     Conditional Content allows course authors to run a/b tests on course content.  We want to make sure that
@@ -878,6 +886,7 @@ class TestConditionalContentAccess(TestConditionalContent):
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
 ))
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class TestMessageDeduplication(ModuleStoreTestCase):
     """
     Tests to verify that access denied messages isn't shown if multiple items in a row are denied.
@@ -1099,6 +1108,7 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
     to check whether a sequence contains content type gated blocks
     The content_type_gate_for_block can be used to return the content type gate for a given block
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         super().setUp()

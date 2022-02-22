@@ -48,12 +48,14 @@ import pytz
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from xblock.plugin import Plugin
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 import lms.djangoapps.lms_xblock.runtime
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 
 
 class XBlockEventTestMixin:
@@ -240,7 +242,7 @@ class XBlockScenarioTestCaseMixin:
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             for chapter_config in cls.test_configuration:
                 chapter = ItemFactory.create(
-                    parent=cls.course,
+                    parent_location=cls.course.location,
                     display_name="ch_" + chapter_config['urlname'],
                     category='chapter'
                 )
@@ -335,6 +337,7 @@ class XBlockStudentTestCaseMixin:
         self.login(email, password)
 
 
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class XBlockTestCase(XBlockStudentTestCaseMixin,
                      XBlockScenarioTestCaseMixin,
                      XBlockEventTestMixin,

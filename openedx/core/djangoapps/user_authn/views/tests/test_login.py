@@ -18,10 +18,10 @@ from django.http import HttpResponse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
-from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from edx_toggles.toggles.testutils import override_waffle_switch
 from freezegun import freeze_time
 from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
-from openedx_events.tests.utils import OpenEdxEventsTestMixin
+from openedx_events.tests.utils import OpenEdxEventsTestMixin  # lint-amnesty, pylint: disable=wrong-import-order
 
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
@@ -30,7 +30,6 @@ from openedx.core.djangoapps.password_policy.compliance import (
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
-from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from openedx.core.djangoapps.user_authn.views.login import (
     ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
     AllowedAuthUser,
@@ -192,7 +191,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     @ddt.unpack
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
     @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @skip_unless_lms
     def test_login_success_with_redirect(self, next_url, course_id, expected_redirect):
         post_params = {}
@@ -215,7 +213,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'ENABLE_AUTHN_MICROFRONTEND': True, 'ENABLE_ENTERPRISE_INTEGRATION': True})
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
     @patch('openedx.core.djangoapps.user_authn.views.login.reverse')
     @skip_unless_lms
@@ -265,7 +262,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     @ddt.data(('', True), ('/enterprise/select/active/?success_url=', False))
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'ENABLE_AUTHN_MICROFRONTEND': True, 'ENABLE_ENTERPRISE_INTEGRATION': True})
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
     @patch('openedx.core.djangoapps.user_authn.views.login.activate_learner_enterprise')
     @patch('openedx.core.djangoapps.user_authn.views.login.reverse')
@@ -1010,6 +1006,8 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
     def setUp(self):
         super().setUp()
         self.url = reverse("user_api_login_session", kwargs={'api_version': 'v1'})
+        self.url_v2 = reverse("user_api_login_session", kwargs={'api_version': 'v2'})
+        self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
 
     @ddt.data("get", "post")
     def test_auth_disabled(self, method):
@@ -1066,9 +1064,6 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
     @ddt.data(True, False)
     @patch('openedx.core.djangoapps.user_authn.views.login.segment')
     def test_login(self, include_analytics, mock_segment):
-        # Create a test user
-        user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
-
         data = {
             "email": self.EMAIL,
             "password": self.PASSWORD,
@@ -1091,7 +1086,7 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
         self.assertHttpOK(response)
 
         # Verify events are called
-        expected_user_id = user.id
+        expected_user_id = self.user.id
         mock_segment.identify.assert_called_once_with(
             expected_user_id,
             {'username': self.USERNAME, 'email': self.EMAIL},
@@ -1104,19 +1099,14 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
         )
 
     def test_login_with_username(self):
-        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         data = {
             "email_or_username": self.USERNAME,
             "password": self.PASSWORD,
         }
-        self.url = reverse("user_api_login_session", kwargs={'api_version': 'v2'})
-        response = self.client.post(self.url, data)
+        response = self.client.post(self.url_v2, data)
         self.assertHttpOK(response)
 
     def test_session_cookie_expiry(self):
-        # Create a test user
-        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
-
         # Login and remember me
         data = {
             "email": self.EMAIL,
@@ -1132,9 +1122,6 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
         assert expected_expiry.strftime('%d %b %Y') in cookie.get('expires').replace('-', ' ')
 
     def test_invalid_credentials(self):
-        # Create a test user
-        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
-
         # Invalid password
         response = self.client.post(self.url, {
             "email": self.EMAIL,
@@ -1149,21 +1136,22 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
         })
         self.assertHttpBadRequest(response)
 
-    def test_missing_login_params(self):
-        # Create a test user
-        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
-
+    @ddt.data(True, False)
+    def test_missing_login_params(self, is_api_v1):
+        email_field_name = "email" if is_api_v1 else "email_or_username"
+        url = self.url if is_api_v1 else self.url_v2
         # Missing password
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
+        response = self.client.post(url, {
+            email_field_name: self.EMAIL,
         })
         self.assertHttpBadRequest(response)
 
         # Missing email
-        response = self.client.post(self.url, {
+        response = self.client.post(url, {
             "password": self.PASSWORD,
         })
         self.assertHttpBadRequest(response)
 
         # Missing both email and password
-        response = self.client.post(self.url, {})
+        response = self.client.post(url, {})
+        self.assertHttpBadRequest(response)

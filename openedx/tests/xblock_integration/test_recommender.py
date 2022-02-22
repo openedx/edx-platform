@@ -14,14 +14,17 @@ import simplejson as json
 from ddt import data, ddt
 from django.conf import settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from openedx.core.lib.url_utils import quote_slashes
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that Recommender state is saved properly

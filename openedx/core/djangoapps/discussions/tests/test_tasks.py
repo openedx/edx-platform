@@ -4,10 +4,11 @@ Tests for discussions tasks.
 import ddt
 import mock
 
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
 from openedx.core.djangoapps.discussions.data import DiscussionTopicContext
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @ddt.ddt
@@ -16,6 +17,8 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
     """
     Tests for the discussions settings update tasks
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         super().setUp()
         self.course = course = CourseFactory.create()
@@ -105,7 +108,7 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
         assert config_data.course_key == self.course.id
         assert config_data.enable_graded_units is False
         assert config_data.unit_level_visibility is False
-        assert config_data.provider_type is None
+        assert config_data.provider_type is not None
         assert config_data.plugin_configuration == {}
         assert len(config_data.contexts) == 4
 
@@ -122,10 +125,12 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
         assert DiscussionTopicContext(
             title="General",
             external_id="general-topic",
+            ordering=0,
         ) in config_data.contexts
         assert DiscussionTopicContext(
             title="Test Topic",
             external_id="test-topic",
+            ordering=1,
         ) in config_data.contexts
 
     @ddt.data(

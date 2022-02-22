@@ -12,11 +12,14 @@ from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
 from waffle.testutils import override_switch
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -26,8 +29,6 @@ from common.djangoapps.student.tests.factories import AdminFactory
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..views import CourseDetailView, CourseListUserThrottle, LazyPageNumberPagination
 from .mixins import TEST_PASSWORD, CourseApiFactoryMixin
@@ -343,8 +344,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
             'org': org_code,
             'run': '2010',
             'number': 'DemoZ',
-            # Using the slash separated course ID bcuz `DemoCourse` isn't updated yet to new locator.
-            'id': f'{org_code}/DemoZ/2010',
+            'id': f'course-v1:{org_code}+DemoZ+2010',
             'content': {
                 'short_description': short_description,
             },
@@ -352,14 +352,13 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
 
         DemoCourse.index(self.searcher, [search_course])
 
-        org, course, run = search_course['id'].split('/')
+        key = CourseKey.from_string(search_course['id'])
 
         db_course = self.create_course(
             mobile_available=False,
-            org=org,
-            course=course,
-            run=run,
-            short_description=short_description,
+            org=key.org,
+            course=key.course,
+            run=key.run,
         )
 
         return db_course
@@ -495,7 +494,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'staff'
         })
         assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(self.course.org)
+        assert filtered_response.data['results'][0].startswith(f'course-v1:{self.course.org}+')
 
         # The course staff user does *not* have the course instructor role on any courses.
         filtered_response = self.verify_response(params={
@@ -510,7 +509,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'instructor'
         })
         assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(alternate_course1.org)
+        assert filtered_response.data['results'][0].startswith(f'course-v1:{alternate_course1.org}+')
 
         # The course instructor user has the inferred course staff role on one course.
         self.setup_user(course_instructor_user)
@@ -519,7 +518,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'staff'
         })
         assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(alternate_course1.org)
+        assert filtered_response.data['results'][0].startswith(f'course-v1:{alternate_course1.org}+')
 
         # The user with both instructor AND staff on a course has the inferred course staff role on that one course.
         self.setup_user(course_instructor_staff_user)
@@ -528,7 +527,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'staff'
         })
         assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(alternate_course2.org)
+        assert filtered_response.data['results'][0].startswith(f'course-v1:{alternate_course2.org}+')
 
     def test_no_libraries(self):
         """
@@ -550,7 +549,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'staff'
         })
         assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(self.course.org)
+        assert filtered_response.data['results'][0].startswith(f'course-v1:{self.course.org}+')
 
 
 class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring

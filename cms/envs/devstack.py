@@ -165,6 +165,9 @@ COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
 
+################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
+DISCUSSIONS_MFE_FEEDBACK_URL = None
+
 ################################# DJANGO-REQUIRE ###############################
 
 # Whether to run django-require in debug mode.

@@ -364,7 +364,7 @@
 
             if ((direction === 'next') && (this.position >= this.contents.length)) {
                 targetUrl = this.nextUrl;
-            } else if ((direction === 'previous') && (this.position === 1)) {
+            } else if ((direction === 'previous')) {
                 targetUrl = this.prevUrl;
             }
 
@@ -425,6 +425,8 @@
                     }
                 });
             }
+            // Reload progress bar
+            this.$('#progress-frame').attr('src', this.$('#progress-frame').attr('src'));
         };
 
         Sequence.prototype.mark_active = function(position) {

@@ -8,14 +8,17 @@ from copy import deepcopy
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
-
-from common.test.utils import XssTestMixin
-from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm
+from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from common.test.utils import XssTestMixin
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm
 
+
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTestMixin):
     """
     All tests for the views.py file

@@ -11,12 +11,12 @@ from fs.memoryfs import MemoryFS
 from fs.wrapfs import WrapFS
 
 from common.djangoapps.static_replace import replace_static_urls
-from xmodule.contentstore.content import StaticContent
-from xmodule.assetstore.assetmgr import AssetManager
-from xmodule.modulestore.django import modulestore as store
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.exceptions import NotFoundError
-from xmodule.xml_module import XmlParserMixin
+from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.assetstore.assetmgr import AssetManager  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore as store  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.xml_module import XmlParserMixin  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 

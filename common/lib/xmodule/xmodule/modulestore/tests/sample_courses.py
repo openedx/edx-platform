@@ -49,7 +49,7 @@ TOY_BLOCK_INFO_TREE = [
     BlockInfo(
         'Overview', "chapter", {"display_name": "Overview"}, [
             BlockInfo(
-                "Toy_Videos", "videosequence", {
+                "Toy_Videos", "sequential", {
                     "xml_attributes": {"filename": ["", None]}, "display_name": "Toy Videos", "format": "Lecture Sequence"  # lint-amnesty, pylint: disable=line-too-long
                 }, [
                     BlockInfo(

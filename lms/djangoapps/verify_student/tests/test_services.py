@@ -17,8 +17,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 FAKE_SETTINGS = {
     "DAYS_GOOD_FOR": 365,
@@ -130,7 +130,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
         course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         path = IDVerificationService.get_verify_location(course.id)
         expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
-        assert path == (expected_path + '?course_id=Robot/999/Test_Course')
+        assert path == (expected_path + '?course_id=course-v1%3ARobot%2B999%2BTest_Course')
 
     def test_get_verify_location_from_string(self):
         """

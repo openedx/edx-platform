@@ -1075,7 +1075,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'General': {
                         'sort_key': 'General',
                         'is_divided': False,
-                        'id': 'i4x-org-number-course-run'
+                        'id': 'course'
                     }
                 }
             },
@@ -1115,7 +1115,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'General': {
                         'sort_key': 'General',
                         'is_divided': False,
-                        'id': 'i4x-org-number-course-run'
+                        'id': 'course'
                     }
                 }
             },
@@ -1152,7 +1152,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'General': {
                         'sort_key': 'General',
                         'is_divided': False,
-                        'id': 'i4x-org-number-course-run'
+                        'id': 'course'
                     }
                 }
             },
@@ -1186,7 +1186,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'General': {
                         'sort_key': 'General',
                         'is_divided': False,
-                        'id': 'i4x-org-number-course-run'
+                        'id': 'course'
                     }
                 }
             },
@@ -1233,20 +1233,6 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
 
         with self.settings(FEATURES={'CUSTOM_COURSES_EDX': True}):
             assert not self.discussion_tab_present(self.enrolled_user)
-
-    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
-    @ddt.data(
-        (True, 'http://test.url/discussions/{}/'),
-        (False, '/courses/{}/discussion/forum/'),
-    )
-    @ddt.unpack
-    def test_tab_with_mfe_flag(self, mfe_enabled, tab_link):
-        """
-        Tests that the correct link is used for the MFE tab
-        """
-        discussion_tab = CourseTabList.get_tab_by_type(self.course.tabs, 'discussion')
-        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, mfe_enabled):
-            assert discussion_tab.link_func(self.course, reverse) == tab_link.format(self.course.id)
 
 
 class IsCommentableDividedTestCase(ModuleStoreTestCase):

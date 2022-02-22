@@ -10,6 +10,10 @@ from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import UTC
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.data import CertificatesDisplayBehaviors
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -19,10 +23,6 @@ from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory,
     LinkedInAddToProfileConfigurationFactory
 )
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.data import CertificatesDisplayBehaviors
 
 # pylint: disable=no-member
 
@@ -33,6 +33,7 @@ FUTURE_DATE = datetime.datetime.now(UTC) + datetime.timedelta(days=2)
 class CertificateDisplayTestBase(SharedModuleStoreTestCase):
     """Tests display of certificates on the student dashboard. """
 
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     USERNAME = "test_user"
     PASSWORD = "password"
     DOWNLOAD_URL = "http://www.example.com/certificate.pdf"

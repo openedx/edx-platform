@@ -9,7 +9,7 @@ from importlib import import_module
 from unittest.mock import patch
 import pytest
 import ddt
-from operator import itemgetter
+from operator import itemgetter  # lint-amnesty, pylint: disable=wrong-import-order
 from django.conf import settings
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
@@ -28,6 +28,7 @@ from lms.djangoapps.courseware.masquerade import (
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
@@ -35,12 +36,13 @@ from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MasqueradeMixin):
     """
     Base class for masquerade tests that sets up a test course and enrolls a user in the course.
@@ -656,7 +658,7 @@ class SetupMasqueradeTests(SharedModuleStoreTestCase, ):
 
         # Warning: the SafeSessions middleware relies on the `real_user` attribute to see if a
         # user is masquerading as another user.  If the name of this attribute is changing, please update
-        # the check in SafeSessionMiddleware._verify_user as well.
+        # the check in SafeSessionMiddleware._verify_user_unchanged as well.
         assert masquerade_user.real_user == self.staff
         assert masquerade_user == self.student
         assert self.request.user.masquerade_settings == masquerade_settings

@@ -5,31 +5,40 @@ from __future__ import annotations
 
 import itertools
 from collections import defaultdict
-from typing import Dict, List, Literal, Optional, Set, Tuple
+from enum import Enum
+from typing import Dict, Iterable, List, Literal, Optional, Set, Tuple
 from urllib.parse import urlencode, urlunparse
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.urls import reverse
-from enum import Enum
+from edx_django_utils.monitoring import function_trace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
+from xmodule.course_module import CourseBlock
+from xmodule.modulestore.django import modulestore
+from xmodule.tabs import CourseTabList
 
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
-from openedx.core.djangoapps.django_comment_common.comment_client.course import get_course_commentable_counts
+from openedx.core.djangoapps.django_comment_common.comment_client.course import (
+    get_course_commentable_counts,
+    get_course_user_stats,
+)
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.django_comment_common.models import (
-    CourseDiscussionSettings,
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
+    CourseDiscussionSettings,
 )
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
@@ -43,15 +52,9 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
-from xmodule.course_module import CourseBlock
-from xmodule.tabs import CourseTabList
-from .exceptions import (
-    CommentNotFoundError,
-    DiscussionBlackOutException,
-    DiscussionDisabledError,
-    ThreadNotFoundError,
-)
-from .forms import CommentActionsForm, ThreadActionsForm
+
+from .exceptions import CommentNotFoundError, DiscussionBlackOutException, DiscussionDisabledError, ThreadNotFoundError
+from .forms import CommentActionsForm, ThreadActionsForm, UserOrdering
 from .pagination import DiscussionAPIPagination
 from .permissions import (
     can_delete,
@@ -62,7 +65,10 @@ from .permissions import (
 from .serializers import (
     CommentSerializer,
     DiscussionTopicSerializer,
+    DiscussionTopicSerializerV2,
     ThreadSerializer,
+    TopicOrdering,
+    UserStatsSerializer,
     get_context,
 )
 from .utils import discussion_open_for_user
@@ -74,6 +80,7 @@ from ..django_comment_client.base.views import (
 from ..django_comment_client.utils import (
     get_group_id_for_user,
     get_user_role_names,
+    has_discussion_privileges,
     is_commentable_divided,
 )
 
@@ -114,11 +121,22 @@ class DiscussionEntity(Enum):
     comment = 'comment'
 
 
-def _get_course(course_key, user):
+def _get_course(course_key: CourseKey, user: User, check_tab: bool = True) -> CourseBlock:
     """
     Get the course descriptor, raising CourseNotFoundError if the course is not found or
     the user cannot access forums for the course, and DiscussionDisabledError if the
     discussion tab is disabled for the course.
+
+    Using the ``check_tab`` parameter, tab checking can be skipped to perform other
+    access checks only.
+
+    Args:
+        course_key (CourseKey): course key of course to fetch
+        user (User): user for access checks
+        check_tab (bool): Whether the discussion tab should be checked
+
+    Returns:
+        CourseBlock: course object
     """
     try:
         course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
@@ -127,9 +145,10 @@ def _get_course(course_key, user):
         # Raise course not found if the user cannot access the course
         raise CourseNotFoundError("Course not found.") from err
 
-    discussion_tab = CourseTabList.get_tab_by_type(course.tabs, 'discussion')
-    if not (discussion_tab and discussion_tab.is_enabled(course, user)):
-        raise DiscussionDisabledError("Discussion is disabled for the course.")
+    if check_tab:
+        discussion_tab = CourseTabList.get_tab_by_type(course.tabs, 'discussion')
+        if not (discussion_tab and discussion_tab.is_enabled(course, user)):
+            raise DiscussionDisabledError("Discussion is disabled for the course.")
 
     return course
 
@@ -152,6 +171,10 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
         course_key = CourseKey.from_string(cc_thread["course_id"])
         course = _get_course(course_key, request.user)
         context = get_context(course, request, cc_thread)
+
+        if retrieve_kwargs.get("flagged_comments") and not context["is_requester_privileged"]:
+            raise ValidationError("Only privileged users can request flagged comments")
+
         course_discussion_settings = CourseDiscussionSettings.get(course_key)
         if (
                 not context["is_requester_privileged"] and
@@ -231,6 +254,7 @@ def get_course(request, course_key):
         CourseNotFoundError: if the course does not exist or is not accessible
         to the requesting user
     """
+
     def _format_datetime(dt):
         """
         Provide backwards compatible datetime formatting.
@@ -403,7 +427,6 @@ def get_course_topics(request: Request, course_key: CourseKey, topic_ids: Option
     Parameters:
 
         course_key: The key of the course to get topics for
-        user: The requesting user, for access control
         topic_ids: A list of topic IDs for which topic details are requested
 
     Returns:
@@ -435,6 +458,71 @@ def get_course_topics(request: Request, course_key: CourseKey, topic_ids: Option
         "courseware_topics": courseware_topics,
         "non_courseware_topics": non_courseware_topics,
     }
+
+
+def get_course_topics_v2(
+    course_key: CourseKey,
+    user: User,
+    topic_ids: Optional[Iterable[str]] = None,
+    order_by: TopicOrdering = TopicOrdering.COURSE_STRUCTURE,
+) -> List[Dict]:
+    """
+    Returns the course topic listing for the given course and user; filtered
+    by 'topic_ids' list if given.
+
+    Parameters:
+
+        course_key: The key of the course to get topics for
+        user: The requesting user, for access control
+        topic_ids: A list of topic IDs for which topic details are requested
+        order_by: The sort ordering for the returned list of topics
+
+    Returns:
+
+        A list of discussion topics for the course.
+
+    Raises:
+        ValidationError: If unsupported ordering is used.
+    """
+    provider_type = DiscussionsConfiguration.get(context_key=course_key).provider_type
+
+    if provider_type in [Provider.OPEN_EDX, Provider.LEGACY]:
+        thread_counts = get_course_commentable_counts(course_key)
+    else:
+        thread_counts = {}
+        # For other providers we can't sort by activity since we don't have activity information.
+        if order_by == TopicOrdering.ACTIVITY:
+            raise ValidationError("Topic ordering type not supported")
+
+    # Check access to the course
+    store = modulestore()
+    _get_course(course_key, user=user, check_tab=False)
+    course_blocks = get_course_blocks(user, store.make_course_usage_key(course_key))
+    accessible_vertical_keys = [
+        block for block in course_blocks.get_block_keys()
+        if block.category == 'vertical'
+    ] + [None]
+    topics_query = DiscussionTopicLink.objects.filter(
+        context_key=course_key,
+        provider_id=provider_type,
+        usage_key__in=accessible_vertical_keys,
+    )
+
+    if topic_ids:
+        topics_query = topics_query.filter(external_id__in=topic_ids)
+
+    if order_by == TopicOrdering.ACTIVITY:
+        topics_query = sorted(
+            topics_query,
+            key=lambda topic: sum(thread_counts.get(topic.external_id, {}).values()),
+            reverse=True,
+        )
+    elif order_by == TopicOrdering.NAME:
+        topics_query = topics_query.order_by('title')
+    else:
+        topics_query = topics_query.order_by('ordering')
+
+    return DiscussionTopicSerializerV2(topics_query, many=True, context={"thread_counts": thread_counts}).data
 
 
 def _get_user_profile_dict(request, usernames):
@@ -499,7 +587,7 @@ def _get_users(discussion_entity_type, discussion_entity, username_profile_dict)
 
 
 def _add_additional_response_fields(
-        request, serialized_discussion_entities, usernames, discussion_entity_type, include_profile_image
+    request, serialized_discussion_entities, usernames, discussion_entity_type, include_profile_image
 ):
     """
     Adds additional data to serialized discussion thread/comment.
@@ -722,7 +810,7 @@ def get_thread_list(
     })
 
 
-def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fields=None):
+def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=False, requested_fields=None):
     """
     Return the list of comments in the given thread.
 
@@ -741,6 +829,8 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fi
 
         page_size: The number of comments to retrieve per page
 
+        flagged: Filter comments by flagged for abuse status.
+
         requested_fields: Indicates which additional fields to return for
         each comment. (i.e. ['profile_image'])
 
@@ -757,6 +847,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fi
             "with_responses": True,
             "recursive": False,
             "user_id": request.user.id,
+            "flagged_comments": flagged,
             "response_skip": response_skip,
             "response_limit": page_size,
         }
@@ -918,7 +1009,7 @@ def _handle_voted_field(form_value, cc_content, api_content, request, context):
         context["cc_requester"].unvote(cc_content)
         api_content["vote_count"] -= 1
     track_voted_event(
-        request, context["course"], cc_content, vote_value="up", undo_vote=False if form_value else True  # lint-amnesty, pylint: disable=simplifiable-if-expression
+        request, context["course"], cc_content, vote_value="up", undo_vote=not form_value
     )
 
 
@@ -1217,6 +1308,74 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
         raise CommentNotFoundError("Comment not found") from err
 
 
+def get_user_comments(
+    request: Request,
+    author: User,
+    course_key: CourseKey,
+    flagged: bool = False,
+    page: int = 1,
+    page_size: int = 10,
+    requested_fields: Optional[List[str]] = None,
+):
+    """
+    Returns the list of comments made by the user in the requested course.
+
+    Arguments:
+
+        request: The django request object.
+
+        author: The user to get comments from.
+
+        course_key: The course locator to filter the comments.
+
+        flagged: Filter comments by flagged status.
+
+        page: The page number (1-indexed) to retrieve
+
+        page_size: The number of comments to retrieve per page
+
+        requested_fields: Indicates which additional fields to return for
+        each child comment. (i.e. ['profile_image'])
+
+    Returns:
+
+        A paginated result containing a list of comments.
+    """
+    course = _get_course(course_key, request.user)
+    context = get_context(course, request)
+
+    if flagged and not context["is_requester_privileged"]:
+        raise ValidationError("Only privileged users can filter comments by flagged status")
+
+    try:
+        response = Comment.retrieve_all({
+            'user_id': author.id,
+            'course_id': str(course_key),
+            'flagged': flagged,
+            'page': page,
+            'per_page': page_size,
+        })
+    except CommentClientRequestError as err:
+        raise CommentNotFoundError("Comment not found") from err
+
+    response_comments = response["collection"]
+    if not response_comments and page != 1:
+        raise PageNotFoundError("Page not found (No results on this page).")
+
+    results = _serialize_discussion_entities(
+        request,
+        context,
+        response_comments,
+        requested_fields,
+        DiscussionEntity.comment,
+    )
+
+    comment_count = response["comment_count"]
+    num_pages = response["num_pages"]
+    paginator = DiscussionAPIPagination(request, page, num_pages, comment_count)
+    return paginator.get_paginated_response(results)
+
+
 def delete_thread(request, thread_id):
     """
     Delete a thread.
@@ -1263,3 +1422,55 @@ def delete_comment(request, comment_id):
         comment_deleted.send(sender=None, user=request.user, post=cc_comment)
     else:
         raise PermissionDenied
+
+
+@function_trace("get_course_discussion_user_stats")
+def get_course_discussion_user_stats(
+    request,
+    course_key_str: str,
+    page: int,
+    page_size: int,
+    order_by: UserOrdering = None,
+) -> Dict:
+    """
+    Get paginated course discussion stats for users in the course.
+
+    Args:
+        request (Request): DRF request
+        course_key_str (str): course key string
+        page (int): Page number to fetch
+        page_size (int): Number of items in each page
+        order_by (UserOrdering): The ordering to use for the user stats
+
+    Returns:
+        Paginated data of a user's discussion stats sorted based on the specified ordering.
+
+    """
+    course_key = CourseKey.from_string(course_key_str)
+    is_privileged = has_discussion_privileges(user=request.user, course_id=course_key)
+    if is_privileged:
+        order_by = order_by or UserOrdering.BY_FLAGS
+    else:
+        order_by = order_by or UserOrdering.BY_ACTIVITY
+        if order_by != UserOrdering.BY_ACTIVITY:
+            raise ValidationError({"order_by": "Invalid value"})
+    course_stats_response = get_course_user_stats(course_key, {
+        'sort_key': str(order_by),
+        'page': page,
+        'per_page': page_size,
+    })
+    serializer = UserStatsSerializer(
+        course_stats_response["user_stats"],
+        context={"is_privileged": is_privileged},
+        many=True,
+    )
+
+    paginator = DiscussionAPIPagination(
+        request,
+        course_stats_response["page"],
+        course_stats_response["num_pages"],
+        course_stats_response["count"],
+    )
+    return paginator.get_paginated_response({
+        "results": serializer.data,
+    })

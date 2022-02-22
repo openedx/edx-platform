@@ -40,8 +40,8 @@ from lms.djangoapps.instructor_task.tests.test_base import (
 )
 from openedx.core.djangoapps.util.testing import TestConditionalContent
 from openedx.core.lib.url_utils import quote_slashes
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 

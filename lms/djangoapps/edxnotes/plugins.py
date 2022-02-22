@@ -13,7 +13,7 @@ from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_apps.plugins import CourseApp
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.tabs import CourseTab, CourseTabList
+from xmodule.tabs import CourseTab, CourseTabList  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()
 

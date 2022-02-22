@@ -143,11 +143,23 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         - `request_utils.capture_cookie_sizes`
         - TOP_N_COOKIES_CAPTURED
         - TOP_N_COOKIE_GROUPS_CAPTURED
+        - COOKIE_SIZE_LOGGING_THRESHOLD
 
         """
 
         raw_header_cookie = request.META.get('HTTP_COOKIE', '')
-        set_custom_attribute('cookies.header.size', len(raw_header_cookie.encode('utf-8')))
+        cookie_header_size = len(raw_header_cookie.encode('utf-8'))
+        set_custom_attribute('cookies.header.size', cookie_header_size)
+
+        # .. setting_name: COOKIE_SIZE_LOGGING_THRESHOLD
+        # .. setting_default: None
+        # .. setting_description: The minimum size for logging a list of cookie names and sizes. Should be set
+        # to a relatively high threshold (suggested 9-10K) to avoid flooding the logs.
+        logging_threshold = getattr(settings, "COOKIE_SIZE_LOGGING_THRESHOLD", None)
+
+        if logging_threshold and cookie_header_size >= logging_threshold:
+            sizes = ', '.join(f"{name}: {len(value)}" for (name, value) in sorted(request.COOKIES.items()))
+            log.info(f"Large (>= {logging_threshold}) cookie header detected. Cookie sizes: {sizes}")
 
         if not CAPTURE_COOKIE_SIZES.is_enabled():
             return

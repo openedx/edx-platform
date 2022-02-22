@@ -42,10 +42,10 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def mock_render_to_response(*args, **kwargs):
@@ -589,9 +589,9 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         original_url = reverse(url_name, kwargs={'course_id': str(course.id)})
         login_url = "{login_url}?next={original_url}".format(
             login_url=reverse('signin_user'),
-            original_url=original_url
+            original_url=urllib.parse.quote(original_url),
         )
-        self.assertRedirects(response, login_url)
+        self.assertRedirects(response, login_url, fetch_redirect_response=False)
 
     @ddt.data(
         "verify_student_start_flow",
@@ -906,7 +906,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
             # ensure the mock api call was made.  NOTE: the following line
             # approximates the check - if the headers were empty it means
             # there was no last request.
-            assert httpretty.last_request().headers != {}
+            assert httpretty.last_request().headers
         return response
 
     def _assert_displayed_mode(self, response, expected_mode):
@@ -1232,9 +1232,6 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
     PASSWORD = "test_password"
     IMAGE_DATA = "data:image/png;base64,1234"
     FULL_NAME = "Ḟüḷḷ Ṅäṁë"
-    EXPERIMENT_NAME = "test-experiment"
-    PORTRAIT_PHOTO_MODE = "upload"
-    ID_PHOTO_MODE = "camera"
 
     def setUp(self):
         super().setUp()
@@ -1387,39 +1384,9 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         # Now the request should succeed
         self._submit_photos(face_image=self.IMAGE_DATA)
 
-    @patch('lms.djangoapps.verify_student.views.segment.track')
-    def test_experiment_params(self, mock_segment_track):
-        # Submit the photos
-        self._submit_photos(
-            face_image=self.IMAGE_DATA,
-            photo_id_image=self.IMAGE_DATA,
-            experiment_name=self.EXPERIMENT_NAME,
-            portrait_photo_mode=self.PORTRAIT_PHOTO_MODE,
-            id_photo_mode=self.ID_PHOTO_MODE
-        )
-
-        # Verify that the attempt is created in the database
-        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
-        assert attempt.status == 'submitted'
-
-        # assert that segment tracking has been called with experiment name
-        experiment_data = {
-            "attempt_id": attempt.id,
-            "experiment_name": self.EXPERIMENT_NAME
-        }
-        mock_segment_track.assert_any_call(self.user.id, "edx.bi.experiment.verification.attempt", experiment_data)
-
-        mode_data = {
-            "attempt_id": attempt.id,
-            "portrait_photo_mode": self.PORTRAIT_PHOTO_MODE,
-            "id_photo_mode": self.ID_PHOTO_MODE
-        }
-        mock_segment_track.assert_any_call(self.user.id, "edx.bi.experiment.verification.attempt.photo.mode", mode_data)
-
     def _submit_photos(
         self, face_image=None, photo_id_image=None,
-        full_name=None, experiment_name=None,
-        portrait_photo_mode=None, id_photo_mode=None, expected_status_code=200
+        full_name=None, expected_status_code=200
     ):
         """Submit photos for verification.
 
@@ -1427,7 +1394,6 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
             face_image (str): The base-64 encoded face image data.
             photo_id_image (str): The base-64 encoded ID image data.
             full_name (unicode): The full name of the user, if the user is changing it.
-            experiment_name (str): Name of A/B experiment associated with attempt
             expected_status_code (int): The expected response status code.
 
         Returns:
@@ -1445,15 +1411,6 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
 
         if full_name is not None:
             params['full_name'] = full_name
-
-        if experiment_name is not None:
-            params['experiment_name'] = experiment_name
-
-        if portrait_photo_mode is not None:
-            params['portrait_photo_mode'] = portrait_photo_mode
-
-        if id_photo_mode is not None:
-            params['id_photo_mode'] = id_photo_mode
 
         with self.immediate_on_commit():
             response = self.client.post(url, params)
@@ -1653,13 +1610,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         assert response.content.decode('utf-8') == 'OK!'
         self._assert_verification_approved_email(expiration_datetime.date())
 
-        # assert that segment tracking has been called with result
-        data = {
-            "attempt_id": attempt.id,
-            "result": "PASS"
-        }
-        mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
-
     @patch.dict(settings.VERIFY_STUDENT, {'USE_DJANGO_MAIL': True})
     def test_approved_email_without_ace(self):
         """
@@ -1719,13 +1669,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         assert response.content.decode('utf-8') == 'OK!'
         self._assert_verification_approved_email(expiration_datetime.date())
 
-        # assert that segment tracking has been called with result
-        data = {
-            "attempt_id": attempt.id,
-            "result": "PASS"
-        }
-        mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
-
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
@@ -1757,13 +1700,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         assert response.content.decode('utf-8') == 'OK!'
         self._assert_verification_denied_email()
 
-        # assert that segment tracking has been called with result
-        data = {
-            "attempt_id": attempt.id,
-            "result": "FAIL"
-        }
-        mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
-
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
@@ -1790,13 +1726,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         assert attempt.error_code == 'You must retry the verification.'
         assert attempt.error_msg == '"Memory overflow"'
         assert response.content.decode('utf-8') == 'OK!'
-
-        # assert that segment tracking has been called with result
-        data = {
-            "attempt_id": attempt.id,
-            "result": "SYSTEM FAIL"
-        }
-        mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',

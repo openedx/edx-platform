@@ -13,15 +13,15 @@ from rest_framework.test import APIClient  # pylint: disable=unused-import
 
 from common.djangoapps.student.models import CourseEnrollment  # pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
-from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
-from xmodule.html_module import CourseInfoBlock
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory  # pylint: disable=unused-import
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from openedx.features.course_experience import ENABLE_COURSE_GOALS
+from xmodule.html_module import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
+from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -104,118 +104,76 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
     """
     REVERSE_INFO = {'name': 'course-handouts-list', 'params': ['course_id', 'api_version']}
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_handouts(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
-            response = self.api_response(expected_response_code=200, api_version=api_version)
-            assert 'Sample' in response.data['handouts_html']
+    @ddt.data(API_V05, API_V1)
+    def test_handouts(self, api_version):
+        self.add_mobile_available_toy_course()
+        response = self.api_response(expected_response_code=200, api_version=api_version)
+        assert 'Sample' in response.data['handouts_html']
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_no_handouts(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
+    @ddt.data(API_V05, API_V1)
+    def test_no_handouts(self, api_version):
+        self.add_mobile_available_toy_course()
 
-            # delete handouts in course
-            handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
-            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
-                self.store.delete_item(handouts_usage_key, self.user.id)
+        # delete handouts in course
+        handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+            self.store.delete_item(handouts_usage_key, self.user.id)
 
-            response = self.api_response(expected_response_code=200, api_version=api_version)
-            assert response.data['handouts_html'] is None
+        response = self.api_response(expected_response_code=200, api_version=api_version)
+        assert response.data['handouts_html'] is None
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_empty_handouts(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
+    @ddt.data(API_V05, API_V1)
+    def test_empty_handouts(self, api_version):
+        self.add_mobile_available_toy_course()
 
-            # set handouts to empty tags
-            handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
-            underlying_handouts = self.store.get_item(handouts_usage_key)
-            underlying_handouts.data = "<ol></ol>"
-            self.store.update_item(underlying_handouts, self.user.id)
-            response = self.api_response(expected_response_code=200, api_version=api_version)
-            assert response.data['handouts_html'] is None
+        # set handouts to empty tags
+        handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
+        underlying_handouts = self.store.get_item(handouts_usage_key)
+        underlying_handouts.data = "<ol></ol>"
+        self.store.update_item(underlying_handouts, self.user.id)
+        response = self.api_response(expected_response_code=200, api_version=api_version)
+        assert response.data['handouts_html'] is None
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_handouts_static_rewrites(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
+    @ddt.data(API_V05, API_V1)
+    def test_handouts_static_rewrites(self, api_version):
+        self.add_mobile_available_toy_course()
 
-            # check that we start with relative static assets
-            handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
-            underlying_handouts = self.store.get_item(handouts_usage_key)
-            assert "'/static/" in underlying_handouts.data
+        # check that we start with relative static assets
+        handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
+        underlying_handouts = self.store.get_item(handouts_usage_key)
+        assert "'/static/" in underlying_handouts.data
 
-            # but shouldn't finish with any
-            response = self.api_response(api_version=api_version)
-            assert "'/static/" not in response.data['handouts_html']
+        # but shouldn't finish with any
+        response = self.api_response(api_version=api_version)
+        assert "'/static/" not in response.data['handouts_html']
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_jump_to_id_handout_href(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
+    @ddt.data(API_V05, API_V1)
+    def test_jump_to_id_handout_href(self, api_version):
+        self.add_mobile_available_toy_course()
 
-            # check that we start with relative static assets
-            handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
-            underlying_handouts = self.store.get_item(handouts_usage_key)
-            underlying_handouts.data = "<a href=\"/jump_to_id/identifier\">Intracourse Link</a>"
-            self.store.update_item(underlying_handouts, self.user.id)
+        # check that we start with relative static assets
+        handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
+        underlying_handouts = self.store.get_item(handouts_usage_key)
+        underlying_handouts.data = "<a href=\"/jump_to_id/identifier\">Intracourse Link</a>"
+        self.store.update_item(underlying_handouts, self.user.id)
 
-            # but shouldn't finish with any
-            response = self.api_response(api_version=api_version)
-            assert f'/courses/{self.course.id}/jump_to_id/' in response.data['handouts_html']
+        # but shouldn't finish with any
+        response = self.api_response(api_version=api_version)
+        assert f'/courses/{self.course.id}/jump_to_id/' in response.data['handouts_html']
 
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, API_V05),
-        (ModuleStoreEnum.Type.mongo, API_V1),
-        (ModuleStoreEnum.Type.split, API_V05),
-        (ModuleStoreEnum.Type.split, API_V1),
-    )
-    @ddt.unpack
-    def test_course_url_handout_href(self, default_ms, api_version):
-        with self.store.default_store(default_ms):
-            self.add_mobile_available_toy_course()
+    @ddt.data(API_V05, API_V1)
+    def test_course_url_handout_href(self, api_version):
+        self.add_mobile_available_toy_course()
 
-            # check that we start with relative static assets
-            handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
-            underlying_handouts = self.store.get_item(handouts_usage_key)
-            underlying_handouts.data = "<a href=\"/course/identifier\">Linked Content</a>"
-            self.store.update_item(underlying_handouts, self.user.id)
+        # check that we start with relative static assets
+        handouts_usage_key = self.course.id.make_usage_key('course_info', 'handouts')
+        underlying_handouts = self.store.get_item(handouts_usage_key)
+        underlying_handouts.data = "<a href=\"/course/identifier\">Linked Content</a>"
+        self.store.update_item(underlying_handouts, self.user.id)
 
-            # but shouldn't finish with any
-            response = self.api_response(api_version=api_version)
-            assert f'/courses/{self.course.id}/' in response.data['handouts_html']
+        # but shouldn't finish with any
+        response = self.api_response(api_version=api_version)
+        assert f'/courses/{self.course.id}/' in response.data['handouts_html']
 
     def add_mobile_available_toy_course(self):
         """ use toy course with handouts, and make it mobile_available """
@@ -230,7 +188,7 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
         self.login_and_enroll()
 
 
-@override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=True)
+@override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
 class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCase):
     """
     Testing the Course Goals User Activity API.
@@ -280,7 +238,7 @@ class TestCourseGoalsUserActivityAPI(MobileAPITestCase, SharedModuleStoreTestCas
         response = self.client.post(self.apiUrl, post_data)
         assert response.status_code == 400
 
-    @override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=False)
+    @override_waffle_flag(ENABLE_COURSE_GOALS, active=False)
     @patch('lms.djangoapps.mobile_api.course_info.views.log')
     def test_flag_disabled(self, mock_logger):
         '''

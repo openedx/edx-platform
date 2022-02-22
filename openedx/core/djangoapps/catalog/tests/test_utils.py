@@ -663,7 +663,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         )
 
         session_entitlements = get_visible_sessions_for_entitlement(entitlement)
-        assert session_entitlements == []
+        assert not session_entitlements
 
 
 @skip_unless_lms
@@ -780,10 +780,10 @@ class TestProgramCourseRunCrawling(TestCase):
         program = {
             'title': 'notice that I do not have a curriculum',
         }
-        assert [] == child_programs(program)
+        assert not child_programs(program)
 
     def test_child_programs_no_children(self):
-        assert [] == child_programs(self.empty_program)
+        assert not child_programs(self.empty_program)
 
     def test_child_programs_one_child(self):
         assert [self.grandchild_1] == child_programs(self.simple_program)

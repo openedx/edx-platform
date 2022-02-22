@@ -49,7 +49,6 @@ set -e
 # Note that you will still need to pass a value for 'TEST_SUITE'
 # or else no tests will be executed.
 SHARD=${SHARD:="all"}
-NUMBER_OF_BOKCHOY_THREADS=${NUMBER_OF_BOKCHOY_THREADS:=1}
 
 # Clean up previous builds
 git clean -qxfd
@@ -131,7 +130,7 @@ case "$TEST_SUITE" in
                 echo "Finding ESLint violations and storing report..."
                 run_paver_quality run_eslint -l $ESLINT_THRESHOLD || { EXIT=1; }
                 echo "Finding Stylelint violations and storing report..."
-                run_paver_quality run_stylelint -l $STYLELINT_THRESHOLD || { EXIT=1; }
+                run_paver_quality run_stylelint || { EXIT=1; }
                 echo "Running xss linter report."
                 run_paver_quality run_xsslint -t $XSSLINT_THRESHOLDS || { EXIT=1; }
                 if [[ ! -z "$TARGET_BRANCH" ]]; then
@@ -179,47 +178,5 @@ case "$TEST_SUITE" in
         # neither command fails then the exit command resolves to simply exit
         # which is considered successful.
         exit $EXIT
-        ;;
-
-    "bok-choy")
-
-        PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS"
-        if [[ -n "$FILTER_WHO_TESTS_WHAT" ]]; then
-            PAVER_ARGS="$PAVER_ARGS --with-wtw=origin/master"
-        fi
-        if [[ -n "$COLLECT_WHO_TESTS_WHAT" ]]; then
-            PAVER_ARGS="$PAVER_ARGS --pytest-remote-contexts --coveragerc=common/test/acceptance/.coveragerc"
-        fi
-        export BOKCHOY_HEADLESS=true
-
-        case "$SHARD" in
-
-            "all")
-                $TOX paver test_bokchoy $PAVER_ARGS
-                ;;
-
-            [1-9]|1[0-9]|2[0-4])
-                $TOX paver test_bokchoy --eval-attr="shard==$SHARD and not a11y" $PAVER_ARGS
-                ;;
-
-            25|"noshard")
-                $TOX paver test_bokchoy --eval-attr="(not shard or shard>=$SHARD) and not a11y" $PAVER_ARGS
-                ;;
-
-            # Default case because if we later define another bok-choy shard on Jenkins
-            # (e.g. Shard 10) in the multi-config project and expand this file
-            # with an additional case condition, old branches without that commit
-            # would not execute any tests on the worker assigned to that shard
-            # and thus their build would fail.
-            # This way they will just report 1 test executed and passed.
-            *)
-                # Need to create an empty test result so the post-build
-                # action doesn't fail the build.
-                # May be unnecessary if we changed the "Skip if there are no test files"
-                # option to True in the jenkins job definitions.
-                mkdir -p reports/bok_choy
-                emptyxunit "bok_choy/xunit"
-                ;;
-        esac
         ;;
 esac

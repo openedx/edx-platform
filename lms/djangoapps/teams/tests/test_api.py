@@ -16,11 +16,11 @@ from lms.djangoapps.teams import api as teams_api
 from lms.djangoapps.teams.models import CourseTeam
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.lib.teams_config import TeamsConfig, TeamsetType
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
-COURSE_KEY1 = CourseKey.from_string('edx/history/1')
-COURSE_KEY2 = CourseKey.from_string('edx/math/1')
+COURSE_KEY1 = CourseKey.from_string('course-v1:edx+history+1')
+COURSE_KEY2 = CourseKey.from_string('course-v1:edx+math+1')
 TOPIC1 = 'topic-1'
 TOPIC2 = 'topic-2'
 TOPIC3 = 'topic-3'
@@ -221,6 +221,32 @@ class PythonAPITests(SharedModuleStoreTestCase):
 
         team_anonymous_user_ids = teams_api.anonymous_user_ids_for_team(user_staff, self.team1)
         assert len(self.team1.users.all()) == len(team_anonymous_user_ids)
+
+    def test_get_teams_in_teamset__bad_course_id(self):
+        bad_course_id = 'badcourseid'
+        with self.assertRaisesMessage(ValueError, f'The supplied course id {bad_course_id} is not valid'):
+            teams_api.get_teams_in_teamset(bad_course_id, 'teamset-id')
+
+    def test_get_teams_in_teamset_1_1(self):
+        result = teams_api.get_teams_in_teamset(str(COURSE_KEY1), TOPIC1)
+        assert len(result) == 2
+        assert self.team1 in result
+        assert self.team1a in result
+
+    def test_get_teams_in_teamset_1_2(self):
+        result = teams_api.get_teams_in_teamset(str(COURSE_KEY1), TOPIC2)
+        assert len(result) == 0
+
+    def test_get_teams_in_teamset_2_2(self):
+        result = teams_api.get_teams_in_teamset(str(COURSE_KEY2), TOPIC2)
+        assert len(result) == 2
+        assert self.team2 in result
+        assert self.team2a in result
+
+    def test_get_teams_in_teamset_2_3(self):
+        result = teams_api.get_teams_in_teamset(str(COURSE_KEY2), TOPIC3)
+        assert len(result) == 1
+        assert self.team3 in result
 
 
 @ddt.ddt

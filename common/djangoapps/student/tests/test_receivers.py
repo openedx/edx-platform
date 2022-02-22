@@ -13,7 +13,7 @@ from common.djangoapps.student.tests.factories import (
     UserFactory,
     UserProfileFactory
 )
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class ReceiversTest(SharedModuleStoreTestCase):
@@ -28,7 +28,9 @@ class ReceiversTest(SharedModuleStoreTestCase):
         # Test initial creation upon an enrollment being made
         enrollment = CourseEnrollmentFactory()
         assert CourseEnrollmentCelebration.objects.count() == 1
-        celebration = CourseEnrollmentCelebration.objects.get(enrollment=enrollment, celebrate_first_section=True)
+        celebration = CourseEnrollmentCelebration.objects.get(
+            enrollment=enrollment, celebrate_first_section=True, celebrate_weekly_goal=True
+        )
 
         # Test nothing changes if we update that enrollment
         celebration.celebrate_first_section = False
@@ -36,7 +38,9 @@ class ReceiversTest(SharedModuleStoreTestCase):
         enrollment.mode = 'test-mode'
         enrollment.save()
         assert CourseEnrollmentCelebration.objects.count() == 1
-        CourseEnrollmentCelebration.objects.get(enrollment=enrollment, celebrate_first_section=False)
+        CourseEnrollmentCelebration.objects.get(
+            enrollment=enrollment, celebrate_first_section=False, celebrate_weekly_goal=True
+        )
 
     def test_celebration_gated_by_waffle(self):
         """ Test we don't make a celebration if the MFE redirect waffle flag is off """

@@ -9,10 +9,10 @@ from django.conf import settings
 
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
-from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.enrollments.api import is_enrollment_valid_for_proctoring
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.theming import helpers as theming_helpers
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def generate_activation_email_context(user, registration):
@@ -23,7 +23,8 @@ def generate_activation_email_context(user, registration):
         user (User): Currently logged-in user
         registration (Registration): Registration object for the currently logged-in user
     """
-    context = get_base_template_context(None)
+    site = theming_helpers.get_current_site()
+    context = get_base_template_context(site)
     context.update({
         'name': user.profile.name,
         'key': registration.activation_key,
@@ -56,7 +57,7 @@ def generate_proctoring_requirements_email_context(user, course_id):
         'course_name': course_module.display_name,
         'proctoring_provider': capwords(course_module.proctoring_provider.replace('_', ' ')),
         'proctoring_requirements_url': settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('faq', ''),
-        'idv_required': not is_integrity_signature_enabled(course_id),
+        'idv_required': not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'),
         'id_verification_url': IDVerificationService.get_verify_location(),
     }
 

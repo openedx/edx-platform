@@ -11,7 +11,7 @@ import Course from 'js/models/course';
 describe('CourseOutlinePage', function() {
     var createCourseOutlinePage, displayNameInput, model, outlinePage, requests, getItemsOfType, getItemHeaders,
         verifyItemsExpanded, expandItemsAndVerifyState, collapseItemsAndVerifyState, selectBasicSettings,
-        selectVisibilitySettings, selectAdvancedSettings, createMockCourseJSON, createMockSectionJSON,
+        selectVisibilitySettings, selectDiscussionSettings, selectAdvancedSettings, createMockCourseJSON, createMockSectionJSON,
         createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, setSelfPaced, setSelfPacedCustomPLS,
         mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
         selectOnboardingExam, createMockCourseJSONWithReviewRules,mockCourseJSONWithReviewRules,
@@ -37,6 +37,7 @@ describe('CourseOutlinePage', function() {
                 display_name: 'Section',
                 children: []
             },
+            unit_level_discussions: false,
             user_partitions: [],
             user_partition_info: {},
             highlights_enabled: true,
@@ -197,6 +198,10 @@ describe('CourseOutlinePage', function() {
         $(".modal-section .settings-tab-button[data-tab='advanced']").click();
     };
 
+    function selectDiscussionSettings() {
+        $(".modal-section .settings-tab-button[data-tab='discussion']").click();
+    }
+
     setSelfPaced = function() {
         /* global course */
         course.set('self_paced', true);
@@ -300,7 +305,7 @@ describe('CourseOutlinePage', function() {
             'course-outline', 'xblock-string-field-editor', 'modal-button',
             'basic-modal', 'course-outline-modal', 'release-date-editor',
             'due-date-editor', 'self-paced-due-date-editor', 'grading-editor', 'publish-editor',
-            'staff-lock-editor', 'unit-access-editor', 'content-visibility-editor',
+            'staff-lock-editor', 'unit-access-editor', 'discussion-editor', 'content-visibility-editor',
             'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
             'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
             'course-highlights-enable'
@@ -2316,8 +2321,9 @@ describe('CourseOutlinePage', function() {
 
     // Note: most tests for units can be found in Bok Choy
     describe('Unit', function() {
-        var getUnitStatus = function(options) {
-            mockCourseJSON = createMockCourseJSON({}, [
+        var getUnitStatus = function(options, courseOptions) {
+            courseOptions = courseOptions || {};
+            mockCourseJSON = createMockCourseJSON(courseOptions, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({}, [
                         createMockVerticalJSON(options)
@@ -2407,6 +2413,35 @@ describe('CourseOutlinePage', function() {
             );
             expect(messages.length).toBe(1);
             expect(messages).toContainText('Contains staff only content');
+        });
+
+        describe('discussion settings', function () {
+            it('hides discussion settings if unit level discussions are disabled', function() {
+                getUnitStatus({}, {unit_level_discussions: false});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('.modal-section .edit-discussion')).not.toExist();
+            });
+
+            it('shows discussion settings if unit level discussions are enabled', function() {
+                getUnitStatus({}, {unit_level_discussions: true});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('.modal-section .edit-discussion')).toExist();
+            });
+
+            it('marks checkbox as disabled', function() {
+                getUnitStatus({}, {unit_level_discussions: true});
+                outlinePage.$('.outline-unit .configure-button').click();
+
+                var discussionCheckbox = $('#discussion_enabled');
+                expect(discussionCheckbox).toExist();
+                expect(discussionCheckbox.is(':checked')).toBeFalsy();
+            });
+
+            it('marks checkbox as enabled', function() {
+                getUnitStatus({discussion_enabled: true}, {unit_level_discussions: true});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('#discussion_enabled').is(':checked')).toBeTruthy();
+            });
         });
 
         verifyTypePublishable('unit', function(options) {

@@ -3,18 +3,20 @@ Unit tests for checking default forum role "Student" of a user when he creates a
 after deleting it creates same course again
 """
 
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.utils import delete_course, reverse_url
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TestUsersDefaultRole(ModuleStoreTestCase):
     """
     Unit tests for checking enrollment and default forum role "Student" of a logged in user
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         """
         Add a user and a course

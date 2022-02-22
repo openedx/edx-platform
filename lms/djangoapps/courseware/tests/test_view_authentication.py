@@ -8,6 +8,9 @@ import datetime
 from unittest.mock import patch
 import pytz
 from django.urls import reverse
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.student.tests.factories import BetaTesterFactory
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
@@ -19,9 +22,6 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -201,7 +201,8 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
                 kwargs={'course_id': str(self.course.id),
                         'chapter': self.overview_chapter.url_name,
                         'section': self.welcome_section.url_name}
-            )
+            ),
+            fetch_redirect_response=False,  # just sends us on to MFE
         )
 
     def test_redirection_missing_enterprise_consent(self):

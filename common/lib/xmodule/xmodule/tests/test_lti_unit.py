@@ -20,6 +20,7 @@ from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 from xmodule.fields import Timedelta
 from xmodule.lti_2_util import LTIError
 from xmodule.lti_module import LTIBlock
+from xmodule.tests.helpers import StubUserService
 
 from . import get_test_system
 
@@ -57,7 +58,6 @@ class LTIBlockTest(unittest.TestCase):
                 </imsx_POXEnvelopeRequest>
             """)
         self.system = get_test_system()
-        self.system.get_real_user = Mock()
         self.system.publish = Mock()
         self.system.rebind_noauth_module_to_user = Mock()
 
@@ -171,9 +171,9 @@ class LTIBlockTest(unittest.TestCase):
         """
         If we have no real user, we should send back failure response.
         """
+        self.system._services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
         self.xmodule.verify_oauth_body_sign = Mock()
         self.xmodule.has_score = True
-        self.system.get_real_user = Mock(return_value=None)
         request = Request(self.environ)
         request.body = self.get_request_body()
         response = self.xmodule.grade_handler(request, '')

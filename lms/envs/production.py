@@ -30,7 +30,7 @@ from path import Path as path
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.logsettings import get_logger_config
-from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
+from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .common import *
 
@@ -277,6 +277,13 @@ if ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', None):
 #        "/edx/src/edx-themes/conf/locale"
 #    ],
 COMPREHENSIVE_THEME_LOCALE_PATHS = ENV_TOKENS.get('COMPREHENSIVE_THEME_LOCALE_PATHS', [])
+
+
+# PREPEND_LOCALE_PATHS contain the paths to locale directories to load first e.g.
+# "PREPEND_LOCALE_PATHS" : [
+#        "/edx/my-locale"
+#    ],
+PREPEND_LOCALE_PATHS = ENV_TOKENS.get('PREPEND_LOCALE_PATHS', [])
 
 
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
@@ -728,6 +735,15 @@ if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
     SEARCH_FILTER_GENERATOR = ENV_TOKENS.get('SEARCH_FILTER_GENERATOR', SEARCH_FILTER_GENERATOR)
 
+SEARCH_SKIP_INVITATION_ONLY_FILTERING = ENV_TOKENS.get(
+    'SEARCH_SKIP_INVITATION_ONLY_FILTERING',
+    SEARCH_SKIP_INVITATION_ONLY_FILTERING,
+)
+SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING = ENV_TOKENS.get(
+    'SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING',
+    SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING,
+)
+
 # TODO: Once we have successfully upgraded to ES7, switch this back to ELASTIC_SEARCH_CONFIG.
 ELASTIC_SEARCH_CONFIG = ENV_TOKENS.get('ELASTIC_SEARCH_CONFIG_ES7', [{}])
 
@@ -750,7 +766,7 @@ if FEATURES.get('CUSTOM_COURSES_EDX'):
 ##### Individual Due Date Extensions #####
 if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     FIELD_OVERRIDE_PROVIDERS += (
-        'courseware.student_field_overrides.IndividualStudentOverrideProvider',
+        'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
 
 ##### Show Answer Override for Self-Paced Courses #####
@@ -953,16 +969,16 @@ DASHBOARD_COURSE_LIMIT = ENV_TOKENS.get('DASHBOARD_COURSE_LIMIT', None)
 ######################## Setting for content libraries ########################
 MAX_BLOCKS_PER_CONTENT_LIBRARY = ENV_TOKENS.get('MAX_BLOCKS_PER_CONTENT_LIBRARY', MAX_BLOCKS_PER_CONTENT_LIBRARY)
 
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)
+
 ############################### Plugin Settings ###############################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
 # Load production.py in plugins
 add_plugins(__name__, ProjectType.LMS, SettingsType.PRODUCTION)
-
-########################## Derive Any Derived Settings  #######################
-
-derive_settings(__name__)
 
 ############## Settings for Completion API #########################
 
@@ -1043,8 +1059,8 @@ COURSE_OLX_VALIDATION_IGNORE_LIST = ENV_TOKENS.get(
 ################# show account activate cta after register ########################
 SHOW_ACCOUNT_ACTIVATION_CTA = ENV_TOKENS.get('SHOW_ACCOUNT_ACTIVATION_CTA', SHOW_ACCOUNT_ACTIVATION_CTA)
 
-################# Settings for Chrome-specific origin trials ########
-# Token for "Disable Different Origin Subframe Dialog Suppression" Chrome Origin Trial, which must be origin-specific.
-CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = ENV_TOKENS.get(
-    'CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN', CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN
-)
+################# Discussions micro frontend URL ########################
+DISCUSSIONS_MICROFRONTEND_URL = ENV_TOKENS.get('DISCUSSIONS_MICROFRONTEND_URL', DISCUSSIONS_MICROFRONTEND_URL)
+
+################### Discussions micro frontend Feedback URL###################
+DISCUSSIONS_MFE_FEEDBACK_URL = ENV_TOKENS.get('DISCUSSIONS_MFE_FEEDBACK_URL', DISCUSSIONS_MFE_FEEDBACK_URL)

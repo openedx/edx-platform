@@ -1,7 +1,11 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import datetime
 from unittest.mock import patch
+
 import pytest
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
 from openedx.core.djangoapps.schedules.content_highlights import (
     course_has_highlights_from_store,
     get_all_course_highlights,
@@ -12,14 +16,10 @@ from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExis
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @skip_unless_lms
 class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     def setUp(self):
         super().setUp()
         self._setup_course()

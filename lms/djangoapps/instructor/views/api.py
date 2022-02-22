@@ -34,12 +34,13 @@ from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
-from rest_framework import serializers, status
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from submissions import api as sub_api  # installed from the edx-submissions repository
-from xmodule.modulestore.django import modulestore
+from rest_framework import serializers, status  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.permissions import IsAdminUser, IsAuthenticated  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
+from submissions import api as sub_api  # installed from the edx-submissions repository  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student import auth
@@ -87,6 +88,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
 )
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
+from lms.djangoapps.instructor.constants import INVOICE_KEY
 from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
@@ -95,13 +97,11 @@ from lms.djangoapps.instructor.enrollment import (
     send_mail_to_student,
     unenroll_email,
 )
-from lms.djangoapps.instructor.views import INVOICE_KEY
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic, csvs as instructor_analytics_csvs
 from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import ReportStore
-from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -709,6 +709,7 @@ def create_and_enroll_user(
                 email_params.update({
                     'message_type': 'account_creation_and_enrollment',
                     'email_address': email,
+                    'user_id': user.id,
                     'password': password,
                     'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
                 })
@@ -1459,7 +1460,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         query_features.append('team')
         query_features_names['team'] = _('Team')
 
-    if is_integrity_signature_enabled(course_key):
+    if settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'):
         if 'verification_status' in query_features:
             query_features.remove('verification_status')
             query_features_names.pop('verification_status')
@@ -1737,7 +1738,7 @@ def get_student_progress_url(request, course_id):
     user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
 
     if course_home_mfe_progress_tab_is_active(course_id):
-        progress_url = get_learning_mfe_home_url(course_id, 'progress')
+        progress_url = get_learning_mfe_home_url(course_id, url_fragment='progress')
         if user is not None:
             progress_url += '/{}/'.format(user.id)
     else:
@@ -1971,6 +1972,8 @@ def rescore_problem(request, course_id):
             )
         except NotImplementedError as exc:
             return HttpResponseBadRequest(str(exc))
+        except ItemNotFoundError as exc:
+            return HttpResponseBadRequest(f"{module_state_key} not found")
 
     elif all_students:
         try:
@@ -1981,6 +1984,8 @@ def rescore_problem(request, course_id):
             )
         except NotImplementedError as exc:
             return HttpResponseBadRequest(str(exc))
+        except ItemNotFoundError as exc:
+            return HttpResponseBadRequest(f"{module_state_key} not found")
     else:
         return HttpResponseBadRequest()
 
@@ -2014,11 +2019,14 @@ def override_problem_score(request, course_id):  # lint-amnesty, pylint: disable
 
     try:
         usage_key = UsageKey.from_string(problem_to_reset).map_into_course(course_key)
+        block = modulestore().get_item(usage_key)
     except InvalidKeyError:
         return _create_error_response(request, f"Unable to parse problem id {problem_to_reset}.")
+    except ItemNotFoundError:
+        return _create_error_response(request, f"Unable to find problem id {problem_to_reset}.")
 
     # check the user's access to this specific problem
-    if not has_access(request.user, "staff", modulestore().get_item(usage_key)):
+    if not has_access(request.user, "staff", block):
         _create_error_response(request, "User {} does not have permission to override scores for problem {}.".format(
             request.user.id,
             problem_to_reset

@@ -25,7 +25,7 @@ from path import Path as path
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
-from xmodule.modulestore.modulestore_settings import update_module_store_settings
+from xmodule.modulestore.modulestore_settings import update_module_store_settings  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .common import *
 
@@ -476,6 +476,8 @@ COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 ENABLE_COMPREHENSIVE_THEMING = True
+
+PREPEND_LOCALE_PATHS = []
 
 LMS_ROOT_URL = "http://localhost:8000"
 

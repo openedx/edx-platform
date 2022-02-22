@@ -75,6 +75,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 max_age=COOKIE_DURATION,
                 secure=self.request.is_secure(),
+                samesite="Lax"
             )
         else:
             response.delete_cookie.assert_called_with(
@@ -212,7 +213,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         result = self.middleware.process_response(self.request, response)
 
         assert result is response
-        assert response.mock_calls == []
+        assert not response.mock_calls
 
     def test_preference_update_noop(self):
         self.request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = 'es'

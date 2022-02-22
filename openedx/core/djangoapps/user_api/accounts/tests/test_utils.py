@@ -11,8 +11,8 @@ from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewi
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import format_social_link, validate_social_link
 
@@ -84,13 +84,10 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
         """
         course = CourseFactory.create()
         with self.store.bulk_operations(course.id):
-            self.chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-            self.sequential = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
-            self.vertical1 = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
-            self.vertical2 = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
-        course.children = [self.chapter]
-        self.chapter.children = [self.sequential]
-        self.sequential.children = [self.vertical1, self.vertical2]
+            self.chapter = ItemFactory.create(category='chapter', parent=course)
+            self.sequential = ItemFactory.create(category='sequential', parent=self.chapter)
+            self.vertical1 = ItemFactory.create(category='vertical', parent=self.sequential)
+            self.vertical2 = ItemFactory.create(category='vertical', parent=self.sequential)
 
         if hasattr(self, 'user_one'):
             CourseEnrollment.enroll(self.engaged_user, course.id)
@@ -100,9 +97,9 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
 
     def submit_faux_completions(self):
         """
-        Submit completions (only for user_one)g
+        Submit completions (only for user_one)
         """
-        for block in self.course.children[0].children[0].children:
+        for block in self.sequential.get_children():
             models.BlockCompletion.objects.submit_completion(
                 user=self.engaged_user,
                 block_key=block.location,
@@ -122,7 +119,8 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
             self.cruft_user
         )
         assert block_url ==\
-               'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
+               'test_url:9999/courses/course-v1:{org}+{course}+{run}/jump_to/'\
+               'block-v1:{org}+{course}+{run}+type@vertical+block@{vertical_id}'.format(
                    org=self.course.location.course_key.org,
                    course=self.course.location.course_key.course,
                    run=self.course.location.course_key.run,

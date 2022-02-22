@@ -5,17 +5,20 @@ Test for split test XModule
 
 from unittest.mock import MagicMock
 from django.urls import reverse
-
-from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor
-from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from edx_toggles.toggles.testutils import override_waffle_flag
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
-class SplitTestBase(SharedModuleStoreTestCase):
+
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
+class SplitTestBase(ModuleStoreTestCase):
     """
     Sets up a basic course and user for split test testing.
     Also provides tests of rendered HTML for two user_tag conditions, 0 and 1.
@@ -39,24 +42,23 @@ class SplitTestBase(SharedModuleStoreTestCase):
             ]
         )
 
-        cls.course = CourseFactory.create(
-            number=cls.COURSE_NUMBER,
-            user_partitions=[cls.partition]
-        )
+    def setUp(self):
+        super().setUp()
 
-        cls.chapter = ItemFactory.create(
-            parent_location=cls.course.location,
+        self.course = CourseFactory.create(
+            number=self.COURSE_NUMBER,
+            user_partitions=[self.partition]
+        )
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location,
             category="chapter",
             display_name="test chapter",
         )
-        cls.sequential = ItemFactory.create(
-            parent_location=cls.chapter.location,
+        self.sequential = ItemFactory.create(
+            parent_location=self.chapter.location,
             category="sequential",
             display_name="Split Test Tests",
         )
-
-    def setUp(self):
-        super().setUp()
 
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)

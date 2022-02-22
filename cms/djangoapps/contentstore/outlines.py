@@ -18,8 +18,8 @@ from openedx.core.djangoapps.content.learning_sequences.data import (
     ExamData,
     VisibilityData
 )
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def _remove_version_info(usage_key):
@@ -245,9 +245,7 @@ def _make_section_data(section, unique_sequences):
     if error:
         section_errors.append(error)
 
-    # We haven't officially killed off problemset and videosequence yet, so
-    # treat them as equivalent to sequential for now.
-    valid_sequence_tags = ['sequential', 'problemset', 'videosequence']
+    valid_sequence_tags = ['sequential']
     sequences_data = []
 
     for sequence in section.get_children():

@@ -711,7 +711,10 @@ def add_courseware_context(content_list, course, user, id_map=None):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def prepare_content(content, course_key, is_staff=False, discussion_division_enabled=None, group_names_by_id=None):
+def prepare_content(
+    content, course_key, is_staff=False, is_community_ta=False,
+    discussion_division_enabled=None, group_names_by_id=None
+):
     """
     This function is used to pre-process thread and comment models in various
     ways before adding them to the HTTP response.  This includes fixing empty
@@ -725,6 +728,7 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
         content (dict): A thread or comment.
         course_key (CourseKey): The course key of the course.
         is_staff (bool): Whether the user is a staff member.
+        is_community_ta (bool): Whether the user is a TA (community or grpup community TA).
         discussion_division_enabled (bool): Whether division of course discussions is enabled.
            Note that callers of this method do not need to provide this value (it defaults to None)--
            it is calculated and then passed to recursive calls of this method.
@@ -738,11 +742,17 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
         'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers',
         'stats', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
-        'endorsement', 'context', 'last_activity_at'
+        'endorsement', 'context', 'last_activity_at', 'username', 'user_id'
     ]
 
-    if (content.get('anonymous') is False) and ((content.get('anonymous_to_peers') is False) or is_staff):
-        fields += ['username', 'user_id']
+    is_anonymous = content.get('anonymous')
+    is_anonymous_to_peers = content.get('anonymous_to_peers')
+    # is_staff is true for both staff and TAs, is_user_staff will be true for staff members only
+    is_user_staff = is_staff and not is_community_ta
+
+    if is_anonymous or (is_anonymous_to_peers and not is_user_staff):
+        fields.remove('username')
+        fields.remove('user_id')
 
     content = strip_none(extract(content, fields))
 
@@ -782,6 +792,7 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
                     child,
                     course_key,
                     is_staff,
+                    is_community_ta,
                     discussion_division_enabled=discussion_division_enabled,
                     group_names_by_id=group_names_by_id
                 )

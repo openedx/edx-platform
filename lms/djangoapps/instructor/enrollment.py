@@ -51,8 +51,8 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangolib.markup import Text
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -63,9 +63,11 @@ class EmailEnrollmentState:
         # N.B. retired users are not a concern here because they should be
         # handled at a higher level (i.e. in enroll_email).  Besides, this
         # class creates readonly objects.
-        exists_user = User.objects.filter(email=email).exists()
-        if exists_user:
+        try:
             user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            user = None
+        if user is not None:
             mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
             # is_active is `None` if the user is not enrolled in the course
             exists_ce = is_active is not None and is_active
@@ -79,7 +81,7 @@ class EmailEnrollmentState:
         exists_allowed = ceas.exists()
         state_auto_enroll = exists_allowed and ceas[0].auto_enroll
 
-        self.user = exists_user
+        self.user = user
         self.enrollment = exists_ce
         self.allowed = exists_allowed
         self.auto_enroll = bool(state_auto_enroll)
@@ -89,7 +91,7 @@ class EmailEnrollmentState:
     def __repr__(self):
         return "{}(user={}, enrollment={}, allowed={}, auto_enroll={})".format(
             self.__class__.__name__,
-            self.user,
+            bool(self.user),
             self.enrollment,
             self.allowed,
             self.auto_enroll,
@@ -105,7 +107,7 @@ class EmailEnrollmentState:
         }
         """
         return {
-            'user': self.user,
+            'user': bool(self.user),
             'enrollment': self.enrollment,
             'allowed': self.allowed,
             'auto_enroll': self.auto_enroll,
@@ -139,7 +141,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
     """
     previous_state = EmailEnrollmentState(course_id, student_email)
     enrollment_obj = None
-    if previous_state.user and User.objects.get(email=student_email).is_active:
+    if previous_state.user and previous_state.user.is_active:
         # if the student is currently unenrolled, don't enroll them in their
         # previous mode
 
@@ -159,6 +161,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         if email_students:
             email_params['message_type'] = 'enrolled_enroll'
             email_params['email_address'] = student_email
+            email_params['user_id'] = previous_state.user.id
             email_params['full_name'] = previous_state.full_name
             send_mail_to_student(student_email, email_params, language=language)
 
@@ -169,6 +172,8 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         if email_students:
             email_params['message_type'] = 'allowed_enroll'
             email_params['email_address'] = student_email
+            if previous_state.user:
+                email_params['user_id'] = previous_state.user.id
             send_mail_to_student(student_email, email_params, language=language)
 
     after_state = EmailEnrollmentState(course_id, student_email)
@@ -194,6 +199,8 @@ def unenroll_email(course_id, student_email, email_students=False, email_params=
         if email_students:
             email_params['message_type'] = 'enrolled_unenroll'
             email_params['email_address'] = student_email
+            if previous_state.user:
+                email_params['user_id'] = previous_state.user.id
             email_params['full_name'] = previous_state.full_name
             send_mail_to_student(student_email, email_params, language=language)
 
@@ -202,6 +209,8 @@ def unenroll_email(course_id, student_email, email_students=False, email_params=
         if email_students:
             email_params['message_type'] = 'allowed_unenroll'
             email_params['email_address'] = student_email
+            if previous_state.user:
+                email_params['user_id'] = previous_state.user.id
             # Since no User object exists for this student there is no "full_name" available.
             send_mail_to_student(student_email, email_params, language=language)
 
@@ -221,6 +230,7 @@ def send_beta_role_email(action, user, email_params):
     if action in ('add', 'remove'):
         email_params['message_type'] = '%s_beta_tester' % action
         email_params['email_address'] = user.email
+        email_params['user_id'] = user.id
         email_params['full_name'] = user.profile.name
     else:
         raise ValueError(f"Unexpected action received '{action}' - expected 'add' or 'remove'")
@@ -464,6 +474,7 @@ def send_mail_to_student(student, param_dict, language=None):
         `course_id`: id of course (a `str`)
         `auto_enroll`: user input option (a `str`)
         `course_url`: url of course (a `str`)
+        `user_id`: LMS user ID of student (an `int`) - None if unknown
         `email_address`: email of student (a `str`)
         `full_name`: student full name (a `str`)
         `message_type`: type of email to send and template to use (a `str`)
@@ -488,6 +499,12 @@ def send_mail_to_student(student, param_dict, language=None):
         param_dict['site_name']
     )
 
+    # Extract an LMS user ID for the student, if possible.
+    # ACE needs the user ID to be able to send email via Braze.
+    lms_user_id = 0
+    if 'user_id' in param_dict and param_dict['user_id'] is not None and param_dict['user_id'] > 0:
+        lms_user_id = param_dict['user_id']
+
     # see if there is an activation email template definition available as configuration,
     # if so, then render that
     message_type = param_dict['message_type']
@@ -504,7 +521,7 @@ def send_mail_to_student(student, param_dict, language=None):
 
     message_class = ace_emails_dict[message_type]
     message = message_class().personalize(
-        recipient=Recipient(lms_user_id=0, email_address=student),
+        recipient=Recipient(lms_user_id=lms_user_id, email_address=student),
         language=language,
         user_context=param_dict,
     )

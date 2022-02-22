@@ -66,7 +66,10 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
                 topic_link.enabled_in_context = False
             else:
                 topic_link.enabled_in_context = True
+                topic_link.ordering = topic_context.ordering
                 topic_link.title = topic_context.title
+                if topic_context.external_id:
+                    topic_link.external_id = topic_context.external_id
             topic_link.save()
         log.info(f"Creating new discussion topic links for {course_key}")
 
@@ -77,6 +80,7 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
                 title=topic_context.title,
                 provider_id=provider_id,
                 external_id=topic_context.external_id or uuid4(),
+                ordering=topic_context.ordering,
                 enabled_in_context=True,
             )
             for topic_context in new_topic_map.values()

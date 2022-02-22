@@ -29,8 +29,8 @@ from lms.djangoapps.edxnotes.plugins import EdxNotesTab
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangolib.markup import Text
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -173,7 +173,7 @@ def preprocess_collection(user, course, collection):
 
             model.update(update)
             usage_id = model["usage_id"]
-            if usage_id in list(cache.keys()):
+            if usage_id in list(cache.keys()):  # lint-amnesty, pylint: disable=consider-iterating-dictionary
                 model.update(cache[usage_id])
                 filtered_collection.append(model)
                 continue
@@ -202,7 +202,7 @@ def preprocess_collection(user, course, collection):
                 if not section:
                     log.debug("Section not found: %s", usage_key)
                     continue
-                if section.location in list(cache.keys()):
+                if section.location in list(cache.keys()):   # lint-amnesty, pylint: disable=consider-iterating-dictionary
                     usage_context = cache[section.location]
                     usage_context.update({
                         "unit": get_module_context(course, unit),
@@ -216,7 +216,7 @@ def preprocess_collection(user, course, collection):
                 if not chapter:
                     log.debug("Chapter not found: %s", usage_key)
                     continue
-                if chapter.location in list(cache.keys()):
+                if chapter.location in list(cache.keys()):  # lint-amnesty, pylint: disable=consider-iterating-dictionary
                     usage_context = cache[chapter.location]
                     usage_context.update({
                         "unit": get_module_context(course, unit),
@@ -349,7 +349,7 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
 
     # Verify response dict structure
     expected_keys = ['total', 'rows', 'num_pages', 'start', 'next', 'previous', 'current_page']
-    keys = list(collection.keys())
+    keys = list(collection.keys())   # lint-amnesty, pylint: disable=consider-iterating-dictionary
     if not keys or not all(key in expected_keys for key in keys):
         log.error("Incorrect data received from notes api: collection_data=%s", str(collection))
         raise EdxNotesParseError(_("Incorrect data received from notes api."))

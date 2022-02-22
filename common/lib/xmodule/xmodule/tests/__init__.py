@@ -26,7 +26,9 @@ from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, ScopeIds
 
+from capa.xqueue_interface import XQueueService
 from xmodule.assetstore import AssetMetadata
+from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorBlock
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import ModuleStoreEnum
@@ -34,7 +36,9 @@ from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests.helpers import mock_render_template, StubMakoService, StubUserService
-from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
+from xmodule.util.sandboxing import SandboxService
+from xmodule.x_module import DoNothingCache, ModuleSystem, XModuleDescriptor, XModuleMixin
+from openedx.core.lib.cache_utils import CacheService
 
 
 MODULE_DIR = path(__file__).dirname()
@@ -48,10 +52,16 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     ModuleSystem for testing
     """
     def __init__(self, **kwargs):
-        id_manager = CourseLocationManager(kwargs['course_id'])
+        course_id = kwargs['course_id']
+        id_manager = CourseLocationManager(course_id)
         kwargs.setdefault('id_reader', id_manager)
         kwargs.setdefault('id_generator', id_manager)
-        kwargs.setdefault('services', {}).setdefault('field-data', DictFieldData({}))
+
+        services = kwargs.get('services', {})
+        services.setdefault('cache', CacheService(DoNothingCache()))
+        services.setdefault('field-data', DictFieldData({}))
+        services.setdefault('sandbox', SandboxService(contentstore, course_id))
+        kwargs['services'] = services
         super().__init__(**kwargs)
 
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):  # lint-amnesty, pylint: disable=arguments-differ
@@ -92,6 +102,7 @@ def get_test_system(
     course_id=CourseKey.from_string('/'.join(['org', 'course', 'run'])),
     user=None,
     user_is_staff=False,
+    user_location=None,
     render_template=None,
 ):
     """
@@ -102,10 +113,14 @@ def get_test_system(
     """
     if not user:
         user = Mock(name='get_test_system.user', is_staff=False)
+    if not user_location:
+        user_location = Mock(name='get_test_system.user_location')
     user_service = StubUserService(
         user=user,
         anonymous_user_id='student',
         user_is_staff=user_is_staff,
+        user_role='student',
+        request_country_code=user_location,
     )
 
     mako_service = StubMakoService(render_template=render_template)
@@ -133,26 +148,24 @@ def get_test_system(
         track_function=Mock(name='get_test_system.track_function'),
         get_module=get_module,
         replace_urls=str,
-        get_real_user=lambda __: user,
         filestore=Mock(name='get_test_system.filestore', root_path='.'),
         debug=True,
         hostname="edx.org",
         services={
             'user': user_service,
             'mako': mako_service,
-        },
-        xqueue={
-            'interface': None,
-            'callback_url': '/',
-            'default_queuename': 'testqueue',
-            'waittime': 10,
-            'construct_callback': Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
+            'xqueue': XQueueService(
+                url='http://xqueue.url',
+                django_auth={},
+                basic_auth=[],
+                default_queuename='testqueue',
+                waittime=10,
+                construct_callback=Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
+            ),
         },
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         course_id=course_id,
         error_descriptor_class=ErrorBlock,
-        get_user_role=Mock(name='get_test_system.get_user_role', is_staff=False),
-        user_location=Mock(name='get_test_system.user_location'),
         descriptor_runtime=descriptor_system,
     )
 

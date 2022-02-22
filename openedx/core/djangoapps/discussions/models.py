@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_mysql.models import ListCharField
-from enum import Enum
+from enum import Enum  # lint-amnesty, pylint: disable=wrong-import-order
 from jsonfield import JSONField
 from lti_consumer.models import LtiConfiguration
 from model_utils.models import TimeStampedModel
@@ -141,7 +141,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='',
         )._asdict(),
         'messages': [],
-        'has_full_support': True
+        'has_full_support': True,
+        'admin_only_config': False,
     },
     Provider.OPEN_EDX: {
         'features': [
@@ -169,7 +170,7 @@ AVAILABLE_PROVIDER_MAP = {
         'messages': [],
         'has_full_support': True,
         'supports_in_context_discussions': True,
-        'visible': False,
+        'admin_only_config': False,
     },
     Provider.ED_DISCUSS: {
         'features': [
@@ -196,7 +197,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='',
         )._asdict(),
         'messages': [pii_sharing_required_message('Ed Discussion')],
-        'has_full_support': False
+        'has_full_support': False,
+        'admin_only_config': True,
     },
     Provider.INSCRIBE: {
         'features': [
@@ -224,7 +226,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='',
         )._asdict(),
         'messages': [pii_sharing_required_message('InScribe')],
-        'has_full_support': False
+        'has_full_support': False,
+        'admin_only_config': True,
     },
     Provider.PIAZZA: {
         'features': [
@@ -248,7 +251,8 @@ AVAILABLE_PROVIDER_MAP = {
             contact_email='team@piazza.com',
         )._asdict(),
         'messages': [],
-        'has_full_support': False
+        'has_full_support': False,
+        'admin_only_config': True
     },
     Provider.YELLOWDIG: {
         'features': [
@@ -267,7 +271,7 @@ AVAILABLE_PROVIDER_MAP = {
         ],
         'supports_lti': True,
         'external_links': ProviderExternalLinks(
-            learn_more='https://www.youtube.com/watch?v=ZACief-qMwY',
+            learn_more='https://youtu.be/oOcvjjMVFAw',
             configuration='',
             general='https://hubs.ly/H0J5Bn70',
             accessibility='',
@@ -518,53 +522,6 @@ class DiscussionsConfiguration(TimeStampedModel):
         )
 
 
-class ProgramDiscussionsConfiguration(TimeStampedModel):
-    """
-    Associates a program with a discussion provider and configuration
-    """
-
-    program_uuid = models.CharField(
-        primary_key=True,
-        db_index=True,
-        max_length=50,
-        verbose_name=_("Program UUID"),
-    )
-    enabled = models.BooleanField(
-        default=True,
-        help_text=_("If disabled, the discussions in the associated program will be disabled.")
-    )
-    lti_configuration = models.ForeignKey(
-        LtiConfiguration,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        help_text=_("The LTI configuration data for this program/provider."),
-    )
-    provider_type = models.CharField(
-        blank=False,
-        max_length=50,
-        verbose_name=_("Discussion provider"),
-        help_text=_("The discussion provider's id"),
-    )
-    history = HistoricalRecords()
-
-    def __str__(self):
-        return f"Configuration(uuid='{self.program_uuid}', provider='{self.provider_type}', enabled={self.enabled})"
-
-    @classmethod
-    def is_enabled(cls, program_uuid) -> bool:
-        """
-        Check if there is an active configuration for a given program uuid
-
-        Default to False, if no configuration exists
-        """
-        try:
-            configuration = cls.objects.get(program_uuid=program_uuid)
-            return configuration.enabled
-        except cls.DoesNotExist:
-            return False
-
-
 class DiscussionTopicLink(models.Model):
     """
     A model linking discussion topics ids to the part of a course they are linked to.
@@ -608,6 +565,10 @@ class DiscussionTopicLink(models.Model):
     enabled_in_context = models.BooleanField(
         default=True,
         help_text=_("Whether this topic should be shown in-context in the course.")
+    )
+    ordering = models.PositiveIntegerField(
+        null=True,
+        help_text=_("Ordering of this topic in its learning context"),
     )
 
     def __str__(self):

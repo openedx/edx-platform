@@ -23,7 +23,7 @@ from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.grades.api import events as grades_events
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..exceptions import UpdateProblemModuleStateError
 from .runner import TaskProgress
@@ -357,16 +357,12 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
         '''
         return lambda event_type, event: task_track(request_info, task_info, event_type, event, page='x_module_task')
 
-    xqueue_callback_url_prefix = xmodule_instance_args.get('xqueue_callback_url_prefix', '') \
-        if xmodule_instance_args is not None else ''
-
     return get_module_for_descriptor_internal(
         user=student,
         descriptor=module_descriptor,
         student_data=student_data,
         course_id=course_id,
         track_function=make_track_function(),
-        xqueue_callback_url_prefix=xqueue_callback_url_prefix,
         grade_bucket_type=grade_bucket_type,
         # This module isn't being used for front-end rendering
         request_token=None,

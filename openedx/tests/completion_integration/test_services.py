@@ -8,13 +8,13 @@ from completion.models import BlockCompletion
 from completion.services import CompletionService
 from completion.test_utils import CompletionWaffleTestMixin
 from opaque_keys.edx.keys import CourseKey
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
+from xmodule.tests import get_test_system
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.library_tools import LibraryToolsService  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tests import get_test_system  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -23,8 +23,6 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
     """
     Test the data returned by the CompletionService.
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

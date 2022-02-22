@@ -8,6 +8,7 @@ import functools
 import os
 from contextlib import contextmanager
 from enum import Enum
+from mimetypes import guess_type
 from unittest.mock import patch
 
 from django.conf import settings
@@ -15,6 +16,12 @@ from django.contrib.auth.models import AnonymousUser
 from django.db import connections, transaction
 from django.test import TestCase
 from django.test.utils import override_settings
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import _CONTENTSTORE
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import SignalHandler, clear_existing_modulestores, modulestore
+from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
@@ -23,11 +30,6 @@ from common.djangoapps.split_modulestore_django.models import SplitModulestoreCo
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory, InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
-from xmodule.contentstore.django import _CONTENTSTORE
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import SignalHandler, clear_existing_modulestores, modulestore
-from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
-from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 
 
 class CourseUserType(Enum):
@@ -195,6 +197,11 @@ TEST_DATA_MIXED_MODULESTORE = functools.partial(
 # Use this modulestore if you specifically want to test mongo and not a mocked modulestore.
 TEST_DATA_MONGO_MODULESTORE = functools.partial(mixed_store_config, mkdtemp_clean(), {})
 
+# When switching away from MONGO-by-default to SPLIT-by-default, we broke a lot of tests.
+# Some we fixed, but others we did not fully investigate. This value was used for those.
+# These tests may actually need MONGO, or they may be able to be fixed to work in SPLIT. Investigation needed.
+TEST_DATA_MONGO_AMNESTY_MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+
 # All store requests now go through mixed
 # Use this modulestore if you specifically want to test split-mongo and not a mocked modulestore.
 TEST_DATA_SPLIT_MODULESTORE = functools.partial(
@@ -275,7 +282,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
                 ...
 
     """
-    MODULESTORE = functools.partial(mixed_store_config, mkdtemp_clean(), {})
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     CONTENTSTORE = functools.partial(contentstore_config)
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache', 'course_index_cache']
 
@@ -604,3 +611,16 @@ class ModuleStoreTestCase(
             self.store.update_item(course, user_id)
         updated_course = self.store.get_course(course.id)
         return updated_course
+
+
+def upload_file_to_course(course_key, contentstore, source_file, target_filename):
+    '''
+    Uploads the given source file to the given course, and returns the content of the file.
+    '''
+    asset_key = course_key.make_asset_key('asset', target_filename)
+    with open(source_file, "rb") as f:
+        file_contents = f.read()
+    mimetype = guess_type(source_file)[0]
+    content = StaticContent(asset_key, target_filename, mimetype, file_contents, locked=False)
+    contentstore.save(content)
+    return file_contents

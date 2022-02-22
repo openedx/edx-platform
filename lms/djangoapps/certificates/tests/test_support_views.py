@@ -19,8 +19,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 CAN_GENERATE_METHOD = 'lms.djangoapps.certificates.generation_handler._can_generate_regular_certificate'
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
@@ -40,10 +40,10 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
     STUDENT_EMAIL = "student@example.com"
     STUDENT_PASSWORD = "student"
 
-    CERT_COURSE_KEY = CourseKey.from_string("edX/DemoX/Demo_Course")
-    COURSE_NOT_EXIST_KEY = CourseKey.from_string("test/TestX/Test_Course_Not_Exist")
-    EXISTED_COURSE_KEY_1 = CourseKey.from_string("test1/Test1X/Test_Course_Exist_1")
-    EXISTED_COURSE_KEY_2 = CourseKey.from_string("test2/Test2X/Test_Course_Exist_2")
+    CERT_COURSE_KEY = CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
+    COURSE_NOT_EXIST_KEY = CourseKey.from_string("course-v1:test+TestX+Test_Course_Not_Exist")
+    EXISTED_COURSE_KEY_1 = CourseKey.from_string("course-v1:test1+Test1X+Test_Course_Exist_1")
+    EXISTED_COURSE_KEY_2 = CourseKey.from_string("course-v1:test2+Test2X+Test_Course_Exist_2")
     CERT_GRADE = 0.89
     CERT_STATUS = CertificateStatuses.downloadable
     CERT_MODE = "verified"

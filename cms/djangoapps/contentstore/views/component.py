@@ -26,8 +26,8 @@ from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xbl
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
 from .helpers import get_parent_xblock, is_unit, xblock_type_display_name
@@ -161,7 +161,7 @@ def container_handler(request, usage_key_string):
             assert section is not None, "Could not determine ancestor section from unit " + str(unit.location)
 
             # for the sequence navigator
-            prev_url, next_url = get_sibling_urls(subsection)
+            prev_url, next_url = get_sibling_urls(subsection, unit.location)
             # these are quoted here because they'll end up in a query string on the page,
             # and quoting with mako will trigger the xss linter...
             prev_url = quote_plus(prev_url) if prev_url else None
@@ -275,7 +275,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
 
     component_display_names = {
         'discussion': _("Discussion"),
-        'html': _("HTML"),
+        'html': _("Text"),
         'problem': _("Problem"),
         'video': _("Video"),
         'openassessment': _("Open Response")

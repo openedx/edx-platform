@@ -8,12 +8,12 @@ from unittest.mock import ANY, MagicMock, patch
 from django.test import TestCase
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 import lms.djangoapps.lti_provider.outcomes as outcomes
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
 class StoreOutcomeParametersTest(TestCase):
@@ -297,6 +297,7 @@ class TestAssignmentsForProblem(ModuleStoreTestCase):
     """
     Test cases for the assignments_for_problem method in outcomes.py
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         super().setUp()

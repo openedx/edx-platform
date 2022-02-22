@@ -17,11 +17,11 @@ from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_a
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resource_url
-from xmodule.library_tools import LibraryToolsService
-from xmodule.modulestore.django import ModuleI18nService, modulestore
-from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService, TeamsConfigurationService
-from xmodule.x_module import ModuleSystem
+from xmodule.library_tools import LibraryToolsService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import ModuleI18nService, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.services import SettingsService, TeamsConfigurationService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import ModuleSystem  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def handler_url(block, handler_name, suffix='', query='', thirdparty=False):

@@ -27,6 +27,12 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
+from xmodule.fields import Date
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -88,10 +94,6 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from xmodule.fields import Date
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from .test_tools import msk_from_problem_urlname
 
@@ -2810,28 +2812,28 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         True,
         False
     )
-    @patch('lms.djangoapps.instructor.views.api.is_integrity_signature_enabled')
     @valid_problem_location
-    def test_idv_retirement_student_features_report(self, toggle_value, mock_toggle):
-        mock_toggle.return_value = toggle_value
-        kwargs = {'course_id': str(self.course.id)}
-        kwargs.update({'csv': '/csv'})
-        url = reverse('get_students_features', kwargs=kwargs)
-        success_status = 'The enrolled learner profile report is being created.'
-        with patch('lms.djangoapps.instructor_task.api.submit_calculate_students_features_csv') as mock_task_endpoint:
-            CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-            response = self.client.post(url, {})
-            self.assertContains(response, success_status)
+    def test_idv_retirement_student_features_report(self, enable_integrity_signature):
+        with patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': enable_integrity_signature}):
+            kwargs = {'course_id': str(self.course.id)}
+            kwargs.update({'csv': '/csv'})
+            url = reverse('get_students_features', kwargs=kwargs)
+            success_status = 'The enrolled learner profile report is being created.'
+            with patch('lms.djangoapps.instructor_task.api.submit_calculate_students_features_csv') \
+                    as mock_task_endpoint:
+                CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+                response = self.client.post(url, {})
+                self.assertContains(response, success_status)
 
-            # assert that if the integrity signature is enabled, the verification
-            # status is not included as a query feature
-            args = mock_task_endpoint.call_args.args
-            self.assertEqual(len(args), 3)
-            query_features = args[2]
-            if not toggle_value:
-                self.assertIn('verification_status', query_features)
-            else:
-                self.assertNotIn('verification_status', query_features)
+                # assert that if the integrity signature is enabled, the verification
+                # status is not included as a query feature
+                args = mock_task_endpoint.call_args.args
+                self.assertEqual(len(args), 3)
+                query_features = args[2]
+                if not enable_integrity_signature:
+                    self.assertIn('verification_status', query_features)
+                else:
+                    self.assertNotIn('verification_status', query_features)
 
     def test_get_ora2_responses_success(self):
         url = reverse('export_ora2_data', kwargs={'course_id': str(self.course.id)})
@@ -3091,6 +3093,8 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
     Test endpoints whereby instructors can rescore student grades,
     reset student attempts and delete state for entrance exam.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -3871,6 +3875,8 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test data dumps for reporting.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -4045,6 +4051,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
     """
     Tests for deleting due date extensions
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         """

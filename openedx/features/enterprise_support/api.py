@@ -21,25 +21,26 @@ from edx_django_utils.cache import TieredCache, get_cache_key
 from edx_rest_api_client.client import EdxRestApiClient
 from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
 
+from common.djangoapps.third_party_auth.pipeline import get as get_partial_pipeline
+from common.djangoapps.third_party_auth.provider import Registry
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.utils import get_data_consent_share_cache_key
-from common.djangoapps.third_party_auth.pipeline import get as get_partial_pipeline
-from common.djangoapps.third_party_auth.provider import Registry
-
 
 try:
+    from consent.models import DataSharingConsent, DataSharingConsentTextOverrides
+    from enterprise.api.v1.serializers import (
+        EnterpriseCustomerUserReadOnlySerializer,
+        EnterpriseCustomerUserWriteSerializer
+    )
     from enterprise.models import (
+        EnterpriseCourseEnrollment,
         EnterpriseCustomer,
         EnterpriseCustomerIdentityProvider,
         EnterpriseCustomerUser,
         PendingEnterpriseCustomerUser
     )
-    from enterprise.api.v1.serializers import (
-        EnterpriseCustomerUserReadOnlySerializer, EnterpriseCustomerUserWriteSerializer
-    )
-    from consent.models import DataSharingConsent, DataSharingConsentTextOverrides
 except ImportError:  # pragma: no cover
     pass
 
@@ -162,14 +163,13 @@ class EnterpriseApiClient:
         endpoint = getattr(self.client, 'enterprise-customer')
         return endpoint(uuid).get()
 
-    def post_enterprise_course_enrollment(self, username, course_id, consent_granted):
+    def post_enterprise_course_enrollment(self, username, course_id):
         """
         Create an EnterpriseCourseEnrollment by using the corresponding serializer (for validation).
         """
         data = {
             'username': username,
             'course_id': course_id,
-            'consent_granted': consent_granted,
         }
         endpoint = getattr(self.client, 'enterprise-course-enrollment')
         try:
@@ -177,11 +177,10 @@ class EnterpriseApiClient:
         except (HttpClientError, HttpServerError):
             message = (
                 "An error occured while posting EnterpriseCourseEnrollment for user {username} and "
-                "course run {course_id} (consent_granted value: {consent_granted})"
+                "course run {course_id}."
             ).format(
                 username=username,
                 course_id=course_id,
-                consent_granted=consent_granted,
             )
             LOGGER.exception(message)
             raise EnterpriseApiException(message)  # lint-amnesty, pylint: disable=raise-missing-from
@@ -784,6 +783,33 @@ def get_enterprise_learner_data_from_db(user):
         queryset = EnterpriseCustomerUser.objects.filter(user_id=user.id)
         serializer = EnterpriseCustomerUserReadOnlySerializer(queryset, many=True)
         return serializer.data
+
+
+@enterprise_is_enabled(otherwise=[])
+def get_data_sharing_consents(user):
+    """
+    Returns a list of data sharing consent records for the given user.
+    """
+
+    return DataSharingConsent.objects.filter(
+        username=user.username
+    )
+
+
+@enterprise_is_enabled(otherwise=[])
+def get_enterprise_course_enrollments(user):
+    """
+    Returns a list of enterprise course enrollments for the given user.
+    """
+
+    return EnterpriseCourseEnrollment.objects.select_related(
+        'licensed_with',
+        'enterprise_customer_user'
+    ).prefetch_related(
+        'enterprise_customer_user__enterprise_customer'
+    ).filter(
+        enterprise_customer_user__user_id=user.id
+    )
 
 
 @enterprise_is_enabled()
