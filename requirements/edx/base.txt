@@ -330,7 +330,7 @@ django-sekizai==3.0.1
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
-django-ses==2.4.0
+django-ses==2.5.0
     # via -r requirements/edx/base.in
 django-simple-history==3.0.0
     # via
@@ -394,15 +394,15 @@ drf-jwt==1.19.2
     # via edx-drf-extensions
 drf-yasg==1.20.0
     # via edx-api-doc-tools
-edx-ace==1.4.1
+edx-ace==1.5.0
     # via -r requirements/edx/base.in
-edx-api-doc-tools==1.5.1
+edx-api-doc-tools==1.6.0
     # via -r requirements/edx/base.in
 edx-auth-backends==4.1.0
     # via -r requirements/edx/base.in
 edx-braze-client==0.1.2
     # via -r requirements/edx/base.in
-edx-bulk-grades==0.9.2
+edx-bulk-grades==1.0.0
     # via
     #   -r requirements/edx/base.in
     #   staff-graded-xblock
@@ -417,7 +417,7 @@ edx-completion==4.2.0
     # via -r requirements/edx/base.in
 edx-django-release-util==1.1.1
     # via -r requirements/edx/base.in
-edx-django-sites-extensions==3.1.0
+edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.in
 edx-django-utils==4.5.0
     # via
@@ -451,7 +451,7 @@ edx-i18n-tools==0.9.1
     # via ora2
 edx-milestones==0.3.3
     # via -r requirements/edx/base.in
-edx-name-affirmation==2.1.0
+edx-name-affirmation==2.2.0
     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.3.0
     # via
@@ -470,7 +470,7 @@ edx-opaque-keys[django]==2.3.0
     #   openedx-events
     #   ora2
     #   xmodule
-edx-organizations==6.10.1
+edx-organizations==6.11.0
     # via -r requirements/edx/base.in
 edx-proctoring==4.9.0
     # via
@@ -485,7 +485,7 @@ edx-rest-api-client==5.5.0
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edx-proctoring
-edx-search==3.1.0
+edx-search==3.2.0
     # via -r requirements/edx/base.in
 edx-sga==0.18.0
     # via -r requirements/edx/base.in
@@ -504,7 +504,7 @@ edx-toggles==4.3.1
     #   ora2
 edx-user-state-client==1.3.2
     # via -r requirements/edx/base.in
-edx-when==2.2.2
+edx-when==2.3.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
@@ -567,7 +567,7 @@ idna==3.3
     #   -r requirements/edx/paver.txt
     #   requests
     #   yarl
-importlib-metadata==4.11.0
+importlib-metadata==4.11.1
     # via markdown
 inflection==0.5.1
     # via drf-yasg
@@ -649,7 +649,7 @@ markdown==3.3.6
     #   xblock-poll
 markey==0.8
     # via enmerkar-underscore
-markupsafe==2.0.1
+markupsafe==2.1.0
     # via
     #   -r requirements/edx/paver.txt
     #   chem
@@ -666,7 +666,7 @@ mock==4.0.3
     #   xblock-poll
 mongodbproxy @ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
     # via -r requirements/edx/github.in
-mongoengine==0.23.1
+mongoengine==0.24.0
     # via -r requirements/edx/base.in
 monotonic==1.6
     # via
@@ -872,7 +872,7 @@ random2==1.0.1
     # via -r requirements/edx/base.in
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
-redis==4.1.3
+redis==4.1.4
     # via -r requirements/edx/base.in
 regex==2022.1.18
     # via nltk
@@ -920,7 +920,7 @@ scipy==1.7.3
     #   openedx-calc
 semantic-version==2.9.0
     # via edx-drf-extensions
-shapely==1.8.0
+shapely==1.8.1.post1
     # via -r requirements/edx/base.in
 simplejson==3.17.6
     # via
@@ -939,7 +939,6 @@ six==1.16.0
     #   crowdsourcehinter-xblock
     #   edx-ace
     #   edx-auth-backends
-    #   edx-bulk-grades
     #   edx-ccx-keys
     #   edx-django-release-util
     #   edx-drf-extensions
@@ -985,7 +984,7 @@ sqlparse==0.4.2
     # via
     #   -r requirements/edx/base.in
     #   django
-staff-graded-xblock==1.6.0
+staff-graded-xblock==2.0.0
     # via -r requirements/edx/base.in
 stevedore==3.5.0
     # via
