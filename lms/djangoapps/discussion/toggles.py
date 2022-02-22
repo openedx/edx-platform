@@ -13,3 +13,12 @@ WAFFLE_FLAG_NAMESPACE = "discussions"
 # .. toggle_creation_date: 2021-11-05
 # .. toggle_target_removal_date: 2022-03-05
 ENABLE_DISCUSSIONS_MFE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_discussions_mfe', __name__)
+
+# .. toggle_name: discussions.enable_new_structure_discussions
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to toggle on the new structure for in context discussions
+# .. toggle_use_cases: temporary, open_edx
+# .. toggle_creation_date: 2022-02-22
+# .. toggle_target_removal_date: 2022-09-22
+ENABLE_NEW_STRUCTURE_DISCUSSIONS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_new_structure_discussions', __name__)
