@@ -2300,7 +2300,7 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
             assert "legacy experience" in content
             assert "new experience" not in content
         else:
-            assert "An educator preview of new discussions experience is available!" not in content
+            assert "You are viewing an educator only preview of the new discussions experience!" not in content
 
     @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
     @ddt.data(*itertools.product((True, False), ("legacy", "new", None)))
