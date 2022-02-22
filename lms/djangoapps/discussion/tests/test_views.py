@@ -2296,7 +2296,7 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
                 response = self.client.get(reverse("forum_form_discussion", args=[self.course.id]))
                 content = response.content.decode('utf8')
         if mfe_url and toggle_enabled:
-            assert "An educator preview of new discussions experience is available!" in content
+            assert "You are viewing an educator only preview of the new discussions experience!" in content
             assert "legacy experience" in content
             assert "new experience" not in content
         else:
