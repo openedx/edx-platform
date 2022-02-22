@@ -111,21 +111,27 @@ class SiteConfigurationTests(TestCase):
         """
         # add SiteConfiguration to database
         with ENABLE_CONFIG_VALUES_MODIFIER.override(use_modifier):
-            site_configuration = SiteConfigurationFactory.create(
+            site_configuration = SiteConfigurationFactory.build(
                 site=self.site,
                 site_values=self.test_config
             )
+            site_configuration.save()
+            site_configuration.refresh_from_db()
             assert bool(site_configuration.tahoe_config_modifier) == use_modifier, 'Sanity check for `override()`'
 
-        # Make sure entry is saved and retrieved correctly
-        self.assertEqual(site_configuration.get_value("PLATFORM_NAME"),
-                         self.test_config['platform_name'])
-        self.assertEqual(site_configuration.get_value("LMS_ROOT_URL"),
-                         self.expected_site_root_url)
-        self.assertTrue(site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK'))
-        self.assertTrue(site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK').endswith('/help'))
-        self.assertTrue(site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK'))
-        self.assertTrue(site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK').endswith('/help'))
+            # Make sure entry is saved and retrieved correctly
+            assert site_configuration.get_value("PLATFORM_NAME") == self.test_config['platform_name']
+            assert site_configuration.get_value("LMS_ROOT_URL") == self.expected_site_root_url
+            assert site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK')
+            assert site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK').endswith('/help')
+            assert site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK')
+            assert site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK').endswith('/help')
+
+            site_configuration.site_values['platform_name'] = 'new platform name'
+            site_configuration.save()
+            site_configuration.refresh_from_db()
+            assert site_configuration.get_value('platform_name') == 'new platform name'
+            assert site_configuration.get_value('PLATFORM_NAME') == 'new platform name'
 
     @ddt_without_and_with_modifier
     def test_hardcoded_values_for_unsaved_config_instance(self, use_modifier):

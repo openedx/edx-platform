@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.files.storage import get_storage_class
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils.encoding import python_2_unicode_compatible
 from jsonfield.fields import JSONField
@@ -79,42 +79,6 @@ class SiteConfiguration(models.Model):
 
     def __repr__(self):
         return self.__str__()
-
-    def tahoe_update_site_values_on_save(self):
-        """
-        Temp. helper until ENABLE_CONFIG_VALUES_MODIFIER is enabled on production.
-
-        # TODO: RED-2828 Clean up after production QA
-        """
-        if not ENABLE_CONFIG_VALUES_MODIFIER.is_enabled():
-            logger.info('ENABLE_CONFIG_VALUES_MODIFIER: switch is disabled, saving override values inline.')
-            from openedx.core.djangoapps.appsembler.sites.config_values_modifier import TahoeConfigurationValueModifier
-            tahoe_config_modifier = TahoeConfigurationValueModifier(site_config_instance=self)
-
-            if not self.site_values:
-                self.site_values = {}
-
-            if not self.get_value('platform_name'):
-                self.site_values['platform_name'] = self.site.name
-
-            if not self.get_value('PLATFORM_NAME'):  # First-time the config is saved with save()
-                self.site_values['css_overrides_file'] = tahoe_config_modifier.get_css_overrides_file()
-                self.site_values['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
-
-            # Everytime the config is saved with save()
-            self.site_values.update({
-                'PLATFORM_NAME': self.site_values.get('platform_name', ''),
-                'LANGUAGE_CODE': self.site_values.get('LANGUAGE_CODE', 'en'),
-                'LMS_ROOT_URL': tahoe_config_modifier.get_lms_root_url(),
-                'SITE_NAME': tahoe_config_modifier.get_domain(),
-                'ACTIVATION_EMAIL_SUPPORT_LINK': tahoe_config_modifier.get_activation_email_support_link(),
-                'PASSWORD_RESET_SUPPORT_LINK': tahoe_config_modifier.get_password_reset_support_link(),
-            })
-
-    def save(self, **kwargs):
-        super().save(**kwargs)
-        self.tahoe_update_site_values_on_save()
-        return self
 
     @beeline.traced('site_config.init_api_client_adapter')
     def init_api_client_adapter(self, site):
@@ -363,6 +327,39 @@ class SiteConfiguration(models.Model):
         if 'customer-sass-input' in path:
             return [(path, self.get_value('customer_sass_input', ''))]
         return None
+
+
+@receiver(pre_save, sender=SiteConfiguration)
+def tahoe_update_site_values_on_save(sender, instance, **kwargs):
+    """
+    Temp. helper until ENABLE_CONFIG_VALUES_MODIFIER is enabled on production.
+
+    # TODO: RED-2828 Clean up after production QA
+    """
+    if not ENABLE_CONFIG_VALUES_MODIFIER.is_enabled():
+        logger.info('ENABLE_CONFIG_VALUES_MODIFIER: switch is disabled, saving override values inline.')
+        from openedx.core.djangoapps.appsembler.sites.config_values_modifier import TahoeConfigurationValueModifier
+        tahoe_config_modifier = TahoeConfigurationValueModifier(site_config_instance=instance)
+
+        if not instance.site_values:
+            instance.site_values = {}
+
+        if not instance.site_values.get('platform_name'):
+            instance.site_values['platform_name'] = instance.site.name
+
+        if not instance.site_values.get('PLATFORM_NAME'):  # First-time the config is saved with save()
+            instance.site_values['css_overrides_file'] = tahoe_config_modifier.get_css_overrides_file()
+            instance.site_values['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
+
+        # Everytime the config is saved with save()
+        instance.site_values.update({
+            'PLATFORM_NAME': instance.site_values.get('platform_name', ''),
+            'LANGUAGE_CODE': instance.site_values.get('LANGUAGE_CODE', 'en'),
+            'LMS_ROOT_URL': tahoe_config_modifier.get_lms_root_url(),
+            'SITE_NAME': tahoe_config_modifier.get_domain(),
+            'ACTIVATION_EMAIL_SUPPORT_LINK': tahoe_config_modifier.get_activation_email_support_link(),
+            'PASSWORD_RESET_SUPPORT_LINK': tahoe_config_modifier.get_password_reset_support_link(),
+        })
 
 
 @receiver(post_save, sender=SiteConfiguration)
