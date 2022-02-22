@@ -87,12 +87,6 @@ RELATIVE_DATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_date
 # Waffle flag to enable user calendar syncing
 CALENDAR_SYNC_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'calendar_sync')
 
-# Namespace for course experience waffle switch.
-WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name='course_experience')
-
-# Waffle switch to enable the separate course outline page and full width content.
-COURSE_OUTLINE_PAGE_SWITCH = WaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'course_outline_page')
-
 def course_home_page_title(course):  # pylint: disable=unused-argument
     """
     Returns the title for the course home page.

@@ -41,7 +41,6 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     COURSE_OUTLINE_PAGE_FLAG,
-    COURSE_OUTLINE_PAGE_SWITCH,
     default_course_url_name,
     RELATIVE_DATES_FLAG,
 )
@@ -453,7 +452,7 @@ class CoursewareIndex(View):
             'disable_optimizely': not WaffleSwitchNamespace('RET').is_enabled('enable_optimizely_in_courseware'),
             'section_title': None,
             'sequence_title': None,
-            'disable_accordion': not COURSE_OUTLINE_PAGE_SWITCH.is_enabled(),
+            'disable_accordion': not COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
             'show_search': show_search,
         }
         courseware_context.update(
@@ -470,16 +469,18 @@ class CoursewareIndex(View):
             self.section_url_name,
             self.field_data_cache,
         )
-        course_block_tree = get_course_outline_block_tree(
-            request, six.text_type(self.course.id), request.user, allow_start_dates_in_future=True
-        )
-        courseware_context['accordion'] = render_accordion(
-            self.request,
-            self.course,
-            course_block_tree,
-            self.chapter_url_name,
-            self.section_url_name
-        )
+
+        if COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id):
+            course_block_tree = get_course_outline_block_tree(
+                request, six.text_type(self.course.id), request.user, allow_start_dates_in_future=True
+            )
+            courseware_context['accordion'] = render_accordion(
+                self.request,
+                self.course,
+                course_block_tree,
+                self.chapter_url_name,
+                self.section_url_name
+            )
 
         courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
             request, course=self.course)
