@@ -11,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
+from openedx_filters.learning.filters import CourseHomeRenderStarted
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active
@@ -240,5 +241,17 @@ class CourseHomeFragmentView(EdxFragmentView):
             'has_discount': has_discount,
             'show_search': show_search,
         }
-        html = render_to_string('course_experience/course-home-fragment.html', context)
+
+        course_home_template = 'course_experience/course-home-fragment.html'
+        try:
+            context, course_home_template = CourseHomeRenderStarted.run_filter(
+                context=context, template_name=course_home_template,
+            )
+        except CourseHomeRenderStarted.PreventCourseHomeRender as exc:
+            html = render_to_string(exc.course_home_template, exc.template_context)
+        except CourseHomeRenderStarted.RedirectCourseHomePage as exc:
+            raise CourseAccessRedirect(exc.redirect_to or reverse("dashboard")) from exc
+        else:
+            html = render_to_string(course_home_template, context)
+
         return Fragment(html)
