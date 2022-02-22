@@ -479,12 +479,14 @@
                                     return _.map(
                                         errorList,
                                         function(errorItem) {
-                                            return StringUtils.interpolate('<li {suppressAttr} >{error}</li>', {
-                                                error: errorItem.user_message,
-                                                suppressAttr: (
-                                                  key === 'email' || key === 'username'
-                                                ) ? 'data-hj-suppress' : ''
-                                            });
+                                            if (errorItem.user_message) {
+                                                return StringUtils.interpolate('<li {suppressAttr} >{error}</li>', {
+                                                    error: errorItem.user_message,
+                                                    suppressAttr: (
+                                                    key === 'email' || key === 'username'
+                                                    ) ? 'data-hj-suppress' : ''
+                                                });
+                                            }
                                         }
                                   );
                                 }
