@@ -37,6 +37,7 @@ from ipware.ip import get_client_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx_filters.learning.filters import CourseAboutRenderStarted
 from pytz import UTC
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from rest_framework import status
@@ -890,7 +891,7 @@ class EnrollStaffView(View):
 @ensure_csrf_cookie
 @ensure_valid_course_key
 @cache_if_anonymous()
-def course_about(request, course_id):
+def course_about(request, course_id):  # pylint: disable=too-many-statements
     """
     Display the course's about page.
     """
@@ -999,7 +1000,23 @@ def course_about(request, course_id):
             'allow_anonymous': allow_anonymous,
         }
 
-        return render_to_response('courseware/course_about.html', context)
+        course_about_template = 'courseware/course_about.html'
+        try:
+            # .. filter_implemented_name: CourseAboutRenderStarted
+            # .. filter_type: org.openedx.learning.course_about.render.started.v1
+            context, course_about_template = CourseAboutRenderStarted.run_filter(
+                context=context, template_name=course_about_template,
+            )
+        except CourseAboutRenderStarted.RenderInvalidCourseAbout as exc:
+            response = render_to_response(exc.course_about_template, exc.template_context)
+        except CourseAboutRenderStarted.RedirectToPage as exc:
+            raise CourseAccessRedirect(exc.redirect_to or reverse('dashboard')) from exc
+        except CourseAboutRenderStarted.RenderCustomResponse as exc:
+            response = exc.response or render_to_response(course_about_template, context)
+        else:
+            response = render_to_response(course_about_template, context)
+
+        return response
 
 
 @ensure_csrf_cookie
