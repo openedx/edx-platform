@@ -42,7 +42,7 @@ class PreviewLanguageFragmentView(EdxFragmentView):
         Creates the base context for rendering a fragment as a standalone page.
         """
         return {
-            'uses_bootstrap': True,
+            'uses_bootstrap': False,
         }
 
     def standalone_page_title(self, request, fragment, **kwargs):
