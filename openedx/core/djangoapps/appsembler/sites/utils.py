@@ -513,6 +513,9 @@ def add_course_creator_role(user):
 
     This will fail in when running tests from within the AMC because the CMS migrations
     don't run during tests. Patch this function to avoid such errors.
+
+    TODO: RED-2853 Remove this helper when AMC is removed
+          This helper is being replaced by `update_course_creator_role_for_cms` which has unit tests.
     """
     from cms.djangoapps.course_creators.models import CourseCreator  # Fix LMS->CMS imports.
     from student.roles import CourseAccessRole, CourseCreatorRole  # Avoid circular import.
