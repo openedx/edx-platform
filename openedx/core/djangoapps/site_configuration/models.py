@@ -263,11 +263,17 @@ class SiteConfiguration(models.Model):
                 'sass_compile_message': developer_message,
             }
 
+        theme_version = self.get_value('THEME_VERSION', 'amc-v1')
+        if theme_version == 'tahoe-v2':
+            scss_file = 'main-v2.scss'
+        else:
+            # TODO: Deprecated. Remove once all sites are migrated to Tahoe 2.0 structure.
+            scss_file = 'main.scss'
+
         try:
-            css_output = sites_utils.compile_sass('main.scss', custom_branding=self._sass_var_override)
+            css_output = sites_utils.compile_sass(scss_file, custom_branding=self._sass_var_override)
             with storage.open(css_file_name, 'w') as f:
                 f.write(css_output)
-
             successful_sass_compile = True
             sass_compile_message = 'Sass compile finished successfully for site {site}'.format(site=self.site.domain)
         except CompileError as exc:
@@ -281,6 +287,7 @@ class SiteConfiguration(models.Model):
         return {
             'successful_sass_compile': successful_sass_compile,
             'sass_compile_message': sass_compile_message,
+            'scss_file_used': scss_file,
         }
 
     def get_css_url(self):

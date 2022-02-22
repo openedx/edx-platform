@@ -257,6 +257,8 @@ def test_site_configuration_compile_sass_success(caplog, clean_site_configuratio
     sass_status = site_configuration.compile_microsite_sass()
     assert sass_status['successful_sass_compile']
     assert 'Sass compile finished successfully' in sass_status['sass_compile_message']
+    assert 'main.scss' in sass_status['scss_file_used'], 'Should use the default file'
+    assert 'main-v2.scss' not in sass_status['scss_file_used']
 
 
 @override_settings(
