@@ -200,7 +200,7 @@ class ConditionalBlockBasicTest(unittest.TestCase):
         fragments = ajax['fragments']
         assert not any(('This is a secret' in item['content']) for item in fragments)
 
-    @patch('xmodule.conditional_module.log')
+    @patch('xmodule.conditional_module.log', autospec=True)
     def test_conditional_with_staff_only_source_module(self, mock_log):
         modules = ConditionalFactory.create(
             self.test_system,
@@ -231,7 +231,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
         descriptor = self.modulestore.get_item(location, depth=None)
         return self.test_system.get_module(descriptor)
 
-    @patch('xmodule.x_module.descriptor_global_local_resource_url')
+    @patch('xmodule.x_module.descriptor_global_local_resource_url', autospec=True)
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': False})
     def test_conditional_module(self, _):
         """Make sure that conditional module works"""

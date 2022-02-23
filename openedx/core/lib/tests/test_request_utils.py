@@ -309,7 +309,7 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
         expected_error_settings_dict = _get_expected_error_settings_dict()
         assert expected_error_settings_dict == {}
 
-    @patch('openedx.core.lib.request_utils.log')
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
     @override_settings(EXPECTED_ERRORS=[{}])
     def test_get_with_missing_module_and_class(self, mock_logger):
         expected_error_settings_dict = _get_expected_error_settings_dict()
@@ -321,7 +321,7 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
         )
         assert expected_error_settings_dict == {}
 
-    @patch('openedx.core.lib.request_utils.log')
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
     @override_settings(EXPECTED_ERRORS=[
         {
             'MODULE_AND_CLASS': 'colon.separator.warning:Class',
@@ -338,7 +338,7 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
         )
         assert 'colon.separator.warning.Class' in expected_error_settings_dict
 
-    @patch('openedx.core.lib.request_utils.log')
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
     @override_settings(EXPECTED_ERRORS=[
         {
             'MODULE_AND_CLASS': 'valid.module.DuplicateClass',
@@ -360,7 +360,7 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
         assert 'valid.module.DuplicateClass' in expected_error_settings_dict
         assert expected_error_settings_dict['valid.module.DuplicateClass']['reason_expected'] == 'Because overridden'
 
-    @patch('openedx.core.lib.request_utils.log')
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
     @override_settings(EXPECTED_ERRORS=[{'MODULE_AND_CLASS': 'valid.module.and.class.ButMissingReason'}])
     def test_get_with_missing_reason(self, mock_logger):
         expected_error_settings_dict = _get_expected_error_settings_dict()
@@ -371,7 +371,7 @@ class TestGetExpectedErrorSettingsDict(unittest.TestCase):
         )
         assert expected_error_settings_dict == {}
 
-    @patch('openedx.core.lib.request_utils.log')
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
     @override_settings(EXPECTED_ERRORS=['not-a-dict'])
     def test_get_with_invalid_dict(self, mock_logger):
         expected_error_settings_dict = _get_expected_error_settings_dict()
@@ -424,16 +424,16 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
 
         assert response == expected_response
 
-    @patch('openedx.core.lib.request_utils.set_custom_attribute')
-    @patch('openedx.core.lib.request_utils.log')
+    @patch('openedx.core.lib.request_utils.set_custom_attribute', autospec=True)
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
     def test_process_exception_no_expected_errors(self, mock_logger, mock_set_custom_attribute):
         ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
 
         mock_logger.info.assert_not_called()
         mock_set_custom_attribute.assert_not_called()
 
-    @patch('openedx.core.lib.request_utils.set_custom_attribute')
-    @patch('openedx.core.lib.request_utils.log')
+    @patch('openedx.core.lib.request_utils.set_custom_attribute', autospec=True)
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
     @ddt.data(None, [])
     def test_process_exception_with_empty_expected_errors(
         self, expected_errors_setting, mock_logger, mock_set_custom_attribute,
@@ -448,8 +448,8 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
         'MODULE_AND_CLASS': 'test.module.TestException',
         'REASON_EXPECTED': 'Because',
     }])
-    @patch('openedx.core.lib.request_utils.set_custom_attribute')
-    @patch('openedx.core.lib.request_utils.log')
+    @patch('openedx.core.lib.request_utils.set_custom_attribute', autospec=True)
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
     def test_process_exception_not_matching_expected_errors(self, mock_logger, mock_set_custom_attribute):
         ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
 
@@ -466,8 +466,8 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
             'REASON_EXPECTED': 'Because',
         }
     ])
-    @patch('openedx.core.lib.request_utils.set_custom_attribute')
-    @patch('openedx.core.lib.request_utils.log')
+    @patch('openedx.core.lib.request_utils.set_custom_attribute', autospec=True)
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
     def test_process_exception_expected_error_with_defaults(self, mock_logger, mock_set_custom_attribute):
         ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, self.mock_exception)
 
@@ -492,7 +492,7 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
             'REASON_EXPECTED': 'Because',
         }
     ])
-    @patch('openedx.core.lib.request_utils.set_custom_attribute')
+    @patch('openedx.core.lib.request_utils.set_custom_attribute', autospec=True)
     @ddt.data(True, False)
     def test_process_exception_called_multiple_times(self, use_same_exception, mock_set_custom_attribute):
         mock_first_exception = self.mock_exception
@@ -521,7 +521,7 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
         'MODULE_AND_CLASS': 'Exception',
         'REASON_EXPECTED': 'Because',
     }])
-    @patch('openedx.core.lib.request_utils.set_custom_attribute')
+    @patch('openedx.core.lib.request_utils.set_custom_attribute', autospec=True)
     def test_process_exception_with_plain_exception(self, mock_set_custom_attribute):
         mock_exception = Exception("Oops")
         ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, mock_exception)
@@ -532,8 +532,8 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
             call('error_ignored_message', 'Oops'),
         ])
 
-    @patch('openedx.core.lib.request_utils.set_custom_attribute')
-    @patch('openedx.core.lib.request_utils.log')
+    @patch('openedx.core.lib.request_utils.set_custom_attribute', autospec=True)
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
     @ddt.data(
         (False, True),  # skip logging
         (True, False),  # log without stacktrace
@@ -590,8 +590,8 @@ class TestExpectedErrorExceptionHandler(unittest.TestCase):
         'LOG_ERROR': True,
         'REASON_EXPECTED': 'Because',
     }])
-    @patch('openedx.core.lib.request_utils.set_custom_attribute')
-    @patch('openedx.core.lib.request_utils.log')
+    @patch('openedx.core.lib.request_utils.set_custom_attribute', autospec=True)
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
     @ddt.data(True, False)
     def test_handler_with_expected_error(
         self, use_valid_context, mock_logger, mock_set_custom_attribute

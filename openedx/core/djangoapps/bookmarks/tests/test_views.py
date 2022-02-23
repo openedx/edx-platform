@@ -83,7 +83,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         (25, True),
     )
     @ddt.unpack
-    @patch('eventtracking.tracker.emit')
+    @patch('eventtracking.tracker.emit', autospec=True)
     def test_get_bookmarks_successfully(self, bookmarks_count, check_all_fields, mock_tracker):
         """
         Test that requesting bookmarks for a course returns records successfully in
@@ -127,7 +127,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
     @ddt.data(
         10, 25
     )
-    @patch('eventtracking.tracker.emit')
+    @patch('eventtracking.tracker.emit', autospec=True)
     def test_get_bookmarks_with_pagination(self, bookmarks_count, mock_tracker):
         """
         Test that requesting bookmarks for a course return results with pagination 200 code.
@@ -166,7 +166,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
             page_number=1
         )
 
-    @patch('eventtracking.tracker.emit')
+    @patch('eventtracking.tracker.emit', autospec=True)
     def test_get_bookmarks_with_invalid_data(self, mock_tracker):
         """
         Test that requesting bookmarks with invalid data returns 0 records.
@@ -182,7 +182,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         assert len(bookmarks_data) == 0
         assert not mock_tracker.emit.called
 
-    @patch('eventtracking.tracker.emit')
+    @patch('eventtracking.tracker.emit', autospec=True)
     def test_get_all_bookmarks_when_course_id_not_given(self, mock_tracker):
         """
         Test that requesting bookmarks returns all records for that user.
@@ -326,7 +326,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         assert 405 == self.client.put(reverse('bookmarks')).status_code
         assert 405 == self.client.delete(reverse('bookmarks')).status_code
 
-    @patch('eventtracking.tracker.emit')
+    @patch('eventtracking.tracker.emit', autospec=True)
     @ddt.unpack
     @ddt.data(
         {'page_size': -1, 'expected_bookmarks_count': 4, 'expected_page_size': 10, 'expected_page_number': 1},
@@ -350,7 +350,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
             page_number=expected_page_number
         )
 
-    @patch('openedx.core.djangoapps.bookmarks.views.eventtracking.tracker.emit')
+    @patch('openedx.core.djangoapps.bookmarks.views.eventtracking.tracker.emit', autospec=True)
     def test_listed_event_for_page_number(self, mock_tracker):
         """ Test that edx.course.bookmark.listed event values are as expected when we request a specific page number """
         self.send_get(client=self.client, url=reverse('bookmarks'), query_parameters='page_size=2&page=2')

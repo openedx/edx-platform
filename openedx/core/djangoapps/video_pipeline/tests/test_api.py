@@ -54,8 +54,8 @@ class TestAPIUtils(VideoPipelineMixin, TestCase):
             'api_secret': '11111111',
         }
     )
-    @patch('openedx.core.djangoapps.video_pipeline.api.log')
-    @patch('openedx.core.djangoapps.video_pipeline.utils.OAuthAPIClient')
+    @patch('openedx.core.djangoapps.video_pipeline.api.log', autospec=True)
+    @patch('openedx.core.djangoapps.video_pipeline.utils.OAuthAPIClient', autospec=True)
     def test_update_transcription_service_credentials(self, credentials_payload, mock_client, mock_logger):
         """
         Tests that the update transcription service credentials api util works as expected.
@@ -74,8 +74,8 @@ class TestAPIUtils(VideoPipelineMixin, TestCase):
             credentials_payload.get('org'), credentials_payload.get('provider')
         ))
 
-    @patch('openedx.core.djangoapps.video_pipeline.api.log')
-    @patch('openedx.core.djangoapps.video_pipeline.utils.OAuthAPIClient')
+    @patch('openedx.core.djangoapps.video_pipeline.api.log', autospec=True)
+    @patch('openedx.core.djangoapps.video_pipeline.utils.OAuthAPIClient', autospec=True)
     def test_update_transcription_service_credentials_exceptions(self, mock_client, mock_logger):
         """
         Tests that the update transcription service credentials logs the exception occurring

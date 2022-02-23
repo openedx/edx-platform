@@ -26,8 +26,8 @@ class LockedTest(ModuleStoreTestCase):
         self.user = UserFactory.create()
         CourseEnrollment.enroll(self.user, self.course.id)
 
-    @patch('cms.djangoapps.contentstore.signals.handlers.cache.add')
-    @patch('cms.djangoapps.contentstore.signals.handlers.task_compute_all_grades_for_course.apply_async')
+    @patch('cms.djangoapps.contentstore.signals.handlers.cache.add', autospec=True)
+    @patch('cms.djangoapps.contentstore.signals.handlers.task_compute_all_grades_for_course.apply_async', autospec=True)
     @ddt.data(True, False)
     def test_locked(self, lock_available, compute_grades_async_mock, add_mock):
         add_mock.return_value = lock_available

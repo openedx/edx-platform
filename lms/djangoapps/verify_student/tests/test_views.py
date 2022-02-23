@@ -1574,8 +1574,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
-    @patch('lms.djangoapps.verify_student.views.log.error')
-    @patch('lms.djangoapps.verify_student.views.segment.track')
+    @patch('lms.djangoapps.verify_student.views.log.error', autospec=True)
+    @patch('lms.djangoapps.verify_student.views.segment.track', autospec=True)
     def test_passed_status_template(self, mock_segment_track, _mock_log_error):
         """
         Test for verification passed.
@@ -1639,8 +1639,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
-    @patch('lms.djangoapps.verify_student.views.log.error')
-    @patch('lms.djangoapps.verify_student.views.segment.track')
+    @patch('lms.djangoapps.verify_student.views.log.error', autospec=True)
+    @patch('lms.djangoapps.verify_student.views.segment.track', autospec=True)
     def test_first_time_verification(self, mock_segment_track, _mock_log_error):
         """
         Test for verification passed if the learner does not have any previous verification
@@ -1673,8 +1673,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
-    @patch('lms.djangoapps.verify_student.views.log.error')
-    @patch('lms.djangoapps.verify_student.views.segment.track')
+    @patch('lms.djangoapps.verify_student.views.log.error', autospec=True)
+    @patch('lms.djangoapps.verify_student.views.segment.track', autospec=True)
     def test_failed_status_template(self, mock_segment_track, _mock_log_error):
         """
         Test for failed verification.
@@ -1704,7 +1704,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
-    @patch('lms.djangoapps.verify_student.views.segment.track')
+    @patch('lms.djangoapps.verify_student.views.segment.track', autospec=True)
     def test_system_fail_result(self, mock_segment_track):
         """
         Test for software secure result system failure.

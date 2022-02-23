@@ -32,9 +32,9 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
         super().setUp()
         self.command = recalculate_subsection_grades.Command()
 
-    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.Submission')
-    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.user_by_anonymous_id')
-    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.recalculate_subsection_grade_v3')
+    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.Submission', autospec=True)
+    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.user_by_anonymous_id', autospec=True)
+    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.recalculate_subsection_grade_v3', autospec=True)
     def test_submissions(self, task_mock, id_mock, subs_mock):
         submission = MagicMock()
         submission.student_item = MagicMock(
@@ -48,9 +48,9 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
         id_mock.return_value.id = "ID"
         self._run_command_and_check_output(task_mock, ScoreDatabaseTableEnum.submissions, include_anonymous_id=True)
 
-    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.StudentModule')
-    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.user_by_anonymous_id')
-    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.recalculate_subsection_grade_v3')
+    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.StudentModule', autospec=True)
+    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.user_by_anonymous_id', autospec=True)
+    @patch('lms.djangoapps.grades.management.commands.recalculate_subsection_grades.recalculate_subsection_grade_v3', autospec=True)
     def test_csm(self, task_mock, id_mock, csm_mock):
         csm_record = MagicMock()
         csm_record.student_id = "ID"

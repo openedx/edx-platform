@@ -14,8 +14,8 @@ class UpdateCourseInCacheTaskTest(ModuleStoreTestCase):
     """
     Ensures that the update_course_in_cache task runs as expected.
     """
-    @patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2.retry')
-    @patch('openedx.core.djangoapps.content.block_structure.api.update_course_in_cache')
+    @patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2.retry', autospec=True)
+    @patch('openedx.core.djangoapps.content.block_structure.api.update_course_in_cache', autospec=True)
     def test_retry_on_error(self, mock_update, mock_retry):
         """
         Ensures that tasks will be retried if IntegrityErrors are encountered.

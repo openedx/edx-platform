@@ -46,7 +46,7 @@ class UserManagementHelperTest(TestCase):
         with pytest.raises(PermissionDenied):
             users.switch_user(self.request, self.lti_user, self.lti_consumer)
 
-    @patch('lms.djangoapps.lti_provider.users.login')
+    @patch('lms.djangoapps.lti_provider.users.login', autospec=True)
     def test_authenticate_called(self, _login_mock):
         with patch('lms.djangoapps.lti_provider.users.authenticate', return_value=self.new_user) as authenticate:
             users.switch_user(self.request, self.lti_user, self.lti_consumer)
@@ -56,7 +56,7 @@ class UserManagementHelperTest(TestCase):
                 lti_consumer=self.lti_consumer
             )
 
-    @patch('lms.djangoapps.lti_provider.users.login')
+    @patch('lms.djangoapps.lti_provider.users.login', autospec=True)
     def test_login_called(self, login_mock):
         with patch('lms.djangoapps.lti_provider.users.authenticate', return_value=self.new_user):
             users.switch_user(self.request, self.lti_user, self.lti_consumer)

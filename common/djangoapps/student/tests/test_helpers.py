@@ -102,7 +102,7 @@ class TestLoginHelper(TestCase):
         for method in ['GET', 'POST']
     ]
 
-    @patch('common.djangoapps.student.helpers.third_party_auth.pipeline.get')
+    @patch('common.djangoapps.student.helpers.third_party_auth.pipeline.get', autospec=True)
     @ddt.data(*tpa_hint_test_cases_with_method)
     @ddt.unpack
     def test_third_party_auth_hint(

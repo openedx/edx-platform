@@ -31,7 +31,7 @@ class LibraryToolsServiceTest(MixedSplitTestCase):
         assert all_libraries
         assert len(all_libraries) == 1
 
-    @patch('xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_library_summaries')
+    @patch('xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_library_summaries', autospec=True)
     def test_list_available_libraries_fetch(self, mock_get_library_summaries):
         """
         Test that library list is compiled using light weight library summary objects.

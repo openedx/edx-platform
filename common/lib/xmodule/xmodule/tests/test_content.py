@@ -127,7 +127,7 @@ class ContentTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         assert AssetLocator(CourseLocator('mitX', '800', 'ignore_run'), 'thumbnail', thumbnail_filename) ==\
                thumbnail_file_location
 
-    @patch('xmodule.contentstore.content.Image')
+    @patch('xmodule.contentstore.content.Image', autospec=True)
     def test_image_is_closed_when_generating_thumbnail(self, image_class_mock):
         # We used to keep the Image's file descriptor open when generating a thumbnail.
         # It should be closed after being used.

@@ -91,13 +91,13 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         assert not FinancialAssistanceTool().is_enabled(self.request, self.course.id)
 
     # mock the response from get_enrollment to use enrollment with course_upgrade_deadline in the past
-    @patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment')
+    @patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment', autospec=True)
     def test_not_visible_when_upgrade_deadline_has_passed(self, get_enrollment_mock):
         get_enrollment_mock.return_value = self.enrollment_deadline_past
         assert not FinancialAssistanceTool().is_enabled(self.request, self.course.id)
 
     # mock the response from get_enrollment to use enrollment with no course_upgrade_deadline
-    @patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment')
+    @patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment', autospec=True)
     def test_not_visible_when_no_upgrade_deadline(self, get_enrollment_mock):
         get_enrollment_mock.return_value = self.enrollment_deadline_missing
         assert not FinancialAssistanceTool().is_enabled(self.request, self.course.id)
@@ -108,7 +108,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         assert not FinancialAssistanceTool().is_enabled(self.request, self.course_overview.id)
 
     # mock the response from get_enrollment to use enrollment where learner upgraded
-    @patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment')
+    @patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment', autospec=True)
     def test_tool_not_visible_when_already_upgraded(self, get_enrollment_mock):
         self.course_financial_mode.save()
         get_enrollment_mock.return_value = self.enrollment_upgraded

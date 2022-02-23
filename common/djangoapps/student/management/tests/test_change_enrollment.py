@@ -42,7 +42,7 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
             self.users.append(user)
             self.enrollments.append(CourseEnrollment.enroll(user, self.course.id, mode='audit'))
 
-    @patch('common.djangoapps.student.management.commands.change_enrollment.logger')
+    @patch('common.djangoapps.student.management.commands.change_enrollment.logger', autospec=True)
     @ddt.data(
         ('email', False, 3),
         ('username', False, 3),
@@ -80,7 +80,7 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
             len(self.users)
         )
 
-    @patch('common.djangoapps.student.management.commands.change_enrollment.logger')
+    @patch('common.djangoapps.student.management.commands.change_enrollment.logger', autospec=True)
     @ddt.data(
         ('email', 'dtennant@thedoctor.com', 3),
         ('username', 'dtennant', 3),

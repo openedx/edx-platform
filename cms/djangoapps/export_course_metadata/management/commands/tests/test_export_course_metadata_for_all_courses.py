@@ -23,7 +23,7 @@ class ExportAllCourses(ModuleStoreTestCase):
         CourseFactory.create()
         CourseFactory.create()
 
-    @patch('cms.djangoapps.export_course_metadata.tasks.course_metadata_export_storage.save')
+    @patch('cms.djangoapps.export_course_metadata.tasks.course_metadata_export_storage.save', autospec=True)
     def test_exporting_all_courses(self, patched_storage):
         """
         Test for exporting course metadata for all courses.

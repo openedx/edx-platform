@@ -295,7 +295,7 @@ class TestLinkProgramEnrollments(TestLinkProgramEnrollmentsMixin, TestCase):
         ('learner-2', 'LEArneR-2'),
     )
     @ddt.unpack
-    @patch('lms.djangoapps.program_enrollments.api.linking.CourseMode.modes_for_course_dict')
+    @patch('lms.djangoapps.program_enrollments.api.linking.CourseMode.modes_for_course_dict', autospec=True)
     def test_update_linking_enrollment_to_another_user(
         self,
         linked_external_key,

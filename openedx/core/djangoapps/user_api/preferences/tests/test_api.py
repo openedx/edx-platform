@@ -113,7 +113,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         set_user_preference(self.user, test_key, "new_value", username=self.user.username)
         assert get_user_preference(self.user, test_key) == 'new_value'
 
-    @patch('openedx.core.djangoapps.user_api.models.UserPreference.save')
+    @patch('openedx.core.djangoapps.user_api.models.UserPreference.save', autospec=True)
     def test_set_user_preference_errors(self, user_preference_save):
         """
         Verifies that set_user_preference returns appropriate errors.
@@ -187,8 +187,8 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         update_user_preferences(self.user, update_data, user=self.user)
         assert get_user_preference(self.user, self.test_preference_key) == 'new_value'
 
-    @patch('openedx.core.djangoapps.user_api.models.UserPreference.delete')
-    @patch('openedx.core.djangoapps.user_api.models.UserPreference.save')
+    @patch('openedx.core.djangoapps.user_api.models.UserPreference.delete', autospec=True)
+    @patch('openedx.core.djangoapps.user_api.models.UserPreference.save', autospec=True)
     def test_update_user_preferences_errors(self, user_preference_save, user_preference_delete):
         """
         Verifies that set_user_preferences returns appropriate errors.
@@ -249,7 +249,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         assert delete_user_preference(self.user, self.test_preference_key, username=self.user.username)
         assert not delete_user_preference(self.user, 'no_such_key')
 
-    @patch('openedx.core.djangoapps.user_api.models.UserPreference.delete')
+    @patch('openedx.core.djangoapps.user_api.models.UserPreference.delete', autospec=True)
     def test_delete_user_preference_errors(self, user_preference_delete):
         """
         Verifies that delete_user_preference returns appropriate errors.

@@ -396,7 +396,7 @@ class DownloadTestCase(AssetsTestCase):
         resp = self.client.get(url, HTTP_ACCEPT='text/html')
         self.assertEqual(resp.status_code, 404)
 
-    @patch('xmodule.modulestore.mixed.MixedModuleStore.find_asset_metadata')
+    @patch('xmodule.modulestore.mixed.MixedModuleStore.find_asset_metadata', autospec=True)
     def test_pickling_calls(self, patched_find_asset_metadata):
         """ Tests if assets are not calling find_asset_metadata
         """

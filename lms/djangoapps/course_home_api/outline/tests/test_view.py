@@ -237,7 +237,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert course_goals == expected_course_goals
 
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-    @patch('lms.djangoapps.course_api.blocks.transformers.milestones.get_attempt_status_summary')
+    @patch('lms.djangoapps.course_api.blocks.transformers.milestones.get_attempt_status_summary', autospec=True)
     def test_proctored_exam(self, mock_summary):
         course = CourseFactory.create(
             org='edX',

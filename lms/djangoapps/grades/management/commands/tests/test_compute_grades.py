@@ -60,7 +60,7 @@ class TestComputeGrades(SharedModuleStoreTestCase):
             self.command._get_course_keys({'from_settings': True})
 
     @ddt.data(True, False)
-    @patch('lms.djangoapps.grades.tasks.compute_grades_for_course_v2')
+    @patch('lms.djangoapps.grades.tasks.compute_grades_for_course_v2', autospec=True)
     def test_tasks_fired(self, estimate_first_attempted, mock_task):
         command = [
             'compute_grades',
@@ -107,7 +107,7 @@ class TestComputeGrades(SharedModuleStoreTestCase):
         for call in expected:
             assert call in actual
 
-    @patch('lms.djangoapps.grades.tasks.compute_grades_for_course_v2')
+    @patch('lms.djangoapps.grades.tasks.compute_grades_for_course_v2', autospec=True)
     def test_tasks_fired_from_settings(self, mock_task):
         ComputeGradesSetting.objects.create(course_ids=self.course_keys[1], batch_size=2)
         call_command('compute_grades', '--from_settings')

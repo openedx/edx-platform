@@ -196,7 +196,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
                             assert user.is_active
                             assert email.called is False, 'method should not have been called'
 
-    @patch('common.djangoapps.student.views.management.compose_activation_email')
+    @patch('common.djangoapps.student.views.management.compose_activation_email', autospec=True)
     def test_send_email_to_inactive_user(self, email):
         """
         Tests that when an inactive user logs-in using the social auth, system
@@ -376,7 +376,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         """
         assert self.do_email_validation(self.user.email) == 'Old email is the same as the new email.'
 
-    @patch('django.core.mail.EmailMultiAlternatives.send')
+    @patch('django.core.mail.EmailMultiAlternatives.send', autospec=True)
     def test_email_failure(self, send_mail):
         """
         Test the return value if sending the email for the user to click fails.
@@ -561,7 +561,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         self.assertFailedBeforeEmailing()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @patch('common.djangoapps.student.views.management.ace')
+    @patch('common.djangoapps.student.views.management.ace', autospec=True)
     def test_old_email_fails(self, ace_mail):
         ace_mail.send.side_effect = [Exception, None]
         self.check_confirm_email_change('email_change_failed.html', {
@@ -571,7 +571,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         self.assertRolledBack()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @patch('common.djangoapps.student.views.management.ace')
+    @patch('common.djangoapps.student.views.management.ace', autospec=True)
     def test_new_email_fails(self, ace_mail):
         ace_mail.send.side_effect = [None, Exception]
         self.check_confirm_email_change('email_change_failed.html', {
@@ -664,7 +664,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         for email in ('bad_email', 'bad_email@', '@bad_email'):
             assert self.do_email_validation(email) == 'Valid e-mail address required.'
 
-    @patch('django.core.mail.EmailMultiAlternatives.send')
+    @patch('django.core.mail.EmailMultiAlternatives.send', autospec=True)
     def test_email_failure(self, send_mail):
         """
         Test the return value if sending the email for the user to click fails.

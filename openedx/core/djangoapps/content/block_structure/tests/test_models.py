@@ -79,7 +79,7 @@ class BlockStructureModelTestCase(TestCase):
             assert created == expect_created
         return bsm
 
-    @patch('openedx.core.djangoapps.content.block_structure.models.log')
+    @patch('openedx.core.djangoapps.content.block_structure.models.log', autospec=True)
     @patch.dict(settings.BLOCK_STRUCTURES_SETTINGS, {'PRUNING_ACTIVE': False})
     def test_update_or_create(self, mock_log):
         serialized_data = 'initial data'
@@ -113,8 +113,8 @@ class BlockStructureModelTestCase(TestCase):
         self._assert_file_count_equal(1)
 
     @patch('openedx.core.djangoapps.content.block_structure.config.num_versions_to_keep', Mock(return_value=1))
-    @patch('openedx.core.djangoapps.content.block_structure.models.BlockStructureModel._delete_files')
-    @patch('openedx.core.djangoapps.content.block_structure.models.log')
+    @patch('openedx.core.djangoapps.content.block_structure.models.BlockStructureModel._delete_files', autospec=True)
+    @patch('openedx.core.djangoapps.content.block_structure.models.log', autospec=True)
     def test_prune_exception(self, mock_log, mock_delete):
         mock_delete.side_effect = Exception
         self._verify_update_or_create_call('test data', expect_created=True)
@@ -163,7 +163,7 @@ class BlockStructureModelTestCase(TestCase):
                 else:
                     raise error_raised_in_operation
 
-    @patch('openedx.core.djangoapps.content.block_structure.models.log')
+    @patch('openedx.core.djangoapps.content.block_structure.models.log', autospec=True)
     def test_old_mongo_keys(self, mock_log):
         self.course_key = CourseLocator('org2', 'course2', str(uuid4()), deprecated=True)
         self.usage_key = BlockUsageLocator(course_key=self.course_key, block_type='course', block_id='course')

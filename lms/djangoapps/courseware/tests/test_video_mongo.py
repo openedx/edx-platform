@@ -793,8 +793,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         return context, expected_context
 
     # pylint: disable=invalid-name
-    @patch('xmodule.video_module.video_module.BrandingInfoConfig')
-    @patch('xmodule.video_module.video_module.rewrite_video_url')
+    @patch('xmodule.video_module.video_module.BrandingInfoConfig', autospec=True)
+    @patch('xmodule.video_module.video_module.rewrite_video_url', autospec=True)
     def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
         """
         Test if sources got from CDN
@@ -1038,7 +1038,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 )
 
     @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
-    @patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles')
+    @patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles', autospec=True)
     def test_get_html_hls(self, get_urls_for_profiles):
         """
         Verify that hls profile functionality works as expected.
@@ -1093,7 +1093,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         context = self.item_descriptor.render(PUBLIC_VIEW).content
         assert '"saveStateEnabled": false' in context
 
-    @patch('xmodule.video_module.video_module.edxval_api.get_course_video_image_url')
+    @patch('xmodule.video_module.video_module.edxval_api.get_course_video_image_url', autospec=True)
     def test_poster_image(self, get_course_video_image_url):
         """
         Verify that poster image functionality works as expected.
@@ -1106,7 +1106,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         assert '"poster": "/media/video-images/poster.png"' in context
 
-    @patch('xmodule.video_module.video_module.edxval_api.get_course_video_image_url')
+    @patch('xmodule.video_module.video_module.edxval_api.get_course_video_image_url', autospec=True)
     def test_poster_image_without_edx_video_id(self, get_course_video_image_url):
         """
         Verify that poster image is set to None and there is no crash when no edx_video_id.
@@ -1574,7 +1574,7 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages', autospec=True)
     def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
                                                        expected_transcripts, mock_get_transcript_languages):
         """
@@ -1770,7 +1770,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
 
-    @patch('xmodule.video_module.transcripts_utils.get_video_ids_info')
+    @patch('xmodule.video_module.transcripts_utils.get_video_ids_info', autospec=True)
     def test_export_no_video_ids(self, mock_get_video_ids_info):
         """
         Tests export when there is no video id. `export_to_xml` only works in case of video id.
@@ -2125,7 +2125,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
     # Use temporary FEATURES in this test without affecting the original
     FEATURES = dict(settings.FEATURES)
 
-    @patch('xmodule.video_module.bumper_utils.get_bumper_settings')
+    @patch('xmodule.video_module.bumper_utils.get_bumper_settings', autospec=True)
     def test_is_bumper_enabled(self, get_bumper_settings):
         """
         Check that bumper is (not)shown if ENABLE_VIDEO_BUMPER is (False)True
@@ -2149,9 +2149,9 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
         with override_settings(FEATURES=self.FEATURES):
             assert not bumper_utils.is_bumper_enabled(self.item_descriptor)
 
-    @patch('xmodule.video_module.bumper_utils.is_bumper_enabled')
-    @patch('xmodule.video_module.bumper_utils.get_bumper_settings')
-    @patch('edxval.api.get_urls_for_profiles')
+    @patch('xmodule.video_module.bumper_utils.is_bumper_enabled', autospec=True)
+    @patch('xmodule.video_module.bumper_utils.get_bumper_settings', autospec=True)
+    @patch('edxval.api.get_urls_for_profiles', autospec=True)
     def test_bumper_metadata(self, get_url_for_profiles, get_bumper_settings, is_bumper_enabled):
         """
         Test content with rendered bumper metadata.

@@ -211,8 +211,8 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             self.assertNotContains(response, "Credit")
 
     @httpretty.activate
-    @patch('common.djangoapps.course_modes.views.enterprise_customer_for_request')
-    @patch('common.djangoapps.course_modes.views.get_course_final_price')
+    @patch('common.djangoapps.course_modes.views.enterprise_customer_for_request', autospec=True)
+    @patch('common.djangoapps.course_modes.views.get_course_final_price', autospec=True)
     @ddt.data(
         (1.0, True),
         (50.0, False),
@@ -516,7 +516,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         (True, {'unsupported_mode': True}, 'Enrollment mode not supported', 200),
     )
     @ddt.unpack
-    @patch('django.contrib.auth.models.PermissionsMixin.has_perm')
+    @patch('django.contrib.auth.models.PermissionsMixin.has_perm', autospec=True)
     def test_errors(self, has_perm, post_params, error_msg, status_code, mock_has_perm):
         """
         Test the error template is rendered on different types of errors.

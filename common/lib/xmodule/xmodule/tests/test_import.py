@@ -108,7 +108,7 @@ class PureXBlockImportTest(BaseCourseTestCase):
         "<genericxblock field1='abc' field2='23' />",
         "<genericxblock field1='abc' field2='23'><genericxblock/></genericxblock>",
     )
-    @patch('xmodule.x_module.XModuleMixin.location')
+    @patch('xmodule.x_module.XModuleMixin.location', autospec=True)
     def test_parsing_pure_xblock(self, xml, mock_location):
         system = self.get_system(load_error_modules=False)
         descriptor = system.process_xml(xml)

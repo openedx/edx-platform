@@ -141,7 +141,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         return mocked_response
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('requests.get')
+    @patch('requests.get', autospec=True)
     @ddt.data(
         (
             {
@@ -225,7 +225,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         self.assertEqual(thumbnail_content_type, 'image/jpeg')
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('requests.get')
+    @patch('requests.get', autospec=True)
     def test_scrape_youtube_thumbnail(self, mocked_request):
         """
         Test that youtube thumbnails are correctly scrapped.
@@ -270,8 +270,8 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         )
     )
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('cms.djangoapps.contentstore.video_utils.LOGGER')
-    @patch('requests.get')
+    @patch('cms.djangoapps.contentstore.video_utils.LOGGER', autospec=True)
+    @patch('requests.get', autospec=True)
     @ddt.unpack
     def test_scrape_youtube_thumbnail_logging(
         self,
@@ -330,8 +330,8 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
             )
         ),
     )
-    @patch('cms.djangoapps.contentstore.video_utils.LOGGER')
-    @patch('cms.djangoapps.contentstore.video_utils.download_youtube_video_thumbnail')
+    @patch('cms.djangoapps.contentstore.video_utils.LOGGER', autospec=True)
+    @patch('cms.djangoapps.contentstore.video_utils.download_youtube_video_thumbnail', autospec=True)
     @ddt.unpack
     def test_no_video_thumbnail_downloaded(
         self,

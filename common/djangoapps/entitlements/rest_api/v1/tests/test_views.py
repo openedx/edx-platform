@@ -1059,7 +1059,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert not CourseEnrollment.is_enrolled(self.user, fake_course_key)
 
     @patch('common.djangoapps.entitlements.models.refund_entitlement', return_value=True)
-    @patch('common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course')
+    @patch('common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course', autospec=True)
     @patch("common.djangoapps.entitlements.models.get_course_uuid_for_course")
     def test_user_can_revoke_and_refund(self, mock_course_uuid, mock_get_course_runs, mock_refund_entitlement):
         course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
@@ -1102,7 +1102,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
 
     @patch('common.djangoapps.entitlements.rest_api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=False)  # lint-amnesty, pylint: disable=line-too-long
     @patch('common.djangoapps.entitlements.models.refund_entitlement', return_value=True)
-    @patch('common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course')
+    @patch('common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course', autospec=True)
     def test_user_can_revoke_and_no_refund_available(
             self,
             mock_get_course_runs,

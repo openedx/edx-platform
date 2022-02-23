@@ -111,8 +111,8 @@ def test_storage_url_not_exists(mock_storage):
 
 @patch('common.djangoapps.static_replace.StaticContent', autospec=True)
 @patch('xmodule.modulestore.django.modulestore', autospec=True)
-@patch('common.djangoapps.static_replace.models.AssetBaseUrlConfig.get_base_url')
-@patch('common.djangoapps.static_replace.models.AssetExcludedExtensionsConfig.get_excluded_extensions')
+@patch('common.djangoapps.static_replace.models.AssetBaseUrlConfig.get_base_url', autospec=True)
+@patch('common.djangoapps.static_replace.models.AssetExcludedExtensionsConfig.get_excluded_extensions', autospec=True)
 def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_modulestore, mock_static_content):
 
     mock_modulestore.return_value = Mock(MongoModuleStore)

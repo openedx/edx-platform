@@ -245,8 +245,8 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         account_settings = get_account_settings(self.default_request)[0]
         assert level_of_education == account_settings['level_of_education']
 
-    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
+    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request', autospec=True)
+    @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get', autospec=True)
     @ddt.data(
         *itertools.product(
             # field_name_value values
@@ -437,7 +437,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         account_settings = get_account_settings(self.default_request)[0]
         assert account_settings['name'] == 'New Name'
 
-    @patch('django.core.mail.EmailMultiAlternatives.send')
+    @patch('django.core.mail.EmailMultiAlternatives.send', autospec=True)
     @patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
     def test_update_sending_email_fails(self, send_mail):
         """Test what happens if all validation checks pass, but sending the email for email change fails."""
@@ -489,7 +489,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         # No error should be thrown, and we need to check that the email update was skipped.
         assert self.user.email == original_email
 
-    @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
+    @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save', autospec=True)
     def test_serializer_save_fails(self, serializer_save):
         """
         Test the behavior of one of the serializers failing to save. Note that email request change

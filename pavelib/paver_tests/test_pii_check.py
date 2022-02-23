@@ -25,7 +25,7 @@ class TestPaverPIICheck(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.report_dir)
 
     @patch.object(pavelib.quality.run_pii_check, 'needs')
-    @patch('pavelib.quality.sh')
+    @patch('pavelib.quality.sh', autospec=True)
     def test_pii_check_report_dir_override(self, mock_paver_sh, mock_needs):
         """
         run_pii_check succeeds with proper report dir
@@ -47,7 +47,7 @@ class TestPaverPIICheck(unittest.TestCase):
         assert open(metrics_file).read() == 'Number of PII Annotation violations: 66\n'
 
     @patch.object(pavelib.quality.run_pii_check, 'needs')
-    @patch('pavelib.quality.sh')
+    @patch('pavelib.quality.sh', autospec=True)
     def test_pii_check_failed(self, mock_paver_sh, mock_needs):
         """
         run_pii_check fails due to crossing the threshold.

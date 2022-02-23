@@ -305,7 +305,7 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
             'software_secure': {},
         },
     )
-    @patch('logging.Logger.info')
+    @patch('logging.Logger.info', autospec=True)
     @ddt.data(
         ('proctortrack', False, False),
         ('software_secure', True, False),

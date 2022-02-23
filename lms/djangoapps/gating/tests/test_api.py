@@ -81,7 +81,7 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
         )
         self.prereq_milestone = gating_api.get_gating_milestone(self.course.id, self.seq1.location, 'fulfills')
 
-    @patch('openedx.core.lib.gating.api.get_subsection_completion_percentage')
+    @patch('openedx.core.lib.gating.api.get_subsection_completion_percentage', autospec=True)
     @data(
         (50, 0, 50, 0, True),
         (50, 0, 10, 0, False),
@@ -102,8 +102,8 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
         assert milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone) == result
 
-    @patch('openedx.core.lib.gating.api.get_subsection_completion_percentage')
-    @patch('openedx.core.lib.gating.api._get_minimum_required_percentage')
+    @patch('openedx.core.lib.gating.api.get_subsection_completion_percentage', autospec=True)
+    @patch('openedx.core.lib.gating.api._get_minimum_required_percentage', autospec=True)
     @data((50, 50, False), (100, 50, False), (50, 100, False), (100, 100, True))
     @unpack
     def test_invalid_min_score(self, module_score, module_completion, result, mock_min_score, mock_completion):
@@ -115,12 +115,12 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
         assert milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone) == result
 
-    @patch('openedx.core.lib.gating.api.get_subsection_grade_percentage')
+    @patch('openedx.core.lib.gating.api.get_subsection_grade_percentage', autospec=True)
     def test_no_prerequisites(self, mock_score):
         evaluate_prerequisite(self.course, self.subsection_grade, self.user)
         assert not mock_score.called
 
-    @patch('openedx.core.lib.gating.api.get_subsection_grade_percentage')
+    @patch('openedx.core.lib.gating.api.get_subsection_grade_percentage', autospec=True)
     def test_no_gated_content(self, mock_score):
         gating_api.add_prerequisite(self.course.id, self.seq1.location)
 

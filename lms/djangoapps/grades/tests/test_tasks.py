@@ -141,7 +141,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             PROBLEM_WEIGHTED_SCORE_CHANGED.send(sender=None, **send_args)
             mock_task_apply.assert_called_once_with(countdown=RECALCULATE_GRADE_DELAY_SECONDS, kwargs=local_task_args)
 
-    @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send', autospec=True)
     def test_triggers_subsection_score_signal(self, mock_subsection_signal):
         """
         Ensures that a subsection grade recalculation triggers a signal.
@@ -198,7 +198,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                 with self.assertNumQueries(num_sql_calls):
                     self._apply_recalculate_subsection_grade()
 
-    @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send', autospec=True)
     def test_other_inaccessible_subsection(self, mock_subsection_signal):
         self.set_up_course()
         accessible_seq = ItemFactory.create(parent=self.chapter, category='sequential')
@@ -252,8 +252,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             assert PersistentCourseGrade.read(self.user.id, self.course.id) is not None
             assert len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)) > 0
 
-    @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
-    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send', autospec=True)
+    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update', autospec=True)
     def test_retry_first_time_only(self, mock_update, mock_course_signal):
         """
         Ensures that a task retry completes after a one-time failure.
@@ -263,8 +263,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self._apply_recalculate_subsection_grade()
         assert mock_course_signal.call_count == 1
 
-    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry', autospec=True)
+    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update', autospec=True)
     def test_retry_on_integrity_error(self, mock_update, mock_retry):
         """
         Ensures that tasks will be retried if IntegrityErrors are encountered.
@@ -276,8 +276,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
     @ddt.data(ScoreDatabaseTableEnum.courseware_student_module, ScoreDatabaseTableEnum.submissions,
               ScoreDatabaseTableEnum.overrides)
-    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    @patch('lms.djangoapps.grades.tasks.log')
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry', autospec=True)
+    @patch('lms.djangoapps.grades.tasks.log', autospec=True)
     def test_retry_when_db_not_updated(self, score_db_table, mock_log, mock_retry):
         self.set_up_course()
         self.recalculate_subsection_grade_kwargs['score_db_table'] = score_db_table
@@ -312,8 +312,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         )
     )
     @ddt.unpack
-    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    @patch('lms.djangoapps.grades.tasks.log')
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry', autospec=True)
+    @patch('lms.djangoapps.grades.tasks.log', autospec=True)
     def test_when_no_score_found(self, score_deleted, score_db_table, mock_log, mock_retry):
         self.set_up_course()
         self.recalculate_subsection_grade_kwargs['score_deleted'] = score_deleted
@@ -339,9 +339,9 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             assert 'Grades: tasks._has_database_updated_with_new_score is False.'\
                    in mock_log.info.call_args_list[0][0][0]
 
-    @patch('lms.djangoapps.grades.tasks.log')
-    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.tasks.log', autospec=True)
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry', autospec=True)
+    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update', autospec=True)
     def test_log_unknown_error(self, mock_update, mock_retry, mock_log):
         """
         Ensures that unknown errors are logged before a retry.
@@ -352,9 +352,9 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         assert 'General exception with no further detail!' in mock_log.info.call_args[0][0]
         self._assert_retry_called(mock_retry)
 
-    @patch('lms.djangoapps.grades.tasks.log')
-    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.tasks.log', autospec=True)
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry', autospec=True)
+    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update', autospec=True)
     def test_no_log_known_error(self, mock_update, mock_retry, mock_log):
         """
         Ensures that known errors are not logged before a retry.
@@ -521,7 +521,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
         )
     )
     @ddt.unpack
-    @patch('lms.djangoapps.grades.tasks.log')
+    @patch('lms.djangoapps.grades.tasks.log', autospec=True)
     def test_compute_all_grades_for_course(self, freeze_flag_value, end_date_adjustment, mock_log):
         self.set_up_course(course_end=timezone.now() - timedelta(end_date_adjustment))
         for user in self.users:
@@ -553,7 +553,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
         )
     )
     @ddt.unpack
-    @patch('lms.djangoapps.grades.tasks.log')
+    @patch('lms.djangoapps.grades.tasks.log', autospec=True)
     def test_compute_grades_for_course(self, freeze_flag_value, end_date_adjustment, mock_log):
         self.set_up_course(course_end=timezone.now() - timedelta(end_date_adjustment))
         for user in self.users:
@@ -586,7 +586,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
         )
     )
     @ddt.unpack
-    @patch('lms.djangoapps.grades.tasks.log')
+    @patch('lms.djangoapps.grades.tasks.log', autospec=True)
     def test_recalculate_course_and_subsection_grades(self, freeze_flag_value, end_date_adjustment, mock_log):
         self.set_up_course(course_end=timezone.now() - timedelta(end_date_adjustment))
         CourseEnrollment.enroll(self.user, self.course.id)
@@ -615,7 +615,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
         )
     )
     @ddt.unpack
-    @patch('lms.djangoapps.grades.tasks.log')
+    @patch('lms.djangoapps.grades.tasks.log', autospec=True)
     def test_recalculate_subsection_grade_v3(self, freeze_flag_value, end_date_adjustment, mock_log):
         self.set_up_course(course_end=timezone.now() - timedelta(end_date_adjustment))
         for user in self.users:

@@ -112,7 +112,7 @@ class TestXMLModuleStore(TestCase):
                 # verify that the above context manager raises a ValueError
                 pass  # pragma: no cover
 
-    @patch('xmodule.modulestore.xml.log')
+    @patch('xmodule.modulestore.xml.log', autospec=True)
     def test_dag_course(self, mock_logging):
         """
         Test a course whose structure is not a tree.

@@ -171,7 +171,7 @@ class IsNewCourseTestCase(unittest.TestCase):
         mocked_datetime.now.return_value = NOW
         self.addCleanup(datetime_patcher.stop)
 
-    @patch('xmodule.course_metadata_utils.datetime.now')
+    @patch('xmodule.course_metadata_utils.datetime.now', autospec=True)
     def test_sorting_score(self, gmtime_mock):
         gmtime_mock.return_value = NOW
 

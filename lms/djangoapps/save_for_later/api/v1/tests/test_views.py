@@ -117,7 +117,7 @@ class ProgramSaveForLaterApiViewTest(ThirdPartyAuthTestMixin, APITestCase):
         self.program = ProgramFactory(uuid=self.uuid)
 
     @patch('lms.djangoapps.save_for_later.helper.BrazeClient', MagicMock())
-    @patch('lms.djangoapps.save_for_later.api.v1.views.get_programs')
+    @patch('lms.djangoapps.save_for_later.api.v1.views.get_programs', autospec=True)
     def test_save_program_using_email(self, mock_get_programs):
         """
         Test successfully email sent

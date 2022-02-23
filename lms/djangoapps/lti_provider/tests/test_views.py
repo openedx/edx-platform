@@ -87,8 +87,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
     """
     Tests for the lti_launch view
     """
-    @patch('lms.djangoapps.lti_provider.views.render_courseware')
-    @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user')
+    @patch('lms.djangoapps.lti_provider.views.render_courseware', autospec=True)
+    @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user', autospec=True)
     def test_valid_launch(self, _authenticate, render):
         """
         Verifies that the LTI launch succeeds when passed a valid request.
@@ -97,9 +97,9 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
         render.assert_called_with(request, USAGE_KEY)
 
-    @patch('lms.djangoapps.lti_provider.views.render_courseware')
-    @patch('lms.djangoapps.lti_provider.views.store_outcome_parameters')
-    @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user')
+    @patch('lms.djangoapps.lti_provider.views.render_courseware', autospec=True)
+    @patch('lms.djangoapps.lti_provider.views.store_outcome_parameters', autospec=True)
+    @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user', autospec=True)
     def test_valid_launch_with_optional_params(self, _authenticate, store_params, _render):
         """
         Verifies that the LTI launch succeeds when passed a valid request.
@@ -112,9 +112,9 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             self.consumer
         )
 
-    @patch('lms.djangoapps.lti_provider.views.render_courseware')
-    @patch('lms.djangoapps.lti_provider.views.store_outcome_parameters')
-    @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user')
+    @patch('lms.djangoapps.lti_provider.views.render_courseware', autospec=True)
+    @patch('lms.djangoapps.lti_provider.views.store_outcome_parameters', autospec=True)
+    @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user', autospec=True)
     def test_outcome_service_registered(self, _authenticate, store_params, _render):
         """
         Verifies that the LTI launch succeeds when passed a valid request.
@@ -165,7 +165,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         assert response.status_code == 403
         assert response.status_code == 403
 
-    @patch('lms.djangoapps.lti_provider.views.render_courseware')
+    @patch('lms.djangoapps.lti_provider.views.render_courseware', autospec=True)
     def test_lti_consumer_record_supplemented_with_guid(self, _render):
         self.mock_verify.return_value = False
 

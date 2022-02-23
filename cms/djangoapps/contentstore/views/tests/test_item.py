@@ -1237,7 +1237,7 @@ class TestMoveItem(ItemTest):
         validation = html.validate()
         self.assertEqual(len(validation.messages), 0)
 
-    @patch('cms.djangoapps.contentstore.views.item.log')
+    @patch('cms.djangoapps.contentstore.views.item.log', autospec=True)
     def test_move_logging(self, mock_logger):
         """
         Test logging when an item is successfully moved.

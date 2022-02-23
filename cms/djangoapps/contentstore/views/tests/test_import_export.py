@@ -607,9 +607,9 @@ class ImportTestCase(CourseTestCase):
         self.assertImportStatusResponse(status_response, self.UnpackingError, import_error.UNKNOWN_ERROR_IN_UNPACKING)
 
     @patch(TASK_LOGGER)
-    @patch('olxcleaner.validate')
-    @patch('cms.djangoapps.contentstore.tasks.report_error_summary')
-    @patch('cms.djangoapps.contentstore.tasks.report_errors')
+    @patch('olxcleaner.validate', autospec=True)
+    @patch('cms.djangoapps.contentstore.tasks.report_error_summary', autospec=True)
+    @patch('cms.djangoapps.contentstore.tasks.report_errors', autospec=True)
     def test_import_failed_with_olx_validations(self, mocked_report, mocked_summary, mocked_validate, mocked_log):
         """
         Tests that course import failure for unknown error while unpacking
@@ -946,8 +946,8 @@ class ExportTestCase(CourseTestCase):
         mock_artifact.file.storage.url.return_value = file_url
         return mock_artifact
 
-    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
-    @patch('user_tasks.models.UserTaskArtifact.objects.get')
+    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status', autospec=True)
+    @patch('user_tasks.models.UserTaskArtifact.objects.get', autospec=True)
     def test_export_status_handler_other(
         self,
         mock_get_user_task_artifact,
@@ -967,8 +967,8 @@ class ExportTestCase(CourseTestCase):
         self.assertEqual(result['ExportOutput'], '/path/to/testfile.tar.gz')
 
     @ddt.data(S3BotoStorage, S3Boto3Storage)
-    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
-    @patch('user_tasks.models.UserTaskArtifact.objects.get')
+    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status', autospec=True)
+    @patch('user_tasks.models.UserTaskArtifact.objects.get', autospec=True)
     def test_export_status_handler_s3(
         self,
         s3_storage,
@@ -988,8 +988,8 @@ class ExportTestCase(CourseTestCase):
         result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/s3/file/path/testfile.tar.gz')
 
-    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
-    @patch('user_tasks.models.UserTaskArtifact.objects.get')
+    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status', autospec=True)
+    @patch('user_tasks.models.UserTaskArtifact.objects.get', autospec=True)
     def test_export_status_handler_filesystem(
         self,
         mock_get_user_task_artifact,

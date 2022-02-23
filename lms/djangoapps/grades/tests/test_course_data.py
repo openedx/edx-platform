@@ -39,7 +39,7 @@ class CourseDataTest(ModuleStoreTestCase):
             'location': self.course.location,
         }
 
-    @patch('lms.djangoapps.grades.course_data.get_course_blocks')
+    @patch('lms.djangoapps.grades.course_data.get_course_blocks', autospec=True)
     def test_fill_course_data(self, mock_get_blocks):
         """
         Tests to ensure that course data is fully filled with just a single input.

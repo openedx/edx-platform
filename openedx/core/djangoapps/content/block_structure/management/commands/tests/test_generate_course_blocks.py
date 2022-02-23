@@ -140,7 +140,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
                     else:
                         assert 'routing_key' not in task_options
 
-    @patch('openedx.core.djangoapps.content.block_structure.management.commands.generate_course_blocks.log')
+    @patch('openedx.core.djangoapps.content.block_structure.management.commands.generate_course_blocks.log', autospec=True)
     def test_not_found_key(self, mock_log):
         self.command.handle(courses=['fake/course/id'])
         assert mock_log.exception.called

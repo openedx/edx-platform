@@ -18,7 +18,7 @@ class TestUtils(unittest.TestCase):
     Test utils.py under pavelib/utils/test
     """
 
-    @patch('subprocess.check_output')
+    @patch('subprocess.check_output', autospec=True)
     def test_firefox_version_ok(self, _mock_subprocesss):
         test_version = MINIMUM_FIREFOX_VERSION
         _mock_subprocesss.return_value = "Mozilla Firefox {version}".format(
@@ -27,7 +27,7 @@ class TestUtils(unittest.TestCase):
         # No exception should be raised
         check_firefox_version()
 
-    @patch('subprocess.check_output')
+    @patch('subprocess.check_output', autospec=True)
     def test_firefox_version_below_expected(self, _mock_subprocesss):
         test_version = MINIMUM_FIREFOX_VERSION - 1
         _mock_subprocesss.return_value = "Mozilla Firefox {version}".format(
@@ -36,13 +36,13 @@ class TestUtils(unittest.TestCase):
         with pytest.raises(Exception):
             check_firefox_version()
 
-    @patch('subprocess.check_output')
+    @patch('subprocess.check_output', autospec=True)
     def test_firefox_version_not_detected(self, _mock_subprocesss):
         _mock_subprocesss.return_value = "Mozilla Firefox"
         with pytest.raises(Exception):
             check_firefox_version()
 
-    @patch('subprocess.check_output')
+    @patch('subprocess.check_output', autospec=True)
     def test_firefox_version_bad(self, _mock_subprocesss):
         _mock_subprocesss.return_value = "garbage"
         with pytest.raises(Exception):

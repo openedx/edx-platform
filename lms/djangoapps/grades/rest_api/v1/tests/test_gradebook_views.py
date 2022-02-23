@@ -244,7 +244,7 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
             expected_data['grades_frozen'] = True
             assert expected_data == resp.data
 
-    @patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_enrollment_details')
+    @patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_enrollment_details', autospec=True)
     def test_can_see_bulk_management_non_masters(self, mock_course_enrollment_details):
         # Given a course without a master's track
         mock_course_enrollment_details.return_value = {'course_modes': [{'slug': 'not-masters'}]}
@@ -257,7 +257,7 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
         assert resp.status_code == status.HTTP_200_OK
         assert resp.data['can_see_bulk_management'] is False
 
-    @patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_enrollment_details')
+    @patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.get_course_enrollment_details', autospec=True)
     def test_can_see_bulk_management_masters(self, mock_course_enrollment_details):
         # Given a course with a master's track
         mock_course_enrollment_details.return_value = {'course_modes': [{'slug': 'not-masters'}, {'slug': 'masters'}]}
@@ -1860,7 +1860,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
         return f"{base_url}?user_id={user_id or self.user_id}&history_record_limit={history_record_limit}"
 
-    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.create')
+    @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.create', autospec=True)
     @ddt.data(
         'login_staff',
         'login_course_admin',

@@ -300,7 +300,7 @@ class TestPreferencesAPITransactions(TransactionTestCase):
         self.user = UserFactory.create(password=TEST_PASSWORD)
         self.url = reverse("preferences_api", kwargs={'username': self.user.username})
 
-    @patch('openedx.core.djangoapps.user_api.models.UserPreference.delete')
+    @patch('openedx.core.djangoapps.user_api.models.UserPreference.delete', autospec=True)
     def test_update_preferences_rollback(self, delete_user_preference):
         """
         Verify that updating preferences is transactional when a failure happens.

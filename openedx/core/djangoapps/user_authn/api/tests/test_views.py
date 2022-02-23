@@ -197,7 +197,7 @@ class SendAccountActivationEmail(UserAPITestCase):
         assert result, 'Could not log in'
         self.path = reverse('send_account_activation_email')
 
-    @patch('common.djangoapps.student.views.management.compose_activation_email')
+    @patch('common.djangoapps.student.views.management.compose_activation_email', autospec=True)
     def test_send_email_to_inactive_user_via_cta_dialog(self, email):
         """
         Tests when user clicks on resend activation email on CTA dialog box, system

@@ -118,7 +118,7 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
         with pytest.raises(CourseUpdateDoesNotExist):
             get_week_highlights(self.user, self.course_key, week_num=1)
 
-    @patch('openedx.core.djangoapps.course_date_signals.utils.get_expected_duration')
+    @patch('openedx.core.djangoapps.course_date_signals.utils.get_expected_duration', autospec=True)
     def test_get_next_section_highlights(self, mock_duration):
         # All of the dates chosen here are to make things easy and clean to calculate with date offsets
         # It only goes up to 6 days because we are using two_days_ago as our reference point
@@ -161,7 +161,7 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
         with pytest.raises(CourseUpdateDoesNotExist):
             get_next_section_highlights(self.user, self.course_key, two_days_ago, six_days.date())
 
-    @patch('lms.djangoapps.courseware.module_render.get_module_for_descriptor')
+    @patch('lms.djangoapps.courseware.module_render.get_module_for_descriptor', autospec=True)
     def test_get_highlights_without_module(self, mock_get_module):
         mock_get_module.return_value = None
 

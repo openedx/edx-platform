@@ -94,15 +94,15 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
         self.store.update_item(course, ModuleStoreEnum.UserID.test)
         assert mock_signal.called
 
-    @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_START_DATE_CHANGED.send')
+    @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_START_DATE_CHANGED.send', autospec=True)
     def test_start_changed(self, mock_signal):
         self.assert_changed_signal_sent([Change('start', self.TODAY, self.NEXT_WEEK)], mock_signal)
 
-    @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_PACING_CHANGED.send')
+    @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_PACING_CHANGED.send', autospec=True)
     def test_pacing_changed(self, mock_signal):
         self.assert_changed_signal_sent([Change('self_paced', True, False)], mock_signal)
 
-    @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_CERT_DATE_CHANGE.send_robust')
+    @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_CERT_DATE_CHANGE.send_robust', autospec=True)
     def test_cert_date_changed(self, mock_signal):
         changes = [
             Change("certificate_available_date", self.TODAY, self.NEXT_WEEK),

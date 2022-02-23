@@ -342,7 +342,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
-    @patch('PIL.Image.open')
+    @patch('PIL.Image.open', autospec=True)
     def test_upload_failure(self, image_open, mock_log):
         """
         Test that when upload validation fails, the proper HTTP response and
@@ -441,7 +441,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         )
         self.check_remove_event_emitted()
 
-    @patch('common.djangoapps.student.models.UserProfile.save')
+    @patch('common.djangoapps.student.models.UserProfile.save', autospec=True)
     def test_remove_failure(self, user_profile_save, mock_log):
         """
         Test that when remove validation fails, the proper HTTP response and

@@ -1222,7 +1222,7 @@ class ChemicalEquationTest(unittest.TestCase):
         assert 'error' in response
         assert "Couldn't parse formula" in response['error']
 
-    @patch('capa.inputtypes.log')
+    @patch('capa.inputtypes.log', autospec=True)
     def test_ajax_other_err(self, mock_log):
         """
         With other errors, test that ChemicalEquationInput also logs it
@@ -1370,7 +1370,7 @@ class FormulaEquationTest(unittest.TestCase):
         assert 'error' in response
         assert response['error'] == "Sorry, couldn't parse formula"
 
-    @patch('capa.inputtypes.log')
+    @patch('capa.inputtypes.log', autospec=True)
     def test_ajax_other_err(self, mock_log):
         """
         With other errors, test that FormulaEquationInput also logs it

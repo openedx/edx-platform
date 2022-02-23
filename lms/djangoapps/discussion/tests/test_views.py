@@ -110,8 +110,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         config.enabled = True
         config.save()
 
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user', autospec=True)
+    @patch('common.djangoapps.student.models.cc.User.active_threads', autospec=True)
     def test_user_profile_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -127,8 +127,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         response = self.client.get(url)
         assert response.status_code == 404
 
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.subscribed_threads')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user', autospec=True)
+    @patch('common.djangoapps.student.models.cc.User.subscribed_threads', autospec=True)
     def test_user_followed_threads_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -1661,7 +1661,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         assert self.client.login(username=username, password=password)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user', autospec=True)
     def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):
         """
         Test that XSS attack is prevented
@@ -1677,8 +1677,8 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         self.assertNotContains(resp, malicious_code)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user', autospec=True)
+    @patch('common.djangoapps.student.models.cc.User.active_threads', autospec=True)
     def test_forum_user_profile_xss_prevent(self, malicious_code, mock_threads, mock_from_django_user, mock_request):
         """
         Test that XSS attack is prevented
@@ -1865,7 +1865,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
 
         self.addCleanup(translation.deactivate)
 
-    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request', autospec=True)
     def test_consent_required(self, mock_enterprise_customer_for_request, mock_request):
         """
         Test that enterprise data sharing consent is required when enabled for the various discussion views.
@@ -2223,7 +2223,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
         self.client.login(username=self.student.username, password=PASSWORD)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.perform_request')
+    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.perform_request', autospec=True)
     def test_thread_viewed_event(self, mock_perform_request):
         mock_perform_request.side_effect = make_mock_perform_request_impl(
             course=self.course,

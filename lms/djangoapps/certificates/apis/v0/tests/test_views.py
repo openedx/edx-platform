@@ -184,7 +184,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
                  'is_passing': True,
                  'download_url': download_url, 'grade': '0.88'}]
 
-    @patch('edx_rest_framework_extensions.permissions.log')
+    @patch('edx_rest_framework_extensions.permissions.log', autospec=True)
     @ddt.data(*list(AuthType))
     def test_another_user(self, auth_type, mock_log):
         """
@@ -276,7 +276,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         assert resp.status_code == status.HTTP_200_OK
         assert len(resp.data) == 1
 
-    @patch('edx_rest_framework_extensions.permissions.log')
+    @patch('edx_rest_framework_extensions.permissions.log', autospec=True)
     @ddt.data(*JWT_AUTH_TYPES)
     def test_jwt_on_behalf_of_other_user(self, auth_type, mock_log):
         """ Returns 403 when scopes are enforced with JwtHasUserFilterForRequestedUser. """
@@ -290,7 +290,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             assert resp.status_code == status.HTTP_200_OK
             assert len(resp.data) == 1
 
-    @patch('edx_rest_framework_extensions.permissions.log')
+    @patch('edx_rest_framework_extensions.permissions.log', autospec=True)
     @ddt.data(*JWT_AUTH_TYPES)
     def test_jwt_no_filter(self, auth_type, mock_log):
         assert True  # pylint: disable=redundant-unittest-assert
@@ -396,7 +396,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         expected_download_url = reverse('certificates:render_cert_by_uuid', kwargs=kwargs)
         self.assert_success_response_for_student(response, download_url=expected_download_url)
 
-    @patch('openedx.core.djangoapps.content.course_overviews.api.get_course_run_details')
+    @patch('openedx.core.djangoapps.content.course_overviews.api.get_course_run_details', autospec=True)
     def test_certificate_without_course(self, mock_get_course_run_details):
         """
         Verify that certificates are returned for deleted XML courses.

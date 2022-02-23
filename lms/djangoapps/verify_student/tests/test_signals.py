@@ -121,7 +121,7 @@ class PostSavePhotoVerificationTest(ModuleStoreTestCase):
         self.photo_id_image_url = 'https://test.photo'
         self.photo_id_key = 'test+key'
 
-    @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
+    @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send', autospec=True)
     def test_post_save_signal(self, mock_signal):
         # create new softwaresecureverification
         attempt = SoftwareSecurePhotoVerification.objects.create(
@@ -154,7 +154,7 @@ class PostSavePhotoVerificationTest(ModuleStoreTestCase):
             full_name=attempt.user.profile.name
         )
 
-    @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
+    @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send', autospec=True)
     def test_post_save_signal_pending_name(self, mock_signal):
         pending_name_change = do_name_change_request(self.user, 'Pending Name', 'test')[0]
 

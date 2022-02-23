@@ -40,7 +40,7 @@ class RssProxyViewTests(TestCase):
         WhitelistedRssUrl.objects.create(url=self.whitelisted_url1)
         WhitelistedRssUrl.objects.create(url=self.whitelisted_url2)
 
-    @patch('lms.djangoapps.rss_proxy.views.requests.get')
+    @patch('lms.djangoapps.rss_proxy.views.requests.get', autospec=True)
     def test_proxy_with_whitelisted_url(self, mock_requests_get):
         """
         Test the proxy view with a whitelisted URL
@@ -51,7 +51,7 @@ class RssProxyViewTests(TestCase):
         assert resp['Content-Type'] == 'application/xml'
         assert resp.content.decode('utf-8') == self.rss
 
-    @patch('lms.djangoapps.rss_proxy.views.requests.get')
+    @patch('lms.djangoapps.rss_proxy.views.requests.get', autospec=True)
     def test_proxy_with_whitelisted_url_404(self, mock_requests_get):
         """
         Test the proxy view with a whitelisted URL that is not found

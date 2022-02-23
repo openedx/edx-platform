@@ -161,9 +161,9 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         'session_index': '1',
     }
 
-    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    @patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
-    @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
+    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request', autospec=True)
+    @patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request', autospec=True)
+    @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get', autospec=True)
     def test_full_pipeline_succeeds_for_unlinking_testshib_account(
         self,
         mock_auth_provider,

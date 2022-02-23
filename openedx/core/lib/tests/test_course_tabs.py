@@ -11,7 +11,7 @@ from openedx.core.lib.course_tabs import CourseTabPluginManager
 class CourseTabPluginManagerTestCase(TestCase):
     """Test cases for CourseTabPluginManager class"""
 
-    @patch('openedx.core.lib.course_tabs.CourseTabPluginManager.get_available_plugins')
+    @patch('openedx.core.lib.course_tabs.CourseTabPluginManager.get_available_plugins', autospec=True)
     def test_get_tab_types(self, get_available_plugins):
         """
         Verify that get_course_view_types sorts appropriately

@@ -167,7 +167,7 @@ class SplitTestBlockLMSTest(SplitTestBlockTest):
         assert self.split_test_module.child_descriptor.url_name == self.split_test_module.child_descriptor.url_name
 
     # Patch the definition_to_xml for the html children.
-    @patch('xmodule.html_module.HtmlBlock.definition_to_xml')
+    @patch('xmodule.html_module.HtmlBlock.definition_to_xml', autospec=True)
     def test_export_import_round_trip(self, def_to_xml):
         # The HtmlBlock definition_to_xml tries to write to the filesystem
         # before returning an xml object. Patch this to just return the xml.
@@ -270,7 +270,7 @@ class SplitTestBlockStudioTest(SplitTestBlockTest):
         assert SplitTestBlock.user_partitions in non_editable_metadata_fields
         assert SplitTestBlock.display_name not in non_editable_metadata_fields
 
-    @patch('xmodule.split_test_module.user_partition_values.values')
+    @patch('xmodule.split_test_module.user_partition_values.values', autospec=True)
     def test_available_partitions(self, _):
         """
         Tests that the available partitions are populated correctly when editable_metadata_fields are called

@@ -209,8 +209,8 @@ class VideoUploadPostTestsMixin:
     Shared test cases for video post tests.
     """
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('boto.s3.key.Key')
-    @patch('boto.s3.connection.S3Connection')
+    @patch('boto.s3.key.Key', autospec=True)
+    @patch('boto.s3.connection.S3Connection', autospec=True)
     def test_post_success(self, mock_conn, mock_key):
         files = [
             {
@@ -523,7 +523,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
             self.assertEqual(response['error'], "Request 'files' entry contain unsupported content_type")
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('boto.s3.connection.S3Connection')
+    @patch('boto.s3.connection.S3Connection', autospec=True)
     def test_upload_with_non_ascii_charaters(self, mock_conn):
         """
         Test that video uploads throws error message when file name contains special characters.
@@ -544,8 +544,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
         self.assertEqual(response['error'], 'The file name for %s must contain only ASCII characters.' % file_name)
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret', AWS_SECURITY_TOKEN='token')
-    @patch('boto.s3.key.Key')
-    @patch('boto.s3.connection.S3Connection')
+    @patch('boto.s3.key.Key', autospec=True)
+    @patch('boto.s3.connection.S3Connection', autospec=True)
     @override_flag(waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].name, active=True)
     def test_devstack_upload_connection(self, mock_conn, mock_key):
         files = [{'file_name': 'first.mp4', 'content_type': 'video/mp4'}]
@@ -571,8 +571,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
             security_token=settings.AWS_SECURITY_TOKEN
         )
 
-    @patch('boto.s3.key.Key')
-    @patch('boto.s3.connection.S3Connection')
+    @patch('boto.s3.key.Key', autospec=True)
+    @patch('boto.s3.connection.S3Connection', autospec=True)
     def test_send_course_to_vem_pipeline(self, mock_conn, mock_key):
         """
         Test that uploads always go to VEM S3 bucket by default.
@@ -600,8 +600,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
         )
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('boto.s3.key.Key')
-    @patch('boto.s3.connection.S3Connection')
+    @patch('boto.s3.key.Key', autospec=True)
+    @patch('boto.s3.connection.S3Connection', autospec=True)
     @ddt.data(
         {
             'global_waffle': True,
@@ -762,7 +762,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
         # Test should fail if video not found
         self.assertEqual(True, False, 'Invalid edx_video_id')
 
-    @patch('cms.djangoapps.contentstore.views.videos.LOGGER')
+    @patch('cms.djangoapps.contentstore.views.videos.LOGGER', autospec=True)
     def test_video_status_update_request(self, mock_logger):
         """
         Verifies that video status update request works as expected.
@@ -826,7 +826,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
         self.assert_video_status(url, edx_video_id, expected_video_status_text)
 
     @ddt.data(True, False)
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled')
+    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', autospec=True)
     def test_video_index_transcript_feature_enablement(self, is_video_transcript_enabled, video_transcript_feature):
         """
         Test that when video transcript is enabled/disabled, correct response is rendered.
@@ -1434,9 +1434,9 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
     )
     @ddt.unpack
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('boto.s3.key.Key')
-    @patch('boto.s3.connection.S3Connection')
-    @patch('cms.djangoapps.contentstore.views.videos.get_transcript_preferences')
+    @patch('boto.s3.key.Key', autospec=True)
+    @patch('boto.s3.connection.S3Connection', autospec=True)
+    @patch('cms.djangoapps.contentstore.views.videos.get_transcript_preferences', autospec=True)
     def test_transcript_preferences_metadata(self, transcript_preferences, is_video_transcript_enabled,
                                              mock_transcript_preferences, mock_conn, mock_key):
         """

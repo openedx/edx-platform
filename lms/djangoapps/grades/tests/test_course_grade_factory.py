@@ -298,7 +298,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             assert course_grade.letter_grade is None
             assert course_grade.percent == 0.0
 
-    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read')
+    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read', autospec=True)
     def test_grading_exception(self, mock_course_grade):
         """Test that we correctly capture exception messages that bubble up from
         grading. Note that we only see errors at this level if the grading

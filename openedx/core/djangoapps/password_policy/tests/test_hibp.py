@@ -19,7 +19,7 @@ class PwnedPasswordsAPITest(TestCase):
     Tests pwned password service
     """
     @override_waffle_switch(ENABLE_PWNED_PASSWORD_API, True)
-    @patch('requests.get')
+    @patch('requests.get', autospec=True)
     def test_matched_pwned_passwords(self, mock_get):
         """
         Test that pwned service returns pwned passwords dict

@@ -108,7 +108,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         self.handler._get_access_token = Mock(return_value='12345')
         self.check_headers(self.handler._get_headers())  # lint-amnesty, pylint: disable=no-member
 
-    @patch('requests.post')
+    @patch('requests.post', autospec=True)
     def test_create_badge(self, post):
         """
         Verify badge spec creation works.
@@ -145,7 +145,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         assert self.handler._slugify(getattr(self, badge_class_type)) == slug
         # lint-amnesty, pylint: disable=no-member
 
-    @patch('requests.get')
+    @patch('requests.get', autospec=True)
     def test_ensure_badge_created_checks(self, get):
         response = Mock()
         response.status_code = 200
@@ -163,7 +163,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         assert BADGR_SERVER_SLUG in BadgrBackend.badges
         assert not self.handler._create_badge.called
 
-    @patch('requests.get')
+    @patch('requests.get', autospec=True)
     def test_ensure_badge_created_creates(self, get):
         response = Mock()
         response.status_code = 404
@@ -176,7 +176,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         assert self.handler._create_badge.call_args == call(self.badge_class)
         assert BADGR_SERVER_SLUG in BadgrBackend.badges
 
-    @patch('requests.post')
+    @patch('requests.post', autospec=True)
     def test_badge_creation_event(self, post):
         result = {
             'result': [{

@@ -285,7 +285,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, p
         response = self.item.transcript(request=request, dispatch='available_translations')
         assert json.loads(response.body.decode('utf-8')) == ['uk']
 
-    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
+    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content', autospec=True)
     def test_multiple_available_translations(self, mock_get_video_transcript_content):
         mock_get_video_transcript_content.return_value = {
             'content': json.dumps({
@@ -311,8 +311,8 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, p
         response = self.item.transcript(request=request, dispatch='available_translations')
         assert sorted(json.loads(response.body.decode('utf-8'))) == sorted(['en', 'uk'])
 
-    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
-    @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages')
+    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content', autospec=True)
+    @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages', autospec=True)
     @ddt.data(
         (
             ['en', 'uk', 'ro'],
@@ -388,7 +388,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, p
         response = self.item.transcript(request=request, dispatch='available_translations')
         self.assertCountEqual(json.loads(response.body.decode('utf-8')), result)
 
-    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages', autospec=True)
     def test_val_available_translations_feature_disabled(self, mock_get_available_transcript_languages):
         """
         Tests available translations with val transcript languages when feature is disabled.
@@ -438,7 +438,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):  # lint-amne
         response = self.item.transcript(request=request, dispatch=self.dispatch)
         assert json.loads(response.body.decode('utf-8')) == [lang]
 
-    @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages')
+    @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages', autospec=True)
     def test_multiple_available_translations(self, mock_get_transcript_languages):
         """
         Verify that available translations dispatch works as expected for multiple
@@ -538,7 +538,7 @@ class TestTranscriptDownloadDispatch(TestVideo):  # lint-amnesty, pylint: disabl
         assert response.headers['Content-Type'] == 'application/x-subrip; charset=utf-8'
         assert response.headers['Content-Disposition'] == 'attachment; filename="en_塞.srt"'
 
-    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data', autospec=True)
     @patch('xmodule.video_module.get_transcript', Mock(side_effect=NotFoundError))
     def test_download_fallback_transcript(self, mock_get_video_transcript_data):
         """
@@ -799,7 +799,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
             store.update_item(self.course, self.user.id)
 
-    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
+    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data', autospec=True)
     @patch('xmodule.video_module.VideoBlock.translation', Mock(side_effect=NotFoundError))
     @patch('xmodule.video_module.VideoBlock.get_static_transcript', Mock(return_value=Response(status=404)))
     def test_translation_fallback_transcript(self, mock_get_video_transcript_data):

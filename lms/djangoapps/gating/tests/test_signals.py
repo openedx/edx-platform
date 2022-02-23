@@ -23,7 +23,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
         self.user = UserFactory.create()
         self.subsection_grade = Mock()
 
-    @patch('lms.djangoapps.gating.api.gating_api.get_gating_milestone')
+    @patch('lms.djangoapps.gating.api.gating_api.get_gating_milestone', autospec=True)
     def test_gating_enabled(self, mock_gating_milestone):
         self.course.enable_subsection_gating = True
         modulestore().update_item(self.course, 0)
@@ -35,7 +35,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
         )
         assert mock_gating_milestone.called
 
-    @patch('lms.djangoapps.gating.api.gating_api.get_gating_milestone')
+    @patch('lms.djangoapps.gating.api.gating_api.get_gating_milestone', autospec=True)
     def test_gating_disabled(self, mock_gating_milestone):
         evaluate_subsection_gated_milestones(
             sender=None,

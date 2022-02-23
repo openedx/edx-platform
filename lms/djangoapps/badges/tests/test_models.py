@@ -214,7 +214,7 @@ class BadgeClassTest(ModuleStoreTestCase):
         BADGR_USERNAME='example@example.com',
         BADGR_PASSWORD='password',
         BADGR_TOKENS_CACHE_KEY='badgr-test-cache-key')
-    @patch('lms.djangoapps.badges.backends.badgr.BadgrBackend.award')
+    @patch('lms.djangoapps.badges.backends.badgr.BadgrBackend.award', autospec=True)
     def test_award(self, mock_award):
         """
         Verify that the award command calls the award function on the backend with the right parameters.

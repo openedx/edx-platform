@@ -23,7 +23,7 @@ class TestApps(TestCase):
         'GENERAL_USER_COMPLIANCE_DEADLINE': '2018-01-01 00:00:00+00:00',
         'STAFF_USER_COMPLIANCE_DEADLINE': 'foo',
     })
-    @patch('openedx.core.djangoapps.password_policy.apps.log')
+    @patch('openedx.core.djangoapps.password_policy.apps.log', autospec=True)
     def test_settings_misconfiguration(self, mock_log):
         """
         Test that we gracefully handle misconfigurations

@@ -65,8 +65,8 @@ class CreateScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: d
     def test_create_schedule_course_updates_experience(self, _mock_highlights):
         self.assert_schedule_created(experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
-    @patch('openedx.core.djangoapps.schedules.signals.log.exception')
-    @patch('openedx.core.djangoapps.schedules.signals.Schedule.objects.create')
+    @patch('openedx.core.djangoapps.schedules.signals.log.exception', autospec=True)
+    @patch('openedx.core.djangoapps.schedules.signals.Schedule.objects.create', autospec=True)
     def test_create_schedule_error(self, mock_create_schedule, mock_log):
         mock_create_schedule.side_effect = ValueError('Fake error')
         self.assert_schedule_not_created()

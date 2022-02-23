@@ -213,8 +213,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'ENABLE_AUTHN_MICROFRONTEND': True, 'ENABLE_ENTERPRISE_INTEGRATION': True})
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
-    @patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
-    @patch('openedx.core.djangoapps.user_authn.views.login.reverse')
+    @patch('openedx.features.enterprise_support.api.EnterpriseApiClient', autospec=True)
+    @patch('openedx.core.djangoapps.user_authn.views.login.reverse', autospec=True)
     @skip_unless_lms
     def test_login_success_for_multiple_enterprises(
         self, expected_redirect, user_has_multiple_enterprises, reverse_mock, mock_api_client_class
@@ -262,9 +262,9 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     @ddt.data(('', True), ('/enterprise/select/active/?success_url=', False))
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'ENABLE_AUTHN_MICROFRONTEND': True, 'ENABLE_ENTERPRISE_INTEGRATION': True})
-    @patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
-    @patch('openedx.core.djangoapps.user_authn.views.login.activate_learner_enterprise')
-    @patch('openedx.core.djangoapps.user_authn.views.login.reverse')
+    @patch('openedx.features.enterprise_support.api.EnterpriseApiClient', autospec=True)
+    @patch('openedx.core.djangoapps.user_authn.views.login.activate_learner_enterprise', autospec=True)
+    @patch('openedx.core.djangoapps.user_authn.views.login.reverse', autospec=True)
     @skip_unless_lms
     def test_enterprise_in_url(
         self, expected_redirect, is_activated, reverse_mock, mock_activate_learner_enterprise, mock_api_client_class
@@ -404,7 +404,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         self._assert_response(response, success=False, error_code="inactive-user")
         self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'Account not active for user'])
 
-    @patch('openedx.core.djangoapps.user_authn.views.login._log_and_raise_inactive_user_auth_error')
+    @patch('openedx.core.djangoapps.user_authn.views.login._log_and_raise_inactive_user_auth_error', autospec=True)
     def test_login_inactivated_user_with_incorrect_credentials(self, mock_inactive_user_email_and_error):
         """
         Tests that when user login with incorrect credentials and an inactive account,
@@ -524,7 +524,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         response, _audit_log = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
 
-    @patch('openedx.core.djangoapps.util.ratelimit.real_ip')
+    @patch('openedx.core.djangoapps.util.ratelimit.real_ip', autospec=True)
     def test_excessive_login_attempts_by_email(self, real_ip_mock):
         # try logging in 6 times, the defalutlimit for the number of failed
         # login attempts in one 5 minute period before the rate gets limited
@@ -1062,7 +1062,7 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
                                         'loginIssueSupportLink': 'https://support.example.com/login-issue-help.html'}]
 
     @ddt.data(True, False)
-    @patch('openedx.core.djangoapps.user_authn.views.login.segment')
+    @patch('openedx.core.djangoapps.user_authn.views.login.segment', autospec=True)
     def test_login(self, include_analytics, mock_segment):
         data = {
             "email": self.EMAIL,

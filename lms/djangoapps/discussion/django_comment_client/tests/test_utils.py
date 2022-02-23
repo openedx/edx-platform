@@ -1678,7 +1678,7 @@ class ClientConfigurationTestCase(TestCase):
         with pytest.raises(CommentClientMaintenanceError):
             perform_request('GET', 'http://www.google.com')
 
-    @patch('requests.request')
+    @patch('requests.request', autospec=True)
     def test_enabled(self, mock_request):
         """Ensures that requests proceed normally when forums are enabled."""
         config = ForumsConfig.current()

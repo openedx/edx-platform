@@ -463,7 +463,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
                     assert get_date(ccx, unit, 'due', parent_node=subsection) == self.mooc_due
 
     @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
-    @patch('lms.djangoapps.ccx.views.TODAY')
+    @patch('lms.djangoapps.ccx.views.TODAY', autospec=True)
     def test_edit_schedule(self, today):
         """
         Get CCX schedule, modify it, save it.
@@ -885,7 +885,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         self.mstore.update_item(node, self.coach.id)
 
     @patch('lms.djangoapps.ccx.views.render_to_response', intercept_renderer)
-    @patch('lms.djangoapps.ccx.views.TODAY')
+    @patch('lms.djangoapps.ccx.views.TODAY', autospec=True)
     def test_get_ccx_schedule(self, today):
         """
         Gets CCX schedule and checks number of blocks in it.

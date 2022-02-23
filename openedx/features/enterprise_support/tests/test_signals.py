@@ -133,7 +133,7 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
 
         return enrollment
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_order_voucher_refundable')
+    @patch('common.djangoapps.student.models.CourseEnrollment.is_order_voucher_refundable', autospec=True)
     @ddt.data(
         (True, True, 2, True, False),  # test if skip_refund
         (False, True, 20, True, False),  # test refundable time passed
@@ -159,7 +159,7 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
             enrollment.update_enrollment(is_active=False, skip_refund=skip_refund)
             assert mock_ecommerce_api_client.called == api_called
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_order_voucher_refundable')
+    @patch('common.djangoapps.student.models.CourseEnrollment.is_order_voucher_refundable', autospec=True)
     @ddt.data(
         (HttpClientError, 'INFO'),
         (HttpServerError, 'ERROR'),

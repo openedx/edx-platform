@@ -1100,7 +1100,7 @@ class ViewsTestCase(BaseViewsTestCase):
 
 # Patching 'lms.djangoapps.courseware.views.views.get_programs' would be ideal,
 # but for some unknown reason that patch doesn't seem to be applied.
-@patch('openedx.core.djangoapps.catalog.utils.cache')
+@patch('openedx.core.djangoapps.catalog.utils.cache', autospec=True)
 class TestProgramMarketingView(SharedModuleStoreTestCase):
     """Unit tests for the program marketing page."""
     program_uuid = str(uuid4())
@@ -2670,8 +2670,8 @@ class TestIndexView(ModuleStoreTestCase):
                     assert 'xblock-student_view-html' in unicode_content
                     assert 'xblock-student_view-video' in unicode_content
 
-    @patch('lms.djangoapps.courseware.views.views.CourseTabView.course_open_for_learner_enrollment')
-    @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message')
+    @patch('lms.djangoapps.courseware.views.views.CourseTabView.course_open_for_learner_enrollment', autospec=True)
+    @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message', autospec=True)
     def test_courseware_messages_differentiate_for_anonymous_users(
             self, patch_register_warning_message, patch_course_open_for_learner_enrollment
     ):
@@ -2698,7 +2698,7 @@ class TestIndexView(ModuleStoreTestCase):
 
         assert open_for_enrollment_message != closed_to_enrollment_message
 
-    @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message')
+    @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message', autospec=True)
     def test_courseware_messages_masters_only(self, patch_register_warning_message):
         with patch(
                 'lms.djangoapps.courseware.views.views.CourseTabView.course_open_for_learner_enrollment'
@@ -3260,7 +3260,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         banner_text = get_expiration_banner_text(self.user, self.course)
         self.assertContains(response, banner_text, html=True)
 
-    @patch('lms.djangoapps.courseware.views.views.is_request_from_mobile_app')
+    @patch('lms.djangoapps.courseware.views.views.is_request_from_mobile_app', autospec=True)
     def test_render_xblock_with_course_duration_limits_in_mobile_browser(self, mock_is_request_from_mobile_app):
         """
         Verify that expired banner message doesn't appear on xblock page in a mobile browser, if learner is enrolled
@@ -3387,7 +3387,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
         CourseOverview.load_from_module_store(self.course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
-    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request', autospec=True)
     def test_consent_required(self, mock_enterprise_customer_for_request):
         """
         Test that enterprise data sharing consent is required when enabled for the various courseware views.
@@ -3485,7 +3485,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
         assert response.status_code == 200
 
     @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
-    @patch('edx_django_utils.monitoring.set_custom_attribute')
+    @patch('edx_django_utils.monitoring.set_custom_attribute', autospec=True)
     def test_defaults(self, mock_set_custom_attribute):
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)

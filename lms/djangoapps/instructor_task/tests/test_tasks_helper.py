@@ -128,8 +128,8 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         num_students = len(emails)
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
+    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task', autospec=True)
+    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter', autospec=True)
     def test_grading_failure(self, mock_grades_iter, _mock_current_task):
         """
         Test that any grading errors are properly reported in the
@@ -305,8 +305,8 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             '',
         )
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter')
+    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task', autospec=True)
+    @patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.iter', autospec=True)
     def test_unicode_in_csv_header(self, mock_grades_iter, _mock_current_task):
         """
         Tests that CSV grade report works if unicode in headers.
@@ -705,7 +705,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         )
         assert len(student_data) == filtered_count
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
+    @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses', autospec=True)
     @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_generate_report_data_not_implemented(
             self,
@@ -801,7 +801,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.student_2 = self.create_student('üser_2')
         self.csv_header_row = ['Student ID', 'Email', 'Username', 'Enrollment Status', 'Grade']
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task', autospec=True)
     def test_no_problems(self, _get_current_task):
         """
         Verify that we see no grade information for a course with no graded
@@ -820,7 +820,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             )))
         ])
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task', autospec=True)
     def test_single_problem(self, _get_current_task):
         vertical = ItemFactory.create(
             parent_location=self.problem_section.location,
@@ -858,7 +858,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             )))
         ])
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task', autospec=True)
     def test_single_problem_verified_student_only(self, _get_current_task):
         with patch(
             'lms.djangoapps.instructor_task.tasks_helper.grades.problem_grade_report_verified_only',
@@ -880,7 +880,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
             )
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task', autospec=True)
     def test_inactive_enrollment_included(self, _get_current_task):
         """
         Students with inactive enrollments in a course should be included in Problem Grade Report.
@@ -1866,7 +1866,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                 ignore_other_columns=True,
             )
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task', autospec=True)
     def test_course_grade_with_verified_student_only(self, _get_current_task):
         """
         Tests that course grade report has expected data when it is generated only for

@@ -416,7 +416,7 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase, OpenEdxEventsTestMi
         # After making the certificate valid method will return false.
         assert not CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
 
-    @patch('openedx.core.djangoapps.programs.tasks.revoke_program_certificates.delay')
+    @patch('openedx.core.djangoapps.programs.tasks.revoke_program_certificates.delay', autospec=True)
     @patch(
         'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
         return_value=True,
@@ -466,7 +466,7 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin
             event_data=expected_event_data
         )
 
-    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event', autospec=True)
     def test_invalidate(self, mock_emit_certificate_event):
         """
         Test the invalidate method
@@ -498,7 +498,7 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin
 
         self._assert_event_data(mock_emit_certificate_event, expected_event_data)
 
-    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event', autospec=True)
     def test_invalidate_find_mode(self, mock_emit_certificate_event):
         """
         Test the invalidate method when mode is retrieved from the enrollment
@@ -529,7 +529,7 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin
 
             self._assert_event_data(mock_emit_certificate_event, expected_event_data)
 
-    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event', autospec=True)
     def test_invalidate_no_mode(self, mock_emit_certificate_event):
         """
         Test the invalidate method when there is no enrollment mode
@@ -560,7 +560,7 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin
 
             self._assert_event_data(mock_emit_certificate_event, expected_event_data)
 
-    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event', autospec=True)
     def test_invalidate_no_profile(self, mock_emit_certificate_event):
         """
         Test the invalidate method when there is no user profile
@@ -593,7 +593,7 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin
 
             self._assert_event_data(mock_emit_certificate_event, expected_event_data)
 
-    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event', autospec=True)
     def test_notpassing(self, mock_emit_certificate_event):
         """
         Test the notpassing method
@@ -654,7 +654,7 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin
         else:
             assert cert.name == profile.name
 
-    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event', autospec=True)
     def test_unverified(self, mock_emit_certificate_event):
         """
         Test the unverified method

@@ -1080,7 +1080,7 @@ class TestCheckTranscripts(BaseTranscripts):
             'Transcripts are supported only for "video" modules.',
         )
 
-    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
+    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content', autospec=True)
     def test_command_for_fallback_transcript(self, mock_get_video_transcript_content):
         """
         Verify the command if a transcript is there in edx-val.

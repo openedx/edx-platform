@@ -444,7 +444,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         reset_student_attempts(self.course_key, self.user, msk, requesting_user=self.user)
         assert json.loads(module().state)['attempts'] == 0
 
-    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send', autospec=True)
     def test_delete_student_attempts(self, _mock_signal):
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
@@ -466,7 +466,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
 
     # Disable the score change signal to prevent other components from being
     # pulled into tests.
-    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send', autospec=True)
     def test_delete_submission_scores(self, mock_send_signal):
         user = UserFactory()
         problem_location = self.course_key.make_usage_key('dummy', 'module')
@@ -586,7 +586,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         # Still should have no state
         self.assert_no_student_module(self.lazy_teammate, team_ora_location)
 
-    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send', autospec=True)
     def test_delete_team_attempts(self, _mock_signal):
         self.setup_team()
         team_ora_location = self.team_enabled_ora.location
@@ -606,7 +606,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         self.assert_no_student_module(self.teammate_b, team_ora_location)
         self.assert_no_student_module(self.lazy_teammate, team_ora_location)
 
-    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send', autospec=True)
     def test_delete_team_attempts_no_team_fallthrough(self, _mock_signal):
         self.setup_team()
         team_ora_location = self.team_enabled_ora.location
@@ -762,7 +762,7 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
         assert grade.all_total.possible == all_possible
         assert grade.graded_total.possible == graded_possible
 
-    @patch('crum.get_current_request')
+    @patch('crum.get_current_request', autospec=True)
     def test_delete_student_state(self, _crum_mock):
         problem_location = self.problem.location
         self._get_subsection_grade_and_verify(0, 1, 0, 1)

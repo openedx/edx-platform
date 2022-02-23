@@ -33,14 +33,14 @@ class TestCreateApiAccessRequest(TestCase):
         call_command(self.command, self.user.username, create_config=create_config)
         self.assert_models_exist(True, create_config)
 
-    @patch('openedx.core.djangoapps.api_admin.models._send_new_pending_email')
+    @patch('openedx.core.djangoapps.api_admin.models._send_new_pending_email', autospec=True)
     def test_create_api_access_request_signals_disconnected(self, mock_send_new_pending_email):
         self.assert_models_exist(False, False)
         call_command(self.command, self.user.username, create_config=True, disconnect_signals=True)
         self.assert_models_exist(True, True)
         assert not mock_send_new_pending_email.called
 
-    @patch('openedx.core.djangoapps.api_admin.models._send_new_pending_email')
+    @patch('openedx.core.djangoapps.api_admin.models._send_new_pending_email', autospec=True)
     def test_create_api_access_request_signals_connected(self, mock_send_new_pending_email):
         self.assert_models_exist(False, False)
         call_command(self.command, self.user.username, create_config=True, disconnect_signals=False)
@@ -57,7 +57,7 @@ class TestCreateApiAccessRequest(TestCase):
         with self.assertRaisesRegex(CommandError, r'User .*? not found'):
             call_command(self.command, 'not-a-user-notfound-nope')
 
-    @patch('openedx.core.djangoapps.api_admin.models.ApiAccessRequest.objects.create')
+    @patch('openedx.core.djangoapps.api_admin.models.ApiAccessRequest.objects.create', autospec=True)
     def test_api_request_error(self, mocked_method):
         mocked_method.side_effect = Exception()
 
@@ -68,7 +68,7 @@ class TestCreateApiAccessRequest(TestCase):
 
         self.assert_models_exist(False, False)
 
-    @patch('openedx.core.djangoapps.api_admin.models.send_request_email')
+    @patch('openedx.core.djangoapps.api_admin.models.send_request_email', autospec=True)
     def test_api_request_permission_denied_error(self, mocked_method):
         """
         When a Permission denied OSError with 'mako_lms' in the message occurs in the post_save receiver,
@@ -82,7 +82,7 @@ class TestCreateApiAccessRequest(TestCase):
 
         self.assert_models_exist(True, True)
 
-    @patch('openedx.core.djangoapps.api_admin.models.ApiAccessRequest.objects.create')
+    @patch('openedx.core.djangoapps.api_admin.models.ApiAccessRequest.objects.create', autospec=True)
     def test_api_request_other_oserrors_raise(self, mocked_method):
         """
         When some other Permission denied OSError occurs, we should still raise.
@@ -96,7 +96,7 @@ class TestCreateApiAccessRequest(TestCase):
 
         self.assert_models_exist(False, False)
 
-    @patch('openedx.core.djangoapps.api_admin.models.ApiAccessConfig.objects.get_or_create')
+    @patch('openedx.core.djangoapps.api_admin.models.ApiAccessConfig.objects.get_or_create', autospec=True)
     def test_api_config_error(self, mocked_method):
         mocked_method.side_effect = Exception()
         self.assert_models_exist(False, False)

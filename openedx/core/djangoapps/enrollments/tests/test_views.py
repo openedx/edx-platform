@@ -1062,7 +1062,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
     @httpretty.activate
     @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker',
                        FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
-    @patch('openedx.features.enterprise_support.api.enterprise_customer_from_api')
+    @patch('openedx.features.enterprise_support.api.enterprise_customer_from_api', autospec=True)
     def test_enterprise_course_enrollment_with_ec_uuid(self, mock_enterprise_customer_from_api):
         """Verify that the enrollment completes when the EnterpriseCourseEnrollment creation succeeds. """
         UserFactory.create(

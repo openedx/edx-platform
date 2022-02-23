@@ -75,7 +75,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         self.instructor = UserFactory.create(is_staff=True, username='test_instructor', password='test')
         self.refresh_course()
 
-    @patch('lms.djangoapps.grades.events.tracker')
+    @patch('lms.djangoapps.grades.events.tracker', autospec=True)
     def test_submit_answer(self, events_tracker):
         self.submit_question_answer('p1', {'2_1': 'choice_choice_2'})
         course = self.store.get_course(self.course.id, depth=0)

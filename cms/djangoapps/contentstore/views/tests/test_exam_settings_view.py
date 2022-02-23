@@ -170,7 +170,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
         assert len(alert_nodes) == 0
 
     @override_settings(FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True})
-    @patch('cms.djangoapps.models.settings.course_metadata.CourseMetadata.validate_proctoring_settings')
+    @patch('cms.djangoapps.models.settings.course_metadata.CourseMetadata.validate_proctoring_settings', autospec=True)
     def test_proctoring_link_is_visible(self, mock_validate_proctoring_settings):
 
         """

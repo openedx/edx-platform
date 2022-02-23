@@ -165,7 +165,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         assert 'fa fa-check-circle check-circle is-hidden' not in html
 
     # pylint: disable=line-too-long
-    @patch('xmodule.seq_module.SequenceBlock.gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems')
+    @patch('xmodule.seq_module.SequenceBlock.gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems', autospec=True)
     def test_timed_exam_gating_waffle_flag(self, mocked_function):  # pylint: disable=unused-argument
         """
         Verify the code inside the waffle flag is not executed with the flag off

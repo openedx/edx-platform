@@ -852,7 +852,7 @@ class TestCourseStructureCache(CacheIsolationMixin, SplitModuleTest):
 
         super().setUp()
 
-    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache', autospec=True)
     def test_course_structure_cache(self, mock_get_cache):
         # force get_cache to return the default cache so we can test
         # its caching behavior
@@ -878,7 +878,7 @@ class TestCourseStructureCache(CacheIsolationMixin, SplitModuleTest):
         # now make sure that you get the same structure
         assert not_corrupt_structure == not_cached_structure
 
-    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache', autospec=True)
     def test_course_structure_cache_no_cache_configured(self, mock_get_cache):
         mock_get_cache.side_effect = InvalidCacheBackendError
 

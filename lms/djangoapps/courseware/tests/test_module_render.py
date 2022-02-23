@@ -887,7 +887,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
 
     @XBlock.register_temp_plugin(GradedStatelessXBlock, identifier='stateless_scorer')
-    @patch('lms.djangoapps.courseware.module_render.grades_signals.SCORE_PUBLISHED.send')
+    @patch('lms.djangoapps.courseware.module_render.grades_signals.SCORE_PUBLISHED.send', autospec=True)
     def test_anonymous_user_not_be_graded(self, mock_score_signal):
         course = CourseFactory.create()
         descriptor_kwargs = {
@@ -2115,7 +2115,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         assert student_module.grade is None
         assert student_module.max_grade is None
 
-    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_RAW_SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_RAW_SCORE_CHANGED.send', autospec=True)
     def test_score_change_signal(self, send_mock):
         """Test that a Django signal is generated when a score changes"""
         with freeze_time(datetime.now().replace(tzinfo=pytz.UTC)):

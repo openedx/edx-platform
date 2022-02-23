@@ -75,7 +75,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         BulkEmailFlag.objects.all().delete()
 
     @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
-    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry')
+    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry', autospec=True)
     def test_data_err_retry(self, retry, get_conn):
         """
         Test that celery handles transient SMTPDataErrors by retrying.
@@ -97,8 +97,8 @@ class TestEmailErrors(ModuleStoreTestCase):
         assert isinstance(exc, SMTPDataError)
 
     @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
-    @patch('lms.djangoapps.bulk_email.tasks.update_subtask_status')
-    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry')
+    @patch('lms.djangoapps.bulk_email.tasks.update_subtask_status', autospec=True)
+    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry', autospec=True)
     def test_data_err_fail(self, retry, result, get_conn):
         """
         Test that celery handles permanent SMTPDataErrors by failing and not retrying.
@@ -130,7 +130,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         assert subtask_status.succeeded == (settings.BULK_EMAIL_EMAILS_PER_TASK - expected_fails)
 
     @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
-    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry')
+    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry', autospec=True)
     def test_disconn_err_retry(self, retry, get_conn):
         """
         Test that celery handles SMTPServerDisconnected by retrying.
@@ -151,7 +151,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         assert isinstance(exc, SMTPServerDisconnected)
 
     @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
-    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry')
+    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry', autospec=True)
     def test_conn_err_retry(self, retry, get_conn):
         """
         Test that celery handles SMTPConnectError by retrying.
@@ -172,8 +172,8 @@ class TestEmailErrors(ModuleStoreTestCase):
         exc = kwargs['exc']
         assert isinstance(exc, SMTPConnectError)
 
-    @patch('lms.djangoapps.bulk_email.tasks.SubtaskStatus.increment')
-    @patch('lms.djangoapps.bulk_email.tasks.log')
+    @patch('lms.djangoapps.bulk_email.tasks.SubtaskStatus.increment', autospec=True)
+    @patch('lms.djangoapps.bulk_email.tasks.log', autospec=True)
     def test_nonexistent_email(self, mock_log, result):
         """
         Tests retries when the email doesn't exist

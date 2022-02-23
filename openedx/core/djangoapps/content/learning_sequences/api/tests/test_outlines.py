@@ -1026,7 +1026,7 @@ class SpecialExamsTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: d
             assert key in student_details.outline.sequences
 
     @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
-    @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.special_exams.get_attempt_status_summary')
+    @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.special_exams.get_attempt_status_summary', autospec=True)
     def test_special_exam_attempt_data_in_details(self, mock_get_attempt_status_summary):
         at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)  # lint-amnesty, pylint: disable=unused-variable
 
@@ -1060,7 +1060,7 @@ class SpecialExamsTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: d
             assert attempt_summary["summary"]["usage_key"] == str(sequence_key)
 
     @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False})
-    @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.special_exams.get_attempt_status_summary')
+    @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.special_exams.get_attempt_status_summary', autospec=True)
     def test_special_exam_attempt_data_empty_when_disabled(self, mock_get_attempt_status_summary):
         at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)  # lint-amnesty, pylint: disable=unused-variable
 

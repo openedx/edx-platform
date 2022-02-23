@@ -712,7 +712,7 @@ class ProgressTestCase(TabTestCase):
             invalid_dict_tab=None,
         )
 
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled')
+    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled', autospec=True)
     def test_progress(self, is_enrolled):
         is_enrolled.return_value = True
         self.course.hide_progress_tab = False
@@ -876,7 +876,7 @@ class DiscussionLinkTestCase(TabTestCase):
 
 class DatesTabTestCase(TabListTestCase):
     """Test cases for dates tab"""
-    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled')
+    @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled', autospec=True)
     def test_dates_tab_disabled_if_unenrolled(self, is_enrolled):
         tab = DatesTab({'type': DatesTab.type, 'name': 'dates'})
 

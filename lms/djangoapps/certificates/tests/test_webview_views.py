@@ -467,7 +467,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.assertContains(response, 'logo_test1.png')
 
     @ddt.data(True, False)
-    @patch('lms.djangoapps.certificates.views.webview.get_completion_badge')
+    @patch('lms.djangoapps.certificates.views.webview.get_completion_badge', autospec=True)
     def test_fetch_badge_info(self, issue_badges, mock_get_completion_badge):
         """
         Test: Fetch badge class info if badges are enabled.
@@ -1061,7 +1061,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
     # TEMPLATES WITHOUT LANGUAGE TESTS
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     @override_settings(LANGUAGE_CODE='fr')
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
     def test_certificate_custom_template_with_org_mode_and_course_key(self, mock_get_course_run_details):
         """
         Tests custom template search and rendering.
@@ -1095,7 +1095,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             self.assertContains(response, 'course name: test_template_3_course')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
     def test_certificate_custom_template_with_org_and_mode(self, mock_get_course_run_details):
         """
         Tests custom template search if no template matches course_key, but a template does
@@ -1130,7 +1130,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             self.assertContains(response, 'course name: test_template_1_course')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
     def test_certificate_custom_template_with_org(self, mock_get_course_run_details):
         """
         Tests custom template search when we have a single template for a organization.
@@ -1154,7 +1154,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             self.assertContains(response, 'course name: test_template_1_course')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
     def test_certificate_custom_template_with_mode(self, mock_get_course_run_details):
         """
         Tests custom template search if we have a single template for a course mode.
@@ -1183,8 +1183,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
     # 1
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     @override_settings(LANGUAGE_CODE='fr')
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
-    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id', autospec=True)
     def test_certificate_custom_language_template_with_org_mode_and_course_key(
             self,
             mock_get_org_id,
@@ -1267,8 +1267,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
     # 2
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
-    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id', autospec=True)
     def test_certificate_custom_language_template_with_org_and_mode(self, mock_get_org_id, mock_get_course_run_details):
         """
         Tests custom template search if no template matches course_key, but a template does
@@ -1327,8 +1327,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
     # 3
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
-    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id', autospec=True)
     def test_certificate_custom_language_template_with_org(self, mock_get_org_id, mock_get_course_run_details):
         """
         Tests custom template search when we have a single template for a organization.
@@ -1385,8 +1385,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
     # 4
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
-    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id', autospec=True)
     def test_certificate_custom_language_template_with_mode(self, mock_get_org_id, mock_get_course_run_details):
         """
         Tests custom template search if we have a single template for a course mode.
@@ -1443,8 +1443,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.assertContains(response, 'course name: test_right_lang_template')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
-    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id', autospec=True)
     def test_certificate_custom_language_template_with_locale_language_from_catalogue(
             self,
             mock_get_org_id,
@@ -1506,8 +1506,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
     @ddt.data(True, False)
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
-    @patch('lms.djangoapps.certificates.api.get_course_organization_id')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
+    @patch('lms.djangoapps.certificates.api.get_course_organization_id', autospec=True)
     def test_certificate_custom_template_with_hours_of_effort(
             self,
             include_effort,
@@ -1541,7 +1541,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             self.assertNotContains(response, 'hours of effort')
 
     @ddt.data(True, False)
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
     def test_certificate_custom_template_with_unicode_data(self, custom_certs_enabled, mock_get_course_run_details):
         """
         Tests custom template renders properly with unicode data.
@@ -1576,7 +1576,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                         self.assertContains(response, 'https://twitter.com/intent/tweet')
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
+    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details', autospec=True)
     def test_certificate_asset_by_slug(self, mock_get_course_run_details):
         """
         Tests certificate template asset display by slug using static.certificate_asset_url method.

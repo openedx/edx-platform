@@ -76,7 +76,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
             'namespace': str(self.seq1.location),
         }
 
-    @patch('openedx.core.lib.gating.api.log.warning')
+    @patch('openedx.core.lib.gating.api.log.warning', autospec=True)
     def test_get_prerequisite_milestone_returns_none(self, mock_log):
         """ Test test_get_prerequisite_milestone_returns_none """
 

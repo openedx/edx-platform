@@ -46,7 +46,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
         assert test_display_name == updated_block_structure.get_xblock_field(self.course_usage_key, 'display_name')
 
     @ddt.data(True, False)
-    @patch('openedx.core.djangoapps.content.block_structure.manager.BlockStructureManager.clear')
+    @patch('openedx.core.djangoapps.content.block_structure.manager.BlockStructureManager.clear', autospec=True)
     def test_cache_invalidation(self, invalidate_cache_enabled, mock_bs_manager_clear):
         test_display_name = "Jedi 101"
 
@@ -72,7 +72,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
         (LibraryLocator(org='org', library='course'), False),
     )
     @ddt.unpack
-    @patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2.apply_async')
+    @patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2.apply_async', autospec=True)
     def test_update_only_for_courses(self, key, expect_update_called, mock_update):
         update_block_structure_on_course_publish(sender=None, course_key=key)
         assert mock_update.called == expect_update_called

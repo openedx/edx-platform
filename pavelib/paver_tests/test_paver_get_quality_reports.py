@@ -15,7 +15,7 @@ class TestGetReportFiles(unittest.TestCase):
     Ensure only the report files we want are returned as part of run_quality.
     """
 
-    @patch('os.walk')
+    @patch('os.walk', autospec=True)
     def test_get_pylint_reports(self, my_mock):
 
         my_mock.return_value = iter([
@@ -25,7 +25,7 @@ class TestGetReportFiles(unittest.TestCase):
         reports = pavelib.quality.get_violations_reports("pylint")
         assert len(reports) == 2
 
-    @patch('os.walk')
+    @patch('os.walk', autospec=True)
     def test_get_pep8_reports(self, my_mock):
         my_mock.return_value = iter([
             ('/foo', (None,), ('pep8.report',)),
@@ -34,7 +34,7 @@ class TestGetReportFiles(unittest.TestCase):
         reports = pavelib.quality.get_violations_reports("pep8")
         assert len(reports) == 2
 
-    @patch('os.walk')
+    @patch('os.walk', autospec=True)
     def test_get_pep8_reports_noisy(self, my_mock):
         """ Several conditions: different report types, different files, multiple files """
         my_mock.return_value = iter([

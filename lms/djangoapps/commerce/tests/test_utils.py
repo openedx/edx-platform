@@ -41,7 +41,7 @@ def update_commerce_config(enabled=False, checkout_page='/test_basket/add/'):
 class AuditLogTests(TestCase):
     """Tests of the commerce audit logging helper."""
 
-    @patch('openedx.core.lib.log_utils.log')
+    @patch('openedx.core.lib.log_utils.log', autospec=True)
     def test_log_message(self, mock_log):
         """Verify that log messages are constructed correctly."""
         audit_log('foo', qux='quux', bar='baz')
@@ -82,7 +82,7 @@ class EcommerceServiceTests(TestCase):
         is_enabled = EcommerceService().is_enabled(self.user)
         assert is_enabled
 
-    @patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site')
+    @patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site', autospec=True)
     def test_is_enabled_for_sites(self, is_site):
         """Verify that is_enabled() returns True if used for a site."""
         is_site.return_value = True

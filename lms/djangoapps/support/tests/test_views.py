@@ -762,7 +762,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         '0001,learner-01,apple,orange\n0002,learner-02,purple',  # extra fields
         '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
     )
-    @patch('lms.djangoapps.support.views.utils.link_program_enrollments')
+    @patch('lms.djangoapps.support.views.utils.link_program_enrollments', autospec=True)
     def test_text(self, text, mocked_link):
         self.client.post(self.url, data={
             'program_uuid': self.program_uuid,
@@ -1678,7 +1678,7 @@ class LinkProgramEnrollmentSupportAPIViewTests(SupportViewTestCase):
         '0001,learner-01,apple,orange\n0002,learner-02,purple',  # extra fields
         '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
     )
-    @patch('lms.djangoapps.support.views.utils.link_program_enrollments')
+    @patch('lms.djangoapps.support.views.utils.link_program_enrollments', autospec=True)
     def test_username_pair_text(self, username_pair_text, mocked_link):
         """
         Tests if enrollment linkages are created for different types of

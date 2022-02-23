@@ -324,9 +324,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(reverse('dashboard'))
         self.assertNotContains(response, '<div class="prerequisites">')
 
-    @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement')
-    @patch('common.djangoapps.student.views.dashboard.get_pseudo_session_for_entitlement')
+    @patch('openedx.core.djangoapps.programs.utils.get_programs', autospec=True)
+    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement', autospec=True)
+    @patch('common.djangoapps.student.views.dashboard.get_pseudo_session_for_entitlement', autospec=True)
     @patch.object(CourseOverview, 'get_from_id')
     def test_unfulfilled_entitlement(self, mock_course_overview, mock_pseudo_session,
                                      mock_course_runs, mock_get_programs):
@@ -385,7 +385,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertContains(response, 'You must select a session to access the course.')
         self.assertNotContains(response, 'To access the course, select a session.')
 
-    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement')
+    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement', autospec=True)
     @patch.object(CourseOverview, 'get_from_id')
     def test_unfulfilled_expired_entitlement(self, mock_course_overview, mock_course_runs):
         """
@@ -411,7 +411,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertNotContains(response, '<li class="course-item">')
 
-    @patch('common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course')
+    @patch('common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course', autospec=True)
     @patch.object(CourseOverview, 'get_from_id')
     def test_sessions_for_entitlement_course_runs(self, mock_course_overview, mock_course_runs):
         """
@@ -477,8 +477,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         # response = self.client.get(self.path)
         # self.assertNotIn(noAvailableSessions, response.content)
 
-    @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement')
+    @patch('openedx.core.djangoapps.programs.utils.get_programs', autospec=True)
+    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement', autospec=True)
     @patch.object(CourseOverview, 'get_from_id')
     def test_fulfilled_entitlement(self, mock_course_overview, mock_course_runs, mock_get_programs):
         """
@@ -513,8 +513,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertContains(response, '<button class="change-session btn-link "')
         self.assertContains(response, 'Related Programs:')
 
-    @patch('openedx.core.djangoapps.programs.utils.get_programs')
-    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement')
+    @patch('openedx.core.djangoapps.programs.utils.get_programs', autospec=True)
+    @patch('common.djangoapps.student.views.dashboard.get_visible_sessions_for_entitlement', autospec=True)
     @patch.object(CourseOverview, 'get_from_id')
     def test_fulfilled_expired_entitlement(self, mock_course_overview, mock_course_runs, mock_get_programs):
         """
@@ -548,8 +548,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertContains(response, 'You can no longer change sessions.')
         self.assertContains(response, 'Related Programs:')
 
-    @patch('openedx.core.djangoapps.catalog.utils.get_course_runs_for_course')
-    @patch('common.djangoapps.student.views.dashboard.is_bulk_email_feature_enabled')
+    @patch('openedx.core.djangoapps.catalog.utils.get_course_runs_for_course', autospec=True)
+    @patch('common.djangoapps.student.views.dashboard.is_bulk_email_feature_enabled', autospec=True)
     def test_email_settings_fulfilled_entitlement(self, mock_email_feature, mock_get_course_runs):
         """
         Assert that the Email Settings action is shown when the user has a fulfilled entitlement.
@@ -570,7 +570,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         assert pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length == 1
 
     @patch.object(CourseOverview, 'get_from_id')
-    @patch('common.djangoapps.student.views.dashboard.is_bulk_email_feature_enabled')
+    @patch('common.djangoapps.student.views.dashboard.is_bulk_email_feature_enabled', autospec=True)
     def test_email_settings_unfulfilled_entitlement(self, mock_email_feature, mock_course_overview):
         """
         Assert that the Email Settings action is not shown when the entitlement is not fulfilled.
@@ -1022,7 +1022,7 @@ class TestCourseDashboardNoticesRedirects(SharedModuleStoreTestCase):
 
         assert results is None
 
-    @patch('common.djangoapps.student.views.dashboard.check_for_unacknowledged_notices')
+    @patch('common.djangoapps.student.views.dashboard.check_for_unacknowledged_notices', autospec=True)
     def test_user_with_unacknowledged_notice(self, mock_notices):
         """
         Verifies that we will redirect the learner to the URL returned from the `check_for_unacknowledged_notices`
@@ -1037,7 +1037,7 @@ class TestCourseDashboardNoticesRedirects(SharedModuleStoreTestCase):
         assert response.url == "/about"
         mock_notices.assert_called_once()
 
-    @patch('common.djangoapps.student.views.dashboard.check_for_unacknowledged_notices')
+    @patch('common.djangoapps.student.views.dashboard.check_for_unacknowledged_notices', autospec=True)
     def test_user_with_unacknowledged_notice_no_notices(self, mock_notices):
         """
         Verifies that we will NOT redirect the user if the result of calling the `check_for_unacknowledged_notices`
@@ -1051,7 +1051,7 @@ class TestCourseDashboardNoticesRedirects(SharedModuleStoreTestCase):
         assert response.status_code == 200
         mock_notices.assert_called_once()
 
-    @patch('common.djangoapps.student.views.dashboard.check_for_unacknowledged_notices')
+    @patch('common.djangoapps.student.views.dashboard.check_for_unacknowledged_notices', autospec=True)
     def test_user_with_unacknowledged_notice_plugin_disabled(self, mock_notices):
         """
         Verifies that the `check_for_unacknowledged_notices` function is NOT called if the feature is disabled.

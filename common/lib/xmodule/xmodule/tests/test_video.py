@@ -603,7 +603,7 @@ class VideoBlockImportTestCase(TestCase):
             'data': ''
         })
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xmodule.video_module.video_module.edxval_api', autospec=True)
     def test_import_val_data(self, mock_val_api):
         """
         Test that `from_xml` works method works as expected.
@@ -648,7 +648,7 @@ class VideoBlockImportTestCase(TestCase):
             course_id='test_course_id'
         )
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xmodule.video_module.video_module.edxval_api', autospec=True)
     def test_import_val_data_invalid(self, mock_val_api):
         mock_val_api.ValCannotCreateError = _MockValCannotCreateError
         mock_val_api.import_from_xml = Mock(side_effect=mock_val_api.ValCannotCreateError)
@@ -675,7 +675,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         self.file_system = OSFS(self.temp_dir)
         self.addCleanup(shutil.rmtree, self.temp_dir)
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xmodule.video_module.video_module.edxval_api', autospec=True)
     def test_export_to_xml(self, mock_val_api):
         """
         Test that we write the correct XML on export.
@@ -734,7 +734,7 @@ class VideoExportTestCase(VideoBlockTestBase):
             course_id=str(self.descriptor.runtime.course_id.for_branch(None)),
         )
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xmodule.video_module.video_module.edxval_api', autospec=True)
     def test_export_to_xml_val_error(self, mock_val_api):
         # Export should succeed without VAL data if video does not exist
         mock_val_api.ValVideoNotFoundError = _MockValVideoNotFoundError
@@ -868,8 +868,8 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
     @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
     @patch('edxval.api.get_video_info_for_course_and_profiles', Mock(return_value={}))
-    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
-    @patch('edxval.api.get_video_info')
+    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content', autospec=True)
+    @patch('edxval.api.get_video_info', autospec=True)
     def test_student_view_data_with_hls_flag(self, mock_get_video_info, mock_get_video_transcript_content):
         mock_get_video_info.return_value = {
             'url': '/edxval/video/example',

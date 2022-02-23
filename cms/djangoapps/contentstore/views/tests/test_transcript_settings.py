@@ -94,7 +94,7 @@ class TranscriptCredentialsTest(CourseTestCase):
         )
     )
     @ddt.unpack
-    @patch('cms.djangoapps.contentstore.views.transcript_settings.update_3rd_party_transcription_service_credentials')
+    @patch('cms.djangoapps.contentstore.views.transcript_settings.update_3rd_party_transcription_service_credentials', autospec=True)
     def test_transcript_credentials_handler(self, request_payload, update_credentials_response, expected_status_code,
                                             expected_response, mock_update_credentials):
         """
@@ -211,7 +211,7 @@ class TranscriptDownloadTest(CourseTestCase):
         response = self.client.post(self.view_url, content_type='application/json')
         self.assertEqual(response.status_code, 405)
 
-    @patch('cms.djangoapps.contentstore.views.transcript_settings.get_video_transcript_data')
+    @patch('cms.djangoapps.contentstore.views.transcript_settings.get_video_transcript_data', autospec=True)
     def test_transcript_download_handler(self, mock_get_video_transcript_data):
         """
         Tests that transcript download handler works as expected.
@@ -303,7 +303,7 @@ class TranscriptUploadTest(CourseTestCase):
         response = self.client.get(self.view_url, content_type='application/json')
         self.assertEqual(response.status_code, 405)
 
-    @patch('cms.djangoapps.contentstore.views.transcript_settings.create_or_update_video_transcript')
+    @patch('cms.djangoapps.contentstore.views.transcript_settings.create_or_update_video_transcript', autospec=True)
     @patch(
         'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
         Mock(return_value=['en']),
@@ -588,7 +588,7 @@ class TranscriptUploadApiTest(CourseTestCase):
         response = self.client.get(self.view_url, content_type='application/json')
         self.assertEqual(response.status_code, 405)
 
-    @patch('cms.djangoapps.contentstore.views.transcript_settings.create_or_update_video_transcript')
+    @patch('cms.djangoapps.contentstore.views.transcript_settings.create_or_update_video_transcript', autospec=True)
     @patch(
         'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
         Mock(return_value=['en']),

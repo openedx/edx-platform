@@ -86,7 +86,7 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
         with pytest.raises(CommandError):
             self.command.handle('not/found', all_courses=False)
 
-    @patch('openedx.core.djangoapps.content.course_overviews.models.log')
+    @patch('openedx.core.djangoapps.content.course_overviews.models.log', autospec=True)
     def test_not_found_key(self, mock_log):
         """
         Test keys not found are logged.
@@ -101,7 +101,7 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
         with pytest.raises(CommandError):
             self.command.handle(all_courses=False)
 
-    @patch('openedx.core.djangoapps.content.course_overviews.tasks.async_course_overview_update')
+    @patch('openedx.core.djangoapps.content.course_overviews.tasks.async_course_overview_update', autospec=True)
     def test_routing_key(self, mock_async_task):
         self.command.handle(all_courses=True, force_update=True, routing_key='my-routing-key', chunk_size=10000)
 
