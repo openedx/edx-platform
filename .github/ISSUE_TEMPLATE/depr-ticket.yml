@@ -1,0 +1,84 @@
+name: Deprecation (DEPR) Ticket
+description: Per OEP-21, use this template to begin the technology deprecation process.
+title: "[DEPR]: <Technology Name>"
+labels: ["DEPR"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Refer to [OEP-21](https://open-edx-proposals.readthedocs.io/en/latest/processes/oep-0021-proc-deprecation.html) for more detail on the deprecation and removal process. This ticket should only be used for proposing the removal of an Open edX technology.
+        Please leave [DEPR] in the title of your ticket!
+  - type: input
+    id: todays-date
+    attributes:
+      label: Proposal Date
+      description: The start date of this proposal (likely today)
+      placeholder: 29 February 2020
+    validations:
+      required: true
+  - type: input
+    id: accept-date
+    attributes:
+      label: Ticket Acceptance Date
+      description: When is the target date for getting this proposal accepted?
+      placeholder: 29 February 2020
+    validations:
+      required: true
+  - type: input
+    id: remove-date
+    attributes:
+      label: Technology Removal Date
+      description: When is the target date for getting this technology removed?
+      placeholder: 29 February 2020
+    validations:
+      required: true
+  - type: input
+    id: named-release-without
+    attributes:
+      label: First Open edX Named Release Without This Functionality
+      description: Named releases are generally CUT in early April and early October. Based on the above removal date, what named release would be the first without this code? Please reach out to the Build Test Release working group (#wg-build-test-release in Slack) if you're not sure.
+      placeholder: Dogwood
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Rationale
+      description: Explain, in a few sentences, why this technology should be removed - what's the usage pattern? What's wrong with keeping it around?
+    validations:
+      required: true
+  - type: textarea
+    id: removal
+    attributes:
+      label: Removal
+      description: Include a description with links to what exactly is being removed.
+    validations:
+      required: true
+  - type: textarea
+    id: replacement
+    attributes:
+      label: Replacement
+      description: Include a description with links to what this is being replaced by.
+    validations:
+      required: true
+  - type: textarea
+    id: deprecation
+    attributes:
+      label: Deprecation
+      description: If you plan to mark the code for deprecation, explain how.
+    validations:
+      required: false
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration
+      description: If automated migration will be needed, explain your migration plan.
+    validations:
+      required: false
+  - type: textarea
+    id: addl-info
+    attributes:
+      label: Additional Info
+      description: If there is any additional publicly sharable information or data from your earlier analysis, include that.
+    validations:
+      required: false
