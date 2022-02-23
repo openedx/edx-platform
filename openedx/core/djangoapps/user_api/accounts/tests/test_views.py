@@ -14,8 +14,6 @@ from django.conf import settings
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_name_affirmation.api import create_verified_name
-from edx_name_affirmation.statuses import VerifiedNameStatus
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
@@ -26,6 +24,7 @@ from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KE
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 
 from .. import ALL_USERS_VISIBILITY, CUSTOM_VISIBILITY, PRIVATE_VISIBILITY
 
@@ -55,6 +54,7 @@ class UserAPITestCase(APITestCase):
         self.staff_user = UserFactory(is_staff=True, password=TEST_PASSWORD)
         self.staff_client = APIClient()
         self.user = UserFactory.create(password=TEST_PASSWORD)  # will be assigned to self.client by default
+        self.name_affirmation_service = get_name_affirmation_service()
 
     def login_client(self, api_client, user):
         """Helper method for getting the client and user and logging in. Returns client. """
@@ -142,15 +142,30 @@ class UserAPITestCase(APITestCase):
     def create_mock_verified_name(self, user):
         """
         Helper method to create an approved VerifiedName entry in name affirmation.
+        Will not do anything if Name Affirmation is not installed.
         """
-        legacy_profile = UserProfile.objects.get(id=user.id)
-        create_verified_name(user, self.VERIFIED_NAME, legacy_profile.name, status=VerifiedNameStatus.APPROVED)
+        if self.name_affirmation_service:
+            legacy_profile = UserProfile.objects.get(id=user.id)
+            self.name_affirmation_service.create_verified_name(
+                user,
+                self.VERIFIED_NAME,
+                legacy_profile.name,
+                status='approved'
+            )
 
     def create_user_registration(self, user):
         """
         Helper method that creates a registration object for the specified user
         """
         RegistrationFactory(user=user)
+
+    def _get_num_queries(self, num_queries):
+        """
+        If Name Affirmation is installed, it will add an extra query
+        """
+        if self.name_affirmation_service:
+            return num_queries + 1
+        return num_queries
 
     def _verify_profile_image_data(self, data, has_profile_image):
         """
@@ -240,7 +255,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     """
 
     ENABLED_CACHES = ['default']
-    TOTAL_QUERY_COUNT = 27
+    TOTAL_QUERY_COUNT = 26
     FULL_RESPONSE_FIELD_COUNT = 30
 
     def setUp(self):
@@ -324,7 +339,6 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # additional admin fields (13)
         assert self.user.email == data['email']
         assert self.user.id == data['id']
-        assert self.VERIFIED_NAME == data['verified_name']
         assert data['extended_profile'] is not None
         assert 'MA' == data['state']
         assert 'f' == data['gender']
@@ -335,6 +349,10 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         assert data['secondary_email'] is None
         assert data['secondary_email_enabled'] is None
         assert year_of_birth == data['year_of_birth']
+        if self.name_affirmation_service:
+            assert self.VERIFIED_NAME == data['verified_name']
+        else:
+            assert data['verified_name'] is None
 
     def test_anonymous_access(self):
         """
@@ -501,7 +519,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(self.TOTAL_QUERY_COUNT):
+        with self.assertNumQueries(self._get_num_queries(self.TOTAL_QUERY_COUNT)):
             response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
@@ -516,7 +534,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(self.TOTAL_QUERY_COUNT):
+        with self.assertNumQueries(self._get_num_queries(self.TOTAL_QUERY_COUNT)):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response)
 
@@ -667,12 +685,12 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             assert data['accomplishments_shared'] is False
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        verify_get_own_information(25)
+        verify_get_own_information(self._get_num_queries(24))
 
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
         self.user.save()
-        verify_get_own_information(17)
+        verify_get_own_information(self._get_num_queries(16))
 
     def test_get_account_empty_string(self):
         """
@@ -687,7 +705,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        with self.assertNumQueries(25):
+        with self.assertNumQueries(self._get_num_queries(24)):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "state", "bio",):
             assert response.data[empty_field] is None

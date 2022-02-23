@@ -3,10 +3,7 @@ Tests for certificate generation
 """
 import ddt
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
-from unittest import mock  # lint-amnesty, pylint: disable=wrong-import-order
-
-from edx_name_affirmation.api import create_verified_name, create_verified_name_config
-from edx_name_affirmation.statuses import VerifiedNameStatus
+from unittest import mock, skipUnless  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import UserProfile
@@ -16,12 +13,14 @@ from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.generation import generate_course_certificate
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
 PROFILE_NAME_METHOD = 'common.djangoapps.student.models_api.get_name'
+name_affirmation_service = get_name_affirmation_service()
 
 
 @ddt.ddt
@@ -193,9 +192,10 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
             assert cert.grade == self.grade
             assert cert.name == ''
 
-    @ddt.data((True, VerifiedNameStatus.APPROVED),
-              (True, VerifiedNameStatus.DENIED),
-              (False, VerifiedNameStatus.PENDING))
+    @skipUnless(name_affirmation_service is not None, 'Requires Name Affirmation')
+    @ddt.data((True, 'approved'),
+              (True, 'denied'),
+              (False, 'pending'))
     @ddt.unpack
     def test_generation_verified_name(self, should_use_verified_name_for_certs, status):
         """
@@ -204,8 +204,11 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
         their profile name.
         """
         verified_name = 'Jonathan Doe'
-        create_verified_name(self.u, verified_name, self.name, status=status)
-        create_verified_name_config(self.u, use_verified_name_for_certs=should_use_verified_name_for_certs)
+        name_affirmation_service.create_verified_name(self.u, verified_name, self.name, status=status)
+        name_affirmation_service.create_verified_name_config(
+            self.u,
+            use_verified_name_for_certs=should_use_verified_name_for_certs
+        )
 
         GeneratedCertificateFactory(
             user=self.u,
@@ -220,7 +223,7 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
 
         cert = GeneratedCertificate.objects.get(user=self.u, course_id=self.key)
 
-        if should_use_verified_name_for_certs and status == VerifiedNameStatus.APPROVED:
+        if should_use_verified_name_for_certs and status == 'approved':
             assert cert.name == verified_name
         else:
             assert cert.name == self.name
