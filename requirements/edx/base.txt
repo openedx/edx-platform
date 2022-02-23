@@ -451,7 +451,7 @@ edx-i18n-tools==0.9.1
     # via ora2
 edx-milestones==0.3.3
     # via -r requirements/edx/base.in
-edx-name-affirmation==2.2.0
+edx-name-affirmation==2.2.1
     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.3.0
     # via
