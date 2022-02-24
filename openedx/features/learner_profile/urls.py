@@ -4,11 +4,11 @@ Defines URLs for the learner profile.
 
 
 from django.conf import settings
+from django.urls import path, re_path
 
 from openedx.features.learner_profile.views.learner_profile import learner_profile
 
 from .views.learner_achievements import LearnerAchievementsFragmentView
-from django.urls import path, re_path
 
 urlpatterns = [
     re_path(

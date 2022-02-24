@@ -4,9 +4,9 @@ Discount API URLs
 
 
 from django.conf import settings
+from django.urls import re_path
 
 from .views import CourseUserDiscount, CourseUserDiscountWithUserParam
-from django.urls import re_path
 
 urlpatterns = [
     re_path(fr'^course/{settings.COURSE_KEY_PATTERN}', CourseUserDiscount.as_view(), name='course_user_discount'),

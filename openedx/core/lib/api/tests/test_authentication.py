@@ -16,6 +16,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.http import urlencode
 from django.utils.timezone import now
+from django.urls import path
 from oauth2_provider import models as dot_models
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -25,7 +26,6 @@ from rest_framework.views import APIView
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
-from django.urls import path
 
 factory = APIRequestFactory()  # pylint: disable=invalid-name
 
