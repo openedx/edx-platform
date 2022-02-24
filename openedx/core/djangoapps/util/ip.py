@@ -173,8 +173,11 @@ def get_client_ip(request):
     First searches for IP using CLIENT_IP_HEADERS configuration. If an IP
     is not found, the IP is determined by walking the X-Forwarded-For header.
     """
-    # Restore the original REMOTE_ADDR since it's needed for IP determination.
-    # Once XForwardedForMiddleware is no longer overwriting REMOTE_ADDR this
+    # The XForwardedForMiddleware currently overwrites `REMOTE_ADDR`, but
+    # IP determination requires the original `REMOTE_ADDR`. This will restore
+    # the original REMOTE_ADDR in a copy of request.META.
+    #
+    # TODO: If XForwardedForMiddleware no longer overwrites REMOTE_ADDR, this
     # rewriting can be removed.
     #
     # This is also the reason all the other functions in this module take a
