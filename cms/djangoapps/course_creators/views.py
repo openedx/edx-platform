@@ -2,6 +2,7 @@
 Methods for interacting programmatically with the user creator table.
 """
 
+from django.conf import settings
 
 from course_creators.models import CourseCreator
 from student import auth
@@ -61,6 +62,11 @@ def get_course_creator_status(user):
         'denied' = user has been denied course creation rights
         None = user does not exist in the table
     """
+    if settings.FEATURES.get('TAHOE_GRANT_CREATOR_STATUS_TO_COURSE_CREATOR_ROLE', False):
+        # Tahoe: Allow using `CourseCreatorRole` and circumvent the need for submitting a CourseCreator request.
+        if auth.user_has_role(user, CourseCreatorRole()):
+            return CourseCreator.GRANTED
+
     user = CourseCreator.objects.filter(user=user)
     if user.count() == 0:
         return None

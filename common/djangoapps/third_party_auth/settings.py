@@ -62,6 +62,7 @@ def apply_settings(django_settings):
         'social_core.pipeline.social_auth.load_extra_data',
         'social_core.pipeline.user.user_details',
         'third_party_auth.pipeline.user_details_force_sync',
+        'openedx.core.djangoapps.appsembler.auth.tahoe_auth0_pipeline.set_roles_from_auth0_roles',
         'third_party_auth.pipeline.set_id_verification_status',
         'third_party_auth.pipeline.set_logged_in_cookies',
         'third_party_auth.pipeline.login_analytics',
