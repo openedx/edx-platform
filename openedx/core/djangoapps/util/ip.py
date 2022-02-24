@@ -169,7 +169,7 @@ def get_client_ip_via_xff(request_meta):
 def get_client_ip(request):
     """
     Determine the IP address of the HTTP client.
-    
+
     First searches for IP using CLIENT_IP_HEADERS configuration. If an IP
     is not found, the IP is determined by walking the X-Forwarded-For header.
     """
