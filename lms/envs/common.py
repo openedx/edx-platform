@@ -3215,6 +3215,9 @@ INSTALLED_APPS = [
 
     # TODO (EventBus): Make Kafka/event-bus optional
     'openedx.core.djangoapps.kafka_consumer',
+
+    # Course Live App
+    'openedx.core.djangoapps.course_live',
 ]
 
 ######################### CSRF #########################################
