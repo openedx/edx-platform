@@ -22,7 +22,7 @@ class TestAdminView(TestCase):
     def test_admin_login_redirect(self, admin_url, index):
         """Admin login will redirect towards the site login page."""
         response = self.client.get(admin_url, follow=True)
-        assert any('/login/edx-oauth2/?next=' in r[0] for r in redirect_chain)
+        assert any('/login/edx-oauth2/?next=' in r[0] for r in response.redirect_chain)
 
     def test_admin_login_default(self):
         """Without flag Admin login will redirect towards the admin default login page."""
