@@ -24,11 +24,9 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from organizations.models import Organization
+from tahoe_sites.api import get_site_by_organization
 
-from openedx.core.djangoapps.appsembler.sites.utils import (
-    get_single_user_organization,
-    get_site_by_organization,
-)
+from openedx.core.djangoapps.appsembler.sites.utils import get_single_user_organization
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
 from student import STUDENT_WAFFLE_NAMESPACE

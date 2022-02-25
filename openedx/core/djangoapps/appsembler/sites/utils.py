@@ -49,15 +49,6 @@ def get_lms_link_from_course_key(base_lms_url, course_key):
     return base_lms_url
 
 
-@beeline.traced(name="get_site_by_organization")
-def get_site_by_organization(org):
-    """
-    Get the site matching the organization, throws an error if there's more than one site.
-    """
-    assert org.sites.count() == 1, 'Should have one and only one site.'
-    return org.sites.all()[0]
-
-
 def _get_active_tiers_uuids():
     """
     Get active Tier organiation UUIDs from the Tiers (AMC Postgres) database.
