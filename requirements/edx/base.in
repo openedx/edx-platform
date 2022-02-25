@@ -36,7 +36,6 @@ botocore==1.8.17                    # via boto3, s3transfer
 bridgekeeper                        # Used for determining permissions for courseware.
 celery                              # Asynchronous task execution library
 chem                                # A helper library for chemistry calculations
-confluent_kafka
 contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
 crowdsourcehinter-xblock
 cryptography                        # Implementations of assorted cryptography algorithms
@@ -97,7 +96,6 @@ edx-user-state-client
 edx-when
 edxval
 event-tracking
-fastavro
 fs==2.0.18
 fs-s3fs==0.1.8
 geoip2                              # Python API for the GeoIP web services and databases
