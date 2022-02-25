@@ -76,6 +76,7 @@ from .utils import discussion_open_for_user
 from ..django_comment_client.base.views import (
     track_comment_created_event,
     track_thread_created_event,
+    track_thread_viewed_event,
     track_voted_event,
 )
 from ..django_comment_client.utils import (
@@ -892,6 +893,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
     results = _serialize_discussion_entities(request, context, responses, requested_fields, DiscussionEntity.comment)
 
     paginator = DiscussionAPIPagination(request, page, num_pages, resp_total)
+    track_thread_viewed_event(request, context["course"], cc_thread)
     return paginator.get_paginated_response(results)
 
 
