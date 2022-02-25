@@ -25,6 +25,7 @@ from django.utils.text import slugify
 from organizations import api as org_api
 from organizations import models as org_models
 from organizations.models import UserOrganizationMapping, Organization
+from tahoe_sites.api import get_organization_for_user
 
 from openedx.core.lib.api.api_key_permissions import is_request_has_valid_api_key
 from openedx.core.lib.log_utils import audit_log
@@ -187,17 +188,6 @@ def reset_amc_tokens(user, access_token=None, refresh_token=None):
     refresh.save()
 
     return get_amc_tokens(user)
-
-
-@beeline.traced(name="get_single_user_organization")
-def get_single_user_organization(user):
-    """
-    Finds the single organization the user is associated with.
-
-    If there's more than one, an exception is thrown.
-    """
-    uom = UserOrganizationMapping.objects.get(user=user)
-    return uom.organization
 
 
 @beeline.traced(name="make_amc_admin")

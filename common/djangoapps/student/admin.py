@@ -24,9 +24,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from organizations.models import Organization
-from tahoe_sites.api import get_site_by_organization
+from tahoe_sites.api import get_organization_for_user, get_site_by_organization
 
-from openedx.core.djangoapps.appsembler.sites.utils import get_single_user_organization
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
 from student import STUDENT_WAFFLE_NAMESPACE
@@ -533,7 +532,7 @@ class RegistrationAdmin(admin.ModelAdmin):
     def organization(self, obj):
         """ Show the organization name. """
         try:
-            org = get_single_user_organization(obj.user)
+            org = get_organization_for_user(obj.user)
         except Organization.DoesNotExist:
             return None
 
@@ -545,7 +544,7 @@ class RegistrationAdmin(admin.ModelAdmin):
             return 'Learner is active.'
 
         try:
-            organization = get_single_user_organization(obj.user)
+            organization = get_organization_for_user(obj.user)
             site = get_site_by_organization(organization)
         except Organization.DoesNotExist:
             return 'Error: missing organization.'

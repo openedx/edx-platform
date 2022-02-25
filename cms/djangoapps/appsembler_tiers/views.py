@@ -5,8 +5,7 @@ Studio views for the tiers app.
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
-
-from openedx.core.djangoapps.appsembler.sites.utils import get_single_user_organization
+from tahoe_sites.api import get_organization_for_user
 
 
 class SiteUnavailableRedirectView(TemplateView):
@@ -19,7 +18,7 @@ class SiteUnavailableRedirectView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(SiteUnavailableRedirectView, self).get_context_data(**kwargs)
-        context['organization'] = get_single_user_organization(self.request.user)
+        context['organization'] = get_organization_for_user(self.request.user)
         return context
 
     @method_decorator(login_required)
