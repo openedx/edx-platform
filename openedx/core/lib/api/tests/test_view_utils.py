@@ -1,8 +1,8 @@
 """
 Tests for (some of) the view utilities.
 """
+from django.conf.urls import url
 from django.test.utils import override_settings
-from django.urls import re_path
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
 from rest_framework.views import APIView
@@ -28,7 +28,7 @@ class MockAPIView(DeveloperErrorViewMixin, APIView):
         return Response(f"Success {course_id}")
 
 urlpatterns = [
-    re_path(r'^mock/(?P<course_id>.*)/$', MockAPIView.as_view()),  # Only works with new-style course keys
+    url(r'^mock/(?P<course_id>.*)/$', MockAPIView.as_view()),  # Only works with new-style course keys
 ]
 
 
