@@ -8,7 +8,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_switch, override_waffle_flag
 from common.djangoapps.student.tests.factories import UserFactory, TEST_PASSWORD
-from openedx.core.djangoapps.user_authn.config.waffle import REDIRECT_TO_LMS
+from openedx.core.djangoapps.user_authn.config.waffle import ADMIN_AUTH_REDIRECT_TO_LMS
 
 from openedx.core.djangoapps.user_authn.views.login import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 
@@ -45,7 +45,7 @@ class TestAdminView(TestCase):
             assert response.url == '/login?next=/admin'
             assert response.status_code == 302
 
-        with override_waffle_flag(REDIRECT_TO_LMS, True):
+        with override_waffle_flag(ADMIN_AUTH_REDIRECT_TO_LMS, True):
             response = self.client.get(reverse('admin:login'))
             assert response.url == '/login?next=/admin'
             assert response.status_code == 302
@@ -54,6 +54,6 @@ class TestAdminView(TestCase):
             response = self.client.get(reverse('admin:login'))
             assert response.template_name == ['admin/login.html']
 
-        with override_waffle_flag(REDIRECT_TO_LMS, False):
+        with override_waffle_flag(ADMIN_AUTH_REDIRECT_TO_LMS, False):
             response = self.client.get(reverse('admin:login'))
             assert response.template_name == ['admin/login.html']

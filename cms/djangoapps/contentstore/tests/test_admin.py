@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 
-from openedx.core.djangoapps.user_authn.config.waffle import REDIRECT_TO_LMS
+from openedx.core.djangoapps.user_authn.config.waffle import ADMIN_AUTH_REDIRECT_TO_LMS
 
 
 @ddt.ddt
@@ -16,7 +16,7 @@ class TestAdminView(TestCase):
     """
     Tests of the admin view.
     """
-    @override_waffle_flag(REDIRECT_TO_LMS, True)
+    @override_waffle_flag(ADMIN_AUTH_REDIRECT_TO_LMS, True)
     @ddt.data(('/admin/', 3), ('/admin/login', 3), (reverse('admin:login'), 2))
     @ddt.unpack
     def test_admin_login_redirect(self, admin_url, index):
