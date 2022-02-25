@@ -267,7 +267,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         1 for teams, 1 for user count
         """
         for _ in range(4):
-            CourseTeamFactory.create(course_id=self.course.id)  
+            CourseTeamFactory.create(course_id=self.course.id)
 
         with self.assertNumQueries(2):
             self.import_manager.load_course_teams()
@@ -636,7 +636,7 @@ class ExternalKeyCsvTests(TeamMembershipEventTestMixin, SharedModuleStoreTestCas
         self.assert_user_not_on_team(new_user)
 
         csv_import_row = _csv_dict_row(new_user.username, new_ext_key, 'audit', teamset_id=self.team.name)
-        
+
         csv_import(self.course, [csv_import_row])
         self.assert_user_on_team(new_user)
         self.assert_learner_added_emitted(self.team.team_id, new_user.id)
@@ -655,7 +655,7 @@ class ExternalKeyCsvTests(TeamMembershipEventTestMixin, SharedModuleStoreTestCas
         """
         Assert that the four test users should be listed as members of the team,
         and user_in_program should be identified by their external_user_key.
-        
+
         no_external_key_value is used because _lookup_team_membership_data returns `None`
         to mean there is no external key, but the CsvWriter library writes `None`s as an empty string
         """

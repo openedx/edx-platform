@@ -254,7 +254,7 @@ class TeamMembershipImportManager:
         header = csv_reader.fieldnames
         if 'username' not in header:
             self.validation_errors.append("Header must contain column 'username'.")
-            return False            
+            return False
         if 'mode' not in header:
             self.validation_errors.append("Header must contain column 'mode'.")
             return False
@@ -265,7 +265,7 @@ class TeamMembershipImportManager:
         The teamsets currently will be directly after 'mode'
         """
         mode_index = csv_reader.fieldnames.index('mode')
-        return csv_reader.fieldnames[mode_index+1:]
+        return csv_reader.fieldnames[mode_index + 1:]
 
     def validate_teamsets(self, csv_reader):
         """
