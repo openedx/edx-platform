@@ -16,7 +16,7 @@ from ..config import waffle
 
 __all__ = [
     'register_redirect_to_lms', 'login_redirect_to_lms', 'howitworks', 'accessibility',
-    'redirect_to_lms_login_for_admin'
+    'redirect_to_lms_login_for_admin',
 ]
 
 

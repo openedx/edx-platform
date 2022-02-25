@@ -42,10 +42,10 @@ ENABLE_PWNED_PASSWORD_API = LegacyWaffleSwitch(
 # .. toggle_name: REDIRECT_TO_LMS
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Set this to True if you want to cms-admin login from lms login.
-# .. in case of logout it will use lms logout also.
+# .. toggle_description: Set this to True if you want to redirect cms-admin login to lms login.
+#   In case of logout it will use lms logout also.
 # .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 8-Feb-2022
+# .. toggle_creation_date: 2022-02-08
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 REDIRECT_TO_LMS = WaffleFlag(   # lint-amnesty, pylint: disable=toggle-missing-annotation
