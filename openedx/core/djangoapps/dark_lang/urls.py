@@ -2,8 +2,8 @@
 Contains all the URLs for the Dark Language Support App
 """
 
-from openedx.core.djangoapps.dark_lang import views
 from django.urls import path
+from openedx.core.djangoapps.dark_lang import views
 
 app_name = 'dark_lang'
 urlpatterns = [

@@ -2,12 +2,11 @@
 URL configuration for Studio's Content Libraries REST API
 """
 
-from django.conf.urls import include
+from django.urls import include, path, re_path
 
 from rest_framework import routers
 
 from . import views
-from django.urls import path, re_path
 
 
 # Django application name.

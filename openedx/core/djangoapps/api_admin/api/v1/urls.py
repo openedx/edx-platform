@@ -2,8 +2,8 @@
 URL definitions for api access request API v1.
 """
 
-from openedx.core.djangoapps.api_admin.api.v1 import views
 from django.urls import path
+from openedx.core.djangoapps.api_admin.api.v1 import views
 
 app_name = 'v1'
 urlpatterns = [

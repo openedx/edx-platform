@@ -1,9 +1,9 @@
 """URLs for API access management."""
 
 
-from django.conf.urls import include
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
+from django.urls import include, path, re_path
 
 from openedx.core.djangoapps.api_admin.decorators import api_access_enabled_or_404
 from openedx.core.djangoapps.api_admin.views import (
@@ -15,7 +15,6 @@ from openedx.core.djangoapps.api_admin.views import (
     CatalogPreviewView,
     CatalogSearchView
 )
-from django.urls import path, re_path
 
 app_name = 'api_admin'
 urlpatterns = (

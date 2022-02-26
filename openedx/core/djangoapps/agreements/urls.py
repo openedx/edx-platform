@@ -3,9 +3,9 @@ URLs for the Agreements API
 """
 
 from django.conf import settings
+from django.urls import re_path
 
 from .views import IntegritySignatureView
-from django.urls import re_path
 
 urlpatterns = [
     re_path(r'^integrity_signature/{course_id}$'.format(

@@ -4,9 +4,9 @@ Contains all the URLs
 
 
 from django.conf import settings
+from django.urls import path, re_path
 
 from openedx.core.djangoapps.courseware_api import views
-from django.urls import path, re_path
 
 urlpatterns = [
     re_path(fr'^course/{settings.COURSE_KEY_PATTERN}',
