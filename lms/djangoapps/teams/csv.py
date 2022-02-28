@@ -9,7 +9,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.db.models import Prefetch
 
 from common.djangoapps.student.models import CourseEnrollment
-from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment
 from lms.djangoapps.teams.api import (
     ORGANIZATION_PROTECTED_MODES,
     OrganizationProtectionStatus,
