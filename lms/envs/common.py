@@ -4961,3 +4961,12 @@ CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-a
 # The expected value is an Integer representing the cutoff point (in months) for inclusion to the message. Example:
 # a value of `3` would include learners who have logged in within the past 3 months.
 BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD = None
+# HTML tags allowed within the body of a message authored via the Bulk Course Email Tool
+BULK_COURSE_EMAIL_ALLOWED_HTML_TAGS = [
+    "a", "abbr", "address", "area", "article", "aside", "audio", "b", "bdi", "bdo", "blockquote", "br", "caption",
+    "cite", "code", "col", "colgroup", "data", "dd", "del", "dfn", "div", "dl", "dt", "em", "embed", "figcaption",
+    "figure", "footer", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "i", "img", "ins", "kbd", "li", "link",
+    "main", "map", "mark", "meta", "menu", "nav", "object", "ol", "p", "param", "picture", "pre", "q", "rp", "rt",
+    "ruby", "s", "samp", "section", "small", "source", "span", "strong", "style", "sub", "sup", "table", "tbody", "td",
+    "tfoot", "th", "thead", "time", "tr", "track", "u", "ul", "var", "video", "wbr",
+]
