@@ -570,7 +570,7 @@ html.video-fullscreen {
         }
 
         header {
-          @extend h1.top-header;
+          @extend %h1-top-header !optional;
 
           border-radius: 0 4px 0 0;
           margin-bottom: -16px;

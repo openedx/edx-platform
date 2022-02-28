@@ -820,7 +820,7 @@ lazy-object-proxy==1.7.1
     # via
     #   -r requirements/edx/testing.txt
     #   astroid
-libsass==0.10.0
+libsass==0.21.0
     # via
     #   -r requirements/edx/testing.txt
     #   ora2

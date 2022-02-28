@@ -18,7 +18,7 @@
 }
 
 .help-tab {
-  @extend %ui-depth2;
+  @extend %ui-depth2 !optional;
   @extend %ui-print-excluded;
 
   transform: rotate(-90deg);

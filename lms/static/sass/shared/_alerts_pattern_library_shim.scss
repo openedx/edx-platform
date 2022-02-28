@@ -142,7 +142,7 @@ $bp-screen-md: 768px !default;
 
   .alert-title {
     @extend %hd-5;
-    @extend %headings-emphasized;
+    @extend %headings-emphasized !optional;
 
     @media (min-width: $bp-screen-md) {
       // shift the section up to make the alert more compact

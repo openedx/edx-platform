@@ -340,7 +340,7 @@
 
 .forum-nav-thread-comments-count {
   @extend %forum-nav-thread-wrapper-2-content;
-  @extend %t-weight4;
+  @extend %t-weight4 !optional;
 
   position: relative;
 

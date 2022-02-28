@@ -612,7 +612,7 @@ lazy==1.4
     #   acid-xblock
     #   lti-consumer-xblock
     #   ora2
-libsass==0.10.0
+libsass==0.21.0
     # via
     #   -r requirements/edx/paver.txt
     #   ora2
