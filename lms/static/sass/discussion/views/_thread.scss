@@ -217,7 +217,7 @@
     @include transition(all 0.2s linear 0s);
 
     .thread-wrapper {
-      @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+      @include border-radius($forum-border-radius $forum-border-radius 0 0);
 
       position: relative;
       overflow-x: hidden;

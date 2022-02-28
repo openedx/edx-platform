@@ -140,7 +140,7 @@ $course-search-input-height: ($button-size);
 
         .search-button {
           @include right($baseline*1.5);
-          @include border-radius(1px, 3px, 3px, 1px);
+          @include border-radius(1px 3px 3px 1px);
 
           @extend %ui-depth2;
           @extend %t-icon3;

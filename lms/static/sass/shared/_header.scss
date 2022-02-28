@@ -561,7 +561,7 @@
 
       &:last-child {
         > a {
-          @include border-radius(0, 4px, 4px, 0);
+          @include border-radius(0 4px 4px 0);
           @include border-left(none);
 
           padding: ($baseline/2) ($baseline/2);
