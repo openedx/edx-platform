@@ -309,6 +309,17 @@ from openedx.core.djangolib.js_utils import (
             %endif
             %endfor
           </ul>
+            <ul  class="item-actions course-actions">
+              <li class="action action-view">
+                <a href="${lms_link}" rel="external" class="view button view-button view-live-button">${_("View Live")}</a>
+              </li>
+              <li class="action action-delete">
+                  <a href="#" class="delete remove-course action-icon"><i class="icon-remove-sign"></i><span class="sr">${_("Delete this course")}</span></a>
+              </li>
+            </ul>
+          </li>
+          %endfor
+        </ul>
       </div>
       %endif
 

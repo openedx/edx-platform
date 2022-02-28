@@ -274,6 +274,9 @@
       .status-update {
         .value {
           background: $red-l1;
+        .course-actions .action-view .view {
+          opacity: 1.0;
+          pointer-events: auto;
         }
 
         .status-indicator {
@@ -324,6 +327,12 @@
       display: block;
     }
   }
+      // encompassing course link
+      .course-link {
+        @extend %ui-depth2;
+        width: flex-grid(6, 9);
+        margin-right: flex-gutter();
+      }
 
   .courses,
   .libraries,
@@ -495,6 +504,60 @@
           margin-left: ($baseline/4);
           margin-right: ($baseline/4);
           color: $gray-l4;
+      .course-actions {
+        @extend %ui-depth3;
+        position: static;
+        width: flex-grid(3, 9);
+        text-align: right;
+
+        .action {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/2);
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        // delete course
+        .action-delete {
+
+          // STATE: disabled
+          &.is-disabled {
+            opacity: 0.0;
+            visibility: hidden;
+            pointer-events: none;
+          }
+
+          .delete {
+            @extend %ui-btn-non;
+            @extend %t-action1;
+            color: $gray-l3;
+
+            &:hover {
+              background-color: $blue;
+              color: $gray-l6;
+            }
+          }
+        }
+
+        // view live button
+        .action-view {
+
+          .view {
+            @extend %ui-depth3;
+            @include transition(opacity $tmg-f2 ease-in-out 0);
+            @include box-sizing(border-box);
+            padding: ($baseline/2);
+            opacity: 0.0;
+            pointer-events: none;
+
+            &:hover {
+              opacity: 1.0;
+              pointer-events: auto;
+            }
+          }
         }
 
         .label {
