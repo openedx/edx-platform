@@ -174,8 +174,6 @@ code-annotations==1.3.0
     #   edx-enterprise
     #   edx-lint
     #   edx-toggles
-confluent-kafka==1.8.2
-    # via -r requirements/edx/base.txt
 contextlib2==21.6.0
     # via -r requirements/edx/base.txt
 coreapi==2.3.3
@@ -205,7 +203,7 @@ cssselect==1.1.0
     # via
     #   -r requirements/edx/testing.in
     #   pyquery
-cssutils==2.3.0
+cssutils==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   pynliner
@@ -324,6 +322,7 @@ django-cors-headers==3.11.0
     # via -r requirements/edx/base.txt
 django-countries==7.2.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
 django-crum==0.7.9
@@ -406,7 +405,7 @@ django-sekizai==3.0.1
     # via
     #   -r requirements/edx/base.txt
     #   django-wiki
-django-ses==2.5.0
+django-ses==2.6.0
     # via -r requirements/edx/base.txt
 django-simple-history==3.0.0
     # via
@@ -500,7 +499,7 @@ edx-celeryutils==1.2.1
     #   super-csv
 edx-completion==4.2.0
     # via -r requirements/edx/base.txt
-edx-django-release-util==1.1.1
+edx-django-release-util==1.2.0
     # via -r requirements/edx/base.txt
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.txt
@@ -539,7 +538,7 @@ edx-i18n-tools==0.9.1
     #   ora2
 edx-lint==5.2.1
     # via -r requirements/edx/testing.in
-edx-milestones==0.3.3
+edx-milestones==0.4.0
     # via -r requirements/edx/base.txt
 edx-name-affirmation==2.2.1
     # via -r requirements/edx/base.txt
@@ -581,7 +580,7 @@ edx-search==3.2.0
     # via -r requirements/edx/base.txt
 edx-sga==0.18.0
     # via -r requirements/edx/base.txt
-edx-submissions==3.5.0
+edx-submissions==3.5.1
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -617,7 +616,7 @@ enmerkar==0.7.1
     #   enmerkar-underscore
 enmerkar-underscore==2.1.0
     # via -r requirements/edx/base.txt
-event-tracking==2.0.0
+event-tracking==2.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
@@ -626,7 +625,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==13.0.0
+faker==13.2.0
     # via factory-boy
 fastapi==0.74.1
     # via pact-python
@@ -693,7 +692,7 @@ idna==3.3
     #   anyio
     #   requests
     #   yarl
-importlib-metadata==4.11.1
+importlib-metadata==4.11.2
     # via
     #   -r requirements/edx/base.txt
     #   markdown
@@ -861,7 +860,7 @@ multidict==6.0.2
     #   yarl
 mysqlclient==2.1.0
     # via -r requirements/edx/base.txt
-newrelic==7.4.0.172
+newrelic==7.6.0.173
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -887,11 +886,11 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
-openedx-events==0.7.1
+openedx-events==0.8.0
     # via -r requirements/edx/base.txt
-openedx-filters==0.4.3
+openedx-filters==0.5.0
     # via -r requirements/edx/base.txt
-ora2==3.8.2
+ora2==4.0.1
     # via -r requirements/edx/base.txt
 packaging==21.3
     # via
@@ -908,7 +907,7 @@ pansi==2020.7.3
     # via
     #   -r requirements/edx/base.txt
     #   py2neo
-path==16.3.0
+path==16.4.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
@@ -1103,7 +1102,7 @@ python-slugify==4.0.1
     #   -r requirements/edx/base.txt
     #   code-annotations
     #   transifex-client
-python-swiftclient==3.13.0
+python-swiftclient==3.13.1
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -1307,7 +1306,7 @@ stevedore==3.5.0
     #   edx-django-utils
     #   edx-enterprise
     #   edx-opaque-keys
-super-csv==2.1.4
+super-csv==3.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
@@ -1320,7 +1319,7 @@ tableauserverclient==0.17.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-testfixtures==6.18.3
+testfixtures==6.18.4
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
@@ -1343,7 +1342,7 @@ tox==3.24.5
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/edx/testing.in
-tqdm==4.62.3
+tqdm==4.63.0
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1384,7 +1383,7 @@ vine==1.3.0
     #   -r requirements/edx/base.txt
     #   amqp
     #   celery
-virtualenv==20.13.1
+virtualenv==20.13.2
     # via tox
 voluptuous==0.12.2
     # via
@@ -1439,7 +1438,7 @@ xblock-drag-and-drop-v2 @ git+https://github.com/edx-solutions/xblock-drag-and-d
     # via -r requirements/edx/base.txt
 xblock-poll @ git+https://github.com/open-craft/xblock-poll@922cd36fb1c3cfe00b4ce03b19a13185d136447d
     # via -r requirements/edx/base.txt
-xblock-utils==2.2.0
+xblock-utils==3.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-sga
