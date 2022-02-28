@@ -139,6 +139,34 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
 
 // ====================
 
+// The Paragon SASS framework has been added to Studio in its totality.
+// There are a handful of places where class names conflict. The styles
+// below attempt to enforce Studio's existing styling rules while offering
+// an opt-in to the full Paragon/Bootstrap style rules.
+
+// Bootstrap .row is display: flex; with negative margins,
+// Studio assumes .row is display: block; and sets no left right margins.
+// If a Bootstrap style row is desired use: <div class="row bs-row">...</div>
+.row:not(.bs-row) {
+  display: block;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+// A series of conflicts in modal styles... The existing Studio modal is
+// styled in this pretty specific selector cms/static/sass/elements/_modal-window.scss
+// So we enforce some styles here to prevent Paragon from messing things up.
+[class*="view-"] .modal-window {
+  max-width: 100%;
+
+  .modal-content {
+    display: block;
+    box-shadow: none;
+  }
+}
+
+// ====================
+
 // TODOs:
 
 // * font-weight syncing

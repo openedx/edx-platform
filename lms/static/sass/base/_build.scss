@@ -3,16 +3,11 @@
 // Theme-specific variables
 @import 'lms/theme/variables';
 
-// Core Bootstrap functions, variables and mixins
+// Legacy variables that augmented Bootstrap
 @import 'bootstrap/variables';
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins';
-@import 'bootstrap/scss/utilities';
 
-
-// Bootstrap components
-@import 'bootstrap/scss/popover';
+// Paragon SASS Framework
+@import '../paragon';
 
 // LMS-specific variables
 @import '../variables';

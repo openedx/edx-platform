@@ -529,6 +529,12 @@ def _compile_sass(system, theme, debug, force, timing_info):
         source_comments = False
         output_style = 'compressed'
 
+    def tilda_node_modules_importer(existing_path):
+        if existing_path.startswith('~'):
+            new_path = existing_path.replace('~', path('node_modules/'))
+            return [(new_path,)]
+        return None
+
     for dirs in sass_dirs:
         start = datetime.now()
         css_dir = dirs['css_destination_dir']
@@ -560,6 +566,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
                 include_paths=COMMON_LOOKUP_PATHS + lookup_paths,
                 source_comments=source_comments,
                 output_style=output_style,
+                importers=[(0, tilda_node_modules_importer)]
             )
 
         # For Sass files without explicit RTL versions, generate

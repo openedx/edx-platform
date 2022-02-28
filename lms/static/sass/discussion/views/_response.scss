@@ -76,7 +76,7 @@
   display: block;
   padding: ($baseline/2) $baseline;
   width: 100%;
-  background: theme-color("lightest");
+  background: $light-300;
   box-shadow: 0 1px 3px -1px $shadow inset;
 }
 
@@ -146,7 +146,7 @@
 
   @include border-radius(0 0 $forum-border-radius $forum-border-radius);
 
-  background: theme-color("lightest");
+  background: $light-300;
   box-shadow: 0 1px 3px -1px $shadow inset;
 
   > li {
