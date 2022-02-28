@@ -18,7 +18,7 @@ from django.urls import reverse
     </header>
     <article class="content-primary">
       <div class=""><!-- What class for a dive to wrap the form? -->
-        <form method="post" action="${reverse('login')}">
+        <form method="post">
           %if login_error_message:
             <div id="login_error"
                  class="message message-status error is-shown"
