@@ -332,9 +332,8 @@ django-config-models==2.3.0
     #   lti-consumer-xblock
 django-cors-headers==3.11.0
     # via -r requirements/edx/testing.txt
-django-countries==7.2.1
+django-countries==7.3.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
 django-crum==0.7.9
@@ -1464,6 +1463,7 @@ typing-extensions==4.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   astroid
+    #   django-countries
     #   mypy
     #   pydantic
     #   pylint
