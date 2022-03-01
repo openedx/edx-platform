@@ -103,6 +103,8 @@ def get_course_by_id(course_key, depth=0):
 
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
+    beeline.add_context_field('course_depth', depth)
+    beeline.add_context_field('course_depth_infinite', depth == 0)
     with modulestore().bulk_operations(course_key):
         course = modulestore().get_course(course_key, depth=depth)
     if course:
