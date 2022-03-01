@@ -50,7 +50,11 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     get_retired_username_by_username,
     is_username_retired
 )
-from common.djangoapps.student.models_api import do_name_change_request
+from common.djangoapps.student.models_api import (
+    confirm_name_change,
+    do_name_change_request,
+    get_pending_name_change
+)
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
@@ -427,17 +431,19 @@ class AccountViewSet(ViewSet):
         return Response(account_settings)
 
 
-class NameChangeView(APIView):
+class NameChangeView(ViewSet):
     """
-    Request a profile name change. This creates a PendingNameChange to be verified later,
-    rather than updating the user's profile name directly.
+    Viewset to manage profile name change requests.
     """
     authentication_classes = (JwtAuthentication, SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
 
-    def post(self, request):
+    def create(self, request):
         """
         POST /api/user/v1/accounts/name_change/
+
+        Request a profile name change. This creates a PendingNameChange to be verified later,
+        rather than updating the user's profile name directly.
 
         Example request:
             {
@@ -461,6 +467,25 @@ class NameChangeView(APIView):
                 )
 
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
+
+    def confirm(self, request, username):
+        """
+        POST /api/user/v1/account/name_change/{username}/confirm
+
+        Confirm a name change request for the specified user, and update their profile name.
+        """
+        if not request.user.is_staff:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        user_model = get_user_model()
+        user = user_model.objects.get(username=username)
+        pending_name_change = get_pending_name_change(user)
+
+        if pending_name_change:
+            confirm_name_change(user, pending_name_change)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class AccountDeactivationView(APIView):
