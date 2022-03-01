@@ -23,6 +23,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.video_module import VideoBlock
 from xmodule.video_module.transcripts_utils import save_to_store
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
 
 LOGGER_NAME = "cms.djangoapps.contentstore.tasks"
 
@@ -303,6 +305,39 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
                  u'[transcripts_count=1] [course={}] '
                  u'[revision=rev-opt-published-only] [video={}]'.format(course_id, self.video_descriptor_2.location))
             )
+        )
+
+        with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
+            call_command('migrate_transcripts', '--course-id', six.text_type(self.course_2.id), '--commit')
+            logger.check(
+                *expected_log
+            )
+
+    @ddt.unpack
+    @ddt.data({
+        'exception_class': ItemNotFoundError,
+        'log_message': 'course-transcript-migration-failed-with-not-found-error-exc',
+        'log_type': 'INFO',
+    }, {
+        'exception_class': ValueError,  # Some random exception
+        'log_message': 'course-transcript-migration-failed-with-unknown-exc',
+        'log_type': 'ERROR',
+    })
+    @patch('cms.djangoapps.contentstore.tasks.async_migrate_transcript')
+    def test_tahoe_migrate_additional_error_handling(self, mock_migrate, exception_class, log_message, log_type):
+        """
+        Tahoe: Test migrate transcripts custom exception handling for ItemNotFoundError and other errors.
+        """
+        exception = exception_class('Test exception')
+        mock_migrate.side_effect = exception
+        course_id = six.text_type(self.course_2.id)
+        expected_log = (
+            (
+                'cms.djangoapps.contentstore.tasks', log_type,
+                (u'[Transcript Migration] [run=1] [{}] [course={}] [exc={}]'.format(
+                    log_message, course_id, str(exception)
+                ))
+            ),
         )
 
         with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:

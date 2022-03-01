@@ -108,8 +108,25 @@ def enqueue_async_migrate_transcripts_tasks(course_keys,
         'command_run': command_run
     }
 
+    # TODO: Undo all the migrate_transcripts edits: https://github.com/appsembler/edx-platform/issues/1068
+    # temp import, kept here to reduce migration conflicts
+    from django.db import transaction
+    from xmodule.modulestore.exceptions import ItemNotFoundError
+
     for course_key in course_keys:
-        async_migrate_transcript(text_type(course_key), **kwargs)
+        try:
+            with transaction.atomic():
+                async_migrate_transcript(text_type(course_key), **kwargs)
+        except ItemNotFoundError as not_found_exc:
+            LOGGER.info(
+                '[%s] [run=%s] [course-transcript-migration-failed-with-not-found-error-exc] [course=%s] [exc=%s]',
+                MIGRATION_LOGS_PREFIX, command_run, course_key, str(not_found_exc)
+            )
+        except Exception as exc:
+            LOGGER.exception(
+                '[%s] [run=%s] [course-transcript-migration-failed-with-unknown-exc] [course=%s] [exc=%s]',
+                MIGRATION_LOGS_PREFIX, command_run, course_key, str(exc)
+            )
 
 
 def get_course_videos(course_key):
