@@ -50,7 +50,7 @@ from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserExc
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
-from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
+from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_topic_url
 from openedx.core.djangoapps.discussions.utils import (
     available_division_schemes,
     get_discussion_categories_ids,
@@ -703,18 +703,23 @@ def followed_threads(request, course_key, user_id):
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
 
-def _discussions_mfe_context(query_params: Dict, course_key: CourseKey, legacy_only_view=False) -> Optional[Dict]:
+def _discussions_mfe_context(query_params: Dict,
+                             course_key: CourseKey,
+                             legacy_only_view=False,
+                             topic_id: Optional[str] = None,
+                             thread_id: Optional[str] = None) -> Optional[Dict]:
     """
     Returns the context for rendering the MFE banner and MFE.
 
     Args:
         query_params (Dict): request query parameters
         course_key (CourseKey): course for which to get URL
+        legacy_only_view (Bool): Force using the legacy view.
 
     Returns:
         A URL for the MFE experience if active for the current request or None
     """
-    mfe_url = get_discussions_mfe_url(course_key)
+    mfe_url = get_discussions_mfe_topic_url(course_key, topic_id, thread_id)
     if not mfe_url:
         return {"show_banner": False, "show_mfe": False}
     discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
@@ -766,8 +771,8 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         """
         course_key = CourseKey.from_string(course_id)
         # Force using the legacy view if a user profile is requested or the URL contains a specific topic or thread
-        force_legacy_view = (profile_page_context or thread_id or discussion_id)
-        mfe_context = _discussions_mfe_context(request.GET, course_key, force_legacy_view)
+        force_legacy_view = bool(profile_page_context)
+        mfe_context = _discussions_mfe_context(request.GET, course_key, force_legacy_view, discussion_id, thread_id)
         if mfe_context["show_mfe"]:
             fragment = Fragment(render_to_string('discussion/discussion_mfe_embed.html', mfe_context))
             fragment.add_css(

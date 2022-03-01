@@ -7,7 +7,26 @@
 <%!
 import json
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from cms.djangoapps.contentstore import utils
+
 %>
+<script>
+    const domain = (new URL("${discussions_mfe_url  | n, js_escaped_string}"));
+    window.addEventListener("message", (event) => {
+        if ((event.origin !== domain.origin) || (event.data.type !== "discussions.path.change"))
+            return;
+        const {postId ,topicId} = event.data.payload;
+        let url = "${mfe_url  | n, js_escaped_string}".split('discussion/forum/')[0].concat("discussion/forum/");
+        if (topicId) {
+            url += topicId;
+            if (postId){
+                url = url.concat("/threads/",postId);
+            }
+        }
+        window.history.pushState(null, null, url);
+    }, false);
+</script>
 
 <section class="discussion discussion-board page-content-container" id="discussion-container"
          data-course-id="${course_key}" >

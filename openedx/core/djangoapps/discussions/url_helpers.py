@@ -20,37 +20,35 @@ def _get_url_with_view_query_params(path: str, view: Optional[str] = None) -> st
 
     """
     if settings.DISCUSSIONS_MICROFRONTEND_URL is None:
-        return ''
+        return ""
     url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{path}"
     if view == "in_context":
         url = f"{url}?inContext"
     return url
 
 
-def get_discussions_mfe_url(course_key: CourseKey, view: Optional[str] = None) -> str:
-    """
-    Returns the url for discussions for the specified course in the discussions MFE.
-
-    Args:
-        course_key (CourseKey): course key of course for which to get url
-        view (str): which view to generate url for
-
-    Returns:
-        (str) URL link for MFE. Empty if the base url isn't configured
-    """
-    return _get_url_with_view_query_params(f"{course_key}/", view)
-
-
-def get_discussions_mfe_topic_url(course_key: CourseKey, topic_id: str, view: Optional[str] = None) -> str:
+def get_discussions_mfe_topic_url(
+    course_key: CourseKey,
+    topic_id: Optional[str] = None,
+    thread_id: Optional[str] = None,
+    view: Optional[str] = None,
+) -> str:
     """
     Returns the url for discussions for the specified course and topic in the discussions MFE.
 
     Args:
         course_key (CourseKey): course key of course for which to get url
         topic_id (str): topic id for topic to get url for
+        thread_id (str): thread id for topic to get url for
         view (str): which view to generate url for
 
     Returns:
         (str) URL link for MFE. Empty if the base url isn't configured
     """
-    return _get_url_with_view_query_params(f"{course_key}/topics/{topic_id}", view)
+    if thread_id and topic_id:
+        return _get_url_with_view_query_params(
+            f"{course_key}/topics/{topic_id}/posts/{thread_id}", view
+        )
+    elif topic_id:
+        return _get_url_with_view_query_params(f"{course_key}/topics/{topic_id}", view)
+    return _get_url_with_view_query_params(f"{course_key}/", view)
