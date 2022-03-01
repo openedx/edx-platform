@@ -18,6 +18,7 @@ Then we add `@override_settings(ROOT_URLCONF=__name__)` to the TestClass
 There are other ways to do this. However, this is simple and does not require
 our code to explicitly hack  `sys.modules` reloading
 """
+from unittest.mock import Mock
 
 import ddt
 from django.conf.urls import include, url
@@ -32,7 +33,10 @@ from student.roles import CourseAccessRole, CourseCreatorRole, CourseInstructorR
 from student.tests.factories import UserFactory
 
 import cms.urls
-from cms.djangoapps.appsembler.views import LoginView
+from cms.djangoapps.appsembler.views import (
+    get_successful_login_next_url,
+    LoginView,
+)
 
 
 # Set the urlpatterns we want to use for our tests in this module only
@@ -166,6 +170,7 @@ class MultiTenantStudioLoginTestCase(TestCase):
         assert response.status_code == status.HTTP_302_FOUND, response.content
         assert not response.content
         new_url = response.url
+        assert new_url == reverse('home'), 'User should be redirected to Studio home'
         response = self.client.get(new_url)
         assert response.status_code == status.HTTP_200_OK
         # Assert we DO have a logged-in session (authorized user)
@@ -187,3 +192,30 @@ class MultiTenantStudioLoginTestCase(TestCase):
         assert response['Content-Type'] == 'text/html; charset=utf-8'
         error_message = self.get_error_message_text(response)
         assert error_message == LoginView.error_messages['invalid_login']
+
+
+def test_login_redirect_url_no_parameter():
+    """
+    Test the default behaviour of `get_successful_login_redirect_url`.
+    """
+    mock_request = Mock(GET={})
+    next_url = get_successful_login_next_url(mock_request)
+    assert next_url == reverse('home'), 'Should redirect to Studio home by default.'
+
+
+def test_login_redirect_url_with_next_parameter():
+    """
+    Test `get_successful_login_redirect_url` with next parameter.
+    """
+    mock_request = Mock(GET={'next': '/course-v1/something'})
+    next_url = get_successful_login_next_url(mock_request)
+    assert next_url == '/course-v1/something', 'Should redirect to the provided url if it is safe'
+
+
+def test_login_redirect_url_with_unsafe_next_parameter():
+    """
+    Test `get_successful_login_redirect_url` with unsafe next parameter.
+    """
+    mock_request = Mock(GET={'next': 'https://untrusted.example.com'})
+    next_url = get_successful_login_next_url(mock_request)
+    assert next_url == reverse('home'), 'Should redirect to Studio home if provided with untrusted URL'

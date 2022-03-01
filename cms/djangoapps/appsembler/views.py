@@ -21,6 +21,7 @@ from django.views.decorators.csrf import csrf_protect
 
 from organizations.models import UserOrganizationMapping
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole
 from edxmako.shortcuts import render_to_response
 
@@ -35,6 +36,24 @@ def forgot_password_link():
 def platform_name():
     return configuration_helpers.get_value('platform_name',
                                            settings.PLATFORM_NAME)
+
+
+def get_successful_login_next_url(request):
+    """
+    Return the successful login redirect URL.
+    """
+    next_url = request.GET.get('next')
+    use_next_url = next_url and is_safe_login_or_logout_redirect(
+        redirect_to=next_url,
+        request_host=request.get_host(),
+        dot_client_id=request.GET.get('client_id'),
+        require_https=request.is_secure(),
+    )
+
+    if use_next_url:
+        return next_url
+    else:
+        return reverse('home')
 
 
 def render_login_page(login_error_message=None):
@@ -251,7 +270,7 @@ class LoginView(View):
                 return self.render_login_page_with_error('invalid_login')
 
             login(request, user)
-            return redirect(reverse('home'))
+            return redirect(get_successful_login_next_url(request))
 
     def log_multiple_objects_returned(self):
         if settings.FEATURES.get('SQUELCH_PII_IN_LOGS'):
