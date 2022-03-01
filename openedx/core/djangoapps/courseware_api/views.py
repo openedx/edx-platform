@@ -33,7 +33,6 @@ from lms.djangoapps.course_goals.api import get_course_goal
 from lms.djangoapps.courseware.access import has_access
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
-from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import (
     is_masquerading_as_specific_student,
     setup_masquerade,
@@ -82,16 +81,7 @@ class CoursewareMeta:
             username or self.request.user.username,
             course_key,
         )
-        # We must compute course load access *before* setting up masquerading,
-        # else course staff (who are not enrolled) will not be able view
-        # their course from the perspective of a learner.
-        self.load_access = check_course_access(
-            self.overview,
-            self.request.user,
-            'load',
-            check_if_enrolled=True,
-            check_if_authenticated=True,
-        )
+
         self.original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
         self.original_user_is_global_staff = self.request.user.is_staff
         self.course_key = course_key

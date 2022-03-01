@@ -226,7 +226,6 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
 
             if enable_anonymous and not logged_in:
                 # multiple checks use this handler
-                check_public_access.assert_called()
                 assert response.data['enrollment']['mode'] is None
                 assert response.data['course_goals']['selected_goal'] is None
                 assert response.data['course_goals']['weekly_learning_goal_enabled'] is False
