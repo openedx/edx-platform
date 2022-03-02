@@ -2813,6 +2813,9 @@ class UpdateThreadTest(
         FORUM_ROLE_COMMUNITY_TA,
         FORUM_ROLE_STUDENT,
     )
+    @mock.patch("lms.djangoapps.discussion.rest_api.serializers.EDIT_REASON_CODES", {
+        "test-edit-reason": "Test Edit Reason",
+    })
     def test_update_thread_with_edit_reason_code(self, role_name):
         """
         Test editing comments, specifying and retrieving edit reason codes.
@@ -2822,16 +2825,17 @@ class UpdateThreadTest(
         try:
             result = update_thread(self.request, "test_thread", {
                 "raw_body": "Edited body",
-                "edit_reason_code": "someReason",
+                "edit_reason_code": "test-edit-reason",
             })
             assert role_name != FORUM_ROLE_STUDENT
             assert result["last_edit"] == {
                 "original_body": "Original body",
-                "reason_code": "someReason",
+                "reason": "Test Edit Reason",
+                "reason_code": "test-edit-reason",
                 "author": self.user.username,
             }
             request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
-            assert request_body["edit_reason_code"] == ["someReason"]
+            assert request_body["edit_reason_code"] == ["test-edit-reason"]
         except ValidationError as error:
             assert role_name == FORUM_ROLE_STUDENT
             assert error.message_dict == {"edit_reason_code": ["This field is not editable."]}
@@ -3225,6 +3229,9 @@ class UpdateCommentTest(
         FORUM_ROLE_COMMUNITY_TA,
         FORUM_ROLE_STUDENT,
     )
+    @mock.patch("lms.djangoapps.discussion.rest_api.serializers.EDIT_REASON_CODES", {
+        "test-edit-reason": "Test Edit Reason",
+    })
     def test_update_comment_with_edit_reason_code(self, role_name):
         """
         Test editing comments, specifying and retrieving edit reason codes.
@@ -3234,16 +3241,17 @@ class UpdateCommentTest(
         try:
             result = update_comment(self.request, "test_comment", {
                 "raw_body": "Edited body",
-                "edit_reason_code": "someReason",
+                "edit_reason_code": "test-edit-reason",
             })
             assert role_name != FORUM_ROLE_STUDENT
             assert result["last_edit"] == {
                 "original_body": "Original body",
-                "reason_code": "someReason",
+                "reason": "Test Edit Reason",
+                "reason_code": "test-edit-reason",
                 "author": self.user.username,
             }
             request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
-            assert request_body["edit_reason_code"] == ["someReason"]
+            assert request_body["edit_reason_code"] == ["test-edit-reason"]
         except ValidationError:
             assert role_name == FORUM_ROLE_STUDENT
 

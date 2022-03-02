@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlencode, urlparse
 import ddt
 import httpretty
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
@@ -2679,13 +2680,13 @@ class DiscussionModerationSettingsViewTests(APITestCase):
         """
         Returns the API endpoint.
         """
-        return "/api/discussion/v1/moderation_settings"
+        return reverse("discussion_moderation_settings", kwargs={"course_id": "course-v1:test+test+test"})
 
-    @override_flag(ENABLE_DISCUSSION_MODERATION_REASON_CODES, active=True)
-    @mock.patch("django.conf.settings.DISCUSSION_MODERATION_EDIT_REASON_CODES", {
+    @override_flag(ENABLE_DISCUSSION_MODERATION_REASON_CODES.name, active=True)
+    @override_settings(DISCUSSION_MODERATION_EDIT_REASON_CODES={
         "test-edit-reason": "Test Edit Reason",
     })
-    @mock.patch("django.conf.settings.DISCUSSION_MODERATION_CLOSE_REASON_CODES", {
+    @override_settings(DISCUSSION_MODERATION_CLOSE_REASON_CODES={
         "test-close-reason": "Test Close Reason",
     })
     def test_retrieve(self):
