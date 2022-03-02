@@ -7,17 +7,18 @@ import json
 import random
 from datetime import datetime
 from unittest import mock
-from urllib.parse import parse_qs, urlparse, urlencode
+from urllib.parse import parse_qs, urlencode, urlparse
 
 import ddt
 import httpretty
-from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
-from rest_framework import status
+from waffle.testutils import override_flag
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -27,11 +28,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import get_retired_username_by_username
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
-from common.djangoapps.student.tests.factories import (
-    CourseEnrollmentFactory,
-    SuperuserFactory,
-    UserFactory,
-)
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
 from common.test.utils import disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
@@ -48,6 +45,7 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     make_paginated_api_response,
     parsed_body,
 )
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSION_MODERATION_REASON_CODES
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
@@ -2683,7 +2681,7 @@ class DiscussionModerationSettingsViewTests(APITestCase):
         """
         return "/api/discussion/v1/moderation_settings"
 
-    @mock.patch("django.conf.settings.ENABLE_DISCUSSION_MODERATION_REASON_CODES", True)
+    @override_flag(ENABLE_DISCUSSION_MODERATION_REASON_CODES, active=True)
     @mock.patch("django.conf.settings.DISCUSSION_MODERATION_EDIT_REASON_CODES", {
         "test-edit-reason": "Test Edit Reason",
     })

@@ -4963,9 +4963,6 @@ CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-a
 BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD = None
 
 ################ Settings for the Discussion Service #########
-# Set this to False to disable the reason code selection UI for
-# moderators when editing or closing users' posts.
-ENABLE_DISCUSSION_MODERATION_REASON_CODES = True
 # Provide a list of reason codes for moderators editing posts and
 # comments, as a mapping from the internal reason code representation,
 # and an internationalizable label to be shown to moderators in the form

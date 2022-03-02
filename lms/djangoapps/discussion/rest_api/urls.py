@@ -35,6 +35,11 @@ urlpatterns = [
         name="discussion_course_settings",
     ),
     re_path(
+        fr'v1/courses/{settings.COURSE_ID_PATTERN}/moderation_settings',
+        DiscussionModerationSettingsView.as_view(),
+        name="discussion_moderation_settings",
+    ),
+    re_path(
         fr"^v1/courses/{settings.COURSE_KEY_PATTERN}/activity_stats",
         CourseActivityStatsView.as_view(),
         name="discussion_course_activity_stats",
@@ -63,7 +68,6 @@ urlpatterns = [
         CourseTopicsView.as_view(),
         name="course_topics"
     ),
-    path('v1/moderation_settings', DiscussionModerationSettingsView.as_view(), name="discussion_moderation_settings"),
     re_path(
         fr"^v2/course_topics/{settings.COURSE_ID_PATTERN}",
         CourseTopicsViewV2.as_view(),

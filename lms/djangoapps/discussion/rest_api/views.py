@@ -72,6 +72,7 @@ from ..rest_api.serializers import (
     DiscussionTopicSerializerV2,
     TopicOrdering,
 )
+from ..toggles import ENABLE_DISCUSSION_MODERATION_REASON_CODES
 
 log = logging.getLogger(__name__)
 
@@ -1293,17 +1294,17 @@ class DiscussionModerationSettingsView(DeveloperErrorViewMixin, APIView):
         }
     """
 
-    ENABLED = getattr(settings, "ENABLE_DISCUSSION_MODERATION_REASON_CODES", {})
     EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
     CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
 
-    def get(self, _):
+    def get(self, request, course_id):
         """
         Implements the GET method as described in the class documentation.
         """
+        course_key = CourseKey.from_string(course_id)
         return Response(
             {
-                "enabled": self.ENABLED,
+                "enabled": ENABLE_DISCUSSION_MODERATION_REASON_CODES.is_enabled(course_key),
                 "edit_reason_codes": [
                     {"key": reason_code, "label": label}
                     for (reason_code, label) in self.EDIT_REASON_CODES.items()
