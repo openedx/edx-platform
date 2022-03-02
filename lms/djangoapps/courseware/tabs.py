@@ -361,6 +361,7 @@ def get_course_tab_list(user, course):
             if tab.type != 'courseware':
                 continue
             tab.name = _("Entrance Exam")
+            tab.title = _("Entrance Exam")
         # TODO: LEARNER-611 - once the course_info tab is removed, remove this code
         if not DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id) and tab.type == 'course_info':
             continue
