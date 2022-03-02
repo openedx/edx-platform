@@ -549,6 +549,9 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _, Time) {
     function onUnstarted() { }
 
     function handlePlaybackQualityChange(value) {
+        console.log(
+            `[Video info]: changing playback quality from ${this.videoPlayer.player.getPlaybackQuality()} to ${value}`
+        );
         this.videoPlayer.player.setPlaybackQuality(value);
     }
 
