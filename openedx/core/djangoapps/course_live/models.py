@@ -37,6 +37,18 @@ class CourseLiveConfiguration(TimeStampedModel):
         return f"Configuration(course_key='{self.course_key}', provider='{self.provider_type}', enabled={self.enabled})"
 
     @classmethod
+    def is_enabled(cls, course_key) -> bool:
+        """
+        Check if there is an active configuration for a given course key
+
+        Default to False, if no configuration exists
+        """
+        configuration = cls.get(course_key)
+        if not configuration:
+            return False
+        return configuration.enabled
+
+    @classmethod
     def get(cls, course_key):
         """
         Lookup a course live configuration by course uuid.
