@@ -10,7 +10,6 @@ import shutil
 import tempfile
 from unittest.mock import Mock, NonCallableMock, patch
 
-import bleach
 import ddt
 import pytest
 from boto.exception import BotoServerError
@@ -3483,40 +3482,6 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
                                                subject=self.full_test_message['subject'],
                                                html_message=self.full_test_message['message'],
                                                template_name=org_template, from_addr=org_email).count()
-
-    def test_send_email_and_sanitize_content(self):
-        test_subject = 'sanitization test subject'
-        test_message = """
-        <h1>Welcome to course101!</h1>
-        <p>We are going to do all the learning together.</p>
-        <script>Content inside script tag</script>
-        <form action="/action_page.php">
-            <label for="fname">First name:</label><br>
-            <input type="text" id="fname" name="fname"><br><br>
-            <input type="submit" value="Submit">
-        </form>
-        """
-        message = {
-            'send_to': '["myself", "staff"]',
-            'subject': test_subject,
-            'message': test_message,
-        }
-        sanitized_subject = bleach.clean(test_subject, tags=settings.BULK_COURSE_EMAIL_ALLOWED_HTML_TAGS)
-        sanitized_message = bleach.clean(test_message, tags=settings.BULK_COURSE_EMAIL_ALLOWED_HTML_TAGS)
-
-        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
-        response = self.client.post(url, message)
-
-        email = CourseEmail.objects.filter(course_id=self.course.id, sender=self.instructor)
-
-        assert response.status_code == 200
-        assert email[0].subject == sanitized_subject
-        assert email[0].html_message == sanitized_message
-
-        # deeper verification, confirm `h1` element hasn't been stripped from message content
-        assert "<h1>" in email[0].html_message
-        # deeper verification, confirm `script` element has been stripped from message content
-        assert "&lt;script&gt;Content inside script tag&lt;/script&gt;" in email[0].html_message
 
 
 class MockCompletionInfo:
