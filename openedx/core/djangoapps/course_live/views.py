@@ -1,3 +1,6 @@
+"""
+View for course live app
+"""
 from typing import Dict
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication

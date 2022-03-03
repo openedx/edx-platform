@@ -1,3 +1,6 @@
+"""
+Test for course live app views
+"""
 import json
 
 from django.urls import reverse

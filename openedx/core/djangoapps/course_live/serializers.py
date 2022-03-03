@@ -59,8 +59,8 @@ class LtiSerializer(serializers.ModelSerializer):
                     setattr(instance, key, value)
 
             pii_sharing_allowed = self.context.get('pii_sharing_allowed', False)
-            setattr(instance, "pii_share_username", pii_sharing_allowed)
-            setattr(instance, "pii_share_email", pii_sharing_allowed)
+            instance.pii_share_username = pii_sharing_allowed
+            instance.pii_share_email = pii_sharing_allowed
             instance.save()
         return instance
 
