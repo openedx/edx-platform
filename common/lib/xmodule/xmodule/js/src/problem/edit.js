@@ -564,7 +564,7 @@
                                 stringValue = stringValue.replace(/{{[\s\S]*?}}/g, '').trim();
                             }
                             // allow for "e" for scientific notation and "i" for complex numbers, otherwise, exclude letters
-                            if (stringValue.match(/[a-df-hj-z]/i)) {
+                            if (stringValue.match(/[a-df-z]/i)) {
                                 return false;
                             }
                             return !isNaN(parseFloat(stringValue));
