@@ -4965,8 +4965,7 @@ BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD = None
 ################ Settings for the Discussion Service #########
 # Provide a list of reason codes for moderators editing posts and
 # comments, as a mapping from the internal reason code representation,
-# and an internationalizable label to be shown to moderators in the form
-# UI.
+# to an internationalizable label to be shown to moderators in the form UI.
 DISCUSSION_MODERATION_EDIT_REASON_CODES = {
     "grammar-spelling": _("Has grammar / spelling issues"),
     "needs-clarity": _("Content needs clarity"),
@@ -4974,9 +4973,9 @@ DISCUSSION_MODERATION_EDIT_REASON_CODES = {
     "inappropriate-language": _("Has inappropriate language"),
     "contains-pii": _("Contains personally identifiable information"),
 }
-# Provide a list of reason codes for moderators to close posts, in the
-# form of tuples containing the internal reason code representation, and
-# an internationalizable label to be shown to moderators in the form UI.
+# Provide a list of reason codes for moderators to close posts, as a mapping
+# from the internal reason code representation, to  an internationalizable label
+#  to be shown to moderators in the form UI.
 DISCUSSION_MODERATION_CLOSE_REASON_CODES = {
     "academic-integrity": _("Post violates honour code or academic integrity"),
     "read-only": _("Post should be read-only"),

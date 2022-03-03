@@ -412,8 +412,6 @@ class ThreadSerializer(_ContentSerializer):
         if not _validate_privileged_access(self.context):
             return None
         reason_code = obj.get("close_reason_code")
-        if not reason_code:
-            return None
         return CLOSE_REASON_CODES.get(reason_code)
 
     def get_closed_by(self, obj):
