@@ -210,7 +210,7 @@ class TestSubmissionMetadataSerializer(TestCase):
         "dateSubmitted": "<yyyy-mm-dd HH:MM:SS>",
         "dateGraded": "<yyyy-mm-dd HH:MM:SS/None>",
         "gradedBy": "<username/empty>",
-        "gradeStatus": "<ungraded/graded>",
+        "gradingStatus": "<ungraded/graded>",
         "lockStatus": "<locked/unlocked/in-progress>",
         "score": {
             "pointsEarned": <num>,
@@ -228,7 +228,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             "dateSubmitted": "1969-07-16 13:32:00",
             "dateGraded": "None",
             "gradedBy": "",
-            "gradeStatus": "ungraded",
+            "gradingStatus": "ungraded",
             "lockStatus": "unlocked",
             "score": {"pointsEarned": 0, "pointsPossible": 10},
         },
@@ -239,7 +239,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             "dateSubmitted": "1969-07-20 20:17:40",
             "dateGraded": "None",
             "gradedBy": "",
-            "gradeStatus": "ungraded",
+            "gradingStatus": "ungraded",
             "lockStatus": "in-progress",
             "score": {"pointsEarned": 0, "pointsPossible": 10},
         },
@@ -250,7 +250,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             "dateSubmitted": "1969-07-21 21:35:00",
             "dateGraded": "1969-07-24 16:44:00",
             "gradedBy": "buz",
-            "gradeStatus": "graded",
+            "gradingStatus": "graded",
             "lockStatus": "unlocked",
             "score": {"pointsEarned": 9, "pointsPossible": 10},
         },
@@ -260,10 +260,13 @@ class TestSubmissionMetadataSerializer(TestCase):
         for submission_id, submission_data in self.submission_data.items():
             data = SubmissionMetadataSerializer(submission_data).data
 
-            # For each submission, the only transform is to change "submissionUuid" to "submissionUUID"
+            # For each submission, there are only a few transforms:
+            # 1) "submissionUuid" to "submissionUUID"
+            # 2) "gradingStatus" to "gradeStatus"
             # Create that "expected" object here by updating the key name
             expected_data = self.submission_data[submission_id].copy()
             expected_data["submissionUUID"] = expected_data.pop("submissionUuid")
+            expected_data["gradeStatus"] = expected_data.pop("gradingStatus")
 
             assert data == expected_data
 
@@ -277,7 +280,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             "dateSubmitted": "1983-06-03 00:00:00",
             "dateGraded": None,
             "gradedBy": None,
-            "gradeStatus": "ungraded",
+            "gradingStatus": "ungraded",
             "lockStatus": "unlocked",
             "score": {},
         }
