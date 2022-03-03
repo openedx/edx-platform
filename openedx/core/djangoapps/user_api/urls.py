@@ -22,7 +22,11 @@ from .accounts.views import (
 from . import views as user_api_views
 from .models import UserPreference
 from .preferences.views import PreferencesDetailView, PreferencesView
-from .verification_api.views import IDVerificationStatusView, IDVerificationStatusDetailsView
+from .verification_api.views import (
+    IDVerificationStatusView,
+    IDVerificationStatusDetailsView,
+    IDVerificationSupportView,
+)
 
 ME = AccountViewSet.as_view({
     'get': 'get',
@@ -145,6 +149,11 @@ urlpatterns = [
         fr'^v1/accounts/{settings.USERNAME_PATTERN}/verifications/$',
         IDVerificationStatusDetailsView.as_view(),
         name='verification_details'
+    ),
+    url(
+        r'^v1/accounts/verifications/(?P<attempt_id>[0-9]+)/$',
+        IDVerificationSupportView.as_view(),
+        name='verification_for_support'
     ),
     url(
         fr'^v1/accounts/{settings.USERNAME_PATTERN}/retirement_status/$',
