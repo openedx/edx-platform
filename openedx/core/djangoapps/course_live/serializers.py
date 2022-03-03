@@ -1,0 +1,142 @@
+"""
+Serializers for course live views.
+"""
+from lti_consumer.models import LtiConfiguration
+from rest_framework import serializers
+
+from .models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
+
+
+class LtiSerializer(serializers.ModelSerializer):
+    """
+    Serialize LtiConfiguration responses
+    """
+    lti_config = serializers.JSONField()
+
+    class Meta:
+        model = LtiConfiguration
+        fields = [
+            'lti_1p1_client_key',
+            'lti_1p1_client_secret',
+            'lti_1p1_launch_url',
+            'version',
+            'lti_config'
+        ]
+        read_only = [
+            'version'
+        ]
+
+    def create(self, validated_data):
+        lti_config = validated_data.pop('lti_config', None)
+        instance = LtiConfiguration()
+        instance.version = 'lti_1p1'
+
+        for key, value in validated_data.items():
+            if key in set(self.Meta.fields).difference(self.Meta.read_only):
+                setattr(instance, key, value)
+
+        pii_sharing_allowed = self.context.get('pii_sharing_allowed', False)
+        instance.lti_config = {
+            "pii_share_username": pii_sharing_allowed,
+            "pii_share_email": pii_sharing_allowed,
+            "additional_parameters": lti_config['additional_parameters']
+        }
+        instance.save()
+        return instance
+
+    def update(self, instance: LtiConfiguration, validated_data: dict) -> LtiConfiguration:
+        """
+        Create/update a model-backed instance
+        """
+        instance.config_store = LtiConfiguration.CONFIG_ON_DB
+        lti_config = validated_data.pop('lti_config', None)
+        if lti_config.get('additional_parameters', None):
+            instance.lti_config['additional_parameters'] = lti_config.get('additional_parameters')
+
+        if validated_data:
+            for key, value in validated_data.items():
+                if key in self.Meta.fields:
+                    setattr(instance, key, value)
+
+            pii_sharing_allowed = self.context.get('pii_sharing_allowed', False)
+            setattr(instance, "pii_share_username", pii_sharing_allowed)
+            setattr(instance, "pii_share_email", pii_sharing_allowed)
+            instance.save()
+        return instance
+
+
+class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
+    """
+    Serialize configuration responses
+    """
+    lti_configuration = LtiSerializer(many=False, read_only=False)
+
+    class Meta:
+        model = CourseLiveConfiguration
+
+        fields = ['course_key', 'provider_type', 'enabled', 'lti_configuration']
+        read_only_fields = ['course_key']
+
+    def create(self, validated_data):
+        """
+        We do not need this.
+        """
+        lti_config = validated_data.pop('lti_configuration')
+        instance = CourseLiveConfiguration()
+        instance.course_key = self.context.get('course_key_string')
+        instance.enabled = self.validated_data.get('enabled', False)
+
+        if self.validated_data.get('provider_type') in AVAILABLE_PROVIDERS:
+            instance.provider_type = self.validated_data.get('provider_type')
+        else:
+            raise serializers.ValidationError(
+                f'Provider type {self.validated_data.get("provider_type")} does not exist')
+
+        instance = self._update_lti(instance, lti_config)
+
+        instance.save()
+        return instance
+
+    def to_representation(self, instance: CourseLiveConfiguration) -> dict:
+        """
+        Serialize data into a dictionary, to be used as a response
+        """
+        payload = super().to_representation(instance)
+        payload.update({'pii_sharing_allowed': self.context['pii_sharing_allowed']})
+        return payload
+
+    def update(self, instance: CourseLiveConfiguration, validated_data: dict) -> CourseLiveConfiguration:
+        """
+        Update and save an existing instance
+        """
+        lti_config = validated_data.pop('lti_configuration')
+        for key in self.Meta.fields:
+            value = validated_data.get(key)
+            if value is not None:
+                setattr(instance, key, value)
+
+        instance = self._update_lti(instance, lti_config)
+        instance.save()
+        return instance
+
+    def _update_lti(
+        self,
+        instance: CourseLiveConfiguration,
+        lti_config: dict,
+    ) -> CourseLiveConfiguration:
+        """
+        Update LtiConfiguration
+        """
+
+        lti_serializer = LtiSerializer(
+            instance.lti_configuration or None,
+            data=lti_config,
+            partial=True,
+            context={
+                'pii_sharing_allowed': self.context.get('pii_sharing_allowed', False),
+            }
+        )
+        if lti_serializer.is_valid(raise_exception=True):
+            lti_serializer.save()
+        instance.lti_configuration = lti_serializer.instance
+        return instance
