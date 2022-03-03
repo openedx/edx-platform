@@ -937,7 +937,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/testing.txt
-openedx-events==0.8.0
+openedx-events==0.8.1
     # via -r requirements/edx/testing.txt
 openedx-filters==0.5.0
     # via -r requirements/edx/testing.txt
