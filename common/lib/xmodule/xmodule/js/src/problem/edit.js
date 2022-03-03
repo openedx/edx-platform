@@ -563,7 +563,7 @@
                             if ((stringValue.indexOf('{{') !== -1) && (stringValue.indexOf('}}') !== -1)) {
                                 stringValue = stringValue.replace(/{{[\s\S]*?}}/g, '').trim();
                             }
-                            if (stringValue.match(/[a-z]/i)) {
+                            if (stringValue.match(/[a-df-hj-z]/i)) {
                                 return false;
                             }
                             return !isNaN(parseFloat(stringValue));
