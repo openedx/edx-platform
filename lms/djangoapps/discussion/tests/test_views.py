@@ -1468,6 +1468,11 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
     def test_html(self, mock_request):
         self.check_html(mock_request)
 
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    @override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True)
+    def test_html_with_mfe_enabled(self, mock_request):
+        self.check_html(mock_request)
+
     def test_ajax(self, mock_request):
         self.check_ajax(mock_request)
 
