@@ -182,7 +182,8 @@ If you look at your hand, you can count that you have five fingers.
   <numericalresponse answer="502*9">
     <responseparam type="tolerance" default="15%" />
     <formulaequationinput />
-  <p>Enter the approximate number of atoms in a mol</p>
+  </numericalresponse>
+  <p>Enter the approximate number of atoms in a mol:</p>
   <numericalresponse answer="6.022e23">
     <responseparam type="tolerance" default="10%" />
     <formulaequationinput />
