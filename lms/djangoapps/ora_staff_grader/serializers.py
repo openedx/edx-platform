@@ -140,7 +140,7 @@ class SubmissionMetadataSerializer(serializers.Serializer):
     dateSubmitted = serializers.DateTimeField()
     dateGraded = serializers.DateTimeField(allow_null=True)
     gradedBy = serializers.CharField(allow_null=True)
-    gradeStatus = GradeStatusField()
+    gradeStatus = GradeStatusField(source="gradingStatus")
     lockStatus = LockStatusField()
     score = ScoreField()
 
