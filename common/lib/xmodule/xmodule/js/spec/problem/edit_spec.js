@@ -145,6 +145,9 @@ Enter the numerical value of Pi:
 Enter the approximate value of 502*9:
 = 502*9 +- 15%
 
+Enter the approximate number of atoms in a mol:
+= 6.022e23 +- 10%
+
 Enter the number of fingers on a human hand:
 = 5
 
@@ -178,6 +181,11 @@ If you look at your hand, you can count that you have five fingers.
   <p>Enter the approximate value of 502*9:</p>
   <numericalresponse answer="502*9">
     <responseparam type="tolerance" default="15%" />
+    <formulaequationinput />
+  </numericalresponse>
+  <p>Enter the approximate number of atoms in a mol:</p>
+  <numericalresponse answer="6.022e23">
+    <responseparam type="tolerance" default="10%" />
     <formulaequationinput />
   </numericalresponse>
   <p>Enter the number of fingers on a human hand:</p>
