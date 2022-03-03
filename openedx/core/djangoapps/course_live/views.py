@@ -107,7 +107,7 @@ class CourseLiveProvidersView(APIView):
         configuration = CourseLiveConfiguration.get(course_key_string)
         return {
             "providers": {
-                "active": configuration.provider_name,
+                "active": configuration.provider_type if configuration else "",
                 "available": AVAILABLE_PROVIDERS
             }
         }

@@ -7,13 +7,14 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
+from ..models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
 
 
-class ApiTest(ModuleStoreTestCase, APITestCase):
+class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
     """
-    Test basic API operations
+    Unit tests for the CourseLiveConfigurationView.
     """
+    password = 'test'
 
     def setUp(self):
         super().setUp()
@@ -34,14 +35,28 @@ class ApiTest(ModuleStoreTestCase, APITestCase):
     def _post(self, data):
         return self.client.post(self.url, data, format='json')
 
-
-class TestProgramDiscussionIframeView(ApiTest):
-    """Unit tests for the program details page."""
-    password = 'test'
-
-    def setUp(self):
-        super().setUp()
-        self.course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+    def create_course_live_config(self):
+        """
+        creates a courseLiveConfiguration
+        """
+        CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=True)
+        lti_config = {
+            'lti_1p1_client_key': 'this_is_key',
+            'lti_1p1_client_secret': 'this_is_secret',
+            'lti_1p1_launch_url': 'example.com',
+            'lti_config': {
+                'additional_parameters': {
+                    'custom_instructor_email': "email@example.com"
+                }
+            },
+        }
+        course_live_config_data = {
+            'enabled': True,
+            'provider_type': 'zoom',
+            'lti_configuration': lti_config
+        }
+        response = self._post(course_live_config_data)
+        return lti_config, course_live_config_data, response
 
     def test_pii_sharing_not_allowed(self):
         """
@@ -72,29 +87,6 @@ class TestProgramDiscussionIframeView(ApiTest):
         }
         content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected_data)
-
-    def create_course_live_config(self):
-        """
-        creates a courseLiveConfiguration
-        """
-        CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=True)
-        lti_config = {
-            'lti_1p1_client_key': 'this_is_key',
-            'lti_1p1_client_secret': 'this_is_secret',
-            'lti_1p1_launch_url': 'example.com',
-            'lti_config': {
-                'additional_parameters': {
-                    'custom_instructor_email': "email@example.com"
-                }
-            },
-        }
-        course_live_config_data = {
-            'enabled': True,
-            'provider_type': 'zoom',
-            'lti_configuration': lti_config
-        }
-        response = self._post(course_live_config_data)
-        return lti_config, course_live_config_data, response
 
     def test_create_configurations_data(self):
         """
@@ -160,3 +152,35 @@ class TestProgramDiscussionIframeView(ApiTest):
         }
         self.assertEqual(content, expected_data)
         self.assertEqual(response.status_code, 400)
+
+
+class TestCourseLiveProvidersView(ModuleStoreTestCase, APITestCase):
+    """
+    Tests for course live provider view
+    """
+
+    def setUp(self):
+        super().setUp()
+        store = ModuleStoreEnum.Type.split
+        self.course = CourseFactory.create(default_store=store)
+        self.user = self.create_user_for_course(self.course, user_type=CourseUserType.GLOBAL_STAFF)
+
+    @property
+    def url(self):
+        """
+        Returns the live providers API url.
+        """
+        return reverse(
+            'live_providers', kwargs={'course_key_string': str(self.course.id)}
+        )
+
+    def test_response_has_correct_data(self):
+        expected_data = {
+            'providers': {
+                'active': '',
+                'available': AVAILABLE_PROVIDERS
+            }
+        }
+        response = self.client.get(self.url)
+        content = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(content, expected_data)
