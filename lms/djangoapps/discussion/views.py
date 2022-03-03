@@ -703,7 +703,7 @@ def followed_threads(request, course_key, user_id):
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
 
-def _discussions_mfe_context(query_params: Dict, course_key: CourseKey, user: User) -> Optional[Dict]:
+def _discussions_mfe_context(query_params: Dict, course_key: CourseKey, legacy_only_view=False) -> Optional[Dict]:
     """
     Returns the context for rendering the MFE banner and MFE.
 
@@ -718,11 +718,14 @@ def _discussions_mfe_context(query_params: Dict, course_key: CourseKey, user: Us
     if not mfe_url:
         return {"show_banner": False, "show_mfe": False}
     discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
-    show_mfe = False
     # Show the MFE if the new MFE is enabled,
-    # or if the legacy experience is not requested via query param
-    if query_params.get("discussions_experience", "").lower() != "legacy" and discussions_mfe_enabled:
-        show_mfe = True
+    # and if the legacy experience is not requested via query param
+    # and if the current view isn't only that's only supported by the legacy view
+    show_mfe = (
+        query_params.get("discussions_experience", "").lower() != "legacy"
+        and discussions_mfe_enabled
+        and not legacy_only_view
+    )
     forum_url = reverse("forum_form_discussion", args=[course_key])
     return {
         "show_mfe": show_mfe,
@@ -762,7 +765,9 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             Fragment: The fragment representing the discussion board
         """
         course_key = CourseKey.from_string(course_id)
-        mfe_context = _discussions_mfe_context(request.GET, course_key, request.user)
+        # Force using the legacy view if a user profile is requested or the URL contains a specific topic or thread
+        force_legacy_view = (profile_page_context or thread_id or discussion_id)
+        mfe_context = _discussions_mfe_context(request.GET, course_key, force_legacy_view)
         if mfe_context["show_mfe"]:
             fragment = Fragment(render_to_string('discussion/discussion_mfe_embed.html', mfe_context))
             fragment.add_css(
