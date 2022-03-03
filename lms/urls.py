@@ -1036,5 +1036,5 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    path('course_live/',include('openedx.core.djangoapps.course_live.urls'))
+    path('course_live/', include('openedx.core.djangoapps.course_live.urls'))
 ]

@@ -35,18 +35,16 @@ class CourseLiveConfigurationView(APIView):
         pii_sharing_allowed = get_lti_pii_sharing_state_for_course(course_key_string)
         if not pii_sharing_allowed:
             return Response({
-                "pii_sharing_allowed" : pii_sharing_allowed,
-                "message" : "PII sharing is not allowed on this course"
+                "pii_sharing_allowed": pii_sharing_allowed,
+                "message": "PII sharing is not allowed on this course"
             })
 
         configuration = CourseLiveConfiguration.get(course_key_string)
-        serializer = CourseLiveConfigurationSerializer(configuration, context= {
+        serializer = CourseLiveConfigurationSerializer(configuration, context={
             "pii_sharing_allowed": pii_sharing_allowed,
         })
 
         return Response(serializer.data)
-
-
 
     @ensure_valid_course_key
     def post(self, request, course_key_string: str) -> Response:
@@ -66,7 +64,7 @@ class CourseLiveConfigurationView(APIView):
             data=request.data,
             context={
                 "pii_sharing_allowed": pii_sharing_allowed,
-                "course_key_string" : course_key_string
+                "course_key_string": course_key_string
             }
         )
         if not serializer.is_valid():
