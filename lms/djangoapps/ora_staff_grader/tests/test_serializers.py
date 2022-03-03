@@ -260,10 +260,13 @@ class TestSubmissionMetadataSerializer(TestCase):
         for submission_id, submission_data in self.submission_data.items():
             data = SubmissionMetadataSerializer(submission_data).data
 
-            # For each submission, the only transform is to change "submissionUuid" to "submissionUUID"
+            # For each submission, there are only a few transforms:
+            # 1) "submissionUuid" to "submissionUUID"
+            # 2) "gradingStatus" to "gradeStatus"
             # Create that "expected" object here by updating the key name
             expected_data = self.submission_data[submission_id].copy()
             expected_data["submissionUUID"] = expected_data.pop("submissionUuid")
+            expected_data["gradeStatus"] = expected_data.pop("gradingStatus")
 
             assert data == expected_data
 
@@ -289,7 +292,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             "dateSubmitted": "1983-06-03 00:00:00",
             "dateGraded": None,
             "gradedBy": None,
-            "gradingStatus": "ungraded",
+            "gradeStatus": "ungraded",
             "lockStatus": "unlocked",
             "score": None,
         }
