@@ -135,7 +135,7 @@ example_submission_list = {
         "dateSubmitted": "1969-07-16 13:32:00",
         "dateGraded": None,
         "gradedBy": None,
-        "gradingStatus": "ungraded",
+        "gradeStatus": "ungraded",
         "lockStatus": "unlocked",
         "score": {"pointsEarned": 0, "pointsPossible": 10},
     }
