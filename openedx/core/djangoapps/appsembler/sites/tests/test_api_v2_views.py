@@ -99,7 +99,7 @@ def test_tahoe_site_create_view(client, site_params):
 @patch('openedx.core.djangoapps.appsembler.sites.utils.compile_sass', Mock(return_value='I am working CSS'))
 def test_compile_sass_file(caplog, site_with_org):
     """
-    Test that main-v2.scss file used when `THEME_VERSION` == tahoe-v2
+    Test that _main-v2.scss file used when `THEME_VERSION` == tahoe-v2
     """
     site, org = site_with_org
     site_config = SiteConfigurationFactory.build(
@@ -114,5 +114,5 @@ def test_compile_sass_file(caplog, site_with_org):
     sass_status = site_config.compile_microsite_sass()
     assert sass_status['successful_sass_compile']
     assert 'Sass compile finished successfully' in sass_status['sass_compile_message']
-    assert 'main-v2.scss' in sass_status['scss_file_used'], 'Use `main-v2.scss` due to THEME_VERSION`'
+    assert '_main-v2.scss' in sass_status['scss_file_used'], 'Use `_main-v2.scss` due to THEME_VERSION`'
     assert 'main.scss' not in sass_status['scss_file_used']
