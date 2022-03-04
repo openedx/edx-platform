@@ -195,6 +195,9 @@ urlpatterns = [
                                namespace='api_admin')),
 
     path('dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
+    # Dashboard REST APIs
+    path('api/dashboard/', include('lms.djangoapps.learner_dashboard.api.urls', namespace='dashboard_api')),
+
     path(
         'api/experiments/',
         include(
