@@ -360,9 +360,9 @@
                         thread.toJSON()
                     );
                 let $threadHTML = $(this.threadListItemTemplate(context).toString());
-                let previewBody = $threadHTML.find('.thread-preview-body').text();
-                $threadHTML.find('.thread-preview-body').html(previewBody);
-                $threadHTML.find('.thread-preview-body').css({'line-height': '16px', 'max-height': '32px'});
+                let previewBody = $threadHTML.find('.thread-preview-body')[0].textContent;
+                previewBody = new DOMParser().parseFromString(previewBody, "text/html").documentElement.textContent;
+                $threadHTML.find('.thread-preview-body').text(previewBody);
                 return $threadHTML;
             };
 
