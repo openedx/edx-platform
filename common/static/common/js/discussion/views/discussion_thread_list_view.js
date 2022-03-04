@@ -359,7 +359,11 @@
                         },
                         thread.toJSON()
                     );
-                return $(this.threadListItemTemplate(context).toString());
+                let $threadHTML = $(this.threadListItemTemplate(context).toString());
+                let previewBody = $threadHTML.find('.thread-preview-body').text();
+                previewBody = new DOMParser().parseFromString(previewBody, "text/html").documentElement.textContent;
+                $threadHTML.find('.thread-preview-body').text(previewBody);
+                return $threadHTML;
             };
 
             DiscussionThreadListView.prototype.threadSelected = function(e) {
