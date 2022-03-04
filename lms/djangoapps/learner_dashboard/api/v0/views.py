@@ -1,16 +1,168 @@
 """ API v0 views. """
 
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from enterprise.models import EnterpriseCourseEnrollment
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.programs.utils import (
+    ProgramProgressMeter,
     get_certificates,
     get_industry_and_credit_pathways,
-    get_program_urls,
-    get_program_and_course_data
+    get_program_and_course_data,
+    get_program_urls
 )
+
+
+class Programs(APIView):
+    """
+        **Use Case**
+
+            * Get a list of all programs in which request user has enrolled.
+
+        **Example Request**
+
+            GET /api/dashboard/v0/programs/{enterprise_uuid}/
+
+        **GET Parameters**
+
+            A GET request must include the following parameters.
+
+            * enterprise_uuid: UUID of an enterprise customer.
+
+        **Example GET Response**
+
+        [
+            {
+                "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                "title": "edX Demonstration Program",
+                "type": "MicroMasters",
+                "banner_image": {
+                    "large": {
+                        "url": "http://localhost:18381/media/programs/banner_images/ff41a5eb-2a73-4933-8e80.large.jpg",
+                        "width": 1440,
+                        "height": 480
+                    },
+                    "medium": {
+                        "url": "http://localhost:18381/media/programs/banner_images/ff41a5eb-2a73-4933-8e80.medium.jpg",
+                        "width": 726,
+                        "height": 242
+                    },
+                    "small": {
+                        "url": "http://localhost:18381/media/programs/banner_images/ff41a5eb-2a73-4933-8e80.small.jpg",
+                        "width": 435,
+                        "height": 145
+                    },
+                    "x-small": {
+                        "url": "http://localhost:18381/media/programs/banner_images/ff41a5eb-2a73-4933-8e8.x-small.jpg",
+                        "width": 348,
+                        "height": 116
+                    }
+                },
+                "authoring_organizations": [
+                    {
+                        "key": "edX"
+                    }
+                ],
+                "progress": {
+                    "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                    "completed": 0,
+                    "in_progress": 0,
+                    "not_started": 2
+                }
+            }
+        ]
+    """
+
+    authentication_classes = (JwtAuthentication, SessionAuthentication,)
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, enterprise_uuid):
+        """
+        Return a list of a enterprise learner's all enrolled programs with their progress.
+
+        Args:
+            request (Request): DRF request object.
+            enterprise_uuid (string): UUID of an enterprise customer.
+        """
+        user = request.user
+
+        enrollments = self._get_enterprise_course_enrollments(enterprise_uuid, user)
+        meter = ProgramProgressMeter(
+            request.site,
+            user,
+            enrollments=enrollments,
+            mobile_only=False,
+            include_course_entitlements=False
+        )
+        engaged_programs = meter.engaged_programs
+        progress = meter.progress(programs=engaged_programs)
+        programs = self._extract_minimal_required_programs_data(engaged_programs)
+        programs = self._combine_programs_data_and_progress(programs, progress)
+
+        return Response(programs)
+
+    def _combine_programs_data_and_progress(self, programs_data, programs_progress):
+        """
+        Return the combined program and progress data so that api clinet can easily process the data.
+        """
+        for program_data in programs_data:
+            program_progress = next((item for item in programs_progress if item['uuid'] == program_data['uuid']), None)
+            program_data['progress'] = program_progress
+
+        return programs_data
+
+    def _extract_minimal_required_programs_data(self, programs_data):
+        """
+        Return only the minimal required program data need for program listing page.
+        """
+        def transform(key, value):
+            transformers = {'authoring_organizations': transform_authoring_organizations}
+
+            if key in transformers:
+                return transformers[key](value)
+
+            return value
+
+        def transform_authoring_organizations(authoring_organizations):
+            """
+            Extract only the required data for `authoring_organizations` for a program
+            """
+            transformed_authoring_organizations = []
+            for authoring_organization in authoring_organizations:
+                transformed_authoring_organizations.append({'key': authoring_organization['key']})
+
+            return transformed_authoring_organizations
+
+        program_data_keys = ['uuid', 'title', 'type', 'banner_image', 'authoring_organizations']
+        programs = []
+        for program_data in programs_data:
+            program = {}
+            for program_data_key in program_data_keys:
+                program[program_data_key] = transform(program_data_key, program_data[program_data_key])
+
+            programs.append(program)
+
+        return programs
+
+    def _get_enterprise_course_enrollments(self, enterprise_uuid, user):
+        """
+        Return only enterprise enrollments for a user.
+        """
+        enterprise_enrollment_course_ids = list(EnterpriseCourseEnrollment.objects.filter(
+            enterprise_customer_user__user_id=user.id,
+            enterprise_customer_user__enterprise_customer__uuid=enterprise_uuid,
+        ).values_list('course_id', flat=True))
+
+        course_enrollments = CourseEnrollment.enrollments_for_user(user).filter(
+            course_id__in=enterprise_enrollment_course_ids
+        ).select_related('course')
+
+        return list(course_enrollments)
 
 
 class ProgramProgressDetailView(APIView):

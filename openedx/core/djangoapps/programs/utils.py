@@ -152,7 +152,7 @@ class ProgramProgressMeter:
             will only inspect this one program, not all programs the user may be
             engaged with.
     """
-    def __init__(self, site, user, enrollments=None, uuid=None, mobile_only=False):
+    def __init__(self, site, user, enrollments=None, uuid=None, mobile_only=False, include_course_entitlements=True):
         self.site = site
         self.user = user
         self.mobile_only = mobile_only
@@ -172,8 +172,10 @@ class ProgramProgressMeter:
             # We can't use dict.keys() for this because the course run ids need to be ordered
             self.course_run_ids.append(enrollment_id)
 
-        self.entitlements = list(CourseEntitlement.unexpired_entitlements_for_user(self.user))
-        self.course_uuids = [str(entitlement.course_uuid) for entitlement in self.entitlements]
+        self.course_uuids = []
+        if include_course_entitlements:
+            self.entitlements = list(CourseEntitlement.unexpired_entitlements_for_user(self.user))
+            self.course_uuids = [str(entitlement.course_uuid) for entitlement in self.entitlements]
 
         if uuid:
             self.programs = [get_programs(uuid=uuid)]

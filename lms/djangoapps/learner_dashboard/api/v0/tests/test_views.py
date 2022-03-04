@@ -5,11 +5,15 @@ Unit tests for Learner Dashboard REST APIs and Views
 from unittest import mock
 from uuid import uuid4
 
+from django.core.cache import cache
 from django.urls import reverse_lazy
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.program_enrollments.rest_api.v1.tests.test_views import ProgramCacheMixin
+from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
+from openedx.core.djangoapps.catalog.cache import SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
@@ -18,7 +22,14 @@ from openedx.core.djangoapps.catalog.tests.factories import (
     ProgramFactory
 )
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.features.enterprise_support.tests.factories import (
+    EnterpriseCourseEnrollmentFactory,
+    EnterpriseCustomerFactory,
+    EnterpriseCustomerUserFactory
+)
 
 PROGRAMS_UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 
@@ -116,3 +127,84 @@ class TestProgramProgressDetailView(ProgramsApiConfigMixin, SharedModuleStoreTes
         response = self.client.get(self.url)
         assert response.status_code == 404
         assert response.data['error_code'] == 'No program data available.'
+
+
+class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
+    """Unit tests for the program details page."""
+
+    enterprise_uuid = str(uuid4())
+    program_uuid = str(uuid4())
+    password = 'test'
+    url = reverse_lazy('learner_dashboard:v0:program_list', kwargs={'enterprise_uuid': enterprise_uuid})
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.user = UserFactory()
+        modulestore_course = ModuleStoreCourseFactory()
+        course_run = CourseRunFactory(key=str(modulestore_course.id))
+        course = CourseFactory(course_runs=[course_run])
+        enterprise_customer = EnterpriseCustomerFactory(uuid=cls.enterprise_uuid)
+        enterprise_customer_user = EnterpriseCustomerUserFactory(
+            user_id=cls.user.id,
+            enterprise_customer=enterprise_customer
+        )
+        CourseEnrollmentFactory(
+            is_active=True,
+            course_id=modulestore_course.id,
+            user=cls.user
+        )
+        EnterpriseCourseEnrollmentFactory(
+            course_id=modulestore_course.id,
+            enterprise_customer_user=enterprise_customer_user
+        )
+
+        cls.program = ProgramFactory(
+            uuid=cls.program_uuid,
+            courses=[course],
+            title='Journey to cooking',
+            type='MicroMasters',
+            authoring_organizations=[{
+                'key': 'MAX'
+            }],
+        )
+        cls.site = SiteFactory(domain='test.localhost')
+
+    def setUp(self):
+        super().setUp()
+        self.client.login(username=self.user.username, password=self.password)
+        self.set_program_in_catalog_cache(self.program_uuid, self.program)
+        ProgramEnrollmentFactory.create(
+            user=self.user,
+            program_uuid=self.program_uuid,
+            external_user_key='0001',
+        )
+
+    @with_site_configuration(configuration={'COURSE_CATALOG_API_URL': 'foo'})
+    def test_program_list(self):
+        """
+        Verify API returns proper response.
+        """
+        cache.set(
+            SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site.domain),
+            [self.program_uuid],
+            None
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        program = response.data[0]
+
+        assert len(program)
+        assert program['uuid'] == self.program['uuid']
+        assert program['title'] == self.program['title']
+        assert program['type'] == self.program['type']
+        assert program['authoring_organizations'] == self.program['authoring_organizations']
+        assert program['banner_image'] == self.program['banner_image']
+        assert program['progress'] == {
+            'uuid': self.program['uuid'],
+            'completed': 0,
+            'in_progress': 0,
+            'not_started': 1
+        }
