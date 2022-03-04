@@ -2557,7 +2557,6 @@ paths:
             * pacing: Course pacing. Possible values: instructor, self
             * tabs: Course tabs
             * user_timezone: User's chosen timezone setting (or null for browser default)
-            * can_load_course: Whether the user can view the course (AccessResponse object)
             * is_staff: Whether the effective user has staff access to the course
             * original_user_is_staff: Whether the original user has staff access to the course
             * can_view_legacy_courseware: Indicates whether the user is able to see the legacy courseware view
