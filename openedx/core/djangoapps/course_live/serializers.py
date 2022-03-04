@@ -79,22 +79,37 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """
-        We do not need this.
+        Create a new CourseLiveConfiguration entry in model
         """
         lti_config = validated_data.pop('lti_configuration')
         instance = CourseLiveConfiguration()
+        instance = self._update_course_live_instance(instance, validated_data)
+        instance = self._update_lti(instance, lti_config)
+        instance.save()
+        return instance
+
+    def update(self, instance: CourseLiveConfiguration, validated_data: dict) -> CourseLiveConfiguration:
+        """
+        Update and save an existing instance
+        """
+        lti_config = validated_data.pop('lti_configuration')
+        instance = self._update_course_live_instance(instance, validated_data)
+        instance = self._update_lti(instance, lti_config)
+        instance.save()
+        return instance
+
+    def _update_course_live_instance(self, instance: CourseLiveConfiguration, data: dict) -> CourseLiveConfiguration:
+        """
+        Adds data to courseLiveConfiguration model instance
+        """
         instance.course_key = self.context.get('course_key_string')
         instance.enabled = self.validated_data.get('enabled', False)
 
-        if self.validated_data.get('provider_type') in AVAILABLE_PROVIDERS:
-            instance.provider_type = self.validated_data.get('provider_type')
+        if data.get('provider_type') in AVAILABLE_PROVIDERS:
+            instance.provider_type = data.get('provider_type')
         else:
             raise serializers.ValidationError(
-                f'Provider type {self.validated_data.get("provider_type")} does not exist')
-
-        instance = self._update_lti(instance, lti_config)
-
-        instance.save()
+                f'Provider type {data.get("provider_type")} does not exist')
         return instance
 
     def to_representation(self, instance: CourseLiveConfiguration) -> dict:
@@ -104,20 +119,6 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         payload = super().to_representation(instance)
         payload.update({'pii_sharing_allowed': self.context['pii_sharing_allowed']})
         return payload
-
-    def update(self, instance: CourseLiveConfiguration, validated_data: dict) -> CourseLiveConfiguration:
-        """
-        Update and save an existing instance
-        """
-        lti_config = validated_data.pop('lti_configuration')
-        for key in self.Meta.fields:
-            value = validated_data.get(key)
-            if value is not None:
-                setattr(instance, key, value)
-
-        instance = self._update_lti(instance, lti_config)
-        instance.save()
-        return instance
 
     def _update_lti(
         self,
