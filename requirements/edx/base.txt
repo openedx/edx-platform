@@ -129,8 +129,6 @@ code-annotations==1.3.0
     # via
     #   edx-enterprise
     #   edx-toggles
-confluent-kafka==1.8.2
-    # via -r requirements/edx/base.in
 contextlib2==21.6.0
     # via -r requirements/edx/base.in
 coreapi==2.3.3
@@ -526,9 +524,7 @@ event-tracking==2.0.0
     #   edx-proctoring
     #   edx-search
 fastavro==1.4.9
-    # via
-    #   -r requirements/edx/base.in
-    #   openedx-events
+    # via openedx-events
 frozenlist==1.3.0
     # via
     #   aiohttp
