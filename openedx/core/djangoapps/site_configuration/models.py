@@ -265,7 +265,7 @@ class SiteConfiguration(models.Model):
 
         theme_version = self.get_value('THEME_VERSION', 'amc-v1')
         if theme_version == 'tahoe-v2':
-            scss_file = 'main-v2.scss'
+            scss_file = '_main-v2.scss'
         else:
             # TODO: Deprecated. Remove once all sites are migrated to Tahoe 2.0 structure.
             scss_file = 'main.scss'
