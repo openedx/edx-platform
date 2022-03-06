@@ -23,6 +23,7 @@ import lms.djangoapps.courseware.access as access
 import lms.djangoapps.courseware.access_response as access_response
 from lms.djangoapps.courseware.masquerade import CourseMasquerade
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
+from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -528,12 +529,22 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         course = self._mock_course_with_invitation(invitation=False)
         self.assertFalse(access._has_access_course(user, 'enroll', course))
 
-    def _mock_course_with_invitation(self, invitation):
+    @ddt.data(True, False)
+    def test_old_mongo_is_invite_only(self, old_mongo):
+        """
+        Ensure that Old Mongo courses are marked as invite only and don't allow enrollment
+        """
+        user = UserFactory.create()
+        course = self._mock_course_with_invitation(invitation=False, deprecated=old_mongo)
+        self.assertEqual(course_is_invitation_only(course), old_mongo)
+        self.assertEqual(access._has_access_course(user, 'enroll', course).has_access, not old_mongo)
+
+    def _mock_course_with_invitation(self, invitation, deprecated=False):
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
         tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
         return Mock(
             enrollment_start=yesterday, enrollment_end=tomorrow,
-            id=CourseLocator('edX', 'test', '2012_Fall'), enrollment_domain='',
+            id=CourseLocator('edX', 'test', '2012_Fall', deprecated=deprecated), enrollment_domain='',
             invitation_only=invitation
         )
 

@@ -29,13 +29,15 @@ from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.api import get_programs_by_type
+from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import (
     get_fulfillable_course_runs_for_entitlement,
     get_programs,
+    get_pathways
 )
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.credentials.utils import get_credentials
+from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_records_url
 from openedx.core.djangoapps.enrollments.api import get_enrollments
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
@@ -48,6 +50,60 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
 
 log = logging.getLogger(__name__)
+
+
+def get_program_and_course_data(site, user, program_uuid, mobile_only=False):
+    """Returns program and course data associated with the given user."""
+    course_data = {}
+    meter = ProgramProgressMeter(site, user, uuid=program_uuid)
+    program_data = meter.programs[0]
+    if program_data:
+        program_data = ProgramDataExtender(program_data, user, mobile_only=mobile_only).extend()
+        course_data = meter.progress(programs=[program_data], count_only=False)[0]
+    return program_data, course_data
+
+
+def get_program_urls(program_data):
+    """Returns important urls of program."""
+    from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
+    program_uuid = program_data.get('uuid')
+    skus = program_data.get('skus')
+    ecommerce_service = EcommerceService()
+
+    # TODO: Don't have business logic of course-certificate==record-available here in LMS.
+    # Eventually, the UI should ask Credentials if there is a record available and get a URL from it.
+    # But this is here for now so that we can gate this URL behind both this business logic and
+    # a waffle flag. This feature is in active developoment.
+    program_record_url = get_credentials_records_url(program_uuid=program_uuid)
+    urls = {
+        'program_listing_url': reverse('program_listing_view'),
+        'track_selection_url': strip_course_id(
+            reverse('course_modes_choose', kwargs={'course_id': FAKE_COURSE_KEY})
+        ),
+        'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
+        'buy_button_url': ecommerce_service.get_checkout_page_url(*skus),
+        'program_record_url': program_record_url,
+    }
+    return urls
+
+
+def get_industry_and_credit_pathways(program_data, site):
+    """Returns pathways of a program."""
+    industry_pathways = []
+    credit_pathways = []
+    try:
+        for pathway_id in program_data['pathway_ids']:
+            pathway = get_pathways(site, pathway_id)
+            if pathway and pathway['email']:
+                if pathway['pathway_type'] == PathwayType.CREDIT.value:
+                    credit_pathways.append(pathway)
+                elif pathway['pathway_type'] == PathwayType.INDUSTRY.value:
+                    industry_pathways.append(pathway)
+    # if pathway caching did not complete fully (no pathway_ids)
+    except KeyError:
+        pass
+
+    return industry_pathways, credit_pathways
 
 
 def get_program_marketing_url(programs_config, mobile_only=False):
@@ -96,7 +152,7 @@ class ProgramProgressMeter:
             will only inspect this one program, not all programs the user may be
             engaged with.
     """
-    def __init__(self, site, user, enrollments=None, uuid=None, mobile_only=False):
+    def __init__(self, site, user, enrollments=None, uuid=None, mobile_only=False, include_course_entitlements=True):
         self.site = site
         self.user = user
         self.mobile_only = mobile_only
@@ -116,8 +172,10 @@ class ProgramProgressMeter:
             # We can't use dict.keys() for this because the course run ids need to be ordered
             self.course_run_ids.append(enrollment_id)
 
-        self.entitlements = list(CourseEntitlement.unexpired_entitlements_for_user(self.user))
-        self.course_uuids = [str(entitlement.course_uuid) for entitlement in self.entitlements]
+        self.course_uuids = []
+        if include_course_entitlements:
+            self.entitlements = list(CourseEntitlement.unexpired_entitlements_for_user(self.user))
+            self.course_uuids = [str(entitlement.course_uuid) for entitlement in self.entitlements]
 
         if uuid:
             self.programs = [get_programs(uuid=uuid)]

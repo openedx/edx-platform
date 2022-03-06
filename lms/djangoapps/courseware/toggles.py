@@ -253,4 +253,5 @@ def streak_celebration_is_active(course_key):
 
 def course_is_invitation_only(courselike) -> bool:
     """Returns whether the course is invitation only or not."""
-    return COURSES_INVITE_ONLY.is_enabled() or courselike.invitation_only
+    # We also mark Old Mongo courses (deprecated keys) as invitation only to cut off enrollment
+    return COURSES_INVITE_ONLY.is_enabled() or courselike.invitation_only or courselike.id.deprecated

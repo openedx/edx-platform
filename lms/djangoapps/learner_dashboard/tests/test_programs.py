@@ -198,7 +198,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
 
 @skip_unless_lms
-@mock.patch(PROGRAMS_MODULE + '.get_pathways')
+@mock.patch(PROGRAMS_UTILS_MODULE + '.get_pathways')
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
 class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""

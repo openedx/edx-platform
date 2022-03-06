@@ -22,7 +22,11 @@ from .accounts.views import (
 from . import views as user_api_views
 from .models import UserPreference
 from .preferences.views import PreferencesDetailView, PreferencesView
-from .verification_api.views import IDVerificationStatusView, IDVerificationStatusDetailsView
+from .verification_api.views import (
+    IDVerificationStatusView,
+    IDVerificationStatusDetailsView,
+    IDVerificationSupportView,
+)
 
 ME = AccountViewSet.as_view({
     'get': 'get',
@@ -39,6 +43,14 @@ ACCOUNT_SEARCH_EMAILS = AccountViewSet.as_view({
 ACCOUNT_DETAIL = AccountViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update',
+})
+
+REQUEST_NAME_CHANGE = NameChangeView.as_view({
+    'post': 'create'
+})
+
+CONFIRM_NAME_CHANGE = NameChangeView.as_view({
+    'post': 'confirm'
 })
 
 PARTNER_REPORT = AccountRetirementPartnerReportView.as_view({
@@ -120,8 +132,13 @@ urlpatterns = [
     ),
     url(
         r'^v1/accounts/name_change/$',
-        NameChangeView.as_view(),
-        name='name_change'
+        REQUEST_NAME_CHANGE,
+        name='request_name_change'
+    ),
+    url(
+        fr'^v1/accounts/name_change/{settings.USERNAME_PATTERN}/confirm/$',
+        CONFIRM_NAME_CHANGE,
+        name='confirm_name_change'
     ),
     url(
         fr'^v1/accounts/{settings.USERNAME_PATTERN}/verification_status/$',
@@ -132,6 +149,11 @@ urlpatterns = [
         fr'^v1/accounts/{settings.USERNAME_PATTERN}/verifications/$',
         IDVerificationStatusDetailsView.as_view(),
         name='verification_details'
+    ),
+    url(
+        r'^v1/accounts/verifications/(?P<attempt_id>[0-9]+)/$',
+        IDVerificationSupportView.as_view(),
+        name='verification_for_support'
     ),
     url(
         fr'^v1/accounts/{settings.USERNAME_PATTERN}/retirement_status/$',

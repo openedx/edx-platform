@@ -18,6 +18,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from common.djangoapps.student.models import PendingEmailChange, UserProfile
+from common.djangoapps.student.models_api import do_name_change_request, get_pending_name_change
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, RegistrationFactory, UserFactory
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
@@ -1126,48 +1127,94 @@ class TestAccountAPITransactions(TransactionTestCase):
 class NameChangeViewTests(UserAPITestCase):
     """ NameChangeView tests """
 
-    def setUp(self):
-        super().setUp()
-        self.url = reverse('name_change')
+    def _send_create(self, client, json_data):
+        """
+        Helper method to send a create request to the server, defaulting to application/json
+        content_type and returning the response.
+        """
+        return client.post(
+            reverse('request_name_change'),
+            data=json.dumps(json_data),
+            content_type='application/json'
+        )
 
-    def test_request_succeeds(self):
+    def _send_confirm(self, client, username):
+        """
+        Helper method to send a confirm request to the server, defaulting to application/json
+        content_type and returning the response.
+        """
+        return client.post(reverse(
+            'confirm_name_change',
+            kwargs={'username': username}
+        ))
+
+    def test_create_request_succeeds(self):
         """
         Test that a valid name change request succeeds.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        self.send_post(self.client, {'name': 'New Name'})
+        response = self._send_create(self.client, {'name': 'New Name'})
+        self.assertEqual(response.status_code, 201)
 
-    def test_unauthenticated(self):
+    def test_create_unauthenticated(self):
         """
         Test that a name change request fails for an unauthenticated user.
         """
-        self.send_post(self.client, {'name': 'New Name'}, expected_status=401)
+        response = self._send_create(self.client, {'name': 'New Name'})
+        self.assertEqual(response.status_code, 401)
 
-    def test_empty_request(self):
+    def test_create_empty_request(self):
         """
         Test that an empty request fails.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        self.send_post(self.client, {}, expected_status=400)
+        response = self._send_create(self.client, {})
+        self.assertEqual(response.status_code, 400)
 
-    def test_blank_name(self):
+    def test_create_blank_name(self):
         """
         Test that a blank name string fails.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        self.send_post(self.client, {'name': ''}, expected_status=400)
+        response = self._send_create(self.client, {'name': ''})
+        self.assertEqual(response.status_code, 400)
 
     @ddt.data('<html>invalid name</html>', 'https://invalid.com')
-    def test_fails_validation(self, invalid_name):
+    def test_create_fails_validation(self, invalid_name):
         """
         Test that an invalid name will return an error.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        self.send_post(
-            self.client,
-            {'name': invalid_name},
-            expected_status=400
-        )
+        response = self._send_create(self.client, {'name': invalid_name})
+        self.assertEqual(response.status_code, 400)
+
+    def test_confirm_succeeds(self):
+        """
+        Test that a staff user can successfully confirm a name change.
+        """
+        self.staff_client.login(username=self.staff_user.username, password=TEST_PASSWORD)
+        do_name_change_request(self.user, 'New Name', 'test')
+        response = self._send_confirm(self.staff_client, self.user.username)
+        self.assertEqual(response.status_code, 204)
+        self.assertIsNone(get_pending_name_change(self.user))
+
+    def test_confirm_non_staff(self):
+        """
+        Test that non-staff users cannot confirm name changes.
+        """
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        do_name_change_request(self.user, 'New Name', 'test')
+        response = self._send_confirm(self.client, self.user.username)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(get_pending_name_change(self.user).new_name, 'New Name')
+
+    def test_confirm_no_pending_name_change(self):
+        """
+        Test that attempting to confirm a non-existent name change request will result in a 404.
+        """
+        self.staff_client.login(username=self.staff_user.username, password=TEST_PASSWORD)
+        response = self._send_confirm(self.staff_client, self.user.username)
+        self.assertEqual(response.status_code, 404)
 
 
 @ddt.ddt

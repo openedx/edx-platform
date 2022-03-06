@@ -1233,7 +1233,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response_data == self.expected_thread_data({
             "read": True,
             "raw_body": "# Test \n This is a very long body that will be truncated for the preview.",
-            "preview_body": "Test This is a very long body that will be…",
+            "preview_body": "Test This is a very long body that…",
             "rendered_body": "<h1>Test</h1>\n<p>This is a very long body that will be truncated for the preview.</p>",
         })
         assert parsed_body(httpretty.last_request()) == {

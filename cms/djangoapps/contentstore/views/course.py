@@ -461,7 +461,7 @@ def _accessible_courses_iter_for_tests(request):
 
         return has_studio_read_access(request.user, course.id)
 
-    courses = filter(course_filter, modulestore().get_course_summaries())
+    courses = filter(course_filter, CourseOverview.get_all_courses())
 
     in_process_course_actions = get_in_process_course_actions(request)
     return courses, in_process_course_actions
@@ -489,7 +489,7 @@ def _accessible_courses_list_from_groups(request):
     course_keys = list(course_keys.values())
 
     if course_keys:
-        courses_list = modulestore().get_course_summaries(course_keys=course_keys)
+        courses_list = CourseOverview.get_all_courses(filter_={'id__in': course_keys})
 
     return courses_list, []
 

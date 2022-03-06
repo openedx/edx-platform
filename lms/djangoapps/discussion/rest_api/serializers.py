@@ -358,7 +358,7 @@ class ThreadSerializer(_ContentSerializer):
         Returns a cleaned and truncated version of the thread's body to display in a
         preview capacity.
         """
-        return Truncator(strip_tags(self.get_rendered_body(obj))).words(10, )
+        return Truncator(strip_tags(self.get_rendered_body(obj))).chars(35, ).replace('\n', ' ')
 
     def create(self, validated_data):
         thread = Thread(user_id=self.context["cc_requester"]["id"], **validated_data)
