@@ -133,6 +133,8 @@ class CohortMembership(models.Model):
                 previous_cohort = membership.course_user_group
 
                 try:
+                    # .. filter_implemented_name: CohortChangeRequested
+                    # .. filter_type: org.openedx.learning.cohort.change.requested.v1
                     membership, cohort = CohortChangeRequested.run_filter(
                         current_membership=membership, target_cohort=cohort,
                     )
