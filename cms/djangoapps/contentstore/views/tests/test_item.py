@@ -2843,6 +2843,7 @@ class TestXBlockInfo(ItemTest):
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+@ddt.ddt
 class TestSpecialExamXBlockInfo(ItemTest):
     """
     Unit tests for XBlock outline handling, specific to special exam XBlocks.
@@ -2854,7 +2855,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
         item_module, 'does_backend_support_onboarding', return_value=True
     )
     patch_get_exam_by_content_id_success = patch.object(
-        item_module, 'get_exam_by_content_id'
+        item_module, 'get_exam_by_content_id', return_value={'is_proctored': True}
     )
     patch_get_exam_by_content_id_not_found = patch.object(
         item_module, 'get_exam_by_content_id', side_effect=ProctoredExamNotFoundException
@@ -2908,7 +2909,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
         )
         # exam proctoring should be enabled and time limited.
         assert xblock_info['is_proctored_exam'] is True
-        assert xblock_info['was_ever_special_exam'] is True
+        assert xblock_info['was_ever_proctored_exam'] is True
         assert xblock_info['is_time_limited'] is True
         assert xblock_info['default_time_limit_minutes'] == 100
         assert xblock_info['proctoring_exam_configuration_link'] == 'test_url'
@@ -2920,8 +2921,15 @@ class TestSpecialExamXBlockInfo(ItemTest):
     @patch_get_exam_configuration_dashboard_url
     @patch_does_backend_support_onboarding
     @patch_get_exam_by_content_id_success
-    def test_xblock_was_ever_special_exam(
+    @ddt.data(
+        (True, True),
+        (False, False),
+    )
+    @ddt.unpack
+    def test_xblock_was_ever_proctored_exam(
             self,
+            is_proctored,
+            expected_value,
             mock_get_exam_by_content_id,
             _mock_does_backend_support_onboarding_patch,
             _mock_get_exam_configuration_dashboard_url,
@@ -2935,13 +2943,14 @@ class TestSpecialExamXBlockInfo(ItemTest):
             is_time_limited=False,
             is_onboarding_exam=False,
         )
+        mock_get_exam_by_content_id.return_value = {'is_proctored': is_proctored}
         sequential = modulestore().get_item(sequential.location)
         xblock_info = create_xblock_info(
             sequential,
             include_child_info=True,
             include_children_predicate=ALWAYS,
         )
-        assert xblock_info['was_ever_special_exam'] is True
+        assert xblock_info['was_ever_proctored_exam'] is expected_value
         assert mock_get_exam_by_content_id.call_count == 1
 
     @patch_get_exam_configuration_dashboard_url
@@ -2968,7 +2977,7 @@ class TestSpecialExamXBlockInfo(ItemTest):
             include_child_info=True,
             include_children_predicate=ALWAYS,
         )
-        assert xblock_info['was_ever_special_exam'] is False
+        assert xblock_info['was_ever_proctored_exam'] is False
         assert mock_get_exam_by_content_id.call_count == 1
 
 
