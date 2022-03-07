@@ -151,14 +151,6 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             enrollment = response.data['enrollment']
             assert enrollment_mode == enrollment['mode']
             assert enrollment['is_active']
-            assert len(response.data['tabs']) == 5
-            found = False
-            for tab in response.data['tabs']:
-                if tab['type'] == 'external_link':
-                    assert tab['url'] != 'http://hidden.com', "Hidden tab is not hidden"
-                    if tab['url'] == 'http://zombo.com':
-                        found = True
-            assert found, 'external link not in course tabs'
 
             assert not response.data['user_has_passing_grade']
             assert response.data['celebrations']['first_section']
