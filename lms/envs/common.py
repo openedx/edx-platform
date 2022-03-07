@@ -3212,9 +3212,6 @@ INSTALLED_APPS = [
 
     # For save for later
     'lms.djangoapps.save_for_later',
-
-    # Course Live App
-    'openedx.core.djangoapps.course_live',
 ]
 
 ######################### CSRF #########################################
