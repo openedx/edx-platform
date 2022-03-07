@@ -1,4 +1,4 @@
-name: Migrations check on MySql 8.0
+name: Unit tests with MySql 8.0
 
 on:
   workflow_dispatch:
