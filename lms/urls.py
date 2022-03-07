@@ -1034,7 +1034,3 @@ if settings.ENABLE_SAVE_FOR_LATER:
 urlpatterns += [
     path('api/ora_staff_grader/', include('lms.djangoapps.ora_staff_grader.urls', 'ora-staff-grader')),
 ]
-
-urlpatterns += [
-    path('course_live/', include('openedx.core.djangoapps.course_live.urls'))
-]
