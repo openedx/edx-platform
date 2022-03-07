@@ -244,6 +244,8 @@ class CourseHomeFragmentView(EdxFragmentView):
 
         course_home_template = 'course_experience/course-home-fragment.html'
         try:
+            # .. filter_implemented_name: CourseHomeRenderStarted
+            # .. filter_type: org.openedx.learning.course_home.render.started.v1
             context, course_home_template = CourseHomeRenderStarted.run_filter(
                 context=context, template_name=course_home_template,
             )
