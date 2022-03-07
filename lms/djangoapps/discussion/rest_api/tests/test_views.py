@@ -519,6 +519,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "allow_anonymous_to_peers": False,
                 'user_is_privileged': False,
                 'user_roles': ['Student'],
+                'learners_tab_enabled': False,
             }
         )
 

@@ -25,6 +25,7 @@ from xmodule.tabs import CourseTabList
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
@@ -305,6 +306,7 @@ def get_course(request, course_key):
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
+        'learners_tab_enabled': ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE.is_enabled(course_key),
     }
 
 
