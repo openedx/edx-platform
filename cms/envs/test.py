@@ -23,7 +23,7 @@ from openedx.core.lib.derived import derive_settings
 
 from xmodule.modulestore.modulestore_settings import update_module_store_settings  # pylint: disable=wrong-import-order
 
-from .common import *
+from .bok_choy import *
 
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.test import (  # pylint: disable=wrong-import-order
