@@ -77,10 +77,10 @@ jobs:
           sudo pip install -r requirements/pip.txt
           sudo pip install -r requirements/edx/testing.txt
           sudo pip install "django~=${{ matrix.django-version }}.0"
-          pip uninstall -y mysqlclient
-          pip install --no-binary mysqlclient mysqlclient
-          pip uninstall -y xmlsec
-          pip install --no-binary xmlsec xmlsec
+          sudo pip uninstall -y mysqlclient
+          sudo pip install --no-binary mysqlclient mysqlclient
+          sudo pip uninstall -y xmlsec
+          sudo pip install --no-binary xmlsec xmlsec
 
       - name: Ubuntu and sql Versions
         run: |
