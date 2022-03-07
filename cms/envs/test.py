@@ -128,7 +128,7 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.mysql'),
-        'NAME': 'edxapp',
+        'NAME': 'edxtest',
         'USER': 'root',
         'PASSWORD': '',
         'DB_HOST': "localhost",

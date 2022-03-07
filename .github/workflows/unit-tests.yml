@@ -77,6 +77,27 @@ jobs:
           sudo pip install -r requirements/pip.txt
           sudo pip install -r requirements/edx/testing.txt
           sudo pip install "django~=${{ matrix.django-version }}.0"
+          pip uninstall -y mysqlclient
+          pip install --no-binary mysqlclient mysqlclient
+          pip uninstall -y xmlsec
+          pip install --no-binary xmlsec xmlsec
+
+      - name: Ubuntu and sql Versions
+        run: |
+          lsb_release -a
+          mysql -V
+
+      - name: Initiate Services
+        run: |
+          sudo systemctl start mongod
+          sudo /etc/init.d/mysql start
+
+      - name: Reset mysql password
+        run: |
+          cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
+            UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
+            FLUSH PRIVILEGES;
+          EOF
 
       - name: get unit tests for shard
         run: |
@@ -84,6 +105,9 @@ jobs:
 
       - name: run tests
         run: |
+          echo "CREATE DATABASE IF NOT EXISTS edxtest;" | mysql -u root
+          echo "CREATE DATABASE IF NOT EXISTS student_module_history_test;" | mysql -u root
+          echo "Running the LMS migrations."
           python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}
 
       - name: rename warnings json file

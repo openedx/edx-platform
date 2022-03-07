@@ -181,13 +181,19 @@ CONTENTSTORE = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.mysql'),
+        'NAME': 'edxtest',
+        'USER': 'root',
+        'PASSWORD': '',
+        'DB_HOST': "localhost",
+        'DB_PORT': "3306",
         'ATOMIC_REQUESTS': True,
     },
     'student_module_history': {
         'ENGINE': 'django.db.backends.sqlite3',
     },
 }
+
 
 CACHES = {
     # This is the cache used for most things.
