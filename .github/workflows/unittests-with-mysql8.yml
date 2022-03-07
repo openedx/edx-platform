@@ -77,5 +77,6 @@ jobs:
         echo "CREATE DATABASE IF NOT EXISTS student_module_history_test;" | mysql -u root
         echo "Running the LMS migrations."
         ./manage.py lms --settings test migrate
+        python -Wd -m pytest -p no:randomly --ds=lms.envs.test
 #        echo "Running the CMS migrations."
 #        ./manage.py cms --settings test migrate
