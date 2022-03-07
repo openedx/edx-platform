@@ -214,6 +214,12 @@ STATIC_URL = "/static/"
 
 BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
 
+# mongo connection settings
+MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
+MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
+from uuid import uuid4
+THIS_UUID = uuid4().hex[:5]
+
 # Update module store settings per defaults for tests
 update_module_store_settings(
     MODULESTORE,
