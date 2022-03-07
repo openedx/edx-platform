@@ -127,8 +127,12 @@ CONTENTSTORE = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "cms.db",
+        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.mysql'),
+        'NAME': 'edxapp',
+        'USER': 'root',
+        'PASSWORD': '',
+        'DB_HOST': "localhost",
+        'DB_PORT': "3306",
         'ATOMIC_REQUESTS': True,
     },
 }
