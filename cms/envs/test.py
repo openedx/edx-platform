@@ -389,3 +389,5 @@ STATICFILES_DIRS += [
     for course_dir in os.listdir(COMMON_TEST_DATA_ROOT)
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
+
+INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')

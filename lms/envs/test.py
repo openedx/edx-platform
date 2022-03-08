@@ -628,3 +628,4 @@ ENABLE_SAVE_FOR_LATER = True
 # rate limit for /api/v1/save/course/ api
 SAVE_FOR_LATER_IP_RATE_LIMIT = '5/d'
 SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'
+INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
