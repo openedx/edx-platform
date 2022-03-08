@@ -355,6 +355,14 @@ RESET_PASSWORD_API_RATELIMIT = '2/m'
 PROCTORING_USER_OBFUSCATION_KEY = 'test_key'
 
 
+MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
+MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
+
+from uuid import uuid4
+THIS_UUID = uuid4().hex[:5]
+
+TEST_ROOT = path('test_root')
+
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
