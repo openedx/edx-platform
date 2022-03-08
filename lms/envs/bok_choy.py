@@ -141,6 +141,7 @@ if RELEASE_LINE == "master":
         'course_author': 'https://edx.readthedocs.io/projects/edx-partner-course-staff',
     }
 
+COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

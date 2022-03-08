@@ -177,6 +177,8 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 
 INSTALLED_APPS.append('openedx.testing.coverage_context_listener')
 
+COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
