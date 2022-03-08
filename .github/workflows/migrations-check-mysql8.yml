@@ -68,14 +68,3 @@ jobs:
           UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
           FLUSH PRIVILEGES;
         EOF
-
-    - name: Run Tests
-      env:
-        LMS_CFG: lms/envs/bok_choy.yml
-      run: |
-        echo "CREATE DATABASE IF NOT EXISTS edxtest;" | mysql -u root
-        echo "CREATE DATABASE IF NOT EXISTS student_module_history_test;" | mysql -u root
-        echo "Running the LMS migrations."
-        ./manage.py lms --settings bok_choy migrate
-        echo "Running the CMS migrations."
-        ./manage.py cms --settings bok_choy migrate
