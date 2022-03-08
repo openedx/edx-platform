@@ -27,7 +27,6 @@ from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
 from xmodule.modulestore.modulestore_settings import update_module_store_settings  # lint-amnesty, pylint: disable=wrong-import-order
 
-from .bok_choy import *
 from .common import *
 
 from common.djangoapps.util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
@@ -191,7 +190,7 @@ DATABASES = {
         'ATOMIC_REQUESTS': True,
     },
     'student_module_history': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
     },
 }
 

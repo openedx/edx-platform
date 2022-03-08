@@ -69,7 +69,7 @@ jobs:
           FLUSH PRIVILEGES;
         EOF
 
-    - name: Run Tests
+    - name: Run migrations
       env:
         LMS_CFG: lms/envs/bok_choy.yml
       run: |
@@ -77,6 +77,7 @@ jobs:
         echo "CREATE DATABASE IF NOT EXISTS student_module_history_test;" | mysql -u root
         echo "Running the LMS migrations."
         ./manage.py lms --settings test migrate
-        python -Wd -m pytest -p no:randomly --ds=lms.envs.test
-#        echo "Running the CMS migrations."
-#        ./manage.py cms --settings test migrate
+        ./manage.py cms --settings bok_choy migrate
+    - name: run tests
+      python -Wd -m pytest -p no:randomly --ds=lms.envs.test lms/ openedx/ common/djangoapps/ common/lib/
+      python -Wd -m pytest -p no:randomly --ds=cms.envs.test cms/

@@ -23,8 +23,6 @@ from openedx.core.lib.derived import derive_settings
 
 from xmodule.modulestore.modulestore_settings import update_module_store_settings  # pylint: disable=wrong-import-order
 
-from .bok_choy import *
-
 from .common import *
 
 # import settings from LMS for consistent behavior with CMS
@@ -130,7 +128,7 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.mysql'),
-        'NAME': 'edxtest',
+        'NAME': 'edxapp',
         'USER': 'root',
         'PASSWORD': '',
         'DB_HOST': "localhost",
@@ -350,3 +348,44 @@ RESET_PASSWORD_API_RATELIMIT = '2/m'
 
 ############### Settings for proctoring  ###############
 PROCTORING_USER_OBFUSCATION_KEY = 'test_key'
+
+
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'DOC_STORE_CONFIG': {
+        'host': MONGO_HOST,
+        'db': f'test_xcontent_{THIS_UUID}',
+        'port': MONGO_PORT_NUM,
+        'collection': 'dont_trip',
+    },
+    # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+    'ADDITIONAL_OPTIONS': {
+        'trashcan': {
+            'bucket': 'trash_fs'
+        }
+    }
+}
+TEST_ROOT = path('test_root')
+
+# Want static files in the same dir for running on jenkins.
+STATIC_ROOT = TEST_ROOT / "staticfiles"
+WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
+
+GITHUB_REPO_ROOT = TEST_ROOT / "data"
+DATA_DIR = TEST_ROOT / "data"
+COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
+
+# For testing "push to lms"
+FEATURES['ENABLE_EXPORT_GIT'] = True
+GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
+
+# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing  # lint-amnesty, pylint: disable=line-too-long
+STATICFILES_DIRS = [
+    COMMON_ROOT / "static",
+    PROJECT_ROOT / "static",
+]
+STATICFILES_DIRS += [
+    (course_dir, COMMON_TEST_DATA_ROOT / course_dir)
+    for course_dir in os.listdir(COMMON_TEST_DATA_ROOT)
+    if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
+]
