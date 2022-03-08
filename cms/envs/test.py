@@ -25,6 +25,8 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 
 from .bok_choy import *
 
+from .common import *
+
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.test import (  # pylint: disable=wrong-import-order
     COMPREHENSIVE_THEME_DIRS,  # unimport:skip
