@@ -80,5 +80,4 @@ jobs:
         ./manage.py cms --settings bok_choy migrate
     - name: run tests
       run: |
-        python -Wd -m pytest -p no:randomly --ds=lms.envs.test lms/ openedx/ common/djangoapps/ common/lib/
-        python -Wd -m pytest -p no:randomly --ds=cms.envs.test cms/
+        python -Wd -m pytest -p no:randomly --ds=lms.envs.bok_choy lms/ openedx/ common/djangoapps/ common/lib/
