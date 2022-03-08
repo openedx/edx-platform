@@ -969,9 +969,9 @@ DATABASES = {
         'HOST': 'localhost',
         'NAME': 'edxapp',
         'OPTIONS': {},
-        'PASSWORD': 'password',
+        'PASSWORD': '',
         'PORT': '3306',
-        'USER': 'edxapp001'
+        'USER': 'root'
     },
     'read_replica': {
         'CONN_MAX_AGE': 0,
@@ -979,9 +979,9 @@ DATABASES = {
         'HOST': 'localhost',
         'NAME': 'edxapp',
         'OPTIONS': {},
-        'PASSWORD': 'password',
+        'PASSWORD': '',
         'PORT': '3306',
-        'USER': 'edxapp001'
+        'USER': 'root'
     },
     'student_module_history': {
         'CONN_MAX_AGE': 0,
@@ -989,9 +989,9 @@ DATABASES = {
         'HOST': 'localhost',
         'NAME': 'edxapp_csmh',
         'OPTIONS': {},
-        'PASSWORD': 'password',
+        'PASSWORD': '',
         'PORT': '3306',
-        'USER': 'edxapp001'
+        'USER': 'root'
     }
 }
 
