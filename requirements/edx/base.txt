@@ -250,7 +250,7 @@ django-config-models==2.3.0
     #   lti-consumer-xblock
 django-cors-headers==3.11.0
     # via -r requirements/edx/base.in
-django-countries==7.3.1
+django-countries==7.3.2
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -523,7 +523,7 @@ event-tracking==2.1.0
     #   -r requirements/edx/base.in
     #   edx-proctoring
     #   edx-search
-fastavro==1.4.9
+fastavro==1.4.10
     # via openedx-events
 frozenlist==1.3.0
     # via
@@ -614,7 +614,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==3.4.3
+lti-consumer-xblock==3.4.4
     # via -r requirements/edx/base.in
 lxml==4.5.0
     # via
@@ -686,7 +686,7 @@ nltk==3.7
     #   chem
 nodeenv==1.6.0
     # via -r requirements/edx/base.in
-numpy==1.22.2
+numpy==1.22.3
     # via
     #   chem
     #   openedx-calc
@@ -749,7 +749,7 @@ py2neo==2021.2.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
-pycountry==22.1.10
+pycountry==22.3.5
     # via -r requirements/edx/base.in
 pycparser==2.21
     # via cffi
@@ -870,7 +870,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
 redis==4.1.4
     # via -r requirements/edx/base.in
-regex==2022.1.18
+regex==2022.3.2
     # via nltk
 requests==2.27.1
     # via
@@ -900,7 +900,7 @@ ruamel-yaml==0.17.21
     # via drf-yasg
 ruamel-yaml-clib==0.2.6
     # via ruamel-yaml
-rules==3.1
+rules==3.2.1
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -1001,7 +1001,7 @@ sympy==1.6.2
     #   openedx-calc
 tableauserverclient==0.17.0
     # via edx-enterprise
-testfixtures==6.18.4
+testfixtures==6.18.5
     # via edx-enterprise
 text-unidecode==1.3
     # via python-slugify
