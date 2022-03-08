@@ -19,6 +19,11 @@ from tempfile import mkdtemp
 from django.utils.translation import gettext_lazy
 from path import Path as path
 
+import openid.oidutil
+from django.utils.translation import gettext_lazy
+from edx_django_utils.plugins import add_plugins
+from path import Path as path
+
 from openedx.core.release import RELEASE_LINE
 from xmodule.modulestore.modulestore_settings import update_module_store_settings  # lint-amnesty, pylint: disable=wrong-import-order
 
