@@ -20,7 +20,7 @@ from organizations.tests.factories import OrganizationFactory
 
 
 @pytest.fixture
-def site_with_org(scope='function'):
+def site_with_org():
     org = OrganizationFactory.create()
     assert org.edx_uuid, 'Should have valid uuid'
     site = Site.objects.create(domain='fake-site')
