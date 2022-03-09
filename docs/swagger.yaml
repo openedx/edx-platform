@@ -2555,7 +2555,6 @@ paths:
                 * `"timestamp"`: generated from the `start` timestamp
                 * `"empty"`: no start date is specified
             * pacing: Course pacing. Possible values: instructor, self
-            * tabs: Course tabs
             * user_timezone: User's chosen timezone setting (or null for browser default)
             * is_staff: Whether the effective user has staff access to the course
             * original_user_is_staff: Whether the original user has staff access to the course
