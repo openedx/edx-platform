@@ -14,6 +14,8 @@ from django.contrib.sites.models import Site
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from site_config_client.openedx.adapter import SiteConfigAdapter
+
 from openedx.core.djangoapps.appsembler.sites.waffle import ENABLE_CONFIG_VALUES_MODIFIER
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
@@ -286,8 +288,25 @@ class SiteConfigAPIClientTests(TestCase):
         ["$brand-accent-color", ["#7f8c8d", "#7f8c8d"]],
     ]
 
-    about_page = {
-        'title': 'About page from site configuration service',
+    backend_configs = {
+        'configuration': {
+            'page': {
+                'about': {
+                    'title': 'About page from site configuration service',
+                }
+            },
+            'css': {
+                '$brand-primary-color': '#0090C1',
+                '$brand-accent-color': '#7f8c8d',
+            },
+            'setting': test_config,
+            'secret': {
+                'SEGMENT_KEY': 'test-secret-from-service',
+            },
+            'admin': {
+                'IDP_TENANT_ID': 'dummy-tenant-id',
+            }
+        }
     }
 
     @classmethod
@@ -297,11 +316,8 @@ class SiteConfigAPIClientTests(TestCase):
             domain=cls.test_config['SITE_NAME'],
             name=cls.test_config['SITE_NAME'],
         )
-        cls.api_adapter = Mock(
-            get_value=cls.test_config.get,
-            get_amc_v1_theme_css_variables=Mock(return_value=cls.sass_variables),
-            get_amc_v1_page=Mock(return_value=cls.about_page),
-        )
+        cls.api_adapter = SiteConfigAdapter('dummy-uuid')
+        cls.api_adapter.get_backend_configs = Mock(return_value=cls.backend_configs)
 
     def test_get_value_with_adapter(self):
         """
@@ -358,3 +374,47 @@ class SiteConfigAPIClientTests(TestCase):
         assert site_configuration.get_page_content('about') == {
             'title': 'About page from site configuration service',
         }
+
+    def test_secret_without_adapter(self):
+        """
+        Test `get_secret_value()` without the SiteConfig adapter.
+        """
+        site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+            site_values={
+                'SEGMENT_KEY': 'dummy-secret-from-model'
+            }
+        )
+        assert site_configuration.get_secret_value('SEGMENT_KEY') == 'dummy-secret-from-model'
+
+    def test_secret_with_adapter(self):
+        """
+        Ensure `get_secret_value()` uses the SiteConfig adapter when available.
+        """
+        site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+        )
+        site_configuration.api_adapter = self.api_adapter
+        assert site_configuration.get_secret_value('SEGMENT_KEY') == 'test-secret-from-service'
+
+    def test_admin_config_without_adapter(self):
+        """
+        Test `get_admin_setting()` without the SiteConfig adapter.
+        """
+        site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+            site_values={
+                'IDP_TENANT_ID': 'dummy-tenant-in-model'
+            }
+        )
+        assert site_configuration.get_admin_setting('IDP_TENANT_ID') == 'dummy-tenant-in-model'
+
+    def test_admin_config_with_adapter(self):
+        """
+        Ensure `get_admin_setting()` uses the SiteConfig adapter when available.
+        """
+        site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+        )
+        site_configuration.api_adapter = self.api_adapter
+        assert site_configuration.get_admin_setting('IDP_TENANT_ID') == 'dummy-tenant-id'

@@ -148,7 +148,7 @@ class DefaultMultipleSegmentClient(object):
             event_props = args[2]
             siteconfig = utils.get_site_config_for_event(event_props)
             if siteconfig:
-                site_segment_key = siteconfig.get_value('SEGMENT_KEY', None)
+                site_segment_key = siteconfig.get_secret_value('SEGMENT_KEY')
         except (IndexError, exceptions.EventProcessingError):
             try:
                 event_name = args[1]
