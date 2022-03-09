@@ -9,6 +9,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.course_apps.plugins import CourseApp
 from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
+
 from .models import CourseLiveConfiguration
 
 User = get_user_model()

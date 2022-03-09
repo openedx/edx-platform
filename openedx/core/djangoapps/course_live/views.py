@@ -2,8 +2,8 @@
 View for course live app
 """
 from typing import Dict
-import edx_api_doc_tools as apidocs
 
+import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lti_consumer.api import get_lti_pii_sharing_state_for_course
@@ -16,9 +16,9 @@ from common.djangoapps.util.views import ensure_valid_course_key
 from openedx.core.djangoapps.course_live.permissions import IsStaffOrInstructor
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
+from ...lib.api.view_utils import verify_course_exists
 from .models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
 from .serializers import CourseLiveConfigurationSerializer
-from ...lib.api.view_utils import verify_course_exists
 
 
 class CourseLiveConfigurationView(APIView):
@@ -154,16 +154,10 @@ class CourseLiveProvidersView(APIView):
                 'course_id',
                 apidocs.ParameterLocation.PATH,
                 description="The course for which to get provider list",
-            ),
-            apidocs.string_parameter(
-                'provider_id',
-                apidocs.ParameterLocation.QUERY,
-                description="The provider_id to fetch data for"
             )
         ],
         responses={
             200: CourseLiveConfigurationSerializer,
-            400: "Invalid provider ID",
             401: "The requester is not authenticated.",
             403: "The requester cannot access the specified course.",
             404: "The requested course does not exist.",

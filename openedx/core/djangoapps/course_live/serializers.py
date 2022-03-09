@@ -1,10 +1,10 @@
 """
 Serializers for course live views.
 """
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from lti_consumer.models import LtiConfiguration
 from rest_framework import serializers
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
 
 from .models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
 

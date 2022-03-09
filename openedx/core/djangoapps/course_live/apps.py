@@ -3,6 +3,7 @@ Configure the django app
 """
 from django.apps import AppConfig
 from edx_django_utils.plugins import PluginURLs
+
 from openedx.core.djangoapps.plugins.constants import ProjectType
 
 
