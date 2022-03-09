@@ -264,7 +264,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         assert credit_state['course_name'] == self.course.display_name
 
     @patch("openedx.core.djangoapps.credit.services.log")
-    def test_course_exception_log(self, exception_log):
+    def test_get_info_from_non_existent_course(self, exception_log):
         """
         Make sure we catch the CourseOverview.DoesNotExist exception and log it instead of raising
         """
