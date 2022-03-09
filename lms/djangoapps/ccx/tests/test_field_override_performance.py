@@ -34,7 +34,7 @@ from openedx.core.djangoapps.content.block_structure.api import get_course_in_ca
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 
-QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
+QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
 
 @mock.patch.dict(
@@ -184,7 +184,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             # can actually take affect.
             OverrideFieldData.provider_classes = None
 
-            with self.assertNumQueries(sql_queries, using='default', table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+            with self.assertNumQueries(sql_queries, using='default', table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
                 with self.assertNumQueries(0, using='student_module_history'):
                     with self.assertMongoCallCount(mongo_reads):
                         with self.assertXBlockInstantiations(1):

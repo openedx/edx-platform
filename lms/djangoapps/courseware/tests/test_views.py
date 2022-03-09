@@ -126,7 +126,7 @@ from openedx.features.course_experience.url_helpers import (
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 
-QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
+QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
 FEATURES_WITH_DISABLE_HONOR_CERTIFICATE = settings.FEATURES.copy()
 FEATURES_WITH_DISABLE_HONOR_CERTIFICATE['DISABLE_HONOR_CERTIFICATES'] = True
@@ -412,7 +412,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         CourseEnrollment.enroll(self.user, course.id)
 
-        with self.assertNumQueries(206, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(206, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(3):
                 url = reverse(
                     'courseware_section',
@@ -1593,7 +1593,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         # TODO: decrease query count as part of REVO-28
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(2):
+        with self.assertNumQueries(query_count, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST), check_mongo_calls(2):
             self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
@@ -1607,14 +1607,14 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.setup_course()
         with override_waffle_switch(grades_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT), active=enable_waffle):
             with self.assertNumQueries(
-                initial, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
+                initial, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
             ), check_mongo_calls(2):
                 self._get_progress_page()
 
             # subsequent accesses to the progress page require fewer queries.
             for _ in range(2):
                 with self.assertNumQueries(
-                    subsequent, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
+                    subsequent, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
                 ), check_mongo_calls(2):
                     self._get_progress_page()
 

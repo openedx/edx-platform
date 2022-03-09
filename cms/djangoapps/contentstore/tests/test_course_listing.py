@@ -287,10 +287,10 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list, __ = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list), USER_COURSES_COUNT)
 
-        with self.assertNumQueries(courses_list_from_group_calls, table_blacklist=WAFFLE_TABLES):
+        with self.assertNumQueries(courses_list_from_group_calls, table_ignorelist=WAFFLE_TABLES):
             _accessible_courses_list_from_groups(self.request)
 
-        with self.assertNumQueries(courses_list_calls, table_blacklist=WAFFLE_TABLES):
+        with self.assertNumQueries(courses_list_calls, table_ignorelist=WAFFLE_TABLES):
             _accessible_courses_iter_for_tests(self.request)
 
     def test_course_listing_errored_deleted_courses(self):
