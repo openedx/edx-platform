@@ -371,7 +371,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 4, 47),
-        (ModuleStoreEnum.Type.split, 3, 47),
+        (ModuleStoreEnum.Type.split, 2, 48),
     )
     @ddt.unpack
     def test_query_counts(self, store_type, mongo_count, expected_query_count):

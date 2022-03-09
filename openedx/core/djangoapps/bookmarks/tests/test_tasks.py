@@ -101,10 +101,10 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
         }
 
     @ddt.data(
-        (2, 2, 3),
-        (4, 2, 3),
-        (2, 3, 3),
-        (2, 4, 3),
+        (2, 2, 2),
+        (4, 2, 2),
+        (2, 3, 2),
+        (2, 4, 2),
     )
     @ddt.unpack
     def test_calculate_course_xblocks_data_queries(self, children_per_block, depth, expected_mongo_calls):
@@ -137,8 +137,8 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
                     assert path_item['usage_key'] == expected_cache_data[usage_key][path_index][path_item_index]
 
     @ddt.data(
-        ('course', 36),
-        ('other_course', 34)
+        ('course', 37),
+        ('other_course', 35)
     )
     @ddt.unpack
     def test_update_xblocks_cache(self, course_attr, expected_sql_queries):
