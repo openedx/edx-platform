@@ -50,11 +50,7 @@ from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_mongo_calls, mongo_uses_error_check
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.tests.test_asides import AsideTestType
-from xmodule.modulestore.tests.utils import (
-    MongoContentstoreBuilder,
-    create_modulestore_instance,
-    mock_tab_from_json
-)
+from xmodule.modulestore.tests.utils import MongoContentstoreBuilder, create_modulestore_instance
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import LocationMixin, import_course_from_xml
 from xmodule.tests import DATA_DIR, CourseComparisonTest
@@ -2659,9 +2655,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 self.store.clone_course(course_key, dest_course_id, self.user_id)
                 signal_handler.send.assert_called_with('course_published', course_key=dest_course_id)
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_course_publish_signal_import_firing(self, default, _from_json):
+    def test_course_publish_signal_import_firing(self, default):
         with MongoContentstoreBuilder().build() as contentstore:
             signal_handler = Mock(name='signal_handler')
             self.store = MixedModuleStore(
