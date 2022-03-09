@@ -37,8 +37,8 @@ class LtiSerializer(serializers.ModelSerializer):
         if additional_parameters and custom_instructor_email:
             try:
                 validate_email(custom_instructor_email)
-            except ValidationError:
-                raise serializers.ValidationError(f'{custom_instructor_email} is not valid email address')
+            except ValidationError as error:
+                raise serializers.ValidationError(f'{custom_instructor_email} is not valid email address') from error
             return value
         raise serializers.ValidationError('custom_instructor_email is required value in additional_parameters')
 
