@@ -17,12 +17,12 @@ class CourseLiveConfig(AppConfig):
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
                 PluginURLs.NAMESPACE: '',
-                PluginURLs.REGEX: r'^api/course_live',
+                PluginURLs.REGEX: r'^api/course_live/',
                 PluginURLs.RELATIVE_PATH: 'urls',
             },
             ProjectType.CMS: {
                 PluginURLs.NAMESPACE: '',
-                PluginURLs.REGEX: r'^api/course_live',
+                PluginURLs.REGEX: r'^api/course_live/',
                 PluginURLs.RELATIVE_PATH: 'urls',
             },
         }

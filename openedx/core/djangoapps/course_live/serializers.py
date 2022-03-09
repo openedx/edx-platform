@@ -3,6 +3,8 @@ Serializers for course live views.
 """
 from lti_consumer.models import LtiConfiguration
 from rest_framework import serializers
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 from .models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
 
@@ -25,6 +27,20 @@ class LtiSerializer(serializers.ModelSerializer):
         read_only = [
             'version'
         ]
+
+    def validate_lti_config(self, value):
+        """
+        Validates if lti_config contains all required data i.e. custom_instructor_email
+        """
+        additional_parameters = value.get('additional_parameters', None)
+        custom_instructor_email = additional_parameters.get('custom_instructor_email', None)
+        if additional_parameters and custom_instructor_email:
+            try:
+                validate_email(custom_instructor_email)
+            except ValidationError:
+                raise serializers.ValidationError(f'{custom_instructor_email} is not valid email address')
+            return value
+        raise serializers.ValidationError('custom_instructor_email is required value in additional_parameters')
 
     def create(self, validated_data):
         lti_config = validated_data.pop('lti_config', None)
@@ -102,7 +118,7 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         """
         Adds data to courseLiveConfiguration model instance
         """
-        instance.course_key = self.context.get('course_key_string')
+        instance.course_key = self.context.get('course_id')
         instance.enabled = self.validated_data.get('enabled', False)
 
         if data.get('provider_type') in AVAILABLE_PROVIDERS:

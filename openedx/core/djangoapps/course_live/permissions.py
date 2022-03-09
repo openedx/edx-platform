@@ -16,7 +16,7 @@ class IsStaffOrInstructor(BasePermission):
     """
 
     def has_permission(self, request, view):
-        course_key_string = view.kwargs.get('course_key_string')
+        course_key_string = view.kwargs.get('course_id')
         course_key = validate_course_key(course_key_string)
 
         if GlobalStaff().has_user(request.user):

@@ -29,7 +29,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
     def url(self):
         """Returns the course live API url. """
         return reverse(
-            'course_live', kwargs={'course_key_string': str(self.course.id)}
+            'course_live', kwargs={'course_id': str(self.course.id)}
         )
 
     def _get(self):
@@ -174,7 +174,7 @@ class TestCourseLiveProvidersView(ModuleStoreTestCase, APITestCase):
         Returns the live providers API url.
         """
         return reverse(
-            'live_providers', kwargs={'course_key_string': str(self.course.id)}
+            'live_providers', kwargs={'course_id': str(self.course.id)}
         )
 
     def test_response_has_correct_data(self):
