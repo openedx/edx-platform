@@ -12,9 +12,9 @@ The new `Course Authoring MFE`_ includes a new UX called "Pages and Resources"
 for configuring different aspects of the course experience such as progress,
 wiki, teams, discussions, etc. all from one place.
 
-This ADR describes the addition of an another course app named ``Live``. The
+This ADR describes the addition of another course app named ``Live``. The
 Live app will be used to configure a video conferencing tool for the course.
-The will be will be available as a new Tab in the course experience.
+The will be available as a new Tab in the course experience.
 The tool will be added as an LTI integration. We will currently support only
 ``Zoom`` as a video conferencing provider. But other providers can also be
 added later.
