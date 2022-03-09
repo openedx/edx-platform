@@ -326,7 +326,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                     isProctoredExam || isPracticeExam || isOnboardingExam
                 ),
                 proctoredExamLockedIn: (
-                    xblockInfo.get('released_to_students') && xblockInfo.get('was_ever_proctored_exam')
+                    xblockInfo.get('released_to_students') && xblockInfo.get('was_exam_ever_linked_with_external')
                 )
             }, this.getContext()));
 

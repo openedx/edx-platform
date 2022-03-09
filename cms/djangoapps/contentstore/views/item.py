@@ -1308,7 +1308,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
                 xblock_info.update({
                     'is_proctored_exam': xblock.is_proctored_exam,
-                    'was_ever_proctored_exam': _was_xblock_ever_proctored_exam(
+                    'was_exam_ever_linked_with_external': _was_xblock_ever_exam_linked_with_external(
                         course, xblock
                     ),
                     'online_proctoring_rules': rules_url,
@@ -1364,16 +1364,16 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     return xblock_info
 
 
-def _was_xblock_ever_proctored_exam(course, xblock):
+def _was_xblock_ever_exam_linked_with_external(course, xblock):
     """
-    Determine whether this XBlock is or was ever configured as a proctored exam.
+    Determine whether this XBlock is or was ever configured as an external proctored exam.
 
-    If this block is *not* currently a proctored exam, the best way for us to tell
-    whether it was was *ever* configured as a proctored exam is by checking whether
+    If this block is *not* currently an externally linked proctored exam, the best way for us to tell
+    whether it was was *ever* such is by checking whether
     edx-proctoring has an exam record associated with the block's ID,
-    and the exam record is proctored.
+    and the exam record has external_id.
     If an exception is not raised, then we know that such a record exists,
-    indicating that this *was* once a special exam.
+    indicating that this *was* once an externally linked proctored exam.
 
     Arguments:
         course (CourseBlock)
@@ -1381,13 +1381,12 @@ def _was_xblock_ever_proctored_exam(course, xblock):
 
     Returns: bool
     """
-    if xblock.is_proctored_enabled:
-        return True
     try:
         exam = get_exam_by_content_id(course.id, xblock.location)
-        return 'is_proctored' in exam and exam['is_proctored']
+        return bool('external_id' in exam and exam['external_id'])
     except ProctoredExamNotFoundException:
-        return False
+        pass
+    return False
 
 
 def add_container_page_publishing_info(xblock, xblock_info):
