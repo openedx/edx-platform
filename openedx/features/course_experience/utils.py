@@ -183,7 +183,7 @@ def dates_banner_should_display(course_key, user):
         return False, False
 
     # Don't display the banner if the course has ended
-    if course_overview.end and course_overview.end < timezone.now():
+    if course_overview.has_ended():
         return False, False
 
     store = modulestore()

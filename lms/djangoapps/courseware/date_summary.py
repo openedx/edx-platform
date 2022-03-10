@@ -366,7 +366,7 @@ class CourseEndDate(DateSummary):
         Registers an alert if the end date is approaching.
         """
         is_enrolled = CourseEnrollment.get_enrollment(request.user, course.id)
-        if not course.start or self.current_time < course.start or not is_enrolled:
+        if not course.start or not course.end or self.current_time < course.start or not is_enrolled:
             return
         days_until_end = (course.end - self.current_time).days
         if course.end > self.current_time and days_until_end <= settings.COURSE_MESSAGE_ALERT_DURATION_IN_DAYS:

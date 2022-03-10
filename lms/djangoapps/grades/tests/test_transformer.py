@@ -429,7 +429,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
         self.client.login(username=self.student.username, password=password)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 3),
+        (ModuleStoreEnum.Type.split, 2),
         (ModuleStoreEnum.Type.mongo, 2),
     )
     @ddt.unpack
