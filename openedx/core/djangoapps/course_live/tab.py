@@ -8,6 +8,7 @@ from common.lib.xmodule.xmodule.course_module import CourseBlock
 from common.lib.xmodule.xmodule.tabs import TabFragmentViewMixin
 from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
+from openedx.core.lib.cache_utils import request_cached
 from openedx.features.lti_course_tab.tab import LtiCourseLaunchMixin
 
 
@@ -21,6 +22,7 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
     is_dynamic = True
     title = gettext_lazy("Live")
 
+    @request_cached()
     def _get_lti_config(self, course: CourseBlock) -> LtiConfiguration:
         """
         Get course live configurations
@@ -28,6 +30,7 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
         return CourseLiveConfiguration.get(course.id).lti_configuration
 
     @classmethod
+    @request_cached()
     def is_enabled(cls, course, user=None):
         """
         Check if the tab is enabled.
