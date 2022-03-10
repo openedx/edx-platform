@@ -27,7 +27,6 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
         """
         return CourseLiveConfiguration.get(course.id).lti_configuration
 
-
     @classmethod
     def is_enabled(cls, course, user=None):
         """
