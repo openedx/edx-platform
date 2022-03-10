@@ -214,7 +214,7 @@ class _ContentSerializer(serializers.Serializer):
         is_user_staff = self.context["request"].user.id in self.context["staff_user_ids"]
         total_abuse_flaggers = len(obj.get("abuse_flaggers", []))
         return (
-            is_user_staff and total_abuse_flaggers or
+            is_user_staff and total_abuse_flaggers > 0 or
             self.context["cc_requester"]["id"] in obj.get("abuse_flaggers", [])
         )
 
