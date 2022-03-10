@@ -52,8 +52,7 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
         is_edly_api_user = request.user.groups.filter(
             name=settings.EDLY_API_USERS_GROUP
         ).exists()
-        if is_edly_api_user and username != request.user.username and \
-                user_belongs_to_edly_sub_organization(request, user):
+        if is_edly_api_user and user_belongs_to_edly_sub_organization(request, user):
             return True
 
         return False
