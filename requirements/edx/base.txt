@@ -713,7 +713,7 @@ openedx-calc==3.0.1
     # via -r requirements/edx/base.in
 openedx-events==0.8.1
     # via -r requirements/edx/base.in
-git+https://github.com/eduNEXT/openedx-filters.git@MJG/template-exceptions#egg=openedx_filters==0.6.0_alpha
+git+https://github.com/eduNEXT/openedx-filters.git@MJG/template-exceptions#egg=openedx_filters==0.6.0_beta
     # via -r requirements/edx/base.in
 ora2==4.0.6
     # via -r requirements/edx/base.in
