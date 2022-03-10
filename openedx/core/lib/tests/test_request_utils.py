@@ -135,6 +135,23 @@ class CookieMonitoringMiddlewareTestCase(unittest.TestCase):
         # cookie logging was not enabled, so nothing should be logged
         mock_logger.info.assert_not_called()
 
+    @override_settings(COOKIE_HEADER_SIZE_LOGGING_THRESHOLD=None)
+    @override_settings(COOKIE_SAMPLING_REQUEST_COUNT=None)
+    @patch("openedx.core.lib.request_utils.set_custom_attribute")
+    def test_cookie_header_corrupt_monitoring(self, mock_set_custom_attribute):
+        middleware = CookieMonitoringMiddleware(self.mock_response)
+        request = RequestFactory().request()
+        # A corrupt cookie header contains "Cookie: ". See custom attribute
+        #   cookies.header.is_corrupt documentation for more details.
+        request.META['HTTP_COOKIE'] = 'corruptCookie: test=1'
+
+        middleware(request)
+
+        mock_set_custom_attribute.assert_has_calls([
+            call('cookies.header.size', len(request.META['HTTP_COOKIE'])),
+            call('cookies.header.is_corrupt', True),
+        ])
+
     @override_settings(COOKIE_HEADER_SIZE_LOGGING_THRESHOLD=1)
     @patch('openedx.core.lib.request_utils.log', autospec=True)
     @patch("openedx.core.lib.request_utils.set_custom_attribute")
