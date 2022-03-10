@@ -3,10 +3,17 @@ Models course live integrations.
 """
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from simple_history.models import HistoricalRecords
 from lti_consumer.models import LtiConfiguration
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
+from simple_history.models import HistoricalRecords
+
+AVAILABLE_PROVIDERS = {
+    'zoom': {
+        'name': 'Zoom LTI PRO',
+        'features': []
+    }
+}
 
 
 class CourseLiveConfiguration(TimeStampedModel):
