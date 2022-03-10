@@ -1,10 +1,14 @@
+"""
+Configurations to render Course Live Tab
+"""
+from django.utils.translation import gettext_lazy
+from lti_consumer.models import LtiConfiguration
+
 from common.lib.xmodule.xmodule.course_module import CourseBlock
 from common.lib.xmodule.xmodule.tabs import TabFragmentViewMixin
 from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
 from openedx.features.lti_course_tab.tab import LtiCourseLaunchMixin
-from django.utils.translation import get_language, gettext_lazy, to_locale
-from lti_consumer.models import LtiConfiguration
 
 
 class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
@@ -29,4 +33,4 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
         """
         Check if the tab is enabled.
         """
-        return super().is_enabled(course, user) and CourseLiveConfiguration.get(course.id).enabled
+        return super().is_enabled(course, user) and CourseLiveConfiguration.is_enabled(course.id)
