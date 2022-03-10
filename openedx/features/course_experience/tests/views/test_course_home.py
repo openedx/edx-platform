@@ -77,7 +77,7 @@ TEST_COURSE_GOAL_UPDATE_FIELD_HIDDEN = 'section-goals hidden'
 COURSE_GOAL_DISMISS_OPTION = 'unsure'
 THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
 
-QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
+QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
 
 def course_home_url(course):
@@ -205,7 +205,7 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(66, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(66, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(3):
                 url = course_home_url(self.course)
                 self.client.get(url)

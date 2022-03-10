@@ -63,7 +63,7 @@ log = logging.getLogger(__name__)
 
 CS_PREFIX = "http://localhost:4567/api/v1"
 
-QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
+QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
 # pylint: disable=missing-docstring
 
@@ -397,7 +397,7 @@ class ViewsQueryCountTestCase(
             with modulestore().default_store(default_store):
                 self.set_up_course(module_count=module_count)
                 self.clear_caches()
-                with self.assertNumQueries(sql_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+                with self.assertNumQueries(sql_queries, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
                     with check_mongo_calls(mongo_calls):
                         func(self, *args, **kwargs)
         return inner

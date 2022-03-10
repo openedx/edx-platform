@@ -2067,8 +2067,7 @@ MIDDLEWARE = [
     # Generate code ownership attributes. Keep this immediately after RequestCacheMiddleware.
     'edx_django_utils.monitoring.CodeOwnerMonitoringMiddleware',
 
-    # After cookie monitoring, but before anything else that looks at
-    # cookies, especially the session middleware
+    # Before anything that looks at cookies, especially the session middleware
     'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
 
     # Monitoring and logging middleware

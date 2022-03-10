@@ -380,7 +380,7 @@ class TestCourseIndexArchived(CourseTestCase):
         """
         Checks the index page, and ensures the number of database queries is as expected.
         """
-        with self.assertNumQueries(sql_queries, table_blacklist=WAFFLE_TABLES):
+        with self.assertNumQueries(sql_queries, table_ignorelist=WAFFLE_TABLES):
             with check_mongo_calls(mongo_queries):
                 self.check_index_page(separate_archived_courses=separate_archived_courses, org=org)
 
