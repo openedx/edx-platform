@@ -7,6 +7,7 @@ import hashlib
 import json
 from copy import deepcopy
 from unittest import mock
+from urllib.parse import quote
 
 import ddt
 import pytz
@@ -20,6 +21,7 @@ from rest_framework.test import APIClient, APITestCase
 from common.djangoapps.student.models import PendingEmailChange, UserProfile
 from common.djangoapps.student.models_api import do_name_change_request, get_pending_name_change
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, RegistrationFactory, UserFactory
+from openedx.core.djangoapps.user_api.accounts import RETIRED_EMAIL_MSG
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -479,6 +481,17 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
 
         response = client.get(url + f'?lms_user_id={non_integer_id}')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @mock.patch('openedx.core.djangoapps.user_api.accounts.views.is_email_retired')
+    def test_get_retired_user_from_email(self, mock_is_email_retired):
+        """
+        Tests that the retired user from email cannot be accessed and shows an error message.
+        """
+        mock_is_email_retired.return_value = True
+        client = self.login_client('staff_client', 'staff_user')
+        url = reverse("accounts_detail_api")
+        response = client.get(url + f'?email={quote(self.user.email)}')
+        assert response.data == {"error_msg": RETIRED_EMAIL_MSG}
 
     def test_search_emails(self):
         client = self.login_client('staff_client', 'staff_user')
