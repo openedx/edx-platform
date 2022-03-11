@@ -4,6 +4,7 @@ Tests for the Credit xBlock service
 
 
 from unittest.mock import patch
+from datetime import datetime
 import ddt
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -273,7 +274,11 @@ class CreditServiceTests(ModuleStoreTestCase):
 
             self.enroll()
             credit_state = self.service.get_credit_state(self.user.id, self.course.id, return_course_info=True)
+
             assert credit_state is not None
+            # When exception is caught, the course_end_date should always be in past
+            assert credit_state["course_end_date"] < datetime.now()
+
             exception_log.exception.assert_called_once_with(
                 "Could not get name and end_date for course %s, This happened because we were unable to "
                 "get/create CourseOverview object for the course. It's possible that the Course has been deleted.",
