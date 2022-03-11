@@ -390,7 +390,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
             milestone
         )
         course_tab_list = get_course_tab_list(self.user, self.course)
-        assert len(course_tab_list) == 2
+        assert len(course_tab_list) == 1
         assert course_tab_list[0]['tab_id'] == 'courseware'
         assert course_tab_list[0]['name'] == 'Entrance Exam'
 
