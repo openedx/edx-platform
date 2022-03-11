@@ -570,7 +570,7 @@ class TestUpdateGradeView(BaseViewTest):
         """A handled ORA failure to submit a grade returns a server error"""
         mock_check_lock.return_value = {"lock_status": "in-progress"}
         mock_submit_grade.side_effect = XBlockInternalError(
-            context={"handler": "staff_assess", "msg": "Danger, Will Robinson!"}
+            context={"handler": "submit_staff_assessment", "msg": "Danger, Will Robinson!"}
         )
         url = self.url_with_params(
             {
@@ -584,7 +584,7 @@ class TestUpdateGradeView(BaseViewTest):
         assert response.status_code == 500
         assert json.loads(response.content) == {
             "error": ERR_INTERNAL,
-            "handler": "staff_assess",
+            "handler": "submit_staff_assessment",
             "msg": "Danger, Will Robinson!",
         }
 
