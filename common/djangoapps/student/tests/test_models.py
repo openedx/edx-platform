@@ -41,7 +41,7 @@ from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -550,13 +550,13 @@ class PendingEmailChangeTests(SharedModuleStoreTestCase):
         assert 1 == len(PendingEmailChange.objects.all())
 
 
-class TestCourseEnrollmentAllowed(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TestCourseEnrollmentAllowed(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
         super().setUp()
         self.email = 'learner@example.com'
         self.course_key = CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
-        self.user = UserFactory.create()
+        self.user = UserFactory.create(email=self.email)
         self.allowed_enrollment = CourseEnrollmentAllowed.objects.create(
             email=self.email,
             course_id=self.course_key,
@@ -584,6 +584,51 @@ class TestCourseEnrollmentAllowed(TestCase):  # lint-amnesty, pylint: disable=mi
             email=self.email
         )
         assert user_search_results.exists()
+
+    def test_may_enroll_and_unenrolled_result_is_based_on_unmarked_user_field(self):
+        """
+        Make sure that if an allowed student has no assigned user in its user field,
+        then it must be counted by may_enroll_and_unenrolled.
+        """
+        # Unmark the user field.
+        self.allowed_enrollment.user = None
+        self.allowed_enrollment.save()
+
+        assert 1 == CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id=self.course_key).count()
+
+    def test_former_allowed_student_isnt_counted_if_email_is_updated(self):
+        """
+        Make sure that if allowed students change their emails after being registered,
+        then they are not counted.
+        """
+        # Once user registers, then it is enrolled in the course.
+        CourseEnrollment.enroll(
+            user=self.user,
+            course_key=self.course_key,
+        )
+        # Change user's email.
+        self.user.email = 'updated-learner@example.com'
+        self.user.save()
+
+        assert 0 == CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id=self.course_key).count()
+
+    def test_may_enroll_and_unenrolled_does_not_count_unenrolled_users(self):
+        """Validate that the unenrollment action has no effect on the result of may_enroll_and_unenrolled."""
+        # Simulating that the users is not yet registered in the platform.
+        self.allowed_enrollment.user = None
+        self.allowed_enrollment.save()
+        # User registers, then it is enrolled.
+        CourseEnrollment.enroll(
+            user=self.user,
+            course_key=self.course_key,
+        )
+        # Unenroll user from course.
+        CourseEnrollment.unenroll(
+            user=self.user,
+            course_id=self.course_key,
+        )
+
+        assert 0 == CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id=self.course_key).count()
 
 
 class TestManualEnrollmentAudit(SharedModuleStoreTestCase):

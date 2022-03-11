@@ -2541,12 +2541,11 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
         Return QuerySet of students who are allowed to enroll in a course.
 
         Result excludes students who have already enrolled in the
-        course.
+        course. Even if they change their emails after registration.
 
         `course_id` identifies the course for which to compute the QuerySet.
         """
-        enrolled = CourseEnrollment.objects.users_enrolled_in(course_id=course_id).values_list('email', flat=True)
-        return CourseEnrollmentAllowed.objects.filter(course_id=course_id).exclude(email__in=enrolled)
+        return CourseEnrollmentAllowed.objects.filter(course_id=course_id, user__isnull=True)
 
 
 @total_ordering
