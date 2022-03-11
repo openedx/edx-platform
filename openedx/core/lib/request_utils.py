@@ -143,6 +143,28 @@ class CookieMonitoringMiddleware:
         # .. custom_attribute_description: The total size in bytes of the cookie header.
         set_custom_attribute('cookies.header.size', cookie_header_size)
 
+        if cookie_header_size == 0:
+            return
+
+        if corrupt_cookie_count := raw_header_cookie.count('Cookie: '):
+            # .. custom_attribute_name: cookies.header.corrupt_count
+            # .. custom_attribute_description: The attribute will only appear for potentially corrupt cookie headers,
+            #   where "Cookie: " is found in the header. If this custom attribute is seen on the same
+            #   requests where other mysterious cookie problems are occurring, this may help troubleshoot.
+            #   See https://openedx.atlassian.net/browse/CR-4614 for more details.
+            #   Also see cookies.header.corrupt_key_count
+            set_custom_attribute('cookies.header.corrupt_count', corrupt_cookie_count)
+            # .. custom_attribute_name: cookies.header.corrupt_key_count
+            # .. custom_attribute_description: The attribute will only appear for potentially corrupt cookie headers,
+            #   where "Cookie: " is found in some of the cookie keys. If this custom attribute is seen on the same
+            #   requests where other mysterious cookie problems are occurring, this may help troubleshoot.
+            #   See https://openedx.atlassian.net/browse/CR-4614 for more details.
+            #   Also see cookies.header.corrupt_count.
+            set_custom_attribute(
+                'cookies.header.corrupt_key_count',
+                sum(1 for key in request.COOKIES.keys() if 'Cookie: ' in key)
+            )
+
         # .. setting_name: COOKIE_HEADER_SIZE_LOGGING_THRESHOLD
         # .. setting_default: None
         # .. setting_description: The minimum size for the full cookie header to log a list of cookie names and sizes.

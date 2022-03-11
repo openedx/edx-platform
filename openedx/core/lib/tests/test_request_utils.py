@@ -135,6 +135,31 @@ class CookieMonitoringMiddlewareTestCase(unittest.TestCase):
         # cookie logging was not enabled, so nothing should be logged
         mock_logger.info.assert_not_called()
 
+    @override_settings(COOKIE_HEADER_SIZE_LOGGING_THRESHOLD=None)
+    @override_settings(COOKIE_SAMPLING_REQUEST_COUNT=None)
+    @patch("openedx.core.lib.request_utils.set_custom_attribute")
+    @ddt.data(
+        # A corrupt cookie header contains "Cookie: ".
+        ('corruptCookie: normal-cookie=value', 1, 1),
+        ('corrupt1Cookie: normal-cookie1=value1;corrupt2Cookie: normal-cookie2=value2', 2, 2),
+        ('corrupt=Cookie: value', 1, 0),
+    )
+    @ddt.unpack
+    def test_cookie_header_corrupt_monitoring(
+        self, corrupt_cookie_header, expected_corrupt_count, expected_corrupt_key_count, mock_set_custom_attribute
+    ):
+        middleware = CookieMonitoringMiddleware(self.mock_response)
+        request = RequestFactory().request()
+        request.META['HTTP_COOKIE'] = corrupt_cookie_header
+
+        middleware(request)
+
+        mock_set_custom_attribute.assert_has_calls([
+            call('cookies.header.size', len(request.META['HTTP_COOKIE'])),
+            call('cookies.header.corrupt_count', expected_corrupt_count),
+            call('cookies.header.corrupt_key_count', expected_corrupt_key_count),
+        ])
+
     @override_settings(COOKIE_HEADER_SIZE_LOGGING_THRESHOLD=1)
     @patch('openedx.core.lib.request_utils.log', autospec=True)
     @patch("openedx.core.lib.request_utils.set_custom_attribute")
@@ -177,6 +202,21 @@ class CookieMonitoringMiddlewareTestCase(unittest.TestCase):
         mock_logger.info.assert_called_once_with(
             "Sampled small (< 9999) cookie header. BEGIN-COOKIE-SIZES(total=16) b: 3, a: 2, c: 1 END-COOKIE-SIZES"
         )
+
+    @override_settings(COOKIE_HEADER_SIZE_LOGGING_THRESHOLD=9999)
+    @override_settings(COOKIE_SAMPLING_REQUEST_COUNT=1)
+    @patch('openedx.core.lib.request_utils.log', autospec=True)
+    @patch("openedx.core.lib.request_utils.set_custom_attribute")
+    def test_empty_cookie_header_skips_sampling(self, mock_set_custom_attribute, mock_logger):
+        middleware = CookieMonitoringMiddleware(self.mock_response)
+        cookies_dict = {}
+
+        middleware(self.get_mock_request(cookies_dict))
+
+        mock_set_custom_attribute.assert_has_calls([
+            call('cookies.header.size', 0),
+        ])
+        mock_logger.info.assert_not_called()
 
     def get_mock_request(self, cookies_dict):
         """
