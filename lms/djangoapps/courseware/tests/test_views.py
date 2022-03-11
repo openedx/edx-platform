@@ -412,7 +412,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         CourseEnrollment.enroll(self.user, course.id)
 
-        with self.assertNumQueries(206, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
+        with self.assertNumQueries(207, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(3):
                 url = reverse(
                     'courseware_section',
@@ -1584,8 +1584,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "Download Your Certificate")
 
     @ddt.data(
-        (True, 53),
-        (False, 53),
+        (True, 54),
+        (False, 54),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1598,8 +1598,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 61, 43),
-        (True, 53, 37)
+        (False, 62, 44),
+        (True, 54, 38)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
