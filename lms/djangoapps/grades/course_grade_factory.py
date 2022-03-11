@@ -103,7 +103,6 @@ class CourseGradeFactory:
         course_data = CourseData(
             user=None, course=course, collected_block_structure=collected_block_structure, course_key=course_key,
         )
-        stats_tags = [f'action:{course_data.course_key}']  # lint-amnesty, pylint: disable=unused-variable
         for user in users:
             yield self._iter_grade_result(user, course_data, force_update)
 
