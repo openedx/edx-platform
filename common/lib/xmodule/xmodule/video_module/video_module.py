@@ -589,6 +589,13 @@ class VideoBlock(
         # Backbonjs view can handle it.
         editable_fields['edx_video_id']['type'] = 'VideoID'
 
+        # `public_access` is a boolean field and by default backbonejs code render it as a dropdown with 2 options
+        # but in our case we also need to show an input field with dropdown, the input field will show the url to
+        # be shared with leaners. This is not possible with default rendering logic in backbonjs code, that is why
+        # we are setting a new type and then do a custom rendering in backbonejs code to render the desired UI.
+        editable_fields['public_access']['type'] = 'PublicAccess'
+        editable_fields['public_access']['url'] = fr'{settings.LMS_ROOT_URL}/videos/{str(self.location)}'
+
         # construct transcripts info and also find if `en` subs exist
         transcripts_info = self.get_transcripts_info()
         possible_sub_ids = [self.sub, self.youtube_id_1_0] + get_html5_ids(self.html5_sources)
