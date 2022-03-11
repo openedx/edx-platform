@@ -64,14 +64,6 @@ def create_modulestore_instance(
     )
 
 
-def mock_tab_from_json(tab_dict):
-    """
-    Mocks out the CourseTab.from_json to just return the tab_dict itself so that we don't have to deal
-    with plugin errors.
-    """
-    return tab_dict
-
-
 def add_temp_files_from_dict(file_dict, dir):  # lint-amnesty, pylint: disable=redefined-builtin
     """
     Takes in a dict formatted as: { file_name: content }, and adds files to directory

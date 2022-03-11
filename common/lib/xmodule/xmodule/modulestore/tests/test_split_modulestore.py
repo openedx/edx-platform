@@ -39,7 +39,7 @@ from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
-from xmodule.modulestore.tests.utils import mock_tab_from_json
+from xmodule.tabs import CourseTab
 from xmodule.x_module import XModuleMixin
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
@@ -96,21 +96,10 @@ class SplitModuleTest(unittest.TestCase):
             "user_id": TEST_USER_ID,
             "fields": {
                 "tabs": [
-                    {
-                        "type": "courseware"
-                    },
-                    {
-                        "type": "course_info",
-                        "name": "Course Info"
-                    },
-                    {
-                        "type": "discussion",
-                        "name": "Discussion"
-                    },
-                    {
-                        "type": "wiki",
-                        "name": "Wiki"
-                    }
+                    CourseTab.load('courseware'),
+                    CourseTab.load('course_info'),
+                    CourseTab.load('discussion'),
+                    CourseTab.load('wiki'),
                 ],
                 "start": _date_field.from_json("2013-02-14T05:00"),
                 "display_name": "The Ancient Greek Hero",
@@ -157,31 +146,16 @@ class SplitModuleTest(unittest.TestCase):
                         ("course", "head12345"): {
                             "end": _date_field.from_json("2013-04-13T04:30"),
                             "tabs": [
-                                {
-                                    "type": "courseware"
-                                },
-                                {
-                                    "type": "course_info",
-                                    "name": "Course Info"
-                                },
-                                {
-                                    "type": "discussion",
-                                    "name": "Discussion"
-                                },
-                                {
-                                    "type": "wiki",
-                                    "name": "Wiki"
-                                },
-                                {
-                                    "type": "static_tab",
-                                    "name": "Syllabus",
-                                    "url_slug": "01356a17b5924b17a04b7fc2426a3798"
-                                },
-                                {
-                                    "type": "static_tab",
-                                    "name": "Advice for Students",
-                                    "url_slug": "57e9991c0d794ff58f7defae3e042e39"
-                                }
+                                CourseTab.load('courseware'),
+                                CourseTab.load('course_info'),
+                                CourseTab.load('discussion'),
+                                CourseTab.load('wiki'),
+                                CourseTab.load(
+                                    'static_tab', name="Syllabus", url_slug="01356a17b5924b17a04b7fc2426a3798"
+                                ),
+                                CourseTab.load(
+                                    'static_tab', name="Advice for Students", url_slug="57e9991c0d794ff58f7defae3e042e"
+                                ),
                             ],
                             "graceperiod": _time_delta_field.from_json("2 hours 0 minutes 0 seconds"),
                             "grading_policy": {
@@ -345,21 +319,10 @@ class SplitModuleTest(unittest.TestCase):
             "user_id": TEST_USER_ID,
             "fields": {
                 "tabs": [
-                    {
-                        "type": "courseware"
-                    },
-                    {
-                        "type": "course_info",
-                        "name": "Course Info"
-                    },
-                    {
-                        "type": "discussion",
-                        "name": "Discussion"
-                    },
-                    {
-                        "type": "wiki",
-                        "name": "Wiki"
-                    }
+                    CourseTab.load('courseware'),
+                    CourseTab.load('course_info'),
+                    CourseTab.load('discussion'),
+                    CourseTab.load('wiki'),
                 ],
                 "start": _date_field.from_json("2013-02-14T05:00"),
                 "display_name": "A wonderful course",
@@ -453,21 +416,10 @@ class SplitModuleTest(unittest.TestCase):
             "user_id": TEST_GUEST_USER_ID,
             "fields": {
                 "tabs": [
-                    {
-                        "type": "courseware"
-                    },
-                    {
-                        "type": "course_info",
-                        "name": "Course Info"
-                    },
-                    {
-                        "type": "discussion",
-                        "name": "Discussion"
-                    },
-                    {
-                        "type": "wiki",
-                        "name": "Wiki"
-                    }
+                    CourseTab.load('courseware'),
+                    CourseTab.load('course_info'),
+                    CourseTab.load('discussion'),
+                    CourseTab.load('wiki'),
                 ],
                 "start": _date_field.from_json("2013-03-14T05:00"),
                 "display_name": "Yet another contender",
@@ -582,8 +534,7 @@ class SplitModuleTest(unittest.TestCase):
 class TestHasChildrenAtDepth(SplitModuleTest):
     """Test the has_children_at_depth method of XModuleMixin. """
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_has_children_at_depth(self, _from_json):
+    def test_has_children_at_depth(self):
         course_locator = CourseLocator(
             org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT
         )
@@ -622,8 +573,7 @@ class SplitModuleCourseTests(SplitModuleTest):
     Course CRUD operation tests
     '''
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_get_courses(self, _from_json):
+    def test_get_courses(self):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT)
         # should have gotten 3 draft courses
         assert len(courses) == 3, 'Wrong number of courses'
@@ -639,8 +589,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         assert course.edited_by == TEST_ASSISTANT_USER_ID
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_get_courses_with_same_course_index(self, _from_json):
+    def test_get_courses_with_same_course_index(self):
         """
         Test that if two courses point to same course index,
         `get_courses` should return both courses.
@@ -659,8 +608,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         assert len(courses) == 4
         assert new_draft_course.id.version_agnostic() in [c.id for c in courses]
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_get_org_courses(self, _from_json):
+    def test_get_org_courses(self):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT, org='guestx')
 
         # should have gotten 1 draft courses
@@ -677,8 +625,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT)
         assert len(courses) == 3
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_branch_requests(self, _from_json):
+    def test_branch_requests(self):
         # query w/ branch qualifier (both draft and published)
         def _verify_published_course(courses_published):
             """ Helper function for verifying published course. """
@@ -706,8 +653,7 @@ class SplitModuleCourseTests(SplitModuleTest):
             locator_key_fields=['org', 'course', 'run']
         )
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_get_course(self, _from_json):
+    def test_get_course(self):
         '''
         Test the various calling forms for get_course
         '''
@@ -760,8 +706,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         with pytest.raises(ItemNotFoundError):
             modulestore().get_course(CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_PUBLISHED))  # lint-amnesty, pylint: disable=line-too-long
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_cache(self, _from_json):
+    def test_cache(self):
         """
         Test that the mechanics of caching work.
         """
@@ -773,8 +718,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         assert BlockKey('chapter', 'chapter1') in block_map
         assert BlockKey('problem', 'problem3_2') in block_map
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_persist_dag(self, _from_json):
+    def test_persist_dag(self):
         """
         try saving temporary xblocks
         """
@@ -919,8 +863,7 @@ class SplitModuleItemTests(SplitModuleTest):
     Item read tests including inheritance
     '''
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_has_item(self, _from_json):
+    def test_has_item(self):
         '''
         has_item(BlockUsageLocator)
         '''
@@ -969,8 +912,7 @@ class SplitModuleItemTests(SplitModuleTest):
         )
         assert not modulestore().has_item(locator)
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_get_item(self, _from_json):
+    def test_get_item(self):
         '''
         get_item(blocklocator)
         '''
@@ -1126,8 +1068,7 @@ class SplitModuleItemTests(SplitModuleTest):
         parent = modulestore().get_parent_location(locator)
         assert parent is None
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_get_children(self, _from_json):
+    def test_get_children(self):
         """
         Test the existing get_children method on xdescriptors
         """
@@ -1482,8 +1423,7 @@ class TestItemCrud(SplitModuleTest):
         other_updated = modulestore().update_item(other_block, self.user_id)
         assert moved_child.version_agnostic() in version_agnostic(other_updated.children)
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_update_definition(self, _from_json):
+    def test_update_definition(self):
         """
         test updating an item's definition: ensure it gets versioned as well as the course getting versioned
         """
@@ -1752,8 +1692,7 @@ class TestCourseCreation(SplitModuleTest):
             fields['grading_policy']['GRADE_CUTOFFS']
         )
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_update_course_index(self, _from_json):
+    def test_update_course_index(self):
         """
         Test the versions pointers. NOTE: you can change the org, course, or other things, but
         it's not clear how you'd find them again or associate them w/ existing student history since
@@ -1808,8 +1747,7 @@ class TestCourseCreation(SplitModuleTest):
                 dupe_course_key.org, dupe_course_key.course, dupe_course_key.run, user, BRANCH_NAME_DRAFT
             )
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_bulk_ops_get_courses(self, _from_json):
+    def test_bulk_ops_get_courses(self):
         """
         Test get_courses when some are created, updated, and deleted w/in a bulk operation
         """
@@ -1848,8 +1786,7 @@ class TestInheritance(SplitModuleTest):
     """
     Test the metadata inheritance mechanism.
     """
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_inheritance(self, _from_json):
+    def test_inheritance(self):
         """
         The actual test
         """
@@ -1923,8 +1860,7 @@ class TestPublish(SplitModuleTest):
     """
     Test the publishing api
     """
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_publish_safe(self, _from_json):
+    def test_publish_safe(self):
         """
         Test the standard patterns: publish to new branch, revise and publish
         """
@@ -1991,8 +1927,7 @@ class TestPublish(SplitModuleTest):
         with pytest.raises(ItemNotFoundError):
             modulestore().copy(self.user_id, source_course, destination_course, [problem1], [])
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_move_delete(self, _from_json):
+    def test_move_delete(self):
         """
         Test publishing moves and deletes.
         """
