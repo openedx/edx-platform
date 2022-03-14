@@ -43,6 +43,22 @@ def listen_for_social_auth_creation(sender, instance, created, **kwargs):  # lin
         )
         raise
 
+def generate_default_display_name(self):
+    """
+    Returns a default display namem which can be overriden by a subclass.
+    """
+    return f'{self.prefix}-{self.slug}-{self.id}'
+
+@receiver(post_save, sender=SAMLProviderConfig)
+def save_default_display_name(sender, instance, created, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+    """
+    Post-save signal that sets default display name if one is not provided
+    """
+    this_display_name = instance.display_name
+    # check if display_name is None, empty, or just spaces
+    if not (this_display_name and this_display_name.strip()):
+        instance.display_name = generate_default_display_name(instance)
+        instance.save()
 
 def matriculate_learner(user, uid):
     """
