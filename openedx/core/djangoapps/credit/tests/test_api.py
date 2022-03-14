@@ -663,7 +663,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         assert not api.is_user_eligible_for_credit(user.username, self.course_key)
 
         # Satisfy the other requirement
-        with self.assertNumQueries(20):
+        with self.assertNumQueries(22):
             api.set_credit_requirement_status(
                 user,
                 self.course_key,

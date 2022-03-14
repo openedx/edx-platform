@@ -763,8 +763,7 @@ MIDDLEWARE = [
     # Cookie monitoring
     'openedx.core.lib.request_utils.CookieMonitoringMiddleware',
 
-    # After cookie monitoring, but before anything else that looks at
-    # cookies, especially the session middleware
+    # Before anything that looks at cookies, especially the session middleware
     'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
 
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',

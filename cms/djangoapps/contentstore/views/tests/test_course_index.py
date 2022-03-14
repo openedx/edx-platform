@@ -380,7 +380,7 @@ class TestCourseIndexArchived(CourseTestCase):
         """
         Checks the index page, and ensures the number of database queries is as expected.
         """
-        with self.assertNumQueries(sql_queries, table_blacklist=WAFFLE_TABLES):
+        with self.assertNumQueries(sql_queries, table_ignorelist=WAFFLE_TABLES):
             with check_mongo_calls(mongo_queries):
                 self.check_index_page(separate_archived_courses=separate_archived_courses, org=org)
 
@@ -403,13 +403,13 @@ class TestCourseIndexArchived(CourseTestCase):
 
     @ddt.data(
         # Staff user has course staff access
-        (True, 'staff', None, 1, 19),
-        (False, 'staff', None, 1, 19),
+        (True, 'staff', None, 0, 20),
+        (False, 'staff', None, 0, 20),
         # Base user has global staff access
-        (True, 'user', ORG, 3, 18),
-        (False, 'user', ORG, 3, 18),
-        (True, 'user', None, 3, 18),
-        (False, 'user', None, 3, 18),
+        (True, 'user', ORG, 1, 20),
+        (False, 'user', ORG, 1, 20),
+        (True, 'user', None, 1, 20),
+        (False, 'user', None, 1, 20),
     )
     @ddt.unpack
     def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):

@@ -104,6 +104,7 @@
       "openedx/core/djangoapps/crawlers/",
       "openedx/core/djangoapps/credentials/",
       "openedx/core/djangoapps/credit/",
+      "openedx/core/djangoapps/course_live/",
       "openedx/core/djangoapps/dark_lang/",
       "openedx/core/djangoapps/debug/",
       "openedx/core/djangoapps/demographics/",

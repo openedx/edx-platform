@@ -25,6 +25,7 @@ from xmodule.tabs import CourseTabList
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
@@ -75,6 +76,7 @@ from .utils import discussion_open_for_user
 from ..django_comment_client.base.views import (
     track_comment_created_event,
     track_thread_created_event,
+    track_thread_viewed_event,
     track_voted_event,
 )
 from ..django_comment_client.utils import (
@@ -305,6 +307,7 @@ def get_course(request, course_key):
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
+        'learners_tab_enabled': ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE.is_enabled(course_key),
     }
 
 
@@ -890,6 +893,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
     results = _serialize_discussion_entities(request, context, responses, requested_fields, DiscussionEntity.comment)
 
     paginator = DiscussionAPIPagination(request, page, num_pages, resp_total)
+    track_thread_viewed_event(request, context["course"], cc_thread)
     return paginator.get_paginated_response(results)
 
 

@@ -193,11 +193,12 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
             tabs.primitive_delete(course, 1)
         with self.assertRaises(IndexError):
             tabs.primitive_delete(course, 7)
-        assert course.tabs[2] != {'type': 'discussion', 'name': 'Discussion'}
+
+        assert course.tabs[2] != {'type': 'dates', 'name': 'Dates'}
         tabs.primitive_delete(course, 2)
         assert {'type': 'progress'} not in course.tabs
-        # Check that discussion has shifted up
-        assert course.tabs[2] == {'type': 'discussion', 'name': 'Discussion'}
+        # Check that dates has shifted up
+        assert course.tabs[2] == {'type': 'dates', 'name': 'Dates'}
 
     def test_insert(self):
         """Test primitive tab insertion."""

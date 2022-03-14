@@ -56,7 +56,7 @@ from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: di
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
-QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
+QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
 # pylint: disable=protected-access
 
@@ -849,5 +849,5 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
                 num_queries = 0
 
         course_overview = CourseOverview.get_from_id(course.id)
-        with self.assertNumQueries(num_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(num_queries, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             bool(access.has_access(user, action, course_overview, course_key=course.id))

@@ -32,7 +32,7 @@ from common.djangoapps.util.date_utils import strftime_localized
 
 from .helpers import LoginEnrollmentTestCase
 
-QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
+QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
 
 @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
@@ -402,7 +402,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         and Mongo queries.
         """
         url = reverse('info', args=[str(course.id)])
-        with self.assertNumQueries(sql_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(sql_queries, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(mongo_queries):
                 with mock.patch("openedx.core.djangoapps.theming.helpers.get_current_site", return_value=None):
                     resp = self.client.get(url)
@@ -410,8 +410,8 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
 
     def test_num_queries_instructor_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 41, 3)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 42, 2)
 
     def test_num_queries_self_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.self_paced_course, 41, 3)
+        self.fetch_course_info_with_queries(self.self_paced_course, 42, 2)

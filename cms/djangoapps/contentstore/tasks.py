@@ -5,10 +5,10 @@ This file contains celery tasks for contentstore views
 import base64
 import json
 import os
-import shutil  # lint-amnesty, pylint: disable=wrong-import-order
-import tarfile  # lint-amnesty, pylint: disable=wrong-import-order
-from datetime import datetime  # lint-amnesty, pylint: disable=wrong-import-order
-from tempfile import NamedTemporaryFile, mkdtemp  # lint-amnesty, pylint: disable=wrong-import-order
+import shutil
+import tarfile
+from datetime import datetime
+from tempfile import NamedTemporaryFile, mkdtemp
 
 import olxcleaner
 import pkg_resources
@@ -17,7 +17,6 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import SuspiciousOperation
 from django.core.files import File
 from django.test import RequestFactory

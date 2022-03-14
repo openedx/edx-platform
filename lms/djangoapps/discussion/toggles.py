@@ -22,3 +22,13 @@ ENABLE_DISCUSSIONS_MFE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_discuss
 # .. toggle_creation_date: 2022-02-22
 # .. toggle_target_removal_date: 2022-09-22
 ENABLE_NEW_STRUCTURE_DISCUSSIONS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_new_structure_discussions', __name__)
+
+# .. toggle_name: discussions.enable_learners_tab_in_discussions_mfe
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to enable learners tab in the new MFE experience for discussions
+# .. toggle_use_cases: temporary, open_edx
+# .. toggle_creation_date: 2022-02-21
+# .. toggle_target_removal_date: 2022-05-21
+# lint-amnesty, pylint: disable=line-too-long
+ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_learners_tab_in_discussions_mfe', __name__)

@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 import ddt
 import httpretty
 import pytest
+from edx_toggles.toggles.testutils import override_waffle_flag
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
@@ -35,6 +36,7 @@ from common.djangoapps.student.tests.factories import (
 from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
+from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
@@ -196,6 +198,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'provider': 'legacy',
             'user_is_privileged': False,
             'user_roles': {'Student'},
+            'learners_tab_enabled': False,
         }
 
     @ddt.data(
@@ -211,6 +214,15 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         course_meta = get_course(self.request, self.course.id)
         assert course_meta["user_is_privileged"]
         assert course_meta["user_roles"] == {FORUM_ROLE_STUDENT} | {role}
+
+    @ddt.data(True, False)
+    def test_learner_tab_enabled_flag(self, learners_tab_enabled):
+        """
+        Test the 'learners_tab_enabled' flag.
+        """
+        with override_waffle_flag(ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE, learners_tab_enabled):
+            course_meta = get_course(self.request, self.course.id)
+            assert course_meta['learners_tab_enabled'] == learners_tab_enabled
 
 
 @ddt.ddt

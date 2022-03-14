@@ -2258,16 +2258,12 @@ class LMSXBlockServiceBindingTest(SharedModuleStoreTestCase):
     Tests that the LMS Module System (XBlock Runtime) provides an expected set of services.
     """
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course = CourseFactory.create()
-
     def setUp(self):
         """
         Set up the user and other fields that will be used to instantiate the runtime.
         """
         super().setUp()
+        self.course = CourseFactory.create()
         self.user = UserFactory()
         self.student_data = Mock()
         self.track_function = Mock()
@@ -2346,15 +2342,10 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
     Tests that verify access to XBlock/XModule children work correctly
     even when those children are filtered by the runtime when loaded.
     """
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course = CourseFactory.create()
-
     # pylint: disable=attribute-defined-outside-init
     def setUp(self):
         super().setUp()
+        self.course = CourseFactory.create()
         self.users = {number: UserFactory() for number in USER_NUMBERS}
 
         self._old_has_access = render.has_access
