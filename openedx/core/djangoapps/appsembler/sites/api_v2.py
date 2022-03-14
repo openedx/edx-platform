@@ -6,11 +6,12 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework import views, status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 import tahoe_sites.api
 
-from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 from .serializers_v2 import TahoeSiteCreationSerializer
@@ -30,7 +31,8 @@ class CompileSassView(views.APIView):
         POST /appsembler/api/compile_sass/
             {"site_uuid": "fake-site-uuid"}
     """
-    permission_classes = (ApiKeyHeaderPermission,)
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request, format=None):
         site_uuid = request.data['site_uuid']
@@ -59,9 +61,10 @@ class TahoeSiteCreateView(views.APIView):
     """
     Site creation API to create a Platform 2.0 Tahoe site.
     """
-
     serializer_class = TahoeSiteCreationSerializer
-    permission_classes = [ApiKeyHeaderPermission]
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
