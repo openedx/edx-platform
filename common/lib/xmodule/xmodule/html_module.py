@@ -457,6 +457,7 @@ class CourseInfoFields:
 
 
 @XBlock.tag("detached")
+@XBlock.needs('replace_urls')
 class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     These pieces of course content are treated as HtmlBlock but we need to overload where the templates are located

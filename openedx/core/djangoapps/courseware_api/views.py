@@ -4,6 +4,7 @@ Course API Views
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
+from django.utils.functional import cached_property
 from edx_django_utils.cache import TieredCache
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -32,6 +33,7 @@ from lms.djangoapps.course_goals.api import get_course_goal
 from lms.djangoapps.courseware.access import has_access
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
+from lms.djangoapps.courseware.entrance_exams import course_has_entrance_exam, user_has_passed_entrance_exam
 from lms.djangoapps.courseware.masquerade import (
     is_masquerading_as_specific_student,
     setup_masquerade,
@@ -44,6 +46,7 @@ from lms.djangoapps.courseware.toggles import (
     course_exit_page_is_active,
 )
 from lms.djangoapps.courseware.views.views import get_cert_data
+from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.agreements.api import get_integrity_signature
@@ -182,11 +185,20 @@ class CoursewareMeta:
                 }
         return course_goals
 
+    @cached_property
+    def course_grade(self):
+        """
+        Returns the Course Grade for the effective user in the course
+
+        Cached property since we use this twice in the class and don't want to recreate the entire grade.
+        """
+        return CourseGradeFactory().read(self.effective_user, self.course)
+
     @property
     def user_has_passing_grade(self):
         """ Returns a boolean on if the effective_user has a passing grade in the course """
         if not self.effective_user.is_anonymous:
-            user_grade = CourseGradeFactory().read(self.effective_user, self.course).percent
+            user_grade = self.course_grade.percent
             return user_grade >= self.course.lowest_passing_grade
         return False
 
@@ -203,6 +215,24 @@ class CoursewareMeta:
         """
         if self.enrollment_object:
             return get_cert_data(self.effective_user, self.course, self.enrollment_object.mode)
+
+    @property
+    def entrance_exam_data(self):
+        """
+        Returns Entrance Exam data for the course
+
+        Although some of the fields will have values (i.e. entrance_exam_minimum_score_pct and
+        entrance_exam_passed), nothing will be used unless entrance_exam_enabled is True.
+        """
+        return {
+            'entrance_exam_current_score': get_entrance_exam_score(
+                self.course_grade, get_entrance_exam_usage_key(self.overview),
+            ),
+            'entrance_exam_enabled': course_has_entrance_exam(self.overview),
+            'entrance_exam_id': self.overview.entrance_exam_id,
+            'entrance_exam_minimum_score_pct': self.overview.entrance_exam_minimum_score_pct,
+            'entrance_exam_passed': user_has_passed_entrance_exam(self.effective_user, self.overview),
+        }
 
     @property
     def verify_identity_url(self):
@@ -383,6 +413,13 @@ class CoursewareInformation(RetrieveAPIView):
             * is_active: boolean
         * enrollment_end: Date enrollment ends, in ISO 8601 notation
         * enrollment_start: Date enrollment begins, in ISO 8601 notation
+        * entrance_exam_data: An object containing information about the course's entrance exam
+            * entrance_exam_current_score: (float) The users current score on the entrance exam
+            * entrance_exam_enabled: (bool) If the course has an entrance exam
+            * entrance_exam_id: (str) The block id for the entrance exam if enabled. Will be a section (chapter)
+            * entrance_exam_minimum_score_pct: (float) The minimum score a user must receive on the entrance exam
+                to unlock the remainder of the course. Returned as a float (i.e. 0.7 for 70%)
+            * entrance_exam_passed: (bool) Indicates if the entrance exam has been passed
         * id: A unique identifier of the course; a serialized representation
             of the opaque key identifying the course.
         * media: An object that contains named media items.  Included here:

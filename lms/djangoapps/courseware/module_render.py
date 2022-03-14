@@ -45,7 +45,8 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.sandboxing import SandboxService
-from common.djangoapps import static_replace
+from common.djangoapps.static_replace.services import ReplaceURLService
+from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID
 from capa.xqueue_interface import XQueueService  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.access import get_user_role, has_access
@@ -79,10 +80,7 @@ from openedx.core.lib.xblock_utils import (
     add_staff_markup,
     get_aside_from_xblock,
     hash_resource,
-    is_xblock_aside,
-    replace_course_urls,
-    replace_jump_to_id_urls,
-    replace_static_urls
+    is_xblock_aside
 )
 from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import wrap_xblock
@@ -692,32 +690,15 @@ def get_module_system_for_user(
             request_token=request_token,
         ))
 
-    # TODO (cpennington): When modules are shared between courses, the static
-    # prefix is going to have to be specific to the module, not the directory
-    # that the xml was loaded from
-
-    # Rewrite urls beginning in /static to point to course-specific content
-    block_wrappers.append(partial(
-        replace_static_urls,
-        getattr(descriptor, 'data_dir', None),
+    replace_url_service = ReplaceURLService(
+        data_directory=getattr(descriptor, 'data_dir', None),
         course_id=course_id,
-        static_asset_path=static_asset_path or descriptor.static_asset_path
-    ))
+        static_asset_path=static_asset_path or descriptor.static_asset_path,
+        jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''})
+    )
 
-    # Allow URLs of the form '/course/' refer to the root of multicourse directory
-    #   hierarchy of this course
-    block_wrappers.append(partial(replace_course_urls, course_id))
-
-    # this will rewrite intra-courseware links (/jump_to_id/<id>). This format
-    # is an improvement over the /course/... format for studio authored courses,
-    # because it is agnostic to course-hierarchy.
-    # NOTE: module_id is empty string here. The 'module_id' will get assigned in the replacement
-    # function, we just need to specify something to get the reverse() to work.
-    block_wrappers.append(partial(
-        replace_jump_to_id_urls,
-        course_id,
-        reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''}),
-    ))
+    # Rewrite static urls with course-specific absolute urls
+    block_wrappers.append(partial(replace_urls_wrapper, replace_url_service=replace_url_service))
 
     block_wrappers.append(partial(display_access_messages, user))
     block_wrappers.append(partial(course_expiration_wrapper, user))
@@ -752,24 +733,6 @@ def get_module_system_for_user(
         user=user,
         debug=settings.DEBUG,
         hostname=settings.SITE_NAME,
-        # TODO (cpennington): This should be removed when all html from
-        # a module is coming through get_html and is therefore covered
-        # by the replace_static_urls code below
-        replace_urls=partial(
-            static_replace.replace_static_urls,
-            data_directory=getattr(descriptor, 'data_dir', None),
-            course_id=course_id,
-            static_asset_path=static_asset_path or descriptor.static_asset_path,
-        ),
-        replace_course_urls=partial(
-            static_replace.replace_course_urls,
-            course_key=course_id
-        ),
-        replace_jump_to_id_urls=partial(
-            static_replace.replace_jump_to_id_urls,
-            course_id=course_id,
-            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''})
-        ),
         node_path=settings.NODE_PATH,
         publish=publish,
         course_id=course_id,
@@ -793,6 +756,7 @@ def get_module_system_for_user(
             'cache': CacheService(cache),
             'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
             'xqueue': xqueue_service,
+            'replace_urls': replace_url_service
         },
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
