@@ -48,13 +48,15 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     get_potentially_retired_user_by_username,
     get_retired_email_by_email,
     get_retired_username_by_username,
-    is_username_retired
+    is_username_retired,
+    is_email_retired
 )
 from common.djangoapps.student.models_api import (
     confirm_name_change,
     do_name_change_request,
     get_pending_name_change
 )
+from openedx.core.djangoapps.user_api.accounts import RETIRED_EMAIL_MSG
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
@@ -318,6 +320,8 @@ class AccountViewSet(ViewSet):
         if usernames:
             search_usernames = usernames.strip(',').split(',')
         elif user_email:
+            if is_email_retired(user_email):
+                return Response({'error_msg': RETIRED_EMAIL_MSG}, status=status.HTTP_404_NOT_FOUND)
             user_email = user_email.strip('')
             try:
                 user = User.objects.get(email=user_email)

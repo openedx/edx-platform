@@ -505,61 +505,6 @@ def run_xsslint(options):
         write_junit_xml('xsslint')
 
 
-@task
-@needs('pavelib.prereqs.install_python_prereqs')
-@timed
-def run_xsscommitlint():
-    """
-    Runs xss-commit-linter.sh on the current branch.
-    """
-    xsscommitlint_script = "xss-commit-linter.sh"
-    xsscommitlint_report_dir = (Env.REPORT_DIR / "xsscommitlint")
-    xsscommitlint_report = xsscommitlint_report_dir / "xsscommitlint.report"
-    _prepare_report_dir(xsscommitlint_report_dir)
-
-    sh(
-        "{repo_root}/scripts/{xsscommitlint_script} -v | tee {xsscommitlint_report}".format(
-            repo_root=Env.REPO_ROOT,
-            xsscommitlint_script=xsscommitlint_script,
-            xsscommitlint_report=xsscommitlint_report,
-        ),
-        ignore_error=True
-    )
-
-    xsscommitlint_count = _get_xsscommitlint_count(xsscommitlint_report)
-
-    try:
-        num_violations = int(xsscommitlint_count)
-    except TypeError:
-        fail_quality(
-            'xsscommitlint',
-            "FAILURE: Number of {xsscommitlint_script} violations could not be found in {xsscommitlint_report}".format(
-                xsscommitlint_script=xsscommitlint_script, xsscommitlint_report=xsscommitlint_report
-            )
-        )
-
-    # Print number of violations to log.
-    violations_count_str = "Number of {xsscommitlint_script} violations: {num_violations}\n".format(
-        xsscommitlint_script=xsscommitlint_script, num_violations=num_violations
-    )
-
-    # Record the metric
-    metrics_report = (Env.METRICS_DIR / "xsscommitlint")
-    _write_metric(violations_count_str, metrics_report)
-    # Output report to console.
-    sh(f"cat {metrics_report}", ignore_error=True)
-    if num_violations:
-        fail_quality(
-            'xsscommitlint',
-            "FAILURE: XSSCommitLinter Failed.\n{error_message}\n"
-            "See {xsscommitlint_report} or run the following command to hone in on the problem:\n"
-            "  ./scripts/xss-commit-linter.sh -h".format(
-                error_message=violations_count_str, xsscommitlint_report=xsscommitlint_report
-            )
-        )
-    write_junit_xml("xsscommitlint")
-
-
 def _write_metric(metric, filename):
     """
     Write a given metric to a given file
@@ -661,34 +606,6 @@ def _get_xsslint_counts(filename):
     except (AttributeError, ValueError):
         violations['total'] = None
     return violations
-
-
-def _get_xsscommitlint_count(filename):
-    """
-    Returns the violation count from the xsscommitlint report.
-
-    Arguments:
-        filename: The name of the xsscommitlint report.
-
-    Returns:
-        The count of xsscommitlint violations, or None if there is  a problem.
-
-    """
-    report_contents = _get_report_contents(filename, 'xsscommitlint')
-
-    if 'No files linted' in report_contents:
-        return 0
-
-    file_count_regex = re.compile(r"^(?P<count>\d+) violations total", re.MULTILINE)
-    try:
-        validation_count = None
-        for count_match in file_count_regex.finditer(report_contents):
-            if validation_count is None:
-                validation_count = 0
-            validation_count += int(count_match.group('count'))
-        return validation_count
-    except ValueError:
-        return None
 
 
 def _extract_missing_pii_annotations(filename):

@@ -1,16 +1,15 @@
 """ Utility functions related to HTTP requests """
 
 import logging
+import random
 import re
 from urllib.parse import urlparse
 
 import crum
 from django.conf import settings
 from django.test.client import RequestFactory
-from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_custom_attribute
-from edx_toggles.toggles import WaffleFlag
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.views import exception_handler
@@ -20,18 +19,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 # accommodates course api urls, excluding any course api routes that do not fall under v*/courses, such as v1/blocks.
 COURSE_REGEX = re.compile(fr'^(.*?/course(s)?/)(?!v[0-9]+/[^/]+){settings.COURSE_ID_PATTERN}')
 
-# .. toggle_name: request_utils.capture_cookie_sizes
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Enables more detailed capturing of cookie sizes for monitoring purposes. This can be useful for tracking
-#       down large cookies if requests are nearing limits on the total size of cookies. See the
-#       CookieMonitoringMiddleware docstring for details on the monitoring custom attributes that will be set.
-# .. toggle_warnings: Enabling this flag will add a number of custom attributes, and could adversely affect other
-#       monitoring. Only enable temporarily, or lower TOP_N_COOKIES_CAPTURED and TOP_N_COOKIE_GROUPS_CAPTURED django
-#       settings to capture less data.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2019-02-22
-CAPTURE_COOKIE_SIZES = WaffleFlag('request_utils.capture_cookie_sizes', __name__)
 log = logging.getLogger(__name__)
 
 
@@ -103,162 +90,129 @@ def course_id_from_url(url):
         return None
 
 
-class CookieMonitoringMiddleware(MiddlewareMixin):
+class CookieMonitoringMiddleware:
     """
     Middleware for monitoring the size and growth of all our cookies, to see if
     we're running into browser limits.
     """
-    def process_request(self, request):
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        # monitor after response to ensure logging can include user id where possible.
+        try:
+            self.log_and_monitor_cookies(request)
+        except BaseException:
+            log.exception("Unexpected error logging and monitoring cookies.")
+        return response
+
+    def log_and_monitor_cookies(self, request):
         """
-        Emit custom attributes for cookie size values for every cookie we have.
+        Add logging and custom attributes for monitoring cookie sizes.
 
         Don't log contents of cookies because that might cause a security issue.
         We just want to see if any cookies are growing out of control.
 
-        A useful NRQL Query:
-            SELECT count(*), max(`cookies.max.group.size`) from Transaction FACET
-            `cookies.max.group.name`
+        Useful NRQL Queries:
 
-            SELECT * FROM Transaction WHERE cookies_total_size > 6000
+            # Always available
+            SELECT * FROM Transaction WHERE cookies.header.size > 6000
 
         Attributes that are added by this middleware:
 
-        cookies.header.size: The total size in bytes of the cookie header
+            For all requests:
 
-        If CAPTURE_COOKIE_SIZES is enabled, additional attributes will be added:
+                cookies.header.size: The total size in bytes of the cookie header
 
-        cookies.<N>.name: The name of the Nth largest cookie
-        cookies.<N>.size: The size of the Nth largest cookie
-        cookies..group.<N>.name: The name of the Nth largest cookie.
-        cookies.group.<N>.size: The size of the Nth largest cookie group.
-        cookies.max.name: The name of the largest cookie sent by the user.
-        cookies.max.size: The size of the largest cookie sent by the user.
-        cookies.max.group.name: The name of the largest group of cookies. A single cookie
-            counts as a group of one for this calculation.
-        cookies.max.group.size: The sum total size of all the cookies in the largest group.
-        cookies_total_size: The sum total size of all cookies in this request.
+            If COOKIE_HEADER_SIZE_LOGGING_THRESHOLD is reached:
+
+                cookies.header.size.calculated
 
         Related Settings (see annotations for details):
 
-        - `request_utils.capture_cookie_sizes`
-        - TOP_N_COOKIES_CAPTURED
-        - TOP_N_COOKIE_GROUPS_CAPTURED
-        - COOKIE_SIZE_LOGGING_THRESHOLD
+            - COOKIE_HEADER_SIZE_LOGGING_THRESHOLD
+            - COOKIE_SAMPLING_REQUEST_COUNT
 
         """
 
         raw_header_cookie = request.META.get('HTTP_COOKIE', '')
         cookie_header_size = len(raw_header_cookie.encode('utf-8'))
+        # .. custom_attribute_name: cookies.header.size
+        # .. custom_attribute_description: The total size in bytes of the cookie header.
         set_custom_attribute('cookies.header.size', cookie_header_size)
 
-        # .. setting_name: COOKIE_SIZE_LOGGING_THRESHOLD
-        # .. setting_default: None
-        # .. setting_description: The minimum size for logging a list of cookie names and sizes. Should be set
-        # to a relatively high threshold (suggested 9-10K) to avoid flooding the logs.
-        logging_threshold = getattr(settings, "COOKIE_SIZE_LOGGING_THRESHOLD", None)
-
-        if logging_threshold and cookie_header_size >= logging_threshold:
-            sizes = ', '.join(f"{name}: {len(value)}" for (name, value) in sorted(request.COOKIES.items()))
-            log.info(f"Large (>= {logging_threshold}) cookie header detected. Cookie sizes: {sizes}")
-
-        if not CAPTURE_COOKIE_SIZES.is_enabled():
+        if cookie_header_size == 0:
             return
 
-        # .. setting_name: TOP_N_COOKIES_CAPTURED
-        # .. setting_default: 8
-        # .. setting_description: The number of the largest cookies to capture when monitoring. Capture fewer cookies
-        #       if you need to save on monitoring resources.
-        # .. setting_warning: Depends on the `request_utils.capture_cookie_sizes` toggle being enabled.
-        top_n_cookies_captured = getattr(settings, "TOP_N_COOKIES_CAPTURED", 8)
-        # .. setting_name: TOP_N_COOKIE_GROUPS_CAPTURED
-        # .. setting_default: 5
-        # .. setting_description: The number of the largest cookie groups to capture when monitoring. Capture
-        #       fewer cookies if you need to save on monitoring resources.
-        # .. setting_warning: Depends on the `request_utils.capture_cookie_sizes` toggle being enabled.
-        top_n_cookie_groups_captured = getattr(settings, "TOP_N_COOKIE_GROUPS_CAPTURED", 5)
-
-        cookie_names_to_size = {}
-        cookie_groups_to_size = {}
-
-        for name, value in request.COOKIES.items():
-            # Get cookie size for all cookies.
-            cookie_size = len(value)
-            cookie_names_to_size[name] = cookie_size
-
-            # Group cookies by their prefix seperated by a period or underscore
-            grouping_name = re.split('[._]', name, 1)[0]
-            if grouping_name and grouping_name != name:
-                # Add or update the size for this group.
-                cookie_groups_to_size[grouping_name] = cookie_groups_to_size.get(grouping_name, 0) + cookie_size
-
-        if cookie_names_to_size:
-            self.set_custom_attributes_for_top_n(
-                cookie_names_to_size,
-                top_n_cookies_captured,
-                attribute_prefix='cookies',
+        if corrupt_cookie_count := raw_header_cookie.count('Cookie: '):
+            # .. custom_attribute_name: cookies.header.corrupt_count
+            # .. custom_attribute_description: The attribute will only appear for potentially corrupt cookie headers,
+            #   where "Cookie: " is found in the header. If this custom attribute is seen on the same
+            #   requests where other mysterious cookie problems are occurring, this may help troubleshoot.
+            #   See https://openedx.atlassian.net/browse/CR-4614 for more details.
+            #   Also see cookies.header.corrupt_key_count
+            set_custom_attribute('cookies.header.corrupt_count', corrupt_cookie_count)
+            # .. custom_attribute_name: cookies.header.corrupt_key_count
+            # .. custom_attribute_description: The attribute will only appear for potentially corrupt cookie headers,
+            #   where "Cookie: " is found in some of the cookie keys. If this custom attribute is seen on the same
+            #   requests where other mysterious cookie problems are occurring, this may help troubleshoot.
+            #   See https://openedx.atlassian.net/browse/CR-4614 for more details.
+            #   Also see cookies.header.corrupt_count.
+            set_custom_attribute(
+                'cookies.header.corrupt_key_count',
+                sum(1 for key in request.COOKIES.keys() if 'Cookie: ' in key)
             )
 
-            max_cookie_name = max(cookie_names_to_size, key=lambda name: cookie_names_to_size[name])
-            max_cookie_size = cookie_names_to_size[max_cookie_name]
+        # .. setting_name: COOKIE_HEADER_SIZE_LOGGING_THRESHOLD
+        # .. setting_default: None
+        # .. setting_description: The minimum size for the full cookie header to log a list of cookie names and sizes.
+        #   Should be set to a relatively high threshold (suggested 9-10K) to avoid flooding the logs.
+        logging_threshold = getattr(settings, "COOKIE_HEADER_SIZE_LOGGING_THRESHOLD", None)
 
-            set_custom_attribute('cookies.max.name', max_cookie_name)
-            set_custom_attribute('cookies.max.size', max_cookie_size)
+        if not logging_threshold:
+            return
 
-        if cookie_groups_to_size:
-            self.set_custom_attributes_for_top_n(
-                cookie_groups_to_size,
-                top_n_cookie_groups_captured,
-                attribute_prefix='cookies.group',
-            )
+        is_large_cookie_header_detected = cookie_header_size >= logging_threshold
+        if not is_large_cookie_header_detected:
+            # .. setting_name: COOKIE_SAMPLING_REQUEST_COUNT
+            # .. setting_default: None
+            # .. setting_description: This setting enables sampling cookie header logging for cookie headers smaller
+            #   than COOKIE_HEADER_SIZE_LOGGING_THRESHOLD. The cookie header logging will happen randomly for each
+            #   request with a chance of 1 in COOKIE_SAMPLING_REQUEST_COUNT. For example, to see approximately one
+            #   sampled log message every 10 minutes, set COOKIE_SAMPLING_REQUEST_COUNT to the average number of
+            #   requests in 10 minutes.
+            # .. setting_warning: This setting requires COOKIE_HEADER_SIZE_LOGGING_THRESHOLD to be enabled to take
+            #   effect.
+            sampling_request_count = getattr(settings, "COOKIE_SAMPLING_REQUEST_COUNT", None)
 
-            max_group_cookie_name = max(cookie_groups_to_size, key=lambda name: cookie_groups_to_size[name])
-            max_group_cookie_size = cookie_groups_to_size[max_group_cookie_name]
+            # if the cookie header size is lower than the threshold, skip logging unless configured to do
+            #   random sampling and we choose the lucky number (in this case, 1).
+            if not sampling_request_count or random.randint(1, sampling_request_count) > 1:
+                return
 
-            # If a single cookies is bigger than any group of cookies, we want max_group... to reflect that.
-            # Treating an individual cookie as a group of 1 for calculating the max.
-            if max_group_cookie_size < max_cookie_size:
-                max_group_cookie_name = max_cookie_name
-                max_group_cookie_size = max_cookie_size
+        # Sort starting with largest cookies
+        sorted_cookie_items = sorted(request.COOKIES.items(), key=lambda x: len(x[1]), reverse=True)
+        sizes = ', '.join(f"{name}: {len(value)}" for (name, value) in sorted_cookie_items)
+        if is_large_cookie_header_detected:
+            log_prefix = f"Large (>= {logging_threshold}) cookie header detected."
+        else:
+            log_prefix = f"Sampled small (< {logging_threshold}) cookie header."
+        log.info(f"{log_prefix} BEGIN-COOKIE-SIZES(total={cookie_header_size}) {sizes} END-COOKIE-SIZES")
+        # The computed header size can be used to double check that there aren't large cookies that are
+        #   duplicates in the original header (from different domains) that aren't being accounted for.
+        cookies_header_size_computed = max(
+            0, sum(len(name) + len(value) + 3 for (name, value) in request.COOKIES.items()) - 2
+        )
 
-            set_custom_attribute('cookies.max.group.name', max_group_cookie_name)
-            set_custom_attribute('cookies.max.group.size', max_group_cookie_size)
-
-        total_cookie_size = sum(cookie_names_to_size.values())
-        set_custom_attribute('cookies_total_size', total_cookie_size)
-        log.debug('cookies_total_size = %d', total_cookie_size)
-
-        top_n_cookies = sorted(
-            cookie_names_to_size,
-            key=lambda x: cookie_names_to_size[x],
-            reverse=True,
-        )[:top_n_cookies_captured]
-        top_n_cookies_size = sum([cookie_names_to_size[name] for name in top_n_cookies])
-        set_custom_attribute('cookies_unaccounted_size', total_cookie_size - top_n_cookies_size)
-
-        set_custom_attribute('cookies_total_num', len(cookie_names_to_size))
-
-    def set_custom_attributes_for_top_n(self, names_to_size, top_n_captured, attribute_prefix):
-        """
-        Sets custom metric for the top N biggest cookies or cookie groups.
-
-        Arguments:
-            names_to_size: Dict of sizes keyed by cookie name or cookie group name
-            top_n_captured: Number of largest sizes to monitor.
-            attribute_prefix: Prefix (cookies|cookies.group) to use in the custom attribute name.
-        """
-        top_n_cookies = sorted(
-            names_to_size,
-            key=lambda x: names_to_size[x],
-            reverse=True,
-        )[:top_n_captured]
-        for count, name in enumerate(top_n_cookies, start=1):
-            size = names_to_size[name]
-            name_attribute = f'{attribute_prefix}.{count}.name'
-            size_attribute = f'{attribute_prefix}.{count}.size'
-
-            set_custom_attribute(name_attribute, name)
-            set_custom_attribute(size_attribute, size)
-            log.debug('%s = %d', name, size)
+        # .. custom_attribute_name: cookies.header.size.computed
+        # .. custom_attribute_description: The computed total size in bytes of the cookie header, based on the
+        #   cookies found in request.COOKIES. This value will only be captured for cookie headers larger than
+        #   COOKIE_HEADER_SIZE_LOGGING_THRESHOLD. The value can be used to double check that there aren't large
+        #   cookies that are duplicates in the cookie header (from different domains) that aren't being accounted
+        #   for.
+        set_custom_attribute('cookies.header.size.computed', cookies_header_size_computed)
 
 
 def expected_error_exception_handler(exc, context):

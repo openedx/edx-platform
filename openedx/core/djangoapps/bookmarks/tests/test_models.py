@@ -269,11 +269,11 @@ class BookmarkModelTests(BookmarksTestsBase):
         }
 
     @ddt.data(
-        ('course', [], 3),
-        ('chapter_1', [], 2),
-        ('sequential_1', ['chapter_1'], 2),
-        ('vertical_1', ['chapter_1', 'sequential_1'], 2),
-        ('html_1', ['chapter_1', 'sequential_2', 'vertical_2'], 2),
+        ('course', [], 2),
+        ('chapter_1', [], 1),
+        ('sequential_1', ['chapter_1'], 1),
+        ('vertical_1', ['chapter_1', 'sequential_1'], 1),
+        ('html_1', ['chapter_1', 'sequential_2', 'vertical_2'], 1),
     )
     @ddt.unpack
     def test_path_and_queries_on_create(self, block_to_bookmark, ancestors_attrs, expected_mongo_calls):

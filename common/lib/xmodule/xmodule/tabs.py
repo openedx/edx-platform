@@ -381,7 +381,6 @@ class CourseTabList(List):
         __init__ method.  This is because the default values are dependent on other information from
         within the course.
         """
-
         course_tabs = [
             CourseTab.load('course_info'),
             CourseTab.load('courseware')
@@ -406,11 +405,20 @@ class CourseTabList(List):
             discussion_tab,
             CourseTab.load('wiki'),
             CourseTab.load('progress'),
+            CourseTab.load('dates'),
         ])
-        # While you should be able to do `tab.priority`, a lot of tests mock tabs to be a dict
-        # which causes them to throw an error on this line
-        course_tabs.sort(key=lambda tab: getattr(tab, 'priority', None) or float('inf'))
-        course.tabs.extend(course_tabs)
+
+        # Cross reference existing slugs with slugs this method would add to not add duplicates.
+        existing_tab_slugs = {tab.type for tab in course.tabs if course.tabs}
+        tabs_to_add = []
+        for tab in course_tabs:
+            if tab.type not in existing_tab_slugs:
+                tabs_to_add.append(tab)
+
+        if tabs_to_add:
+            tabs_to_add.extend(course.tabs)
+            tabs_to_add.sort(key=lambda tab: tab.priority or float('inf'))
+            course.tabs = tabs_to_add
 
     @staticmethod
     def get_discussion(course):

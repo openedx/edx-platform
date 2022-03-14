@@ -7,7 +7,6 @@ from edx_toggles.toggles import LegacyWaffleFlagNamespace
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
-
 WAFFLE_NAMESPACE = LegacyWaffleFlagNamespace(name='course_live')
 
 # .. toggle_name: course_live.enable_course_live

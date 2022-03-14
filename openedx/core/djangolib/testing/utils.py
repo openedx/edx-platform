@@ -152,19 +152,19 @@ class CacheIsolationTestCase(CacheIsolationMixin, TestCase):
 class _AssertNumQueriesContext(CaptureQueriesContext):
     """
     This is a copy of Django's internal class of the same name, with the
-    addition of being able to provide a table_blacklist used to filter queries
+    addition of being able to provide a table_ignorelist used to filter queries
     before comparing the count.
     """
-    def __init__(self, test_case, num, connection, table_blacklist=None):
+    def __init__(self, test_case, num, connection, table_ignorelist=None):
         """
         Same as Django's _AssertNumQueriesContext __init__, with the addition of
         the following argument:
-            table_blacklist (List): A list of table names to filter out of the
+            table_ignorelist (List): A list of table names to filter out of the
                 set of queries that get counted.
         """
         self.test_case = test_case
         self.num = num
-        self.table_blacklist = table_blacklist
+        self.table_ignorelist = table_ignorelist
         super().__init__(connection)
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -176,8 +176,8 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
             Note: This is a simple naive implementation that makes no attempt
             to parse the query.
             """
-            if self.table_blacklist:
-                for table in self.table_blacklist:
+            if self.table_ignorelist:
+                for table in self.table_ignorelist:
                     # SQL contains the following format for columns:
                     # "table_name"."column_name".  The regex ensures there is no
                     # "." before the name to avoid matching columns.
@@ -204,17 +204,17 @@ class FilteredQueryCountMixin:
     assertNumQueries with one that accepts a blacklist of tables to filter out
     of the count.
     """
-    def assertNumQueries(self, num, func=None, table_blacklist=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
+    def assertNumQueries(self, num, func=None, table_ignorelist=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
         """
         Used to replace Django's assertNumQueries with the same capability, with
         the addition of the following argument:
-            table_blacklist (List): A list of table names to filter out of the
+            table_ignorelist (List): A list of table names to filter out of the
                 set of queries that get counted.
         """
         using = kwargs.pop("using", DEFAULT_DB_ALIAS)
         conn = connections[using]
 
-        context = _AssertNumQueriesContext(self, num, conn, table_blacklist=table_blacklist)
+        context = _AssertNumQueriesContext(self, num, conn, table_ignorelist=table_ignorelist)
         if func is None:
             return context
 

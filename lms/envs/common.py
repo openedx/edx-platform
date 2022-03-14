@@ -2067,8 +2067,7 @@ MIDDLEWARE = [
     # Generate code ownership attributes. Keep this immediately after RequestCacheMiddleware.
     'edx_django_utils.monitoring.CodeOwnerMonitoringMiddleware',
 
-    # After cookie monitoring, but before anything else that looks at
-    # cookies, especially the session middleware
+    # Before anything that looks at cookies, especially the session middleware
     'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
 
     # Monitoring and logging middleware
@@ -4579,7 +4578,19 @@ COURSE_ENROLLMENT_MODES = {
         "slug": "executive-educations",
         "display_name": _("Executive Education"),
         "min_price": 1
-    }
+    },
+    "unpaid-executive-education": {
+        "id": 9,
+        "slug": "unpaid-executive-education",
+        "display_name": _("Unpaid Executive Education"),
+        "min_price": 0
+    },
+    "paid-executive-education": {
+        "id": 10,
+        "slug": "paid-executive-education",
+        "display_name": _("Paid Executive Education"),
+        "min_price": 1
+    },
 }
 
 CONTENT_TYPE_GATE_GROUP_IDS = {

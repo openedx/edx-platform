@@ -4,8 +4,6 @@ Course API Views
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
-from django.urls import reverse
-from django.utils.translation import gettext as _
 from edx_django_utils.cache import TieredCache
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -41,7 +39,6 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
-from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.toggles import (
     courseware_legacy_is_visible,
     course_exit_page_is_active,
@@ -138,23 +135,6 @@ class CoursewareMeta:
     @property
     def license(self):
         return self.course.license
-
-    @property
-    def tabs(self):
-        """
-        Return course tab metadata.
-        """
-        tabs = []
-        for priority, tab in enumerate(get_course_tab_list(self.effective_user, self.overview)):
-            title = tab.title or tab.get('name', '')
-            tabs.append({
-                'title': _(title),  # pylint: disable=translation-of-non-string
-                'slug': tab.tab_id,
-                'priority': priority,
-                'type': tab.type,
-                'url': tab.link_func(self.overview, reverse),
-            })
-        return tabs
 
     @property
     def verified_mode(self):
@@ -438,7 +418,6 @@ class CoursewareInformation(RetrieveAPIView):
             * `"timestamp"`: generated from the `start` timestamp
             * `"empty"`: no start date is specified
         * pacing: Course pacing. Possible values: instructor, self
-        * tabs: Course tabs
         * user_timezone: User's chosen timezone setting (or null for browser default)
         * can_load_course: Whether the user can view the course (AccessResponse object)
         * is_staff: Whether the effective user has staff access to the course

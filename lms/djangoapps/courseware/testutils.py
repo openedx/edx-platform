@@ -161,8 +161,8 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
         return response
 
     @ddt.data(
-        ('vertical_block', 5),
-        ('html_block', 5),
+        ('vertical_block', 4),
+        ('html_block', 4),
     )
     @ddt.unpack
     def test_courseware_html(self, block_name, mongo_calls):
@@ -193,12 +193,11 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
         self.setup_user(admin=True, enroll=True, login=True)
 
         # The 5 mongoDB calls include calls for
-        #   (1) course_index - bulk_operation call
-        #   (2) structure - get_course_with_access
-        #   (3) definition - get_course_with_access
-        #   (4) definition - HTML block
-        #   (5) definition - edx_notes decorator (original_get_html)
-        with check_mongo_calls(5):
+        #   (1) structure - get_course_with_access
+        #   (2) definition - get_course_with_access
+        #   (3) definition - HTML block
+        #   (4) definition - edx_notes decorator (original_get_html)
+        with check_mongo_calls(4):
             self.verify_response()
 
     def test_success_unenrolled_staff(self):

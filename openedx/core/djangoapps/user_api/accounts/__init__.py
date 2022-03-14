@@ -63,6 +63,9 @@ EMAIL_CONFLICT_MSG = _(
 )
 AUTHN_EMAIL_CONFLICT_MSG = _(  # pylint: disable=translation-of-non-string
     f'This email is already associated with an existing or previous {settings.PLATFORM_NAME} account')
+RETIRED_EMAIL_MSG = _(
+    "This email is associated to a retired account."
+)
 AUTHN_PASSWORD_COMPROMISED_MSG = _(
     "The password you entered is on a list of known compromised passwords. Please choose a different one."
 )
