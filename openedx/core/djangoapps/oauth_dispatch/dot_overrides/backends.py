@@ -4,10 +4,9 @@ Custom authentication backends.
 
 
 from django.contrib.auth.backends import AllowAllUsersModelBackend as UserModelBackend
-from ratelimitbackend.backends import RateLimitMixin
 
 
-class EdxRateLimitedAllowAllUsersModelBackend(RateLimitMixin, UserModelBackend):
+class EdxRateLimitedAllowAllUsersModelBackend(UserModelBackend):
     """
     Authentication backend needed to incorporate rate limiting of login attempts - but also
     enabling users with is_active of False in the Django auth_user model to still authenticate.

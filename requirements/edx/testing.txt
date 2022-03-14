@@ -267,6 +267,7 @@ distlib==0.3.4
     #   django-mysql
     #   django-oauth-toolkit
     #   django-pyfs
+    #   django-ratelimit-backend
     #   django-sekizai
     #   django-ses
     #   django-splash
@@ -410,6 +411,8 @@ django-pipeline==2.0.8
 django-pyfs==3.2.0
     # via -r requirements/edx/base.txt
 django-ratelimit==3.0.1
+    # via -r requirements/edx/base.txt
+django-ratelimit-backend @ git+https://github.com/edx/django-ratelimit-backend.git@6e1a0c6ea1d27062c16e9fb94d3c44475146877e
     # via -r requirements/edx/base.txt
 django-require @ git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
     # via -r requirements/edx/base.txt
