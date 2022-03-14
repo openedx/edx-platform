@@ -277,7 +277,9 @@ class ExternalDiscussionCourseTab(LinkTab):
     def is_enabled(cls, course, user=None):
         if not super().is_enabled(course, user=user):
             return False
-        return course.discussion_link
+        # Course Overview objects don't have this attribute so avoid the error for now and figure
+        # out a better long-term solution
+        return hasattr(course, 'discussion_link') and course.discussion_link
 
 
 class ExternalLinkCourseTab(LinkTab):
