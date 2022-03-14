@@ -2,6 +2,7 @@
 Tests for SAMLProviderConfig endpoints
 """
 import copy
+import re
 from uuid import uuid4
 from django.urls import reverse
 from django.contrib.sites.models import Site
@@ -96,7 +97,7 @@ class SAMLProviderConfigTests(APITestCase):
         assert results[0]['entity_id'] == SINGLE_PROVIDER_CONFIG['entity_id']
         assert results[0]['metadata_source'] == SINGLE_PROVIDER_CONFIG['metadata_source']
         assert response.data['results'][0]['country'] == SINGLE_PROVIDER_CONFIG['country']
-        assert results[0]['display_name'] == "saml-test-ep-1"
+        assert re.match(r"saml-test-slug-\d{4}", results[0]['display_name'])
         assert SAMLProviderConfig.objects.count() == 1
 
     def test_get_one_config_by_enterprise_uuid_invalid_uuid(self):
