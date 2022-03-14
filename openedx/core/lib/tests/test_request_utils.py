@@ -111,6 +111,7 @@ class CookieMonitoringMiddlewareTestCase(unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.mock_response = Mock()
+        RequestCache.clear_all_namespaces()
 
     @patch('openedx.core.lib.request_utils.log', autospec=True)
     @patch("openedx.core.lib.request_utils.set_custom_attribute")

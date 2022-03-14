@@ -95,17 +95,27 @@ class CookieMonitoringMiddleware:
     Middleware for monitoring the size and growth of all our cookies, to see if
     we're running into browser limits.
     """
+    COOKIE_MONITORING_REQUEST_CACHE_KEY = "CookieMonitoringMiddleware"
+    COOKIE_HEADER_LOG_MESSAGE_KEY = "cookie_header_log_message"
 
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        response = self.get_response(request)
-        # monitor after response to ensure logging can include user id where possible.
+        # Monitor at request-time to skip any cookies that may be added during the request.
         try:
             self.log_and_monitor_cookies(request)
         except BaseException:
             log.exception("Unexpected error logging and monitoring cookies.")
+
+        response = self.get_response(request)
+
+        # Delay logging until response-time so that the user id can be included in the log message.
+        request_cache = RequestCache(self.COOKIE_MONITORING_REQUEST_CACHE_KEY)
+        cache_response = request_cache.get_cached_response(self.COOKIE_HEADER_LOG_MESSAGE_KEY)
+        if cache_response.is_found:
+            log.info(cache_response.value)
+
         return response
 
     def log_and_monitor_cookies(self, request):
@@ -128,7 +138,7 @@ class CookieMonitoringMiddleware:
 
             If COOKIE_HEADER_SIZE_LOGGING_THRESHOLD is reached:
 
-                cookies.header.size.calculated
+                cookies.header.size.computed
 
         Related Settings (see annotations for details):
 
@@ -199,7 +209,10 @@ class CookieMonitoringMiddleware:
             log_prefix = f"Large (>= {logging_threshold}) cookie header detected."
         else:
             log_prefix = f"Sampled small (< {logging_threshold}) cookie header."
-        log.info(f"{log_prefix} BEGIN-COOKIE-SIZES(total={cookie_header_size}) {sizes} END-COOKIE-SIZES")
+        log_message = f"{log_prefix} BEGIN-COOKIE-SIZES(total={cookie_header_size}) {sizes} END-COOKIE-SIZES"
+        request_cache = RequestCache(self.COOKIE_MONITORING_REQUEST_CACHE_KEY)
+        request_cache.set(self.COOKIE_HEADER_LOG_MESSAGE_KEY, log_message)
+
         # The computed header size can be used to double check that there aren't large cookies that are
         #   duplicates in the original header (from different domains) that aren't being accounted for.
         cookies_header_size_computed = max(
