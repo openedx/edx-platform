@@ -575,7 +575,7 @@ class SAMLProviderConfig(ProviderConfig):
         max_length=30, blank=True,
         help_text=_("A configuration nickname."))
     backend_name = models.CharField(
-        max_length=50, default='tpa-saml', blank=True, 
+        max_length=50, default='tpa-saml', blank=True,
         help_text="Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend.")
     entity_id = models.CharField(
         max_length=255, verbose_name="Entity ID", blank=True,
