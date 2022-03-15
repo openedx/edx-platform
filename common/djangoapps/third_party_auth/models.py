@@ -9,6 +9,8 @@ import logging
 import re
 
 from config_models.models import ConfigurationModel, cache
+from simple_history import register
+from social_django.models import UserSocialAuth
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
@@ -36,6 +38,11 @@ REGISTRATION_FORM_FIELD_BLACKLIST = [
     'name',
     'username'
 ]
+
+# Registers UserSocialAuth with simple-django-history.
+# This registration makes third_party_auth a required app for Studio,
+# even when it is supposed to be for LMS only.
+register(UserSocialAuth, app=__package__)
 
 
 # A dictionary of {name: class} entries for each python-social-auth backend available.
