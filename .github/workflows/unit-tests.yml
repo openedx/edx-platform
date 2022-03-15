@@ -36,7 +36,7 @@ jobs:
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # This gives Mongo several chances to start. We started getting flakiness
       # around 2022-02-15 wherein the start command would sometimes exit with:
@@ -95,7 +95,7 @@ jobs:
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: collect pytest warnings files
         uses: actions/download-artifact@v2
         with:
