@@ -572,7 +572,7 @@ class SAMLProviderConfig(ProviderConfig):
     """
     prefix = 'saml'
     display_name = models.CharField(
-        max_length=30, blank=True,
+        max_length=35, blank=True,
         help_text=_("A configuration nickname."))
     backend_name = models.CharField(
         max_length=50, default='tpa-saml', blank=True,

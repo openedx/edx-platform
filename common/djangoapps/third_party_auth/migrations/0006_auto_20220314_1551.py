@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='samlproviderconfig',
             name='display_name',
-            field=models.CharField(blank=True, help_text='A configuration nickname.', max_length=30),
+            field=models.CharField(blank=True, help_text='A configuration nickname.', max_length=35),
         ),
         migrations.AlterField(
             model_name='ltiproviderconfig',

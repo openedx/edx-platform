@@ -4,7 +4,7 @@ Signal handlers for program enrollments
 
 
 import logging
-import datetime
+from datetime import datetime
 
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
@@ -49,8 +49,8 @@ def generate_default_display_name(self):
     """
     Returns a default display name for SamlProviderConfig.
     """
-    t = datetime.datetime.now()
-    return f'{self.prefix}-{self.slug}-{t.minute}{t.second}'
+    time = datetime.now().strftime('%M%S')
+    return f'{self.slug}-{time}'
 
 
 @receiver(pre_save, sender=SAMLProviderConfig)
