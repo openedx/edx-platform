@@ -10,9 +10,11 @@ import re
 import shutil
 import tarfile
 import tempfile
+import tracemalloc
 from io import BytesIO
 from unittest.mock import Mock, patch
 from uuid import uuid4
+
 
 import ddt
 import lxml
@@ -847,6 +849,7 @@ class ExportTestCase(CourseTestCase):
         """
         Verify that useable library data can be exported.
         """
+        tracemalloc.start()
         youtube_id = "qS4NO9MNC6w"
         library = LibraryFactory.create(modulestore=self.store)
         video_block = ItemFactory.create(
@@ -858,6 +861,13 @@ class ExportTestCase(CourseTestCase):
         )
         name = library.url_name
         lib_key = library.location.library_key
+
+        snapshot = tracemalloc.take_snapshot()
+        top_stats = snapshot.statistics('lineno')
+        print("[ Top 10 differences ]")
+        for stat in top_stats[:10]:
+            print(stat)
+
         root_dir = path(tempfile.mkdtemp())
         try:
             export_library_to_xml(self.store, contentstore(), lib_key, root_dir, name)
