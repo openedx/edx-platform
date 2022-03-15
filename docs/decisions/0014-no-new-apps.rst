@@ -20,7 +20,7 @@ While the preference should always be to create a new repository for a new appli
 * The application relates directly to core functionality: course authoring, course administration, or learner-courseware interactions
 * The application requires multiple imports from edx-platform
 
-  * If possible, consider if the new application could instead of directly importing models use querysets returned from api.py
+  * If possible, consider if the new application could use querysets returned from api.py instead of directly importing models 
   * If it is truly necessary to import from edx-platform directly, in addition to noting this in the ADR, the authors of the new application should add the libraries or applications it imports from to a sub-document of this ADR. This will help edX and the community prioritize which applications should be broken out. 
 
 
