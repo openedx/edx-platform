@@ -1036,8 +1036,6 @@ SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
 SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
 
 RETRY_CALENDAR_SYNC_EMAIL_MAX_ATTEMPTS = 5
-# Deadline message configurations
-COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
 
 MARKETING_EMAILS_OPT_IN = False
 
@@ -3180,7 +3178,6 @@ INSTALLED_APPS = [
     'openedx.features.calendar_sync',
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
-    'openedx.features.course_search',
     'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
     'openedx.features.learner_profile',
     'openedx.features.course_duration_limits',

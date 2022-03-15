@@ -9,14 +9,12 @@ from config_models.models import cache as config_cache
 from django.conf import settings
 from django.core.cache import cache as django_cache
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 
 from ..models import IPFilter, RestrictedCourse
 from ..test_utils import restrict_course
@@ -24,7 +22,6 @@ from ..test_utils import restrict_course
 
 @ddt.ddt
 @skip_unless_lms
-@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     """Tests of embargo middleware country access rules.
 
@@ -45,10 +42,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
-        self.courseware_url = reverse(
-            'openedx.course_experience.course_home',
-            kwargs={'course_id': str(self.course.id)}
-        )
+        self.courseware_url = reverse('about_course', kwargs={'course_id': str(self.course.id)})
         self.non_courseware_url = reverse('dashboard')
 
         # Clear the cache to avoid interference between tests

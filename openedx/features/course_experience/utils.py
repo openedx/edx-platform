@@ -128,23 +128,6 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
     return course_outline_root_block
 
 
-def get_resume_block(block):
-    """
-    Gets the deepest block marked as 'resume_block'.
-
-    """
-    if block.get('authorization_denial_reason') or not block.get('resume_block'):
-        return None
-    if not block.get('children'):
-        return block
-
-    for child in block['children']:
-        resume_block = get_resume_block(child)
-        if resume_block:
-            return resume_block
-    return block
-
-
 def get_start_block(block):
     """
     Gets the deepest block to use as the starting block.
