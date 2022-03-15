@@ -111,7 +111,8 @@ class ProviderConfig(ConfigurationModel):
             'SVG images are recommended as they can scale to any size.'
         ),
     )
-    name = models.CharField(max_length=50, blank=False, help_text="Name of this provider (shown to users)")
+    name = models.CharField(
+        max_length=50, blank=True, help_text="Name of this provider (shown to users)")
     slug = models.SlugField(
         max_length=30, db_index=True, default='default',
         help_text=(
@@ -429,6 +430,7 @@ class SAMLConfiguration(ConfigurationModel):
     slug = models.SlugField(
         max_length=30,
         default='default',
+        blank=True,
         help_text=(
             'A short string uniquely identifying this configuration. '
             'Cannot contain spaces. Examples: "ubc", "mit-staging"'
@@ -569,13 +571,17 @@ class SAMLProviderConfig(ProviderConfig):
     .. no_pii:
     """
     prefix = 'saml'
+    display_name = models.CharField(
+        max_length=35, blank=True,
+        help_text=_("A configuration nickname."))
     backend_name = models.CharField(
-        max_length=50, default='tpa-saml', blank=False,
+        max_length=50, default='tpa-saml', blank=True,
         help_text="Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend.")
     entity_id = models.CharField(
-        max_length=255, verbose_name="Entity ID", help_text="Example: https://idp.testshib.org/idp/shibboleth")
+        max_length=255, verbose_name="Entity ID", blank=True,
+        help_text="Example: https://idp.testshib.org/idp/shibboleth")
     metadata_source = models.CharField(
-        max_length=255,
+        max_length=255, blank=True,
         help_text=(
             "URL to this provider's XML metadata. Should be an HTTPS URL. "
             "Example: https://www.testshib.org/metadata/testshib-providers.xml"
@@ -622,7 +628,7 @@ class SAMLProviderConfig(ProviderConfig):
                   "in the automatic refresh job, if configured."
     )
     identity_provider_type = models.CharField(
-        max_length=128, blank=False, verbose_name="Identity Provider Type", default=STANDARD_SAML_PROVIDER_KEY,
+        max_length=128, blank=True, verbose_name="Identity Provider Type", default=STANDARD_SAML_PROVIDER_KEY,
         choices=get_saml_idp_choices(), help_text=(
             "Some SAML providers require special behavior. For example, SAP SuccessFactors SAML providers require an "
             "additional API call to retrieve user metadata not provided in the SAML response. Select the provider type "

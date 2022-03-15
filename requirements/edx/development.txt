@@ -333,8 +333,8 @@ django-cache-memoize==0.1.10
     #   edx-enterprise
 django-celery-results==2.2.0
     # via
-    #   -r requirements/edx/base.txt
     #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/testing.txt
 django-classy-tags==3.0.1
     # via
     #   -r requirements/edx/testing.txt
@@ -726,10 +726,8 @@ html5lib==1.1
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-httpretty==0.9.7
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.txt
+httpretty==1.1.4
+    # via -r requirements/edx/testing.txt
 icalendar==4.0.9
     # via -r requirements/edx/testing.txt
 idna==3.3
@@ -1343,7 +1341,6 @@ six==1.16.0
     #   fs
     #   fs-s3fs
     #   html5lib
-    #   httpretty
     #   interchange
     #   isodate
     #   libsass
