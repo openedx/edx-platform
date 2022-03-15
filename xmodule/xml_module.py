@@ -107,6 +107,8 @@ class XmlParserMixin:
     """
     Class containing XML parsing functionality shared between XBlock and XModuleDescriptor.
     """
+    resources_dir = None
+
     # Extension to append to filename paths
     filename_extension = 'xml'
 
@@ -509,8 +511,6 @@ class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     Mixin class for standardized parsing of XModule xml.
     """
-    resources_dir = None
-
     @classmethod
     def from_xml(cls, xml_data, system, id_generator):
         """
