@@ -1556,16 +1556,6 @@ MODULESTORE = {
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
-                {
-                    'NAME': 'draft',
-                    'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
-                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-                    'OPTIONS': {
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-                        'fs_root': DATA_DIR,
-                        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
-                    }
-                }
             ]
         }
     }
