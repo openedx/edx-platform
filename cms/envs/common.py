@@ -1673,6 +1673,7 @@ INSTALLED_APPS = [
     # These are apps that aren't strictly needed by Studio, but are imported by
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
+    'common.djangoapps.third_party_auth',
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
     'lms.djangoapps.courseware',
     'lms.djangoapps.coursewarehistoryextended',
