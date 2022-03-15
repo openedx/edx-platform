@@ -6,7 +6,7 @@ In Review
 
 Context
 -------
-In recent years, edX and the software industry as a whole have been moving away from a monolith structure towards more modular architecture. The goal is to transition from a base site with plugins to a collection of more encapsulated services that can be used as building blocks to a larger application. To that end, much of the original edx-platform repository has been split out into micro-frontends, other microservices, plugins, and libraries. However, there are still a number of optional applications within edx-platform and new ones continue to be added.
+The Open edX platform is moving toward a more modular architecture. The goal is to transition from a monolithic application in edx-platform to one in which this repository represents a small, stable core with volatility pushed into extensions and plugins. To that end, much of the original edx-platform repository has been split out into micro-frontends, other microservices, plugins, and libraries. However, there are still a number of optional and non-core applications within edx-platform and new ones continue to be added.
 
 Decision
 --------
@@ -21,7 +21,11 @@ While the preference should always be to create a new repository for a new appli
 * The application requires multiple imports from edx-platform
 
   * If possible, consider if the new application could use querysets returned from api.py instead of directly importing models 
-  * If it is truly necessary to import from edx-platform directly, in addition to noting this in the ADR, the authors of the new application should add the libraries or applications it imports from to a sub-document of this ADR. This will help edX and the community prioritize which applications should be broken out. 
+  * If it is truly necessary to import from edx-platform directly, in addition to noting this in the ADR, the authors of the new application should add the libraries or applications it imports from to the `Known Dependencies` section of this ADR. This will help edX and the community prioritize which applications should be broken out. 
+  
+Known Dependencies
+------------------
+  
 
 
 
