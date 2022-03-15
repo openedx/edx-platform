@@ -319,8 +319,10 @@ django-cache-memoize==0.1.10
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-celery-results==2.3.0
-    # via -r requirements/edx/base.txt
+django-celery-results==2.2.0
+    # via
+    #   -r requirements/edx/base.txt
+    #   -c requirements/edx/../constraints.txt
 django-classy-tags==3.0.1
     # via
     #   -r requirements/edx/base.txt

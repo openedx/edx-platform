@@ -245,8 +245,10 @@ django-appconf==1.0.5
     #   django-statici18n
 django-cache-memoize==0.1.10
     # via edx-enterprise
-django-celery-results==2.3.0
-    # via -r requirements/edx/base.in
+django-celery-results==2.2.0
+    # via
+    #   -r requirements/edx/base.txt
+    #   -c requirements/edx/../constraints.txt
 django-classy-tags==3.0.1
     # via django-sekizai
 django-config-models==2.3.0
