@@ -2,6 +2,7 @@
 Tests for SAMLProviderConfig endpoints
 """
 import copy
+import re
 from uuid import uuid4
 from django.urls import reverse
 from django.contrib.sites.models import Site
@@ -32,6 +33,7 @@ SINGLE_PROVIDER_CONFIG = {
 SINGLE_PROVIDER_CONFIG_2 = copy.copy(SINGLE_PROVIDER_CONFIG)
 SINGLE_PROVIDER_CONFIG_2['name'] = 'name-of-config-2'
 SINGLE_PROVIDER_CONFIG_2['slug'] = 'test-slug-2'
+SINGLE_PROVIDER_CONFIG_2['display_name'] = 'display-name'
 
 SINGLE_PROVIDER_CONFIG_3 = copy.copy(SINGLE_PROVIDER_CONFIG)
 SINGLE_PROVIDER_CONFIG_3['name'] = 'name-of-config-3'
@@ -96,6 +98,7 @@ class SAMLProviderConfigTests(APITestCase):
         assert results[0]['entity_id'] == SINGLE_PROVIDER_CONFIG['entity_id']
         assert results[0]['metadata_source'] == SINGLE_PROVIDER_CONFIG['metadata_source']
         assert response.data['results'][0]['country'] == SINGLE_PROVIDER_CONFIG['country']
+        assert re.match(r"test-slug-\d{4}", results[0]['display_name'])
         assert SAMLProviderConfig.objects.count() == 1
 
     def test_get_one_config_by_enterprise_uuid_invalid_uuid(self):
@@ -147,6 +150,7 @@ class SAMLProviderConfigTests(APITestCase):
         assert provider_config.name == 'name-of-config-2'
         assert provider_config.country == SINGLE_PROVIDER_CONFIG_2['country']
         assert provider_config.attr_username == SINGLE_PROVIDER_CONFIG['attr_first_name']
+        assert provider_config.display_name == SINGLE_PROVIDER_CONFIG_2['display_name']
 
         # check association has also been created
         assert EnterpriseCustomerIdentityProvider.objects.filter(
