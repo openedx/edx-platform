@@ -1,0 +1,39 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+  <tr>
+    <td>
+      <p style="color: rgba(0,0,0,.75);">
+        {% autoescape off %}
+          {{ course_email.html_message }}
+        {% endautoescape %}
+        <br/>
+      </p>
+
+      <p style="font-size: 11px;">
+        {% filter force_escape %}
+          {% blocktrans %}
+            This email was automatically sent from {{ platform_name }}.
+          {% endblocktrans %}
+        {% endfilter %}
+        <br>
+        {% filter force_escape %}
+          {% blocktrans %}
+            You are receiving this email at address {{ email }} because you are enrolled in
+          {% endblocktrans %}
+        {% endfilter %} <a href='{{ course_url }}'>{{ course_title }}</a>.
+        <br>
+        {% filter force_escape %}
+          {% blocktrans %}
+            To stop receiving email like this, update your course email settings
+          {% endblocktrans %}
+        {% endfilter %} <a href='{{ email_settings_url }}'>{% trans "here" as transhere %}{{transhere|force_escape}}</a>.
+        <br><a href='{{ unsubscribe_link }}'>{% trans "unsubscribe" as transunsub %}{{transunsub|force_escape}}</a>
+      </p>
+    </td>
+  </tr>
+</table>
+{% endblock %}

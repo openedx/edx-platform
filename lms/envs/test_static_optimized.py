@@ -14,6 +14,7 @@ from the same directory.
 
 
 from openedx.core.lib.derived import derive_settings
+from openedx.core.lib.django_require.staticstorage import OptimizedCachedRequireJsStorage
 
 from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -47,7 +48,7 @@ PROCTORING_BACKENDS = {
 ######################### PIPELINE ####################################
 
 # Use RequireJS optimized storage
-STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
+STATICFILES_STORAGE = f"{OptimizedCachedRequireJsStorage.__module__}.{OptimizedCachedRequireJsStorage.__name__}"
 
 # Revert to the default set of finders as we don't want to dynamically pick up files from the pipeline
 STATICFILES_FINDERS = [

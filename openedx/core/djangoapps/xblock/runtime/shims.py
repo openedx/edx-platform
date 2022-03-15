@@ -13,6 +13,7 @@ from fs.memoryfs import MemoryFS
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
+from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.student.models import anonymous_id_for_user
 
@@ -178,44 +179,35 @@ class RuntimeShim:
 
     def replace_urls(self, html_str):
         """
-        Deprecated precursor to transform_static_paths_to_urls
-
-        Given an HTML string, replace any static file paths like
-            /static/foo.png
-        (which are really pointing to block-specific assets stored in blockstore)
-        with working absolute URLs like
-            https://s3.example.com/blockstore/bundle17/this-block/assets/324.png
-        See common/djangoapps/static_replace/__init__.py
-
-        This is generally done automatically for the HTML rendered by XBlocks,
-        but if an XBlock wants to have correct URLs in data returned by its
-        handlers, the XBlock must call this API directly.
-
-        Note that the paths are only replaced if they are in "quotes" such as if
-        they are an HTML attribute or JSON data value. Thus, to transform only a
-        single path string on its own, you must pass html_str=f'"{path}"'
+        Deprecated in favor of the replace_urls service.
         """
-        return self.transform_static_paths_to_urls(self._active_block, html_str)
+        warnings.warn(
+            'replace_urls is deprecated. Please use ReplaceURLService instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        return ReplaceURLService(
+            xblock=self._active_block,
+            lookup_asset_url=self._lookup_asset_url
+        ).replace_urls(html_str)
 
     def replace_course_urls(self, html_str):
         """
-        Given an HTML string, replace any course-relative URLs like
-            /course/blah
-        with working URLs like
-            /course/:course_id/blah
-        See common/djangoapps/static_replace/__init__.py
+        Deprecated in favor of the replace_urls service.
         """
-        # TODO: implement or deprecate.
-        # See also the version in openedx/core/lib/xblock_utils/__init__.py
+        warnings.warn(
+            'replace_course_urls is deprecated. Please use ReplaceURLService instead.',
+            DeprecationWarning, stacklevel=3,
+        )
         return html_str
 
     def replace_jump_to_id_urls(self, html_str):
         """
-        Replace /jump_to_id/ URLs in the HTML with expanded versions.
-        See common/djangoapps/static_replace/__init__.py
+        Deprecated in favor of the replace_urls service.
         """
-        # TODO: implement or deprecate.
-        # See also the version in openedx/core/lib/xblock_utils/__init__.py
+        warnings.warn(
+            'replace_jump_to_id_urls is deprecated. Please use ReplaceURLService instead.',
+            DeprecationWarning, stacklevel=3,
+        )
         return html_str
 
     @property

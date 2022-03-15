@@ -88,6 +88,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     enrollment = serializers.DictField()
     enrollment_start = serializers.DateTimeField()
     enrollment_end = serializers.DateTimeField()
+    entrance_exam_data = serializers.DictField()
     id = serializers.CharField()  # pylint: disable=invalid-name
     license = serializers.CharField()
     media = _CourseApiMediaCollectionSerializer(source='*')

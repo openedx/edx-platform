@@ -277,7 +277,9 @@ class ExternalDiscussionCourseTab(LinkTab):
     def is_enabled(cls, course, user=None):
         if not super().is_enabled(course, user=user):
             return False
-        return course.discussion_link
+        # Course Overview objects don't have this attribute so avoid the error for now and figure
+        # out a better long-term solution
+        return hasattr(course, 'discussion_link') and course.discussion_link
 
 
 class ExternalLinkCourseTab(LinkTab):
@@ -361,6 +363,7 @@ def get_course_tab_list(user, course):
             if tab.type != 'courseware':
                 continue
             tab.name = _("Entrance Exam")
+            tab.title = _("Entrance Exam")
         # TODO: LEARNER-611 - once the course_info tab is removed, remove this code
         if not DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id) and tab.type == 'course_info':
             continue
