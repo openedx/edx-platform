@@ -279,6 +279,7 @@ class XModuleFields:
     )
 
 
+@XBlock.needs("i18n")
 class XModuleMixin(XModuleFields, XBlock):
     """
     Fields and methods used by XModules internally.

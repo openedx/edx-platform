@@ -20,7 +20,7 @@ from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml.factories import CourseFactory, ProblemFactory, SequenceFactory
 from xmodule.x_module import XModuleMixin
-from xmodule.xml_module import XmlDescriptor, deserialize_field, serialize_field
+from xmodule.xml_module import XmlMixin, deserialize_field, serialize_field
 
 
 class CrazyJsonString(String):
@@ -65,7 +65,7 @@ class InheritingFieldDataTest(unittest.TestCase):
     Tests of InheritingFieldData.
     """
 
-    class TestableInheritingXBlock(XmlDescriptor):  # lint-amnesty, pylint: disable=abstract-method
+    class TestableInheritingXBlock(XmlMixin):  # lint-amnesty, pylint: disable=abstract-method
         """
         An XBlock we can use in these tests.
         """
@@ -227,11 +227,15 @@ class InheritingFieldDataTest(unittest.TestCase):
 
 
 class EditableMetadataFieldsTest(unittest.TestCase):
+    class TestableXmlXBlock(XmlMixin, XModuleMixin):  # lint-amnesty, pylint: disable=abstract-method
+        """
+        This is subclassing `XModuleMixin` to use metadata fields in the unmixed class.
+        """
 
     def test_display_name_field(self):
         editable_fields = self.get_xml_editable_fields(DictFieldData({}))
         # Tests that the xblock fields (currently tags and name) get filtered out.
-        # Also tests that xml_attributes is filtered out of XmlDescriptor.
+        # Also tests that xml_attributes is filtered out of XmlMixin.
         assert 1 == len(editable_fields), editable_fields
         self.assert_field_values(
             editable_fields, 'display_name', XModuleMixin.display_name,
@@ -334,13 +338,13 @@ class EditableMetadataFieldsTest(unittest.TestCase):
     def get_xml_editable_fields(self, field_data):
         runtime = get_test_descriptor_system()
         return runtime.construct_xblock_from_class(
-            XmlDescriptor,
+            self.TestableXmlXBlock,
             scope_ids=Mock(),
             field_data=field_data,
         ).editable_metadata_fields
 
     def get_descriptor(self, field_data):
-        class TestModuleDescriptor(TestFields, XmlDescriptor):  # lint-amnesty, pylint: disable=abstract-method
+        class TestModuleDescriptor(TestFields, self.TestableXmlXBlock):  # lint-amnesty, pylint: disable=abstract-method
             @property
             def non_editable_metadata_fields(self):
                 non_editable_fields = super().non_editable_metadata_fields

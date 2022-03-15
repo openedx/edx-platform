@@ -8,13 +8,11 @@ import os
 
 from lxml import etree
 from lxml.etree import ElementTree, XMLParser
-from xblock.core import XBlock, XML_NAMESPACES
+from xblock.core import XML_NAMESPACES
 from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
-
-from .x_module import XModuleMixin
 
 log = logging.getLogger(__name__)
 
@@ -505,8 +503,3 @@ class XmlMixin:
         non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.append(XmlMixin.xml_attributes)
         return non_editable_fields
-
-
-@XBlock.needs("i18n")
-class XmlDescriptor(XmlMixin, XModuleMixin):  # lint-amnesty, pylint: disable=abstract-method
-    pass
