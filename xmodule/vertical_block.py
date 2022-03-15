@@ -21,7 +21,7 @@ from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.misc import is_xblock_an_assignment
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW, XModuleFields
-from xmodule.xml_module import XmlParserMixin
+from xmodule.xml_module import XmlMixin
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ class VerticalBlock(
     VerticalFields,
     XModuleFields,
     StudioEditableBlock,
-    XmlParserMixin,
+    XmlMixin,
     MakoTemplateBlockBase,
     XBlock
 ):

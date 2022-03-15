@@ -1169,7 +1169,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
     def add_block_as_child_node(self, block, node):
-        child = etree.SubElement(node, "unknown")
+        child = etree.SubElement(node, block.category)
         child.set('url_name', block.url_name)
         block.add_xml_to_node(child)
 

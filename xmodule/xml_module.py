@@ -7,7 +7,7 @@ import logging
 import os
 
 from lxml import etree
-from lxml.etree import Element, ElementTree, XMLParser
+from lxml.etree import ElementTree, XMLParser
 from xblock.core import XBlock, XML_NAMESPACES
 from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
@@ -103,7 +103,7 @@ def deserialize_field(field, value):
         return value
 
 
-class XmlParserMixin:
+class XmlMixin:
     """
     Class containing XML parsing functionality shared between XBlock and XModuleDescriptor.
     """
@@ -503,106 +503,8 @@ class XmlParserMixin:
         Return a list of all metadata fields that cannot be edited.
         """
         non_editable_fields = super().non_editable_metadata_fields
-        non_editable_fields.append(XmlParserMixin.xml_attributes)
+        non_editable_fields.append(XmlMixin.xml_attributes)
         return non_editable_fields
-
-
-class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
-    """
-    Mixin class for standardized parsing of XModule xml.
-    """
-    @classmethod
-    def from_xml(cls, xml_data, system, id_generator):
-        """
-        Creates an instance of this descriptor from the supplied xml_data.
-        This may be overridden by subclasses.
-
-        Args:
-            xml_data (str): A string of xml that will be translated into data and children
-                for this module
-
-            system (:class:`.XMLParsingSystem):
-
-            id_generator (:class:`xblock.runtime.IdGenerator`): Used to generate the
-                usage_ids and definition_ids when loading this xml
-
-        """
-        # Shim from from_xml to the parse_xml defined in XmlParserMixin.
-        # This only exists to satisfy subclasses that both:
-        #    a) define from_xml themselves
-        #    b) call super(..).from_xml(..)
-        return super().parse_xml(
-            etree.fromstring(xml_data),
-            system,
-            None,  # This is ignored by XmlParserMixin
-            id_generator,
-        )
-
-    @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):
-        """
-        Interpret the parsed XML in `node`, creating an XModuleDescriptor.
-        """
-        if cls.from_xml != XmlMixin.from_xml:
-            xml = etree.tostring(node).decode('utf-8')
-            block = cls.from_xml(xml, runtime, id_generator)
-            return block
-        else:
-            return super().parse_xml(node, runtime, keys, id_generator)
-
-    @classmethod
-    def parse_xml_new_runtime(cls, node, runtime, keys):
-        """
-        This XML lives within Blockstore and the new runtime doesn't need this
-        legacy XModule code. Use the "normal" XBlock parsing code.
-        """
-        try:
-            return super().parse_xml_new_runtime(node, runtime, keys)
-        except AttributeError:
-            return super().parse_xml(node, runtime, keys, id_generator=None)
-
-    def export_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=unused-argument
-        """
-        Returns an xml string representing this module, and all modules
-        underneath it.  May also write required resources out to resource_fs.
-
-        Assumes that modules have single parentage (that no module appears twice
-        in the same course), and that it is thus safe to nest modules as xml
-        children as appropriate.
-
-        The returned XML should be able to be parsed back into an identical
-        XModuleDescriptor using the from_xml method with the same system, org,
-        and course
-        """
-        # Shim from export_to_xml to the add_xml_to_node defined in XmlParserMixin.
-        # This only exists to satisfy subclasses that both:
-        #    a) define export_to_xml themselves
-        #    b) call super(..).export_to_xml(..)
-        node = Element(self.category)
-        super().add_xml_to_node(node)
-        return etree.tostring(node)
-
-    def add_xml_to_node(self, node):
-        """
-        Export this :class:`XModuleDescriptor` as XML, by setting attributes on the provided
-        `node`.
-        """
-        if self.export_to_xml != XmlMixin.export_to_xml:  # lint-amnesty, pylint: disable=comparison-with-callable
-            xml_string = self.export_to_xml(self.runtime.export_fs)
-            exported_node = etree.fromstring(xml_string)
-            node.tag = exported_node.tag
-            node.text = exported_node.text
-            node.tail = exported_node.tail
-
-            for key, value in exported_node.items():
-                if key == 'url_name' and value == 'course' and key in node.attrib:
-                    # if url_name is set in ExportManager then do not override it here.
-                    continue
-                node.set(key, value)
-
-            node.extend(list(exported_node))
-        else:
-            super().add_xml_to_node(node)
 
 
 @XBlock.needs("i18n")
