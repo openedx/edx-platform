@@ -904,7 +904,7 @@ openedx-events==0.8.1
     # via -r requirements/edx/base.txt
 openedx-filters==0.5.0
     # via -r requirements/edx/base.txt
-ora2==4.0.3
+ora2==4.0.4
     # via -r requirements/edx/base.txt
 packaging==21.3
     # via

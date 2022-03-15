@@ -77,7 +77,7 @@ def submit_grade(request, usage_id, grade_data):
 
     Returns: {'success': True/False, 'msg': err_msg}
     """
-    handler_name = "staff_assess"
+    handler_name = "submit_staff_assessment"
     response = call_xblock_json_handler(request, usage_id, handler_name, grade_data)
 
     # Unhandled errors might not be JSON, catch before loading
