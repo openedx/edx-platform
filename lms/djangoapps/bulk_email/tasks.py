@@ -29,7 +29,8 @@ from celery import current_task, shared_task
 from celery.exceptions import RetryTaskError
 from celery.states import FAILURE, RETRY, SUCCESS
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives, get_connection
+from django.contrib.sites.models import Site
+from django.core.mail import get_connection
 from django.core.mail.message import forbid_multi_line_headers
 from django.urls import reverse
 from django.utils import timezone
@@ -42,7 +43,14 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.bulk_email.api import get_unsubscribed_link
-from lms.djangoapps.bulk_email.toggles import is_email_use_course_id_from_for_bulk_enabled
+from lms.djangoapps.bulk_email.messages import (
+    DjangoEmail,
+    ACEEmail,
+)
+from lms.djangoapps.bulk_email.toggles import (
+    is_bulk_email_edx_ace_enabled,
+    is_email_use_course_id_from_for_bulk_enabled,
+)
 from lms.djangoapps.bulk_email.models import CourseEmail, Optout
 from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.instructor_task.models import InstructorTask
@@ -52,6 +60,7 @@ from lms.djangoapps.instructor_task.subtasks import (
     queue_subtasks_for_query,
     update_subtask_status
 )
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
 
@@ -498,16 +507,16 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         # use the email from address in the CourseEmail, if it is present, otherwise compute it.
         from_addr = course_email.from_addr or _get_source_address(course_email.course_id, course_title, course_language)
 
-    # use the CourseEmailTemplate that was associated with the CourseEmail
-    course_email_template = course_email.get_template()
-
+    site = Site.objects.get_current()
     try:
         connection = get_connection()
         connection.open()
 
         # Define context values to use in all course emails:
-        email_context = {'name': '', 'email': ''}
+        email_context = {'name': '', 'email': '', 'course_email': course_email, 'from_address': from_addr}
+        template_context = get_base_template_context(site)
         email_context.update(global_email_context)
+        email_context.update(template_context)
 
         start_time = time.time()
         while to_list:
@@ -519,6 +528,8 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             recipient_num += 1
             current_recipient = to_list[-1]
             email = current_recipient['email']
+            user_id = current_recipient['pk']
+            profile_name = current_recipient['profile__name']
             if _has_non_ascii_characters(email):
                 to_list.pop()
                 total_recipients_failed += 1
@@ -530,26 +541,16 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                 continue
 
             email_context['email'] = email
-            email_context['name'] = current_recipient['profile__name']
-            email_context['user_id'] = current_recipient['pk']
+            email_context['name'] = profile_name
+            email_context['user_id'] = user_id
             email_context['course_id'] = course_email.course_id
             email_context['unsubscribe_link'] = get_unsubscribed_link(current_recipient['username'],
                                                                       str(course_email.course_id))
 
-            # Construct message content using templates and context:
-            plaintext_msg = course_email_template.render_plaintext(course_email.text_message, email_context)
-            html_msg = course_email_template.render_htmltext(course_email.html_message, email_context)
-
-            # Create email:
-            email_msg = EmailMultiAlternatives(
-                course_email.subject,
-                plaintext_msg,
-                from_addr,
-                [email],
-                connection=connection
-            )
-            email_msg.attach_alternative(html_msg, 'text/html')
-
+            if is_bulk_email_edx_ace_enabled():
+                message = ACEEmail(site, email_context)
+            else:
+                message = DjangoEmail(connection, course_email, email_context)
             # Throttle if we have gotten the rate limiter.  This is not very high-tech,
             # but if a task has been retried for rate-limiting reasons, then we sleep
             # for a period of time between all emails within this task.  Choice of
@@ -563,8 +564,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                     f"BulkEmail ==> Task: {parent_task_id}, SubTask: {task_id}, EmailId: {email_id}, Recipient num: "
                     f"{recipient_num}/{total_recipients}, Recipient UserId: {current_recipient['pk']}"
                 )
-                connection.send_messages([email_msg])
-
+                message.send()
             except SMTPDataError as exc:
                 # According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure.
                 total_recipients_failed += 1

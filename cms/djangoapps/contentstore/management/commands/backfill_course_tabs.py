@@ -5,6 +5,9 @@ up the new tab automatically via course creation and the CourseTabList.initializ
 People updating to Nutmeg release should run this command as part of the upgrade process.
 
 This should be invoked from the Studio process.
+
+Note: This command will not fail due to updates, but can encounter errors and will log those out.
+Search for the error message to detect any issues.
 """
 import logging
 
@@ -50,4 +53,9 @@ class Command(BaseCommand):
                 # This will trigger the Course Published Signal which is necessary to update
                 # the corresponding Course Overview
                 logger.info(f'Updating tabs for {course_key}.')
-                store.update_item(course, ModuleStoreEnum.UserID.mgmt_command)
+                try:
+                    store.update_item(course, ModuleStoreEnum.UserID.mgmt_command)
+                    logger.info(f'Successfully updated tabs for {course_key}.')
+                except Exception as err:  # pylint: disable=broad-except
+                    logger.exception(err)
+                    logger.error(f'Course {course_key} encountered an Exception while trying to update.')

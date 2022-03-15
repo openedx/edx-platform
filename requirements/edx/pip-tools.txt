@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-click==8.0.3
+click==8.0.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   pip-tools

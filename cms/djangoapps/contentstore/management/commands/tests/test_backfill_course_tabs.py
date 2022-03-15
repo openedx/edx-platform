@@ -8,7 +8,6 @@ from django.core.management import call_command
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.tabs import InvalidTabsException
 
 
 class BackfillCourseTabsTest(ModuleStoreTestCase):
@@ -46,13 +45,14 @@ class BackfillCourseTabsTest(ModuleStoreTestCase):
         course = self.store.get_course(course.id)
         assert len(course.tabs) == 7
         assert 'dates' in {tab.type for tab in course.tabs}
-        mock_logger.info.assert_called_with(f'Updating tabs for {course.id}.')
-        assert mock_logger.info.call_count == 2
+        mock_logger.info.assert_any_call(f'Updating tabs for {course.id}.')
+        mock_logger.info.assert_any_call(f'Successfully updated tabs for {course.id}.')
+        assert mock_logger.info.call_count == 3
 
         call_command('backfill_course_tabs')
         # Ensure rerunning the command does not require another update on the course.
         # Goes up by one from the courses read log.
-        assert mock_logger.info.call_count == 3
+        assert mock_logger.info.call_count == 4
 
     @mock.patch('cms.djangoapps.contentstore.management.commands.backfill_course_tabs.logger')
     def test_multiple_courses_one_update(self, mock_logger):
@@ -76,13 +76,14 @@ class BackfillCourseTabsTest(ModuleStoreTestCase):
         assert 'dates' in {tab.type for tab in course.tabs}
         assert 'progress' in {tab.type for tab in course.tabs}
         mock_logger.info.assert_any_call('4 courses read from modulestore.')
-        mock_logger.info.assert_called_with(f'Updating tabs for {course.id}.')
-        assert mock_logger.info.call_count == 2
+        mock_logger.info.assert_any_call(f'Updating tabs for {course.id}.')
+        mock_logger.info.assert_any_call(f'Successfully updated tabs for {course.id}.')
+        assert mock_logger.info.call_count == 3
 
         call_command('backfill_course_tabs')
         # Ensure rerunning the command does not require another update on the course.
         # Goes up by one from the courses read log.
-        assert mock_logger.info.call_count == 3
+        assert mock_logger.info.call_count == 4
 
     @mock.patch('cms.djangoapps.contentstore.management.commands.backfill_course_tabs.logger')
     def test_multiple_courses_all_updated(self, mock_logger):
@@ -110,22 +111,47 @@ class BackfillCourseTabsTest(ModuleStoreTestCase):
         assert 'progress' in {tab.type for tab in course_2.tabs}
         mock_logger.info.assert_any_call('2 courses read from modulestore.')
         mock_logger.info.assert_any_call(f'Updating tabs for {course_1.id}.')
+        mock_logger.info.assert_any_call(f'Successfully updated tabs for {course_1.id}.')
         mock_logger.info.assert_any_call(f'Updating tabs for {course_2.id}.')
-        assert mock_logger.info.call_count == 3
+        mock_logger.info.assert_any_call(f'Successfully updated tabs for {course_2.id}.')
+        assert mock_logger.info.call_count == 5
 
         call_command('backfill_course_tabs')
         # Ensure rerunning the command does not require another update on any courses.
         # Goes up by one from the courses read log.
-        assert mock_logger.info.call_count == 4
+        assert mock_logger.info.call_count == 6
 
     @mock.patch('cms.djangoapps.contentstore.management.commands.backfill_course_tabs.logger')
-    def test_command_fails_if_error_raised(self, mock_logger):
-        CourseFactory()
+    def test_command_logs_exception_on_error(self, mock_logger):
+        """
+        The command should make it through all the courses regardless of Exceptions and will log any
+        encountered.
+
+        Command is only manually run and should be monitored.
+        """
+        error_course = CourseFactory()
+        error_course.tabs = [tab for tab in error_course.tabs if tab.type != 'dates']
+        self.update_course(error_course, ModuleStoreEnum.UserID.test)
+        error_course_tabs_before = error_course.tabs
+
+        updated_course = CourseFactory()
+        updated_course.tabs = [tab for tab in updated_course.tabs if tab.type != 'dates']
+        self.update_course(updated_course, ModuleStoreEnum.UserID.test)
+        updated_course_tabs_before = updated_course.tabs
+
         with mock.patch(
-            'cms.djangoapps.contentstore.management.commands.backfill_course_tabs.CourseTabList.initialize_default',
-            side_effect=InvalidTabsException
+            'lms.djangoapps.ccx.modulestore.CCXModulestoreWrapper.update_item', side_effect=[ValueError, None]
         ):
-            with self.assertRaises(InvalidTabsException):
-                call_command('backfill_course_tabs')
-        # Never calls the update, but does make it through grabbing the courses
-        mock_logger.info.assert_called_once_with('1 courses read from modulestore.')
+            call_command('backfill_course_tabs')
+
+        error_course = self.store.get_course(error_course.id)
+        error_course_tabs_after = error_course.tabs
+        # Course wasn't updated due to the ValueError
+        assert error_course_tabs_before == error_course_tabs_after
+
+        mock_logger.info.assert_any_call('2 courses read from modulestore.')
+        mock_logger.info.assert_any_call(f'Successfully updated tabs for {updated_course.id}.')
+        mock_logger.exception.assert_called()
+        mock_logger.error.assert_called_once_with(
+            f'Course {error_course.id} encountered an Exception while trying to update.'
+        )
