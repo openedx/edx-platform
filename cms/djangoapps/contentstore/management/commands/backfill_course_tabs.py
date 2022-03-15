@@ -44,18 +44,18 @@ class Command(BaseCommand):
         logger.info(f'{len(course_keys)} courses read from modulestore.')
 
         for course_key in course_keys:
-            course = store.get_course(course_key, depth=1)
-            existing_tabs = {tab.type for tab in course.tabs}
-            CourseTabList.initialize_default(course)
-            new_tabs = {tab.type for tab in course.tabs}
+            try:
+                course = store.get_course(course_key, depth=1)
+                existing_tabs = {tab.type for tab in course.tabs}
+                CourseTabList.initialize_default(course)
+                new_tabs = {tab.type for tab in course.tabs}
 
-            if existing_tabs != new_tabs:
-                # This will trigger the Course Published Signal which is necessary to update
-                # the corresponding Course Overview
-                logger.info(f'Updating tabs for {course_key}.')
-                try:
+                if existing_tabs != new_tabs:
+                    # This will trigger the Course Published Signal which is necessary to update
+                    # the corresponding Course Overview
+                    logger.info(f'Updating tabs for {course_key}.')
                     store.update_item(course, ModuleStoreEnum.UserID.mgmt_command)
                     logger.info(f'Successfully updated tabs for {course_key}.')
-                except Exception as err:  # pylint: disable=broad-except
-                    logger.exception(err)
-                    logger.error(f'Course {course_key} encountered an Exception while trying to update.')
+            except Exception as err:  # pylint: disable=broad-except
+                logger.exception(err)
+                logger.error(f'Course {course_key} encountered an Exception while trying to update.')
