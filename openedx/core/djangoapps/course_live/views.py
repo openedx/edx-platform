@@ -170,8 +170,7 @@ class CourseLiveProvidersView(APIView):
                 * 404: The requested course does not exist.
             **Response**
 
-                In the case of a 200 response code, the response will be iframe HTML and status if discussion is configured
-                for the program.
+                In the case of a 200 response code, the response will be available live providers.
 
             **Example**
 

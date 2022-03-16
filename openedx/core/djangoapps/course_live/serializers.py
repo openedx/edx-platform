@@ -91,7 +91,7 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseLiveConfiguration
 
-        fields = ['course_key', 'provider_type', 'enabled', 'lti_configuration','pii_sharing_allowed']
+        fields = ['course_key', 'provider_type', 'enabled', 'lti_configuration', 'pii_sharing_allowed']
         read_only_fields = ['course_key']
 
     def get_pii_sharing_allowed(self, instance):
@@ -101,7 +101,7 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         payload = super().to_representation(instance)
         if not payload['lti_configuration']:
             payload['lti_configuration'] = LtiSerializer(LtiConfiguration()).data
-        return  payload
+        return payload
 
     def create(self, validated_data):
         """
