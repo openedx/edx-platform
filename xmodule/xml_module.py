@@ -287,7 +287,7 @@ class XmlMixin:
                 metadata[attr] = value
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):  # pylint: disable=unused-argument
+    def parse_xml(cls, node, runtime, _keys, id_generator):
         """
         Use `node` to construct a new block.
 
@@ -296,8 +296,8 @@ class XmlMixin:
 
             runtime (:class:`.Runtime`): The runtime to use while parsing.
 
-            keys (:class:`.ScopeIds`): The keys identifying where this block
-                will store its data.
+            _keys (:class:`.ScopeIds`): The keys identifying where this block
+                will store its data. Not used by this implementation.
 
             id_generator (:class:`.IdGenerator`): An object that will allow the
                 runtime to generate correct definition and usage ids for
@@ -306,8 +306,7 @@ class XmlMixin:
         Returns (XBlock): The newly parsed XBlock
 
         """
-        # VS[compat] -- just have the url_name lookup, once translation is done
-        url_name = cls._get_url_name(node)
+        url_name = node.get('url_name')
         def_id = id_generator.create_definition(node.tag, url_name)
         usage_id = id_generator.create_usage(def_id)
         aside_children = []
@@ -387,18 +386,11 @@ class XmlMixin:
             return super().parse_xml(node, runtime, keys, id_generator=None)
 
     @classmethod
-    def _get_url_name(cls, node):
-        """
-        Reads url_name attribute from the node
-        """
-        return node.get('url_name', node.get('slug'))
-
-    @classmethod
     def load_definition_xml(cls, node, runtime, def_id):
         """
         Loads definition_xml stored in a dedicated file
         """
-        url_name = cls._get_url_name(node)
+        url_name = node.get('url_name')
         filepath = cls._format_filepath(node.tag, name_to_pathname(url_name))
         definition_xml = cls.load_file(filepath, runtime.resources_fs, def_id)
         return definition_xml, filepath
@@ -480,7 +472,9 @@ class XmlMixin:
             node.attrib.update(xml_object.attrib)
             node.extend(xml_object)
 
-        node.set('url_name', self.url_name)
+        # Do not override an existing value for the course.
+        if not node.get('url_name'):
+            node.set('url_name', self.url_name)
 
         # Special case for course pointers:
         if self.category == 'course':
