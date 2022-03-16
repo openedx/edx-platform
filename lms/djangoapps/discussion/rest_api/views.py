@@ -401,6 +401,14 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * read (optional): A boolean to mark thread as read
 
+        * closed (optional, privileged): A boolean to mark thread as closed.
+
+        * edit_reason_code (optional, privileged): A string containing a reason
+        code for editing the thread's body.
+
+        * close_reason_code (optional, privileged): A string containing a reason
+        code for closing the thread.
+
         * topic_id, type, title, raw_body, anonymous, and anonymous_to_peers
         are accepted with the same meaning as in a POST request
 
@@ -629,6 +637,9 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * raw_body, anonymous and anonymous_to_peers are accepted with the same
         meaning as in a POST request
+
+        * edit_reason_code (optional, privileged): A string containing a reason
+        code for a moderator to edit the comment.
 
         If "application/merge-patch+json" is not the specified content type,
         a 415 error is returned.
