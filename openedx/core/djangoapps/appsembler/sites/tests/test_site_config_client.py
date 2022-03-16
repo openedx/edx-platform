@@ -5,7 +5,6 @@ Tests for site_config_client_helpers and SiteConfigAdapter.
 import pytest
 from django.contrib.sites.models import Site
 from mock import Mock
-from organizations.models import Organization
 from organizations.tests.factories import OrganizationFactory
 
 from openedx.core.djangoapps.appsembler.sites import (
@@ -23,8 +22,7 @@ def site_with_org():
 
 
 @pytest.mark.django_db
-def test_is_enabled_for_site_with_client(monkeypatch, site_with_org):
-    monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', True)
+def test_is_enabled_for_site(monkeypatch, site_with_org):
     site, org = site_with_org
 
     helper = Mock()
@@ -36,8 +34,19 @@ def test_is_enabled_for_site_with_client(monkeypatch, site_with_org):
 
 
 @pytest.mark.django_db
-def test_is_disabled_for_main_site_with_client(settings, monkeypatch, site_with_org):
-    monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', True)
+def test_is_disabled_for_non_existent_organizations():
+    """
+    Ensures a sane result on incorrect or incomplete data.
+
+    This is mostly useful for tests which adds no organization for a site.
+    """
+    site_without_organization = Site.objects.create(domain='fake-site')
+    is_enabled = client_helpers.is_enabled_for_site(site_without_organization)
+    assert not is_enabled, 'Should be disabled if a site has no organization'
+
+
+@pytest.mark.django_db
+def test_is_disabled_for_main_site(settings, site_with_org):
     site, org = site_with_org
     settings.SITE_ID = site.id
     is_enabled = client_helpers.is_enabled_for_site(site)
@@ -45,15 +54,7 @@ def test_is_disabled_for_main_site_with_client(settings, monkeypatch, site_with_
 
 
 @pytest.mark.django_db
-def test_is_enabled_for_site_without_client(monkeypatch, site_with_org):
-    site, _ = site_with_org
-    monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', False)
-    assert not client_helpers.is_enabled_for_site(site), 'Disable if no client is installed'
-
-
-@pytest.mark.django_db
-def test_get_configuration_adapter_with_client(monkeypatch, site_with_org):
-    monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', True)
+def test_get_configuration_adapter(site_with_org):
     site, org = site_with_org
 
     adapter = client_helpers.get_configuration_adapter(site)
@@ -62,17 +63,9 @@ def test_get_configuration_adapter_with_client(monkeypatch, site_with_org):
 
 
 @pytest.mark.django_db
-def test_get_configuration_adapter_with_client(monkeypatch, site_with_org):
-    monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', True)
+def test_get_configuration_adapter(site_with_org):
     site, org = site_with_org
 
     adapter = client_helpers.get_configuration_adapter(site)
     assert adapter, 'Should return if client package is installed'
     assert adapter.site_uuid == org.edx_uuid, 'Should set the correct ID'
-
-
-@pytest.mark.django_db
-def test_get_configuration_adapter_without_client(monkeypatch, site_with_org):
-    monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', False)
-    site, _ = site_with_org
-    assert not client_helpers.get_configuration_adapter(site), 'Do not return if no client is installed'
