@@ -82,17 +82,16 @@ class CoursewareMeta:
             course_key,
         )
 
-        self.original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
+        original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
         self.original_user_is_global_staff = self.request.user.is_staff
         self.course_key = course_key
         self.course = get_course_by_id(self.course_key)
         self.course_masquerade, self.effective_user = setup_masquerade(
             self.request,
             course_key,
-            staff_access=self.original_user_is_staff,
+            staff_access=original_user_is_staff,
         )
         self.request.user = self.effective_user
-        self.is_staff = has_access(self.effective_user, 'staff', self.overview).has_access
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
         self.can_view_legacy_courseware = courseware_legacy_is_visible(
@@ -138,13 +137,6 @@ class CoursewareMeta:
     @property
     def license(self):
         return self.course.license
-
-    @property
-    def verified_mode(self):
-        """
-        Return verified mode information, or None.
-        """
-        return serialize_upgrade_info(self.effective_user, self.overview, self.enrollment_object)
 
     @property
     def notes(self):
@@ -427,7 +419,6 @@ class CoursewareInformation(RetrieveAPIView):
               as an object with the following fields:
                 * uri: The location of the image
         * name: Name of the course
-        * number: Catalog number of the course
         * offer: An object detailing upgrade discount information
             * code: (str) Checkout code
             * expiration_date: (str) Expiration of offer, in ISO 8601 notation
@@ -457,8 +448,6 @@ class CoursewareInformation(RetrieveAPIView):
         * pacing: Course pacing. Possible values: instructor, self
         * user_timezone: User's chosen timezone setting (or null for browser default)
         * can_load_course: Whether the user can view the course (AccessResponse object)
-        * is_staff: Whether the effective user has staff access to the course
-        * original_user_is_staff: Whether the original user has staff access to the course
         * can_view_legacy_courseware: Indicates whether the user is able to see the legacy courseware view
         * user_has_passing_grade: Whether or not the effective user's grade is equal to or above the courses minimum
             passing grade
