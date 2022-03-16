@@ -46,7 +46,15 @@ from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
 from util.request_rate_limiter import PasswordResetEmailRateLimiter
 
+from openedx.core.djangoapps.site_configuration import tahoe_auth0_helpers
+
 from organizations.models import UserOrganizationMapping
+
+try:
+    from tahoe_auth0 import api as tahoe_auth0_api  # Tahoe: optional dependency
+except ImportError:
+    pass
+
 
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
@@ -111,6 +119,10 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
         preferred_email (str): Send email to this address if present, otherwise fallback to user's email address.
     """
     site = get_current_site()
+
+    if tahoe_auth0_helpers.is_tahoe_auth0_enabled():
+        return tahoe_auth0_api.request_password_reset(user.email)
+
     message_context = get_base_template_context(site)
     message_context.update({
         'request': request,  # Used by google_analytics_tracking_pixel
