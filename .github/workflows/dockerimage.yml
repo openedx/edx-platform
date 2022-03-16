@@ -1,0 +1,48 @@
+name: docker
+
+on:
+  push:
+    branches:
+      - main
+      - prod
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: 'Build the Docker images'
+        shell: bash
+        run: |
+          # Build both images at once corresponding to `edx-platform` branch names
+          docker build --target edxapp-build --tag edxapp-build-prod --file Dockerfile.tutor .
+          docker build --target edxapp-build-experimental --tag edxapp-build-main --file Dockerfile.tutor .
+
+      - name: 'Set env.BRANCH to the current git branch'
+        run: |
+          echo "BRANCH=$(echo $GITHUB_REF | cut -d'/' -f 3)" >> $GITHUB_ENV
+
+      - name: 'Login to DockerHub'
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERUSER }}
+          password: ${{ secrets.DOCKERPASSWORD }}
+        if: ${{ env.BRANCH == 'main' || env.BRANCH == 'prod' }}
+
+      - name: 'Push the docker images after merge to `main` and `prod`'
+        shell: bash
+        run: |
+          IMAGE_NAME="appsembler/edxapp-juniper"
+
+          # Tag images from either `main` or `prod`
+          BRANCH_IMAGE_TAG="$IMAGE_NAME:$BRANCH-$(date +'%Y-%m-%d')-$(git rev-parse --short HEAD)"
+          BRANCH_IMAGE_LATEST="$IMAGE_NAME:$BRANCH"
+
+          docker tag "edxapp-build-$BRANCH" "$BRANCH_IMAGE_TAG";  # pin the build in history
+          docker tag "edxapp-build-$BRANCH" "$BRANCH_IMAGE_LATEST";  # branch's "latest" image
+
+          docker push "$BRANCH_IMAGE_TAG" "$BRANCH_IMAGE_LATEST";
+        if: ${{ env.BRANCH == 'main' || env.BRANCH == 'prod' }}

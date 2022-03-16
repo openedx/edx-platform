@@ -1,0 +1,54 @@
+# Tahoe Dockerfile production image
+
+# Start off from: https://github.com/overhangio/tutor/blob/v10.5.3/tutor/templates/build/openedx/Dockerfile
+# `overhangio/openedx:10.5.3` is the last version to support Juniper
+FROM overhangio/openedx:10.5.3 as edxapp-build
+MAINTAINER Appsembler <ops@appsembler.com>
+
+# TODO: Compile assets
+# TODO: Install theme
+# TODO: Compile i18n js messages, if it's needed
+# TODO: Consolidate requirements in a shared Ansible/Docker place in `edx-configs`
+
+RUN rm -rf /openedx/edx-platform/
+COPY . /openedx/edx-platform
+WORKDIR /openedx/edx-platform
+
+# Install standard Open edX python requirements
+RUN pip install -r ./requirements/edx/base.txt  \
+    && pip install -r ./requirements/edx/appsembler.txt
+
+# Sync with `edx-configs` `appsembler/tahoe/us/juniper/prod/files/server-vars.yml`
+RUN echo "Installing pip packages:" \
+    && pip install openedx-scorm-xblock==10.4.0 \
+    && pip install xblock-launchcontainer==2.3.1 \
+    && pip install xblock-prismjs==0.1.4 \
+    && pip install xblock-problem-builder==4.1.9 \
+    && echo \
+    && pip install https://github.com/appsembler/pdfXBlock/archive/v0.3.1.tar.gz \
+    && pip install https://github.com/edx/xblock-free-text-response/archive/4149cc450.tar.gz \
+    && pip install https://github.com/pmitros/FeedbackXBlock/archive/v1.1.tar.gz \
+    && pip install https://github.com/ubc/ubcpi/archive/1.0.0.tar.gz \
+    && echo \
+    && pip install course-access-groups==0.5.4 \
+    && pip install figures==0.4.1 \
+    && pip install tahoe-figures-plugins==0.1.0  \
+    && pip install tahoe-lti==0.3.0 \
+    && pip install tahoe-scorm==0.1.2 \
+    && echo \
+    && pip install https://github.com/appsembler/openedx-completion-aggregator/archive/3.0.3-2021-may-18-bug-fixes.tar.gz \
+    && echo "Finished installing pip packages."
+
+EXPOSE 8000
+
+FROM edxapp-build as edxapp-build-experimental
+# Sync with `edx-configs` `appsembler/tahoe/us/juniper/staging/files/server-vars.yml`
+RUN echo "Installing pip packages:" \
+    && pip install gestore==0.1.0-dev3 \
+    && pip install python-jose==3.2.0 \
+    && pip install xblock-grade-fetcher==0.2 \
+    && pip install -e 'git+https://github.com/appsembler/tahoe-auth0.git@main#egg=tahoe_auth0' \
+    && echo "Finished installing pip packages."
+
+
+EXPOSE 8000
