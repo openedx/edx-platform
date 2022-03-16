@@ -86,12 +86,22 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
     Serialize configuration responses
     """
     lti_configuration = LtiSerializer(many=False, read_only=False)
+    pii_sharing_allowed = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseLiveConfiguration
 
-        fields = ['course_key', 'provider_type', 'enabled', 'lti_configuration']
+        fields = ['course_key', 'provider_type', 'enabled', 'lti_configuration','pii_sharing_allowed']
         read_only_fields = ['course_key']
+
+    def get_pii_sharing_allowed(self, instance):
+        return self.context['pii_sharing_allowed']
+
+    def to_representation(self, instance):
+        payload = super().to_representation(instance)
+        if not payload['lti_configuration']:
+            payload['lti_configuration'] = LtiSerializer(LtiConfiguration()).data
+        return  payload
 
     def create(self, validated_data):
         """
@@ -127,14 +137,6 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 f'Provider type {data.get("provider_type")} does not exist')
         return instance
-
-    def to_representation(self, instance: CourseLiveConfiguration) -> dict:
-        """
-        Serialize data into a dictionary, to be used as a response
-        """
-        payload = super().to_representation(instance)
-        payload.update({'pii_sharing_allowed': self.context['pii_sharing_allowed']})
-        return payload
 
     def _update_lti(
         self,
