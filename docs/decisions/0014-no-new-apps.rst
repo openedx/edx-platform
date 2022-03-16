@@ -25,12 +25,3 @@ While the preference should always be to develop outside the edx-platform reposi
   
 Known Dependencies
 ------------------
-  
-
-
-
-
-
-
-
-
