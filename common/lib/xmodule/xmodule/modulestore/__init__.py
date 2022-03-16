@@ -50,7 +50,6 @@ class ModuleStoreEnum:
         The various types of modulestores provided
         """
         split = 'split'
-        mongo = 'mongo'
 
     class RevisionOption:
         """
