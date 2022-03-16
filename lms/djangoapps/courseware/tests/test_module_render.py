@@ -57,7 +57,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW, CombinedSystem  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps import static_replace
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
@@ -101,20 +101,6 @@ class PureXBlock(XBlock):
     Pure XBlock to use in tests.
     """
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
-class EmptyXModule(XModule):  # pylint: disable=abstract-method
-    """
-    Empty XModule for testing with no dependencies.
-    """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
-class EmptyXModuleDescriptor(XModuleDescriptor):  # pylint: disable=abstract-method
-    """
-    Empty XModule for testing with no dependencies.
-    """
-    module_class = EmptyXModule
 
 
 class GradedStatelessXBlock(XBlock):
@@ -1085,6 +1071,7 @@ class TestTOC(ModuleStoreTestCase):
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 class TestProctoringRendering(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
+
     def setUp(self):
         """
         Set up the initial mongo datastores
@@ -1402,6 +1389,7 @@ class TestGatedSubsectionRendering(ModuleStoreTestCase, MilestonesTestCaseMixin)
     """
     Test the toc for a course is rendered correctly when there is gated content
     """
+
     def setUp(self):
         """
         Set up the initial test data
@@ -1764,7 +1752,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
       </div>""")
 
         assert expected_score_override_html.format(block_id=problem_descriptor.location.block_id) in\
-               html_fragment.content
+            html_fragment.content
 
     @XBlock.register_temp_plugin(DetachedXBlock, identifier='detached-block')
     def test_staff_debug_info_disabled_for_detached_blocks(self):
@@ -1858,9 +1846,7 @@ PER_STUDENT_ANONYMIZED_XBLOCKS = [
 ]
 
 # The "set" here is to work around the bug that load_classes returns duplicates for multiply-declared classes.
-PER_STUDENT_ANONYMIZED_DESCRIPTORS = sorted(set([
-    class_ for (name, class_) in XModuleDescriptor.load_classes()
-] + PER_STUDENT_ANONYMIZED_XBLOCKS), key=str)
+PER_STUDENT_ANONYMIZED_DESCRIPTORS = sorted(set(PER_STUDENT_ANONYMIZED_XBLOCKS), key=str)
 
 
 @ddt.ddt
@@ -2233,7 +2219,6 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @ddt.data('xblock', 'xmodule')
     @XBlock.register_temp_plugin(PureXBlock, identifier='xblock')
-    @XBlock.register_temp_plugin(EmptyXModuleDescriptor, identifier='xmodule')
     @patch.object(render, 'make_track_function')
     def test_event_publishing(self, block_type, mock_track_function):
         request = self.request_factory.get('')
@@ -2318,21 +2303,6 @@ class PureXBlockWithChildren(PureXBlock):
     has_children = True
 
 
-class EmptyXModuleWithChildren(EmptyXModule):  # pylint: disable=abstract-method
-    """
-    Empty XModule for testing with no dependencies.
-    """
-    has_children = True
-
-
-class EmptyXModuleDescriptorWithChildren(EmptyXModuleDescriptor):  # pylint: disable=abstract-method
-    """
-    Empty XModule for testing with no dependencies.
-    """
-    module_class = EmptyXModuleWithChildren
-    has_children = True
-
-
 BLOCK_TYPES = ['xblock', 'xmodule']
 USER_NUMBERS = list(range(2))
 
@@ -2344,6 +2314,7 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
     even when those children are filtered by the runtime when loaded.
     """
     # pylint: disable=attribute-defined-outside-init
+
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create()
@@ -2356,7 +2327,6 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
 
     @ddt.data(*BLOCK_TYPES)
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
     def test_unbound(self, block_type):
         block = self._load_block(block_type)
         self.assertUnboundChildren(block)
@@ -2364,7 +2334,6 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
     @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
     @ddt.unpack
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
     def test_unbound_then_bound_as_descriptor(self, block_type, user_number):
         user = self.users[user_number]
         block = self._load_block(block_type)
@@ -2375,23 +2344,16 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
     @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
     @ddt.unpack
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
     def test_unbound_then_bound_as_xmodule(self, block_type, user_number):
         user = self.users[user_number]
         block = self._load_block(block_type)
         self.assertUnboundChildren(block)
         self._bind_block(block, user)
-
-        # Validate direct XModule access as well
-        if isinstance(block, XModuleDescriptor):
-            self.assertBoundChildren(block._xmodule, user)  # pylint: disable=protected-access
-        else:
-            self.assertBoundChildren(block, user)
+        self.assertBoundChildren(block, user)
 
     @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
     @ddt.unpack
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
     def test_bound_only_as_descriptor(self, block_type, user_number):
         user = self.users[user_number]
         block = self._load_block(block_type)
@@ -2401,17 +2363,11 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
     @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
     @ddt.unpack
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
     def test_bound_only_as_xmodule(self, block_type, user_number):
         user = self.users[user_number]
         block = self._load_block(block_type)
         self._bind_block(block, user)
-
-        # Validate direct XModule access as well
-        if isinstance(block, XModuleDescriptor):
-            self.assertBoundChildren(block._xmodule, user)  # pylint: disable=protected-access
-        else:
-            self.assertBoundChildren(block, user)
+        self.assertBoundChildren(block, user)
 
     def _load_block(self, block_type):
         """

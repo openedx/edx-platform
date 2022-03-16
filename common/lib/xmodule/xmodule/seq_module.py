@@ -40,7 +40,7 @@ from .exceptions import NotFoundError
 from .fields import Date
 from .mako_module import MakoTemplateBlockBase
 from .progress import Progress
-from .x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW, XModule  # pylint: disable=unused-import
+from .x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW  # pylint: disable=unused-import
 from .xml_module import XmlMixin
 
 

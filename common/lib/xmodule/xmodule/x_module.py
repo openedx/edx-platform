@@ -2,14 +2,12 @@
 
 import logging
 import os
-import sys
 import time
 import warnings
 from collections import namedtuple
 from functools import partial
 
 import yaml
-
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
@@ -33,23 +31,19 @@ from xblock.fields import (
     UserScope
 )
 from xblock.runtime import IdGenerator, IdReader, Runtime
-
 from xmodule import block_metadata_utils
-from xmodule.errortracker import exc_info_to_str
-from xmodule.exceptions import UndefinedContext
 from xmodule.fields import RelativeTime
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.xmodule_django import add_webpack_to_fragment
-from openedx.core.djangolib.markup import HTML
 
 from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,
     ATTR_KEY_REQUEST_COUNTRY_CODE,
     ATTR_KEY_USER_ID,
     ATTR_KEY_USER_IS_STAFF,
-    ATTR_KEY_USER_ROLE,
+    ATTR_KEY_USER_ROLE
 )
-
+from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger(__name__)
 
@@ -97,6 +91,7 @@ class OpaqueKeyReader(IdReader):
     """
     IdReader for :class:`DefinitionKey` and :class:`UsageKey`s.
     """
+
     def get_definition_id(self, usage_id):
         """Retrieve the definition that a usage is derived from.
 
@@ -174,6 +169,7 @@ class AsideKeyGenerator(IdGenerator):
     """
     An :class:`.IdGenerator` that only provides facilities for constructing new XBlockAsides.
     """
+
     def create_aside(self, definition_id, usage_id, aside_type):
         """
         Make a new aside definition and usage ids, indicating an :class:`.XBlockAside` of type `aside_type`
@@ -251,26 +247,18 @@ class HTMLSnippet:
 
     @classmethod
     def get_preview_view_js(cls):
-        if issubclass(cls, XModule):
-            return cls.get_javascript()
         return cls.preview_view_js
 
     @classmethod
     def get_preview_view_js_bundle_name(cls):
-        if issubclass(cls, XModule):
-            return cls.__name__
         return cls.__name__ + 'Preview'
 
     @classmethod
     def get_studio_view_js(cls):
-        if issubclass(cls, XModuleDescriptor):
-            return cls.get_javascript()
         return cls.studio_view_js
 
     @classmethod
     def get_studio_view_js_bundle_name(cls):
-        if issubclass(cls, XModuleDescriptor):
-            return cls.__name__
         return cls.__name__ + 'Studio'
 
     @classmethod
@@ -291,14 +279,10 @@ class HTMLSnippet:
 
     @classmethod
     def get_preview_view_css(cls):
-        if issubclass(cls, XModule):
-            return cls.get_css()
         return cls.preview_view_css
 
     @classmethod
     def get_studio_view_css(cls):
-        if issubclass(cls, XModuleDescriptor):
-            return cls.get_css()
         return cls.studio_view_css
 
     def get_html(self):
@@ -834,54 +818,6 @@ class XModuleMixin(XModuleFields, XBlock):
         return Fragment(alert_html.format(display_text))
 
 
-class ProxyAttribute:
-    """
-    A (python) descriptor that proxies attribute access.
-
-    For example:
-
-    class Foo(object):
-        def __init__(self, value):
-            self.foo_attr = value
-
-    class Bar(object):
-        foo = Foo('x')
-        foo_attr = ProxyAttribute('foo', 'foo_attr')
-
-    bar = Bar()
-
-    assert bar.foo_attr == 'x'
-    bar.foo_attr = 'y'
-    assert bar.foo.foo_attr == 'y'
-    del bar.foo_attr
-    assert not hasattr(bar.foo, 'foo_attr')
-    """
-    def __init__(self, source, name):
-        """
-        :param source: The name of the attribute to proxy to
-        :param name: The name of the attribute to proxy
-        """
-        self._source = source
-        self._name = name
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-
-        return getattr(getattr(instance, self._source), self._name)
-
-    def __set__(self, instance, value):
-        setattr(getattr(instance, self._source), self._name, value)
-
-    def __delete__(self, instance):
-        delattr(getattr(instance, self._source), self._name)
-
-
-module_attr = partial(ProxyAttribute, '_xmodule')  # pylint: disable=invalid-name
-descriptor_attr = partial(ProxyAttribute, 'descriptor')  # pylint: disable=invalid-name
-module_runtime_attr = partial(ProxyAttribute, 'xmodule_runtime')  # pylint: disable=invalid-name
-
-
 class XModuleToXBlockMixin:
     """
     Common code needed by XModule and XBlocks converted from XModules.
@@ -908,6 +844,7 @@ class XModuleToXBlockMixin:
             name, so we carry the FieldStorage .filename attribute as the .name.
 
             """
+
             def __init__(self, webob_file):
                 self.file = webob_file.file
                 self.name = webob_file.filename
@@ -924,108 +861,6 @@ class XModuleToXBlockMixin:
 
         response_data = self.handle_ajax(suffix, request_post)
         return Response(response_data, content_type='application/json', charset='UTF-8')
-
-
-@XBlock.needs("i18n")
-class XModule(XModuleToXBlockMixin, HTMLSnippet, XModuleMixin):  # lint-amnesty, pylint: disable=abstract-method
-    """ Implements a generic learning module.
-
-        Subclasses must at a minimum provide a definition for get_html in order
-        to be displayed to users.
-
-        See the HTML module for a simple example.
-    """
-
-    entry_point = "xmodule.v1"
-
-    has_score = descriptor_attr('has_score')
-    max_score = descriptor_attr('max_score')
-    show_in_read_only_mode = descriptor_attr('show_in_read_only_mode')
-    _field_data_cache = descriptor_attr('_field_data_cache')
-    _field_data = descriptor_attr('_field_data')
-    _dirty_fields = descriptor_attr('_dirty_fields')
-
-    def __init__(self, descriptor, *args, **kwargs):
-        """
-        Construct a new xmodule
-
-        runtime: An XBlock runtime allowing access to external resources
-
-        descriptor: the XModuleDescriptor that this module is an instance of.
-
-        field_data: A dictionary-like object that maps field names to values
-            for those fields.
-        """
-
-        # Set the descriptor first so that we can proxy to it
-        self.descriptor = descriptor
-        self._runtime = None
-        super().__init__(*args, **kwargs)
-        self.runtime.xmodule_instance = self
-
-    @property
-    def runtime(self):
-        return CombinedSystem(self._runtime, self.descriptor._runtime)  # pylint: disable=protected-access
-
-    @runtime.setter
-    def runtime(self, value):
-        self._runtime = value
-
-    def __str__(self):
-        # xss-lint: disable=python-wrap-html
-        return f'<x_module(id={self.id})>'  # lint-amnesty, pylint: disable=no-member
-
-    def handle_ajax(self, _dispatch, _data):
-        """ dispatch is last part of the URL.
-            data is a dictionary-like object with the content of the request"""
-        return ""
-
-    def get_child(self, usage_id):
-        if usage_id in self._child_cache:
-            return self._child_cache[usage_id]
-
-        # Take advantage of the children cache that the descriptor might have
-        child_descriptor = self.descriptor.get_child(usage_id)
-        child_block = None
-        if child_descriptor is not None:
-            child_block = self.system.get_module(child_descriptor)
-
-        self._child_cache[usage_id] = child_block
-        return child_block
-
-    def get_child_descriptors(self):
-        """
-        Returns the descriptors of the child modules
-
-        Overriding this changes the behavior of get_children and
-        anything that uses get_children, such as get_display_items.
-
-        This method will not instantiate the modules of the children
-        unless absolutely necessary, so it is cheaper to call than get_children
-
-        These children will be the same children returned by the
-        descriptor unless descriptor.has_dynamic_children() is true.
-        """
-        return self.descriptor.get_children()
-
-    def displayable_items(self):
-        """
-        Returns list of displayable modules contained by this module. If this
-        module is visible, should return [self].
-        """
-        return [self.descriptor]
-
-    # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
-    def student_view(self, context):  # lint-amnesty, pylint: disable=unused-argument
-        """
-        Return a fragment with the html from this XModule
-
-        Doesn't yet add any of the javascript to the fragment, nor the css.
-        Also doesn't expect any javascript binding, yet.
-
-        Makes no use of the context parameter
-        """
-        return Fragment(self.get_html())
 
 
 def policy_key(location):
@@ -1195,165 +1030,11 @@ class XModuleDescriptorToXBlockMixin:
         raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
 
 
-@XBlock.needs("i18n")
-class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):  # lint-amnesty, pylint: disable=abstract-method
-    """
-    An XModuleDescriptor is a specification for an element of a course. This
-    could be a problem, an organizational element (a group of content), or a
-    segment of video, for example.
-
-    XModuleDescriptors are independent and agnostic to the current student state
-    on a problem. They handle the editing interface used by instructors to
-    create a problem, and can generate XModules (which do know about student
-    state).
-    """
-
-    entry_point = "xmodule.v1"
-
-    module_class = XModule
-
-    # ============================= STRUCTURAL MANIPULATION ===================
-    def __init__(self, *args, **kwargs):
-        """
-        Construct a new XModuleDescriptor. The only required arguments are the
-        system, used for interaction with external resources, and the
-        definition, which specifies all the data needed to edit and display the
-        problem (but none of the associated metadata that handles recordkeeping
-        around the problem).
-
-        This allows for maximal flexibility to add to the interface while
-        preserving backwards compatibility.
-
-        runtime: A DescriptorSystem for interacting with external resources
-
-        field_data: A dictionary-like object that maps field names to values
-            for those fields.
-
-        XModuleDescriptor.__init__ takes the same arguments as xblock.core:XBlock.__init__
-        """
-        super().__init__(*args, **kwargs)
-        # update_version is the version which last updated this xblock v prev being the penultimate updater
-        # leaving off original_version since it complicates creation w/o any obv value yet and is computable
-        # by following previous until None
-        # definition_locator is only used by mongostores which separate definitions from blocks
-        self.previous_version = self.update_version = self.definition_locator = None
-        self.xmodule_runtime = None
-
-    def editor_saved(self, user, old_metadata, old_content):
-        """
-        This method is called when "Save" is pressed on the Studio editor.
-
-        Note that after this method is called, the modulestore update_item method will
-        be called on this xmodule. Therefore, any modifications to the xmodule that are
-        performed in editor_saved will automatically be persisted (calling update_item
-        from implementors of this method is not necessary).
-
-        Args:
-            user: the user who requested the save (as obtained from the request)
-            old_metadata (dict): the values of the fields with Scope.settings before the save was performed
-            old_content (dict): the values of the fields with Scope.content before the save was performed.
-                This will include 'data'.
-        """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-    # =============================== BUILTIN METHODS ==========================
-    def __eq__(self, other):
-        """
-        Is this XModule effectively equal to the other instance?
-        """
-        return (hasattr(other, 'scope_ids') and
-                self.scope_ids == other.scope_ids and
-                set(self.fields.keys()) == set(other.fields.keys()) and  # lint-amnesty, pylint: disable=no-member
-                all(getattr(self, field.name) == getattr(other, field.name)
-                    for field in self.fields.values()))  # lint-amnesty, pylint: disable=no-member
-
-    def __hash__(self):  # pylint: disable=useless-super-delegation
-        """
-        This isn't technically appropriate since descriptors are actually mutable,
-        but in practice we rarely modify them after creation or instantiate two
-        equivalent descriptors in the same process.  And we perform graph
-        operations on large collections of XBlocks that have simply unacceptable
-        performance if we have to rely on lists and equality rather than sets,
-        dictionaries, and identity-based hash functions.
-        """
-        return super().__hash__()
-
-    def __repr__(self):
-        return (
-            "{0.__class__.__name__}("
-            "{0.runtime!r}, "
-            "{0._field_data!r}, "
-            "{0.scope_ids!r}"
-            ")".format(self)
-        )
-
-    # ~~~~~~~~~~~~~~~ XModule Indirection ~~~~~~~~~~~~~~~~
-    @property
-    def _xmodule(self):
-        """
-        Returns the XModule corresponding to this descriptor. Expects that the system
-        already supports all of the attributes needed by xmodules
-        """
-        if self.xmodule_runtime is None:
-            raise UndefinedContext()
-        assert self.xmodule_runtime.error_descriptor_class is not None
-        if self.xmodule_runtime.xmodule_instance is None:
-            try:
-                self.xmodule_runtime.construct_xblock_from_class(
-                    self.module_class,
-                    descriptor=self,
-                    scope_ids=self.scope_ids,
-                    field_data=self._field_data,
-                    for_parent=self.get_parent() if self.has_cached_parent else None
-                )
-                self.xmodule_runtime.xmodule_instance.save()
-            except Exception:  # pylint: disable=broad-except
-                # xmodule_instance is set by the XModule.__init__. If we had an error after that,
-                # we need to clean it out so that we can set up the ErrorBlock instead
-                self.xmodule_runtime.xmodule_instance = None
-
-                if isinstance(self, self.xmodule_runtime.error_descriptor_class):
-                    log.exception('Error creating an ErrorBlock from an ErrorBlock')
-                    raise
-
-                log.exception('Error creating xmodule')
-                descriptor = self.xmodule_runtime.error_descriptor_class.from_descriptor(
-                    self,
-                    error_msg=exc_info_to_str(sys.exc_info())
-                )
-                descriptor.xmodule_runtime = self.xmodule_runtime
-                self.xmodule_runtime.xmodule_instance = descriptor
-        return self.xmodule_runtime.xmodule_instance
-
-    course_id = module_attr('course_id')
-    displayable_items = module_attr('displayable_items')
-    get_display_items = module_attr('get_display_items')
-    get_icon_class = module_attr('get_icon_class')
-    get_progress = module_attr('get_progress')
-    get_score = module_attr('get_score')
-    handle_ajax = module_attr('handle_ajax')
-    student_view = module_attr(STUDENT_VIEW)
-    public_view = module_attr(PUBLIC_VIEW)
-    get_child_descriptors = module_attr('get_child_descriptors')
-    xmodule_handler = module_attr('xmodule_handler')
-
-    # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
-    def studio_view(self, _context):
-        """
-        Return a fragment with the html from this XModuleDescriptor's editing view
-
-        Doesn't yet add any of the javascript to the fragment, nor the css.
-        Also doesn't expect any javascript binding, yet.
-
-        Makes no use of the context parameter
-        """
-        return Fragment(self.get_html())
-
-
 class ConfigurableFragmentWrapper:
     """
     Runtime mixin that allows for composition of many `wrap_xblock` wrappers
     """
+
     def __init__(self, wrappers=None, wrappers_asides=None, **kwargs):
         """
         :param wrappers: A list of wrappers, where each wrapper is:
@@ -1486,6 +1167,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
     """
     Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
     """
+
     def __init__(
         self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=lambda: [], **kwargs
     ):
@@ -2161,10 +1843,7 @@ class CombinedSystem:
 
         Otherwise, return block.
         """
-        if isinstance(block, XModuleDescriptor) and block.xmodule_runtime:
-            return block._xmodule  # pylint: disable=protected-access
-        else:
-            return block
+        return block
 
     def render(self, block, view_name, context=None):
         """
@@ -2258,6 +1937,7 @@ class CombinedSystem:
 
 class DoNothingCache:
     """A duck-compatible object to use in ModuleSystem when there's no cache."""
+
     def get(self, _key):
         return None
 

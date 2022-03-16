@@ -11,17 +11,13 @@ import unittest
 from importlib import import_module
 from unittest.mock import patch
 
-import pytest
 import ddt
+import pytest
 from ccx_keys.locator import CCXBlockUsageLocator
 from django.core.cache import InvalidCacheBackendError, caches
 from opaque_keys.edx.locator import BlockUsageLocator, CourseKey, CourseLocator, LocalId
 from path import Path as path
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
-
-from openedx.core.djangolib.testing.utils import CacheIsolationMixin
-from openedx.core.lib import tempdir
-from openedx.core.lib.tests import attr
 from xmodule.course_module import CourseBlock
 from xmodule.fields import Date, Timedelta
 from xmodule.modulestore import ModuleStoreEnum
@@ -41,6 +37,10 @@ from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NU
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 from xmodule.tabs import CourseTab
 from xmodule.x_module import XModuleMixin
+
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin
+from openedx.core.lib import tempdir
+from openedx.core.lib.tests import attr
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
 BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published

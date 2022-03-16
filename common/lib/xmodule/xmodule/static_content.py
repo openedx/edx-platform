@@ -30,7 +30,7 @@ from xmodule.seq_module import SequenceBlock
 from xmodule.split_test_module import SplitTestBlock
 from xmodule.template_module import CustomTagBlock
 from xmodule.word_cloud_module import WordCloudBlock
-from xmodule.x_module import XModuleDescriptor, HTMLSnippet
+from xmodule.x_module import HTMLSnippet
 
 LOG = logging.getLogger(__name__)
 
@@ -111,24 +111,16 @@ def write_descriptor_js(output_root):
 
 def _list_descriptors():
     """Return a list of all registered XModuleDescriptor classes."""
-    return sorted(
-        [
-            desc for (_, desc) in XModuleDescriptor.load_classes()
-        ] + XBLOCK_CLASSES,
-        key=str
-    )
+    return sorted(XBLOCK_CLASSES,
+                  key=str
+                  )
 
 
 def _list_modules():
     """Return a list of all registered XModule classes."""
-    return sorted(
-        [
-            desc.module_class for desc in [
-                desc for (_, desc) in XModuleDescriptor.load_classes()
-            ]
-        ] + XBLOCK_CLASSES,
-        key=str
-    )
+    return sorted(XBLOCK_CLASSES,
+                  key=str
+                  )
 
 
 def _ensure_dir(directory):

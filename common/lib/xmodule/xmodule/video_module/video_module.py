@@ -28,26 +28,31 @@ from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
-
-from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
-from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
-from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
-from openedx.core.lib.cache_utils import request_cached
-from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import EditingMixin, TabsEditingMixin
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_module import EmptyDataRawMixin
-from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.video_module import manage_video_subtitles_save
 from xmodule.x_module import (
-    PUBLIC_VIEW, STUDENT_VIEW,
-    HTMLSnippet, ResourceTemplates, shim_xmodule_js,
-    XModuleMixin, XModuleToXBlockMixin, XModuleDescriptorToXBlockMixin,
+    PUBLIC_VIEW,
+    STUDENT_VIEW,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleDescriptorToXBlockMixin,
+    XModuleMixin,
+    XModuleToXBlockMixin,
+    shim_xmodule_js
 )
 from xmodule.xml_module import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
+
+from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
+from openedx.core.djangoapps.video_config.models import CourseYoutubeBlockedFlag, HLSPlaybackEnabledFlag
+from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
+from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.license import LicenseMixin
 
 from .bumper_utils import bumperize
 from .transcripts_utils import (

@@ -13,7 +13,6 @@ from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
-from xmodule.x_module import XModuleDescriptor  # lint-amnesty, pylint: disable=unused-import
 
 log = logging.getLogger(__name__)
 
@@ -612,5 +611,5 @@ class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
             super().add_xml_to_node(node)
 
 
-class XmlDescriptor(XmlMixin, XModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method
+class XmlDescriptor(XmlMixin):  # lint-amnesty, pylint: disable=abstract-method
     pass

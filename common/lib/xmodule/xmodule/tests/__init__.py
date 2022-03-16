@@ -37,7 +37,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests.helpers import StubReplaceURLService, mock_render_template, StubMakoService, StubUserService
 from xmodule.util.sandboxing import SandboxService
-from xmodule.x_module import DoNothingCache, ModuleSystem, XModuleDescriptor, XModuleMixin
+from xmodule.x_module import DoNothingCache, ModuleSystem
 from openedx.core.lib.cache_utils import CacheService
 
 
@@ -183,7 +183,7 @@ def get_test_descriptor_system(render_template=None):
         resources_fs=Mock(name='get_test_descriptor_system.resources_fs'),
         error_tracker=Mock(name='get_test_descriptor_system.error_tracker'),
         render_template=render_template or mock_render_template,
-        mixins=(InheritanceMixin, XModuleMixin),
+        mixins=(InheritanceMixin,),
         field_data=field_data,
         services={'field-data': field_data},
     )
