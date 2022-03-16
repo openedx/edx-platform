@@ -147,19 +147,18 @@ class TranslateCustomTagBlock(  # pylint: disable=abstract-method
     resources_dir = None
 
     @classmethod
-    def from_xml(cls, xml_data, system, id_generator):
+    def parse_xml(cls, node, runtime, _keys, _id_generator):
         """
         Transforms the xml_data from <$custom_tag attr="" attr=""/> to
         <customtag attr="" attr="" impl="$custom_tag"/>
         """
 
-        xml_object = etree.fromstring(xml_data)
-        system.error_tracker(Text('WARNING: the <{tag}> tag is deprecated.  '
-                             'Instead, use <customtag impl="{tag}" attr1="..." attr2="..."/>. ')
-                             .format(tag=xml_object.tag))
+        runtime.error_tracker(Text('WARNING: the <{tag}> tag is deprecated.  '
+                              'Instead, use <customtag impl="{tag}" attr1="..." attr2="..."/>. ')
+                              .format(tag=node.tag))
 
-        tag = xml_object.tag
-        xml_object.tag = 'customtag'
-        xml_object.attrib['impl'] = tag
+        tag = node.tag
+        node.tag = 'customtag'
+        node.attrib['impl'] = tag
 
-        return system.process_xml(etree.tostring(xml_object))
+        return runtime.process_xml(etree.tostring(node))
