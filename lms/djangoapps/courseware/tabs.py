@@ -277,7 +277,9 @@ class ExternalDiscussionCourseTab(LinkTab):
     def is_enabled(cls, course, user=None):
         if not super().is_enabled(course, user=user):
             return False
-        return course.discussion_link
+        # Course Overview objects don't have this attribute so avoid the error for now and figure
+        # out a better long-term solution
+        return hasattr(course, 'discussion_link') and course.discussion_link
 
 
 class ExternalLinkCourseTab(LinkTab):
@@ -361,16 +363,15 @@ def get_course_tab_list(user, course):
             if tab.type != 'courseware':
                 continue
             tab.name = _("Entrance Exam")
+            tab.title = _("Entrance Exam")
         # TODO: LEARNER-611 - once the course_info tab is removed, remove this code
         if not DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id) and tab.type == 'course_info':
             continue
         if tab.type == 'static_tab' and tab.course_staff_only and \
                 not bool(user and has_access(user, 'staff', course, course.id)):
             continue
-        # We had initially created a CourseTab.load() for dates that ended up
-        # persisting the dates tab tomodulestore on Course Run creation, but
-        # ignoring any static dates tab here we can fix forward without
-        # allowing the bug to continue to surface
+        # We are phasing this out in https://github.com/openedx/edx-platform/pull/30045/, but need this
+        # until the backfill course tabs command is completed
         if tab.type == 'dates':
             continue
         course_tab_list.append(tab)

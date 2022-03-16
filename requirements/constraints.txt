@@ -12,14 +12,15 @@
 # This file contains all common constraints for edx-repos
 -c common_constraints.txt
 
-# celert>5.0.0 hasn't been tested yet, so the constraint will be removed after testing latest version
-celery<5.0.0
+# As it is not clarified what exact breaking changes will be introduced as per
+# the next major release, ensure the installed version is within boundaries.
+celery>=5.2.2,<6.0.0
+
+# required for celery>=5.2.0;<5.3.0
+click>=8.0,<9.0
 
 # edx-platform currently only supported for Django 3.2.x
 django<3.3
-
-# Newer versions need celery >= 5.0
-django-celery-results<2.1
 
 # We do not support version django-config-models<1.0.0
 django-config-models>=1.0.0
@@ -30,7 +31,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.40.10
+edx-enterprise==3.40.16
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
@@ -67,9 +68,6 @@ sympy==1.6.2
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
 
-# With greater version these tests `common.djangoapps.terrain.stubs.tests` becomes flaky on jenkins.
-httpretty<1.0
-
 # latest version of diff-cover conflicts with pygments version see https://github.com/Bachmann1234/diff_cover/commit/01f91760321cee1ad28cfa0d801c4acd8b9765a6
 diff-cover==4.0.0
 
@@ -79,9 +77,6 @@ python-slugify<5.0.0
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
-
-# celery requires click<8.0.0 which would be fixed once https://github.com/celery/celery/issues/6753 is done.
-click<8.0.0
 
 # Release 2.1.0 pulls declares `pact-python` as a base requirement, even though it should be
 # a testing requirement. Installing it would cause a bunch of new tool packages to become base
@@ -108,3 +103,8 @@ scipy<1.8.0
 # This will be fixed when sphinxcontrib-openapi depends on m2r2 instead of m2r
 # See issue: https://github.com/sphinx-contrib/openapi/issues/123
 mistune<2.0.0
+
+# django-celery-results==2.3.0 requires psycopg2 as dependency but hasn't explicitly added in package requirements.
+# The PR https://github.com/celery/django-celery-results/pull/292 fixing this issue has been merged but
+# new version hasn't been released yet with the fix so pinning the version until django-celery-results>2.3.0 is out.
+django-celery-results<2.3.0

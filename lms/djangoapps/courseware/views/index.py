@@ -29,7 +29,7 @@ from web_fragments.fragment import Fragment
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
-from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
+from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
@@ -531,7 +531,7 @@ class CoursewareIndex(View):
         """
         if course_has_entrance_exam(self.course) and getattr(self.chapter, 'is_entrance_exam', False):
             courseware_context['entrance_exam_passed'] = user_has_passed_entrance_exam(self.effective_user, self.course)
-            courseware_context['entrance_exam_current_score'] = get_entrance_exam_score_ratio(
+            courseware_context['entrance_exam_current_score'] = get_entrance_exam_score(
                 CourseGradeFactory().read(self.effective_user, self.course),
                 get_entrance_exam_usage_key(self.course),
             )

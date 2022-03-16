@@ -50,11 +50,7 @@ from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_mongo_calls, mongo_uses_error_check
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.tests.test_asides import AsideTestType
-from xmodule.modulestore.tests.utils import (
-    MongoContentstoreBuilder,
-    create_modulestore_instance,
-    mock_tab_from_json
-)
+from xmodule.modulestore.tests.utils import MongoContentstoreBuilder, create_modulestore_instance
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import LocationMixin, import_course_from_xml
 from xmodule.tests import DATA_DIR, CourseComparisonTest
@@ -368,7 +364,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    fake: one w/ wildcard version
     # split: has one lookup for the course and then one for the course items
     #    but the active_versions check is done in MySQL
-    @ddt.data((ModuleStoreEnum.Type.mongo, [1, 1], 0), (ModuleStoreEnum.Type.split, [2, 1], 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, [1, 1], 0), (ModuleStoreEnum.Type.split, [1, 1], 0))
     @ddt.unpack
     def test_has_item(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -391,17 +387,17 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     # split:
     #   problem: active_versions, structure
     #   non-existent problem: ditto
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, [3, 2], 0), (ModuleStoreEnum.Type.split, 0, [2, 1], 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, [0, 0], [3, 2], 0), (ModuleStoreEnum.Type.split, [1, 0], [1, 1], 0))
     @ddt.unpack
     def test_get_item(self, default_ms, num_mysql, max_find, max_send):
         self.initdb(default_ms)
         self._create_block_hierarchy()
 
-        with check_mongo_calls(max_find.pop(0), max_send), self.assertNumQueries(num_mysql):
+        with check_mongo_calls(max_find.pop(0), max_send), self.assertNumQueries(num_mysql.pop(0)):
             assert self.store.get_item(self.problem_x1a_1) is not None  # lint-amnesty, pylint: disable=no-member
 
         # try negative cases
-        with check_mongo_calls(max_find.pop(0), max_send), self.assertNumQueries(num_mysql):
+        with check_mongo_calls(max_find.pop(0), max_send), self.assertNumQueries(num_mysql.pop(0)):
             with pytest.raises(ItemNotFoundError):
                 self.store.get_item(self.fake_location)
 
@@ -414,7 +410,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     # Split:
     #    mysql: fetch course's active version from SplitModulestoreCourseIndex, spurious refetch x2
     #    find: get structure
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 14, 0), (ModuleStoreEnum.Type.split, 0, 3, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 14, 0), (ModuleStoreEnum.Type.split, 2, 1, 0))
     @ddt.unpack
     def test_get_items(self, default_ms, num_mysql, max_find, max_send):
         self.initdb(default_ms)
@@ -917,7 +913,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
     #   Find: active_versions, 2 structures (published & draft), definition (unnecessary)
     #   Sends: updated draft and published structures and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 7, 2), (ModuleStoreEnum.Type.split, 3, 3, 3))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 7, 2), (ModuleStoreEnum.Type.split, 4, 2, 3))
     @ddt.unpack
     def test_delete_item(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -946,7 +942,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
     #    find: draft and published structures, definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 9, 2), (ModuleStoreEnum.Type.split, 3, 4, 3))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 9, 2), (ModuleStoreEnum.Type.split, 4, 3, 3))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1000,7 +996,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   mysql: SplitModulestoreCourseIndex - select 2x (by course_id, by objectid), update, update historical record
     #   find: structure (cached)
     #   send: update structure and active_versions
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 4, 1), (ModuleStoreEnum.Type.split, 3, 2, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 4, 1), (ModuleStoreEnum.Type.split, 4, 1, 2))
     @ddt.unpack
     def test_delete_draft_vertical(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1043,7 +1039,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #          executed twice, possibly unnecessarily)
     #   find: 2 reads of structure, definition (s/b lazy; so, unnecessary),
     #         plus 1 wildcard find in draft mongo which has none
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 3, 0), (ModuleStoreEnum.Type.split, 0, 5, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 2, 0), (ModuleStoreEnum.Type.split, 2, 3, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, num_mysql, max_find, max_send):
         self.initdb(default_ms)
@@ -1083,7 +1079,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     # draft is 2: find out which ms owns course, get item
     # split: active_versions (mysql), structure, definition (to load course wiki string)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 2, 0), (ModuleStoreEnum.Type.split, 0, 3, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 2, 0), (ModuleStoreEnum.Type.split, 1, 2, 0))
     @ddt.unpack
     def test_get_course(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1120,7 +1116,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     # still only 2)
     # Draft: get_parent
     # Split: active_versions, structure
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 1, 0), (ModuleStoreEnum.Type.split, 0, 2, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 1, 0), (ModuleStoreEnum.Type.split, 1, 1, 0))
     @ddt.unpack
     def test_get_parent_locations(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -1638,7 +1634,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    8-9. get vertical, compute inheritance
     #    10-11. get other vertical_x1b (why?) and compute inheritance
     # Split: loading structure from mongo (also loads active version from MySQL, not tracked here)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, [12, 3], 0), (ModuleStoreEnum.Type.split, 0, [3, 1], 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, [0, 0], [12, 3], 0), (ModuleStoreEnum.Type.split, [1, 0], [2, 1], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_mysql, num_finds, num_sends):
         """
@@ -1659,7 +1655,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
             for location, expected in should_work:
                 # each iteration has different find count, pop this iter's find count
-                with check_mongo_calls(num_finds.pop(0), num_sends), self.assertNumQueries(num_mysql):
+                with check_mongo_calls(num_finds.pop(0), num_sends), self.assertNumQueries(num_mysql.pop(0)):
                     path = path_to_location(self.store, location)
                     assert path == expected
 
@@ -1878,7 +1874,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     # Draft: get all items which can be or should have parents
     # Split: active_versions (mysql), structure (mongo)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 1, 0), (ModuleStoreEnum.Type.split, 0, 2, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 1, 0), (ModuleStoreEnum.Type.split, 1, 1, 0))
     @ddt.unpack
     def test_get_orphans(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -2015,7 +2011,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     # Draft: wildcard search of draft (find) and split (mysql)
     # Split: wildcard search of draft (find) and split (mysql)
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 2, 0), (ModuleStoreEnum.Type.split, 0, 2, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 1, 0), (ModuleStoreEnum.Type.split, 1, 1, 0))
     @ddt.unpack
     def test_get_courses_for_wiki(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -2046,7 +2042,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    Sends:
     #      1. insert structure
     #      2. write index entry
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 2, 6), (ModuleStoreEnum.Type.split, 3, 3, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 2, 6), (ModuleStoreEnum.Type.split, 4, 2, 2))
     @ddt.unpack
     def test_unpublish(self, default_ms, num_mysql, max_find, max_send):
         """
@@ -2084,7 +2080,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     # Draft: specific query for revision None
     # Split: active_versions from MySQL, structure from mongo
-    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 1, 0), (ModuleStoreEnum.Type.split, 0, 2, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 0, 1, 0), (ModuleStoreEnum.Type.split, 1, 1, 0))
     @ddt.unpack
     def test_has_published_version(self, default_ms, mysql_queries, max_find, max_send):
         """
@@ -2659,9 +2655,8 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 self.store.clone_course(course_key, dest_course_id, self.user_id)
                 signal_handler.send.assert_called_with('course_published', course_key=dest_course_id)
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_course_publish_signal_import_firing(self, default, _from_json):
+    def test_course_publish_signal_import_firing(self, default):
         with MongoContentstoreBuilder().build() as contentstore:
             signal_handler = Mock(name='signal_handler')
             self.store = MixedModuleStore(
@@ -3785,7 +3780,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         assert asides2[0].field11 == 'aside1_default_value1'
         assert asides2[0].field12 == 'aside1_default_value2'
 
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 0), (ModuleStoreEnum.Type.split, 2, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 0), (ModuleStoreEnum.Type.split, 1, 0))
     @XBlockAside.register_temp_plugin(AsideFoo, 'test_aside1')
     @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
            lambda self, block: ['test_aside1'])

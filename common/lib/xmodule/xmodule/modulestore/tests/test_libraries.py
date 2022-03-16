@@ -37,7 +37,7 @@ class TestLibraries(MixedSplitTestCase):
         -> INSERT into SplitModulestoreCourseIndex to save the new library
         -> INSERT a historical record of the SplitModulestoreCourseIndex
         """
-        with check_mongo_calls(2, 3), self.assertNumQueries(3):
+        with check_mongo_calls(0, 3), self.assertNumQueries(5):
             LibraryFactory.create(modulestore=self.store)
 
     def test_duplicate_library(self):

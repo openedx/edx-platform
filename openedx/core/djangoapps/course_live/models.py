@@ -3,10 +3,17 @@ Models course live integrations.
 """
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from simple_history.models import HistoricalRecords
 from lti_consumer.models import LtiConfiguration
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
+from simple_history.models import HistoricalRecords
+
+AVAILABLE_PROVIDERS = {
+    'zoom': {
+        'name': 'Zoom LTI PRO',
+        'features': []
+    }
+}
 
 
 class CourseLiveConfiguration(TimeStampedModel):
@@ -35,6 +42,18 @@ class CourseLiveConfiguration(TimeStampedModel):
 
     def __str__(self):
         return f"Configuration(course_key='{self.course_key}', provider='{self.provider_type}', enabled={self.enabled})"
+
+    @classmethod
+    def is_enabled(cls, course_key) -> bool:
+        """
+        Check if there is an active configuration for a given course key
+
+        Default to False, if no configuration exists
+        """
+        configuration = cls.get(course_key)
+        if not configuration:
+            return False
+        return configuration.enabled
 
     @classmethod
     def get(cls, course_key):

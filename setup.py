@@ -29,6 +29,7 @@ setup(
             "html_textbooks = lms.djangoapps.courseware.tabs:HtmlTextbookTabs",
             "instructor = lms.djangoapps.instructor.views.instructor_dashboard:InstructorDashboardTab",
             "lti_discussion = openedx.features.lti_course_tab.tab:DiscussionLtiCourseTab",
+            "lti_live = openedx.core.djangoapps.course_live.tab:CourseLiveTab",
             "lti_tab = openedx.features.lti_course_tab.tab:LtiCourseTab",
             "pdf_textbooks = lms.djangoapps.courseware.tabs:PDFTextbookTabs",
             "progress = lms.djangoapps.courseware.tabs:ProgressTab",
@@ -48,6 +49,7 @@ setup(
             "textbooks = lms.djangoapps.courseware.plugins:TextbooksCourseApp",
             "wiki = lms.djangoapps.course_wiki.plugins.course_app:WikiCourseApp",
             "custom_pages = lms.djangoapps.courseware.plugins:CustomPagesCourseApp",
+            "live = openedx.core.djangoapps.course_live.plugins:LiveCourseApp",
         ],
         "openedx.course_tool": [
             "calendar_sync_toggle = openedx.features.calendar_sync.plugins:CalendarSyncToggleTool",
@@ -91,6 +93,7 @@ setup(
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "credentials = openedx.core.djangoapps.credentials.apps:CredentialsConfig",
+            "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",
             "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
             "discussions = openedx.core.djangoapps.discussions.apps:DiscussionsConfig",
@@ -109,6 +112,7 @@ setup(
         "cms.djangoapp": [
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",
             "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             # Importing an LMS app into the Studio process is not a good
             # practice. We're ignoring this for Discussions here because its

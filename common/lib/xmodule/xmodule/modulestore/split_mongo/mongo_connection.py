@@ -12,6 +12,7 @@ import zlib
 from contextlib import contextmanager
 from time import time
 
+from ccx_keys.locator import CCXLocator
 from django.core.cache import caches, InvalidCacheBackendError
 from django.db.transaction import TransactionManagementError
 import pymongo
@@ -471,8 +472,7 @@ class MongoPersistenceBackend:
             if not last_update_already_set:
                 course_index['last_update'] = datetime.datetime.now(pytz.utc)
             # Update the course index:
-            result = self.course_index.replace_one(query, course_index, upsert=False,)
-            return result.modified_count == 1
+            self.course_index.replace_one(query, course_index, upsert=False,)
 
     def delete_course_index(self, course_key):
         """
@@ -588,11 +588,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         """
         Get the course_index from the persistence mechanism whose id is the given key
         """
-        #######################
-        # TEMP: as we migrate, we are currently reading from MongoDB only, but writing to both MySQL + MongoDB
-        return super().get_course_index(key, ignore_case=ignore_case)
-        #######################
-        if key.version_guid and not key.org:  # pylint: disable=unreachable
+        if key.version_guid and not key.org:
             # I don't think it was intentional, but with the MongoPersistenceBackend, using a key with only a version
             # guid and no org/course/run value would not raise an error, but would always return None. So we need to be
             # compatible with that.
@@ -611,6 +607,17 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         try:
             return SplitModulestoreCourseIndex.objects.get(**query).as_v1_schema()
         except SplitModulestoreCourseIndex.DoesNotExist:
+            # The mongo implementation does not retrieve by string key; it retrieves by (org, course, run) tuple.
+            # As a result, it will handle read requests for a CCX key like
+            #   ccx-v1:org.0+course_0+Run_0+branch@published-branch+ccx@1
+            # identically to the corresponding course key. This seems to be an oversight though, not an intentional
+            # feature, as the CCXModulestoreWrapper is supposed to "hide" CCX keys from the underlying modulestore.
+            # Anyhow, for compatbility we need to do the same:
+            if isinstance(key, CCXLocator):
+                log.warning(
+                    f"A CCX key leaked through to the underlying modulestore, bypassing CCXModulestoreWrapper: {key}"
+                )
+                return self.get_course_index(key.to_course_locator(), ignore_case)
             return None
 
     def find_matching_course_indexes(  # pylint: disable=arguments-differ
@@ -632,10 +639,6 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
             org_target: If specified, this is an ORG filter so that only course_indexs are
                 returned for the specified ORG
         """
-        #######################
-        # TEMP: as we migrate, we are currently reading from MongoDB only, but writing to both MySQL + MongoDB
-        force_mongo = True
-        #######################
         if force_mongo:
             # For data migration purposes, this argument will read from MongoDB instead of MySQL
             return super().find_matching_course_indexes(
@@ -688,31 +691,17 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         RequestCache(namespace="course_index_cache").clear()
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
         # Find the SplitModulestoreCourseIndex entry that we'll be updating:
-        try:
-            index_obj = SplitModulestoreCourseIndex.objects.get(objectid=course_index["_id"])
-        except SplitModulestoreCourseIndex.DoesNotExist:
-            #######################
-            # TEMP: Maybe the data migration hasn't (completely) run yet?
-            data = SplitModulestoreCourseIndex.fields_from_v1_schema(course_index)
-            if super().get_course_index(data["course_id"]) is None:
-                raise  # This course doesn't exist in MySQL or in MongoDB
-            # This course record exists in MongoDB but not yet in MySQL
-            index_obj = SplitModulestoreCourseIndex(**data)
-            if from_index:
-                index_obj.last_update = from_index["last_update"]  # Make sure this won't get marked as a collision
-            #######################
+        index_obj = SplitModulestoreCourseIndex.objects.get(objectid=course_index["_id"])
 
         # Check for collisions:
-        # Except this collision logic doesn't work when using both MySQL and MongoDB together, one for writes and one
-        # for reads, so we're temporarily defering to Mongo's colision logic.
-        # if from_index and index_obj.last_update != from_index["last_update"]:
-        #     # "last_update not only tells us when this course was last updated but also helps prevent collisions"
-        #     log.warning(
-        #         "Collision in Split Mongo when applying course index. This can happen in dev if django debug toolbar "
-        #         "is enabled, as it slows down parallel queries. \nNew index was: %s\nFrom index was: %s",
-        #         course_index, from_index,
-        #     )
-        #     return  # Collision; skip this update
+        if from_index and index_obj.last_update != from_index["last_update"]:
+            # "last_update not only tells us when this course was last updated but also helps prevent collisions"
+            log.warning(
+                "Collision in Split Mongo when applying course index. This can happen in dev if django debug toolbar "
+                "is enabled, as it slows down parallel queries. New index was: %s",
+                course_index,
+            )
+            return  # Collision; skip this update
 
         # Apply updates to the index entry. While doing so, track which branch versions were changed (if any).
         changed_branches = []
@@ -735,13 +724,10 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
             # which branch(es) were changed, not anything more useful than that.
             index_obj._change_reason = f'Updated {" and ".join(changed_branches)} branch'  # pylint: disable=protected-access
 
+        # Save the course index entry and create a historical record:
+        index_obj.save()
         # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
-        mongo_updated = super().update_course_index(
-            course_index, from_index, course_context, last_update_already_set=True
-        )
-        if mongo_updated:
-            # Save the course index entry and create a historical record:
-            index_obj.save()
+        super().update_course_index(course_index, from_index, course_context, last_update_already_set=True)
 
     def delete_course_index(self, course_key):
         """

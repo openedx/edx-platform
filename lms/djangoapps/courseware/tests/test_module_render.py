@@ -58,6 +58,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyC
 from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps import static_replace
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
@@ -2258,16 +2259,12 @@ class LMSXBlockServiceBindingTest(SharedModuleStoreTestCase):
     Tests that the LMS Module System (XBlock Runtime) provides an expected set of services.
     """
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course = CourseFactory.create()
-
     def setUp(self):
         """
         Set up the user and other fields that will be used to instantiate the runtime.
         """
         super().setUp()
+        self.course = CourseFactory.create()
         self.user = UserFactory()
         self.student_data = Mock()
         self.track_function = Mock()
@@ -2346,15 +2343,10 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
     Tests that verify access to XBlock/XModule children work correctly
     even when those children are filtered by the runtime when loaded.
     """
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course = CourseFactory.create()
-
     # pylint: disable=attribute-defined-outside-init
     def setUp(self):
         super().setUp()
+        self.course = CourseFactory.create()
         self.users = {number: UserFactory() for number in USER_NUMBERS}
 
         self._old_has_access = render.has_access
@@ -2770,3 +2762,19 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     def test_cache(self):
         assert hasattr(self.runtime.cache, 'get')
         assert hasattr(self.runtime.cache, 'set')
+
+    def test_replace_urls(self):
+        html = '<a href="/static/id">'
+        assert self.runtime.replace_urls(html) == \
+            static_replace.replace_static_urls(html, course_id=self.runtime.course_id)
+
+    def test_replace_course_urls(self):
+        html = '<a href="/course/id">'
+        assert self.runtime.replace_course_urls(html) == \
+            static_replace.replace_course_urls(html, course_key=self.runtime.course_id)
+
+    def test_replace_jump_to_id_urls(self):
+        html = '<a href="/jump_to_id/id">'
+        jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': str(self.runtime.course_id), 'module_id': ''})
+        assert self.runtime.replace_jump_to_id_urls(html) == \
+            static_replace.replace_jump_to_id_urls(html, self.runtime.course_id, jump_to_id_base_url)

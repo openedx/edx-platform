@@ -1959,6 +1959,51 @@ class ModuleSystemShim:
         )
         return self._services.get('cache') or DoNothingCache()
 
+    @property
+    def replace_urls(self):
+        """
+        Returns a function to replace static urls with course specific urls.
+
+        Deprecated in favor of the replace_urls service.
+        """
+        warnings.warn(
+            'runtime.replace_urls is deprecated. Please use the replace_urls service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        replace_urls_service = self._services.get('replace_urls')
+        if replace_urls_service:
+            return partial(replace_urls_service.replace_urls, static_replace_only=True)
+
+    @property
+    def replace_course_urls(self):
+        """
+        Returns a function to replace static urls with course specific urls.
+
+        Deprecated in favor of the replace_urls service.
+        """
+        warnings.warn(
+            'runtime.replace_course_urls is deprecated. Please use the replace_urls service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        replace_urls_service = self._services.get('replace_urls')
+        if replace_urls_service:
+            return partial(replace_urls_service.replace_urls)
+
+    @property
+    def replace_jump_to_id_urls(self):
+        """
+        Returns a function to replace static urls with course specific urls.
+
+        Deprecated in favor of the replace_urls service.
+        """
+        warnings.warn(
+            'runtime.replace_jump_to_id_urls is deprecated. Please use the replace_urls service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        replace_urls_service = self._services.get('replace_urls')
+        if replace_urls_service:
+            return partial(replace_urls_service.replace_urls)
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1975,11 +2020,9 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
     def __init__(
             self, static_url, track_function, get_module,
-            replace_urls, descriptor_runtime, filestore=None,
+            descriptor_runtime, filestore=None,
             debug=False, hostname="", publish=None, node_path="",
-            course_id=None,
-            replace_course_urls=None,
-            replace_jump_to_id_urls=None, error_descriptor_class=None,
+            course_id=None, error_descriptor_class=None,
             field_data=None, rebind_noauth_module_to_user=None,
             **kwargs):
         """
@@ -1998,10 +2041,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         filestore - A filestore ojbect.  Defaults to an instance of OSFS based
                          at settings.DATA_DIR.
-
-        replace_urls - TEMPORARY - A function like static_replace.replace_urls
-                         that capa_module can use to fix up the static urls in
-                         ajax results.
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
 
@@ -2029,14 +2068,11 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         self.get_module = get_module
         self.DEBUG = self.debug = debug
         self.HOSTNAME = self.hostname = hostname
-        self.replace_urls = replace_urls
         self.node_path = node_path
         self.course_id = course_id
 
         if publish:
             self.publish = publish
-        self.replace_course_urls = replace_course_urls
-        self.replace_jump_to_id_urls = replace_jump_to_id_urls
         self.error_descriptor_class = error_descriptor_class
         self.xmodule_instance = None
 

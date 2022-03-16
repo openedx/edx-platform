@@ -88,6 +88,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     enrollment = serializers.DictField()
     enrollment_start = serializers.DateTimeField()
     enrollment_end = serializers.DateTimeField()
+    entrance_exam_data = serializers.DictField()
     id = serializers.CharField()  # pylint: disable=invalid-name
     license = serializers.CharField()
     media = _CourseApiMediaCollectionSerializer(source='*')
@@ -101,7 +102,6 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     start_display = serializers.CharField()
     start_type = serializers.CharField()
     pacing = serializers.CharField()
-    tabs = serializers.ListField()
     user_timezone = serializers.CharField()
     verified_mode = serializers.DictField()
     show_calculator = serializers.BooleanField()

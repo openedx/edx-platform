@@ -123,6 +123,7 @@ class Randomization(String):
 @XBlock.needs('mako')
 @XBlock.needs('cache')
 @XBlock.needs('sandbox')
+@XBlock.needs('replace_urls')
 # Studio doesn't provide XQueueService, but the LMS does.
 @XBlock.wants('xqueue')
 @XBlock.wants('call_to_action')
@@ -1175,7 +1176,9 @@ class ProblemBlock(
                     )
                 ),
                 # Course-authored HTML demand hints are supported.
-                hint_text=HTML(self.runtime.replace_urls(get_inner_html_from_xpath(demand_hints[counter])))
+                hint_text=HTML(self.runtime.service(self, "replace_urls").replace_urls(
+                    get_inner_html_from_xpath(demand_hints[counter])
+                ))
             )
             counter += 1
 
@@ -1280,12 +1283,7 @@ class ProblemBlock(
 
         # Now do all the substitutions which the LMS module_render normally does, but
         # we need to do here explicitly since we can get called for our HTML via AJAX
-        html = self.runtime.replace_urls(html)
-        if self.runtime.replace_course_urls:
-            html = self.runtime.replace_course_urls(html)
-
-        if self.runtime.replace_jump_to_id_urls:
-            html = self.runtime.replace_jump_to_id_urls(html)
+        html = self.runtime.service(self, "replace_urls").replace_urls(html)
 
         return html
 
@@ -1567,11 +1565,7 @@ class ProblemBlock(
         new_answers = {}
         for answer_id in answers:
             try:
-                answer_content = self.runtime.replace_urls(answers[answer_id])
-                if self.runtime.replace_course_urls:
-                    answer_content = self.runtime.replace_course_urls(answer_content)
-                if self.runtime.replace_jump_to_id_urls:
-                    answer_content = self.runtime.replace_jump_to_id_urls(answer_content)
+                answer_content = self.runtime.service(self, "replace_urls").replace_urls(answers[answer_id])
                 new_answer = {answer_id: answer_content}
             except TypeError:
                 log.debug('Unable to perform URL substitution on answers[%s]: %s',

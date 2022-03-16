@@ -72,7 +72,7 @@ from openedx.features.enterprise_support.tests.mixins.enterprise import Enterpri
 
 log = logging.getLogger(__name__)
 
-QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
+QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
 
 
 class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -574,7 +574,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             [num_cached_mongo_calls, AllowPlusOrMinusOneInt(num_cached_sql_queries)],
         ]
         for expected_mongo_calls, expected_sql_queries in cached_calls:
-            with self.assertNumQueries(expected_sql_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+            with self.assertNumQueries(expected_sql_queries, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
                 with check_mongo_calls(expected_mongo_calls):
                     call_single_thread()
 

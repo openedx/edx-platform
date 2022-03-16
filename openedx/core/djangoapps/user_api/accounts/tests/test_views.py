@@ -7,6 +7,7 @@ import hashlib
 import json
 from copy import deepcopy
 from unittest import mock
+from urllib.parse import quote
 
 import ddt
 import pytz
@@ -20,10 +21,12 @@ from rest_framework.test import APIClient, APITestCase
 from common.djangoapps.student.models import PendingEmailChange, UserProfile
 from common.djangoapps.student.models_api import do_name_change_request, get_pending_name_change
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, RegistrationFactory, UserFactory
+from openedx.core.djangoapps.user_api.accounts import RETIRED_EMAIL_MSG
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 
@@ -208,7 +211,7 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         Internal helper to perform the actual assertion
         """
-        with self.assertNumQueries(queries):
+        with self.assertNumQueries(queries, table_ignorelist=WAFFLE_TABLES):
             response = self.send_get(self.client, expected_status=expected_status)
         if expected_status == 200:
             data = response.data
@@ -220,7 +223,7 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
         Test that a client (logged in) can get her own username.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        self._verify_get_own_username(17)
+        self._verify_get_own_username(16)
 
     def test_get_username_inactive(self):
         """
@@ -230,7 +233,7 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.user.is_active = False
         self.user.save()
-        self._verify_get_own_username(17)
+        self._verify_get_own_username(16)
 
     def test_get_username_not_logged_in(self):
         """
@@ -239,7 +242,7 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
         """
 
         # verify that the endpoint is inaccessible when not logged in
-        self._verify_get_own_username(13, expected_status=401)
+        self._verify_get_own_username(12, expected_status=401)
 
 
 @ddt.ddt
@@ -256,7 +259,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     """
 
     ENABLED_CACHES = ['default']
-    TOTAL_QUERY_COUNT = 26
+    TOTAL_QUERY_COUNT = 25
     FULL_RESPONSE_FIELD_COUNT = 30
 
     def setUp(self):
@@ -479,6 +482,17 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = client.get(url + f'?lms_user_id={non_integer_id}')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @mock.patch('openedx.core.djangoapps.user_api.accounts.views.is_email_retired')
+    def test_get_retired_user_from_email(self, mock_is_email_retired):
+        """
+        Tests that the retired user from email cannot be accessed and shows an error message.
+        """
+        mock_is_email_retired.return_value = True
+        client = self.login_client('staff_client', 'staff_user')
+        url = reverse("accounts_detail_api")
+        response = client.get(url + f'?email={quote(self.user.email)}')
+        assert response.data == {"error_msg": RETIRED_EMAIL_MSG}
+
     def test_search_emails(self):
         client = self.login_client('staff_client', 'staff_user')
         json_data = {'emails': [self.user.email]}
@@ -520,7 +534,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(self._get_num_queries(self.TOTAL_QUERY_COUNT)):
+        with self.assertNumQueries(self._get_num_queries(self.TOTAL_QUERY_COUNT), table_ignorelist=WAFFLE_TABLES):
             response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
@@ -535,7 +549,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(self._get_num_queries(self.TOTAL_QUERY_COUNT)):
+        with self.assertNumQueries(self._get_num_queries(self.TOTAL_QUERY_COUNT), table_ignorelist=WAFFLE_TABLES):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response)
 
@@ -660,7 +674,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             """
             Internal helper to perform the actual assertions
             """
-            with self.assertNumQueries(queries):
+            with self.assertNumQueries(queries, table_ignorelist=WAFFLE_TABLES):
                 response = self.send_get(self.client)
             data = response.data
             assert self.FULL_RESPONSE_FIELD_COUNT == len(data)
@@ -686,7 +700,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             assert data['accomplishments_shared'] is False
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        verify_get_own_information(self._get_num_queries(24))
+        verify_get_own_information(self._get_num_queries(23))
 
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
@@ -706,7 +720,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        with self.assertNumQueries(self._get_num_queries(24)):
+        with self.assertNumQueries(self._get_num_queries(23), table_ignorelist=WAFFLE_TABLES):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "state", "bio",):
             assert response.data[empty_field] is None

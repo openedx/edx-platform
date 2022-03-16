@@ -47,22 +47,11 @@ jobs:
       # ...not having produced any logs or other output. We couldn't figure out
       # what was causing Mongo to fail, so this is a (temporary?) hack to get
       # PRs unblocked.
-      - name: start mongodb service
+      - name: start mongod server for tests
         run: |
-          maxtries=5
-          attempt=1
-          while true; do
-            if sudo /etc/init.d/mongodb start; then
-              break
-            elif [[ "$attempt" -ge "$maxtries" ]]; then
-              echo "Failed to start Mongo in $attempt tries, giving up."
-              exit 1
-            else
-              echo "Failed to start Mongo (attempt $attempt), sleeping and trying again"
-              (( attempt++ ))
-              sleep 5
-            fi
-          done
+          sudo mkdir -p /data/db
+          sudo chmod -R a+rw /data/db
+          mongod &
 
       - name: set settings path
         run: |

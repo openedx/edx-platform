@@ -522,8 +522,8 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.assert_enrollment_status(
             course_id='entirely/fake/course',
             expected_status=status.HTTP_400_BAD_REQUEST,
-            min_mongo_calls=3,
-            max_mongo_calls=4
+            min_mongo_calls=2,
+            max_mongo_calls=3
         )
 
     def test_get_enrollment_details_bad_course(self):

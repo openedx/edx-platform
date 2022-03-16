@@ -89,7 +89,7 @@ class CoursesTest(ModuleStoreTestCase):
         assert not error.value.access_response.has_access
 
     @ddt.data(
-        (GET_COURSE_WITH_ACCESS, 3),
+        (GET_COURSE_WITH_ACCESS, 2),
         (GET_COURSE_OVERVIEW_WITH_ACCESS, 0),
     )
     @ddt.unpack
