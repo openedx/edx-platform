@@ -22,51 +22,12 @@ class ModuleStoreSettingsMigration(TestCase):
     """
     Tests for the migration code for the module store settings
     """
-
-    OLD_CONFIG = {
-        "default": {
-            "ENGINE": "xmodule.modulestore.xml.XMLModuleStore",
-            "OPTIONS": {
-                "data_dir": "directory",
-                "default_class": "xmodule.hidden_module.HiddenDescriptor",
-            },
-            "DOC_STORE_CONFIG": {},
-        }
-    }
-
-    OLD_CONFIG_WITH_DIRECT_MONGO = {
-        "default": {
-            "ENGINE": "xmodule.modulestore.mongo.MongoModuleStore",
-            "OPTIONS": {
-                "collection": "modulestore",
-                "db": "edxapp",
-                "default_class": "xmodule.hidden_module.HiddenDescriptor",
-                "fs_root": mkdtemp_clean(),
-                "host": "localhost",
-                "password": "password",
-                "port": 27017,
-                "render_template": "common.djangoapps.edxmako.shortcuts.render_to_string",
-                "user": "edxapp"
-            },
-            "DOC_STORE_CONFIG": {},
-        }
-    }
-
     OLD_MIXED_CONFIG_WITH_DICT = {
         "default": {
             "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
             "OPTIONS": {
                 "mappings": {},
                 "stores": {
-                    "an_old_mongo_store": {
-                        "DOC_STORE_CONFIG": {},
-                        "ENGINE": "xmodule.modulestore.mongo.MongoModuleStore",
-                        "OPTIONS": {
-                            "collection": "modulestore",
-                            "db": "test",
-                            "default_class": "xmodule.hidden_module.HiddenDescriptor",
-                        }
-                    },
                     "default": {
                         "ENGINE": "the_default_store",
                         "OPTIONS": {
@@ -168,13 +129,6 @@ class ModuleStoreSettingsMigration(TestCase):
         self.assertStoreValuesEqual(new_default_store_setting, old_setting["default"])
         assert new_default_store_setting['ENGINE'] == old_setting['default']['ENGINE']
         assert not self.is_split_configured(new_mixed_setting)
-
-    def test_convert_from_old_mongo_to_draft_store(self):
-        old_setting = self.OLD_CONFIG_WITH_DIRECT_MONGO
-        new_mixed_setting, new_default_store_setting = self.assertMigrated(old_setting)
-        self.assertStoreValuesEqual(new_default_store_setting, old_setting["default"])
-        assert new_default_store_setting['ENGINE'] == 'xmodule.modulestore.mongo.draft.DraftModuleStore'
-        assert self.is_split_configured(new_mixed_setting)
 
     def test_convert_from_dict_to_list(self):
         old_mixed_setting = self.OLD_MIXED_CONFIG_WITH_DICT

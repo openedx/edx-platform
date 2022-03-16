@@ -25,11 +25,6 @@ def convert_module_store_setting_if_needed(module_store_setting):
             else:
                 new_store_list.append(store_settings)
 
-            # migrate request for the old 'direct' Mongo store to the Draft store
-            if store_settings['ENGINE'] == 'xmodule.modulestore.mongo.MongoModuleStore':
-                warnings.warn("MongoModuleStore is deprecated! Please use DraftModuleStore.", DeprecationWarning)
-                store_settings['ENGINE'] = 'xmodule.modulestore.mongo.draft.DraftModuleStore'
-
         return new_store_list
 
     if module_store_setting is None:

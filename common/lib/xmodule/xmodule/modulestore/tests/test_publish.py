@@ -23,11 +23,9 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls, mongo_uses_error_check
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBootstrapper
 from xmodule.modulestore.tests.utils import (
-    DRAFT_MODULESTORE_SETUP,
     MODULESTORE_SETUPS,
     SPLIT_MODULESTORE_SETUP,
     MongoContentstoreBuilder,
-    MongoModulestoreBuilder
 )
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 

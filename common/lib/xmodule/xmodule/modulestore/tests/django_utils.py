@@ -100,27 +100,6 @@ def mixed_store_config(data_dir, mappings, store_order=None, modulestore_options
     return store
 
 
-def draft_mongo_store_config(modulestore_options):
-    """
-    Defines default module store using DraftMongoModuleStore.
-    """
-    store = {
-        'default': {
-            'NAME': 'draft',
-            'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
-            'DOC_STORE_CONFIG': {
-                'host': MONGO_HOST,
-                'port': MONGO_PORT_NUM,
-                'db': f'test_xmodule_{os.getpid()}',
-                'collection': 'modulestore',
-            },
-            'OPTIONS': modulestore_options
-        }
-    }
-
-    return store
-
-
 def split_mongo_store_config(modulestore_options):
     """
     Defines split module store.

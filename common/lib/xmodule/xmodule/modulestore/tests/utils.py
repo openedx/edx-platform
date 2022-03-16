@@ -16,7 +16,6 @@ from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.mongo.base import ModuleStoreEnum
-from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_ONLY_SPLIT_MODULESTORE_DRAFT_PREFERRED
 from xmodule.modulestore.tests.factories import ItemFactory
@@ -233,53 +232,6 @@ class StoreBuilderBase:
                 yield contentstore, modulestore
 
 
-class MongoModulestoreBuilder(StoreBuilderBase):
-    """
-    A builder class for a DraftModuleStore.
-    """
-    @contextmanager
-    def build_with_contentstore(self, contentstore, **kwargs):
-        """
-        A contextmanager that returns an isolated mongo modulestore, and then deletes
-        all of its data at the end of the context.
-
-        Args:
-            contentstore: The contentstore that this modulestore should use to store
-                all of its assets.
-        """
-        doc_store_config = dict(
-            db=f'modulestore{THIS_UUID}',
-            collection='xmodule',
-            asset_collection='asset_metadata',
-            **COMMON_DOCSTORE_CONFIG
-        )
-
-        # Set up a temp directory for storing filesystem content created during import
-        fs_root = mkdtemp()
-
-        modulestore = DraftModuleStore(
-            contentstore,
-            doc_store_config,
-            fs_root,
-            render_template=repr,
-            branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
-            metadata_inheritance_cache_subsystem=MemoryCache(),
-            xblock_mixins=XBLOCK_MIXINS,
-        )
-        modulestore.ensure_indexes()
-
-        try:
-            yield modulestore
-        finally:
-            # Delete the created database
-            modulestore._drop_database()  # pylint: disable=protected-access
-
-            # Delete the created directory on the filesystem
-            rmtree(fs_root, ignore_errors=True)
-
-    def __repr__(self):
-        return 'MongoModulestoreBuilder()'
-
 
 class VersioningModulestoreBuilder(StoreBuilderBase):
     """
@@ -324,30 +276,6 @@ class VersioningModulestoreBuilder(StoreBuilderBase):
 
     def __repr__(self):
         return 'SplitModulestoreBuilder()'
-
-
-class XmlModulestoreBuilder(StoreBuilderBase):
-    """
-    A builder class for a XMLModuleStore.
-    """
-    # pylint: disable=unused-argument
-    @contextmanager
-    def build_with_contentstore(self, contentstore=None, course_ids=None, **kwargs):
-        """
-        A contextmanager that returns an isolated xml modulestore
-
-        Args:
-            contentstore: The contentstore that this modulestore should use to store
-                all of its assets.
-        """
-        modulestore = XMLModuleStore(
-            DATA_DIR,
-            course_ids=course_ids,
-            default_class='xmodule.hidden_module.HiddenDescriptor',
-            xblock_mixins=XBLOCK_MIXINS,
-        )
-
-        yield modulestore
 
 
 class MixedModulestoreBuilder(StoreBuilderBase):
@@ -431,29 +359,16 @@ XBLOCK_MIXINS = (InheritanceMixin, XModuleMixin)
 
 
 MIXED_MODULESTORE_BOTH_SETUP = MixedModulestoreBuilder([
-    ('draft', MongoModulestoreBuilder()),
     ('split', VersioningModulestoreBuilder())
 ])
-DRAFT_MODULESTORE_SETUP = MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())])
 SPLIT_MODULESTORE_SETUP = MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())])
 MIXED_MODULESTORE_SETUPS = (
-    DRAFT_MODULESTORE_SETUP,
     SPLIT_MODULESTORE_SETUP,
 )
 MIXED_MS_SETUPS_SHORT = (
     'mixed_mongo',
     'mixed_split',
 )
-DIRECT_MODULESTORE_SETUPS = (
-    MongoModulestoreBuilder(),
-    # VersioningModulestoreBuilder(),  # FUTUREDO: LMS-11227
-)
-DIRECT_MS_SETUPS_SHORT = (
-    'mongo',
-    #'split',
-)
-MODULESTORE_SETUPS = DIRECT_MODULESTORE_SETUPS + MIXED_MODULESTORE_SETUPS
-MODULESTORE_SHORTNAMES = DIRECT_MS_SETUPS_SHORT + MIXED_MS_SETUPS_SHORT
 SHORT_NAME_MAP = dict(list(zip(MODULESTORE_SETUPS, MODULESTORE_SHORTNAMES)))
 
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)

@@ -95,12 +95,6 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
     OPTIONS = {
         'stores': [
             {
-                'NAME': ModuleStoreEnum.Type.mongo,
-                'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
-                'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-                'OPTIONS': modulestore_options
-            },
-            {
                 'NAME': ModuleStoreEnum.Type.split,
                 'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
                 'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
