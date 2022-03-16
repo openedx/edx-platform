@@ -149,7 +149,7 @@ coreschema==0.0.4
     #   drf-yasg
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.in
-cryptography==36.0.1
+cryptography==36.0.2
     # via
     #   -r requirements/edx/base.in
     #   django-fernet-fields
@@ -656,7 +656,7 @@ markdown==3.3.6
     #   xblock-poll
 markey==0.8
     # via enmerkar-underscore
-markupsafe==2.1.0
+markupsafe==2.1.1
     # via
     #   -r requirements/edx/paver.txt
     #   chem
@@ -883,7 +883,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
 redis==4.1.4
     # via -r requirements/edx/base.in
-regex==2022.3.2
+regex==2022.3.15
     # via nltk
 requests==2.27.1
     # via
