@@ -472,7 +472,7 @@ class CoursewareIndex(View):
 
         if COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id):
             course_block_tree = get_course_outline_block_tree(
-                request, six.text_type(self.course.id), request.user, allow_start_dates_in_future=True
+                request, six.text_type(self.course.id), request.user
             )
             courseware_context['accordion'] = render_accordion(
                 self.request,
