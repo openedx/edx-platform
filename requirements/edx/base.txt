@@ -479,7 +479,7 @@ edx-opaque-keys[django]==2.3.0
     #   openedx-events
     #   ora2
     #   xmodule
-edx-organizations==6.11.0
+edx-organizations==6.11.1
     # via -r requirements/edx/base.in
 edx-proctoring==4.9.0
     # via
