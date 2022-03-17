@@ -156,7 +156,7 @@ class BadgeClassTest(ModuleStoreTestCase):
                 criteria='test', display_name='Testola', image_file_handle=img,
                 course_id=course_key,
             )
-            img.close()
+        img.close()
 
     def test_get_badge_class_create(self):
         """
