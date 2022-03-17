@@ -2057,25 +2057,23 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
-
     'crum.CurrentRequestUserMiddleware',
 
-    'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
-    # A newer and safer request cache.
+    # Resets the request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
 
-    # Generate code ownership attributes. Keep this immediately after RequestCacheMiddleware.
+    # Various monitoring middleware
+    'edx_django_utils.monitoring.CachedCustomMonitoringMiddleware',
     'edx_django_utils.monitoring.CodeOwnerMonitoringMiddleware',
+    'edx_django_utils.monitoring.CookieMonitoringMiddleware',
+    'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
+    'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
 
     # Before anything that looks at cookies, especially the session middleware
     'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
 
     # Monitoring and logging middleware
     'openedx.core.lib.request_utils.ExpectedErrorMiddleware',
-    'edx_django_utils.monitoring.CachedCustomMonitoringMiddleware',
-
-    # Cookie monitoring
-    'openedx.core.lib.request_utils.CookieMonitoringMiddleware',
 
     'lms.djangoapps.mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
