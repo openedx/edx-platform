@@ -1,4 +1,4 @@
-14. Documentating of new Django applications in edx-platform
+14. Justifying new Django applications in edx-platform
 
 Status
 ------
