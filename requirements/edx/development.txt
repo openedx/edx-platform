@@ -298,7 +298,6 @@ django==3.2.12
     #   edx-completion
     #   edx-django-release-util
     #   edx-django-sites-extensions
-    #   edx-django-utils
     #   edx-drf-extensions
     #   edx-enterprise
     #   edx-i18n-tools
@@ -355,7 +354,6 @@ django-countries==7.3.2
 django-crum==0.7.9
     # via
     #   -r requirements/edx/testing.txt
-    #   edx-django-utils
     #   edx-enterprise
     #   edx-proctoring
     #   edx-rbac
@@ -458,7 +456,6 @@ django-user-tasks==3.0.0
 django-waffle==2.3.0
     # via
     #   -r requirements/edx/testing.txt
-    #   edx-django-utils
     #   edx-drf-extensions
     #   edx-enterprise
     #   edx-proctoring
@@ -535,7 +532,7 @@ edx-django-release-util==1.2.0
     # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/testing.txt
-edx-django-utils==4.5.0
+edx_django_utils @ git+https://github.com/edx/edx-django-utils.git@robrap/ARCHBOM-2054-move-cookie-monitoring-middleware
     # via
     #   -r requirements/edx/testing.txt
     #   django-config-models
@@ -927,9 +924,7 @@ mypy-extensions==0.4.3
 mysqlclient==2.1.0
     # via -r requirements/edx/testing.txt
 newrelic==7.6.0.173
-    # via
-    #   -r requirements/edx/testing.txt
-    #   edx-django-utils
+    # via -r requirements/edx/testing.txt
 nltk==3.7
     # via
     #   -r requirements/edx/testing.txt
@@ -1027,7 +1022,6 @@ prompt-toolkit==3.0.28
 psutil==5.9.0
     # via
     #   -r requirements/edx/testing.txt
-    #   edx-django-utils
     #   pact-python
     #   pytest-xdist
 py==1.11.0
@@ -1428,7 +1422,6 @@ stevedore==3.5.0
     #   -r requirements/edx/testing.txt
     #   code-annotations
     #   edx-ace
-    #   edx-django-utils
     #   edx-enterprise
     #   edx-opaque-keys
 super-csv==3.0.0
@@ -1497,7 +1490,7 @@ uritemplate==4.1.1
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-urllib3==1.26.8
+urllib3==1.26.9
     # via
     #   -r requirements/edx/testing.txt
     #   elasticsearch
