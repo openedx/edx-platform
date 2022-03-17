@@ -434,7 +434,7 @@ django-sekizai==3.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   django-wiki
-django-ses==2.6.0
+django-ses==2.6.1
     # via -r requirements/edx/testing.txt
 django-simple-history==3.0.0
     # via
@@ -535,7 +535,7 @@ edx-django-release-util==1.2.0
     # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/testing.txt
-edx-django-utils==4.5.0
+edx-django-utils==4.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-config-models
@@ -699,7 +699,6 @@ fs-s3fs==0.1.8
 future==0.18.2
     # via
     #   -r requirements/edx/testing.txt
-    #   django-ses
     #   edx-celeryutils
     #   pyjwkest
 geoip2==4.5.0
@@ -1497,7 +1496,7 @@ uritemplate==4.1.1
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-urllib3==1.26.8
+urllib3==1.26.9
     # via
     #   -r requirements/edx/testing.txt
     #   elasticsearch
