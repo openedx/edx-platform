@@ -14,12 +14,12 @@ class Comment(models.Model):
         'endorsed', 'parent_id', 'thread_id', 'username', 'votes', 'user_id',
         'closed', 'created_at', 'updated_at', 'depth', 'at_position_list',
         'type', 'commentable_id', 'abuse_flaggers', 'endorsement',
-        'child_count',
+        'child_count', 'edit_history',
     ]
 
     updatable_fields = [
         'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'closed',
-        'user_id', 'endorsed', 'endorsement_user_id',
+        'user_id', 'endorsed', 'endorsement_user_id', 'edit_reason_code',
     ]
 
     initializable_fields = updatable_fields

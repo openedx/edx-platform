@@ -1510,6 +1510,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "can_delete": True,
             "anonymous": False,
             "anonymous_to_peers": False,
+            "last_edit": None,
         }
         response_data.update(overrides or {})
         return response_data
@@ -1902,6 +1903,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "can_delete": True,
             "anonymous": False,
             "anonymous_to_peers": False,
+            "last_edit": None,
         }
         response = self.client.post(
             self.url,
@@ -1992,6 +1994,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "can_delete": True,
             "anonymous": False,
             "anonymous_to_peers": False,
+            "last_edit": None,
         }
         response_data.update(overrides or {})
         return response_data
@@ -2179,6 +2182,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "can_delete": True,
             "anonymous": False,
             "anonymous_to_peers": False,
+            "last_edit": None,
         }
 
         response = self.client.get(self.url)
