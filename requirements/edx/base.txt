@@ -338,7 +338,7 @@ django-sekizai==3.0.1
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
-django-ses==2.6.0
+django-ses==2.6.1
     # via -r requirements/edx/base.in
 django-simple-history==3.0.0
     # via
@@ -428,9 +428,10 @@ edx-django-release-util==1.2.0
     # via -r requirements/edx/base.in
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.in
-edx-django-utils==4.5.0
+edx-django-utils==4.6.0
     # via
     #   -r requirements/edx/base.in
+    #   -r requirements/edx/github.in
     #   django-config-models
     #   edx-drf-extensions
     #   edx-enterprise
@@ -552,7 +553,6 @@ fs-s3fs==0.1.8
     #   django-pyfs
 future==0.18.2
     # via
-    #   django-ses
     #   edx-celeryutils
     #   pyjwkest
 geoip2==4.5.0
@@ -1031,7 +1031,7 @@ uritemplate==4.1.1
     # via
     #   coreapi
     #   drf-yasg
-urllib3==1.26.8
+urllib3==1.26.9
     # via
     #   -r requirements/edx/paver.txt
     #   elasticsearch
