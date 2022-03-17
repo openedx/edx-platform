@@ -12,12 +12,11 @@ failure, and outputs the pytest command needed to replicate.
 
 Sample usage::
 
-    python scripts/xdist/find_dependent_test_failures.py --log-file console.txt --test-suite lms-unit
+    python scripts/find_order_dependent_test_failures.py --test-file test_list.txt
 
 """
 
 
-import io
 import os
 import re
 import shutil
@@ -25,47 +24,39 @@ import tempfile
 
 import click
 
-OUTPUT_FOLDER_NAME = "worker_list_files"
-test_suite_option = None
-fast_option = None
+OUTPUT_FOLDER_NAME = "test_order_files"
 verbose_option = None
 
 
 @click.command()
 @click.option(
-    '--log-file',
-    help="File name of console log .txt file from a Jenkins build "
-    "that ran pytest-xdist. This can be acquired by running: "
-    "curl -o console.txt https://build.testeng.edx.org/job/JOBNAME/BUILDNUMBER/consoleText",
+    '--test-file',
+    help="File name of a .txt file containing a list of passing tests and ending with a single "
+         "failing test from a test run that may have an order dependency.",
     required=True
-)
-@click.option(
-    '--test-suite',
-    help="Test suite that the pytest worker ran.",
-    type=click.Choice(['lms-unit', 'cms-unit', 'commonlib-unit']),
-    required=True
-)
-@click.option(
-    '--fast/--slow',
-    help="Fast looks for issues in setup/teardown by running one test per class or file.",
-    default=True
 )
 @click.option(
     '--verbose/--quiet',
     help="Verbose includes the test output.",
     default=None
 )
-def main(log_file, test_suite, fast, verbose):
-    global test_suite_option
-    global fast_option
+def main(test_file, verbose):
+    """
+    Script to find simplest duplication of a test order issue.
+
+    Note: The script used to be able to do the following:
+    1. Pulling tests from test output (like pytest -v), and finding the test names.
+    2. Filtering down to a single test per file in a fast_mode for finding certain types of errors.
+    3. Returning a list of passing tests followed by a single failing test.
+
+    Unless that functionality is added back, the above steps must be done manually.
+    """
     global verbose_option
-    test_suite_option = test_suite
-    fast_option = fast
     verbose_option = verbose
 
     _clean_output_folder()
 
-    failing_test_list = _strip_console_for_tests_with_failure(log_file, test_suite)
+    failing_test_list = _load_test_file(test_file)
 
     if not failing_test_list:
         print('No failures found in log file.')
@@ -81,10 +72,6 @@ def main(log_file, test_suite, fast, verbose):
         print(f'Use: {pytest_command}')
         return
 
-    if fast_option:
-        print('No tests failed locally with --fast option. Try running again with --slow to include more tests.')
-        return
-
     print('No tests failed locally.')
 
 
@@ -94,40 +81,15 @@ def _clean_output_folder():
     os.mkdir(OUTPUT_FOLDER_NAME)
 
 
-def _strip_console_for_tests_with_failure(log_file, test_suite):
+def _load_test_file(test_file):
     """
-    Returns list of tests ending with a failing test, or None if no failures found.
+    Returns list of tests from the provided file.
     """
-    global fast_option
-    worker_test_dict = {}
-    test_base_included = {}
-    failing_worker_num = None
-    with open(log_file) as console_file:
+    test_list = []
+    with open(test_file) as console_file:
         for line in console_file:
-            regex_search = re.search(fr'\[gw(\d+)] (PASSED|FAILED|SKIPPED|ERROR) (\S+)', line)
-            if regex_search:
-                worker_num_string = regex_search.group(1)
-                pass_fail_string = regex_search.group(2)
-                if worker_num_string not in worker_test_dict:
-                    worker_test_dict[worker_num_string] = []
-                test = regex_search.group(3)
-                if test_suite == "commonlib-unit":
-                    if "pavelib" not in test and not test.startswith('scripts'):
-                        test = f"common/lib/{test}"
-                if fast_option and pass_fail_string == 'PASSED':
-                    # fast option will only take one test per class or module, in case
-                    # the failure is a setup/teardown failure.
-                    test_base = '::'.join(test.split('::')[:-1])
-                    if test_base not in test_base_included:
-                        worker_test_dict[worker_num_string].append(test)
-                        test_base_included[test_base] = True
-                elif (not fast_option or (fast_option and pass_fail_string == 'FAILED')):
-                    worker_test_dict[worker_num_string].append(test)
-                if pass_fail_string == 'FAILED':
-                    failing_worker_num = worker_num_string
-                    break
-    if failing_worker_num:
-        return worker_test_dict[failing_worker_num]
+            test_list.append(line)
+    return test_list
 
 
 def _get_pytest_command(output_file_name):
@@ -160,10 +122,7 @@ def _create_and_check_test_files_for_failures(test_list, test_type):
     Returns the pytest command to run if failures are found.
     """
     print(f"Testing {test_type}, includes {len(test_list)} test(s)...")
-    global test_suite_option
-    output_file_name = "{}_failing_test_list_{}_{}.txt".format(
-        OUTPUT_FOLDER_NAME, test_suite_option, test_type, len(test_list)
-    )
+    output_file_name = f"{OUTPUT_FOLDER_NAME}_failing_test_list_{test_type}.txt"
     output_file_path = os.path.join(OUTPUT_FOLDER_NAME, output_file_name)
     # Note: We don't really need a temporary file, and could just output the tests directly
     # to the command line, but this keeps the verbose  output cleaner.
