@@ -67,6 +67,7 @@ class BadgeImageConfigurationTest(TestCase):
                       .full_clean)
         img.close()
 
+
 class DummyBackend:
     """
     Dummy badge backend, used for testing.
@@ -253,6 +254,7 @@ class BadgeClassTest(ModuleStoreTestCase):
         pytest.raises(ValidationError, BadgeClass(slug='test', issuing_component='test2', criteria='test3',
                                                   description='test4', image=img).full_clean)
         img.close()
+
 
 class BadgeAssertionTest(ModuleStoreTestCase):
     """
