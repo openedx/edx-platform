@@ -1425,6 +1425,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "can_delete": False,
                 "anonymous": False,
                 "anonymous_to_peers": False,
+                "last_edit": None,
             },
             {
                 "id": "test_comment_2",
@@ -1450,6 +1451,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "can_delete": False,
                 "anonymous": True,
                 "anonymous_to_peers": False,
+                "last_edit": None,
             },
         ]
         actual_comments = self.get_comment_list(
@@ -1879,8 +1881,19 @@ class CreateThreadTest(
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
             "read": True,
             "editable_fields": [
-                "abuse_flagged", "anonymous", "closed", "following", "pinned",
-                "raw_body", "read", "title", "topic_id", "type", "voted"
+                "abuse_flagged",
+                "anonymous",
+                "close_reason_code",
+                "closed",
+                "edit_reason_code",
+                "following",
+                "pinned",
+                "raw_body",
+                "read",
+                "title",
+                "topic_id",
+                "type",
+                "voted",
             ],
         })
         assert actual == expected
@@ -2169,6 +2182,7 @@ class CreateCommentTest(
             "can_delete": True,
             "anonymous": False,
             "anonymous_to_peers": False,
+            "last_edit": None,
         }
         assert actual == expected
         expected_url = (
@@ -2250,11 +2264,19 @@ class CreateCommentTest(
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["abuse_flagged", "anonymous", "endorsed", "raw_body", "voted"],
+            "editable_fields": [
+                "abuse_flagged",
+                "anonymous",
+                "edit_reason_code",
+                "endorsed",
+                "raw_body",
+                "voted",
+            ],
             "child_count": 0,
             "can_delete": True,
             "anonymous": False,
             "anonymous_to_peers": False,
+            "last_edit": None,
         }
         assert actual == expected
         expected_url = (
@@ -2455,6 +2477,7 @@ class UpdateThreadTest(
         MockSignalHandlerMixin
 ):
     """Tests for update_thread"""
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -2463,6 +2486,7 @@ class UpdateThreadTest(
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
+
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.reset)
@@ -2514,7 +2538,7 @@ class UpdateThreadTest(
             'preview_body': 'Edited body',
             'topic_id': 'original_topic',
             'read': True,
-            'title': 'Original Title'
+            'title': 'Original Title',
         })
         assert parsed_body(httpretty.last_request()) == {
             'course_id': [str(self.course.id)],
@@ -2795,6 +2819,35 @@ class UpdateThreadTest(
             update_thread(self.request, "test_thread", {"raw_body": ""})
         assert assertion.value.message_dict == {'raw_body': ['This field may not be blank.']}
 
+    @ddt.data(
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_STUDENT,
+    )
+    def test_update_thread_with_edit_reason_code(self, role_name):
+        """
+        Test editing comments, specifying and retrieving edit reason codes.
+        """
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
+        self.register_thread()
+        try:
+            result = update_thread(self.request, "test_thread", {
+                "raw_body": "Edited body",
+                "edit_reason_code": "someReason",
+            })
+            assert role_name != FORUM_ROLE_STUDENT
+            assert result["last_edit"] == {
+                "original_body": "Original body",
+                "reason_code": "someReason",
+                "author": self.user.username,
+            }
+            request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
+            assert request_body["edit_reason_code"] == ["someReason"]
+        except ValidationError as error:
+            assert role_name == FORUM_ROLE_STUDENT
+            assert error.message_dict == {"edit_reason_code": ["This field is not editable."]}
+
 
 @ddt.ddt
 @disable_signal(api, 'comment_edited')
@@ -2893,6 +2946,7 @@ class UpdateCommentTest(
             "editable_fields": ["abuse_flagged", "anonymous", "raw_body", "voted"],
             "child_count": 0,
             "can_delete": True,
+            "last_edit": None,
         }
         assert actual == expected
         assert parsed_body(httpretty.last_request()) == {
@@ -3176,6 +3230,34 @@ class UpdateCommentTest(
             assert last_request_path == (flag_url if new_flagged else unflag_url)
             assert httpretty.last_request().method == 'PUT'
             assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
+
+    @ddt.data(
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_STUDENT,
+    )
+    def test_update_comment_with_edit_reason_code(self, role_name):
+        """
+        Test editing comments, specifying and retrieving edit reason codes.
+        """
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
+        self.register_comment()
+        try:
+            result = update_comment(self.request, "test_comment", {
+                "raw_body": "Edited body",
+                "edit_reason_code": "someReason",
+            })
+            assert role_name != FORUM_ROLE_STUDENT
+            assert result["last_edit"] == {
+                "original_body": "Original body",
+                "reason_code": "someReason",
+                "author": self.user.username,
+            }
+            request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
+            assert request_body["edit_reason_code"] == ["someReason"]
+        except ValidationError:
+            assert role_name == FORUM_ROLE_STUDENT
 
 
 @ddt.ddt

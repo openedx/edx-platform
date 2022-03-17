@@ -95,20 +95,26 @@ class CookieMonitoringMiddleware:
     Middleware for monitoring the size and growth of all our cookies, to see if
     we're running into browser limits.
     """
-
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        response = self.get_response(request)
-        # monitor after response to ensure logging can include user id where possible.
+        # Monitor at request-time to skip any cookies that may be added during the request.
+        log_message = None
         try:
-            self.log_and_monitor_cookies(request)
+            log_message = self.get_log_message_and_monitor_cookies(request)
         except BaseException:
             log.exception("Unexpected error logging and monitoring cookies.")
+
+        response = self.get_response(request)
+
+        # Delay logging until response-time so that the user id can be included in the log message.
+        if log_message:
+            log.info(log_message)
+
         return response
 
-    def log_and_monitor_cookies(self, request):
+    def get_log_message_and_monitor_cookies(self, request):
         """
         Add logging and custom attributes for monitoring cookie sizes.
 
@@ -128,12 +134,17 @@ class CookieMonitoringMiddleware:
 
             If COOKIE_HEADER_SIZE_LOGGING_THRESHOLD is reached:
 
-                cookies.header.size.calculated
+                cookies.header.size.computed
 
         Related Settings (see annotations for details):
 
             - COOKIE_HEADER_SIZE_LOGGING_THRESHOLD
             - COOKIE_SAMPLING_REQUEST_COUNT
+
+        Returns: The message to be logged. This is returned, rather than directly
+            logged, so that it can be processed at request time (before any cookies
+            may be changed server-side), but logged at response time, once the user
+            id is available for authenticated calls.
 
         """
 
@@ -192,14 +203,6 @@ class CookieMonitoringMiddleware:
             if not sampling_request_count or random.randint(1, sampling_request_count) > 1:
                 return
 
-        # Sort starting with largest cookies
-        sorted_cookie_items = sorted(request.COOKIES.items(), key=lambda x: len(x[1]), reverse=True)
-        sizes = ', '.join(f"{name}: {len(value)}" for (name, value) in sorted_cookie_items)
-        if is_large_cookie_header_detected:
-            log_prefix = f"Large (>= {logging_threshold}) cookie header detected."
-        else:
-            log_prefix = f"Sampled small (< {logging_threshold}) cookie header."
-        log.info(f"{log_prefix} BEGIN-COOKIE-SIZES(total={cookie_header_size}) {sizes} END-COOKIE-SIZES")
         # The computed header size can be used to double check that there aren't large cookies that are
         #   duplicates in the original header (from different domains) that aren't being accounted for.
         cookies_header_size_computed = max(
@@ -213,6 +216,16 @@ class CookieMonitoringMiddleware:
         #   cookies that are duplicates in the cookie header (from different domains) that aren't being accounted
         #   for.
         set_custom_attribute('cookies.header.size.computed', cookies_header_size_computed)
+
+        # Sort starting with largest cookies
+        sorted_cookie_items = sorted(request.COOKIES.items(), key=lambda x: len(x[1]), reverse=True)
+        sizes = ', '.join(f"{name}: {len(value)}" for (name, value) in sorted_cookie_items)
+        if is_large_cookie_header_detected:
+            log_prefix = f"Large (>= {logging_threshold}) cookie header detected."
+        else:
+            log_prefix = f"Sampled small (< {logging_threshold}) cookie header."
+        log_message = f"{log_prefix} BEGIN-COOKIE-SIZES(total={cookie_header_size}) {sizes} END-COOKIE-SIZES"
+        return log_message
 
 
 def expected_error_exception_handler(exc, context):

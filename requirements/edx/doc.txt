@@ -38,7 +38,7 @@ jinja2==3.0.3
     # via
     #   code-annotations
     #   sphinx
-markupsafe==2.1.0
+markupsafe==2.1.1
     # via jinja2
 packaging==21.3
     # via sphinx

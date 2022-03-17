@@ -102,6 +102,7 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
     editable_fields = {
         "abuse_flagged": True,
         "closed": is_thread and is_privileged,
+        "close_reason_code": is_thread and is_privileged,
         "pinned": is_thread and is_privileged,
         "read": is_thread,
     }
@@ -114,6 +115,7 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
     editable_fields.update({
         "voted": True,
         "raw_body": is_privileged or is_author,
+        "edit_reason_code": is_privileged,
         "following": is_thread,
         "topic_id": is_thread and (is_author or is_privileged),
         "type": is_thread and (is_author or is_privileged),
