@@ -62,7 +62,9 @@ class BadgeImageConfigurationTest(TestCase):
         Verify that the image validator is triggered when cleaning the model.
         """
         with open(f'{TEST_DATA_DIR}/badges/unbalanced.png', mode='rb') as img_file:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
-            pytest.raises(ValidationError, CourseCompleteImageConfiguration(mode='test2', icon=ImageFile(img_file)).full_clean)
+            pytest.raises(ValidationError, CourseCompleteImageConfiguration(
+                mode='test2', icon=ImageFile(img_file)).full_clean
+            )
 
 
 class DummyBackend:
@@ -206,7 +208,9 @@ class BadgeClassTest(ModuleStoreTestCase):
         """
         with open(f'{TEST_DATA_DIR}/badges/good.png', mode='rb') as img_file:
             with pytest.raises(IntegrityError), self.allow_transaction_exception():
-                BadgeClass.get_badge_class(slug='new_slug', issuing_component='new_component', image_file_handle=ImageFile(img_file))
+                BadgeClass.get_badge_class(
+                    slug='new_slug', issuing_component='new_component', image_file_handle=ImageFile(img_file)
+                )
 
     def test_get_for_user(self):
         """
