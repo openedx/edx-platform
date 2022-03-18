@@ -3,13 +3,16 @@ Tests for `backfill_course_outlines` Studio (cms) management command.
 """
 from unittest import mock
 
+import ddt
 from django.core.management import call_command
-
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from cms.djangoapps.contentstore.models import BackfillCourseTabsConfig
 
+
+@ddt.ddt
 class BackfillCourseTabsTest(ModuleStoreTestCase):
     """
     Test `backfill_course_tabs`
@@ -75,7 +78,7 @@ class BackfillCourseTabsTest(ModuleStoreTestCase):
         assert len(course.tabs) == 7
         assert 'dates' in {tab.type for tab in course.tabs}
         assert 'progress' in {tab.type for tab in course.tabs}
-        mock_logger.info.assert_any_call('4 courses read from modulestore.')
+        mock_logger.info.assert_any_call('4 courses read from modulestore. Processing 0 to 4.')
         mock_logger.info.assert_any_call(f'Updating tabs for {course.id}.')
         mock_logger.info.assert_any_call(f'Successfully updated tabs for {course.id}.')
         assert mock_logger.info.call_count == 3
@@ -109,7 +112,7 @@ class BackfillCourseTabsTest(ModuleStoreTestCase):
         assert len(course_2.tabs) == 7
         assert 'dates' in {tab.type for tab in course_1.tabs}
         assert 'progress' in {tab.type for tab in course_2.tabs}
-        mock_logger.info.assert_any_call('2 courses read from modulestore.')
+        mock_logger.info.assert_any_call('2 courses read from modulestore. Processing 0 to 2.')
         mock_logger.info.assert_any_call(f'Updating tabs for {course_1.id}.')
         mock_logger.info.assert_any_call(f'Successfully updated tabs for {course_1.id}.')
         mock_logger.info.assert_any_call(f'Updating tabs for {course_2.id}.')
@@ -149,9 +152,29 @@ class BackfillCourseTabsTest(ModuleStoreTestCase):
         # Course wasn't updated due to the ValueError
         assert error_course_tabs_before == error_course_tabs_after
 
-        mock_logger.info.assert_any_call('2 courses read from modulestore.')
+        mock_logger.info.assert_any_call('2 courses read from modulestore. Processing 0 to 2.')
         mock_logger.info.assert_any_call(f'Successfully updated tabs for {updated_course.id}.')
         mock_logger.exception.assert_called()
         mock_logger.error.assert_called_once_with(
             f'Course {error_course.id} encountered an Exception while trying to update.'
         )
+
+    @ddt.data(
+        (1, 2, [False, True, True, False]),
+        (1, 0, [False, True, True, True]),
+        (-1, -1, [True, True, True, True]),
+    )
+    @ddt.unpack
+    def test_arguments_batching(self, start, count, expected_tabs_modified):
+        courses = CourseFactory.create_batch(4)
+        for course in courses:
+            course.tabs = [tab for tab in course.tabs if tab.type in ('course_info', 'courseware')]
+            course = self.update_course(course, ModuleStoreEnum.UserID.test)
+            assert len(course.tabs) == 2
+
+        BackfillCourseTabsConfig.objects.create(enabled=True, start_index=start, count=count)
+        call_command('backfill_course_tabs')
+
+        for i, course in enumerate(courses):
+            course = self.store.get_course(course.id)
+            assert len(course.tabs) == (7 if expected_tabs_modified[i] else 2), f'Wrong tabs for course index {i}'
