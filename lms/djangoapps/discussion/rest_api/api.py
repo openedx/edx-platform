@@ -9,6 +9,7 @@ from enum import Enum
 from typing import Dict, Iterable, List, Literal, Optional, Set, Tuple
 from urllib.parse import urlencode, urlunparse
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.http import Http404
@@ -54,6 +55,19 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 
+from ..django_comment_client.base.views import (
+    track_comment_created_event,
+    track_thread_created_event,
+    track_thread_viewed_event,
+    track_voted_event,
+)
+from ..django_comment_client.utils import (
+    get_group_id_for_user,
+    get_user_role_names,
+    has_discussion_privileges,
+    is_commentable_divided,
+)
+from ..toggles import ENABLE_DISCUSSION_MODERATION_REASON_CODES
 from .exceptions import CommentNotFoundError, DiscussionBlackOutException, DiscussionDisabledError, ThreadNotFoundError
 from .forms import CommentActionsForm, ThreadActionsForm, UserOrdering
 from .pagination import DiscussionAPIPagination
@@ -73,18 +87,6 @@ from .serializers import (
     get_context,
 )
 from .utils import discussion_open_for_user
-from ..django_comment_client.base.views import (
-    track_comment_created_event,
-    track_thread_created_event,
-    track_thread_viewed_event,
-    track_voted_event,
-)
-from ..django_comment_client.utils import (
-    get_group_id_for_user,
-    get_user_role_names,
-    has_discussion_privileges,
-    is_commentable_divided,
-)
 
 User = get_user_model()
 
@@ -281,6 +283,8 @@ def get_course(request, course_key):
     course = _get_course(course_key, request.user)
     user_roles = get_user_role_names(request.user, course_key)
     course_config = DiscussionsConfiguration.get(course_key)
+    EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
+    CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
 
     return {
         "id": str(course_key),
@@ -308,6 +312,16 @@ def get_course(request, course_key):
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),
         'learners_tab_enabled': ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE.is_enabled(course_key),
+        "reason_codes_enabled": ENABLE_DISCUSSION_MODERATION_REASON_CODES.is_enabled(course_key),
+        "edit_reasons": [
+            {"code": reason_code, "label": label}
+            for (reason_code, label) in EDIT_REASON_CODES.items()
+        ],
+        "post_close_reasons": [
+            {"code": reason_code, "label": label}
+            for (reason_code, label) in CLOSE_REASON_CODES.items()
+        ],
+
     }
 
 

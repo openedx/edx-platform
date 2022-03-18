@@ -487,6 +487,7 @@ class CommentsServiceMockMixin:
             "response_count": 0,
             "last_edit": None,
             "closed_by": None,
+            "close_reason": None,
             "close_reason_code": None,
         }
         response_data.update(overrides or {})
