@@ -478,6 +478,8 @@ FEATURES = {
     # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
+
+    'TAHOE_ENABLE_API_DOCS_URLS': False,  # RED-2861
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews

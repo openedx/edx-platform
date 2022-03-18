@@ -407,6 +407,7 @@ FEATURES = {
     # .. toggle_status: supported
     'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
     'TAHOE_STUDIO_LOCAL_LOGIN': False,
+    'TAHOE_ENABLE_API_DOCS_URLS': False,  # RED-2861
 }
 
 ENABLE_JASMINE = False

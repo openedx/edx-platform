@@ -988,7 +988,8 @@ if settings.BRANCH_IO_KEY:
     ]
 
 # API docs.
-urlpatterns += make_docs_urls(api_info)
+if settings.FEATURES.get('TAHOE_ENABLE_API_DOCS_URLS', False):
+    urlpatterns += make_docs_urls(api_info)
 
 # edx-drf-extensions csrf app
 urlpatterns += [

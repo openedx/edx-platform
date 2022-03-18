@@ -287,7 +287,8 @@ if settings.TAHOE_ENABLE_CUSTOM_ERROR_VIEW:
     ]
 
 # API docs.
-urlpatterns += make_docs_urls(api_info)
+if settings.FEATURES.get('TAHOE_ENABLE_API_DOCS_URLS', False):
+    urlpatterns += make_docs_urls(api_info)
 
 if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
     urlpatterns += [
