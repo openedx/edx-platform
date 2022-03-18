@@ -94,7 +94,6 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     media = _CourseApiMediaCollectionSerializer(source='*')
     name = serializers.CharField(source='display_name_with_default_escaped')
     offer = serializers.DictField()
-    org = serializers.CharField(source='display_org_with_default')
     related_programs = CourseProgramSerializer(many=True)
     short_description = serializers.CharField()
     start = serializers.DateTimeField()
