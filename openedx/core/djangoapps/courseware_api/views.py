@@ -68,10 +68,12 @@ from common.djangoapps.student.models import (
 
 from .serializers import CourseInfoSerializer
 
+
 class CoursewareMeta:
     """
     Encapsulates courseware and enrollment metadata.
     """
+
     def __init__(self, course_key, request, username=''):
         self.request = request
         self.overview = course_detail(
