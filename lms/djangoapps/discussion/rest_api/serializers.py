@@ -237,7 +237,11 @@ class _ContentSerializer(serializers.Serializer):
         Returns a boolean indicating whether the requester has flagged the
         content as abusive.
         """
-        return self.context["cc_requester"]["id"] in obj.get("abuse_flaggers", [])
+        total_abuse_flaggers = len(obj.get("abuse_flaggers", []))
+        return (
+            self.context["is_requester_privileged"] and total_abuse_flaggers > 0 or
+            self.context["cc_requester"]["id"] in obj.get("abuse_flaggers", [])
+        )
 
     def get_voted(self, obj):
         """
