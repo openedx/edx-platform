@@ -67,8 +67,6 @@ from common.djangoapps.student.models import (
 )
 
 from .serializers import CourseInfoSerializer
-from .utils import serialize_upgrade_info
-
 
 class CoursewareMeta:
     """
