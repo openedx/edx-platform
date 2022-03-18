@@ -170,7 +170,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
     def __exit__(self, exc_type, exc_value, traceback):
         def is_unfiltered_query(query):
             """
-            Returns True if the query does not contain a blacklisted table, and
+            Returns True if the query does not contain a ignorelisted table, and
             False otherwise.
 
             Note: This is a simple naive implementation that makes no attempt
@@ -201,7 +201,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
 class FilteredQueryCountMixin:
     """
     Mixin to add to any subclass of Django's TestCase that replaces
-    assertNumQueries with one that accepts a blacklist of tables to filter out
+    assertNumQueries with one that accepts a ignorelist of tables to filter out
     of the count.
     """
     def assertNumQueries(self, num, func=None, table_ignorelist=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
@@ -210,6 +210,8 @@ class FilteredQueryCountMixin:
         the addition of the following argument:
             table_ignorelist (List): A list of table names to filter out of the
                 set of queries that get counted.
+
+        Important: TestCase must include FilteredQueryCountMixin for this to work.
         """
         using = kwargs.pop("using", DEFAULT_DB_ALIAS)
         conn = connections[using]
