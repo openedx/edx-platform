@@ -200,6 +200,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'group_at_subsection': False,
             'provider': 'legacy',
             'user_is_privileged': False,
+            'is_user_admin': False,
             'user_roles': {'Student'},
             'learners_tab_enabled': False,
             'reason_codes_enabled': False,
