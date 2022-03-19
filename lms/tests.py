@@ -28,4 +28,5 @@ class LmsModuleTests(TestCase):
         Tests that requests to the `/api-docs/` endpoint do not raise an exception.
         """
         response = self.client.get('/api-docs/')
-        self.assertEqual(200, response.status_code)
+        self.assertFalse(settings.FEATURES.get('TAHOE_ENABLE_API_DOCS_URLS'))
+        self.assertEqual(404, response.status_code)  # Tahoe: Changed from `200`
