@@ -149,7 +149,7 @@ coreschema==0.0.4
     #   drf-yasg
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.in
-cryptography==36.0.1
+cryptography==36.0.2
     # via
     #   -r requirements/edx/base.in
     #   django-fernet-fields
@@ -195,7 +195,6 @@ django==3.2.12
     #   django-mysql
     #   django-oauth-toolkit
     #   django-pyfs
-    #   django-ratelimit-backend
     #   django-sekizai
     #   django-ses
     #   django-splash
@@ -330,15 +329,13 @@ django-pyfs==3.2.0
     # via -r requirements/edx/base.in
 django-ratelimit==3.0.1
     # via -r requirements/edx/base.in
-django-ratelimit-backend @ git+https://github.com/edx/django-ratelimit-backend.git@6e1a0c6ea1d27062c16e9fb94d3c44475146877e
-    # via -r requirements/edx/github.in
 django-require @ git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
     # via -r requirements/edx/github.in
 django-sekizai==3.0.1
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
-django-ses==2.6.0
+django-ses==2.6.1
     # via -r requirements/edx/base.in
 django-simple-history==3.0.0
     # via
@@ -428,7 +425,7 @@ edx-django-release-util==1.2.0
     # via -r requirements/edx/base.in
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.in
-edx-django-utils==4.5.0
+edx-django-utils==4.6.0
     # via
     #   -r requirements/edx/base.in
     #   django-config-models
@@ -479,7 +476,7 @@ edx-opaque-keys[django]==2.3.0
     #   openedx-events
     #   ora2
     #   xmodule
-edx-organizations==6.11.0
+edx-organizations==6.11.1
     # via -r requirements/edx/base.in
 edx-proctoring==4.9.0
     # via
@@ -552,7 +549,6 @@ fs-s3fs==0.1.8
     #   django-pyfs
 future==0.18.2
     # via
-    #   django-ses
     #   edx-celeryutils
     #   pyjwkest
 geoip2==4.5.0
@@ -625,7 +621,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==3.4.4
+lti-consumer-xblock==3.4.5
     # via -r requirements/edx/base.in
 lxml==4.5.0
     # via
@@ -656,7 +652,7 @@ markdown==3.3.6
     #   xblock-poll
 markey==0.8
     # via enmerkar-underscore
-markupsafe==2.1.0
+markupsafe==2.1.1
     # via
     #   -r requirements/edx/paver.txt
     #   chem
@@ -716,7 +712,7 @@ openedx-events==0.8.1
     # via -r requirements/edx/base.in
 openedx-filters==0.5.0
     # via -r requirements/edx/base.in
-ora2==4.0.4
+ora2==4.0.5
     # via -r requirements/edx/base.in
 packaging==21.3
     # via
@@ -849,7 +845,7 @@ python3-saml==1.9.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
-pytz==2021.3
+pytz==2022.1
     # via
     #   -r requirements/edx/base.in
     #   babel
@@ -883,7 +879,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
 redis==4.1.4
     # via -r requirements/edx/base.in
-regex==2022.3.2
+regex==2022.3.15
     # via nltk
 requests==2.27.1
     # via
@@ -1031,7 +1027,7 @@ uritemplate==4.1.1
     # via
     #   coreapi
     #   drf-yasg
-urllib3==1.26.8
+urllib3==1.26.9
     # via
     #   -r requirements/edx/paver.txt
     #   elasticsearch
