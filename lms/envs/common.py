@@ -4987,3 +4987,8 @@ DISCUSSION_MODERATION_CLOSE_REASON_CODES = {
     "duplicate": _("Post is a duplicate"),
     "off-topic": _("Post is off-topic"),
 }
+
+################# Settings for edx-financial-assistance #################
+IS_ELIGIBLE_FOR_FINANCIAL_ASSISTANCE_URL = '/core/api/course_eligibility/'
+FINANCIAL_ASSISTANCE_APPLICATION_STATUS_URL = "/core/api/financial_assistance_application/status/"
+CREATE_FINANCIAL_ASSISTANCE_APPLICATION_URL = '/core/api/financial_assistance_applications'

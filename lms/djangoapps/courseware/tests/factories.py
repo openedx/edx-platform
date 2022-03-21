@@ -17,7 +17,8 @@ from lms.djangoapps.courseware.models import (
     StudentModule,
     XModuleStudentInfoField,
     XModuleStudentPrefsField,
-    XModuleUserStateSummaryField
+    XModuleUserStateSummaryField,
+    FinancialAssistanceConfiguration
 )
 
 COURSE_KEY = CourseKey.from_string('edX/test_course/test')
@@ -75,3 +76,12 @@ class StudentInfoFactory(DjangoModelFactory):
     field_name = 'existing_field'
     value = json.dumps('old_value')
     student = factory.SubFactory(UserFactory)
+
+
+class FinancialAssistanceConfigurationFactory(DjangoModelFactory):
+    """
+    Factory for FinancialAssistanceConfiguration model.
+    """
+
+    class Meta:
+        model = FinancialAssistanceConfiguration
