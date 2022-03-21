@@ -49,7 +49,8 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     get_retired_email_by_email,
     get_retired_username_by_username,
     is_username_retired,
-    is_email_retired
+    is_email_retired,
+    AccountRecovery
 )
 from common.djangoapps.student.models_api import (
     confirm_name_change,
@@ -320,7 +321,7 @@ class AccountViewSet(ViewSet):
         if usernames:
             search_usernames = usernames.strip(',').split(',')
         elif user_email:
-            if is_email_retired(user_email):
+            if is_email_retired(user_email) or AccountRecovery.objects.filter(secondary_email=user_email).exists():
                 return Response({'error_msg': RETIRED_EMAIL_MSG}, status=status.HTTP_404_NOT_FOUND)
             user_email = user_email.strip('')
             try:
