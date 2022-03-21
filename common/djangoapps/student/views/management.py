@@ -74,6 +74,14 @@ from util.db import outer_atomic
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
+from openedx.core.djangoapps.site_configuration import tahoe_auth0_helpers
+
+try:
+    from tahoe_auth0 import api as tahoe_auth0_api  # Tahoe: optional dependency
+except ImportError:
+    pass
+
+
 log = logging.getLogger("edx.student")
 
 AUDIT_LOG = logging.getLogger("audit")
@@ -794,6 +802,9 @@ def confirm_email_change(request, key):
             response = render_to_response("email_change_failed.html", {'email': user.email})
             transaction.set_rollback(True)
             return response
+
+        if tahoe_auth0_helpers.is_tahoe_auth0_enabled():
+            tahoe_auth0_api.update_user_email(user, pec.new_email, set_email_as_verified=True)
 
         user.email = pec.new_email
         user.save()
