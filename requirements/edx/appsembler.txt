@@ -9,3 +9,4 @@ django-hijack==2.1.10
 django-hijack-admin==2.1.10
 honeycomb-beeline==2.12.1
 tahoe-sites==0.1.2
+site-configuration-client==0.1.3

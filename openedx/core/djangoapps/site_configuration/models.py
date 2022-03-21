@@ -118,7 +118,7 @@ class SiteConfiguration(models.Model):
                 if self.api_adapter:
                     # Tahoe: Use `SiteConfigAdapter` if available.
                     beeline.add_context_field('value_source', 'site_config_service')
-                    return self.api_adapter.get_value(name, default)
+                    return self.api_adapter.get_value_of_type(self.api_adapter.TYPE_SETTING, name, default)
                 else:
                     beeline.add_context_field('value_source', 'django_model')
                     return self.site_values.get(name, default)
@@ -144,11 +144,56 @@ class SiteConfiguration(models.Model):
             Page content `dict`.
         """
         if self.api_adapter:
+            # Tahoe: Use `SiteConfigAdapter` if available.
             beeline.add_context_field('page_source', 'site_config_service')
-            return self.api_adapter.get_amc_v1_page(name, default)
+            return self.api_adapter.get_value_of_type(self.api_adapter.TYPE_PAGE, name, default)
         else:
             beeline.add_context_field('page_source', 'django_model')
             return self.page_elements.get(name, default)
+
+    @beeline.traced('site_config.get_admin_setting')
+    def get_admin_setting(self, name, default=None):
+        """
+        Tahoe: Get `admin` setting from the site configuration service.
+
+        If SiteConfiguration adapter isn't in use, fallback to the deprecated `SiteConfiguration.site_values` field.
+
+        Args:
+            name (str): Name of the setting to fetch.
+            default: default value to return if setting is not found in the configuration.
+
+        Returns:
+            Value for the given key or returns `None` if not configured.
+        """
+        if self.api_adapter:
+            # Tahoe: Use `SiteConfigAdapter` if available.
+            beeline.add_context_field('setting_source', 'site_config_service')
+            return self.api_adapter.get_value_of_type(self.api_adapter.TYPE_ADMIN, name, default)
+        else:
+            beeline.add_context_field('setting_source', 'django_model')
+            return self.site_values.get(name, default)
+
+    @beeline.traced('site_config.get_secret_value')
+    def get_secret_value(self, name, default=None):
+        """
+        Tahoe: Get `secret` value from the site configuration service.
+
+        If SiteConfiguration adapter isn't in use, fallback to the deprecated `SiteConfiguration.site_values` field.
+
+        Args:
+            name (str): Name of the secret to fetch.
+            default: default value to return if secret is not found in the configuration.
+
+        Returns:
+            Value for the given key or returns `None` if not configured.
+        """
+        if self.api_adapter:
+            # Tahoe: Use `SiteConfigAdapter` if available.
+            beeline.add_context_field('setting_source', 'site_config_service')
+            return self.api_adapter.get_value_of_type(self.api_adapter.TYPE_SECRET, name, default)
+        else:
+            beeline.add_context_field('setting_source', 'django_model')
+            return self.site_values.get(name, default)
 
     @classmethod
     def get_configuration_for_org(cls, org, select_related=None):

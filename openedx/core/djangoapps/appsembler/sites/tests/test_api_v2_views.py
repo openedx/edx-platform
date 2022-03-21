@@ -19,12 +19,8 @@ from rest_framework.authtoken.models import Token
 import tahoe_sites.api
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.appsembler.sites import (
-    site_config_client_helpers as client_helpers,
-)
 
 from openedx.core.djangoapps.appsembler.sites import api_v2
-
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from organizations.tests.factories import OrganizationFactory
@@ -72,8 +68,7 @@ def test_v2_views_security_classes(api_v2_view):
 
 
 @pytest.mark.django_db
-def test_compile_sass_view(client, monkeypatch, site_with_uuid, superuser_with_token):
-    monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', True)
+def test_compile_sass_view(client, site_with_uuid, superuser_with_token):
     _, api_token = superuser_with_token
     site, site_uuid = site_with_uuid
     site_configuration = SiteConfigurationFactory.build(
@@ -93,9 +88,8 @@ def test_compile_sass_view(client, monkeypatch, site_with_uuid, superuser_with_t
 
 
 @pytest.mark.django_db
-def test_compile_sass_view_site_not_found(client, monkeypatch, superuser_with_token):
+def test_compile_sass_view_site_not_found(client, superuser_with_token):
     _, api_token = superuser_with_token
-    monkeypatch.setattr(client_helpers, 'CONFIG_CLIENT_INSTALLED', True)
     url = reverse('tahoe_compile_sass')
     data = {'site_uuid': 'ee9894a6-898e-11ec-ab4d-9779d2628f5b'}
     response = client.post(url, data=data, HTTP_AUTHORIZATION='Token {}'.format(api_token))

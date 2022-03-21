@@ -286,7 +286,7 @@ def send_event(request, method, **params):
     # analytics library format.
     url = 'https://api.segment.io/v1/{0}'.format(method)
     main_response = requests.post(url, json=data)
-    segment_key = helpers.get_value('SEGMENT_KEY', None)
+    segment_key = helpers.get_current_site_configuration().get_secret_value('SEGMENT_KEY')
     if segment_key:
         data['writeKey'] = segment_key
         data['messageId'] = 'ajs-' + uuid.uuid4().hex
