@@ -131,7 +131,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             user.profile.save()
         for feature in query_features:
             assert feature in AVAILABLE_FEATURES
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             userreports = enrolled_students_features(self.course_key, query_features)
         assert len(userreports) == len(self.users)
 
@@ -159,7 +159,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         Assert that we can query individual fields in the 'meta' field in the UserProfile
         """
         query_features = ('meta.position', 'meta.company')
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             userreports = enrolled_students_features(self.course_key, query_features)
         assert len(userreports) == len(self.users)
         for userreport in userreports:
@@ -211,11 +211,12 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.client.login(username=instructor.username, password='test')
 
         query_features = ('username', 'cohort')
-        # There should be a constant of 2 SQL queries when calling
+        # There should be a constant of 3 SQL queries when calling
         # enrolled_students_features.  The first query comes from the call to
         # User.objects.filter(...), and the second comes from
-        # prefetch_related('course_groups').
-        with self.assertNumQueries(2):
+        # prefetch_related('course_groups'), and the third comes from the query
+        # to site configuration.
+        with self.assertNumQueries(3):
             userreports = enrolled_students_features(course.id, query_features)
         assert len([r for r in userreports if r['username'] in cohorted_usernames]) == len(cohorted_students)
         assert len([r for r in userreports if r['username'] == non_cohorted_student.username]) == 1
@@ -237,7 +238,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 ProgramEnrollmentFactory.create(user=user, external_user_key=external_user_key)
                 username_with_external_user_key_dict[user.username] = external_user_key
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             userreports = enrolled_students_features(self.course_key, query_features)
         assert len(userreports) == 30
         for report in userreports:

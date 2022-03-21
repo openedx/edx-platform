@@ -119,6 +119,10 @@ def enrolled_students_features(course_key, features):
         for program_enrollment in program_enrollments:
             external_user_key_dict[program_enrollment.user_id] = program_enrollment.external_user_key
 
+    STUDENT_FEATURES_WITH_CUSTOM = STUDENT_FEATURES + tuple(
+        getattr(settings, "STUDENT_PROFILE_DOWNLOAD_FIELDS_CUSTOM_STUDENT_ATTRIBUTES", ())
+    )
+
     def extract_attr(student, feature):
         """Evaluate a student attribute that is ready for JSON serialization"""
         attr = getattr(student, feature)
@@ -130,7 +134,7 @@ def enrolled_students_features(course_key, features):
 
     def extract_student(student, features):
         """ convert student to dictionary """
-        student_features = [x for x in STUDENT_FEATURES if x in features]
+        student_features = [x for x in STUDENT_FEATURES_WITH_CUSTOM if x in features]
         profile_features = [x for x in PROFILE_FEATURES if x in features]
 
         # For data extractions on the 'meta' field
