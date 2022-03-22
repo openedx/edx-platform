@@ -2733,12 +2733,15 @@ def send_email(request, course_id):
     # Create the CourseEmail object.  This is saved immediately, so that
     # any transaction that has been pending up to this point will also be
     # committed.
+    # TODO: convert to use bulk_email app's `create_course_email` API function and remove direct import and use of
+    # bulk_email model
     try:
         email = CourseEmail.create(
             course_id,
             request.user,
             targets,
-            subject, message,
+            subject,
+            message,
             template_name=template_name,
             from_addr=from_addr
         )
