@@ -673,7 +673,7 @@ mock==4.0.3
     #   xblock-poll
 mongodbproxy @ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
     # via -r requirements/edx/github.in
-mongoengine==0.24.0
+mongoengine==0.24.1
     # via -r requirements/edx/base.in
 monotonic==1.6
     # via
@@ -716,7 +716,7 @@ openedx-events==0.8.1
     # via -r requirements/edx/base.in
 openedx-filters==0.5.0
     # via -r requirements/edx/base.in
-ora2==4.0.4
+ora2==4.0.5
     # via -r requirements/edx/base.in
 packaging==21.3
     # via
@@ -849,7 +849,7 @@ python3-saml==1.9.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
-pytz==2021.3
+pytz==2022.1
     # via
     #   -r requirements/edx/base.in
     #   babel

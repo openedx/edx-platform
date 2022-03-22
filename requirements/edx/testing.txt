@@ -855,7 +855,7 @@ mock==4.0.3
     #   xblock-poll
 mongodbproxy @ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
     # via -r requirements/edx/base.txt
-mongoengine==0.24.0
+mongoengine==0.24.1
     # via -r requirements/edx/base.txt
 monotonic==1.6
     # via
@@ -903,7 +903,7 @@ openedx-events==0.8.1
     # via -r requirements/edx/base.txt
 openedx-filters==0.5.0
     # via -r requirements/edx/base.txt
-ora2==4.0.4
+ora2==4.0.5
     # via -r requirements/edx/base.txt
 packaging==21.3
     # via
@@ -914,7 +914,7 @@ packaging==21.3
     #   pytest
     #   redis
     #   tox
-pact-python==1.5.1
+pact-python==1.5.2
     # via -r requirements/edx/testing.in
 pansi==2020.7.3
     # via
@@ -1063,7 +1063,7 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-pytest==7.1.0
+pytest==7.1.1
     # via
     #   -r requirements/edx/testing.in
     #   pylint-pytest
@@ -1131,7 +1131,7 @@ python3-saml==1.9.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-pytz==2021.3
+pytz==2022.1
     # via
     #   -r requirements/edx/base.txt
     #   babel
@@ -1403,7 +1403,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.13.3
+virtualenv==20.13.4
     # via tox
 voluptuous==0.12.2
     # via
