@@ -52,7 +52,7 @@ python-slugify==4.0.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   code-annotations
-pytz==2021.3
+pytz==2022.1
     # via babel
 pyyaml==6.0
     # via code-annotations
