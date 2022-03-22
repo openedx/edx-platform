@@ -25,6 +25,7 @@ class XForwardedForMiddleware(MiddlewareMixin):
         # for monitoring in case of unexpected changes, etc.
         xff = request.META.get('HTTP_X_FORWARDED_FOR')
         xff_len = xff.count(',') + 1 if xff else 0
+        # IP chain is XFF + REMOTE_ADDR
         set_custom_attribute('ip_chain.count', xff_len + 1)
 
         for field, header in [("HTTP_X_FORWARDED_FOR", "REMOTE_ADDR"), ("HTTP_HOST", "SERVER_NAME"),
