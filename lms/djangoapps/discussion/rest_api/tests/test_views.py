@@ -7,17 +7,18 @@ import json
 import random
 from datetime import datetime
 from unittest import mock
-from urllib.parse import parse_qs, urlparse, urlencode
+from urllib.parse import parse_qs, urlencode, urlparse
 
 import ddt
 import httpretty
-from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
+from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
-from rest_framework import status
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -27,11 +28,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import get_retired_username_by_username
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
-from common.djangoapps.student.tests.factories import (
-    CourseEnrollmentFactory,
-    SuperuserFactory,
-    UserFactory,
-)
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
 from common.test.utils import disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
@@ -483,6 +480,8 @@ class CommentViewSetListByUserTest(
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_settings(DISCUSSION_MODERATION_EDIT_REASON_CODES={"test-edit-reason": "Test Edit Reason"})
+@override_settings(DISCUSSION_MODERATION_CLOSE_REASON_CODES={"test-close-reason": "Test Close Reason"})
 class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
     def setUp(self):
@@ -512,14 +511,18 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                     "http://testserver/api/discussion/v1/threads/?course_id=course-v1%3Ax%2By%2Bz&following=True"
                 ),
                 "topics_url": "http://testserver/api/discussion/v1/course_topics/course-v1:x+y+z",
-                'enable_in_context': True,
-                'group_at_subsection': False,
-                'provider': 'legacy',
+                "enable_in_context": True,
+                "group_at_subsection": False,
+                "provider": "legacy",
                 "allow_anonymous": True,
                 "allow_anonymous_to_peers": False,
-                'user_is_privileged': False,
-                'user_roles': ['Student'],
+                "user_is_privileged": False,
+                'is_user_admin': False,
+                "user_roles": ["Student"],
                 'learners_tab_enabled': False,
+                "reason_codes_enabled": False,
+                "edit_reasons": [{"code": "test-edit-reason", "label": "Test Edit Reason"}],
+                "post_close_reasons": [{"code": "test-close-reason", "label": "Test Close Reason"}],
             }
         )
 
@@ -1510,6 +1513,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "can_delete": True,
             "anonymous": False,
             "anonymous_to_peers": False,
+            "last_edit": None,
         }
         response_data.update(overrides or {})
         return response_data
@@ -1902,6 +1906,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "can_delete": True,
             "anonymous": False,
             "anonymous_to_peers": False,
+            "last_edit": None,
         }
         response = self.client.post(
             self.url,
@@ -1992,6 +1997,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "can_delete": True,
             "anonymous": False,
             "anonymous_to_peers": False,
+            "last_edit": None,
         }
         response_data.update(overrides or {})
         return response_data
@@ -2179,6 +2185,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "can_delete": True,
             "anonymous": False,
             "anonymous_to_peers": False,
+            "last_edit": None,
         }
 
         response = self.client.get(self.url)

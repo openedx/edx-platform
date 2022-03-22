@@ -31,10 +31,19 @@ def _get_thread_callback(thread_data):
         additional required fields.
         """
         response_data = make_minimal_cs_thread(thread_data)
+        original_data = response_data.copy()
         for key, val_list in parsed_body(request).items():
             val = val_list[0]
             if key in ["anonymous", "anonymous_to_peers", "closed", "pinned"]:
                 response_data[key] = val == "True"
+            elif key == "edit_reason_code":
+                response_data["edit_history"] = [
+                    {
+                        "original_body": original_data["body"],
+                        "author": thread_data.get('username'),
+                        "reason_code": val,
+                    },
+                ]
             else:
                 response_data[key] = val
         return (200, headers, json.dumps(response_data))
@@ -53,6 +62,7 @@ def _get_comment_callback(comment_data, thread_id, parent_id):
         Simulate the comment creation or update endpoint as described above.
         """
         response_data = make_minimal_cs_comment(comment_data)
+        original_data = response_data.copy()
         # thread_id and parent_id are not included in request payload but
         # are returned by the comments service
         response_data["thread_id"] = thread_id
@@ -61,6 +71,14 @@ def _get_comment_callback(comment_data, thread_id, parent_id):
             val = val_list[0]
             if key in ["anonymous", "anonymous_to_peers", "endorsed"]:
                 response_data[key] = val == "True"
+            elif key == "edit_reason_code":
+                response_data["edit_history"] = [
+                    {
+                        "original_body": original_data["body"],
+                        "author": comment_data.get('username'),
+                        "reason_code": val,
+                    },
+                ]
             else:
                 response_data[key] = val
         return (200, headers, json.dumps(response_data))
@@ -438,8 +456,15 @@ class CommentsServiceMockMixin:
             "voted": False,
             "vote_count": 0,
             "editable_fields": [
-                "abuse_flagged", "anonymous", "following", "raw_body", "read",
-                "title", "topic_id", "type", "voted"
+                "abuse_flagged",
+                "anonymous",
+                "following",
+                "raw_body",
+                "read",
+                "title",
+                "topic_id",
+                "type",
+                "voted",
             ],
             "course_id": str(self.course.id),
             "topic_id": "test_topic",
@@ -460,6 +485,10 @@ class CommentsServiceMockMixin:
             "id": "test_thread",
             "type": "discussion",
             "response_count": 0,
+            "last_edit": None,
+            "closed_by": None,
+            "close_reason": None,
+            "close_reason_code": None,
         }
         response_data.update(overrides or {})
         return response_data
@@ -497,6 +526,8 @@ def make_minimal_cs_thread(overrides=None):
         "read": False,
         "endorsed": False,
         "resp_total": 0,
+        "closed_by": None,
+        "close_reason_code": None,
     }
     ret.update(overrides or {})
     return ret

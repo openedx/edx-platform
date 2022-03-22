@@ -60,9 +60,10 @@ class CourseLiveConfigurationView(APIView):
                 "message": "PII sharing is not allowed on this course"
             })
 
-        configuration = CourseLiveConfiguration.get(course_id)
+        configuration = CourseLiveConfiguration.get(course_id) or CourseLiveConfiguration()
         serializer = CourseLiveConfigurationSerializer(configuration, context={
             "pii_sharing_allowed": pii_sharing_allowed,
+            "course_id": course_id
         })
 
         return Response(serializer.data)
@@ -148,27 +149,44 @@ class CourseLiveProvidersView(APIView):
     )
     permission_classes = (IsStaffOrInstructor,)
 
-    @apidocs.schema(
-        parameters=[
-            apidocs.string_parameter(
-                'course_id',
-                apidocs.ParameterLocation.PATH,
-                description="The course for which to get provider list",
-            )
-        ],
-        responses={
-            200: CourseLiveConfigurationSerializer,
-            401: "The requester is not authenticated.",
-            403: "The requester cannot access the specified course.",
-            404: "The requested course does not exist.",
-        },
-    )
     @ensure_valid_course_key
     @verify_course_exists()
     def get(self, request, course_id: str, **_kwargs) -> Response:
         """
-        Handle HTTP/GET requests
-        """
+            A view for retrieving Program live IFrame .
+
+            Path: ``api/course_live/providers/{course_id}/``
+
+            Accepts: [GET]
+
+            ------------------------------------------------------------------------------------
+            GET
+            ------------------------------------------------------------------------------------
+
+            **Returns**
+                * 200: Returns list of providers with active provider,
+                * 401: The requester is not authenticated.
+                * 403: The requester cannot access the specified course.
+                * 404: The requested course does not exist.
+            **Response**
+
+                In the case of a 200 response code, the response will be available live providers.
+
+            **Example**
+
+                {
+                    "providers": {
+                        "active": "zoom",
+                        "available": {
+                            'zoom': {
+                                'name': 'Zoom LTI PRO',
+                                'features': []
+                            }
+                        }
+                    }
+                }
+
+            """
         data = self.get_provider_data(course_id)
         return Response(data)
 

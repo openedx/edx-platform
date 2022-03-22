@@ -78,13 +78,15 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         response = self._get()
         self.assertEqual(response.status_code, 200)
         expected_data = {
-            'enabled': False,
+            'enabled': True,
+            'course_key': None,
+            'pii_sharing_allowed': True,
             'lti_configuration': {
                 'lti_1p1_client_key': '',
                 'lti_1p1_client_secret': '',
                 'lti_1p1_launch_url': '',
-                'lti_config': None,
-                'version': None
+                'lti_config': {},
+                'version': 'lti_1p1'
             },
             'provider_type': ''
         }

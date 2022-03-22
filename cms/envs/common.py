@@ -752,16 +752,15 @@ XQUEUE_INTERFACE = {
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
-
     'crum.CurrentRequestUserMiddleware',
 
-    'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
-    # A newer and safer request cache.
+    # Resets the request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
-    'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
 
-    # Cookie monitoring
-    'openedx.core.lib.request_utils.CookieMonitoringMiddleware',
+    # Various monitoring middleware
+    'edx_django_utils.monitoring.CookieMonitoringMiddleware',
+    'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
+    'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
 
     # Before anything that looks at cookies, especially the session middleware
     'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
