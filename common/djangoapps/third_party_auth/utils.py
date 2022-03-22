@@ -33,8 +33,10 @@ class MetadataParseError(Exception):
 
 
 def fetch_metadata_xml(url):
-    # Fetches IDP metadata from provider url
-    # Returns: xml document
+    """
+    Fetches IDP metadata from provider url
+    Returns: xml document
+    """
     try:
         log.info("Fetching %s", url)
         if not url.lower().startswith('https'):

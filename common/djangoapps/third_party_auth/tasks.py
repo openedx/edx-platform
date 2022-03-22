@@ -11,8 +11,12 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from lxml import etree
 from requests import exceptions
 
-from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
-from common.djangoapps.third_party_auth.utils import MetadataParseError, create_or_update_saml_provider_data, parse_metadata_xml
+from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
+from common.djangoapps.third_party_auth.utils import (
+    MetadataParseError,
+    create_or_update_saml_provider_data,
+    parse_metadata_xml,
+)
 
 log = logging.getLogger(__name__)
 
