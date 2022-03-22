@@ -9,8 +9,7 @@ Testing
 Overview
 ========
 
-We maintain three kinds of tests: unit tests, integration tests, and
-acceptance tests.
+We maintain two kinds of tests: unit tests and integration tests.
 
 Overall, you want to write the tests that **maximize coverage** while
 **minimizing maintenance**. In practice, this usually means investing
@@ -22,8 +21,8 @@ the code base.
 
    Test Pyramid
 
-The pyramid above shows the relative number of unit tests, integration
-tests, and acceptance tests. Most of our tests are unit tests or
+The pyramid above shows the relative number of unit tests and integration
+tests. Most of our tests are unit tests or
 integration tests.
 
 Test Types
@@ -67,19 +66,6 @@ Integration Tests
 
 .. _Django test client: https://docs.djangoproject.com/en/dev/topics/testing/overview/
 
-
-UI Acceptance Tests
-~~~~~~~~~~~~~~~~~~~
-
--  There should be very few UI acceptance tests since they are generally slow and
-   flaky. Use these to test only bare minimum happy paths for necessary features.
-
--  We use `Bok Choy`_ to write end-user acceptance tests directly in Python,
-   using the framework to maximize reliability and maintainability.
-
-.. _Bok Choy: https://bok-choy.readthedocs.org/en/latest/tutorial.html
-
-
 Test Locations
 --------------
 
@@ -94,14 +80,6 @@ Test Locations
    the test for ``src/views/module.js`` should be written in
    ``spec/views/module_spec.js``.
 
--  UI acceptance tests:
-
-   -  Set up and helper methods, and stubs for external services:
-      ``common/djangoapps/terrain``
-   -  Bok Choy Acceptance Tests: located under ``common/test/acceptance/tests``
-   -  Bok Choy Accessibility Tests: located under ``common/test/acceptance/tests`` and tagged with ``@attr("a11y")``
-   -  Bok Choy PageObjects: located under ``common/test/acceptance/pages``
-
 Running Tests
 =============
 
@@ -109,8 +87,7 @@ You can run all of the unit-level tests using this command::
 
     paver test
 
-This includes python, JavaScript, and documentation tests. It does not,
-however, run any acceptance tests.
+This includes python, JavaScript, and documentation tests.
 
 Note -
 `paver` is a scripting tool. To get information about various options, you can run the this command::
@@ -425,7 +402,7 @@ Other Testing Tips
 Connecting to Browser
 ---------------------
 
-If you want to see the browser being automated for JavaScript or bok-choy tests,
+If you want to see the browser being automated for JavaScript or e2e tests against any sandbox,
 you can connect to the container running it via VNC.
 
 +------------------------+----------------------+
