@@ -35,11 +35,11 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from six import iteritems, text_type
 from social_django.models import UserSocialAuth
+from tahoe_sites.api import get_organization_for_user
 from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
 from entitlements.models import CourseEntitlement
-from openedx.core.djangoapps.appsembler.sites.utils import get_single_user_organization
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
@@ -492,7 +492,7 @@ class DeactivateLogoutView(APIView):
         profile = user.profile
         meta = profile.get_meta()
 
-        organization = get_single_user_organization(user)
+        organization = get_organization_for_user(user)
 
         # Store the original email in the case of Account Deletion cancellation is needed
         # This value will be removed when the pipeline is executed, so it won't

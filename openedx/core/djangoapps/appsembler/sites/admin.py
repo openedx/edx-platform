@@ -13,11 +13,11 @@ from student.admin import UserAdmin
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 from organizations.models import UserOrganizationMapping
+from tahoe_sites.api import get_organization_for_user
 
 from openedx.core.djangoapps.appsembler.sites.forms import MakeAMCAdminForm
 from openedx.core.djangoapps.appsembler.sites.utils import (
     get_amc_tokens,
-    get_single_user_organization,
     make_amc_admin,
 )
 
@@ -47,7 +47,7 @@ class TahoeUserAdmin(UserAdmin, HijackUserAdminMixin):
         user = self.get_object(request, user_id)
 
         try:
-            current_org = get_single_user_organization(user)
+            current_org = get_organization_for_user(user)
             current_org_name = current_org.name
         except (UserOrganizationMapping.DoesNotExist, MultipleObjectsReturned):
             current_org_name = ''

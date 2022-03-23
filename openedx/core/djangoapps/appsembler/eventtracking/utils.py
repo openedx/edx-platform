@@ -39,17 +39,11 @@ def get_site_config_for_event(event_props):
     Return a SiteConfiguration object if found; otherwise, None.
 
     django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet
-
-    We get the site matching the org direcly from the organization object
-    instead of calling 'appsembler.sites.utils.get_site_by_organization'. The
-    problem is that importing 'appsembler.sites.utils' in this module at the
-    module level causes the following exception:
-
-        `django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet`
     """
 
     # try first via request obj in thread
     from organizations.models import Organization
+    from tahoe_sites.api import get_site_by_organization
 
     site_configuration = get_current_site_configuration()
     if not site_configuration:
@@ -71,11 +65,7 @@ def get_site_config_for_event(event_props):
                     "There isn't and org, course_key or course_id attribute set in the "
                     "segment event, so we couldn't determine the site."
                 )
-            # Same logic as in 'appsembler.sites.utils.get_site_by_organization'
-            # See function docstring for additional comments
-            assert org.sites.count() == 1, 'Should have one and only one site.'
-            site = org.sites.all()[0]
-            site_configuration = site.configuration
+            site_configuration = get_site_by_organization(org).configuration
         except (
             AttributeError,
             TypeError,

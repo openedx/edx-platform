@@ -13,10 +13,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
+from tahoe_sites.api import get_organization_for_user
 
 from course_creators.views import user_requested_access
 from edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.appsembler.sites.utils import get_single_user_organization
 from student import auth
 from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
 from student.models import CourseEnrollment
@@ -131,7 +131,7 @@ def _course_team_user(request, course_key, email):
                 #   organization from the requesting user. This is secure given the
                 #   `get_user_permissions` check above. Still we're not using this softer
                 #   check for courses because security isn't fully reviewed.
-                organization = get_single_user_organization(request.user)
+                organization = get_organization_for_user(request.user)
             else:
                 organization = Organization.objects.get(organizationcourse__course_id=course_key)
             user = organization.userorganizationmapping_set.get(user__email=email).user

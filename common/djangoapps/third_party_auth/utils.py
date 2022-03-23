@@ -7,10 +7,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from openedx.core.djangoapps.appsembler.sites.utils import (
-    get_current_organization,
-    get_single_user_organization
-)
+from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
 
 logger = logging.getLogger(__name__)
 

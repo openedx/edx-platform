@@ -25,6 +25,7 @@ from django.utils.text import slugify
 from organizations import api as org_api
 from organizations import models as org_models
 from organizations.models import UserOrganizationMapping, Organization
+from tahoe_sites.api import get_organization_for_user
 
 from openedx.core.lib.api.api_key_permissions import is_request_has_valid_api_key
 from openedx.core.lib.log_utils import audit_log
@@ -47,15 +48,6 @@ def get_lms_link_from_course_key(base_lms_url, course_key):
     if course_site:
         return course_site.domain
     return base_lms_url
-
-
-@beeline.traced(name="get_site_by_organization")
-def get_site_by_organization(org):
-    """
-    Get the site matching the organization, throws an error if there's more than one site.
-    """
-    assert org.sites.count() == 1, 'Should have one and only one site.'
-    return org.sites.all()[0]
 
 
 def _get_active_tiers_uuids():
@@ -196,17 +188,6 @@ def reset_amc_tokens(user, access_token=None, refresh_token=None):
     refresh.save()
 
     return get_amc_tokens(user)
-
-
-@beeline.traced(name="get_single_user_organization")
-def get_single_user_organization(user):
-    """
-    Finds the single organization the user is associated with.
-
-    If there's more than one, an exception is thrown.
-    """
-    uom = UserOrganizationMapping.objects.get(user=user)
-    return uom.organization
 
 
 @beeline.traced(name="make_amc_admin")
