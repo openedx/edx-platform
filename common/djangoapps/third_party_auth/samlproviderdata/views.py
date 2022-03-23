@@ -120,10 +120,10 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
             str_message = f" Created new record for SAMLProviderData for entityID {entity_id}"
             log.info(str_message)
             response = str_message
-            http_status = status.HTTP_200_OK
+            http_status = status.HTTP_201_CREATED
         else:
             str_message = f" Updated existing SAMLProviderData. Nothing has changed for entityID {entity_id}"
             log.info(str_message)
             response = str_message
-            http_status = status.HTTP_201_CREATED
+            http_status = status.HTTP_200_OK
         return Response(response, status=http_status)
