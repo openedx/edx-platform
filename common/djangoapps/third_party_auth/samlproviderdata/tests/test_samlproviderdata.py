@@ -212,6 +212,6 @@ class SAMLProviderDataTests(APITestCase):
         # should only update this time
         response = self.client.post(url, data)
         assert response.status_code == status.HTTP_200_OK
-        assert response.data == " Updated existing SAMLProviderData. "
-        "Nothing has changed for entityID http://entity-id-1"
+        assert response.data == (" Updated existing SAMLProviderData. "
+                                 "Nothing has changed for entityID http://entity-id-1")
         assert SAMLProviderData.objects.count() == orig_count + 1
