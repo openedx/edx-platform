@@ -1,11 +1,13 @@
 """
 Tests for xmodule.x_module.ResourceTemplates
 """
-
-
+import pathlib
 import unittest
 
+from django.test import override_settings
 from xmodule.x_module import ResourceTemplates
+
+CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = pathlib.Path(__file__).parent.parent / "templates/"
 
 
 class ResourceTemplatesTests(unittest.TestCase):
@@ -27,6 +29,20 @@ class ResourceTemplatesTests(unittest.TestCase):
 
     def test_get_template(self):
         assert TestClass.get_template('latex_html.yaml')['template_id'] == 'latex_html.yaml'
+
+    @override_settings(CUSTOM_RESOURCE_TEMPLATES_DIRECTORY=CUSTOM_RESOURCE_TEMPLATES_DIRECTORY)
+    def test_get_custom_template(self):
+        assert TestClassResourceTemplate.get_template('latex_html.yaml')['template_id'] == 'latex_html.yaml'
+
+    @override_settings(CUSTOM_RESOURCE_TEMPLATES_DIRECTORY=CUSTOM_RESOURCE_TEMPLATES_DIRECTORY)
+    def test_custom_templates(self):
+        expected = {
+            'latex_html.yaml',
+            'zooming_image.yaml',
+            'announcement.yaml',
+            'anon_user_id.yaml'}
+        got = {t['template_id'] for t in TestClassResourceTemplate.templates()}
+        assert expected == got
 
 
 class TestClass(ResourceTemplates):
@@ -55,3 +71,14 @@ class TestClass2(TestClass):
     @classmethod
     def get_template_dir(cls):
         return 'foo'
+
+
+class TestClassResourceTemplate(ResourceTemplates):
+    """
+    Like TestClass, but `template_packages` contains a module that doesn't
+    have any templates.
+
+    See `TestClass`.
+    """
+    template_packages = ['capa.checker']
+    template_dir_name = 'test'
