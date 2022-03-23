@@ -206,5 +206,11 @@ class SAMLProviderDataTests(APITestCase):
         response = self.client.post(url, data)
 
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.message == f" Created new record for SAMLProviderData for entityID http://entity-id-1"
+        assert response.data == f" Created new record for SAMLProviderData for entityID http://entity-id-1"
+        assert SAMLProviderData.objects.count() == orig_count + 1
+
+        # should only update this time
+        response = self.client.post(url, data)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == f" Updated existing SAMLProviderData. Nothing has changed for entityID http://entity-id-1"
         assert SAMLProviderData.objects.count() == orig_count + 1
