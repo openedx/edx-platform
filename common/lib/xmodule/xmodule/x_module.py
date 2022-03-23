@@ -10,11 +10,12 @@ from functools import partial
 import yaml
 from contracts import contract, new_contract
 from django.utils.encoding import python_2_unicode_compatible
+from django.conf import settings
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_exists, resource_isdir, resource_listdir, resource_string
+from pkg_resources import resource_exists, resource_isdir, resource_listdir, resource_string, resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
@@ -1039,6 +1040,35 @@ class ResourceTemplates:
     template_packages = [__name__]
 
     @classmethod
+    def _load_template(cls, template_path, template_id):
+        """
+        Reads an loads the yaml content provided in the template_path and
+        return the content as a dictionary.
+        """
+        if not os.path.exists(template_path):
+            return None
+
+        with open(template_path) as file_object:
+            template = yaml.safe_load(file_object)
+            template['template_id'] = template_id
+            return template
+
+    @classmethod
+    def _load_templates_in_dir(cls, dirpath):
+        """
+        Lists every resource template found in the provided dirpath.
+        """
+        templates = []
+        for template_file in os.listdir(dirpath):
+            if not template_file.endswith('.yaml'):
+                log.warning("Skipping unknown template file %s", template_file)
+                continue
+
+            template = cls._load_template(os.path.join(dirpath, template_file), template_file)
+            templates.append(template)
+        return templates
+
+    @classmethod
     def templates(cls):
         """
         Returns a list of dictionary field: value objects that describe possible templates that can be used
@@ -1047,21 +1077,21 @@ class ResourceTemplates:
         Expects a class attribute template_dir_name that defines the directory
         inside the 'templates' resource directory to pull templates from
         """
-        templates = []
+        templates = {}
         dirname = cls.get_template_dir()
         if dirname is not None:
             for pkg in cls.template_packages:
                 if not resource_isdir(pkg, dirname):
                     continue
-                for template_file in resource_listdir(pkg, dirname):
-                    if not template_file.endswith('.yaml'):
-                        log.warning("Skipping unknown template file %s", template_file)
-                        continue
-                    template_content = resource_string(pkg, os.path.join(dirname, template_file))
-                    template = yaml.safe_load(template_content)
-                    template['template_id'] = template_file
-                    templates.append(template)
-        return templates
+                for template in cls._load_templates_in_dir(resource_filename(pkg, dirname)):
+                    templates[template['template_id']] = template
+
+        custom_template_dir = cls.get_custom_template_dir()
+        if custom_template_dir is not None:
+            for template in cls._load_templates_in_dir(custom_template_dir):
+                templates[template['template_id']] = template
+
+        return list(templates.values())
 
     @classmethod
     def get_template_dir(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -1079,21 +1109,48 @@ class ResourceTemplates:
             return None
 
     @classmethod
+    def get_custom_template_dir(cls):
+        """
+        If settings.CUSTOM_RESOURCE_TEMPLATES_DIRECTORY is defined, check if it has a
+        subdirectory named as the class's template_dir_name and return the full path.
+        """
+        template_dir_name = getattr(cls, 'template_dir_name', None)
+
+        if template_dir_name is None:
+            return
+
+        resource_dir = settings.CUSTOM_RESOURCE_TEMPLATES_DIRECTORY
+
+        if not resource_dir:
+            return None
+
+        template_dir_path = os.path.join(resource_dir, template_dir_name)
+
+        if os.path.exists(template_dir_path):
+            return template_dir_path
+        return None
+
+    @classmethod
     def get_template(cls, template_id):
         """
         Get a single template by the given id (which is the file name identifying it w/in the class's
         template_dir_name)
-
         """
         dirname = cls.get_template_dir()
         if dirname is not None:
             path = os.path.join(dirname, template_id)
             for pkg in cls.template_packages:
                 if resource_exists(pkg, path):
-                    template_content = resource_string(pkg, path)
-                    template = yaml.safe_load(template_content)
-                    template['template_id'] = template_id
-                    return template
+                    abs_path = resource_filename(pkg, path)
+                    return cls._load_template(abs_path, template_id)
+
+        custom_template_dir = cls.get_custom_template_dir()
+
+        if custom_template_dir is not None:
+            abs_path = os.path.join(custom_template_dir, template_id)
+            return cls._load_template(abs_path, template_id)
+
+        return None
 
 
 class XModuleDescriptorToXBlockMixin:
