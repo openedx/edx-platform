@@ -44,5 +44,6 @@ jobs:
           docker tag "edxapp-build-$BRANCH" "$BRANCH_IMAGE_TAG";  # pin the build in history
           docker tag "edxapp-build-$BRANCH" "$BRANCH_IMAGE_LATEST";  # branch's "latest" image
 
-          docker push "$BRANCH_IMAGE_TAG" "$BRANCH_IMAGE_LATEST";
+          docker push "$BRANCH_IMAGE_TAG";
+          docker push "$BRANCH_IMAGE_LATEST";
         if: ${{ env.BRANCH == 'main' || env.BRANCH == 'prod' }}
