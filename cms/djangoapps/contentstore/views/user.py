@@ -13,7 +13,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
-from tahoe_sites.api import get_organization_for_user
+from tahoe_sites.api import get_organization_for_user, get_organization_user_by_email
 
 from course_creators.views import user_requested_access
 from edxmako.shortcuts import render_to_response
@@ -134,7 +134,7 @@ def _course_team_user(request, course_key, email):
                 organization = get_organization_for_user(request.user)
             else:
                 organization = Organization.objects.get(organizationcourse__course_id=course_key)
-            user = organization.userorganizationmapping_set.get(user__email=email).user
+            user = get_organization_user_by_email(email=email, organization=organization)
         else:
             user = User.objects.get(email=email)
     except Exception:  # pylint: disable=broad-except
