@@ -56,13 +56,13 @@ from six.moves.urllib.parse import urlencode
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 from organizations.models import UserOrganizationMapping, OrganizationCourse
+from tahoe_sites.api import get_organization_by_site
 from openedx.core.djangoapps.theming.helpers import (
     get_current_request,
     get_current_site,
 )
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from lms.djangoapps.instructor.sites import get_organization_for_site
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.courseware.models import (
@@ -1629,7 +1629,7 @@ class CourseEnrollment(models.Model):
         """
         try:
             site = get_current_site()
-            organization = get_organization_for_site(site)
+            organization = get_organization_by_site(site)
             user = organization.userorganizationmapping_set.get(user__email=email).user
             return cls.enroll(user, course_id, mode)
         except UserOrganizationMapping.DoesNotExist:
@@ -2493,7 +2493,7 @@ def get_user_by_username_or_email_inside_organization(username_or_email):
     username_or_email = strip_if_string(username_or_email)
     # there should be one user with either username or email equal to username_or_email
     site = get_current_site()
-    organization = get_organization_for_site(site)
+    organization = get_organization_by_site(site)
     try:
         user = organization.userorganizationmapping_set.get(Q(user__email=username_or_email) | Q(user__username=username_or_email)).user
     except UserOrganizationMapping.DoesNotExist:

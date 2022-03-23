@@ -19,8 +19,8 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
-@patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
+@patch('lms.djangoapps.instructor.enrollment.is_exist_organization_user_by_email', Mock(return_value=True))
+@patch('lms.djangoapps.instructor.enrollment.get_organization_user_by_email')
 class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
     """
     Test whether the enroll, unenroll and beta role emails are sent in the
@@ -95,13 +95,13 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
 
     def test_enroll_unsubscribed_student(self, mock_get_user):
         mock_get_user.return_value = None
-        with patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False)):
+        with patch('lms.djangoapps.instructor.enrollment.is_exist_organization_user_by_email', Mock(return_value=False)):
             # Student is unknown, so the platform language should be used
             self.update_enrollement("enroll", "newuser@hotmail.com")
         self.check_outbox("You have been")
 
     @override_settings(LANGUAGE_CODE="eo")
-    @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
+    @patch('lms.djangoapps.instructor.enrollment.is_exist_organization_user_by_email', Mock(return_value=False))
     def test_user_without_preference_receives_email_in_esperanto(self, mock_get_user):
         mock_get_user.return_value = self.student
         delete_user_preference(self.student, LANGUAGE_KEY)

@@ -41,9 +41,9 @@ class TestInstructorAccessList(SharedModuleStoreTestCase):
         self.assertEqual(set(beta_testers), set(self.beta_testers))
 
 
-@patch('lms.djangoapps.instructor.enrollment.get_organization_for_site', Mock())
-@patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
-@patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
+@patch('lms.djangoapps.instructor.enrollment.get_organization_by_site', Mock())
+@patch('lms.djangoapps.instructor.enrollment.is_exist_organization_user_by_email', Mock(return_value=True))
+@patch('lms.djangoapps.instructor.enrollment.get_organization_user_by_email')
 class TestInstructorAccessAllow(EmailTemplateTagMixin, SharedModuleStoreTestCase):
     """ Test access allow. """
     @classmethod
