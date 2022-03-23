@@ -2125,6 +2125,16 @@ DEFAULT_SITE_THEME = None
 # .. toggle_creation_date: 2016-06-30
 ENABLE_COMPREHENSIVE_THEMING = False
 
+# .. setting_name: CUSTOM_RESOURCE_TEMPLATES_DIRECTORY
+# .. setting_default: None
+# .. setting_description: Path to an existing directory of YAML files containing
+#    html content to be used with the subclasses of xmodule.x_module.ResourceTemplates.
+#    Default example templates can be found in xmodule/templates/html.
+#    Note that the extension used is ".yaml" and not ".yml".
+#    See xmodule.x_module.ResourceTemplates for usage.
+#   "CUSTOM_RESOURCE_TEMPLATES_DIRECTORY" : null
+CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = None
+
 ############################ Global Database Configuration #####################
 
 DATABASE_ROUTERS = [
