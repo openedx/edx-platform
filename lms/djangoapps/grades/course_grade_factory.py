@@ -33,7 +33,7 @@ class CourseGradeFactory:
             course_structure=None,
             course_key=None,
             create_if_needed=True,
-            send_grade_signals=True,
+            send_course_grade_signals=True,
     ):
         """
         Returns the CourseGrade for the given user in the course.
@@ -52,7 +52,7 @@ class CourseGradeFactory:
             if assume_zero_if_absent(course_data.course_key):
                 return self._create_zero(user, course_data)
             elif create_if_needed:
-                return self._update(user, course_data, send_grade_signals=send_grade_signals)
+                return self._update(user, course_data, send_course_grade_signals=send_course_grade_signals)
             else:
                 return None
 
@@ -161,11 +161,11 @@ class CourseGradeFactory:
         )
 
     @staticmethod
-    def _update(user, course_data, force_update_subsections=False, send_grade_signals=True):
+    def _update(user, course_data, force_update_subsections=False, send_course_grade_signals=True):
         """
         Computes, saves, and returns a CourseGrade object for the given user and course.
 
-        send_grade_signals defines if signals should be sent. Use it to avoid recursion issues in
+        send_course_grade_signals defines if signals should be sent. Use it to avoid recursion issues in
         cases when the signal listener trying to get grades but Persistent Grades are disabled.
         If True - sends:
             COURSE_GRADE_CHANGED signal to listeners and
@@ -197,7 +197,7 @@ class CourseGradeFactory:
                 passed=course_grade.passed,
             )
 
-        if send_grade_signals:
+        if send_course_grade_signals:
             COURSE_GRADE_CHANGED.send_robust(
                 sender=None,
                 user=user,
