@@ -1,0 +1,66 @@
+name: Update Swagger Docs
+
+on:
+  push:
+    branches:
+      - 'feanil/**'
+#  schedule:
+#    - cron: "0 2 * * 2"
+#  workflow_dispatch:
+#    inputs:
+#      branch:
+#        description: 'Target branch to create swagger update PR against.'
+#        required: true
+#        default: 'master'
+
+jobs:
+  update_swagger_yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Install Required System Packages
+        run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
+
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+
+      - name: Get pip cache dir
+        id: pip-cache-dir
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+
+      - name: Cache pip dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - run: make requirements
+
+      - run: make swagger
+
+      - uses: peter-evans/create-pull-request@v4
+        id: cpr
+        with:
+          delete-branch: true
+          add-paths: |
+            docs/swagger.yaml
+          commit-message: "chore: Update swagger.yaml."
+          title: "chore: Update swagger.yaml"
+          body: |
+            Regenerate docs/swagger.yaml based on the latest APIs that exist
+            in the edx-platform.
+
+            Updated by running `make swagger`
+
+      - name: Check outputs
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
