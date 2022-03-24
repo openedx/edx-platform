@@ -58,10 +58,10 @@ def fetch_metadata_xml(url):
         # HTTPError is raised in case of unexpected status code (e.g. 500 error etc.)
         # RequestException is the base exception for any request related error that "requests" lib raises.
         # MetadataParseError is raised if there is error in the fetched meta data (e.g. missing @entityID etc.)
-        log.exception(str(error))
+        log.exception(str(error), exc_info=error)
         raise error
     except etree.XMLSyntaxError as error:
-        log.exception(str(error))
+        log.exception(str(error), exc_info=error)
         raise error
 
 
