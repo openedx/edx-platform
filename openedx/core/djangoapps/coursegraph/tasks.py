@@ -231,7 +231,9 @@ def should_dump_course(course_key, graph):
         course_key: a CourseKey object.
         graph: a py2neo Graph object.
 
-    Returns: bool of whether this course should be dumped to neo4j.
+    Returns:
+        - whether this course should be dumped to neo4j (bool)
+        - reason why course needs to be dumped (string, None if doesn't need to be dumped)
     """
 
     last_this_command_was_run = get_command_last_run(course_key, graph)
@@ -241,17 +243,27 @@ def should_dump_course(course_key, graph):
     # if we don't have a record of the last time this command was run,
     # we should serialize the course and dump it
     if last_this_command_was_run is None:
-        return True
+        return (
+            True,
+            "no record of the last neo4j update time for the course"
+        )
 
     # if we've serialized the course recently and we have no published
     # events, we will not dump it, and so we can skip serializing it
     # again here
     if last_this_command_was_run and course_last_published_date is None:
-        return False
+        return (False, None)
 
     # otherwise, serialize and dump the course if the command was run
     # before the course's last published event
-    return last_this_command_was_run < course_last_published_date
+    needs_update = last_this_command_was_run < course_last_published_date
+    update_reason = None
+    if needs_update:
+        update_reason = (
+            f"course has been published since last neo4j update time - "
+            f"update date {last_this_command_was_run} < published date {course_last_published_date}"
+        )
+    return (needs_update, update_reason)
 
 
 @shared_task
@@ -366,11 +378,15 @@ class ModuleStoreSerializer:
                 total_number_of_courses,
             )
 
-            if not (override_cache or should_dump_course(course_key, graph)):
+            (needs_dump, reason) = should_dump_course(course_key, graph)
+            if not (override_cache or needs_dump):
                 log.info("skipping submitting %s, since it hasn't changed", course_key)
                 skipped_courses.append(str(course_key))
                 continue
 
+            if override_cache:
+                reason = "override_cache is True"
+            log.info("submitting %s, because %s", course_key, reason)
             dump_course_to_neo4j.apply_async(
                 args=[str(course_key), credentials],
             )
