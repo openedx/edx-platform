@@ -663,7 +663,7 @@ AUTHENTICATION_BACKENDS = [
     'auth_backends.backends.EdXOAuth2',
     'rules.permissions.ObjectPermissionBackend',
     'openedx.core.djangoapps.content_libraries.auth.LtiAuthenticationBackend',
-    'odjango.contrib.auth.backends.AllowAllUsersModelBackend',
+    'django.contrib.auth.backends.AllowAllUsersModelBackend',
     'bridgekeeper.backends.RulePermissionBackend',
 ]
 
