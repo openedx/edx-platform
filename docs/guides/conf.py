@@ -235,7 +235,7 @@ def update_settings_module(service='lms'):
     Set the "DJANGO_SETTINGS_MODULE" environment variable appropriately
     for the module sphinx-apidoc is about to be run on.
     """
-    if os.environ['EDX_PLATFORM_SETTINGS'] == 'devstack_docker':
+    if os.environ.get('EDX_PLATFORM_SETTINGS') == 'devstack_docker':
         settings_module = f'{service}.envs.devstack_docker'
     else:
         settings_module = f'{service}.envs.devstack'
