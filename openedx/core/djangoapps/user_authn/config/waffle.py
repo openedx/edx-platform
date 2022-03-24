@@ -3,7 +3,7 @@ Waffle flags and switches for user authn.
 """
 
 
-from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace, WaffleFlag
+from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
 
 _WAFFLE_NAMESPACE = 'user_authn'
 _WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name=_WAFFLE_NAMESPACE, log_prefix='UserAuthN: ')
