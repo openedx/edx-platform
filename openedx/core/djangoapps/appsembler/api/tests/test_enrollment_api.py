@@ -16,6 +16,8 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 
 import ddt
 import mock
+from tahoe_sites.api import update_admin_role_in_organization
+
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 
 from openedx.core.djangoapps.site_configuration.tests.factories import (
@@ -29,6 +31,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from organizations.models import UserOrganizationMapping
+from tahoe_sites.tests.utils import create_organization_mapping
+
 from openedx.core.djangoapps.appsembler.api.sites import (
     get_enrollments_for_site,
 )
@@ -37,7 +41,6 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
     CourseOverviewFactory,
     OrganizationFactory,
     OrganizationCourseFactory,
-    UserOrganizationMappingFactory,
 )
 
 
@@ -68,8 +71,7 @@ class BaseEnrollmentApiTestCase(ModuleStoreTestCase):
         ]
 
         for enrollment in self.my_enrollments:
-            UserOrganizationMappingFactory(user=enrollment.user,
-                                           organization=self.my_site_org)
+            create_organization_mapping(user=enrollment.user, organization=self.my_site_org)
 
         self.other_enrollments = [CourseEnrollmentFactory()]
         OrganizationCourseFactory(organization=self.other_site_org,
@@ -77,9 +79,7 @@ class BaseEnrollmentApiTestCase(ModuleStoreTestCase):
                                       self.other_enrollments[0].course_overview.id))
 
         self.caller = UserFactory()
-        UserOrganizationMappingFactory(user=self.caller,
-                                       organization=self.my_site_org,
-                                       is_amc_admin=True)
+        create_organization_mapping(user=self.caller, organization=self.my_site_org, is_admin=True)
 
         self.get_curent_site_patch = 'lms.djangoapps.instructor.enrollment.get_current_site'
 
@@ -118,8 +118,7 @@ class EnrollmentApiGetTest(BaseEnrollmentApiTestCase):
         ]
 
         for enrollment in expected_enrollments:
-            UserOrganizationMappingFactory(user=enrollment.user,
-                                           organization=self.my_site_org)
+            create_organization_mapping(user=enrollment.user, organization=self.my_site_org)
         expected_enrollments.append(self.my_enrollments[0])
         response = self.call_enrollment_api('get', self.my_site, self.caller, {
             'data': {
@@ -140,9 +139,7 @@ class EnrollmentApiGetTest(BaseEnrollmentApiTestCase):
     def test_get_enrollments_for_user(self, query_param, attr_name):
         # Set up additional test data
         user = UserFactory()
-        UserOrganizationMappingFactory(user=self.caller,
-                                       organization=self.my_site_org,
-                                       is_amc_admin=True)
+        update_admin_role_in_organization(user=self.caller, organization=self.my_site_org, set_as_admin=True)
         courses = [CourseFactory.create() for i in range(0, 3)]
         course_overviews = []
         course_enrollments = []
@@ -217,7 +214,7 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
 
         for reg_user in reg_users:
             # add the users to the site, otherwise they won't have new enrollments
-            UserOrganizationMappingFactory(user=reg_user, organization=self.my_site_org)
+            create_organization_mapping(user=reg_user, organization=self.my_site_org)
             # make sure that the registered users are not in the enrollments
             mode, is_active = CourseEnrollment.enrollment_mode_for_user(reg_user, co.id)
             assert mode is None and is_active is None, "email: {}".format(reg_user.email)
@@ -398,7 +395,7 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         """
         co = self.my_course_overviews[0]
         registered_user = UserFactory.create()
-        UserOrganizationMappingFactory(user=registered_user, organization=self.my_site_org)
+        create_organization_mapping(user=registered_user, organization=self.my_site_org)
         mode, is_active = CourseEnrollment.enrollment_mode_for_user(registered_user, co.id)
         assert mode is None and is_active is None, "email: {}".format(registered_user.email)
 
@@ -433,7 +430,7 @@ class EnrollmentApiUnenrollPostTest(BaseEnrollmentApiTestCase):
         self.first_course = self.my_course_overviews[0]
         for reg_user in self.reg_users:
             # add the users to the site, otherwise they won't have new enrollments
-            UserOrganizationMappingFactory(user=reg_user, organization=self.my_site_org)
+            create_organization_mapping(user=reg_user, organization=self.my_site_org)
             # make sure that the registered users are not in the enrollments
             mode, is_active = CourseEnrollment.enrollment_mode_for_user(reg_user, self.first_course.id)
             assert mode is None and is_active is None, "email: {}".format(reg_user.email)
@@ -507,9 +504,7 @@ class EnrollmentApiUnenrollPostTest(BaseEnrollmentApiTestCase):
             ],
         }
         other_site_caller = UserFactory()
-        UserOrganizationMappingFactory(user=other_site_caller,
-                                       organization=self.other_site_org,
-                                       is_amc_admin=True)
+        create_organization_mapping(user=other_site_caller, organization=self.other_site_org, is_admin=True)
 
         response = self.call_enrollment_api('post', self.other_site, other_site_caller, {
             'data': payload,

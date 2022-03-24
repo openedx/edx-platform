@@ -7,6 +7,7 @@ from django.urls import resolve, reverse
 from django.utils.timezone import utc
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
+from tahoe_sites.tests.utils import create_organization_mapping
 
 from student.tests.factories import UserFactory
 
@@ -21,10 +22,7 @@ from openedx.core.djangoapps.appsembler.api.sites import (
 
 from openedx.core.djangoapps.appsembler.api.v1.serializers import UserIndexSerializer
 
-from openedx.core.djangoapps.appsembler.api.tests.factories import (
-    OrganizationFactory,
-    UserOrganizationMappingFactory,
-)
+from openedx.core.djangoapps.appsembler.api.tests.factories import OrganizationFactory
 
 APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'
 
@@ -74,18 +72,14 @@ class UserIndexViewSetTest(TestCase):
         ]
 
         for user in self.my_site_users:
-            UserOrganizationMappingFactory(user=user,
-                                           organization=self.my_site_org)
+            create_organization_mapping(user=user, organization=self.my_site_org)
 
         self.other_site_users = [UserFactory()]
         for user in self.other_site_users:
-            UserOrganizationMappingFactory(user=user,
-                                           organization=self.other_site_org)
+            create_organization_mapping(user=user, organization=self.other_site_org)
 
         self.caller = UserFactory()
-        UserOrganizationMappingFactory(user=self.caller,
-                                       organization=self.my_site_org,
-                                       is_amc_admin=True)
+        create_organization_mapping(user=self.caller, organization=self.my_site_org, is_admin=True)
 
     def test_serializer(self):
         user = self.my_site_users[0]

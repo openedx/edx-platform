@@ -9,8 +9,6 @@ from openedx.core.djangoapps.content.course_overviews.models import (
 )
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
-from student.tests.factories import UserFactory
-
 from openedx.core.djangoapps.site_configuration.tests.factories import (
     SiteFactory,
 )
@@ -84,16 +82,6 @@ class OrganizationFactory(factory.DjangoModelFactory):
             return
         if extracted:
             create_tahoe_site_by_link(organization=self, site=extracted)
-
-
-class UserOrganizationMappingFactory(factory.DjangoModelFactory):
-    class Meta(object):
-        model = organizations.models.UserOrganizationMapping
-
-    user = factory.SubFactory(UserFactory)
-    organization = factory.SubFactory(OrganizationFactory)
-    is_active = True
-    is_amc_admin = False
 
 
 class OrganizationCourseFactory(factory.DjangoModelFactory):
