@@ -55,8 +55,18 @@ from six.moves import range
 from six.moves.urllib.parse import urlencode
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
-from organizations.models import UserOrganizationMapping, OrganizationCourse, Organization
-from tahoe_sites.api import get_organization_by_site, get_organization_for_user
+from organizations.models import (
+    OrganizationCourse,
+    Organization,
+)
+from tahoe_sites.api import (
+    deprecated_is_existing_email_but_not_linked_yet,
+    get_organization_by_site,
+    get_organization_for_user,
+    get_organization_user_by_email,
+    get_organization_user_by_username_or_email,
+    is_exist_organization_user_by_email,
+)
 from openedx.core.djangoapps.theming.helpers import (
     get_current_request,
     get_current_site,
@@ -331,14 +341,11 @@ def email_exists_or_retired(email, check_for_new_site=False):
     """
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
         if check_for_new_site:
-            exists = User.objects.filter(
-                email=email,
-                userorganizationmapping__isnull=True,  # Allow learners to signup for trial site, but ensure the trial
-                                                       # workflow is completed.
-            ).exists()
+            # Allow learners to signup for trial site, but ensure the trial workflow is completed.
+            exists = deprecated_is_existing_email_but_not_linked_yet(email=email)
         else:
             current_org = get_current_organization()
-            exists = current_org.userorganizationmapping_set.filter(user__email=email).exists()
+            exists = is_exist_organization_user_by_email(email=email, organization=current_org)
     else:
         exists = User.objects.filter(email=email).exists()
     check_within_organization = not check_for_new_site  # Allow existing learners to spin their new Tahoe trial
@@ -1629,10 +1636,10 @@ class CourseEnrollment(models.Model):
         """
         try:
             site = get_current_site()
-            organization = get_organization_by_site(site)
-            user = organization.userorganizationmapping_set.get(user__email=email).user
-            return cls.enroll(user, course_id, mode)
-        except UserOrganizationMapping.DoesNotExist:
+            site_org = get_organization_by_site(site)
+            user_to_enroll = get_organization_user_by_email(email=email, organization=site_org)
+            return cls.enroll(user_to_enroll, course_id, mode)
+        except User.DoesNotExist:
             err_msg = u"Tried to enroll email {} into course {}, but user not found"
             log.error(err_msg.format(email, course_id))
             if ignore_errors:
@@ -2497,10 +2504,10 @@ def get_user_by_username_or_email_inside_organization(username_or_email):
     # there should be one user with either username or email equal to username_or_email
     site = get_current_site()
     organization = get_organization_by_site(site)
-    try:
-        user = organization.userorganizationmapping_set.get(Q(user__email=username_or_email) | Q(user__username=username_or_email)).user
-    except UserOrganizationMapping.DoesNotExist:
-        raise User.DoesNotExist
+    user = get_organization_user_by_username_or_email(
+        username_or_email=username_or_email,
+        organization=organization
+    )
 
     if user.username == username_or_email:
         UserRetirementRequest = apps.get_model('user_api', 'UserRetirementRequest')
