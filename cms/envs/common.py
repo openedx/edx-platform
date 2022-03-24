@@ -610,7 +610,7 @@ EDX_ROOT_URL = ''
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = [
     'rules.permissions.ObjectPermissionBackend',
-    'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
+    'django.contrib.auth.backends.AllowAllUsersModelBackend',
     'bridgekeeper.backends.RulePermissionBackend',
 ]
 
@@ -751,9 +751,6 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
 
     'codejail.django_integration.ConfigureCodeJailMiddleware',
-
-    # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
-    'ratelimitbackend.middleware.RateLimitMiddleware',
 
     # for expiring inactive sessions
     'openedx.core.djangoapps.session_inactivity_timeout.middleware.SessionInactivityTimeout',
@@ -1605,8 +1602,6 @@ INSTALLED_APPS = [
 
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
-
-    'ratelimitbackend',
 
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',

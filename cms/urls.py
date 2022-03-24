@@ -8,7 +8,7 @@ from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
 from edx_api_doc_tools import make_docs_urls
-from ratelimitbackend import admin
+from django.contrib import admin
 
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
