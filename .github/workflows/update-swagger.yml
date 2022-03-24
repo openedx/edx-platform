@@ -48,6 +48,8 @@ jobs:
       - uses: peter-evans/create-pull-request@v4
         with:
           delete-branch: true
+          add-paths: |
+            docs/swagger.yml
 
 
 
