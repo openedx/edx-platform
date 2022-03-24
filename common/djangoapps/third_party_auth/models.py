@@ -700,6 +700,14 @@ class SAMLProviderConfig(ProviderConfig):
         blank=True,
     )
 
+    was_valid_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text=(
+            "Timestamped field that indicates a user has successfully logged in using this configuration at least once."
+        )
+    )
+
     def clean(self):
         """ Standardize and validate fields """
         super().clean()

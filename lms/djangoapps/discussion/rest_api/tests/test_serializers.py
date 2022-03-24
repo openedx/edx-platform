@@ -317,6 +317,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "editable_fields": ["abuse_flagged", "voted"],
             "child_count": 0,
             "can_delete": False,
+            "last_edit": None,
         }
 
         assert self.serialize(comment) == expected

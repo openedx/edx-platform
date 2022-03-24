@@ -38,7 +38,7 @@ jinja2==3.0.3
     # via
     #   code-annotations
     #   sphinx
-markupsafe==2.1.0
+markupsafe==2.1.1
     # via jinja2
 packaging==21.3
     # via sphinx
@@ -52,7 +52,7 @@ python-slugify==4.0.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   code-annotations
-pytz==2021.3
+pytz==2022.1
     # via babel
 pyyaml==6.0
     # via code-annotations
@@ -84,7 +84,7 @@ stevedore==3.5.0
     # via code-annotations
 text-unidecode==1.3
     # via python-slugify
-urllib3==1.26.8
+urllib3==1.26.9
     # via requests
 zipp==3.7.0
     # via importlib-metadata
