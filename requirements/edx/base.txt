@@ -880,7 +880,7 @@ random2==1.0.1
     # via -r requirements/edx/base.in
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
-redis==4.2.0
+redis==4.1.4
     # via -r requirements/edx/base.in
 regex==2022.3.15
     # via nltk
