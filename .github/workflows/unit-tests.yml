@@ -10,6 +10,7 @@ jobs:
   run-tests:
     runs-on: [ edx-platform-runner ]
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.8']
         django-version: ["3.2"]
@@ -57,37 +58,42 @@ jobs:
         run: |
           echo "settings_path=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} --output settings )" >> $GITHUB_ENV
 
-#      - name: set pytest randomly option
-#        run: |
-#          echo "pytest_randomly_option=$(if [ '${{ env.module_name }}' = 'cms' ] || [ '${{ env.module_name }}' = 'common' ]; then echo '-p no:randomly'; else echo '' ; fi)" >> $GITHUB_ENV
+      - name: set pytest randomly option
+        run: |
+          random_shards=(lms-2 lms-4 lms-5 cms-1)
+          echo "pytest_randomly_option=$(if [[ " ${random_shards[@]} " =~ '${{ matrix.shard_name }}' ]]; then echo ''; else echo '-p no:randomly' ; fi)" >> $GITHUB_ENV
 
       - name: install requirements
         run: |
           sudo pip install -r requirements/pip.txt
           sudo pip install -r requirements/edx/testing.txt
           sudo pip install "django~=${{ matrix.django-version }}.0"
+          sudo pip install pytest-random-order pytest-flakefinder
 
       - name: get unit tests for shard
         run: |
           echo "unit_test_paths=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} )" >> $GITHUB_ENV
 
       - name: run tests
+        continue-on-error: true
         run: |
-          python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}
+          python -Wd -m pytest --random-order --random-order-bucket=global --flake-finder --flake-runs=4 --ds=${{ env.settings_path }} --json-report --json-report-omit keywords streams collectors log traceback warnings --json-report-file=pytest_report_${{ matrix.shard_name }}.json ${{ env.unit_test_paths }}
 
-      - name: rename warnings json file
-        if: success()
-        run: |
-          cd test_root/log
-          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}.json
+      - name: list files
+        run: ls -la
+#      - name: rename warnings json file
+#        if: success()
+#        run: |
+#          cd test_root/log
+#          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}.json
 
-      - name: save pytest warnings json file
-        if: success()
+      - name: save pytest json file
+#        if: success()
         uses: actions/upload-artifact@v2
         with:
-          name: pytest-warnings-json
+          name: pytest-report-json
           path: |
-            test_root/log/pytest_warnings*.json
+            pytest_report*.json
 
   compile-warnings-report:
     runs-on: [ edx-platform-runner ]

@@ -2,7 +2,6 @@
 
 
 import pytest
-from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohortsSettings
@@ -15,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-a
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-class RoleAssignmentTest(TestCase):
+class RoleAssignmentTest(ModuleStoreTestCase):
     """
     Basic checks to make sure our Roles get assigned and unassigned as students
     are enrolled and unenrolled from a course.

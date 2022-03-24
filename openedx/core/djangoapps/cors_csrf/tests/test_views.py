@@ -6,10 +6,9 @@ import unittest
 
 from django.conf import settings
 from django.urls import NoReverseMatch, reverse
-from django.test import TestCase
 
 import ddt
-from config_models.models import cache
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 # cors_csrf is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
@@ -18,8 +17,10 @@ if settings.ROOT_URLCONF == 'lms.urls':
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-class XDomainProxyTest(TestCase):
+class XDomainProxyTest(CacheIsolationTestCase):
     """Tests for the xdomain proxy end-point. """
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         """Clear model-based config cache. """
@@ -28,8 +29,6 @@ class XDomainProxyTest(TestCase):
             self.url = reverse('xdomain_proxy')
         except NoReverseMatch:
             self.skipTest('xdomain_proxy URL is not configured')
-
-        cache.clear()
 
     def test_xdomain_proxy_disabled(self):
         self._configure(False)
@@ -63,7 +62,6 @@ class XDomainProxyTest(TestCase):
             config.whitelist = "\n".join(whitelist)
 
         config.save()
-        cache.clear()
 
     def _load_page(self):
         """Load the end-point. """

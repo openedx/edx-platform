@@ -75,5 +75,6 @@ class DeferPlugin:
 
 
 def pytest_configure(config):
-    if config.pluginmanager.hasplugin("pytest_jsonreport") or config.pluginmanager.hasplugin("json-report"):
-        config.pluginmanager.register(DeferPlugin())
+    pass
+#     if config.pluginmanager.hasplugin("pytest_jsonreport") or config.pluginmanager.hasplugin("json-report"):
+#         config.pluginmanager.register(DeferPlugin())
