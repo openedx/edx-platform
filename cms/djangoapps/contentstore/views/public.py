@@ -7,7 +7,6 @@ from django.conf import settings
 from django.shortcuts import redirect
 from urllib.parse import quote_plus  # lint-amnesty, pylint: disable=wrong-import-order
 from waffle.decorators import waffle_switch
-from django.contrib import admin
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 
