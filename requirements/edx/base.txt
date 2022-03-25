@@ -47,7 +47,9 @@ appdirs==1.4.4
 asgiref==3.5.0
     # via django
 async-timeout==4.0.2
-    # via aiohttp
+    # via
+    #   aiohttp
+    #   redis
 attrs==21.4.0
     # via
     #   -r requirements/edx/base.in
@@ -195,7 +197,6 @@ django==3.2.12
     #   django-mysql
     #   django-oauth-toolkit
     #   django-pyfs
-    #   django-ratelimit-backend
     #   django-sekizai
     #   django-ses
     #   django-splash
@@ -330,8 +331,6 @@ django-pyfs==3.2.0
     # via -r requirements/edx/base.in
 django-ratelimit==3.0.1
     # via -r requirements/edx/base.in
-django-ratelimit-backend @ git+https://github.com/edx/django-ratelimit-backend.git@6e1a0c6ea1d27062c16e9fb94d3c44475146877e
-    # via -r requirements/edx/github.in
 django-require @ git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
     # via -r requirements/edx/github.in
 django-sekizai==3.0.1
@@ -913,7 +912,7 @@ ruamel-yaml==0.17.21
     # via drf-yasg
 ruamel-yaml-clib==0.2.6
     # via ruamel-yaml
-rules==3.2.1
+rules==3.3
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -1019,10 +1018,12 @@ testfixtures==6.18.5
     # via edx-enterprise
 text-unidecode==1.3
     # via python-slugify
-tqdm==4.63.0
+tqdm==4.63.1
     # via nltk
 typing-extensions==4.1.1
-    # via django-countries
+    # via
+    #   django-countries
+    #   redis
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.in

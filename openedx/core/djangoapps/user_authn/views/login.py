@@ -11,7 +11,6 @@ import re
 import urllib
 
 from django.conf import settings
-from django.contrib import admin
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
@@ -43,10 +42,7 @@ from common.djangoapps.util.password_policy_validators import normalize_password
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_authn.config.waffle import (
-    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
-    ADMIN_AUTH_REDIRECT_TO_LMS
-)
+from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangoapps.user_authn.cookies import get_response_with_refreshed_jwt_cookies, set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.user_authn.toggles import (
@@ -658,10 +654,7 @@ def redirect_to_lms_login(request):
     This view redirect the admin/login url to the site's login page if
     waffle switch is on otherwise returns the admin site's login view.
     """
-    if ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.is_enabled() or ADMIN_AUTH_REDIRECT_TO_LMS.is_enabled():
-        return redirect('/login?next=/admin')
-    else:
-        return admin.site.login(request)
+    return redirect('/login?next=/admin')
 
 
 class LoginSessionView(APIView):

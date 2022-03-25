@@ -69,6 +69,7 @@ async-timeout==4.0.2
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
+    #   redis
 attrs==21.4.0
     # via
     #   -r requirements/edx/base.txt
@@ -267,7 +268,6 @@ distlib==0.3.4
     #   django-mysql
     #   django-oauth-toolkit
     #   django-pyfs
-    #   django-ratelimit-backend
     #   django-sekizai
     #   django-ses
     #   django-splash
@@ -411,8 +411,6 @@ django-pipeline==2.0.8
 django-pyfs==3.2.0
     # via -r requirements/edx/base.txt
 django-ratelimit==3.0.1
-    # via -r requirements/edx/base.txt
-django-ratelimit-backend @ git+https://github.com/edx/django-ratelimit-backend.git@6e1a0c6ea1d27062c16e9fb94d3c44475146877e
     # via -r requirements/edx/base.txt
 django-require @ git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
     # via -r requirements/edx/base.txt
@@ -641,7 +639,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==13.3.2
+faker==13.3.3
     # via factory-boy
 fastapi==0.75.0
     # via pact-python
@@ -1203,7 +1201,7 @@ ruamel-yaml-clib==0.2.6
     # via
     #   -r requirements/edx/base.txt
     #   ruamel-yaml
-rules==3.2.1
+rules==3.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1359,7 +1357,7 @@ tox==3.24.5
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/edx/testing.in
-tqdm==4.63.0
+tqdm==4.63.1
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1372,6 +1370,7 @@ typing-extensions==4.1.1
     #   django-countries
     #   pydantic
     #   pylint
+    #   redis
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.txt

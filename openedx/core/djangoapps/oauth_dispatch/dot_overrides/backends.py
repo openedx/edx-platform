@@ -1,3 +1,0 @@
-"""
-Custom authentication backends.
-"""

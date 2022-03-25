@@ -89,5 +89,5 @@ sympy==1.6.2
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   openedx-calc
-tqdm==4.63.0
+tqdm==4.63.1
     # via nltk
