@@ -371,13 +371,6 @@ class ModuleStoreSerializer:
             # first, clear the request cache to prevent memory leaks
             RequestCache.clear_all_namespaces()
 
-            log.info(
-                "Now submitting %s for export to neo4j: course %d of %d total courses",
-                course_key,
-                index + 1,
-                total_number_of_courses,
-            )
-
             (needs_dump, reason) = should_dump_course(course_key, graph)
             if not (override_cache or needs_dump):
                 log.info("skipping submitting %s, since it hasn't changed", course_key)
@@ -386,7 +379,15 @@ class ModuleStoreSerializer:
 
             if override_cache:
                 reason = "override_cache is True"
-            log.info("submitting %s, because %s", course_key, reason)
+
+            log.info(
+                "Now submitting %s for export to neo4j, because %s: course %d of %d total courses",
+                course_key,
+                reason,
+                index + 1,
+                total_number_of_courses,
+            )
+
             dump_course_to_neo4j.apply_async(
                 args=[str(course_key), credentials],
             )
