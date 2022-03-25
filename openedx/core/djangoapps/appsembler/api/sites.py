@@ -2,8 +2,13 @@ import beeline
 import logging
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from organizations.models import Organization, OrganizationCourse
+
 from tahoe_sites.api import get_organization_by_site, get_users_of_organization
+
+from organizations.models import (
+    Organization,
+    OrganizationCourse,
+)
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 

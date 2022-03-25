@@ -30,6 +30,7 @@ from student.models import (
 )
 
 from organizations.models import Organization, OrganizationCourse
+from tahoe_sites.api import get_users_of_organization
 
 
 class Command(BaseCommand):
@@ -422,9 +423,9 @@ class Command(BaseCommand):
         """
         self.debug_message('Processing {} organization users...'.format(organization.name))
         return [{
-            'username': mapping.user.username,
-            'active': mapping.is_active,
-        } for mapping in organization.userorganizationmapping_set.all()]
+            'username': user.username,
+            'active': user.is_active,
+        } for user in get_users_of_organization(organization=organization).all()]
 
     def process_site_configurations(self, site):
         """

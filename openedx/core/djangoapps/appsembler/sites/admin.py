@@ -9,11 +9,11 @@ from django.utils.html import format_html
 from hijack_admin.admin import HijackUserAdminMixin
 from ratelimitbackend import admin
 from student.admin import UserAdmin
+from organizations.models import Organization
+from tahoe_sites.api import get_organization_for_user
 
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
-from organizations.models import UserOrganizationMapping
-from tahoe_sites.api import get_organization_for_user
 
 from openedx.core.djangoapps.appsembler.sites.forms import MakeAMCAdminForm
 from openedx.core.djangoapps.appsembler.sites.utils import (
@@ -49,7 +49,7 @@ class TahoeUserAdmin(UserAdmin, HijackUserAdminMixin):
         try:
             current_org = get_organization_for_user(user)
             current_org_name = current_org.name
-        except (UserOrganizationMapping.DoesNotExist, MultipleObjectsReturned):
+        except (Organization.DoesNotExist, MultipleObjectsReturned):
             current_org_name = ''
 
         form = MakeAMCAdminForm({'organization_name': current_org_name})

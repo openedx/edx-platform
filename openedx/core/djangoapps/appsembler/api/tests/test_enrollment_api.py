@@ -30,8 +30,8 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from organizations.models import UserOrganizationMapping
 from tahoe_sites.tests.utils import create_organization_mapping
+from tahoe_sites.api import get_users_of_organization
 
 from openedx.core.djangoapps.appsembler.api.sites import (
     get_enrollments_for_site,
@@ -227,12 +227,10 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
             assert not CourseEnrollmentAllowed.objects.filter(email=new_user_email).exists()
 
         before_my_site_ce_count = get_enrollments_for_site(self.my_site).count()
-        before_my_site_user_count = UserOrganizationMapping.objects.filter(
-            organization=self.my_site_org).count()
+        before_my_site_user_count = get_users_of_organization(organization=self.my_site_org).count()
 
         before_other_site_ce_count = get_enrollments_for_site(self.other_site).count()
-        before_other_site_user_count = UserOrganizationMapping.objects.filter(
-            organization=self.other_site_org).count()
+        before_other_site_user_count = get_users_of_organization(organization=self.other_site_org).count()
 
         payload = {
             'action': 'enroll',
@@ -249,12 +247,10 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         })
         results = response.data['results']
         after_my_site_ce_count = get_enrollments_for_site(self.my_site).count()
-        after_my_site_user_count = UserOrganizationMapping.objects.filter(
-            organization=self.my_site_org).count()
+        after_my_site_user_count = get_users_of_organization(organization=self.my_site_org).count()
 
         after_other_site_ce_count = get_enrollments_for_site(self.other_site).count()
-        after_other_site_user_count = UserOrganizationMapping.objects.filter(
-            organization=self.other_site_org).count()
+        after_other_site_user_count = get_users_of_organization(organization=self.other_site_org).count()
 
         assert after_other_site_ce_count == before_other_site_ce_count
         assert after_other_site_user_count == before_other_site_user_count

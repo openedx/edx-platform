@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from organizations.models import UserOrganizationMapping
+from tahoe_sites.api import get_organization_for_user, is_active_admin_on_organization
 
 from .test_utils import lms_multi_tenant_test, with_organization_context
 
@@ -124,23 +124,25 @@ class MultiTenantAMCSignupTest(APITestCase):
     def test_learner_invited_for_existing_organization(self, _mock_add_creator):
         red_site = 'red1'
         learner_email = 'learner@example.com'
-        queryset = UserOrganizationMapping.objects.filter(user__email=learner_email)
-        assert not queryset.exists(), 'Sanity check to ensure correct testing'
 
+        assert not User.objects.filter(email=learner_email).exists()
         with with_organization_context(site_color=red_site):
             self.register_learner(learner_email, 'learner')
 
-        mapping = UserOrganizationMapping.objects.get(user__email=learner_email)
-        assert not mapping.is_amc_admin, 'Should be just a learner'
+        user = User.objects.get(email=learner_email)
+        user.is_active = True
+        user.save()  # Simulate account activation via email
+
+        organization = get_organization_for_user(user=user)
+        assert not is_active_admin_on_organization(user=user, organization=organization), 'Should be just a learner'
 
         # Perform the step after clicking the invite link in the email from the AMC.
         # This is usually implemented in the SetPasswordView
         response = self.trial_step_1_admin_user(
             color=red_site,
             email=learner_email,
-            username=mapping.user.username,
+            username=user.username,
             send_organization=True,
         )
         assert response.status_code == status.HTTP_200_OK, response.content
-        mapping.refresh_from_db()
-        assert mapping.is_amc_admin, 'Should now be a site admin'
+        assert is_active_admin_on_organization(user=user, organization=organization), 'Should now be a site admin'

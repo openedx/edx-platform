@@ -9,8 +9,11 @@ from django.conf import settings
 from unittest import skipUnless
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
-from organizations.models import Organization, UserOrganizationMapping
 from tahoe_sites.api import create_tahoe_site_by_link
+
+from organizations.models import Organization
+from tahoe_sites.tests.utils import create_organization_mapping
+
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 from student.tests.factories import UserFactory
@@ -54,7 +57,7 @@ def create_org_user(organization, is_amc_admin=False, **kwargs):
     Create one user and save it to the database.
     """
     user = UserFactory.create(**kwargs)
-    UserOrganizationMapping.objects.create(user=user, organization=organization, is_amc_admin=is_amc_admin)
+    create_organization_mapping(user=user, organization=organization, is_admin=is_amc_admin)
     return user
 
 

@@ -9,7 +9,11 @@ from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import override_settings, TestCase
-from tahoe_sites.api import create_tahoe_site_by_link
+from tahoe_sites.api import (
+    create_tahoe_site_by_link,
+    get_organization_for_user,
+    get_users_of_organization,
+)
 from tahoe_sites.tests.utils import create_organization_mapping
 
 from openedx.core.djangoapps.appsembler.sites.management.commands.create_devstack_site import Command
@@ -50,7 +54,7 @@ from student.tests.factories import (
     UserStandingFactory,
 )
 
-from organizations.models import Organization, OrganizationCourse, UserOrganizationMapping
+from organizations.models import Organization, OrganizationCourse
 
 from oauth2_provider.models import AccessToken, RefreshToken, Application
 
@@ -99,11 +103,11 @@ class CreateDevstackSiteCommandTestCase(TestCase):
 
         # Ensure objects are created correctly.
         assert Site.objects.get(domain=self.site_name)
-        assert Organization.objects.get(name=self.name)
+        organization = Organization.objects.get(name=self.name)
         user = get_user_model().objects.get()
         assert user.check_password(self.name)
         assert user.profile.name == self.name
-        assert UserOrganizationMapping.objects.get(organization__name=self.name, user=user)
+        assert get_organization_for_user(user=user) == organization
 
         assert CourseCreatorRole().has_user(user), 'User should be a course creator'
 
@@ -321,16 +325,16 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
         organization = OrganizationFactory.create(name='test')
         new_user_count = 3
 
-        assert organization.userorganizationmapping_set.count() == 0
+        assert get_users_of_organization(organization=organization).count() == 0
         self.create_org_users(org=organization, new_user_count=new_user_count)
-        assert organization.userorganizationmapping_set.count() == new_user_count
+        assert get_users_of_organization(organization=organization).count() == new_user_count
 
         data = self.command.process_organization_users(organization)
         assert len(data) == new_user_count
         assert data == [{
-            'username': mapping.user.username,
-            'active': mapping.is_active,
-        } for mapping in organization.userorganizationmapping_set.all()]
+            'username': user.username,
+            'active': user.is_active,
+        } for user in get_users_of_organization(organization=organization).all()]
 
     def test_process_site_configurations(self):
         data = self.command.process_site_configurations(self.site)

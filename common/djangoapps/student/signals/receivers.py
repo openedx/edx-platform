@@ -61,8 +61,8 @@ def on_user_updated(sender, instance, **kwargs):
                     #
                     # Chicken-and-egg:
                     #   It's impossible to get the organization for a user that we didn't save yet
-                    #   to the database because we don't have `UserOrganizationMapping` yet.
-                    #   We cannot have `UserOrganizationMapping` until we save the user,
+                    #   to the database because we don't have a link between the user and the organization yet.
+                    #   We cannot have that link until we save the user,
                     #   therefore it's not possible to get the organization from the user.
                     check_within_organization=bool(organization),
                     organization=organization,

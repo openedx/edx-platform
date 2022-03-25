@@ -4,6 +4,7 @@ Registration related views.
 
 
 import datetime
+import django.core.exceptions
 import json
 import logging
 
@@ -30,6 +31,14 @@ from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
+
+from django.core.exceptions import ObjectDoesNotExist
+from tahoe_sites.api import (
+    add_user_to_organization,
+    get_organization_for_user,
+    get_organization_user_by_email,
+    update_admin_role_in_organization,
+)
 
 import third_party_auth
 # Note that this lives in LMS, so this dependency should be refactored.
@@ -85,7 +94,6 @@ from openedx.core.djangoapps.appsembler.sites.utils import (
     is_request_for_amc_admin,
     is_request_for_new_amc_site,
 )
-from organizations.models import UserOrganizationMapping
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -245,19 +253,19 @@ def create_account_with_params(request, params):
 
     _track_user_registration(user, profile, params, third_party_provider)
 
+    # TODO: RED-2845 Clean when AMC is removed.
     if not is_request_for_new_amc_site(request):
         # When _new_ trial is requested, we register the user first, then the
         # Organization and SiteConfiguration.
-        # So UserOrganizationMapping for new AMC admin sites is deferred later
-        # until `bootstrap_site()` is called.
-        # Tech Debt: This is a weird logic in my opinion that we should simplify into a single API call -- Omar
+        # So the new is_admin role is will not be set until `bootstrap_site()` is called.
         current_org = get_current_organization(failure_return_none=True)
         if current_org:
-            UserOrganizationMapping.objects.get_or_create(
-                user=user,
-                organization=current_org,
-                is_amc_admin=is_request_for_amc_admin(request),
-            )
+            is_admin = is_request_for_amc_admin(request)
+            try:
+                get_organization_for_user(user)
+                update_admin_role_in_organization(user=user, organization=current_org, set_as_admin=is_admin)
+            except ObjectDoesNotExist:
+                add_user_to_organization(user, current_org, is_admin=is_admin)
 
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)
@@ -536,22 +544,20 @@ class RegistrationView(APIView):
             if username and email:
                 # Being a bit defensive and requiring checking for both email and username to avoid possible
                 # account collision.
-                mapping_query = UserOrganizationMapping.objects.filter(
-                    user__email=email,
-                    user__username=username,
-                    organization=current_org,
-                )
-                if mapping_query.exists():
-                    # If the user already exists in the organization, we just
-                    # return ok. Since the user already exists, the next steps
-                    # will be to set the user as is_amc_admin=Ture and create
-                    # the OAuth tokens only.
-                    # TODO: In the AMC side, make sure to verify the user email
-                    #       before allowing to register it.
-                    mapping = mapping_query.get()
-                    mapping.is_amc_admin = True
-                    mapping.save()
-                    return self._create_response(request, {}, status_code=200)
+                try:
+                    user = get_organization_user_by_email(email=email, organization=current_org)
+                except User.DoesNotExist:
+                    pass
+                else:
+                    if user.username == username:
+                        # If the user already exists in the organization, we just
+                        # return ok. Since the user already exists, the next steps
+                        # will be to set the user as is_amc_admin=Ture and create
+                        # the OAuth tokens only.
+                        # TODO: In the AMC side, make sure to verify the user email
+                        #       before allowing to register it.
+                        update_admin_role_in_organization(user=user, organization=current_org, set_as_admin=True)
+                        return self._create_response(request, {}, status_code=200)
 
         check_for_new_site = is_request_for_new_amc_site(request)
         if email is not None and email_exists_or_retired(email, check_for_new_site=check_for_new_site):
