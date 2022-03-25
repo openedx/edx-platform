@@ -46,7 +46,7 @@ jobs:
       - run: make swagger
 
       - uses: peter-evans/create-pull-request@v4
-				id: cpr
+        id: cpr
         with:
           delete-branch: true
           add-paths: |
