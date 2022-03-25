@@ -42,9 +42,10 @@ def _get_event_properties(request, data):
         marketing_url = data.get('marketing_url')
         event_properties.update({
             'properties': {
-                'course_image_url': '{base_url}{image_path}'.format(
-                    base_url=lms_url, image_path=course.course_image_url
-                ),
+                # 'course_image_url': '{base_url}{image_path}'.format(
+                #     base_url=lms_url, image_path=course.course_image_url
+                # ),
+                'course_image_url': 'https://prod-discovery.edx-cdn.org/media/course/image/911175d0-6724-4276-a058-c7b052773dd1-aba3108f3ab9.small.png',
                 'partner_image_url': org_img_url,
                 'enroll_course_url': '{base_url}/register?course_id={course_id}&enrollment_action=enroll&email_opt_in='
                                      'false&save_for_later=true'.format(base_url=lms_url, course_id=course.id),
@@ -64,9 +65,11 @@ def _get_event_properties(request, data):
         price = int(program.get('price_ranges')[0].get('total'))
         event_properties.update({
             'properties': {
-                'program_image_url': program.get('card_image_url'),
-                'partner_image_url': program.get('authoring_organizations')[0].get('logo_image_url') if program.get(
-                    'authoring_organizations') else None,
+                'program_image_url': 'https://prod-discovery.edx-cdn.org/media/programs/card_images/3178ea5b-b7a1-4439-a8b5-aad5df14af34-8a373ec30197.jpg',
+                # 'program_image_url': program.get('card_image_url'),
+                'partner_image_url': 'https://prod-discovery.edx-cdn.org/organization/logos/54bc81cb-b736-4505-aa51-dd2b18c61d84-2082c7ba1024.png',
+                # 'partner_image_url': program.get('authoring_organizations')[0].get('logo_image_url') if program.get(
+                #     'authoring_organizations') else None,
                 'view_program_url': program.get('marketing_url') + '?save_for_later=true' if program.get(
                     'marketing_url') else '#',
                 'title': program.get('title'),
@@ -113,14 +116,24 @@ def send_email(request, email, data):
             }]
 
         braze_client.track_user(events=[event_properties], attributes=attributes)
-        tracker.emit(
-            USER_SENT_EMAIL_SAVE_FOR_LATER,
-            {
+        event_data = {
                 'user_id': request.user.id,
                 'category': 'save-for-later',
                 'type': event_properties.get('type'),
                 'send_to_self': bool(not request.user.is_anonymous and request.user.email == email),
             }
+        if data.get('type') == 'program':
+            program = data.get('program')
+            event_data.update({'program_uuid': program.get('uuid')})
+        elif data.get('type') == 'course':
+            course = data.get('course')
+            event_data.update({'course_key': course.get('key')})
+
+        print('\n\n\n\n>>>>>'+event_data)
+
+        tracker.emit(
+            USER_SENT_EMAIL_SAVE_FOR_LATER,
+            event_data
         )
     except Exception:  # pylint: disable=broad-except
         log.warning('Unable to send save for later email ', exc_info=True)
