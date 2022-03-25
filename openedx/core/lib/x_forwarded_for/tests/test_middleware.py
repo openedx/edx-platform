@@ -60,9 +60,9 @@ class TestXForwardedForMiddleware(TestCase):
 
     @ddt.unpack
     @ddt.data(
-        (None, 0),
-        ('1.2.3.4', 1),
-        ('7.8.9.0, 1.2.3.4, 5.5.5.5', 3),
+        (None, 1),
+        ('1.2.3.4', 2),
+        ('XXXXXXXX, 1.2.3.4, 5.5.5.5', 4),
     )
     @patch("openedx.core.lib.x_forwarded_for.middleware.set_custom_attribute")
     def test_xff_metrics(self, xff, expected_count, mock_set_custom_attribute):
@@ -72,4 +72,6 @@ class TestXForwardedForMiddleware(TestCase):
 
         XForwardedForMiddleware().process_request(request)
 
-        mock_set_custom_attribute.assert_has_calls([call('header.x-forwarded-for.count', expected_count)])
+        mock_set_custom_attribute.assert_has_calls([
+            call('ip_chain.count', expected_count),
+        ])

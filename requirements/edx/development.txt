@@ -559,7 +559,7 @@ edx-drf-extensions==8.0.1
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.41.2
+edx-enterprise==3.41.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -903,7 +903,7 @@ mock==4.0.3
     #   xblock-poll
 mongodbproxy @ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
     # via -r requirements/edx/testing.txt
-mongoengine==0.24.0
+mongoengine==0.24.1
     # via -r requirements/edx/testing.txt
 monotonic==1.6
     # via
@@ -955,7 +955,7 @@ openedx-events==0.8.1
     # via -r requirements/edx/testing.txt
 openedx-filters==0.5.0
     # via -r requirements/edx/testing.txt
-ora2==4.0.4
+ora2==4.0.5
     # via -r requirements/edx/testing.txt
 packaging==21.3
     # via
@@ -967,7 +967,7 @@ packaging==21.3
     #   redis
     #   sphinx
     #   tox
-pact-python==1.5.1
+pact-python==1.5.2
     # via -r requirements/edx/testing.txt
 pansi==2020.7.3
     # via
@@ -1133,7 +1133,7 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/testing.txt
     #   edxval
-pytest==7.1.0
+pytest==7.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   pylint-pytest
@@ -1203,7 +1203,7 @@ python3-saml==1.9.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
-pytz==2021.3
+pytz==2022.1
     # via
     #   -r requirements/edx/testing.txt
     #   babel
@@ -1518,7 +1518,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.13.3
+virtualenv==20.13.4
     # via
     #   -r requirements/edx/testing.txt
     #   tox

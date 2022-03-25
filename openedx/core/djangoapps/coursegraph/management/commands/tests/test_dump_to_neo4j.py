@@ -509,11 +509,29 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.get_course_last_published')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.get_command_last_run')
     @ddt.data(
-        (str(datetime(2016, 3, 30)), str(datetime(2016, 3, 31)), True),
-        (str(datetime(2016, 3, 31)), str(datetime(2016, 3, 30)), False),
-        (str(datetime(2016, 3, 31)), None, False),
-        (None, str(datetime(2016, 3, 30)), True),
-        (None, None, True),
+        (
+            str(datetime(2016, 3, 30)), str(datetime(2016, 3, 31)),
+            (True, (
+                'course has been published since last neo4j update time - '
+                'update date 2016-03-30 00:00:00 < published date 2016-03-31 00:00:00'
+            ))
+        ),
+        (
+            str(datetime(2016, 3, 31)), str(datetime(2016, 3, 30)),
+            (False, None)
+        ),
+        (
+            str(datetime(2016, 3, 31)), None,
+            (False, None)
+        ),
+        (
+            None, str(datetime(2016, 3, 30)),
+            (True, 'no record of the last neo4j update time for the course')
+        ),
+        (
+            None, None,
+            (True, 'no record of the last neo4j update time for the course')
+        ),
     )
     @ddt.unpack
     def test_should_dump_course(
