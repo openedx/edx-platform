@@ -50,6 +50,13 @@ jobs:
           delete-branch: true
           add-paths: |
             docs/swagger.yml
+          commit-message: "chore: Update swagger.yaml."
+          title: "chore: Update swagger.yaml"
+          body: |
+            Regenerate docs/swagger.yaml based on the latest APIs that exist
+            in the edx-platform.
+
+            Updated by running `make swagger`
 
 
 
