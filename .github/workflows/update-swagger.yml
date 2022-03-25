@@ -46,6 +46,7 @@ jobs:
       - run: make swagger
 
       - uses: peter-evans/create-pull-request@v4
+				id: cpr
         with:
           delete-branch: true
           add-paths: |
@@ -58,5 +59,8 @@ jobs:
 
             Updated by running `make swagger`
 
-
-
+      - name: Check outputs
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
