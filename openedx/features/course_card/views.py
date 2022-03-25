@@ -7,12 +7,12 @@ import pytz
 from django.views.decorators.csrf import csrf_exempt
 
 from course_action_state.models import CourseRerunState
+from custom_settings.models import CustomSettings
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_card.models import CourseCard
 from philu_overrides.helpers import get_user_current_enrolled_class
 from student.models import CourseEnrollment
-
 from .helpers import get_course_open_date
 
 utc = pytz.UTC
@@ -54,11 +54,20 @@ def get_course_cards(request):
     courses_list = sorted(courses_list, key=lambda _course: _course.number)
     current_time = datetime.utcnow()
 
+    show_all_courses = request.GET.get('show_all', False)
+    show_all_courses = show_all_courses == 'true'
+
+    course_custom_settings = CustomSettings.objects.filter(id__in=[course.id for course in courses_list]).in_bulk()
+    popular_courses = []
     filtered_courses = []
 
     for course in courses_list:
 
         if course.invitation_only and not CourseEnrollment.is_enrolled(request.user, course.id):
+            continue
+
+        is_featured_course = course_custom_settings[course.id].is_featured
+        if not show_all_courses and not is_featured_course:
             continue
 
         course_rerun_states = [crs.course_key for crs in CourseRerunState.objects.filter(
@@ -69,12 +78,16 @@ def get_course_cards(request):
 
         course = get_course_with_link_and_start_date(course, course_rerun_object, request)
 
-        filtered_courses.append(course)
+        if is_featured_course:
+            popular_courses.append(course)
+        elif show_all_courses:
+            filtered_courses.append(course)
 
     return render_to_response(
         "course_card/courses.html",
         {
-            'courses': filtered_courses
+            'courses': filtered_courses,
+            'popular_courses': popular_courses
         }
     )
 
