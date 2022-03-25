@@ -484,6 +484,19 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
     'ENABLE_INTEGRITY_SIGNATURE': False,
+
+    # .. toggle_name: MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If enabled, the Library Content Block is marked as complete when users view it.
+    #   Otherwise (by default), all children of this block must be completed.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2022-03-22
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/28268
+    # .. toggle_warnings: For consistency in user-experience, keep the value in sync with the setting of the same name
+    #   in the LMS and CMS.
+    'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
