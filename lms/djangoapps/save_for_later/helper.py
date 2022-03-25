@@ -110,7 +110,7 @@ def send_email(request, email, data):
             attributes = [{
                 'user_alias': user_alias,
                 'pref-lang': request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME, 'en')
-                }]
+            }]
 
         braze_client.track_user(events=[event_properties], attributes=attributes)
 
@@ -119,7 +119,7 @@ def send_email(request, email, data):
             'category': 'save-for-later',
             'type': event_properties.get('type'),
             'send_to_self': bool(not request.user.is_anonymous and request.user.email == email),
-            }
+        }
         if data.get('type') == 'program':
             program = data.get('program')
             event_data.update({'program_uuid': program.get('uuid')})
