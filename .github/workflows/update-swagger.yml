@@ -50,7 +50,7 @@ jobs:
         with:
           delete-branch: true
           add-paths: |
-            docs/swagger.yml
+            docs/swagger.yaml
           commit-message: "chore: Update swagger.yaml."
           title: "chore: Update swagger.yaml"
           body: |
