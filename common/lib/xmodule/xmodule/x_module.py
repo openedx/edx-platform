@@ -2004,6 +2004,19 @@ class ModuleSystemShim:
         if replace_urls_service:
             return partial(replace_urls_service.replace_urls)
 
+    @property
+    def filestore(self):
+        """
+        A filestore ojbect. Defaults to an instance of OSFS based at settings.DATA_DIR.
+
+        Deprecated in favor of runtime.resources_fs property.
+        """
+        warnings.warn(
+            'runtime.filestore is deprecated. Please use the runtime.resources_fs service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        return self.resources_fs
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -2020,9 +2033,8 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
     def __init__(
             self, static_url, track_function, get_module,
-            descriptor_runtime, filestore=None,
-            debug=False, hostname="", publish=None, node_path="",
-            course_id=None, error_descriptor_class=None,
+            descriptor_runtime, debug=False, hostname="", publish=None,
+            node_path="", course_id=None, error_descriptor_class=None,
             field_data=None, rebind_noauth_module_to_user=None,
             **kwargs):
         """
@@ -2038,9 +2050,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         get_module - function that takes a descriptor and returns a corresponding
                          module instance object.  If the current user does not have
                          access to that location, returns None.
-
-        filestore - A filestore ojbect.  Defaults to an instance of OSFS based
-                         at settings.DATA_DIR.
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
 
@@ -2064,7 +2073,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         self.STATIC_URL = static_url
         self.track_function = track_function
-        self.filestore = filestore
         self.get_module = get_module
         self.DEBUG = self.debug = debug
         self.HOSTNAME = self.hostname = hostname
