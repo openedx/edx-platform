@@ -1,11 +1,14 @@
 """
 All views for course card application
 """
+import logging
 from datetime import datetime
 
 import pytz
+from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 
+from common.lib.discovery_client.client import DiscoveryClient
 from course_action_state.models import CourseRerunState
 from custom_settings.models import CustomSettings
 from edxmako.shortcuts import render_to_response
@@ -16,7 +19,7 @@ from student.models import CourseEnrollment
 from .helpers import get_course_open_date
 
 utc = pytz.UTC
-
+logger = logging.getLogger(__name__)
 
 def get_course_start_date(course):
     """
@@ -83,12 +86,18 @@ def get_course_cards(request):
         elif show_all_courses:
             filtered_courses.append(course)
 
+    specializations_context = {}
+    try:
+        specializations_context = DiscoveryClient().active_programs()
+    except ValidationError as exc:
+        logger.exception(exc.message)
+
     return render_to_response(
         "course_card/courses.html",
         {
             'courses': filtered_courses,
             'popular_courses': popular_courses
-        }
+        }.update(specializations_context)
     )
 
 
