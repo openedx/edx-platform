@@ -82,6 +82,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'CELERY_QUEUES',
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
+        'REST_FRAMEWORK',
     ]
     for key in KEYS_WITH_MERGED_VALUES:
         if key in __config_copy__:
@@ -1064,3 +1065,6 @@ DISCUSSIONS_MICROFRONTEND_URL = ENV_TOKENS.get('DISCUSSIONS_MICROFRONTEND_URL', 
 
 ################### Discussions micro frontend Feedback URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = ENV_TOKENS.get('DISCUSSIONS_MFE_FEEDBACK_URL', DISCUSSIONS_MFE_FEEDBACK_URL)
+
+############## DRF overrides ##############
+REST_FRAMEWORK.update(ENV_TOKENS.get('REST_FRAMEWORK', {}))
