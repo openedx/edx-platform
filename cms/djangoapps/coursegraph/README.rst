@@ -1,37 +1,54 @@
 
-Coursegraph Support
+CourseGraph Support
 -------------------
 
-This app exists to write data to "Coursegraph", a tool enabling Open edX developers and support specialists to inspect their platform instance's learning content. Coursegraph itself is simply an instance of Neo4j, which is an open-source graph database with a web interface.
+This app exists to write data to "CourseGraph", a tool enabling Open edX developers and support specialists to inspect their platform instance's learning content. CourseGraph itself is simply an instance of `Neo4j`_, which is an open-source graph database with a Web interface.
+
+.. _Neo4j: https://neo4j.com
 
 Deploying Coursegraph
 =====================
 
-As of the Maple Open edX release, Coursegraph is *not* automatically provisioned by the community installation, and is *not* considered a "supported" part of the platform. However, operators may find the `neo4j Ansible playbook`_ useful as a starting point for deploying their own Coursegraph instance. Alternatively, Neo4j also maintains an official `Docker image`_.
+There are two ways to deploy CourseGraph:
 
-In order for Coursegraph to have queryable data, learning content from LMS must be written to Coursegraph using the ``dump_to_neo4j`` management command included in this app. In order for the data to stay up to date, it must be periodically refreshed, either manually or via an automation server such as Jenkins.
+* For operators using Tutor, there is a `CourseGraph plugin for Tutor`_ that is currently released as "Beta". Nutmeg is the earliest Open edX release that the plugin will work alongside.
 
-**Please note**: Access to a populated Coursegraph instance confers access to all the learning content in the related Open edX LMS/CMS. The basic authentication provided by Neo4j may or may not be sufficient for your security needs. Consider taking additional security measures, such as restricting Coursegraph access to only users on a private VPN.
+* For operators still using the old Ansible installation pathway, there exists a `neo4j Ansible playbook`_. Be warned that this method is not well-documented nor officially supported.
+
+In order for CourseGraph to have queryable, up-to-date data, learning content from CMS must be written to CourseGraph regularly. That is where this Django app comes into play. For details on the various ways to write CMS data to CourseGraph, visit the `operations section of the CourseGraph Tutor plugin docs`_.
+
+**Please note**: Access to a populated CourseGraph instance confers access to all the learning content in the associated Open edX CMS (Studio). The basic authentication provided by Neo4j may or may not be sufficient for your security needs. Consider taking additional security measures, such as restricting CourseGraph access to only users on a private VPN.
 
 .. _neo4j Ansible playbook: https://github.com/edx/configuration/blob/master/playbooks/neo4j.yml
 
-.. _Docker image: https://neo4j.com/developer/docker-run-neo4j/
+.. _CourseGraph plugin for Tutor: https://github.com/openedx/tutor-contrib-coursegraph/
 
+.. _operations section of the CourseGraph Tutor plugin docs: https://github.com/openedx/tutor-contrib-coursegraph/#managing-data
 
-Coursegraph in Devstack
-=======================
+Running CourseGraph locally
+===========================
 
-Coursegraph is included as an "extra" component in the `Open edX Devstack`_. That is, it is not run or provisioned by default, but can be enabled on-demand.
+In some circumstances, you may want to run CourseGraph locally, connected to a development-mode Open edX instance. You can do this in both Tutor and Devstack.
 
-To provision Devstack Coursegraph with data from Devstack LMS, run::
+Tutor
+*****
+
+The `CourseGraph plugin for Tutor`_ makes it easy to install, configure, and run CourseGraph for local development.
+
+Devstack
+********
+
+CourseGraph is included as an "extra" component in the `Open edX Devstack`_. That is, it is not run or provisioned by default, but can be enabled on-demand.
+
+To provision Devstack CourseGraph with data from Devstack LMS, run::
 
   make dev.provision.coursegraph
 
-Coursegraph should now be accessible at http://localhost:7474 with the username ``neo4j`` and the password ``edx``.
+CourseGraph should now be accessible at http://localhost:7474 with the username ``neo4j`` and the password ``edx``.
 
-Under the hood, the provisioning command just invokes ``dump_to_neo4j`` on your LMS, pointed at your Coursegraph. The provisioning command can be run again at any point in the future to refresh Coursegraph with new LMS data. The data in Coursegraph will persist unless you explicitly destroy it (as noted below).
+Under the hood, the provisioning command just invokes ``dump_to_neo4j`` on your LMS, pointed at your CourseGraph. The provisioning command can be run again at any point in the future to refresh CourseGraph with new LMS data. The data in CourseGraph will persist unless you explicitly destroy it (as noted below).
 
-Other Devstack Coursegraph commands include::
+Other Devstack CourseGraph commands include::
 
   make dev.up.coursegraph       # Bring up the container (without re-provisioning).
   make dev.down.coursegraph     # Stop and remove the container.
@@ -48,7 +65,7 @@ The above commands should be run in your ``devstack`` folder, and they assume th
 Querying Coursegraph
 ====================
 
-Coursegraph is queryable using the `Cypher`_ query language. Open edX learning content is represented in Neo4j using a straightforward scheme:
+CourseGraph is queryable using the `Cypher`_ query language. Open edX learning content is represented in Neo4j using a straightforward scheme:
 
 * A node is an XBlock usage.
 
@@ -97,3 +114,7 @@ In a given course, which units contain problems with custom Python grading code?
       c.course_key = '<course_key>'
   RETURN
       u.location
+
+You can see many more examples of useful CourseGraph queries on the `query archive wiki page`_.
+
+.. _query archive wiki page: https://openedx.atlassian.net/wiki/spaces/COMM/pages/3273228388/Useful+CourseGraph+Queries
