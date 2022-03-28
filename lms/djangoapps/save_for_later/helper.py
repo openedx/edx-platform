@@ -113,14 +113,23 @@ def send_email(request, email, data):
             }]
 
         braze_client.track_user(events=[event_properties], attributes=attributes)
+
+        event_data = {
+            'user_id': request.user.id,
+            'category': 'save-for-later',
+            'type': event_properties.get('type'),
+            'send_to_self': bool(not request.user.is_anonymous and request.user.email == email),
+        }
+        if data.get('type') == 'program':
+            program = data.get('program')
+            event_data.update({'program_uuid': program.get('uuid')})
+        elif data.get('type') == 'course':
+            course = data.get('course')
+            event_data.update({'course_key': str(course.id)})
+
         tracker.emit(
             USER_SENT_EMAIL_SAVE_FOR_LATER,
-            {
-                'user_id': request.user.id,
-                'category': 'save-for-later',
-                'type': event_properties.get('type'),
-                'send_to_self': bool(not request.user.is_anonymous and request.user.email == email),
-            }
+            event_data
         )
     except Exception:  # pylint: disable=broad-except
         log.warning('Unable to send save for later email ', exc_info=True)
