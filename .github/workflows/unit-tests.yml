@@ -9,7 +9,7 @@ on:
 
 jobs:
   run-tests:
-    runs-on: [ self-hosted ]
+    runs-on: [ edx-platform-runner ]
     strategy:
       matrix:
         python-version: ['3.8']
@@ -35,9 +35,11 @@ jobs:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
       - uses: actions/checkout@v2
-      - name: start mongodb service
+      - name: start mongod server for tests
         run: |
-          sudo /etc/init.d/mongodb start
+          sudo mkdir -p /data/db
+          sudo chmod -R a+rw /data/db
+          mongod &
 
       - name: set top-level module name
         run: |
