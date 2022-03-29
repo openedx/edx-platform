@@ -8,7 +8,7 @@ on:
 
 jobs:
   collect-and-verify:
-    runs-on: [ self-hosted ]
+    runs-on: [ edx-platform-runner ]
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
