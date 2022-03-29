@@ -3,15 +3,17 @@
 Code adapted from Figures
 
 """
+import logging
+
 import django.contrib.sites.shortcuts
 
 from rest_framework.permissions import BasePermission
 from rest_framework.throttling import UserRateThrottle
 
-from organizations.models import (
-    Organization,
-    UserOrganizationMapping,
-)
+from organizations.models import Organization
+from tahoe_sites.api import get_organization_by_site, is_active_admin_on_organization
+
+log = logging.getLogger(__name__)
 
 
 def is_site_admin_user(request):
@@ -19,22 +21,18 @@ def is_site_admin_user(request):
     current_site = django.contrib.sites.shortcuts.get_current_site(request)
 
     # get orgs for the site
-    orgs = Organization.objects.filter(sites__in=[current_site])
-
-    # Should just be mappings for organizations in this site
-    # If just one organization in a site, then the queryset returned
-    # should contain just one element
-
-    uom_qs = UserOrganizationMapping.objects.filter(
-        organization__in=orgs,
-        user=request.user)
-
-    # Since Tahoe does just one org, we're going to cheat and just look
-    # for the first element
-    if uom_qs:
-        return uom_qs[0].is_amc_admin and uom_qs[0].is_active
-    else:
+    try:
+        organization = get_organization_by_site(site=current_site)
+    except Organization.DoesNotExist:
         return False
+    except Organization.MultipleObjectsReturned:
+        log.warning(
+            'is_site_admin_user: This module expects a one:one relationship between organization and site. '
+            'Raised by site (%s)', current_site.id
+        )
+        return False
+
+    return is_active_admin_on_organization(user=request.user, organization=organization)
 
 
 class IsSiteAdminUser(BasePermission):
