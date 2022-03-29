@@ -163,23 +163,6 @@ class DraftModuleStore(MongoModuleStore):
         else:
             raise UnsupportedRevisionError()
 
-    def delete_course(self, course_key, user_id):  # lint-amnesty, pylint: disable=arguments-differ
-        """
-        :param course_key: which course to delete
-        :param user_id: id of the user deleting the course
-        """
-        # Note: does not need to inform the bulk mechanism since after the course is deleted,
-        # it can't calculate inheritance anyway. Nothing is there to be dirty.
-        # delete the assets
-        super().delete_course(course_key, user_id)  # lint-amnesty, pylint: disable=super-with-arguments
-
-        # delete all of the db records for the course
-        course_query = self._course_key_to_son(course_key)
-        self.collection.delete_many(course_query)
-        self.delete_all_asset_metadata(course_key, user_id)
-
-        self._emit_course_deleted_signal(course_key)
-
     def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):
         """
         Only called if cloning within this store or if env doesn't set up mixed.
