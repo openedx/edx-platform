@@ -14,7 +14,7 @@ from social_django.utils import load_backend, load_strategy, psa
 from social_django.views import complete
 
 from common.djangoapps import third_party_auth
-from common.djangoapps.student.helpers import get_next_url_for_login_page
+from common.djangoapps.student.helpers import get_next_url_for_login_page, is_safe_login_or_logout_redirect
 from common.djangoapps.student.models import UserProfile
 from common.djangoapps.student.views import compose_and_send_activation_email
 from common.djangoapps.third_party_auth import pipeline, provider
@@ -54,7 +54,15 @@ def inactive_user_view(request):
     if not activated:
         compose_and_send_activation_email(user, profile)
 
-    return redirect(request.GET.get('next', 'dashboard'))
+    request_params = request.GET
+    redirect_to = request_params.get('next')
+
+    if redirect_to and is_safe_login_or_logout_redirect(redirect_to=redirect_to, request_host=request.get_host(),
+                                                        dot_client_id=request_params.get('client_id'),
+                                                        require_https=request.is_secure()):
+        return redirect(redirect_to)
+
+    return redirect('dashboard')
 
 
 def saml_metadata_view(request):
