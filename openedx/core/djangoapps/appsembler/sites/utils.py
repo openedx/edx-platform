@@ -25,7 +25,7 @@ from django.utils.text import slugify
 from organizations import api as org_api
 from organizations import models as org_models
 from organizations.models import UserOrganizationMapping, Organization
-from tahoe_sites.api import get_organization_for_user
+from tahoe_sites.api import create_tahoe_site_by_link
 
 from openedx.core.lib.api.api_key_permissions import is_request_has_valid_api_key
 from openedx.core.lib.log_utils import audit_log
@@ -466,7 +466,7 @@ def bootstrap_site(site, org_data=None, username=None):
             'edx_uuid': org_data.get('edx_uuid')
         })
         organization = org_models.Organization.objects.get(id=organization_data.get('id'))
-        organization.sites.add(site)
+        create_tahoe_site_by_link(organization=organization, site=site)
         site_config.site_values['course_org_filter'] = organization_slug
         site_config.save()
     else:

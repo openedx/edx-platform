@@ -74,9 +74,7 @@ class SiteAdminPermissionsTest(TestCase):
         patch = mock.patch(SITE_CONFIGURATION_CLASS + '.compile_microsite_sass')
         self.mock_site_config_method = patch.start()
         self.site = SiteFactory()
-        self.organization = OrganizationFactory(
-            sites=[self.site],
-        )
+        self.organization = OrganizationFactory(linked_site=self.site)
         self.site_configuration = SiteConfigurationFactory(
             site=self.site,
             sass_variables={},

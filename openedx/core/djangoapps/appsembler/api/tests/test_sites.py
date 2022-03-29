@@ -49,8 +49,8 @@ class SitesModuleTests(TestCase):
         """
         self.other_site = Site.objects.get(domain='example.com')
         self.my_site = SiteFactory(domain='foo.test')
-        self.other_site_org = OrganizationFactory(sites=[self.other_site])
-        self.my_site_org = OrganizationFactory(sites=[self.my_site])
+        self.other_site_org = OrganizationFactory(linked_site=self.other_site)
+        self.my_site_org = OrganizationFactory(linked_site=self.my_site)
         self.my_course_overviews = [
             CourseOverviewFactory(),
             CourseOverviewFactory()

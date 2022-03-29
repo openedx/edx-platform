@@ -48,7 +48,7 @@ def test_event_has_site_context(context_key):
     have them
     """
     site_config = SiteConfigurationFactory()
-    org = OrganizationFactory(sites=[site_config.site])
+    org = OrganizationFactory(linked_site=site_config.site)
     org_course = OrganizationCourseFactory(organization=org)
 
     site_context = dict(

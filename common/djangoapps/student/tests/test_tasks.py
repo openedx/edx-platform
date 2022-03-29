@@ -28,7 +28,7 @@ class SendActivationEmailTestCase(TestCase):
 
         # Tahoe: Added multi-site support
         self.site = SiteFactory()
-        self.org = OrganizationFactory(sites=[self.site])
+        self.org = OrganizationFactory(linked_site=self.site)
 
         self.student = UserFactory()
 
