@@ -86,19 +86,21 @@ def get_course_cards(request):
         elif show_all_courses:
             filtered_courses.append(course)
 
-    specializations_context = {}
+    specializations_context = {'results': []}
     try:
         specializations_context = DiscoveryClient().active_programs()
     except ValidationError as exc:
         logger.exception(exc.message)
 
-    return render_to_response(
-        "course_card/courses.html",
-        {
+    context = {
             'courses': filtered_courses,
             'popular_courses': popular_courses
-        }.update(specializations_context)
-    )
+        }
+    context.update(specializations_context)
+
+    print specializations_context
+
+    return render_to_response("course_card/courses.html", context)
 
 
 def get_course_with_link_and_start_date(course, course_rerun_object, request):
