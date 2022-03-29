@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_voucher_refundable, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
+<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_voucher_refundable, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
 
 <%!
 import datetime
@@ -65,7 +65,6 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
     <%
         course_verified_certs = enrollment_mode_display(
             enrollment.mode,
-            verification_status.get('status'),
             course_overview.id
         )
     %>
@@ -376,50 +375,6 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
         % if show_consent_link:
           <%include file="_dashboard_show_consent.html" args="course_overview=course_overview, course_target=course_target, enrollment=enrollment, enterprise_customer_name=enterprise_customer_name"/>
         %endif
-
-        % if verification_status.get('should_display') and verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_RESUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY]:
-          <div class="message message-status wrapper-message-primary is-shown">
-            % if verification_status['status'] == VERIFY_STATUS_NEED_TO_VERIFY:
-              <div class="verification-reminder">
-                % if verification_status['days_until_deadline'] is not None:
-                  <h4 class="message-title">${_('To earn a certificate, you must verify your ID')}</h4>
-                  <p class="message-copy">${ungettext(
-                    'You only have {days} day left to verify for this course.',
-                    'You only have {days} days left to verify for this course.',
-                    verification_status['days_until_deadline']
-                  ).format(days=verification_status['days_until_deadline'])}</p>
-                % else:
-                  <h4 class="message-title">${_('Almost there!')}</h4>
-                  <p class="message-copy">${_('You still need to verify for this course.')}</p>
-                % endif
-              </div>
-              <div class="verification-cta">
-                <a href="${IDVerificationService.get_verify_location(course_overview.id)}" class="btn" data-course-id="${course_overview.id}">${_('Verify Now')}</a>
-              </div>
-            % elif verification_status['status'] == VERIFY_STATUS_SUBMITTED:
-              <h4 class="message-title">${_('You have submitted your verification information.')}</h4>
-              <p class="message-copy">${_('You will see a message on your dashboard when the verification process is complete (usually within 5-7 days).')}</p>
-            % elif verification_status['status'] == VERIFY_STATUS_RESUBMITTED:
-              <h4 class="message-title">${_('Your current verification will expire soon!')}</h4>
-              <p class="message-copy">${_('You have submitted your reverification information. You will see a message on your dashboard when the verification process is complete (usually within 5-7 days).')}</p>
-            % elif verification_status['status'] == VERIFY_STATUS_APPROVED:
-              <h4 class="message-title">${_('You have successfully verified your ID with {platform_name}').format(platform_name=settings.PLATFORM_NAME)}</h4>
-              % if verification_status.get('verification_good_until') is not None:
-                <p class="message-copy">${_('Your current verification is effective until {date}.').format(date=verification_status['verification_good_until'])}
-              % endif
-            % elif verification_status['status'] == VERIFY_STATUS_NEED_TO_REVERIFY:
-              <h4 class="message-title">${_('Your current verification will expire soon.')}</h4>
-              ## Translators: start_link and end_link will be replaced with HTML tags;
-              ## please do not translate these.
-              <p class="message-copy">${Text(_('Your current verification will expire in {days} days. {start_link}Re-verify your identity now{end_link} using a webcam and a government-issued photo ID.')).format(
-                  start_link=HTML('<a href="{href}">').format(href=IDVerificationService.get_verify_location()),
-                  end_link=HTML('</a>'),
-                  days=settings.VERIFY_STUDENT.get("EXPIRING_SOON_WINDOW")
-                )}
-              </p>
-            % endif
-          </div>
-        % endif
 
         % if display_course_upgrade:
           <div class="message message-upsell has-actions is-shown">

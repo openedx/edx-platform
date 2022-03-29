@@ -1425,8 +1425,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         query_features = [
             'id', 'username', 'name', 'email', 'language', 'location',
             'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-            'goals', 'enrollment_mode', 'verification_status',
-            'last_login', 'date_joined', 'external_user_key'
+            'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
         ]
 
     # Provide human-friendly and translatable names for these features. These names
@@ -1445,7 +1444,6 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         'mailing_address': _('Mailing Address'),
         'goals': _('Goals'),
         'enrollment_mode': _('Enrollment Mode'),
-        'verification_status': _('Verification Status'),
         'last_login': _('Last Login'),
         'date_joined': _('Date Joined'),
         'external_user_key': _('External User Key'),
@@ -1459,11 +1457,6 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
     if course.teams_enabled:
         query_features.append('team')
         query_features_names['team'] = _('Team')
-
-    if settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'):
-        if 'verification_status' in query_features:
-            query_features.remove('verification_status')
-            query_features_names.pop('verification_status')
 
     # For compatibility reasons, city and country should always appear last.
     query_features.append('city')
