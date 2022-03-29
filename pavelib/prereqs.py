@@ -144,14 +144,14 @@ def node_prereqs_installation():
     # The implementation of Paver's `sh` function returns before the forked
     # actually returns. Using a Popen object so that we can ensure that
     # the forked process has returned
-    proc = subprocess.Popen(npm_command, stderr=npm_log_file)  # lint-amnesty, pylint: disable=consider-using-with
+    proc = subprocess.Popen(npm_command, stderr=subprocess.STDOUT,stdout=subprocess.PIPE)  # lint-amnesty, pylint: disable=consider-using-with
     retcode = proc.wait()
     if retcode == 1:
         # Error handling around a race condition that produces "cb() never called" error. This
         # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
         # npm to 3 or higher. TODO: clean this up when we do that.
         print("npm install error detected. Retrying...")
-        proc = subprocess.Popen(npm_command, stderr=npm_log_file)  # lint-amnesty, pylint: disable=consider-using-with
+        proc = subprocess.Popen(npm_command, stderr=subprocess.STDOUT,stdout=subprocess.PIPE)  # lint-amnesty, pylint: disable=consider-using-with
         retcode = proc.wait()
         if retcode == 1:
             raise Exception(f"npm install failed: See {npm_log_file_path}")
