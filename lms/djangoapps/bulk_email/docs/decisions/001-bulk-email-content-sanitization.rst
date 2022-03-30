@@ -23,9 +23,8 @@ We will not sanitize the HTML content received through the bulk course email too
 Rejected solutions
 ------------------
 
+Bleach with allowlist ****************************
 
-Bleach with allowlist
-Santization using blocklists is vulnerable to obfuscation attacks, and the industry standard is to use an allowlist and explicitly enumerate all supported values. Given that this tool has been live for many years with no sanitization in place, a highly restrictive allowlist would be difficult to roll out to users, resulting in broken email templates and angry instructors who are used to having free rein. A permissive allowlist would potentially address this, but presents the non-trivial problem of assembling and maintaining a comprehensive list.
+It has been standard practice for us to use Bleach with an allowlist to sanitize user provided content within the Open edX ecosystem. Santization using blocklists is vulnerable to obfuscation attacks, and the industry standard is to use an allowlist and explicitly enumerate all supported values. Given that this tool has been live for many years with no sanitization in place, a highly restrictive allowlist would be difficult to roll out to users, resulting in broken email templates and angry instructors who are used to having free rein. A permissive allowlist would potentially address this, but presents the non-trivial problem of assembling and maintaining a comprehensive list.
 
-
-TODO - add link to bleach
+_bleach: https://bleach.readthedocs.io/en/latest/
