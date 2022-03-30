@@ -3083,10 +3083,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'lms.djangoapps.course_blocks',
 
-
-    # Coursegraph
-    'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
-
     # Mailchimp Syncing
     'lms.djangoapps.mailing',
 

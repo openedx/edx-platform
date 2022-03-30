@@ -7,6 +7,7 @@ neo4j, a graph database.
 import logging
 
 from celery import shared_task
+from django.conf import settings
 from django.utils import timezone
 from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -133,29 +134,26 @@ def get_command_last_run(course_key, graph):
 
 def get_course_last_published(course_key):
     """
-    We use the CourseStructure table to get when this course was last
-    published.
+    Approximately when was a course last published?
+
+    We use the 'modified' column in the CourseOverview table as a quick and easy
+    (although perhaps inexact) way of determining when a course was last
+    published. This works because CourseOverview rows are re-written upon
+    course publish.
+
     Args:
         course_key: a CourseKey
 
-    Returns: The datetime the course was last published at, converted into
-        text, or None, if there's no record of the last time this course
-        was published.
+    Returns: The datetime the course was last published at, stringified.
+        Uses Python's default str(...) implementation for datetimes, which
+        is sortable and similar to ISO 8601:
+        https://docs.python.org/3/library/datetime.html#datetime.date.__str__
     """
     # Import is placed here to avoid model import at project startup.
-    from xmodule.modulestore.django import modulestore
-    from openedx.core.djangoapps.content.block_structure.models import BlockStructureModel
-    from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
+    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
-    store = modulestore()
-    course_usage_key = store.make_course_usage_key(course_key)
-    try:
-        structure = BlockStructureModel.get(course_usage_key)
-        course_last_published_date = str(structure.modified)
-    except BlockStructureNotFound:
-        course_last_published_date = None
-
-    return course_last_published_date
+    approx_last_published = CourseOverview.get_from_id(course_key).modified
+    return str(approx_last_published)
 
 
 def strip_branch_and_version(location):
@@ -268,14 +266,14 @@ def should_dump_course(course_key, graph):
 
 @shared_task
 @set_code_owner_attribute
-def dump_course_to_neo4j(course_key_string, credentials):
+def dump_course_to_neo4j(course_key_string, connection_overrides=None):
     """
     Serializes a course and writes it to neo4j.
 
     Arguments:
-        course_key: course key for the course to be exported
-        credentials (dict): the necessary credentials to connect
-          to neo4j and create a py2neo `Graph` obje
+        course_key_string: course key for the course to be exported
+        connection_overrides (dict):  overrides to Neo4j connection
+            parameters specified in `settings.COURSEGRAPH_CONNECTION`.
     """
     course_key = CourseKey.from_string(course_key_string)
     nodes, relationships = serialize_course(course_key)
@@ -286,7 +284,9 @@ def dump_course_to_neo4j(course_key_string, credentials):
         len(relationships),
     )
 
-    graph = authenticate_and_create_graph(credentials)
+    graph = authenticate_and_create_graph(
+        connection_overrides=connection_overrides
+    )
 
     transaction = graph.begin()
     course_string = str(course_key)
@@ -346,13 +346,13 @@ class ModuleStoreSerializer:
             course_keys = [course_key for course_key in course_keys if course_key not in skip_keys]
         return cls(course_keys)
 
-    def dump_courses_to_neo4j(self, credentials, override_cache=False):
+    def dump_courses_to_neo4j(self, connection_overrides=None, override_cache=False):
         """
         Method that iterates through a list of courses in a modulestore,
         serializes them, then submits tasks to write them to neo4j.
         Arguments:
-            credentials (dict): the necessary credentials to connect
-              to neo4j and create a py2neo `Graph` object
+            connection_overrides (dict): overrides to Neo4j connection
+                parameters specified in `settings.COURSEGRAPH_CONNECTION`.
             override_cache: serialize the courses even if they'be been recently
                 serialized
 
@@ -365,18 +365,11 @@ class ModuleStoreSerializer:
         submitted_courses = []
         skipped_courses = []
 
-        graph = authenticate_and_create_graph(credentials)
+        graph = authenticate_and_create_graph(connection_overrides)
 
         for index, course_key in enumerate(self.course_keys):
             # first, clear the request cache to prevent memory leaks
             RequestCache.clear_all_namespaces()
-
-            log.info(
-                "Now submitting %s for export to neo4j: course %d of %d total courses",
-                course_key,
-                index + 1,
-                total_number_of_courses,
-            )
 
             (needs_dump, reason) = should_dump_course(course_key, graph)
             if not (override_cache or needs_dump):
@@ -386,38 +379,42 @@ class ModuleStoreSerializer:
 
             if override_cache:
                 reason = "override_cache is True"
-            log.info("submitting %s, because %s", course_key, reason)
+
+            log.info(
+                "Now submitting %s for export to neo4j, because %s: course %d of %d total courses",
+                course_key,
+                reason,
+                index + 1,
+                total_number_of_courses,
+            )
+
             dump_course_to_neo4j.apply_async(
-                args=[str(course_key), credentials],
+                kwargs=dict(
+                    course_key_string=str(course_key),
+                    connection_overrides=connection_overrides,
+                )
             )
             submitted_courses.append(str(course_key))
 
         return submitted_courses, skipped_courses
 
 
-def authenticate_and_create_graph(credentials):
+def authenticate_and_create_graph(connection_overrides=None):
     """
     This function authenticates with neo4j and creates a py2neo graph object
+
     Arguments:
-        credentials (dict): a dictionary of credentials used to authenticate,
-          and then create, a py2neo graph object.
+        connection_overrides (dict): overrides to Neo4j connection
+            parameters specified in `settings.COURSEGRAPH_CONNECTION`.
 
     Returns: a py2neo `Graph` object.
     """
-
-    host = credentials['host']
-    port = credentials['port']
-    secure = credentials['secure']
-    neo4j_user = credentials['user']
-    neo4j_password = credentials['password']
-
-    graph = Graph(
-        protocol='bolt',
-        password=neo4j_password,
-        user=neo4j_user,
-        address=host,
-        port=port,
-        secure=secure,
-    )
-
-    return graph
+    provided_overrides = {
+        key: value
+        for key, value in (connection_overrides or {}).items()
+        # Drop overrides whose values are `None`. Note that `False` is a
+        # legitimate override value that we don't want to drop here.
+        if value is not None
+    }
+    connection_with_overrides = {**settings.COURSEGRAPH_CONNECTION, **provided_overrides}
+    return Graph(**connection_with_overrides)
