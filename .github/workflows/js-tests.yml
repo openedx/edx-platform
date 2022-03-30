@@ -12,6 +12,7 @@ jobs:
   run_tests:
     name: JS
     runs-on: ${{ matrix.os }}
+    continue-on-error: true
     strategy:
       matrix:
         os: [ ubuntu-20.04 ]
