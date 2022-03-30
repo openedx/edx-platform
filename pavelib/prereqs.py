@@ -146,6 +146,8 @@ def node_prereqs_installation():
     # the forked process has returned
     proc = subprocess.Popen(npm_command, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)  # lint-amnesty, pylint: disable=consider-using-with
     retcode = proc.wait()
+    output = proc.stdout.read()
+    print(output)
     if retcode == 1:
         # Error handling around a race condition that produces "cb() never called" error. This
         # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
