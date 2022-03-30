@@ -557,7 +557,7 @@ edx-drf-extensions==8.0.1
     #   edx-rbac
     #   edx-when
     #   edxval
--e git+https://github.com/openedx/edx-enterprise.git@ed4b800616e8c8ecd286b16d3bb7be33377895e9#egg=edx-enterprise
+-e git+https://github.com/openedx/edx-enterprise.git@2c54564f77b75b7f9054825c0b9e1b8557f4a1f1#egg=edx-enterprise
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
