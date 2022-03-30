@@ -156,6 +156,8 @@ class CourseRunFactory(DictFactoryBase):
     end = factory.LazyFunction(generate_zulu_datetime)
     enrollment_end = factory.LazyFunction(generate_zulu_datetime)
     enrollment_start = factory.LazyFunction(generate_zulu_datetime)
+    is_enrollable = True
+    is_marketable = True
     image = ImageFactory()
     key = factory.LazyFunction(generate_course_run_key)
     marketing_url = factory.Faker('url')
