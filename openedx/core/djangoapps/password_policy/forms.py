@@ -6,6 +6,7 @@ from django.contrib.admin.forms import AdminAuthenticationForm
 from django.forms import ValidationError
 
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
+from openedx.core.djangolib.markup import HTML
 
 
 class PasswordPolicyAwareAdminAuthForm(AdminAuthenticationForm):
@@ -24,9 +25,9 @@ class PasswordPolicyAwareAdminAuthForm(AdminAuthenticationForm):
                 password_policy_compliance.enforce_compliance_on_login(self.user_cache, cleaned_data['password'])
             except password_policy_compliance.NonCompliantPasswordWarning as e:
                 # Allow login, but warn the user that they will be required to reset their password soon.
-                messages.warning(self.request, str(e))
+                messages.warning(self.request, HTML(str(e)))
             except password_policy_compliance.NonCompliantPasswordException as e:
                 # Prevent the login attempt.
-                raise ValidationError(str(e))  # lint-amnesty, pylint: disable=raise-missing-from
+                raise ValidationError(HTML(str(e)))  # lint-amnesty, pylint: disable=raise-missing-from
 
         return cleaned_data
