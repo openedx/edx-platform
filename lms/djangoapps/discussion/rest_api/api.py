@@ -308,6 +308,7 @@ def get_course(request, course_key):
             FORUM_ROLE_MODERATOR,
             FORUM_ROLE_COMMUNITY_TA,
         }),
+        "is_user_admin": request.user.is_staff,
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,
         "group_at_subsection": course_config.plugin_configuration.get("group_at_subsection", False),

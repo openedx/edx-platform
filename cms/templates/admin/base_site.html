@@ -17,10 +17,7 @@
         {% endif %}
     {% endif %}
 
-    {% flag "user_authn.admin_auth_redirect_to_lms" %}
-        <a href="/logout/">{% trans 'Log out' as tmsg %} {{tmsg|force_escape}}</a>
-    {% else %}
-        <a href="{% url 'admin:logout' %}">{% trans 'Log out' as tmsg %} {{tmsg|force_escape}}</a>
-    {% endflag %}
+    <a href="/logout/">{% trans 'Log out' as tmsg %} {{tmsg|force_escape}}</a>
+
 
 {% endblock %}

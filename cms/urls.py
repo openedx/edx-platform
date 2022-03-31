@@ -10,7 +10,7 @@ from django.urls import path, re_path
 from django.utils.translation import gettext_lazy as _
 from auth_backends.urls import oauth2_urlpatterns
 from edx_api_doc_tools import make_docs_urls
-from ratelimitbackend import admin
+from django.contrib import admin
 
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views

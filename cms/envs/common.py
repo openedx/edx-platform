@@ -484,6 +484,19 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
     'ENABLE_INTEGRITY_SIGNATURE': False,
+
+    # .. toggle_name: MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: If enabled, the Library Content Block is marked as complete when users view it.
+    #   Otherwise (by default), all children of this block must be completed.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2022-03-22
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/28268
+    # .. toggle_warnings: For consistency in user-experience, keep the value in sync with the setting of the same name
+    #   in the LMS and CMS.
+    'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -518,6 +531,16 @@ LIBRARY_AUTHORING_MICROFRONTEND_URL = None
 # .. toggle_creation_date: 2021-12-03
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-666
 ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
+# .. toggle_name: ENABLE_AUTHN_REGISTER_HIBP_POLICY
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle activates the use of the password validation
+#   HIBP Policy on Authn MFE's registration.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2022-03-25
+# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-669
+ENABLE_AUTHN_REGISTER_HIBP_POLICY = False
+HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3
 
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
@@ -663,7 +686,7 @@ AUTHENTICATION_BACKENDS = [
     'auth_backends.backends.EdXOAuth2',
     'rules.permissions.ObjectPermissionBackend',
     'openedx.core.djangoapps.content_libraries.auth.LtiAuthenticationBackend',
-    'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
+    'django.contrib.auth.backends.AllowAllUsersModelBackend',
     'bridgekeeper.backends.RulePermissionBackend',
 ]
 
@@ -752,16 +775,15 @@ XQUEUE_INTERFACE = {
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
-
     'crum.CurrentRequestUserMiddleware',
 
-    'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
-    # A newer and safer request cache.
+    # Resets the request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
-    'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
 
-    # Cookie monitoring
-    'openedx.core.lib.request_utils.CookieMonitoringMiddleware',
+    # Various monitoring middleware
+    'edx_django_utils.monitoring.CookieMonitoringMiddleware',
+    'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
+    'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
 
     # Before anything that looks at cookies, especially the session middleware
     'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
@@ -810,9 +832,6 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
 
     'codejail.django_integration.ConfigureCodeJailMiddleware',
-
-    # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
-    'ratelimitbackend.middleware.RateLimitMiddleware',
 
     # for expiring inactive sessions
     'openedx.core.djangoapps.session_inactivity_timeout.middleware.SessionInactivityTimeout',
@@ -1592,7 +1611,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.self_paced',
 
     # Coursegraph
-    'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
+    'cms.djangoapps.coursegraph.apps.CoursegraphConfig',
 
     # Credit courses
     'openedx.core.djangoapps.credit.apps.CreditConfig',
@@ -1688,8 +1707,6 @@ INSTALLED_APPS = [
 
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
-
-    'ratelimitbackend',
 
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
@@ -2218,7 +2235,33 @@ POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 # .. setting_default: value of LOW_PRIORITY_QUEUE
 # .. setting_description: The name of the Celery queue to which CourseGraph refresh
 #      tasks will be sent
-COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
+COURSEGRAPH_JOB_QUEUE: str = LOW_PRIORITY_QUEUE
+
+# .. setting_name: COURSEGRAPH_CONNECTION
+# .. setting_default: 'bolt+s://localhost:7687', in dictionary form.
+# .. setting_description: Dictionary specifying Neo4j connection parameters for
+#      CourseGraph refresh. Accepted keys are protocol ('bolt' or 'http'),
+#      secure (bool), host (str), port (int), user (str), and password (str).
+#      See https://py2neo.org/2021.1/profiles.html#individual-settings for a
+#      a description of each of those keys.
+COURSEGRAPH_CONNECTION: dict = {
+    "protocol": "bolt",
+    "secure": True,
+    "host": "localhost",
+    "port": 7687,
+    "user": "neo4j",
+    "password": None,
+}
+
+# .. toggle_name: COURSEGRAPH_DUMP_COURSE_ON_PUBLISH
+# .. toggle_implementation: DjangoSetting
+# .. toggle_creation_date: 2022-01-27
+# .. toggle_use_cases: open_edx
+# .. toggle_default: False
+# .. toggle_description: Whether, upon publish, a course should automatically
+#      be exported to Neo4j via the connection parameters specified in
+#      `COURSEGRAPH_CONNECTION`.
+COURSEGRAPH_DUMP_COURSE_ON_PUBLISH: bool = False
 
 ########## Settings for video transcript migration tasks ############
 VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE

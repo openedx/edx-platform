@@ -166,7 +166,8 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
             title='Journey to cooking',
             type='MicroMasters',
             authoring_organizations=[{
-                'key': 'MAX'
+                'key': 'MAX',
+                'logo_image_url': 'http://test.org/media/organization/logos/test-logo.png'
             }],
         )
         cls.site = SiteFactory(domain='test.localhost')
