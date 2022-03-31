@@ -28,3 +28,6 @@ class CourseLiveConfig(AppConfig):
             },
         }
     }
+
+    def ready(self):
+        from . import handlers  # lint-amnesty, pylint: disable=unused-import
