@@ -34,6 +34,7 @@ from lms.djangoapps.ora_staff_grader.errors import (
     XBlockInternalError,
 )
 from lms.djangoapps.ora_staff_grader.ora_api import (
+    batch_delete_submission_locks,
     check_submission_lock,
     claim_submission_lock,
     delete_submission_lock,
@@ -425,6 +426,52 @@ class SubmissionLockView(StaffGraderBaseView):
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
+            return UnknownErrorResponse()
+
+class SubmissionBatchUnlockView(StaffGraderBaseView):
+    """
+    POST delete a group of submission locks, limited to just those in the list that the user owns.
+
+    Params:
+    - ora_location (str/UsageID): ORA location for XBlock handling
+
+    Body:
+    - submissionUUIDs (UUID): A list of submission/team submission UUIDS to lock/unlock
+
+    Response: None
+
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
+    - XBlockInternalError (HTTP 500) for an issue within ORA
+    """
+
+    @require_params([PARAM_ORA_LOCATION])
+    def post(self, request, ora_location, *args, **kwargs):
+        """Batch delete submission locks"""
+        try:
+            # Validate ORA location
+            UsageKey.from_string(ora_location)
+
+            # Pull submission UUIDs list from request body
+            submission_uuids = request.data.get('submissionUUIDs')
+            batch_delete_submission_locks(request, ora_location, submission_uuids)
+
+            # Return empty response
+            return Response({})
+
+        # Catch bad ORA location
+        except (InvalidKeyError, ItemNotFoundError):
+            log.error(f"Bad ORA location provided: {ora_location}")
+            return BadOraLocationResponse()
+
+        # Issues with the XBlock handlers
+        except XBlockInternalError as ex:
+            log.error(ex)
+            return InternalErrorResponse(context=ex.context)
+
+        # Blanket exception handling
         except Exception as ex:
             log.exception(ex)
             return UnknownErrorResponse()
