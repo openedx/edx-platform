@@ -207,7 +207,7 @@ class IdPRedirectViewTest(SAMLTestCase):
 
 @unittest.skipUnless(AUTH_FEATURE_ENABLED, AUTH_FEATURES_KEY + ' not enabled')
 class InactiveUserViewTests(TestCase):
-
+    """Test inactive user view """
     @patch('common.djangoapps.third_party_auth.views.redirect')
     @override_settings(LOGIN_REDIRECT_WHITELIST=['courses.edx.org'])
     def test_inactive_user_view_allows_valid_redirect(self, mock_redirect):
@@ -235,7 +235,8 @@ class InactiveUserViewTests(TestCase):
     def test_inactive_user_view_redirects_back_to_host(self, mock_redirect):
         inactive_user = UserFactory(is_active=False)
         Registration().register(inactive_user)
-        request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL, {'next': 'https://myedxhost.com'}, HTTP_HOST='myedxhost.com')
+        request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL, {'next': 'https://myedxhost.com'},
+                                       HTTP_HOST='myedxhost.com')
         request.user = inactive_user
         with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
             with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
@@ -247,7 +248,8 @@ class InactiveUserViewTests(TestCase):
     def test_inactive_user_view_does_not_redirect_https_to_http(self, mock_redirect):
         inactive_user = UserFactory(is_active=False)
         Registration().register(inactive_user)
-        request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL, {'next': 'http://courses.edx.org'}, secure=True)
+        request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL, {'next': 'http://courses.edx.org'},
+                                       secure=True)
         request.user = inactive_user
         with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
             with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
