@@ -155,6 +155,7 @@ def delete_submission_lock(request, usage_id, submission_uuid):
 
     return json.loads(response.content)
 
+
 def batch_delete_submission_locks(request, usage_id, submission_uuids):
     """
     Batch delete a list of submission locks. Limited only to those in the list the user owns.

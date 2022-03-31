@@ -430,6 +430,7 @@ class SubmissionLockView(StaffGraderBaseView):
             log.exception(ex)
             return UnknownErrorResponse()
 
+
 class SubmissionBatchUnlockView(StaffGraderBaseView):
     """
     POST delete a group of submission locks, limited to just those in the list that the user owns.
