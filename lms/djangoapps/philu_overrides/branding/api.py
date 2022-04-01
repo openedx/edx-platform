@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 from branding.models import BrandingApiConfig
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 log = logging.getLogger("edx.footer")
 EMPTY_URL = '#'
@@ -132,6 +133,8 @@ def _footer_social_links():
 
 def _auth_footer_navigation_links():
     """Return the navigation links to display in the footer. """
+    branding_config = SiteConfiguration.objects.first().get_value('branding_config', {})
+    perks_url = branding_config.get('perks_url', '#')
     return [
         {
             "name": link_name,
@@ -140,14 +143,17 @@ def _auth_footer_navigation_links():
             "target": link_target,
         }
         for link_name, link_url, link_title, link_target in [
-            ("about", "https://philanthropyu.org/about-us/our-story/", _("About Philanthropy University"), "_blank")
+            ("about", "https://philanthropyu.org", "About Philanthropy University", "_blank"),
+            ("perks", perks_url, "Perks", "_blank"),
         ]
-        if link_url and link_url != "#"
     ]
 
 
 def _auth_footer_courses_communities_links():
     """Return the navigation links to display in the footer. """
+    branding_config = SiteConfiguration.objects.first().get_value('branding_config', {})
+    mentors_url = branding_config.get('mentors_url', '#')
+    google_ad_grants_url = branding_config.get('google_ad_grants_url', '#')
     return [
         {
             "name": link_name,
@@ -158,14 +164,16 @@ def _auth_footer_courses_communities_links():
         }
         for link_name, link_url, link_title, link_target, link_class in [
             ("explore_course", "/courses", _("Explore our Courses"), "_self", ""),
-            ("communities", settings.NODEBB_ENDPOINT, _("Be part of our Communities"), "_self", "communities-link"),
+            ("mentors", mentors_url, "Mentors", "_blank", ""),
+            ("google-ad-grants", google_ad_grants_url, "Google Ad Grants", "_blank", ""),
         ]
-        if link_url and link_url != "#"
     ]
 
 
 def _footer_navigation_links():
     """Return the navigation links to display in the footer. """
+    branding_config = SiteConfiguration.objects.first().get_value('branding_config', {})
+    perks_url = branding_config.get('perks_url', '#')
     return [
         {
             "name": link_name,
@@ -174,11 +182,9 @@ def _footer_navigation_links():
             "target": link_target,
         }
         for link_name, link_url, link_title, link_target in [
-            ("about", "https://philanthropyu.org/about-us/our-story/", _("About Philanthropy University"), "_blank"),
-            ("explore_course", "/courses", _("Explore our Courses"), "_self"),
-            ("communities", settings.NODEBB_ENDPOINT, _("Be part of our Communities"), "_self"),
+            ("about", "https://philanthropyu.org/", "About Philanthropy University", "_blank"),
+            ("perks", perks_url, "Perks", "_blank"),
         ]
-        if link_url and link_url != "#"
     ]
 
 

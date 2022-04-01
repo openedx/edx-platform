@@ -1,22 +1,27 @@
 """
 All views for course card application
 """
+import logging
 from datetime import datetime
 
 import pytz
+from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
+from opaque_keys.edx.keys import CourseKey
 
+from common.lib.discovery_client.client import DiscoveryClient
 from course_action_state.models import CourseRerunState
+from custom_settings.models import CustomSettings
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_card.models import CourseCard
 from philu_overrides.helpers import get_user_current_enrolled_class
 from student.models import CourseEnrollment
-
+from lms.djangoapps.philu_overrides.helpers import get_course_details
 from .helpers import get_course_open_date
 
 utc = pytz.UTC
-
+logger = logging.getLogger(__name__)
 
 def get_course_start_date(course):
     """
@@ -54,11 +59,20 @@ def get_course_cards(request):
     courses_list = sorted(courses_list, key=lambda _course: _course.number)
     current_time = datetime.utcnow()
 
+    show_all_courses = request.GET.get('show_all', False)
+    show_all_courses = show_all_courses == 'true'
+
+    course_custom_settings = CustomSettings.objects.filter(id__in=[course.id for course in courses_list]).in_bulk()
+    popular_courses = []
     filtered_courses = []
 
     for course in courses_list:
 
         if course.invitation_only and not CourseEnrollment.is_enrolled(request.user, course.id):
+            continue
+
+        is_featured_course = course_custom_settings[course.id].is_featured
+        if not show_all_courses and not is_featured_course:
             continue
 
         course_rerun_states = [crs.course_key for crs in CourseRerunState.objects.filter(
@@ -69,14 +83,43 @@ def get_course_cards(request):
 
         course = get_course_with_link_and_start_date(course, course_rerun_object, request)
 
-        filtered_courses.append(course)
+        if is_featured_course:
+            popular_courses.append(course)
+        elif show_all_courses:
+            filtered_courses.append(course)
 
-    return render_to_response(
-        "course_card/courses.html",
-        {
-            'courses': filtered_courses
+    specializations_context = {'results': []}
+    try:
+        specializations_context = DiscoveryClient().active_programs()
+
+        # This code block assumes that instructor will be same for all the courses of a single specialization.
+        for specialization in specializations_context['results']:
+            specialization_courses = specialization['courses']
+            first_course_run = specialization_courses[0]['course_runs'][0]
+            first_course_run_key = CourseKey.from_string(first_course_run['key'])
+
+            is_enrolled = False
+            if request.user.is_authenticated:
+                is_enrolled = CourseEnrollment.is_enrolled(request.user, first_course_run_key)
+
+            course_details = get_course_details(first_course_run_key)
+            instructors = course_details.instructor_info.get('instructors')
+
+            specialization['is_enrolled'] = is_enrolled
+            specialization['instructors'] = instructors
+
+    except ValidationError as exc:
+        logger.exception(exc.message)
+
+    context = {
+            'courses': filtered_courses,
+            'popular_courses': popular_courses
         }
-    )
+    context.update(specializations_context)
+
+    print specializations_context
+
+    return render_to_response("course_card/courses.html", context)
 
 
 def get_course_with_link_and_start_date(course, course_rerun_object, request):
