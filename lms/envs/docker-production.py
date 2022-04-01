@@ -1,8 +1,12 @@
+"""
+Specific overrides to the base prod settings for a docker production deployment.
+"""
+
 import platform
-from .production import *
+from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 
-def get_logger_config(log_dir='/var/tmp',
+def get_docker_logger_config(log_dir='/var/tmp',
                       logging_env="no_env",
                       edx_filename="edx.log",
                       dev_env=False,
@@ -76,4 +80,4 @@ def get_logger_config(log_dir='/var/tmp',
 
     return logger_config
 
-LOGGING = get_logger_config()
+LOGGING = get_docker_logger_config()
