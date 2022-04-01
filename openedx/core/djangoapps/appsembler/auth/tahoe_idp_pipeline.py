@@ -1,5 +1,5 @@
 """
-Pipeline steps for Third Party Auth to support tahoe-auth0 package.
+Pipeline steps for Third Party Auth to support tahoe-idp package.
 """
 import logging
 
@@ -8,25 +8,25 @@ import tahoe_sites.api
 
 from . import course_roles
 
-TAHOE_AUTH0_BACKEND_NAME = 'tahoe-auth0'
+TAHOE_IDP_BACKEND_NAME = 'tahoe-idp'
 log = logging.getLogger(__name__)
 
 
-@beeline.traced(name='tpa_pipeline.set_roles_from_auth0_roles')
-def set_roles_from_auth0_roles(auth_entry, strategy, details, user=None, *args, **kwargs):
+@beeline.traced(name='tpa_pipeline.set_roles_from_tahoe_idp_roles')
+def set_roles_from_tahoe_idp_roles(auth_entry, strategy, details, user=None, *args, **kwargs):
     """
-    Update the user `is_admin` status and OrgStaffRole when using the `tahoe-auth0` backend.
+    Update the user `is_admin` status and OrgStaffRole when using the `tahoe-idp` backend.
 
-    This pipeline step links both `tahoe-auth0` and `tahoe-sites` packages.
+    This pipeline step links both `tahoe-idp` and `tahoe-sites` packages.
     Although unlikely, updates to either modules may break this step.
     """
     backend_name = strategy.request.backend.name
     beeline.add_context_field('backend_name', backend_name)
     beeline.add_context_field('pipeline_details', details)
 
-    if user and backend_name == TAHOE_AUTH0_BACKEND_NAME:
-        set_as_admin = details['auth0_is_organization_admin']
-        set_as_organization_staff = details['auth0_is_organization_staff']
+    if user and backend_name == TAHOE_IDP_BACKEND_NAME:
+        set_as_admin = details['tahoe_idp_is_organization_admin']
+        set_as_organization_staff = details['tahoe_idp_is_organization_staff']
 
         organization = tahoe_sites.api.get_current_organization(strategy.request)
 

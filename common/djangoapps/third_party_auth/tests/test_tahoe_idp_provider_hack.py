@@ -1,5 +1,5 @@
 """
-Tests for the hacks we have to enable the tahoe-auth0 package.
+Tests for the hacks we have to enable the tahoe-idp package.
 """
 
 import unittest
@@ -17,78 +17,78 @@ SITE_DOMAIN_B = 'somethingelse.example.com'
 
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 @ddt.ddt
-class TahoeAuth0IntegrationHackTests(testutil.TestCase):
+class TahoeIdpIntegrationHackTests(testutil.TestCase):
     """Tests registry discovery and operation."""
 
-    def test_is_auth0_disabled_for_no_tahoe_auth0(self):
+    def test_is_idp_disabled_for_no_tahoe_idp(self):
         prov = self.configure_oauth_provider(enabled=True, backend_name="dummy")
 
-        with with_site_configuration_context(configuration={"ENABLE_TAHOE_AUTH0": True}):
-            with self.settings(FEATURES={"ENABLE_TAHOE_AUTH0": True}):
+        with with_site_configuration_context(configuration={"ENABLE_TAHOE_IDP": True}):
+            with self.settings(FEATURES={"ENABLE_TAHOE_IDP": True}):
                 self.assertEqual(prov.enabled_for_current_site, False)
 
-    def test_is_auth0_enabled_for_site_configuration(self):
+    def test_is_idp_enabled_for_site_configuration(self):
         """
-        Verify that Tahoe Auth0 is enabled when the Site Configuration asks for it.
+        Verify that Tahoe Idp is enabled when the Site Configuration asks for it.
         """
-        prov = self.configure_oauth_provider(enabled=True, backend_name="tahoe-auth0")
+        prov = self.configure_oauth_provider(enabled=True, backend_name="tahoe-idp")
 
-        with with_site_configuration_context(configuration={"ENABLE_TAHOE_AUTH0": True}):
-            with self.settings(FEATURES={"ENABLE_TAHOE_AUTH0": True}):
+        with with_site_configuration_context(configuration={"ENABLE_TAHOE_IDP": True}):
+            with self.settings(FEATURES={"ENABLE_TAHOE_IDP": True}):
                 self.assertEqual(prov.enabled_for_current_site, True)
 
-            with self.settings(FEATURES={"ENABLE_TAHOE_AUTH0": False}):
+            with self.settings(FEATURES={"ENABLE_TAHOE_IDP": False}):
                 self.assertEqual(prov.enabled_for_current_site, True)
 
-    def test_is_auth0_publicly_configured(self):
+    def test_is_idp_publicly_configured(self):
         """
-        Verify that Tahoe Auth0 is enabled or disabled based on the public setting
+        Verify that Tahoe Idp is enabled or disabled based on the public setting
         if the Site Configuration doesn't specify a custom value.
         """
-        prov = self.configure_oauth_provider(enabled=True, backend_name="tahoe-auth0")
+        prov = self.configure_oauth_provider(enabled=True, backend_name="tahoe-idp")
 
         with with_site_configuration_context(configuration={}):
-            with self.settings(FEATURES={"ENABLE_TAHOE_AUTH0": True}):
+            with self.settings(FEATURES={"ENABLE_TAHOE_IDP": True}):
                 self.assertEqual(prov.enabled_for_current_site, True)
 
-            with self.settings(FEATURES={"ENABLE_TAHOE_AUTH0": False}):
+            with self.settings(FEATURES={"ENABLE_TAHOE_IDP": False}):
                 self.assertEqual(prov.enabled_for_current_site, False)
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_TAHOE_AUTH0': True})
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_TAHOE_IDP': True})
     @ddt.data(
-        {'auth0_backend_enabled': False, 'domain_name': SITE_DOMAIN_A},
-        {'auth0_backend_enabled': False, 'domain_name': SITE_DOMAIN_B},
-        {'auth0_backend_enabled': True, 'domain_name': SITE_DOMAIN_A},
-        {'auth0_backend_enabled': True, 'domain_name': SITE_DOMAIN_B},
+        {'idp_backend_enabled': False, 'domain_name': SITE_DOMAIN_A},
+        {'idp_backend_enabled': False, 'domain_name': SITE_DOMAIN_B},
+        {'idp_backend_enabled': True, 'domain_name': SITE_DOMAIN_A},
+        {'idp_backend_enabled': True, 'domain_name': SITE_DOMAIN_B},
     )
     @ddt.unpack
-    def test_auth0_feature_enabled_with_different_sites(self, auth0_backend_enabled, domain_name):
+    def test_idp_feature_enabled_with_different_sites(self, idp_backend_enabled, domain_name):
         """
-        Verify that enabled_for_current_site returns True when Auth0 provider is configured
+        Verify that enabled_for_current_site returns True when Idp provider is configured
         for a different site.
 
-        The `ProviderConfig.enabled` (auth0_backend_enabled) property is disregarded.
+        The `ProviderConfig.enabled` (idp_backend_enabled) property is disregarded.
         """
         site_b, _created = Site.objects.get_or_create(domain=SITE_DOMAIN_B, name=SITE_DOMAIN_B)
         with with_site_configuration_context(domain_name):
-            prov = self.configure_oauth_provider(enabled=auth0_backend_enabled, site=site_b, backend_name="tahoe-auth0")
-            assert prov.enabled_for_current_site, 'Backend should be shown when ENABLE_TAHOE_AUTH0 is enabled'
+            prov = self.configure_oauth_provider(enabled=idp_backend_enabled, site=site_b, backend_name="tahoe-idp")
+            assert prov.enabled_for_current_site, 'Backend should be shown when ENABLE_TAHOE_IDP is enabled'
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_TAHOE_AUTH0': False})
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_TAHOE_IDP': False})
     @ddt.data(
-        {'auth0_backend_enabled': False, 'domain_name': SITE_DOMAIN_A},
-        {'auth0_backend_enabled': False, 'domain_name': SITE_DOMAIN_B},
-        {'auth0_backend_enabled': True, 'domain_name': SITE_DOMAIN_A},
-        {'auth0_backend_enabled': True, 'domain_name': SITE_DOMAIN_B},
+        {'idp_backend_enabled': False, 'domain_name': SITE_DOMAIN_A},
+        {'idp_backend_enabled': False, 'domain_name': SITE_DOMAIN_B},
+        {'idp_backend_enabled': True, 'domain_name': SITE_DOMAIN_A},
+        {'idp_backend_enabled': True, 'domain_name': SITE_DOMAIN_B},
     )
     @ddt.unpack
-    def test_auth0_feature_disabled_with_different_sites(self, auth0_backend_enabled, domain_name):
+    def test_idp_feature_disabled_with_different_sites(self, idp_backend_enabled, domain_name):
         """
-        Verify that enabled_for_current_site returns False when ENABLE_TAHOE_AUTH0 is set to False.
+        Verify that enabled_for_current_site returns False when ENABLE_TAHOE_IDP is set to False.
 
-        The `ProviderConfig.enabled` (auth0_backend_enabled) property is disregarded.
+        The `ProviderConfig.enabled` (idp_backend_enabled) property is disregarded.
         """
         site_b, _created = Site.objects.get_or_create(domain=SITE_DOMAIN_B, name=SITE_DOMAIN_B)
         with with_site_configuration_context(domain_name):
-            prov = self.configure_oauth_provider(enabled=auth0_backend_enabled, site=site_b, backend_name="tahoe-auth0")
-            assert not prov.enabled_for_current_site, 'Backend should be hidden when ENABLE_TAHOE_AUTH0 is disabled'
+            prov = self.configure_oauth_provider(enabled=idp_backend_enabled, site=site_b, backend_name="tahoe-idp")
+            assert not prov.enabled_for_current_site, 'Backend should be hidden when ENABLE_TAHOE_IDP is disabled'
