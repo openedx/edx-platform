@@ -140,8 +140,8 @@ def _auth_footer_navigation_links():
             "target": link_target,
         }
         for link_name, link_url, link_title, link_target in [
-            ("about", "https://philanthropyu.org/about-us/our-story/", _("About Philanthropy University"), "_blank"),
-            ("perks", "#", "Perks", "_self"),
+            ("about", "https://philanthropyu.org", "About Philanthropy University", "_blank"),
+            ("perks", "#", "Perks", "_blank"),
         ]
     ]
 
@@ -174,11 +174,8 @@ def _footer_navigation_links():
             "target": link_target,
         }
         for link_name, link_url, link_title, link_target in [
-            ("about", "https://philanthropyu.org/about-us/our-story/", _("About Philanthropy University"), "_blank"),
-            ("perks", "#", "Perks", "_self"),
-            ("explore_course", "/courses", "Explore our Courses", "_self"),
-            ("mentors", "#", "Mentors", "_blank"),
-            ("google_ad_grants", "#", "Google Ad Grants", "_blank"),
+            ("about", "https://philanthropyu.org/", "About Philanthropy University", "_blank"),
+            ("perks", "#", "Perks", "_blank"),
         ]
     ]
 

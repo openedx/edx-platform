@@ -7,6 +7,7 @@ from datetime import datetime
 import pytz
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
+from opaque_keys.edx.keys import CourseKey
 
 from common.lib.discovery_client.client import DiscoveryClient
 from course_action_state.models import CourseRerunState
@@ -16,6 +17,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.features.course_card.models import CourseCard
 from philu_overrides.helpers import get_user_current_enrolled_class
 from student.models import CourseEnrollment
+from lms.djangoapps.philu_overrides.helpers import get_course_details
 from .helpers import get_course_open_date
 
 utc = pytz.UTC
@@ -89,6 +91,23 @@ def get_course_cards(request):
     specializations_context = {'results': []}
     try:
         specializations_context = DiscoveryClient().active_programs()
+
+        # This code block assumes that instructor will be same for all the courses of a single specialization.
+        for specialization in specializations_context['results']:
+            specialization_courses = specialization['courses']
+            first_course_run = specialization_courses[0]['course_runs'][0]
+            first_course_run_key = CourseKey.from_string(first_course_run['key'])
+
+            is_enrolled = False
+            if request.user.is_authenticated:
+                is_enrolled = CourseEnrollment.is_enrolled(request.user, first_course_run_key)
+
+            course_details = get_course_details(first_course_run_key)
+            instructors = course_details.instructor_info.get('instructors')
+
+            specialization['is_enrolled'] = is_enrolled
+            specialization['instructors'] = instructors
+
     except ValidationError as exc:
         logger.exception(exc.message)
 
