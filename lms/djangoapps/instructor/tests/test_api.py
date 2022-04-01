@@ -10,8 +10,10 @@ import shutil
 import tempfile
 from unittest.mock import Mock, NonCallableMock, patch
 
+import dateutil
 import ddt
 import pytest
+import pytz
 from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -27,6 +29,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
+from testfixtures import LogCapture
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import (
@@ -91,12 +94,14 @@ from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMM
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, delete_user_preference
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 
 from .test_tools import msk_from_problem_urlname
 
+LOG_PATH = "lms.djangoapps.instructor.views.api"
 DATE_FIELD = Date()
 EXPECTED_CSV_HEADER = (
     '"code","redeem_code_url","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser",'
@@ -3369,13 +3374,6 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
-        test_subject = '\u1234 test subject'
-        test_message = '\u6824 test message'
-        cls.full_test_message = {
-            'send_to': '["myself", "staff"]',
-            'subject': test_subject,
-            'message': test_message,
-        }
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
 
     @classmethod
@@ -3385,9 +3383,25 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
 
     def setUp(self):
         super().setUp()
+        test_subject = '\u1234 test subject'
+        test_message = '\u6824 test message'
+        self.full_test_message = {
+            'send_to': '["myself", "staff"]',
+            'subject': test_subject,
+            'message': test_message,
+        }
 
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
+
+    def tearDown(self):
+        super().tearDown()
+        delete_user_preference(self.instructor, 'time_zone', username=self.instructor.username)
+
+    def _get_expected_schedule(self, schedule, timezone):
+        local_tz = dateutil.tz.gettz(timezone)
+        local_dt = dateutil.parser.parse(schedule).replace(tzinfo=local_tz)
+        return local_dt.astimezone(pytz.utc)
 
     def test_send_email_as_logged_in_instructor(self):
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
@@ -3474,6 +3488,122 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
                                                subject=self.full_test_message['subject'],
                                                html_message=self.full_test_message['message'],
                                                template_name=org_template, from_addr=org_email).count()
+
+    @patch("lms.djangoapps.instructor.views.api.task_api.submit_bulk_course_email")
+    def test_send_email_with_schedule_and_timezone(self, mock_task_api):
+        """
+        Test for the new scheduling logic added to the `send_email` function.
+        """
+        schedule = "2030-05-02T14:00:00.000Z"
+        timezone = "America/New_York"
+        self.full_test_message['schedule'] = schedule
+        self.full_test_message['browser_timezone'] = timezone
+        expected_schedule = self._get_expected_schedule(schedule, timezone)
+        expected_messages = [
+            f"Converting requested schedule from local time '{schedule}' with the timezone '{timezone}' to UTC",
+        ]
+
+        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
+        with LogCapture() as log:
+            response = self.client.post(url, self.full_test_message)
+
+        assert response.status_code == 200
+        _, _, _, arg_schedule = mock_task_api.call_args.args
+        assert arg_schedule == expected_schedule
+        log.check_present(
+            (LOG_PATH, "INFO", expected_messages[0]),
+        )
+
+    @patch("lms.djangoapps.instructor.views.api.task_api.submit_bulk_course_email")
+    def test_send_email_with_schedule_and_no_browser_timezone(self, mock_task_api):
+        """
+        Test that verifies we will retrieve and use the preferred time zone if possible.
+        """
+        schedule = "2030-05-02T14:00:00.000Z"
+        timezone = "America/New_York"
+        self.full_test_message['schedule'] = schedule
+        self.full_test_message['browser_timezone'] = ""
+        expected_schedule = self._get_expected_schedule(schedule, timezone)
+        set_user_preference(self.instructor, 'time_zone', timezone)
+
+        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, self.full_test_message)
+
+        assert response.status_code == 200
+        _, _, _, arg_schedule = mock_task_api.call_args.args
+        assert arg_schedule == expected_schedule
+
+    @patch("lms.djangoapps.instructor.views.api.task_api.submit_bulk_course_email")
+    def test_send_email_with_schedule_and_preferred_timezone(self, mock_task_api):
+        """
+        Test that verifies we will use the preferred timezone over the browser timezone if possible.
+        """
+        schedule = "2030-05-02T14:00:00.000Z"
+        preferred_timezone = "America/Anchorage"
+        self.full_test_message['schedule'] = schedule
+        self.full_test_message['browser_timezone'] = "America/New_York"
+        expected_schedule = self._get_expected_schedule(schedule, preferred_timezone)
+        set_user_preference(self.instructor, 'time_zone', preferred_timezone)
+
+        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, self.full_test_message)
+
+        assert response.status_code == 200
+        _, _, _, arg_schedule = mock_task_api.call_args.args
+        assert arg_schedule == expected_schedule
+
+    def test_send_email_with_malformed_schedule_expect_error(self):
+        self.full_test_message['schedule'] = "Blub Glub"
+        self.full_test_message['browser_timezone'] = "America/New_York"
+        expected_messages = [
+            "Error occurred while attempting to create a scheduled bulk email task: unknown string format",
+        ]
+
+        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
+        with LogCapture() as log:
+            response = self.client.post(url, self.full_test_message)
+
+        assert response.status_code == 400
+        log.check_present(
+            (LOG_PATH, "ERROR", expected_messages[0]),
+        )
+
+    def test_send_email_with_malformed_timezone_expect_error(self):
+        self.full_test_message['schedule'] = "2030-05-02T14:00:00.000Z"
+        self.full_test_message['browser_timezone'] = "Flim/Flam"
+        expected_messages = [
+            "Error occurred while attempting to create a scheduled bulk email task: Unable to determine the time zone "
+            "to use to convert the schedule to UTC",
+        ]
+
+        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
+        with LogCapture() as log:
+            response = self.client.post(url, self.full_test_message)
+
+        assert response.status_code == 400
+        log.check_present(
+            (LOG_PATH, "ERROR", expected_messages[0]),
+        )
+
+    def test_send_email_with_lapsed_date_expect_error(self):
+        schedule = "2020-01-01T00:00:00.000Z"
+        timezone = "America/New_York"
+        self.full_test_message['schedule'] = schedule
+        self.full_test_message['browser_timezone'] = timezone
+        expected_schedule = self._get_expected_schedule(schedule, timezone)
+        expected_messages = [
+            "Error occurred while attempting to create a scheduled bulk email task: The requested schedule "
+            f"'{expected_schedule}' is in the past"
+        ]
+
+        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
+        with LogCapture() as log:
+            response = self.client.post(url, self.full_test_message)
+
+        assert response.status_code == 400
+        log.check_present(
+            (LOG_PATH, "ERROR", expected_messages[0]),
+        )
 
 
 class MockCompletionInfo:
@@ -3717,7 +3847,9 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         self.setup_fake_email_info(num_emails, with_failures)
         task_history_request.return_value = list(self.tasks.values())
         url = reverse('list_email_content', kwargs={'course_id': str(self.course.id)})
-        with patch('lms.djangoapps.instructor.views.api.CourseEmail.objects.get') as mock_email_info:
+        with patch(
+            'lms.djangoapps.instructor.views.instructor_task_helpers.CourseEmail.objects.get'
+        ) as mock_email_info:
             mock_email_info.side_effect = self.get_matching_mock_email
             response = self.client.post(url, {})
         assert response.status_code == 200
@@ -3794,7 +3926,9 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         email_info = FakeEmailInfo(email, 0, 10)
         task_history_request.return_value = [task_info]
         url = reverse('list_email_content', kwargs={'course_id': str(self.course.id)})
-        with patch('lms.djangoapps.instructor.views.api.CourseEmail.objects.get') as mock_email_info:
+        with patch(
+            'lms.djangoapps.instructor.views.instructor_task_helpers.CourseEmail.objects.get'
+        ) as mock_email_info:
             mock_email_info.return_value = email
             response = self.client.post(url, {})
         assert response.status_code == 200

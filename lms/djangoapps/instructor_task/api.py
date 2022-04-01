@@ -22,6 +22,7 @@ from lms.djangoapps.instructor_task.api_helper import (
     check_entrance_exam_problems_for_rescoring,
     encode_entrance_exam_and_student_input,
     encode_problem_and_student_input,
+    schedule_task,
     submit_task
 )
 from lms.djangoapps.instructor_task.models import InstructorTask
@@ -292,7 +293,7 @@ def submit_delete_entrance_exam_state_for_student(request, usage_key, student): 
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
-def submit_bulk_course_email(request, course_key, email_id):
+def submit_bulk_course_email(request, course_key, email_id, schedule=None):
     """
     Request to have bulk email sent as a background task.
 
@@ -321,6 +322,10 @@ def submit_bulk_course_email(request, course_key, email_id):
     task_key_stub = str(email_id)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
+
+    if schedule:
+        return schedule_task(request, task_type, course_key, task_input, task_key, schedule)
+
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
