@@ -74,6 +74,7 @@ async-timeout==4.0.2
     # via
     #   -r requirements/edx/testing.txt
     #   aiohttp
+    #   redis
 attrs==21.4.0
     # via
     #   -r requirements/edx/testing.txt
@@ -279,7 +280,6 @@ django==3.2.12
     #   django-mysql
     #   django-oauth-toolkit
     #   django-pyfs
-    #   django-ratelimit-backend
     #   django-sekizai
     #   django-ses
     #   django-splash
@@ -426,15 +426,13 @@ django-pyfs==3.2.0
     # via -r requirements/edx/testing.txt
 django-ratelimit==3.0.1
     # via -r requirements/edx/testing.txt
-django-ratelimit-backend @ git+https://github.com/edx/django-ratelimit-backend.git@6e1a0c6ea1d27062c16e9fb94d3c44475146877e
-    # via -r requirements/edx/testing.txt
 django-require @ git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
     # via -r requirements/edx/testing.txt
 django-sekizai==3.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   django-wiki
-django-ses==2.6.0
+django-ses==2.6.1
     # via -r requirements/edx/testing.txt
 django-simple-history==3.0.0
     # via
@@ -535,7 +533,7 @@ edx-django-release-util==1.2.0
     # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/testing.txt
-edx-django-utils==4.5.0
+edx-django-utils==4.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-config-models
@@ -559,7 +557,7 @@ edx-drf-extensions==8.0.1
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.40.16
+edx-enterprise==3.41.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -660,7 +658,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==13.3.2
+faker==13.3.3
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -699,7 +697,6 @@ fs-s3fs==0.1.8
 future==0.18.2
     # via
     #   -r requirements/edx/testing.txt
-    #   django-ses
     #   edx-celeryutils
     #   pyjwkest
 geoip2==4.5.0
@@ -841,7 +838,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==3.4.4
+lti-consumer-xblock==3.4.5
     # via -r requirements/edx/testing.txt
 lxml==4.5.0
     # via
@@ -904,7 +901,7 @@ mock==4.0.3
     #   xblock-poll
 mongodbproxy @ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
     # via -r requirements/edx/testing.txt
-mongoengine==0.24.0
+mongoengine==0.24.1
     # via -r requirements/edx/testing.txt
 monotonic==1.6
     # via
@@ -956,7 +953,7 @@ openedx-events==0.8.1
     # via -r requirements/edx/testing.txt
 openedx-filters==0.5.0
     # via -r requirements/edx/testing.txt
-ora2==4.0.4
+ora2==4.0.6
     # via -r requirements/edx/testing.txt
 packaging==21.3
     # via
@@ -968,7 +965,7 @@ packaging==21.3
     #   redis
     #   sphinx
     #   tox
-pact-python==1.5.1
+pact-python==1.5.2
     # via -r requirements/edx/testing.txt
 pansi==2020.7.3
     # via
@@ -1134,7 +1131,7 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/testing.txt
     #   edxval
-pytest==7.1.0
+pytest==7.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   pylint-pytest
@@ -1204,7 +1201,7 @@ python3-saml==1.9.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
-pytz==2021.3
+pytz==2022.1
     # via
     #   -r requirements/edx/testing.txt
     #   babel
@@ -1280,7 +1277,7 @@ ruamel-yaml-clib==0.2.6
     # via
     #   -r requirements/edx/testing.txt
     #   ruamel-yaml
-rules==3.2.1
+rules==3.3
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -1472,7 +1469,7 @@ tox==3.24.5
     #   tox-battery
 tox-battery==0.6.1
     # via -r requirements/edx/testing.txt
-tqdm==4.63.0
+tqdm==4.63.1
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
@@ -1486,6 +1483,7 @@ typing-extensions==4.1.1
     #   mypy
     #   pydantic
     #   pylint
+    #   redis
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/testing.txt
@@ -1497,7 +1495,7 @@ uritemplate==4.1.1
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-urllib3==1.26.8
+urllib3==1.26.9
     # via
     #   -r requirements/edx/testing.txt
     #   elasticsearch
@@ -1519,7 +1517,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.13.3
+virtualenv==20.13.4
     # via
     #   -r requirements/edx/testing.txt
     #   tox

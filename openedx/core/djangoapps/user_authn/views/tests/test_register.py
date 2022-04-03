@@ -934,6 +934,9 @@ class RegistrationViewTestV1(
         )
 
     def test_register_form_year_of_birth(self):
+        # WARNING: This test may fail locally due to a test order issue. If it passes on Github,
+        #     but is failing for you locally, you probably did not cause the problem if you
+        #     are not working on registration. See VAN-900 for more details.
         this_year = datetime.now(UTC).year
         year_options = (
             [
@@ -1320,6 +1323,9 @@ class RegistrationViewTestV1(
         REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm',
     )
     def test_field_order(self):
+        # WARNING: This test may fail locally due to a test order issue. If it passes on Github,
+        #     but is failing for you locally, you probably did not cause the problem if you
+        #     are not working on registration. See VAN-900 for more details.
         response = self.client.get(self.url)
         self.assertHttpOK(response)
 
@@ -1382,6 +1388,9 @@ class RegistrationViewTestV1(
         ],
     )
     def test_field_order_override(self):
+        # WARNING: This test may fail locally due to a test order issue. If it passes on Github,
+        #     but is failing for you locally, you probably did not cause the problem if you
+        #     are not working on registration. See VAN-900 for more details.
         response = self.client.get(self.url)
         self.assertHttpOK(response)
 
@@ -1423,6 +1432,9 @@ class RegistrationViewTestV1(
         ],
     )
     def test_field_order_invalid_override(self):
+        # WARNING: This test may fail locally due to a test order issue. If it passes on Github,
+        #     but is failing for you locally, you probably did not cause the problem if you
+        #     are not working on registration. See VAN-900 for more details.
         response = self.client.get(self.url)
         self.assertHttpOK(response)
 
@@ -2002,6 +2014,9 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         ],
     )
     def test_field_order_invalid_override(self):
+        # WARNING: This test may fail locally due to a test order issue. If it passes on Github,
+        #     but is failing for you locally, you probably did not cause the problem if you
+        #     are not working on registration. See VAN-900 for more details.
         response = self.client.get(self.url)
         self.assertHttpOK(response)
 
@@ -2066,6 +2081,9 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         ],
     )
     def test_field_order_override(self):
+        # WARNING: This test may fail locally due to a test order issue. If it passes on Github,
+        #     but is failing for you locally, you probably did not cause the problem if you
+        #     are not working on registration. See VAN-900 for more details.
         response = self.client.get(self.url)
         self.assertHttpOK(response)
 
@@ -2094,6 +2112,9 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm',
     )
     def test_field_order(self):
+        # WARNING: This test may fail locally due to a test order issue. If it passes on Github,
+        #     but is failing for you locally, you probably did not cause the problem if you
+        #     are not working on registration. See VAN-900 for more details.
         response = self.client.get(self.url)
         self.assertHttpOK(response)
 

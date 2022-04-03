@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 import ddt
 import httpretty
 import pytest
+from django.test import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -153,6 +154,8 @@ def _set_course_discussion_blackout(course, user_id):
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+@override_settings(DISCUSSION_MODERATION_EDIT_REASON_CODES={"test-edit-reason": "Test Edit Reason"})
+@override_settings(DISCUSSION_MODERATION_CLOSE_REASON_CODES={"test-close-reason": "Test Close Reason"})
 @ddt.ddt
 class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_course"""
@@ -197,8 +200,12 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'group_at_subsection': False,
             'provider': 'legacy',
             'user_is_privileged': False,
+            'is_user_admin': False,
             'user_roles': {'Student'},
             'learners_tab_enabled': False,
+            'reason_codes_enabled': False,
+            'edit_reasons': [{'code': 'test-edit-reason', 'label': 'Test Edit Reason'}],
+            'post_close_reasons': [{'code': 'test-close-reason', 'label': 'Test Close Reason'}],
         }
 
     @ddt.data(
@@ -2825,6 +2832,9 @@ class UpdateThreadTest(
         FORUM_ROLE_COMMUNITY_TA,
         FORUM_ROLE_STUDENT,
     )
+    @mock.patch("lms.djangoapps.discussion.rest_api.serializers.EDIT_REASON_CODES", {
+        "test-edit-reason": "Test Edit Reason",
+    })
     def test_update_thread_with_edit_reason_code(self, role_name):
         """
         Test editing comments, specifying and retrieving edit reason codes.
@@ -2834,16 +2844,17 @@ class UpdateThreadTest(
         try:
             result = update_thread(self.request, "test_thread", {
                 "raw_body": "Edited body",
-                "edit_reason_code": "someReason",
+                "edit_reason_code": "test-edit-reason",
             })
             assert role_name != FORUM_ROLE_STUDENT
             assert result["last_edit"] == {
                 "original_body": "Original body",
-                "reason_code": "someReason",
+                "reason": "Test Edit Reason",
+                "reason_code": "test-edit-reason",
                 "author": self.user.username,
             }
             request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
-            assert request_body["edit_reason_code"] == ["someReason"]
+            assert request_body["edit_reason_code"] == ["test-edit-reason"]
         except ValidationError as error:
             assert role_name == FORUM_ROLE_STUDENT
             assert error.message_dict == {"edit_reason_code": ["This field is not editable."]}
@@ -3237,6 +3248,9 @@ class UpdateCommentTest(
         FORUM_ROLE_COMMUNITY_TA,
         FORUM_ROLE_STUDENT,
     )
+    @mock.patch("lms.djangoapps.discussion.rest_api.serializers.EDIT_REASON_CODES", {
+        "test-edit-reason": "Test Edit Reason",
+    })
     def test_update_comment_with_edit_reason_code(self, role_name):
         """
         Test editing comments, specifying and retrieving edit reason codes.
@@ -3246,16 +3260,17 @@ class UpdateCommentTest(
         try:
             result = update_comment(self.request, "test_comment", {
                 "raw_body": "Edited body",
-                "edit_reason_code": "someReason",
+                "edit_reason_code": "test-edit-reason",
             })
             assert role_name != FORUM_ROLE_STUDENT
             assert result["last_edit"] == {
                 "original_body": "Original body",
-                "reason_code": "someReason",
+                "reason": "Test Edit Reason",
+                "reason_code": "test-edit-reason",
                 "author": self.user.username,
             }
             request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
-            assert request_body["edit_reason_code"] == ["someReason"]
+            assert request_body["edit_reason_code"] == ["test-edit-reason"]
         except ValidationError:
             assert role_name == FORUM_ROLE_STUDENT
 

@@ -7,10 +7,8 @@ from django.conf import settings
 from django.shortcuts import redirect
 from urllib.parse import quote_plus  # lint-amnesty, pylint: disable=wrong-import-order
 from waffle.decorators import waffle_switch
-from django.contrib import admin
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.user_authn.config.waffle import ADMIN_AUTH_REDIRECT_TO_LMS
 
 from ..config import waffle
 
@@ -48,10 +46,7 @@ def redirect_to_lms_login_for_admin(request):
     """
     This view redirect the admin/login url to the site's login page.
     """
-    if ADMIN_AUTH_REDIRECT_TO_LMS.is_enabled():
-        return redirect('/login?next=/admin')
-    else:
-        return admin.site.login(request)
+    return redirect('/login?next=/admin')
 
 
 def _build_next_param(request):

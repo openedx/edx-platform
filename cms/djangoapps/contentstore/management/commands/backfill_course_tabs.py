@@ -12,10 +12,11 @@ Search for the error message to detect any issues.
 import logging
 
 from django.core.management.base import BaseCommand
-
 from xmodule.tabs import CourseTabList
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+
+from cms.djangoapps.contentstore.models import BackfillCourseTabsConfig
 
 logger = logging.getLogger(__name__)
 
@@ -37,12 +38,19 @@ class Command(BaseCommand):
         if there are any new default course tabs. Else, makes no updates.
         """
         store = modulestore()
-        course_keys = sorted(
+        all_course_keys = sorted(
             (course.id for course in store.get_course_summaries()),
             key=str  # Different types of CourseKeys can't be compared without this.
         )
-        logger.info(f'{len(course_keys)} courses read from modulestore.')
 
+        config = BackfillCourseTabsConfig.current()
+        start = config.start_index if config.enabled and config.start_index >= 0 else 0
+        end = (start + config.count) if config.enabled and config.count > 0 else len(all_course_keys)
+        course_keys = all_course_keys[start:end]
+
+        logger.info(f'{len(all_course_keys)} courses read from modulestore. Processing {start} to {end}.')
+
+        error_keys = []
         for course_key in course_keys:
             try:
                 course = store.get_course(course_key, depth=1)
@@ -59,3 +67,10 @@ class Command(BaseCommand):
             except Exception as err:  # pylint: disable=broad-except
                 logger.exception(err)
                 logger.error(f'Course {course_key} encountered an Exception while trying to update.')
+                error_keys.append(course_key)
+
+        if error_keys:
+            msg = 'The following courses encountered errors and were not updated:\n'
+            for error_key in error_keys:
+                msg += f' - {error_key}\n'
+            logger.info(msg)
