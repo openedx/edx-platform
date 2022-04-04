@@ -944,3 +944,39 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+FEATURES['base_discovery_url'] = "https://staging-courses.visionempowertrust.org/"
+FEATURES['base_lms_url'] = "https://staging-lms.visionempowertrust.org/"
+FEATURES['client_id'] = "rUzjVpccbxHBwe4EsPIP5tiWXOTfI3Hq1kleJgkJ"
+FEATURES['client_secret'] = "xYn1EW6jqjbdlRvacoSG8zPWTyagJBBR0nyYvpzpC4Od6j0yBc3l7pkHWS0FWWzHM6l8tZF1FNV5KvFGAOAaMHTJ0tCYZ6alsqkpho5qogPmFrY8cMy7kzCFOfHELiv8"
+FEATURES['Header_lang_key'] = ENV_TOKENS.get('Header_lang_key')
+
+LANGUAGE_CODE = 'en'
+
+PARLER_DEFAULT_LANGUAGE_CODE = LANGUAGE_CODE
+
+PARLER_LANGUAGES = {
+    1: (
+        {'code': LANGUAGE_CODE, },
+        {'code': 'kn', },
+        {'code': 'hi', },
+        {'code': 'ml', },
+        {'code': 'te', },
+        {'code': 'ta', },
+    ),
+    'default': {
+         'fallbacks': [PARLER_DEFAULT_LANGUAGE_CODE],
+         'hide_untranslated': False,
+     }
+}
+
+# Parler seems to be a bit overeager with its caching of translated models,
+# and so we get a large number of sets, but rarely any gets
+PARLER_ENABLE_CACHING = False
+
+if 'figures' in INSTALLED_APPS:
+        import figures
+        figures.update_settings(
+            WEBPACK_LOADER,
+            CELERYBEAT_SCHEDULE,
+            ENV_TOKENS.get('FIGURES', {}))

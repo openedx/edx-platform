@@ -7,13 +7,13 @@
 {% block nav-global %}{% endblock %}
 {% block userlinks %}
     {% if site_url %}
-        <a href="{{ site_url }}">{% trans 'View site' %}</a> /
+        <a href="{{ site_url }}">{% trans 'View site' as tmsg%} {{tmsg|force_escape}}</a> /
     {% endif %}
     {% if user.is_active and user.is_staff %}
         {% url 'django-admindocs-docroot' as docsroot %}
         {% if docsroot %}
-            <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
+            <a href="{{ docsroot }}">{% trans 'Documentation' as tmsg %} {{tmsg|force_escape}}</a> /
         {% endif %}
     {% endif %}
-    <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
+    <a href="{% url 'admin:logout' %}">{% trans 'Log out' as tmsg %} {{tmsg|force_escape}}</a>
 {% endblock %}

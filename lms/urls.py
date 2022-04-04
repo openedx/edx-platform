@@ -124,6 +124,9 @@ urlpatterns = [
     # Courseware search endpoints
     url(r'^search/', include('search.urls')),
 
+    #Course details form course discovery site
+    url(r'^explore-courses/', include('mx_course_discovery.urls')),
+
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
 
@@ -150,6 +153,10 @@ urlpatterns = [
 
     # Update session view
     url(r'^lang_pref/session_language', lang_pref_views.update_session_language, name='session_language'),
+
+    # subodha-addin
+    url(r'^mx-user-info/', include('subodha-addin.mx_user_info.urls')),
+    url(r'^mx-translations/',include('subodha-addin.mx_multilingual_meta.urls')), 
 
     # Multiple course modes and identity verification
     url(r'^course_modes/', include('course_modes.urls')),
@@ -1004,3 +1011,9 @@ urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
 urlpatterns += [
     url(r'^api/course_home/', include('lms.djangoapps.course_home_api.urls')),
 ]
+
+if 'figures' in settings.INSTALLED_APPS:
+        urlpatterns += (
+            url(r'^figures/',
+                include('figures.urls', namespace='figures')),
+ )

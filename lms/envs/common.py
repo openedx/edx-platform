@@ -298,7 +298,7 @@ FEATURES = {
     'EXPOSE_CACHE_PROGRAMS_ENDPOINT': False,
 
     # Courseware search feature
-    'ENABLE_COURSEWARE_SEARCH': False,
+    'ENABLE_COURSEWARE_SEARCH': True,
     'ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF': False,
 
     # Dashboard search feature
@@ -338,7 +338,7 @@ FEATURES = {
     'ENABLE_OPENBADGES': False,
 
     # Enable LTI Provider feature.
-    'ENABLE_LTI_PROVIDER': False,
+    'ENABLE_LTI_PROVIDER': True,
 
     # Show the language selector in the header
     'SHOW_HEADER_LANGUAGE_SELECTOR': False,
@@ -1153,7 +1153,7 @@ SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
 # django-session-cookie middleware
-DCS_SESSION_COOKIE_SAMESITE = 'None'
+DCS_SESSION_COOKIE_SAMESITE = 'lax'
 DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 
 # CMS base
@@ -2562,6 +2562,16 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
+
+    #course details from course decovery site
+    'mx_course_discovery',
+    #user import exoprt
+    'import_export',
+    #subodha_addin
+    'subodha-addin.mx_user_info',
+    'subodha-addin.mx_multilingual_meta',
+    'parler',
+
 ]
 
 ######################### CSRF #########################################
@@ -3569,7 +3579,7 @@ PROGRAM_CERTIFICATES_ROUTING_KEY = 'edx.lms.core.default'
 
 # See https://github.com/edx/edx-django-sites-extensions for more info
 # Default site to use if site matching request headers does not exist
-SITE_ID = 1
+SITE_ID = 3
 
 # dir containing all themes
 COMPREHENSIVE_THEME_DIRS = []

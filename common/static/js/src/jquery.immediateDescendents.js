@@ -11,7 +11,11 @@ contained somewhere inside ".xblock" elements.
   jQuery.fn.immediateDescendents = function(selector) {
     return this.children().map(function() {
       var elem;
-      elem = jQuery(this);
+      if (jQuery === undefined)
+         elem = $(this);
+      else
+         elem = jQuery(this);
+
       if (elem.is(selector)) {
         return this;
       } else {

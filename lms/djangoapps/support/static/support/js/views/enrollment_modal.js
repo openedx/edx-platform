@@ -21,6 +21,7 @@
             },
 
             render: function() {
+                // xss-lint: disable=javascript-jquery-html
                 this.$el.html(_.template(this.template)({
                     enrollment: this.enrollment,
                     modes: this.modes,

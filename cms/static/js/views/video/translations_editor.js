@@ -127,17 +127,20 @@ function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, ViewUtils, FileUpload
                 languageMap = TranscriptUtils.Storage.get('languageMap');
 
             _.each(values, function(value, newLang) {
-                var html = $(self.templateItem({
+                var $html = $(self.templateItem({
                     newLang: newLang,
                     originalLang: _.findKey(languageMap, function(lang) { return lang === newLang; }) || '',
                     value: value,
                     url: self.model.get('urlRoot')
-                })).prepend(dropdown.clone().val(newLang))[0];
-
-                frag.appendChild(html);
+                }));
+                HtmlUtils.append($html, dropdown.clone().val(newLang));
+                frag.appendChild($html[0]);
             });
 
-            this.$el.find('ol').html([frag]);
+            HtmlUtils.setHtml(
+                this.$el.find('ol'),
+                HtmlUtils.HTML([frag])
+            );
         },
 
         addEntry: function(event) {

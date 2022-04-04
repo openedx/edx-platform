@@ -86,6 +86,9 @@ setup(
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
             "program_enrollments = lms.djangoapps.program_enrollments.apps:ProgramEnrollmentsConfig",
             "courseware_api = openedx.core.djangoapps.courseware_api.apps:CoursewareAPIConfig",
+            "mx_course_discovery = lms.djangoapps.mx_course_discovery.apps:CourseDiscoveryDetailsConfig",
+            "mx_user_info = subodha-addin.mx_user_info.apps:MxUserInfoConfig",
+            "mx_multilingual_meta = subodha-addin.mx_multilingual_meta.apps:MxMultilingualMetaConfig",
         ],
         "cms.djangoapp": [
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
@@ -105,6 +108,7 @@ setup(
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
             "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
+            "mx_importcoursedocx = cms.djangoapps.mx_importcoursedocx.apps:CourseCreateScriptConfig",
         ],
         'openedx.learning_context': [
             'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',
