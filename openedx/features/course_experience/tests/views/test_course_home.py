@@ -527,6 +527,25 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         )
         self.assertRedirects(response, expected_url)
 
+    def test_old_mongo_access_error(self):
+        """
+        Ensure that a user accessing an Old Mongo course sees a redirect to
+        the student dashboard, not a 404.
+        """
+        course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
+        user = UserFactory(password=self.TEST_PASSWORD)
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+
+        response = self.client.get(course_home_url(course))
+
+        expected_params = QueryDict(mutable=True)
+        expected_params['access_response_error'] = f'{course.display_name_with_default} is no longer available.'
+        expected_url = '{url}?{params}'.format(
+            url=reverse('dashboard'),
+            params=expected_params.urlencode(),
+        )
+        self.assertRedirects(response, expected_url)
+
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_expiration_banner_with_expired_upgrade_deadline(self):
         """
