@@ -1,4 +1,5 @@
 import beeline
+import logging
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from organizations.models import Organization, OrganizationCourse
@@ -10,12 +11,20 @@ from student.models import CourseEnrollment
 
 from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
 
+log = logging.getLogger(__name__)
+
 
 @beeline.traced(name="api.sites.get_course_keys_for_site")
 def get_course_keys_for_site(site):
     try:
         organization = get_organization_by_site(site=site)
     except Organization.DoesNotExist:
+        result = []
+    except Organization.MultipleObjectsReturned:
+        log.warning(
+            'get_course_keys_for_site: This module expects a one:one relationship between organization and site. '
+            'Raised by site (%s)', site.id
+        )
         result = []
     else:
         org_courses = OrganizationCourse.objects.filter(organization=organization)
