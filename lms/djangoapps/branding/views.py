@@ -36,7 +36,7 @@ def index(request):
     Redirects to main page -- info page if user authenticated, or marketing if not
     """
     # This is to redirect Microsites when a homepage is not necessarily needed.
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         if configuration_helpers.get_value(
                 'ALWAYS_REDIRECT_HOMEPAGE_TO_LOGIN_FOR_UNAUTHENTICATED_USER',
                 settings.FEATURES.get('ALWAYS_REDIRECT_HOMEPAGE_TO_LOGIN_FOR_UNAUTHENTICATED_USER', True)
