@@ -27,7 +27,6 @@ from lms.djangoapps.courseware.access_response import (
     MilestoneAccessError,
     MobileAvailabilityError,
     NoAllowedPartitionGroupsError,
-    OldMongoAccessError,
     VisibilityError
 )
 from lms.djangoapps.courseware.access_utils import (
@@ -330,9 +329,6 @@ def _has_access_course(user, action, courselike):
         # ).or(
         #     _has_staff_access_to_descriptor, user, courselike, courselike.id
         # )
-        if courselike.id.deprecated:  # we no longer support accessing Old Mongo courses
-            return OldMongoAccessError(courselike)
-
         visible_to_nonstaff = _visible_to_nonstaff_users(courselike)
         if not visible_to_nonstaff:
             staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
