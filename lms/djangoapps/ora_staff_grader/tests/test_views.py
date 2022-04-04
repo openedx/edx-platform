@@ -579,14 +579,26 @@ class TestBatchSubmissionLockView(BaseViewTest):
         """Wrapper for easier calling of 'batch_unlock'"""
         return self.client.post(self.url_with_params(params), body, format="json")
 
-    def test_batch_unlock_invalid_ora(self):
+    @patch("lms.djangoapps.ora_staff_grader.views.batch_delete_submission_locks")
+    def test_batch_unlock_invalid_ora(self, mock_batch_delete):
         """An invalid ORA returns a 400"""
         self.test_request_params[PARAM_ORA_LOCATION] = "not_a_real_location"
+
+        response = self.batch_unlock(self.test_request_params, self.test_request_body)
+
+        assert response.status_code == 400
+        assert json.loads(response.content) == {"error": ERR_BAD_ORA_LOCATION}
+        mock_batch_delete.assert_not_called()
+
+    @patch("lms.djangoapps.ora_staff_grader.views.batch_delete_submission_locks")
+    def test_batch_unlock_missing_submisison_list(self, mock_batch_delete):
+        """An invalid ORA returns a 400"""
 
         response = self.batch_unlock(self.test_request_params, {})
 
         assert response.status_code == 400
-        assert json.loads(response.content) == {"error": ERR_BAD_ORA_LOCATION}
+        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
+        mock_batch_delete.assert_not_called()
 
     @patch("lms.djangoapps.ora_staff_grader.views.batch_delete_submission_locks")
     def test_batch_unlock(self, mock_batch_delete):
@@ -597,6 +609,7 @@ class TestBatchSubmissionLockView(BaseViewTest):
 
         assert response.status_code == 200
         assert json.loads(response.content) == {}
+        mock_batch_delete.assert_called()
 
     @patch("lms.djangoapps.ora_staff_grader.views.batch_delete_submission_locks")
     def test_batch_unlock_internal_error(self, mock_batch_delete):
