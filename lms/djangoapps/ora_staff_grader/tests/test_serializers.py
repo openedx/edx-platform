@@ -365,7 +365,8 @@ class TestInitializeSerializer(TestCase):
         assert output_data["courseMetadata"] == expected_course_data
         assert output_data["oraMetadata"] == expected_ora_data
         assert output_data["submissions"] == expected_submissions_data
-        assert output_data["isEnabled"] == True
+        assert output_data["isEnabled"] is True
+
 
 class TestRubricConfigSerializer(TestCase):
     """Tests for RubricConfigSerializer"""
