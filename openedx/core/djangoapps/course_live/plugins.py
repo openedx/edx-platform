@@ -47,9 +47,7 @@ class LiveCourseApp(CourseApp):
         """
         Set live enabled status in CourseLiveConfiguration model.
         """
-        configuration = CourseLiveConfiguration.get(course_key)
-        if configuration is None:
-            raise ValueError("Can't enable/disable live for course before it is configured.")
+        configuration, _ = CourseLiveConfiguration.objects.get_or_create(course_key=course_key)
         configuration.enabled = enabled
         configuration.save()
         return configuration.enabled
