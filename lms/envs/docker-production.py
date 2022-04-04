@@ -7,11 +7,11 @@ from .production import *  # pylint: disable=wildcard-import, unused-wildcard-im
 
 
 def get_docker_logger_config(log_dir='/var/tmp',
-                      logging_env="no_env",
-                      edx_filename="edx.log",
-                      dev_env=False,
-                      debug=False,
-                      service_variant='lms'):
+                             logging_env="no_env",
+                             edx_filename="edx.log",
+                             dev_env=False,
+                             debug=False,
+                             service_variant='lms'):
     """
     Return the appropriate logging config dictionary. You should assign the
     result of this to the LOGGING var in your settings.
