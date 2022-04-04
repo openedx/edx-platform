@@ -13,7 +13,7 @@
     "@edx/edx-proctoring": "^4.8.2",
     "@edx/frontend-component-cookie-policy-banner": "1.0.0",
     "@edx/paragon": "2.6.4",
-    "@edx/paragon-new": "npm:@edx/paragon@^14.12.4",
+    "@edx/paragon-new": "npm:@edx/paragon@^19.13.6",
     "@edx/studio-frontend": "^1.17.0",
     "axios": "^0.21.1",
     "babel-loader": "8.2.4",
