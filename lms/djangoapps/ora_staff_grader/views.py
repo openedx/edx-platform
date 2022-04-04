@@ -14,6 +14,7 @@ from edx_rest_framework_extensions.auth.session.authentication import (
 )
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from openassessment.xblock.config_mixin import WAFFLE_NAMESPACE, ENHANCED_STAFF_GRADER
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -53,6 +54,7 @@ from lms.djangoapps.ora_staff_grader.utils import require_params
 from openedx.core.djangoapps.content.course_overviews.api import (
     get_course_overview_or_none,
 )
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 log = logging.getLogger(__name__)
@@ -80,6 +82,7 @@ class InitializeView(StaffGraderBaseView):
         courseMetadata
         oraMetadata
         submissions
+        isEnabled
     }
 
     Errors:
@@ -88,6 +91,15 @@ class InitializeView(StaffGraderBaseView):
     - XBlockInternalError (HTTP 500) for an issue with ORA
     - UnknownError (HTTP 500) for other errors
     """
+
+    def _is_staff_grader_enabled(self, course_key):
+        """ Helper to evaluate if the staff grader flag / overrides are enabled """
+        enhanced_staff_grader_flag = CourseWaffleFlag(
+            WAFFLE_NAMESPACE,
+            ENHANCED_STAFF_GRADER,
+            module_name='openassessment.xblock.config_mixin'
+        )
+        return enhanced_staff_grader_flag.is_enabled(course_key)
 
     @require_params([PARAM_ORA_LOCATION])
     def get(self, request, ora_location, *args, **kwargs):
@@ -104,6 +116,9 @@ class InitializeView(StaffGraderBaseView):
 
             # Get list of submissions for this ORA
             init_data["submissions"] = get_submissions(request, ora_location)
+
+            # Is the Staff Grader enabled for this course?
+            init_data["isEnabled"] = self._is_staff_grader_enabled(ora_usage_key.course_key)
 
             response_data = InitializeSerializer(init_data).data
             log.info(response_data)

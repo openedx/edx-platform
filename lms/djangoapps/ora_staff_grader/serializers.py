@@ -167,12 +167,14 @@ class InitializeSerializer(serializers.Serializer):
     courseMetadata = CourseMetadataSerializer()
     oraMetadata = OpenResponseMetadataSerializer()
     submissions = serializers.DictField(child=SubmissionMetadataSerializer())
+    isEnabled = serializers.BooleanField()
 
     class Meta:
         fields = [
             "courseMetadata",
             "oraMetadata",
             "submissions",
+            "isEnabled"
         ]
         read_only_fields = fields
 
