@@ -94,6 +94,8 @@ class InitializeView(StaffGraderBaseView):
 
     def _is_staff_grader_enabled(self, course_key):
         """ Helper to evaluate if the staff grader flag / overrides are enabled """
+        # This toggle is documented on the edx-ora2 repo in openassessment/xblock/config_mixin.py
+        # pylint: disable=toggle-missing-annotation
         enhanced_staff_grader_flag = CourseWaffleFlag(
             WAFFLE_NAMESPACE,
             ENHANCED_STAFF_GRADER,
