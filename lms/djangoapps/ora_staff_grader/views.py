@@ -30,6 +30,7 @@ from lms.djangoapps.ora_staff_grader.errors import (
     InternalErrorResponse,
     LockContestedError,
     LockContestedResponse,
+    MissingParamResponse,
     UnknownErrorResponse,
     XBlockInternalError,
 )
@@ -457,6 +458,8 @@ class SubmissionBatchUnlockView(StaffGraderBaseView):
 
             # Pull submission UUIDs list from request body
             submission_uuids = request.data.get('submissionUUIDs')
+            if not isinstance(submission_uuids, list):
+                return MissingParamResponse()
             batch_delete_submission_locks(request, ora_location, submission_uuids)
 
             # Return empty response
