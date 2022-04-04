@@ -135,10 +135,9 @@ CMD gunicorn \
     - lms.wsgi:application
 
 ##################################################
-ENV LMS_CFG="$CONFIG_ROOT/lms.yml"
-
 # Define LMS non-dev target.
 FROM base as lms
+ENV LMS_CFG="$CONFIG_ROOT/lms.yml"
 ENV SERVICE_VARIANT lms
 ENV DJANGO_SETTINGS_MODULE="lms.envs.$EDX_PLATFORM_SETTINGS"
 EXPOSE 8000
