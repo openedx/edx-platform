@@ -116,7 +116,7 @@ class TestInitializeView(BaseViewTest):
             self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key}
         )
 
-        expected_keys = set(["courseMetadata", "oraMetadata", "submissions"])
+        expected_keys = set(["courseMetadata", "oraMetadata", "submissions", "isEnabled"])
         assert response.status_code == 200
         assert response.data.keys() == expected_keys
 
