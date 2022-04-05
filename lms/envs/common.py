@@ -4604,6 +4604,18 @@ COURSE_ENROLLMENT_MODES = {
         "display_name": _("Paid Executive Education"),
         "min_price": 1
     },
+    "unpaid-bootcamp": {
+        "id": 11,
+        "slug": "unpaid-bootcamp",
+        "display_name": _("Unpaid Bootcamp"),
+        "min_price": 0
+    },
+    "paid-bootcamp": {
+        "id": 12,
+        "slug": "paid-bootcamp",
+        "display_name": _("Paid Bootcamp"),
+        "min_price": 1
+    },
 }
 
 CONTENT_TYPE_GATE_GROUP_IDS = {
