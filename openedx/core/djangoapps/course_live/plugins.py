@@ -5,14 +5,13 @@ from typing import Dict, Optional
 
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_noop as _
+from lti_consumer.models import LtiConfiguration
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.course_apps.plugins import CourseApp
 from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
 
 from .models import CourseLiveConfiguration
-from lti_consumer.models import LtiConfiguration
-
 
 User = get_user_model()
 
