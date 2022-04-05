@@ -332,7 +332,6 @@ class DatesTab(EnrolledTab):
     title = gettext_noop("Dates")
     priority = 30
     view_name = "dates"
-    is_dynamic = True
 
     def __init__(self, tab_dict):
         def link_func(course, reverse_func):
@@ -369,10 +368,6 @@ def get_course_tab_list(user, course):
             continue
         if tab.type == 'static_tab' and tab.course_staff_only and \
                 not bool(user and has_access(user, 'staff', course, course.id)):
-            continue
-        # We are phasing this out in https://github.com/openedx/edx-platform/pull/30045/, but need this
-        # until the backfill course tabs command is completed
-        if tab.type == 'dates':
             continue
         course_tab_list.append(tab)
 

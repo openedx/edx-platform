@@ -4,12 +4,14 @@ Test for course live app views
 import json
 
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from rest_framework.test import APITestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from ..config.waffle import ENABLE_COURSE_LIVE
 from ..models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
 
 
@@ -144,6 +146,50 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(content, expected_data)
 
+    def test_update_configurations_response(self):
+        """
+        Create, update & test POST request response data
+        """
+        self.create_course_live_config()
+        updated_data = {
+            'enabled': False,
+            'provider_type': 'zoom',
+            'lti_configuration': {
+                'lti_1p1_client_key': 'new_key',
+                'lti_1p1_client_secret': 'new_secret',
+                'lti_1p1_launch_url': 'example01.com',
+                'lti_config': {
+                    'additional_parameters': {
+                        'custom_instructor_email': 'new_email@example.com'
+                    },
+                },
+            },
+        }
+        response = self._post(updated_data)
+        content = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        expected_data = {
+            'course_key': str(self.course.id),
+            'provider_type': 'zoom',
+            'enabled': False,
+            'lti_configuration': {
+                'lti_1p1_client_key': 'new_key',
+                'lti_1p1_client_secret': 'new_secret',
+                'lti_1p1_launch_url': 'example01.com',
+                'version': 'lti_1p1',
+                'lti_config': {
+                    'pii_share_username': True,
+                    'pii_share_email': True,
+                    'additional_parameters': {
+                        'custom_instructor_email':
+                            'new_email@example.com'
+                    }
+                }
+            },
+            'pii_sharing_allowed': True
+        }
+        self.assertEqual(content, expected_data)
+
     def test_post_error_messages(self):
         """
         Test all related validation messages are recived
@@ -157,6 +203,37 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         }
         self.assertEqual(content, expected_data)
         self.assertEqual(response.status_code, 400)
+
+    def test_non_staff_user_access(self):
+        """
+        Test non staff user has no access to API
+        """
+        self.user = self.create_user_for_course(self.course, user_type=CourseUserType.UNENROLLED)
+        response = self._get()
+        content = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(content, {'detail': 'You do not have permission to perform this action.'})
+
+        response = self._post({})
+        content = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(content, {'detail': 'You do not have permission to perform this action.'})
+
+    def test_courseware_api_has_live_tab(self):
+        """
+        Test if courseware api has live-tab after ENABLE_COURSE_LIVE flag is enabled
+        """
+        self.create_course_live_config()
+        with override_waffle_flag(ENABLE_COURSE_LIVE, True):
+            url = reverse('course-home:course-metadata', args=[self.course.id])
+            response = self.client.get(url)
+            content = json.loads(response.content.decode('utf-8'))
+        data = next((tab for tab in content['tabs'] if tab['tab_id'] == 'lti_live'), None)
+        self.assertEqual(data, {
+            'tab_id': 'lti_live',
+            'title': 'Live',
+            'url': f'http://testserver/courses/{self.course.id}/tab/lti_live/'
+        })
 
 
 class TestCourseLiveProvidersView(ModuleStoreTestCase, APITestCase):

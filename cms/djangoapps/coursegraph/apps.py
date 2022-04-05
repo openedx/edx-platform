@@ -12,6 +12,6 @@ class CoursegraphConfig(AppConfig):
     """
     AppConfig for courseware app
     """
-    name = 'openedx.core.djangoapps.coursegraph'
+    name = 'cms.djangoapps.coursegraph'
 
-    from openedx.core.djangoapps.coursegraph import tasks
+    from cms.djangoapps.coursegraph import tasks

@@ -11,7 +11,6 @@ import re
 import urllib
 
 from django.conf import settings
-from django.contrib import admin
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
@@ -43,12 +42,10 @@ from common.djangoapps.util.password_policy_validators import normalize_password
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_authn.config.waffle import (
-    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
-    ADMIN_AUTH_REDIRECT_TO_LMS
-)
+from openedx.core.djangoapps.user_api import accounts
+from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangoapps.user_authn.cookies import get_response_with_refreshed_jwt_cookies, set_logged_in_cookies
-from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
+from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError, VulnerablePasswordError
 from openedx.core.djangoapps.user_authn.toggles import (
     is_require_third_party_auth_enabled,
     should_redirect_to_authn_microfrontend
@@ -580,12 +577,25 @@ def login_user(request, api_version='v1'):
             if possibly_authenticated_user and password_policy_compliance.should_enforce_compliance_on_login():
                 # Important: This call must be made AFTER the user was successfully authenticated.
                 _enforce_password_policy_compliance(request, possibly_authenticated_user)
-                check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), user.is_staff)
 
         if possibly_authenticated_user is None or not (
             possibly_authenticated_user.is_active or settings.MARKETING_EMAILS_OPT_IN
         ):
             _handle_failed_authentication(user, possibly_authenticated_user)
+
+        pwned_properties = check_pwned_password_and_send_track_event(
+            user.id, request.POST.get('password'), user.is_staff
+        ) if not is_user_third_party_authenticated else {}
+        # Set default for third party login
+        password_frequency = pwned_properties.get('frequency', -1)
+        if (
+            settings.ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY and
+            password_frequency >= settings.HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD
+        ):
+            raise VulnerablePasswordError(
+                accounts.AUTHN_LOGIN_BLOCK_HIBP_POLICY_MSG,
+                'require-password-change'
+            )
 
         _handle_successful_authentication_and_login(possibly_authenticated_user, request)
 
@@ -603,6 +613,16 @@ def login_user(request, api_version='v1'):
             redirect_url = get_redirect_url_with_host(
                 root_url,
                 enterprise_selection_page(request, possibly_authenticated_user, finish_auth_url or next_url)
+            )
+
+        if (
+            settings.ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY and
+            0 <= password_frequency <= settings.HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD
+        ):
+            raise VulnerablePasswordError(
+                accounts.AUTHN_LOGIN_NUDGE_HIBP_POLICY_MSG,
+                'nudge-password-change',
+                redirect_url
             )
 
         response = JsonResponse({
@@ -627,13 +647,16 @@ def login_user(request, api_version='v1'):
             set_custom_attribute('login_error_code', error_code)
         email_or_username_key = 'email' if api_version == API_V1 else 'email_or_username'
         email_or_username = request.POST.get(email_or_username_key, None)
-        email_or_username = possibly_authenticated_user.email \
-            if possibly_authenticated_user else email_or_username
+        email_or_username = possibly_authenticated_user.email if possibly_authenticated_user else email_or_username
         response_content['email'] = email_or_username
-        response = JsonResponse(response_content, status=400)
-        set_custom_attribute('login_user_auth_failed_error', True)
-        set_custom_attribute('login_user_response_status', response.status_code)
-        return response
+    except VulnerablePasswordError as error:
+        response_content = error.get_response()
+        log.exception(response_content)
+
+    response = JsonResponse(response_content, status=400)
+    set_custom_attribute('login_user_auth_failed_error', True)
+    set_custom_attribute('login_user_response_status', response.status_code)
+    return response
 
 
 # CSRF protection is not needed here because the only side effect
@@ -658,10 +681,7 @@ def redirect_to_lms_login(request):
     This view redirect the admin/login url to the site's login page if
     waffle switch is on otherwise returns the admin site's login view.
     """
-    if ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.is_enabled() or ADMIN_AUTH_REDIRECT_TO_LMS.is_enabled():
-        return redirect('/login?next=/admin')
-    else:
-        return admin.site.login(request)
+    return redirect('/login?next=/admin')
 
 
 class LoginSessionView(APIView):

@@ -641,12 +641,17 @@ def _validate_password(password, username=None, email=None, reset_password_page=
     except ValidationError as validation_err:
         raise errors.AccountPasswordInvalid(' '.join(validation_err.messages))
 
-    # TODO: VAN-666 - Restrict this feature to reset password page for now until it is
-    #  enabled on account sign in and register.
-    if settings.ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY and reset_password_page:
+    if (
+        (settings.ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY and reset_password_page) or
+        (settings.ENABLE_AUTHN_REGISTER_HIBP_POLICY and not reset_password_page)
+    ):
         pwned_response = check_pwned_password(password)
         if pwned_response.get('vulnerability', 'no') == 'yes':
-            raise errors.AccountPasswordInvalid(accounts.AUTHN_PASSWORD_COMPROMISED_MSG)
+            if (
+                reset_password_page or
+                pwned_response.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
+            ):
+                raise errors.AccountPasswordInvalid(accounts.AUTHN_PASSWORD_COMPROMISED_MSG)
 
 
 def _validate_country(country):

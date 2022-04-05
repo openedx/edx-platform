@@ -169,22 +169,6 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         Renders student view for LMS.
         """
         fragment = Fragment()
-        mfe_url = get_discussions_mfe_topic_url(self.course_key, self.discussion_id)
-        if ENABLE_DISCUSSIONS_MFE.is_enabled(self.course_key) and mfe_url:
-            fragment.add_content(HTML(
-                "<iframe id='discussions-mfe-tab-embed' src='{src}' title='{title}'></iframe>"
-            ).format(src=mfe_url, title=_("Discussions")))
-            fragment.add_css(
-                """
-                #discussions-mfe-tab-embed {
-                    width: 100%;
-                    height: 800px;
-                    border: none;
-                }
-                """
-            )
-            return fragment
-
         self.add_resource_urls(fragment)
 
         login_msg = ''

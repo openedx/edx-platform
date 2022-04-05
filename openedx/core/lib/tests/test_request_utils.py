@@ -12,7 +12,6 @@ from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 
 from openedx.core.lib.request_utils import (
-    CookieMonitoringMiddleware,
     ExpectedErrorMiddleware,
     _get_expected_error_settings_dict,
     clear_cached_expected_error_settings,
@@ -101,131 +100,6 @@ class RequestUtilTestCase(unittest.TestCase):
         assert course_id.org == org
         assert course_id.course == course
         assert course_id.run == run
-
-
-@ddt.ddt
-class CookieMonitoringMiddlewareTestCase(unittest.TestCase):
-    """
-    Tests for CookieMonitoringMiddleware.
-    """
-    def setUp(self):
-        super().setUp()
-        self.mock_response = Mock()
-
-    @patch('openedx.core.lib.request_utils.log', autospec=True)
-    @patch("openedx.core.lib.request_utils.set_custom_attribute")
-    @ddt.data(
-        (None, None),  # logging threshold not defined
-        (5, None),  # logging threshold too high
-        (5, 9999999999999999999),  # logging threshold too high, and random sampling impossibly unlikely
-    )
-    @ddt.unpack
-    def test_cookie_monitoring_with_no_logging(
-        self, logging_threshold, sampling_request_count, mock_set_custom_attribute, mock_logger
-    ):
-        middleware = CookieMonitoringMiddleware(self.mock_response)
-        cookies_dict = {'a': 'y'}
-
-        with override_settings(COOKIE_HEADER_SIZE_LOGGING_THRESHOLD=logging_threshold):
-            with override_settings(COOKIE_SAMPLING_REQUEST_COUNT=sampling_request_count):
-                middleware(self.get_mock_request(cookies_dict))
-
-        # expect monitoring of header size for all requests
-        mock_set_custom_attribute.assert_called_once_with('cookies.header.size', 3)
-        # cookie logging was not enabled, so nothing should be logged
-        mock_logger.info.assert_not_called()
-
-    @override_settings(COOKIE_HEADER_SIZE_LOGGING_THRESHOLD=None)
-    @override_settings(COOKIE_SAMPLING_REQUEST_COUNT=None)
-    @patch("openedx.core.lib.request_utils.set_custom_attribute")
-    @ddt.data(
-        # A corrupt cookie header contains "Cookie: ".
-        ('corruptCookie: normal-cookie=value', 1, 1),
-        ('corrupt1Cookie: normal-cookie1=value1;corrupt2Cookie: normal-cookie2=value2', 2, 2),
-        ('corrupt=Cookie: value', 1, 0),
-    )
-    @ddt.unpack
-    def test_cookie_header_corrupt_monitoring(
-        self, corrupt_cookie_header, expected_corrupt_count, expected_corrupt_key_count, mock_set_custom_attribute
-    ):
-        middleware = CookieMonitoringMiddleware(self.mock_response)
-        request = RequestFactory().request()
-        request.META['HTTP_COOKIE'] = corrupt_cookie_header
-
-        middleware(request)
-
-        mock_set_custom_attribute.assert_has_calls([
-            call('cookies.header.size', len(request.META['HTTP_COOKIE'])),
-            call('cookies.header.corrupt_count', expected_corrupt_count),
-            call('cookies.header.corrupt_key_count', expected_corrupt_key_count),
-        ])
-
-    @override_settings(COOKIE_HEADER_SIZE_LOGGING_THRESHOLD=1)
-    @patch('openedx.core.lib.request_utils.log', autospec=True)
-    @patch("openedx.core.lib.request_utils.set_custom_attribute")
-    def test_log_cookie_with_threshold_met(self, mock_set_custom_attribute, mock_logger):
-        middleware = CookieMonitoringMiddleware(self.mock_response)
-        cookies_dict = {
-            "a": "yy",
-            "b": "xxx",
-            "c": "z",
-        }
-
-        middleware(self.get_mock_request(cookies_dict))
-
-        mock_set_custom_attribute.assert_has_calls([
-            call('cookies.header.size', 16),
-            call('cookies.header.size.computed', 16)
-        ])
-        mock_logger.info.assert_called_once_with(
-            "Large (>= 1) cookie header detected. BEGIN-COOKIE-SIZES(total=16) b: 3, a: 2, c: 1 END-COOKIE-SIZES"
-        )
-
-    @override_settings(COOKIE_HEADER_SIZE_LOGGING_THRESHOLD=9999)
-    @override_settings(COOKIE_SAMPLING_REQUEST_COUNT=1)
-    @patch('openedx.core.lib.request_utils.log', autospec=True)
-    @patch("openedx.core.lib.request_utils.set_custom_attribute")
-    def test_log_cookie_with_sampling(self, mock_set_custom_attribute, mock_logger):
-        middleware = CookieMonitoringMiddleware(self.mock_response)
-        cookies_dict = {
-            "a": "yy",
-            "b": "xxx",
-            "c": "z",
-        }
-
-        middleware(self.get_mock_request(cookies_dict))
-
-        mock_set_custom_attribute.assert_has_calls([
-            call('cookies.header.size', 16),
-            call('cookies.header.size.computed', 16)
-        ])
-        mock_logger.info.assert_called_once_with(
-            "Sampled small (< 9999) cookie header. BEGIN-COOKIE-SIZES(total=16) b: 3, a: 2, c: 1 END-COOKIE-SIZES"
-        )
-
-    @override_settings(COOKIE_HEADER_SIZE_LOGGING_THRESHOLD=9999)
-    @override_settings(COOKIE_SAMPLING_REQUEST_COUNT=1)
-    @patch('openedx.core.lib.request_utils.log', autospec=True)
-    @patch("openedx.core.lib.request_utils.set_custom_attribute")
-    def test_empty_cookie_header_skips_sampling(self, mock_set_custom_attribute, mock_logger):
-        middleware = CookieMonitoringMiddleware(self.mock_response)
-        cookies_dict = {}
-
-        middleware(self.get_mock_request(cookies_dict))
-
-        mock_set_custom_attribute.assert_has_calls([
-            call('cookies.header.size', 0),
-        ])
-        mock_logger.info.assert_not_called()
-
-    def get_mock_request(self, cookies_dict):
-        """
-        Return mock request with the provided cookies in the header.
-        """
-        factory = RequestFactory()
-        for name, value in cookies_dict.items():
-            factory.cookies[name] = value
-        return factory.request()
 
 
 class TestGetExpectedErrorSettingsDict(unittest.TestCase):
