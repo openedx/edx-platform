@@ -5,6 +5,7 @@ from typing import Dict, Optional
 
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_noop as _
+from lti_consumer.models import LtiConfiguration
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.course_apps.plugins import CourseApp
@@ -49,6 +50,10 @@ class LiveCourseApp(CourseApp):
         """
         configuration, _ = CourseLiveConfiguration.objects.get_or_create(course_key=course_key)
         configuration.enabled = enabled
+        if not configuration.lti_configuration:
+            configuration.lti_configuration = LtiConfiguration.objects.create(
+                config_store=LtiConfiguration.CONFIG_ON_DB
+            )
         configuration.save()
         return configuration.enabled
 
