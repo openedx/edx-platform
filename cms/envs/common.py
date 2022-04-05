@@ -542,6 +542,30 @@ ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
 ENABLE_AUTHN_REGISTER_HIBP_POLICY = False
 HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3
 
+# .. toggle_name: ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle activates the use of the password validation
+#   on Authn MFE's login.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2022-03-29
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-668
+ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY = False
+HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
+
+# .. toggle_name: ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle activates the use of the password validation
+#   on Authn MFE's login.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2022-03-29
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-667
+ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
+HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
+
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
     # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
