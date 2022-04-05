@@ -12,6 +12,7 @@ from lti_consumer.api import get_lti_pii_sharing_state_for_course
 from lti_consumer.lti_1p1.contrib.django import lti_embed
 from lti_consumer.models import LtiConfiguration
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.courseware.access import get_user_role
@@ -114,7 +115,7 @@ class LtiCourseLaunchMixin:
         )
 
     def _get_lti_config(self, course: CourseBlock) -> LtiConfiguration:
-        raise NotImplementedError
+        return CourseLiveConfiguration.get(course.id).lti_configuration
 
     def _get_lti_embed_code(self, course: CourseBlock, request: HttpRequest) -> str:
         """

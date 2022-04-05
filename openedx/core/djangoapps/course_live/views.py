@@ -7,14 +7,18 @@ import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lti_consumer.api import get_lti_pii_sharing_state_for_course
+from opaque_keys.edx.keys import CourseKey
+from rest_framework import permissions, status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 
 from common.djangoapps.util.views import ensure_valid_course_key
+from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.course_live.permissions import IsStaffOrInstructor
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.features.lti_course_tab.tab import LtiCourseLaunchMixin
 
 from ...lib.api.view_utils import verify_course_exists
 from .models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
@@ -207,3 +211,69 @@ class CourseLiveProvidersView(APIView):
                 "available": AVAILABLE_PROVIDERS
             }
         }
+
+
+class CourseLiveIFrameView(APIView):
+    """
+    A view for retrieving course live iFrame.
+
+    Path: ``api/course_live/iframe/{course_id}/``
+
+    Accepts: [GET]
+
+    ------------------------------------------------------------------------------------
+    GET
+    ------------------------------------------------------------------------------------
+
+    **Returns**
+
+        * 200: OK - Contains a program live zoom iframe.
+        * 401: The requesting user is not authenticated.
+        * 404: The requesting user lacks access to the course.
+        * 404: The requested program does not exist.
+
+    **Response**
+
+        In the case of a 200 response code, the response will be iframe HTML.
+
+    **Example**
+
+        {
+            "iframe": "
+                        <iframe
+                            id='lti-tab-embed'
+                            style='width: 100%; min-height: 800px; border: none'
+                            srcdoc='{srcdoc}'
+                            >
+                        </iframe>
+                        ",
+        }
+
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser
+    )
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @ensure_valid_course_key
+    @verify_course_exists()
+    def get(self, request, course_id: str, **_kwargs) -> Response:
+        """
+        Handle HTTP/GET requests
+        """
+        course_key = CourseKey.from_string(course_id)
+        is_lti_enabled = CourseLiveConfiguration.is_enabled(course_key)
+        if not is_lti_enabled:
+            error_data = {
+                "developer_message": "LTI configuration is not available for this course."
+            }
+            return Response(error_data, status=status.HTTP_200_OK)
+
+        course = get_course_with_access(request.user, 'load', course_key)
+        iframe = LtiCourseLaunchMixin().render_to_fragment(request, course)
+        data = {
+            "iframe": iframe.content
+        }
+        return Response(data, status=status.HTTP_200_OK)
