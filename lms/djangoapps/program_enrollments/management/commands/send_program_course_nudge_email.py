@@ -74,6 +74,7 @@ class Command(BaseCommand):
         return course_run['is_enrollable'] \
             and course_run['is_marketable'] \
             and course_run['marketing_url'] \
+            and course_run['image'] \
             and course_run['status'] == COURSE_PUBLISHED
 
     def get_course_run_to_suggest(self, programs_progress, completed_course_id):
@@ -134,6 +135,7 @@ class Command(BaseCommand):
             'COURSE_TWO_NAME': suggested_course_run['title'],
             'COURSE_TWO_SHORT_DESCRIPTION': suggested_course_run['short_description'],
             'COURSE_TWO_LINK': urljoin(settings.MKTG_URLS.get('ROOT'), suggested_course_run['marketing_url']),
+            'COURSE_TWO_IMAGE_LINK': suggested_course_run['image'].get('src'),
         }
         segment.track(user.id, 'edx.bi.program.course-enrollment.nudge', event_properties)
 
