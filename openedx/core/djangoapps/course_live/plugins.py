@@ -11,6 +11,8 @@ from openedx.core.djangoapps.course_apps.plugins import CourseApp
 from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
 
 from .models import CourseLiveConfiguration
+from lti_consumer.models import LtiConfiguration
+
 
 User = get_user_model()
 
@@ -49,6 +51,10 @@ class LiveCourseApp(CourseApp):
         """
         configuration, _ = CourseLiveConfiguration.objects.get_or_create(course_key=course_key)
         configuration.enabled = enabled
+        if not configuration.lti_configuration:
+            configuration.lti_configuration = LtiConfiguration.objects.create(
+                config_store=LtiConfiguration.CONFIG_ON_DB
+            )
         configuration.save()
         return configuration.enabled
 
