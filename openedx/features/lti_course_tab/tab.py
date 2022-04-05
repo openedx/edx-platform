@@ -16,7 +16,6 @@ from web_fragments.fragment import Fragment
 
 from lms.djangoapps.courseware.access import get_user_role
 from lms.djangoapps.courseware.tabs import EnrolledTab
-from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangolib.markup import HTML
 from common.djangoapps.student.models import anonymous_id_for_user
@@ -115,7 +114,7 @@ class LtiCourseLaunchMixin:
         )
 
     def _get_lti_config(self, course: CourseBlock) -> LtiConfiguration:
-        return CourseLiveConfiguration.get(course.id).lti_configuration
+        raise NotImplementedError
 
     def _get_lti_embed_code(self, course: CourseBlock, request: HttpRequest) -> str:
         """

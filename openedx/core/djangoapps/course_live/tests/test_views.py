@@ -284,7 +284,7 @@ class TestCourseLiveIFrameView(ModuleStoreTestCase, APITestCase):
     @property
     def url(self):
         """
-        Returns the live providers API url.
+        Returns the course live iframe API url.
         """
         return reverse(
             'live_iframe', kwargs={'course_id': str(self.course.id)}
@@ -317,10 +317,37 @@ class TestCourseLiveIFrameView(ModuleStoreTestCase, APITestCase):
         self.assertIsInstance(response.data['iframe'], Markup)
         self.assertIn('iframe', str(response.data['iframe']))
 
-    def test_if_user_is_not_authenticated(self):
+    def test_non_authenticated_user(self):
         """
         Verify that 401 is returned if user is not authenticated.
         """
         self.client.logout()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 401)
+
+    def test_not_enrolled_user(self):
+        """
+        Verify that 403 is returned if user is not enrolled.
+        """
+        self.user = self.create_user_for_course(self.course, user_type=CourseUserType.UNENROLLED)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_live_configuration_disabled(self):
+        """
+        Verify that proper error message is returned if live configuration is disabled.
+        """
+        CourseLiveConfiguration.objects.create(
+            course_key=self.course.id,
+            enabled=False,
+            provider_type="zoom",
+        )
+        response = self.client.get(self.url)
+        self.assertEqual(response.data['developer_message'], 'Course live is not enabled for this course.')
+
+    def test_course_live_not_configured(self):
+        """
+        Verify that proper error message is returned if live configuration does not exist.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.data['developer_message'], 'Course live is not configured for this course.')

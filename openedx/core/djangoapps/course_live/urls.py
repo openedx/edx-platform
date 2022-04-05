@@ -8,7 +8,7 @@ from django.urls import re_path
 
 from openedx.core.djangoapps.course_live.views import (
     CourseLiveConfigurationView,
-    CourseLiveIFrameView,
+    CourseLiveIframeView,
     CourseLiveProvidersView
 )
 
@@ -18,5 +18,5 @@ urlpatterns = [
     re_path(fr'^providers/{settings.COURSE_ID_PATTERN}/?$',
             CourseLiveProvidersView.as_view(), name='live_providers'),
     re_path(fr'^iframe/{settings.COURSE_ID_PATTERN}/?$',
-            CourseLiveIFrameView.as_view(), name='live_iframe'),
+            CourseLiveIframeView.as_view(), name='live_iframe'),
 ]
