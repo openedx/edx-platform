@@ -428,28 +428,28 @@
     }
 
     .deco-corner-tl {
-      @include triangle(20px, $cert-base-color, up-right);
+      @include edx-triangle(20px, $cert-base-color, up-right);
 
       top: 0;
       right: 0;
     }
 
     .deco-corner-tr {
-      @include triangle(20px, $cert-base-color, up-left);
+      @include edx-triangle(20px, $cert-base-color, up-left);
 
       top: 0;
       left: 0;
     }
 
     .deco-corner-bl {
-      @include triangle(20px, $cert-base-color, down-right);
+      @include edx-triangle(20px, $cert-base-color, down-right);
 
       bottom: 0;
       right: 0;
     }
 
     .deco-corner-br {
-      @include triangle(20px, $cert-base-color, down-left);
+      @include edx-triangle(20px, $cert-base-color, down-left);
 
       bottom: 0;
       left: 0;
@@ -521,19 +521,19 @@
     background-size: 65%;
 
     .deco-corner-tl {
-      @include triangle(20px, $cert-distinguished-color, up-right);
+      @include edx-triangle(20px, $cert-distinguished-color, up-right);
     }
 
     .deco-corner-tr {
-      @include triangle(20px, $cert-distinguished-color, up-left);
+      @include edx-triangle(20px, $cert-distinguished-color, up-left);
     }
 
     .deco-corner-bl {
-      @include triangle(20px, $cert-distinguished-color, down-right);
+      @include edx-triangle(20px, $cert-distinguished-color, down-right);
     }
 
     .deco-corner-br {
-      @include triangle(20px, $cert-distinguished-color, down-left);
+      @include edx-triangle(20px, $cert-distinguished-color, down-left);
     }
   }
 
