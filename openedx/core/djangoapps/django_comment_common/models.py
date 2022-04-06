@@ -298,6 +298,7 @@ class CourseDiscussionSettings(models.Model):
             'division_scheme': (str,)[0],
             'always_divide_inline_discussions': bool,
             'divided_discussions': list,
+            'reported_content_email_notifications': bool,
         }
         for field, field_type in fields.items():
             if field in validated_data:
