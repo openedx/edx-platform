@@ -20,6 +20,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.models import AccountRecoveryConfiguration
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 
 LOGGER_NAME = 'common.djangoapps.student.management.commands.recover_account'
@@ -87,8 +88,9 @@ class RecoverAccountTests(TestCase):
 
             assert len(mail.outbox) == 1
 
-        authn_mfe_url = re.findall(settings.AUTHN_MICROFRONTEND_URL, mail.outbox[0].body)[0]
-        self.assertEqual(authn_mfe_url, settings.AUTHN_MICROFRONTEND_URL)
+        mfe_url = configuration_helpers.get_value('AUTHN_MICROFRONTEND_URL', settings.AUTHN_MICROFRONTEND_URL)
+        authn_mfe_url = re.findall(mfe_url, mail.outbox[0].body)[0]
+        self.assertEqual(authn_mfe_url, mfe_url)
 
     def test_file_not_found_error(self):
         """

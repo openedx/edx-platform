@@ -353,7 +353,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 reset_msg = reset_msg.format(site_name)
 
                 assert reset_msg in msg
-                assert settings.AUTHN_MICROFRONTEND_URL in msg
+                assert configuration_helpers.get_value('AUTHN_MICROFRONTEND_URL', settings.AUTHN_MICROFRONTEND_URL) in msg
 
                 sign_off = f"The {platform_name} Team"
                 assert sign_off in msg

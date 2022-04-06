@@ -24,6 +24,7 @@ from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.branding.api import get_privacy_url
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangoapps.user_authn.cookies import JWT_COOKIE_NAMES
@@ -90,7 +91,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         # Test with setting enabled and waffle flag active, redirects to microfrontend
         with override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True):
             response = self.client.get(reverse(url_name))
-            self.assertRedirects(response, settings.AUTHN_MICROFRONTEND_URL + path, fetch_redirect_response=False)
+            self.assertRedirects(response, configuration_helpers.get_value('AUTHN_MICROFRONTEND_URL', settings.AUTHN_MICROFRONTEND_URL) + path, fetch_redirect_response=False)
 
     @ddt.data(
         (
@@ -112,7 +113,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         Test that if request is redirected to logistration MFE,
         query params are passed to the redirect url.
         """
-        expected_url = settings.AUTHN_MICROFRONTEND_URL + path + '?' + urlencode(query_params)
+        expected_url = configuration_helpers.get_value('AUTHN_MICROFRONTEND_URL', settings.AUTHN_MICROFRONTEND_URL) + path + '?' + urlencode(query_params)
         response = self.client.get(reverse(url_name), query_params)
 
         self.assertRedirects(response, expected_url, fetch_redirect_response=False)

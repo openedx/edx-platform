@@ -18,6 +18,7 @@ from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.features.learner_profile.toggles import REDIRECT_TO_PROFILE_MICROFRONTEND
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
@@ -118,7 +119,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
             })
             self.client.login(username=self.USERNAME, password=self.PASSWORD)
             response = self.client.get(path=profile_path)
-            profile_url = settings.PROFILE_MICROFRONTEND_URL
+            profile_url = configuration_helpers.get_value('PROFILE_MICROFRONTEND_URL', settings.PROFILE_MICROFRONTEND_URL)
             self.assertRedirects(response, profile_url + self.USERNAME, fetch_redirect_response=False)
 
     def test_records_link(self):

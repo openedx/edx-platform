@@ -18,6 +18,7 @@ from lms.djangoapps.commerce.tests.mocks import mock_get_orders
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.tests.test_api import EN, LT_LT
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context, get_user_orders
@@ -245,7 +246,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         with override_waffle_flag(REDIRECT_TO_ACCOUNT_MICROFRONTEND, active=True):
             # Test with waffle flag active and none site setting, redirects to microfrontend
             response = self.client.get(path=old_url_path)
-            self.assertRedirects(response, settings.ACCOUNT_MICROFRONTEND_URL, fetch_redirect_response=False)
+            self.assertRedirects(response, configuration_helpers.get_value('ACCOUNT_MICROFRONTEND_URL', settings.ACCOUNT_MICROFRONTEND_URL), fetch_redirect_response=False)
 
         # Test with waffle flag disabled and site setting disabled, does not redirect
         response = self.client.get(path=old_url_path)
@@ -268,4 +269,4 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         site.configuration.save()
         site.__class__.objects.clear_cache()
         response = self.client.get(path=old_url_path)
-        self.assertRedirects(response, settings.ACCOUNT_MICROFRONTEND_URL, fetch_redirect_response=False)
+        self.assertRedirects(response, configuration_helpers.get_value('ACCOUNT_MICROFRONTEND_URL', settings.ACCOUNT_MICROFRONTEND_URL), fetch_redirect_response=False)

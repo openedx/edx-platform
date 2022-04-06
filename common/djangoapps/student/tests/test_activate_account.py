@@ -232,7 +232,7 @@ class TestActivateAccount(TestCase):
         login page with correct query param.
         """
         login_page_url = "{authn_mfe}/login?account_activation_status=".format(
-            authn_mfe=settings.AUTHN_MICROFRONTEND_URL
+            authn_mfe=configuration_helpers.get_value('AUTHN_MICROFRONTEND_URL', settings.AUTHN_MICROFRONTEND_URL)
         )
 
         self._assert_user_active_state(expected_active_state=False)
@@ -260,7 +260,7 @@ class TestActivateAccount(TestCase):
         as a parameter in the login page the requesting user is redirected to.
         """
         login_page_url = "{authn_mfe}/login?account_activation_status=".format(
-            authn_mfe=settings.AUTHN_MICROFRONTEND_URL
+            authn_mfe=configuration_helpers.get_value('AUTHN_MICROFRONTEND_URL', settings.AUTHN_MICROFRONTEND_URL)
         )
 
         self._assert_user_active_state(expected_active_state=False)
