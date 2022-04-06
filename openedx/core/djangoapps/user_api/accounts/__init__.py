@@ -95,12 +95,15 @@ PASSWORD_BAD_TYPE_MSG = "Password must be a string."
 # Translators: These messages are shown to users who do not enter information
 # into the required field or enter it incorrectly.
 REQUIRED_FIELD_NAME_MSG = _("Enter your full name.")
+REQUIRED_FIELD_FIRST_NAME_MSG = _("Enter your first name.")
+REQUIRED_FIELD_LAST_NAME_MSG = _("Enter your last name.")
 REQUIRED_FIELD_CONFIRM_EMAIL_MSG = _("The email addresses do not match.")
 REQUIRED_FIELD_COUNTRY_MSG = _("Select your country or region of residence.")
 REQUIRED_FIELD_PROFESSION_SELECT_MSG = _("Select your profession.")
 REQUIRED_FIELD_SPECIALTY_SELECT_MSG = _("Select your specialty.")
 REQUIRED_FIELD_PROFESSION_TEXT_MSG = _("Enter your profession.")
 REQUIRED_FIELD_SPECIALTY_TEXT_MSG = _("Enter your specialty.")
+REQUIRED_FIELD_STATE_MSG = _("Enter your State.")
 REQUIRED_FIELD_CITY_MSG = _("Enter your city.")
 REQUIRED_FIELD_GOALS_MSG = _("Tell us your goals.")
 REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG = _("Select the highest level of education you have completed.")

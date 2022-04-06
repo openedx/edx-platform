@@ -4909,6 +4909,17 @@ HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
 ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
 HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 
+# .. toggle_name: ENABLE_DYNAMIC_REGISTRATION_FIELDS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle adds fields configured in
+# REGISTRATION_EXTRA_FIELDS to Authn MFE
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2022-04-21
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
+ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
+
 ############### Settings for the ace_common plugin #################
 ACE_ENABLED_CHANNELS = ['django_email']
 ACE_ENABLED_POLICIES = ['bulk_email_optout']
