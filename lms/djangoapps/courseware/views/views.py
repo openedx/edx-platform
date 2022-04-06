@@ -113,6 +113,7 @@ from openedx.core.djangoapps.credit.api import (
     is_credit_course,
     is_user_eligible_for_credit
 )
+from openedx.core.lib.courses import get_course_by_id
 from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -1820,6 +1821,58 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'render_course_wide_assets': True,
 
             **optimization_flags,
+        }
+        return render_to_response('courseware/courseware-chromeless.html', context)
+
+
+@require_http_methods(["GET"])
+@ensure_valid_usage_key
+@xframe_options_exempt
+@transaction.non_atomic_requests
+def render_public_video_xblock(request, usage_key_string):
+    """
+    Returns an HttpResponse with HTML content for the Video xBlock with the given usage_key.
+    The returned HTML is a chromeless rendering of the Video xBlock (excluding content of the containing courseware).
+    """
+    view = 'public_view'
+
+    usage_key = UsageKey.from_string(usage_key_string)
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+    course_key = usage_key.course_key
+
+    # usage key block type must be `video` else raise 404
+    if usage_key.block_type != 'video':
+        raise Http404("Video not found.")
+
+    with modulestore().bulk_operations(course_key):
+        course = get_course_by_id(course_key, 0)
+
+        block, _ = get_module_by_usage_id(
+            request,
+            str(course_key),
+            str(usage_key),
+            disable_staff_debug_info=True,
+            course=course,
+            will_recheck_access=False
+        )
+
+        # video must be public (`Public Access` field set to True) by course author in studio in video advanced settings
+        if not block.public_access:
+            raise Http404("Video not found.")
+
+        fragment = block.render(view, context={})
+
+        context = {
+            'fragment': fragment,
+            'course': course,
+            'disable_accordion': False,
+            'allow_iframing': True,
+            'disable_header': False,
+            'disable_footer': False,
+            'disable_window_wrap': True,
+            'edx_notes_enabled': False,
+            'is_learning_mfe': True,
+            'is_mobile_app': False,
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
 
