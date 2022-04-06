@@ -1333,7 +1333,7 @@
     }
 
     .deco-arrow {
-      @include triangle(($baseline/2), $m-gray-d3, up);
+      @include edx-triangle(($baseline/2), $m-gray-d3, up);
 
       position: absolute;
 
@@ -1366,7 +1366,7 @@
     }
 
     .deco-arrow {
-      @include triangle(($baseline/2), $error-color, up);
+      @include edx-triangle(($baseline/2), $error-color, up);
     }
   }
 
@@ -1393,7 +1393,7 @@
     }
 
     .deco-arrow {
-      @include triangle(($baseline/2), $verified-color-lvl4, up);
+      @include edx-triangle(($baseline/2), $verified-color-lvl4, up);
     }
   }
 
