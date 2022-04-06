@@ -3282,6 +3282,79 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         self.assertNotContains(response, banner_text, html=True)
 
 
+class TestRenderPublicVideoXBlock(ModuleStoreTestCase):
+    """
+    Tests for the courseware.render_public_video_xblock endpoint.
+    """
+    def setup_course(self):
+        """
+        Helper method to create the course.
+        """
+        with self.store.default_store(self.store.default_modulestore.get_modulestore_type()):
+            course = CourseFactory.create(**{'start': datetime.now() - timedelta(days=1)})
+            chapter = ItemFactory.create(parent=course, category='chapter')
+            vertical_block = ItemFactory.create(
+                parent_location=chapter.location,
+                category='vertical',
+                display_name="Vertical"
+            )
+            self.html_block = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+                parent=vertical_block,
+                category='html',
+                data="<p>Test HTML Content<p>"
+            )
+            self.video_block_public = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+                parent=vertical_block,
+                category='video',
+                display_name='Video with public access',
+                metadata={'public_access': True}
+            )
+            self.video_block_not_public = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+                parent=vertical_block,
+                category='video',
+                display_name='Video with private access'
+            )
+        CourseOverview.load_from_module_store(course.id)
+
+    def get_response(self, usage_key):
+        """
+        Overridable method to get the response from the endpoint that is being tested.
+        """
+        url = reverse('render_public_video_xblock', kwargs={'usage_key_string': str(usage_key)})
+        return self.client.get(url)
+
+    def test_render_xblock_with_invalid_usage_key(self):
+        """
+        Verify that endpoint returns expected response with invalid usage key
+        """
+        response = self.get_response(usage_key='some_invalid_usage_key')
+        self.assertContains(response, 'Page not found', status_code=404)
+
+    def test_render_xblock_with_non_video_usage_key(self):
+        """
+        Verify that endpoint returns expected response if usage key block type is not `video`
+        """
+        self.setup_course()
+        response = self.get_response(usage_key=self.html_block.location)
+        self.assertContains(response, 'Page not found', status_code=404)
+
+    def test_render_xblock_with_video_usage_key_with_public_access(self):
+        """
+        Verify that endpoint returns expected response if usage key block type is `video` and video has public access
+        """
+        self.setup_course()
+        response = self.get_response(usage_key=self.video_block_public.location)
+        self.assertContains(response, 'Play video', status_code=200)
+
+    def test_render_xblock_with_video_usage_key_with_non_public_access(self):
+        """
+        Verify that endpoint returns expected response if usage key block type is `video` and video has private access
+        """
+        self.setup_course()
+        response = self.get_response(usage_key=self.video_block_not_public.location)
+        self.assertContains(response, 'Page not found', status_code=404)
+
+
 class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Test rendering XBlocks for a self-paced course. Relies on the query

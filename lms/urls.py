@@ -56,6 +56,7 @@ from common.djangoapps.util import views as util_views
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
+RENDER_VIDEO_XBLOCK_NAME = 'render_public_video_xblock'
 COURSE_DATES_NAME = 'dates'
 COURSE_PROGRESS_NAME = 'progress'
 
@@ -317,6 +318,11 @@ urlpatterns += [
         fr'^xblock/{settings.USAGE_KEY_PATTERN}$',
         courseware_views.render_xblock,
         name=RENDER_XBLOCK_NAME,
+    ),
+    re_path(
+        fr'^videos/{settings.USAGE_KEY_PATTERN}$',
+        courseware_views.render_public_video_xblock,
+        name=RENDER_VIDEO_XBLOCK_NAME,
     ),
 
     # xblock Resource URL
