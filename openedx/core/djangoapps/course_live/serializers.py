@@ -46,6 +46,7 @@ class LtiSerializer(serializers.ModelSerializer):
         lti_config = validated_data.pop('lti_config', None)
         instance = LtiConfiguration()
         instance.version = 'lti_1p1'
+        instance.config_store = LtiConfiguration.CONFIG_ON_DB
 
         for key, value in validated_data.items():
             if key in set(self.Meta.fields).difference(self.Meta.read_only):

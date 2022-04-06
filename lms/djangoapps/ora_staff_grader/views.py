@@ -14,6 +14,7 @@ from edx_rest_framework_extensions.auth.session.authentication import (
 )
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+from openassessment.xblock.config_mixin import WAFFLE_NAMESPACE, ENHANCED_STAFF_GRADER
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -30,10 +31,12 @@ from lms.djangoapps.ora_staff_grader.errors import (
     InternalErrorResponse,
     LockContestedError,
     LockContestedResponse,
+    MissingParamResponse,
     UnknownErrorResponse,
     XBlockInternalError,
 )
 from lms.djangoapps.ora_staff_grader.ora_api import (
+    batch_delete_submission_locks,
     check_submission_lock,
     claim_submission_lock,
     delete_submission_lock,
@@ -53,6 +56,7 @@ from lms.djangoapps.ora_staff_grader.utils import require_params
 from openedx.core.djangoapps.content.course_overviews.api import (
     get_course_overview_or_none,
 )
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 log = logging.getLogger(__name__)
@@ -80,6 +84,7 @@ class InitializeView(StaffGraderBaseView):
         courseMetadata
         oraMetadata
         submissions
+        isEnabled
     }
 
     Errors:
@@ -88,6 +93,17 @@ class InitializeView(StaffGraderBaseView):
     - XBlockInternalError (HTTP 500) for an issue with ORA
     - UnknownError (HTTP 500) for other errors
     """
+
+    def _is_staff_grader_enabled(self, course_key):
+        """ Helper to evaluate if the staff grader flag / overrides are enabled """
+        # This toggle is documented on the edx-ora2 repo in openassessment/xblock/config_mixin.py
+        # pylint: disable=toggle-missing-annotation
+        enhanced_staff_grader_flag = CourseWaffleFlag(
+            WAFFLE_NAMESPACE,
+            ENHANCED_STAFF_GRADER,
+            module_name='openassessment.xblock.config_mixin'
+        )
+        return enhanced_staff_grader_flag.is_enabled(course_key)
 
     @require_params([PARAM_ORA_LOCATION])
     def get(self, request, ora_location, *args, **kwargs):
@@ -104,6 +120,9 @@ class InitializeView(StaffGraderBaseView):
 
             # Get list of submissions for this ORA
             init_data["submissions"] = get_submissions(request, ora_location)
+
+            # Is the Staff Grader enabled for this course?
+            init_data["isEnabled"] = self._is_staff_grader_enabled(ora_usage_key.course_key)
 
             response_data = InitializeSerializer(init_data).data
             log.info(response_data)
@@ -425,6 +444,55 @@ class SubmissionLockView(StaffGraderBaseView):
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
+            return UnknownErrorResponse()
+
+
+class SubmissionBatchUnlockView(StaffGraderBaseView):
+    """
+    POST delete a group of submission locks, limited to just those in the list that the user owns.
+
+    Params:
+    - ora_location (str/UsageID): ORA location for XBlock handling
+
+    Body:
+    - submissionUUIDs (UUID): A list of submission/team submission UUIDS to lock/unlock
+
+    Response: None
+
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
+    - XBlockInternalError (HTTP 500) for an issue within ORA
+    """
+
+    @require_params([PARAM_ORA_LOCATION])
+    def post(self, request, ora_location, *args, **kwargs):
+        """Batch delete submission locks"""
+        try:
+            # Validate ORA location
+            UsageKey.from_string(ora_location)
+
+            # Pull submission UUIDs list from request body
+            submission_uuids = request.data.get('submissionUUIDs')
+            if not isinstance(submission_uuids, list):
+                return MissingParamResponse()
+            batch_delete_submission_locks(request, ora_location, submission_uuids)
+
+            # Return empty response
+            return Response({})
+
+        # Catch bad ORA location
+        except (InvalidKeyError, ItemNotFoundError):
+            log.error(f"Bad ORA location provided: {ora_location}")
+            return BadOraLocationResponse()
+
+        # Issues with the XBlock handlers
+        except XBlockInternalError as ex:
+            log.error(ex)
+            return InternalErrorResponse(context=ex.context)
+
+        # Blanket exception handling
         except Exception as ex:
             log.exception(ex)
             return UnknownErrorResponse()

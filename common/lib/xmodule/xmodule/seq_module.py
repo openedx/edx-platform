@@ -246,7 +246,6 @@ class ProctoringFields:
 
 
 @XBlock.wants('proctoring')
-@XBlock.wants('verification')
 @XBlock.wants('gating')
 @XBlock.wants('credit')
 @XBlock.wants('completion')
@@ -922,7 +921,6 @@ class SequenceBlock(
 
         proctoring_service = self.runtime.service(self, 'proctoring')
         credit_service = self.runtime.service(self, 'credit')
-        verification_service = self.runtime.service(self, 'verification')
 
         # Is this sequence designated as a Timed Examination, which includes
         # Proctored Exams
@@ -949,7 +947,6 @@ class SequenceBlock(
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
                 'grace_period': self.graceperiod,  # lint-amnesty, pylint: disable=no-member
-                'is_integrity_signature_enabled': settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'),
             }
 
             # inject the user's credit requirements and fulfillments
@@ -959,14 +956,6 @@ class SequenceBlock(
                     context.update({
                         'credit_state': credit_state
                     })
-
-            # inject verification status
-            if verification_service:
-                verification_status = verification_service.get_status(user_id)
-                context.update({
-                    'verification_status': verification_status['status'],
-                    'reverify_url': verification_service.reverify_url(),
-                })
 
             # See if the edx-proctoring subsystem wants to present
             # a special view to the student rather

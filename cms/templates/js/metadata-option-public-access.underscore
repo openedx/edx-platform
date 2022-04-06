@@ -1,0 +1,21 @@
+<div class="wrapper-comp-setting">
+    <label class="label setting-label" for="<%- uniqueId %>"><%- model.get('display_name') %></label>
+    <select class="input setting-input" id="<%- uniqueId %>" name="<%- model.get('display_name') %>">
+        <% _.each(model.get('options'), function(option) { %>
+            <% if (option.display_name !== undefined) { %>
+                <option value="<%- option['display_name'] %>"><%- option['display_name'] %></option>
+            <% } else { %>
+                <option value="<%- option %>"><%- option %></option>
+            <% } %>
+        <% }) %>
+    </select>
+    <button class="action setting-clear inactive" type="button" name="setting-clear" value="<%- gettext("Clear") %>" data-tooltip="<%- gettext("Clear") %>">
+        <span class="icon fa fa-undo" aria-hidden="true"></span><span class="sr">"<%- gettext("Clear Value") %>"</span>
+    </button>
+</div>
+<span class="tip setting-help"><%- model.get('help') %></span>
+<br>
+<div class="public-access-block-url-container is-hidden">
+    <label class="label setting-label" for="<%- uniqueId %>"><%- gettext("URL") %></label>
+    <input class="input setting-input" type="text" id="<%- uniqueId %>" value='<%- model.get("url") %>' readonly/>
+</div>

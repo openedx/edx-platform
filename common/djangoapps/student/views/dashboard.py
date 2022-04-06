@@ -748,11 +748,6 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     else:
         redirect_message = ''
 
-    valid_verification_statuses = ['approved', 'must_reverify', 'pending', 'expired']
-    display_sidebar_on_dashboard = not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE') and \
-        verification_status['status'] in valid_verification_statuses and \
-        verification_status['should_display']
-
     # Filter out any course enrollment course cards that are associated with fulfilled entitlements
     for entitlement in [e for e in course_entitlements if e.enrollment_course_run is not None]:
         course_enrollments = [
@@ -804,7 +799,6 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'show_dashboard_tabs': True,
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
-        'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
         'display_sidebar_account_activation_message': not(user.is_active or hide_dashboard_courses_until_activated),
         'display_dashboard_courses': (user.is_active or not hide_dashboard_courses_until_activated),
         'empty_dashboard_message': empty_dashboard_message,

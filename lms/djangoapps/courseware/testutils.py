@@ -116,6 +116,11 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
                 category='problem',
                 display_name='Problem'
             )
+            self.video_block = ItemFactory.create(
+                parent=self.vertical_block,
+                category='video',
+                display_name='Video'
+            )
         CourseOverview.load_from_module_store(self.course.id)
 
         # block_name_to_be_tested can be `html_block` or `vertical_block`.

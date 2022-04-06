@@ -2808,32 +2808,24 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 response = self.client.post(url, {})
                 self.assertContains(response, success_status)
 
-    @ddt.data(
-        True,
-        False
-    )
     @valid_problem_location
-    def test_idv_retirement_student_features_report(self, enable_integrity_signature):
-        with patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': enable_integrity_signature}):
-            kwargs = {'course_id': str(self.course.id)}
-            kwargs.update({'csv': '/csv'})
-            url = reverse('get_students_features', kwargs=kwargs)
-            success_status = 'The enrolled learner profile report is being created.'
-            with patch('lms.djangoapps.instructor_task.api.submit_calculate_students_features_csv') \
-                    as mock_task_endpoint:
-                CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-                response = self.client.post(url, {})
-                self.assertContains(response, success_status)
+    def test_idv_retirement_student_features_report(self):
+        kwargs = {'course_id': str(self.course.id)}
+        kwargs.update({'csv': '/csv'})
+        url = reverse('get_students_features', kwargs=kwargs)
+        success_status = 'The enrolled learner profile report is being created.'
+        with patch('lms.djangoapps.instructor_task.api.submit_calculate_students_features_csv') as mock_task_endpoint:
+            CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+            response = self.client.post(url, {})
+            self.assertContains(response, success_status)
 
-                # assert that if the integrity signature is enabled, the verification
-                # status is not included as a query feature
-                args = mock_task_endpoint.call_args.args
-                self.assertEqual(len(args), 3)
-                query_features = args[2]
-                if not enable_integrity_signature:
-                    self.assertIn('verification_status', query_features)
-                else:
-                    self.assertNotIn('verification_status', query_features)
+            # assert that if the integrity signature is enabled, the verification
+            # status is not included as a query feature
+            args = mock_task_endpoint.call_args.args
+            self.assertEqual(len(args), 3)
+            query_features = args[2]
+
+            self.assertNotIn('verification_status', query_features)
 
     def test_get_ora2_responses_success(self):
         url = reverse('export_ora2_data', kwargs={'course_id': str(self.course.id)})

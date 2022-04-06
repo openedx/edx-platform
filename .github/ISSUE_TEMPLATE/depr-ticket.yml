@@ -1,3 +1,10 @@
+## This configuration file overrides the inherited configuration file defined
+## in openedx/.github/.github/ISSUE_TEMPLATE because this repo currently does
+## not have Issues turned on, so we create this override to *only* show DEPR
+## issues to users creating Issues. Once Issues are turned on and the repo is
+## ready to accept Issues of all types, this file must be deleted so inheritance
+## of standard openedx configuration works properly.
+
 name: Deprecation (DEPR) Ticket
 description: Per OEP-21, use this template to begin the technology deprecation process.
 title: "[DEPR]: <Technology Name>"

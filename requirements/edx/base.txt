@@ -452,7 +452,7 @@ edx-drf-extensions==8.0.1
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.41.11
+edx-enterprise==3.41.13
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -481,7 +481,7 @@ edx-opaque-keys[django]==2.3.0
     #   xmodule
 edx-organizations==6.11.1
     # via -r requirements/edx/base.in
-edx-proctoring==4.9.0
+edx-proctoring==4.10.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -715,7 +715,7 @@ openedx-events==0.8.1
     # via -r requirements/edx/base.in
 openedx-filters==0.5.0
     # via -r requirements/edx/base.in
-ora2==4.0.6
+ora2==4.1.0
     # via -r requirements/edx/base.in
 packaging==21.3
     # via

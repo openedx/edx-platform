@@ -107,3 +107,12 @@ REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG = _("Select the highest level of education
 REQUIRED_FIELD_YEAR_OF_BIRTH_MSG = _("Select your year of birth")
 REQUIRED_FIELD_GENDER_MSG = _("Select your gender")
 REQUIRED_FIELD_MAILING_ADDRESS_MSG = _("Enter your mailing address.")
+
+# HIBP Strings
+AUTHN_LOGIN_BLOCK_HIBP_POLICY_MSG = _(
+    'Our system detected that your password is vulnerable. Change your password so that your account stays secure.'
+)
+AUTHN_LOGIN_NUDGE_HIBP_POLICY_MSG = _(
+    'Our system detected that your password is vulnerable. '
+    'We recommend you change it so that your account stays secure.'
+)
