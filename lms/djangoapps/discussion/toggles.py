@@ -45,3 +45,16 @@ ENABLE_DISCUSSION_MODERATION_REASON_CODES = CourseWaffleFlag(
     'enable_moderation_reason_codes',
     __name__,
 )
+
+# .. toggle_name: discussions.enable_reported_content_email_notifications
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to toggle email notifications for reported content for moderators
+# .. toggle_use_cases: temporary, open_edx
+# .. toggle_creation_date: 2022-03-08
+# .. toggle_target_removal_date: 2022-12-31
+ENABLE_REPORTED_CONTENT_EMAIL_NOTIFICATIONS = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE,
+    'enable_reported_content_email_notifications',
+    __name__,
+)

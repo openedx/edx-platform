@@ -2313,7 +2313,9 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
             'divided_course_wide_discussions': [],
             'id': 1,
             'division_scheme': 'cohort',
-            'available_division_schemes': ['cohort']
+            'available_division_schemes': ['cohort'],
+            'reported_content_email_notifications': False,
+            'reported_content_email_notifications_flag': False,
         }
 
     def patch_request(self, data, headers=None):
@@ -2490,6 +2492,15 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         self._assert_current_settings(expected_response)
         expected_response['division_scheme'] = 'none'
         self._assert_patched_settings({'division_scheme': 'none'}, expected_response)
+
+    def test_update_reported_content_email_notifications(self):
+        """Test whether the 'reported_content_email_notifications' setting is updated."""
+        config_course_cohorts(self.course, is_cohorted=True)
+        config_course_discussions(self.course, reported_content_email_notifications=True)
+        expected_response = self._get_expected_response()
+        expected_response['reported_content_email_notifications'] = True
+        self._login_as_staff()
+        self._assert_current_settings(expected_response)
 
 
 @ddt.ddt
