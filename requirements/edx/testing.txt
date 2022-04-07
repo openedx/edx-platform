@@ -1311,7 +1311,7 @@ sqlparse==0.4.2
     # via
     #   -r requirements/edx/base.txt
     #   django
-staff-graded-xblock==2.0.0
+staff-graded-xblock==2.0.1
     # via -r requirements/edx/base.txt
 starlette==0.17.1
     # via fastapi
