@@ -1414,7 +1414,7 @@ sqlparse==0.4.2
     #   -r requirements/edx/testing.txt
     #   django
     #   django-debug-toolbar
-staff-graded-xblock==2.0.0
+staff-graded-xblock==2.0.1
     # via -r requirements/edx/testing.txt
 starlette==0.17.1
     # via
