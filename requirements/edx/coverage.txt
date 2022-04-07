@@ -10,9 +10,9 @@ diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/coverage.in
-inflect==5.4.0
+inflect==5.5.2
     # via jinja2-pluralize
-jinja2==3.0.3
+jinja2==3.1.1
     # via
     #   diff-cover
     #   jinja2-pluralize

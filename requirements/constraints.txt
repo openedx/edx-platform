@@ -108,3 +108,6 @@ mistune<2.0.0
 # The PR https://github.com/celery/django-celery-results/pull/292 fixing this issue has been merged but
 # new version hasn't been released yet with the fix so pinning the version until django-celery-results>2.3.0 is out.
 django-celery-results<2.3.0
+
+# Pinning the pylint version for now so the quality issues can be fixed in a separate PR
+pylint<2.13.0
