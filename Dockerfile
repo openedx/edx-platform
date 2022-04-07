@@ -122,9 +122,9 @@ RUN pip install -r requirements/edx/base.txt
 # Define LMS docker-based non-dev target.
 FROM base as lms-docker
 ENV SERVICE_VARIANT lms
-ARG LMS_CFG
-RUN echo "$LMS_CFG"
-ENV LMS_CFG="$LMS_CFG"
+ARG LMS_CFG_OVERRIDE
+RUN echo "$LMS_CFG_OVERRIDE"
+ENV LMS_CFG="${LMS_CFG_OVERRIDE:-$LMS_CFG}"
 RUN echo "$LMS_CFG"
 ENV EDX_PLATFORM_SETTINGS='docker-production'
 ENV DJANGO_SETTINGS_MODULE="lms.envs.$EDX_PLATFORM_SETTINGS"
