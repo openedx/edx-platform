@@ -2840,7 +2840,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         ),
     )
 
-    def is_enabled(self, *key_fields):
+    def is_enabled(self, *key_fields):  # pylint: disable=arguments-differ
         """
         Checks both the model itself and share_settings to see if LinkedIn Add to Profile is enabled
         """

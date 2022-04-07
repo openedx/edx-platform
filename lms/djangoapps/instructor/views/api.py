@@ -963,9 +963,9 @@ def bulk_beta_modify_access(request, course_id):
             # Tabulate the action result of this email address
             results.append({
                 'identifier': identifier,
-                'error': error,
-                'userDoesNotExist': user_does_not_exist,
-                'is_active': user_active
+                'error': error,  # pylint: disable=used-before-assignment
+                'userDoesNotExist': user_does_not_exist,  # pylint: disable=used-before-assignment
+                'is_active': user_active  # pylint: disable=used-before-assignment
             })
 
     response_payload = {
