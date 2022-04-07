@@ -58,7 +58,7 @@
     "redux-thunk": "2.2.0",
     "requirejs": "2.3.5",
     "rtlcss": "2.2.1",
-    "sass": "^1.49.10",
+    "sass": "1.49.11",
     "sass-loader": "6.0.6",
     "scriptjs": "2.5.8",
     "string-replace-webpack-plugin": "0.1.3",
