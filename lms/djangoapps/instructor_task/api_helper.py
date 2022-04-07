@@ -88,7 +88,7 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
             "No duplicate tasks found: task_type %s, task_key %s, and most recent task_id = %s",
             task_type,
             task_key,
-            most_recent_id
+            most_recent_id  # pylint: disable=used-before-assignment
         )
 
     # Create log entry now, so that future requests will know it's running.

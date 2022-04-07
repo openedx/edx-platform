@@ -122,7 +122,8 @@ RUN pip install -r requirements/edx/base.txt
 # Define LMS docker-based non-dev target.
 FROM base as lms-docker
 ENV SERVICE_VARIANT lms
-ENV LMS_CFG="/vault-api-secrets/secrets/edx-platform.yml"
+ARG LMS_CFG
+ENV LMS_CFG="$LMS_CFG"
 ENV EDX_PLATFORM_SETTINGS='docker-production'
 ENV DJANGO_SETTINGS_MODULE="lms.envs.$EDX_PLATFORM_SETTINGS"
 EXPOSE 8000

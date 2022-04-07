@@ -492,7 +492,7 @@ def enterprise_selection_page(request, user, next_url):
     rate=settings.LOGISTRATION_RATELIMIT_RATE,
     method='POST',
 )  # lint-amnesty, pylint: disable=too-many-statements
-def login_user(request, api_version='v1'):
+def login_user(request, api_version='v1'):  # pylint: disable=too-many-statements
     """
     AJAX request to log in the user.
 
