@@ -29,9 +29,9 @@ class IsStaffOrInstructor(BasePermission):
         )
 
 
-class IsEnrolled(BasePermission):
+class IsEnrolledOrStaff(BasePermission):
     """
-    Check if user is enrolled in the course
+    Check if user is enrolled in the course or staff
     """
 
     def has_permission(self, request, view):

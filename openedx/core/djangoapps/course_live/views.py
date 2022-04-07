@@ -20,7 +20,7 @@ from common.djangoapps.util.views import ensure_valid_course_key
 from common.lib.xmodule.xmodule.course_module import CourseBlock
 from lms.djangoapps.courseware.access import get_user_role
 from lms.djangoapps.courseware.courses import get_course_with_access
-from openedx.core.djangoapps.course_live.permissions import IsEnrolled, IsStaffOrInstructor
+from openedx.core.djangoapps.course_live.permissions import IsEnrolledOrStaff, IsStaffOrInstructor
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.lti_course_tab.tab import LtiCourseLaunchMixin
 
@@ -259,11 +259,12 @@ class CourseLiveIframeView(APIView, LtiCourseLaunchMixin):
         BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser
     )
-    permission_classes = (permissions.IsAuthenticated, IsEnrolled)
+    permission_classes = (permissions.IsAuthenticated, IsEnrolledOrStaff)
 
     ROLE_MAP = {
         'student': 'Student',
         'staff': 'Administrator',
+        'instructor': 'Administrator',
     }
 
     def _get_lti_config(self, course: CourseBlock) -> LtiConfiguration:
