@@ -61,7 +61,7 @@ asgiref==3.5.0
     #   -r requirements/edx/base.txt
     #   django
     #   uvicorn
-astroid==2.11.2
+astroid==2.9.3
     # via
     #   pylint
     #   pylint-celery
@@ -248,8 +248,6 @@ diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/coverage.txt
-dill==0.3.4
-    # via pylint
 distlib==0.3.4
     # via virtualenv
     # via
@@ -846,7 +844,7 @@ maxminddb==2.2.0
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
-mccabe==0.7.0
+mccabe==0.6.1
     # via pylint
 mock==4.0.3
     # via
@@ -1020,8 +1018,9 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/base.txt
     #   olxcleaner
-pylint==2.13.5
+pylint==2.12.2
     # via
+    #   -c requirements/edx/../constraints.txt
     #   edx-lint
     #   pylint-celery
     #   pylint-django
@@ -1346,11 +1345,12 @@ text-unidecode==1.3
     #   -r requirements/edx/base.txt
     #   python-slugify
 toml==0.10.2
-    # via tox
+    # via
+    #   pylint
+    #   tox
 tomli==2.0.1
     # via
     #   coverage
-    #   pylint
     #   pytest
 tox==3.24.5
     # via
