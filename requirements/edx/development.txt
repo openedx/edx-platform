@@ -93,7 +93,7 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   analytics-python
-beautifulsoup4==4.10.0
+beautifulsoup4==4.11.0
     # via
     #   -r requirements/edx/testing.txt
     #   pynliner
@@ -101,7 +101,7 @@ billiard==3.6.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   celery
-bleach==4.1.0
+bleach==5.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-wiki
@@ -594,7 +594,7 @@ edx-opaque-keys[django]==2.3.0
     #   xmodule
 edx-organizations==6.11.1
     # via -r requirements/edx/testing.txt
-edx-proctoring==4.10.1
+edx-proctoring==4.10.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
@@ -955,14 +955,13 @@ openedx-calc==3.0.1
     # via -r requirements/edx/testing.txt
 openedx-events==0.8.1
     # via -r requirements/edx/testing.txt
-openedx-filters==0.6.0
+openedx-filters==0.6.1
     # via -r requirements/edx/testing.txt
 ora2==4.1.2
     # via -r requirements/edx/testing.txt
 packaging==21.3
     # via
     #   -r requirements/edx/testing.txt
-    #   bleach
     #   drf-yasg
     #   py2neo
     #   pytest
@@ -1441,7 +1440,7 @@ sympy==1.6.2
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   openedx-calc
-tableauserverclient==0.17.0
+tableauserverclient==0.18.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -1524,7 +1523,7 @@ virtualenv==20.14.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox
-voluptuous==0.13.0
+voluptuous==0.13.1
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
