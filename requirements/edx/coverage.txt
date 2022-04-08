@@ -4,19 +4,13 @@
 #
 #    make upgrade
 #
+chardet==4.0.0
+    # via diff-cover
 coverage==6.3.2
     # via -r requirements/edx/coverage.in
-diff-cover==4.0.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/coverage.in
-inflect==5.5.2
-    # via jinja2-pluralize
+diff-cover==6.4.5
+    # via -r requirements/edx/coverage.in
 jinja2==3.1.1
-    # via
-    #   diff-cover
-    #   jinja2-pluralize
-jinja2-pluralize==0.3.0
     # via diff-cover
 markupsafe==2.1.1
     # via jinja2
