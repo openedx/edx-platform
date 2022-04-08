@@ -63,11 +63,11 @@ babel==2.9.1
     #   enmerkar-underscore
 backoff==1.10.0
     # via analytics-python
-beautifulsoup4==4.10.0
+beautifulsoup4==4.11.0
     # via pynliner
 billiard==3.6.4.0
     # via celery
-bleach==4.1.0
+bleach==5.0.0
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
@@ -181,7 +181,6 @@ deprecated==1.2.13
 django==3.2.12
     # via
     #   -c requirements/edx/../common_constraints.txt
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   django-appconf
     #   django-classy-tags
@@ -254,7 +253,6 @@ django-classy-tags==3.0.1
     # via django-sekizai
 django-config-models==2.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edx-name-affirmation
@@ -481,7 +479,7 @@ edx-opaque-keys[django]==2.3.0
     #   xmodule
 edx-organizations==6.11.1
     # via -r requirements/edx/base.in
-edx-proctoring==4.10.1
+edx-proctoring==4.10.2
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -713,13 +711,12 @@ openedx-calc==3.0.1
     # via -r requirements/edx/base.in
 openedx-events==0.8.1
     # via -r requirements/edx/base.in
-openedx-filters==0.6.0
+openedx-filters==0.6.1
     # via -r requirements/edx/base.in
 ora2==4.1.2
     # via -r requirements/edx/base.in
 packaging==21.3
     # via
-    #   bleach
     #   drf-yasg
     #   py2neo
     #   redis
@@ -1012,7 +1009,7 @@ sympy==1.6.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   openedx-calc
-tableauserverclient==0.17.0
+tableauserverclient==0.18.0
     # via edx-enterprise
 testfixtures==6.18.5
     # via edx-enterprise
@@ -1044,7 +1041,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-voluptuous==0.13.0
+voluptuous==0.13.1
     # via ora2
 watchdog==2.1.7
     # via -r requirements/edx/paver.txt

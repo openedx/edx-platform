@@ -87,7 +87,7 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
-beautifulsoup4==4.10.0
+beautifulsoup4==4.11.0
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
@@ -96,7 +96,7 @@ billiard==3.6.4.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
-bleach==4.1.0
+bleach==5.0.0
     # via
     #   -r requirements/edx/base.txt
     #   django-wiki
@@ -254,7 +254,6 @@ distlib==0.3.4
     # via virtualenv
     # via
     #   -c requirements/edx/../common_constraints.txt
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
     #   django-classy-tags
@@ -331,7 +330,6 @@ django-classy-tags==3.0.1
     #   django-sekizai
 django-config-models==2.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-name-affirmation
@@ -577,7 +575,7 @@ edx-opaque-keys[django]==2.3.0
     #   xmodule
 edx-organizations==6.11.1
     # via -r requirements/edx/base.txt
-edx-proctoring==4.10.1
+edx-proctoring==4.10.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -901,14 +899,13 @@ openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
 openedx-events==0.8.1
     # via -r requirements/edx/base.txt
-openedx-filters==0.6.0
+openedx-filters==0.6.1
     # via -r requirements/edx/base.txt
 ora2==4.1.2
     # via -r requirements/edx/base.txt
 packaging==21.3
     # via
     #   -r requirements/edx/base.txt
-    #   bleach
     #   drf-yasg
     #   py2neo
     #   pytest
@@ -1332,7 +1329,7 @@ sympy==1.6.2
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   openedx-calc
-tableauserverclient==0.17.0
+tableauserverclient==0.18.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1404,7 +1401,7 @@ vine==5.0.0
     #   kombu
 virtualenv==20.14.0
     # via tox
-voluptuous==0.13.0
+voluptuous==0.13.1
     # via
     #   -r requirements/edx/base.txt
     #   ora2
