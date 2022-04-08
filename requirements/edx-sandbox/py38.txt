@@ -84,9 +84,8 @@ six==1.16.0
     # via
     #   chem
     #   python-dateutil
-sympy==1.6.2
+sympy==1.10.1
     # via
-    #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   openedx-calc
 tqdm==4.64.0
