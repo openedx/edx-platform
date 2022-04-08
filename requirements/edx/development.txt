@@ -101,8 +101,9 @@ billiard==3.6.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   celery
-bleach==5.0.0
+bleach==4.1.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-wiki
     #   edx-enterprise
@@ -962,6 +963,7 @@ ora2==4.1.2
 packaging==21.3
     # via
     #   -r requirements/edx/testing.txt
+    #   bleach
     #   drf-yasg
     #   py2neo
     #   pytest

@@ -67,8 +67,9 @@ beautifulsoup4==4.11.0
     # via pynliner
 billiard==3.6.4.0
     # via celery
-bleach==5.0.0
+bleach==4.1.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   django-wiki
     #   edx-enterprise
@@ -719,6 +720,7 @@ ora2==4.1.2
     # via -r requirements/edx/base.in
 packaging==21.3
     # via
+    #   bleach
     #   drf-yasg
     #   py2neo
     #   redis
