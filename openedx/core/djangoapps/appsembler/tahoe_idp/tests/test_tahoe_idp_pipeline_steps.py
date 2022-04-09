@@ -8,7 +8,7 @@ from django.conf import settings
 import tahoe_sites.api
 
 from common.djangoapps.student.roles import CourseCreatorRole, OrgStaffRole
-from ..tahoe_idp_pipeline import set_roles_from_tahoe_idp_roles
+from ..tpa_pipeline import set_roles_from_tahoe_idp_roles
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from common.djangoapps.student.tests.factories import UserFactory
@@ -20,7 +20,7 @@ def test_tahoe_idp_step_in_settings():
     """
     Test for SOCIAL_AUTH_PIPELINE setting to ensure the `set_roles_from_tahoe_idp_roles` step is configured correctly.
     """
-    idp_step_path = 'openedx.core.djangoapps.appsembler.auth.tahoe_idp_pipeline.set_roles_from_tahoe_idp_roles'
+    idp_step_path = 'openedx.core.djangoapps.appsembler.tahoe_idp.tpa_pipeline.set_roles_from_tahoe_idp_roles'
     force_sync_step_path = 'third_party_auth.pipeline.user_details_force_sync'
     # Release upgrade note: If this fails, it means upstream have updated Open edX significantly and we need
     #                       to review the setup of `set_roles_from_tahoe_idp_roles`

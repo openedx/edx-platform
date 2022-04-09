@@ -46,7 +46,7 @@ from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
 from util.request_rate_limiter import PasswordResetEmailRateLimiter
 
-from openedx.core.djangoapps.site_configuration import tahoe_idp_helpers
+from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
 
 from organizations.models import UserOrganizationMapping
 

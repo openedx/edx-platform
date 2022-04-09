@@ -352,7 +352,7 @@ class ProviderConfig(ConfigurationModel):
         is_tahoe_idp_enabled = False
         if self.is_tahoe_idp_backend():
             # Tahoe: Local imports to avoid circular import errors.
-            from openedx.core.djangoapps.site_configuration import tahoe_idp_helpers
+            from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
             is_tahoe_idp_enabled = tahoe_idp_helpers.is_tahoe_idp_enabled()
 
         return is_tahoe_idp_enabled
