@@ -8,19 +8,17 @@ Pending
 Context
 =======
 Currently, courses are being stored in Modulestore(MongoDB) and the libraries are stored
-in both Modulestore(libraries v1) and the Blockstore(libraries v2). We are currently
-building out the functionality of libraries v2, and trying to migrate all usage of
-content libraries onto Blockstore. There has to be a content reuse mechanism that
-allows authors to incorporate content (XBlocks) by referencing it from blockstore-based
-content libraries(libraries v2) into their courses instead of making copies of content
-in Modulestore(libraries v1).
+in both Modulestore(libraries v1) and the Blockstore(libraries v2).There has to be a
+content reuse mechanism that allows authors to incorporate content (XBlocks) by
+referencing it from blockstore-based content libraries(libraries v2) into the courses
+instead of making copies of content in Modulestore(libraries v1).
 
-There is work going on in building out the functionality of libraries v2, and trying
+There is work going on in building out the functionality of libraries v2, and
 to migrate all usage of content libraries onto Blockstore. The benefits of using the
 blockstore-backed v2 content libraries are:
 
 #. Blockstore can store anything that can be represented as a file - unlike modulestore,
-   which only stores courses built of XBlocks.
+   which only stores courses built out of XBlocks.
 #. Blockstore is being moved into the edx-platform as a separate Django application.
 #. Blockstore is simpler to maintain.
 #. Blockstore increases re-usability of the content.
