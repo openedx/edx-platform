@@ -32,9 +32,22 @@ Terminology Used
 
 Decisions
 =========
-The requirement is to reference single and multiple specific blocks from a library
-(v2, as well as v1) into a course (that are stored in modulestore). The workflow
-discussed for the interface for library content referencing would be:
+As of now, blockstore-backed content libraries(libraries v2) stores the blocks in
+blockstore and when the library is used in a course, the blocks are copied from
+Blockstore to Modulestore with the help of LibrarySourcedBlock.
+
+The coping of blocks from Blockstore to Modulestore occupies a lot of space and
+Modulestore has a lot of complexity which causes performance issues. The complete
+elimination of Modulestore doesn't seem to be a pragmatic solution since it is required
+for backward compatibility of courses. Pragmatic solution here is to use Modulestore
+more efficiently.
+
+Hence, instead of storing blocks, the Modulestore will now store a reference of blocks
+from blockstore-backed content libraries. The LmsXBlockRuntime will use unit_compositor
+which helps to replace each reference with it's corresponding library block definitions
+and apply the required course-author-specified customizations.
+
+The user flow for the above process will be:
 
 #. Author chooses a library.
 #. Author can choose to reference one or multiple blocks.
@@ -44,9 +57,9 @@ discussed for the interface for library content referencing would be:
 Current Architecture/Implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Currently, the courses are stored in modulestore and the libraries can either be
-stored in Modulestore or Blockstore. The course lives in the modulestore and some
-of the libraries in blockstore, the [library_sourced_block](https://github.com/openedx/edx-platform/blob/master/common/lib/xmodule/xmodule/library_sourced_block.py)
-is used to make a copy of that blockstore based library block and store it in modulestore
+stored in Modulestore or Blockstore. The course lives in the Modulestore and some
+of the libraries in Blockstore, the [library_sourced_block](https://github.com/openedx/edx-platform/blob/master/common/lib/xmodule/xmodule/library_sourced_block.py)
+is used to make a copy of that blockstore based library block and store it in Modulestore
 itself as the child.
 
 
@@ -66,7 +79,7 @@ The LmsXBlockRuntime (called “CombinedSystem” until BD-13 is done) is update
 the unit_compositor as its backing store for units. When a unit is requested for a
 particular user, [the unit_compositor would](https://openedx.atlassian.net/wiki/spaces/COMM/pages/3173220481/BD-14+Library+use+cases+implementation+discovery#Example%3A):
 
-#. Load the unit’s child blocks from modulestore.
+#. Load the unit’s child blocks from Modulestore.
 #. Replace each library reference block with its corresponding library block definitions,
    each overridden with any course-author-specified customizations, and each given a
    usage key that composes the library reference block's usage information with the
@@ -81,4 +94,5 @@ Goals
 #. Referenced content will be presented as separate blocks. This will help us take
    advantage of the atomicity of LMS that is currently being using in courseware
    (problem grade report, gradebook etc.)
-#. Extendable to support structured libraries
+#. Extendable to support structural libraries i.e the libraries with unit, sequence
+   and chapters just like how courses are structured right now.
