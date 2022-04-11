@@ -1,22 +1,35 @@
 """
-This is the common settings file, intended to set sane defaults. If you have a
-piece of configuration that's dependent on a set of feature flags being set,
-then create a function that returns the calculated value based on the value of
-FEATURES[...]. Modules that extend this one can change the feature
-configuration in an environment specific config file and re-calculate those
-values.
+This is the common settings file, intended to set sane defaults.
 
-We should make a method that calls all these config methods so that you just
-make one call at the end of your site-specific dev file to reset all the
-dependent variables (like INSTALLED_APPS) for you.
+If you wish to override some of the settings set here without needing to specify
+everything, you should create a new settings file that imports the content of this
+one and then overrides anything you wish to make overridable.
 
-Longer TODO:
-1. Right now our treatment of static content in general and in particular
-   course-specific static content is haphazard.
-2. We should have a more disciplined approach to feature flagging, even if it
-   just means that we stick them in a dict called FEATURES.
-3. We need to handle configuration for multiple courses. This could be as
-   multiple sites, but we do need a way to map their data assets.
+Some known files that extend this one:
+
+- `production.py` - This file loads overrides from a yaml settings file and uses that
+    to override the settings set in this file.
+
+
+Conventions
+-----------
+
+1. Extending a List Setting
+
+    Sometimes settings take the form of a list and rather than replacing the
+    whole list, we want to add items to the list. eg. CELERY_IMPORTS.
+
+    In this case, it is recommended that a new variable created in your extended
+    file that contains the word `EXTRA` and enough of the base variable to easily
+    let people map between the two items.
+
+    Examples:
+        - CELERY_EXTRA_IMPORTS  (preferred format)
+        - EXTRA_MIDDLEWARE_CLASSES
+        - XBLOCK_EXTRA_MIXINS  (preferred format)
+
+    The preferred format for the name of the new setting (e.g. `CELERY_EXTRA_IMPORTS`) is to use
+    the same prefix (e.g. `CELERY`) of the setting that is being appended (e.g. `CELERY_IMPORTS`).
 """
 
 # We intentionally define lots of variables that aren't used
