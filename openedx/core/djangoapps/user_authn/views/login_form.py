@@ -35,6 +35,9 @@ from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
+from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
+
+
 log = logging.getLogger(__name__)
 
 
@@ -144,6 +147,11 @@ def login_and_registration_form(request, initial_mode="login"):
     #  the other login-related cookies. See ARCH-282.
     if request.user.is_authenticated and are_logged_in_cookies_set(request):
         return redirect(redirect_to)
+
+    # Tahoe: Disable upstream login/register forms when the Tahoe Identity Provider is enabled.
+    tahoe_idp_redirect_url = tahoe_idp_helpers.get_idp_form_url(request, initial_mode, redirect_to)
+    if tahoe_idp_redirect_url:
+        return redirect(tahoe_idp_redirect_url)
 
     # Retrieve the form descriptions from the user API
     form_descriptions = _get_form_descriptions(request)
