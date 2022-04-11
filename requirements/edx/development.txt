@@ -267,7 +267,6 @@ distlib==0.3.4
 django==3.2.12
     # via
     #   -c requirements/edx/../common_constraints.txt
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-appconf
     #   django-classy-tags
@@ -345,7 +344,6 @@ django-classy-tags==3.0.1
     #   django-sekizai
 django-config-models==2.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-name-affirmation
