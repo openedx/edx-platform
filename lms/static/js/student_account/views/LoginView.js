@@ -231,7 +231,7 @@
                             anchorStart: HtmlUtils.HTML(
                                 StringUtils.interpolate(
                                     '<a href="{SupportUrl}">', {
-                                        SupportUrl: this.supportURL,
+                                        SupportUrl: this.supportURL
                                     }
                                 )
                             ),

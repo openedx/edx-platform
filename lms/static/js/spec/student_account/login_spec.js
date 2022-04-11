@@ -22,7 +22,7 @@
                     IS_ENTERPRISE_ENABLE = true,
                     USER_DATA = {
                         email: 'xsy@edx.org',
-                        password: 'xsyisawesome',
+                        password: 'xsyisawesome'
                     },
                     THIRD_PARTY_AUTH = {
                         currentProvider: null,

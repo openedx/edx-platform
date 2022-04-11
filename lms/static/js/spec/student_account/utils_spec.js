@@ -3,7 +3,7 @@ define(['jquery', 'js/student_account/utils'],
         'use strict';
         describe('edxUserCookie', function() {
             var user,
-                edxUserInfoCookieName = 'edx-user-info', 
+                edxUserInfoCookieName = 'edx-user-info',
                 userInfo = {
                     version: 1,
                     username: 'local-test-user'

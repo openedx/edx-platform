@@ -116,7 +116,7 @@
                                 mode: this.activeForm
                             })
                         )
-                    )
+                    );
                     this.postRender();
 
                     return this;
@@ -210,7 +210,7 @@
                             platformName: this.platformName,
                             hideAuthWarnings: this.hideAuthWarnings,
                             is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled,
-                            enableCoppaCompliance: this.enable_coppa_compliance,
+                            enableCoppaCompliance: this.enable_coppa_compliance
                         });
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
@@ -271,7 +271,6 @@
 
                 // Load the form. Institution login is always refreshed since it changes based on the previous form.
                     if (!this.form.isLoaded($form) || type == 'institution_login') {
-
                         // We need a special case for loading reset form as there is mismatch of form id
                         // value ie 'password-reset' vs load function name ie 'reset'
                         if (type === 'password-reset') {

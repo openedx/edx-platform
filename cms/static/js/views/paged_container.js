@@ -98,7 +98,7 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                     success: function(fragment) {
                         var originalDone = options.done;
                         options.done = function() {
-                            self.processPaging({ requested_page: options.page_number });
+                            self.processPaging({requested_page: options.page_number});
                             self.page.updatePreviewButton(self.collection.showChildrenPreviews);
                             self.page.renderAddXBlockComponents();
                             if (options.force_render) {
@@ -109,7 +109,7 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                             if (originalDone) {
                                 originalDone();
                             }
-                        }
+                        };
                         self.handleXBlockFragment(fragment, options);
                     }
                 });

@@ -15,7 +15,7 @@
             },
 
             closeBanner: function(event) {
-                sessionStorage.setItem("isBannerClosed", true);
+                sessionStorage.setItem('isBannerClosed', true);
                 this.hideMessage();
             },
 
@@ -46,7 +46,7 @@
 
             showMessage: function(message) {
                 this.message = message;
-                if (sessionStorage.getItem("isBannerClosed") == null) {
+                if (sessionStorage.getItem('isBannerClosed') == null) {
                     this.render();
                 }
             },

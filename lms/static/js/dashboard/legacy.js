@@ -235,10 +235,10 @@
                  data: $(this).serializeArray(),
                  success: function() {
                      setTimeout(
-                       function(){
-                         $('#activate-account-modal p svg').remove();
+                       function() {
+                           $('#activate-account-modal p svg').remove();
                          // xss-lint: disable=javascript-jquery-append
-                         $('#activate-account-modal p').append(
+                           $('#activate-account-modal p').append(
                          // xss-lint: disable=javascript-concat-html
                          '<svg  style="vertical-align:bottom" width="20" height="20"' +
                          // xss-lint: disable=javascript-concat-html
@@ -273,7 +273,7 @@
                  display: 'block',
                  'z-index': 0
              });
-             $('#activate-account-modal').focus()
+             $('#activate-account-modal').focus();
          }
 
          $('.action-email-settings').each(function(index) {

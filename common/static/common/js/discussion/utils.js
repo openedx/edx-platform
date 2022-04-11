@@ -31,8 +31,8 @@
             if (_.isUndefined(userId)) {
                 userId = this.user ? this.user.id : void 0;
             }
-            if(_.isUndefined(this.roleIds)) {
-                this.roleIds = {}
+            if (_.isUndefined(this.roleIds)) {
+                this.roleIds = {};
             }
             staff = _.union(this.roleIds.Moderator, this.roleIds.Administrator);
             return _.include(staff, parseInt(userId));
@@ -483,7 +483,6 @@
                 element,
                 this.postMathJaxProcessor(this.markdownWithHighlight(element.text()))
             );
-
         };
 
         DiscussionUtil.typesetMathJax = function(element) {

@@ -395,13 +395,13 @@ function(Component) {
             var $spanElem,
                 $listElem,
                 $element = $('<li />', {
-                class: ['submenu-item', 'menu-item', this.options.prefix + 'submenu-item'].join(' '),
-                'aria-expanded': 'false',
-                'aria-haspopup': 'true',
-                'aria-labelledby': 'submenu-item-label-' + this.id,
-                role: 'menuitem',
-                tabindex: -1
-            });
+                    class: ['submenu-item', 'menu-item', this.options.prefix + 'submenu-item'].join(' '),
+                    'aria-expanded': 'false',
+                    'aria-haspopup': 'true',
+                    'aria-labelledby': 'submenu-item-label-' + this.id,
+                    role: 'menuitem',
+                    tabindex: -1
+                });
 
             $spanElem = $('<span />', {
                 id: 'submenu-item-label-' + this.id,

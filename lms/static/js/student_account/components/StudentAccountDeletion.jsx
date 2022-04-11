@@ -110,8 +110,8 @@ export class StudentAccountDeletion extends React.Component {
         <p className="account-settings-header-subtitle">{ gettext('We’re sorry to see you go!') }</p>
         <p className="account-settings-header-subtitle">{noteDeletion}</p>
         <p className="account-settings-header-subtitle">
-              <span>{bodyDeletion} </span>
-              <span>{bodyDeletion2}</span>
+          <span>{bodyDeletion} </span>
+          <span>{bodyDeletion2}</span>
         </p>
         <p
           className="account-settings-header-subtitle"

@@ -397,7 +397,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         events: {
             'change #due_in': 'validateDueIn',
             'keyup #due_in': 'validateDueIn',
-            'blur #due_in': 'validateDueIn',
+            'blur #due_in': 'validateDueIn'
         },
 
         getValue: function() {
@@ -408,27 +408,25 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             if (!this.getValue() || !course.get('start')) return;
             var startDate = new Date(course.get('start'));
             // The value returned by toUTCString() is a string in the form Www, dd Mmm yyyy hh:mm:ss GMT
-            var startDateList = startDate.toUTCString().split(' ')
+            var startDateList = startDate.toUTCString().split(' ');
             // This text will look like Mmm dd, yyyy (i.e. Jul 26, 2021)
-            this.$("#relative_weeks_due_start_date").text(startDateList[2] + ' ' + startDateList[1] + ', ' + startDateList[3]);
-            var projectedDate = new Date(startDate)
-            projectedDate.setDate(projectedDate.getDate() + this.getValue()*7);
+            this.$('#relative_weeks_due_start_date').text(startDateList[2] + ' ' + startDateList[1] + ', ' + startDateList[3]);
+            var projectedDate = new Date(startDate);
+            projectedDate.setDate(projectedDate.getDate() + this.getValue() * 7);
             var projectedDateList = projectedDate.toUTCString().split(' ');
-            this.$("#relative_weeks_due_projected_due_in").text(projectedDateList[2] + ' ' + projectedDateList[1] + ', ' + projectedDateList[3]);
+            this.$('#relative_weeks_due_projected_due_in').text(projectedDateList[2] + ' ' + projectedDateList[1] + ', ' + projectedDateList[3]);
             this.$('#relative_weeks_due_projected').show();
         },
 
         validateDueIn: function() {
             this.$('#relative_weeks_due_projected').hide();
-            if (this.getValue() > 18){
+            if (this.getValue() > 18) {
                 this.$('#relative_weeks_due_warning_max').show();
                 BaseModal.prototype.disableActionButton.call(this.parent, 'save');
-            }
-            else if (this.getValue() < 1){
-                this.$('#relative_weeks_due_warning_min').show()
+            } else if (this.getValue() < 1) {
+                this.$('#relative_weeks_due_warning_min').show();
                 BaseModal.prototype.disableActionButton.call(this.parent, 'save');
-            }
-            else {
+            } else {
                 this.$('#relative_weeks_due_warning_max').hide();
                 this.$('#relative_weeks_due_warning_min').hide();
                 this.showProjectedDate();
@@ -439,10 +437,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
             if (this.model.get('graded')) {
-                this.$('#relative_date_input').show()
-            }
-            else {
-                this.$('#relative_date_input').hide()
+                this.$('#relative_date_input').show();
+            } else {
+                this.$('#relative_date_input').hide();
             }
             this.$('.field-due-in input').val(this.model.get('relative_weeks_due'));
             this.$('#relative_weeks_due_projected').hide();
@@ -451,12 +448,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getRequestData: function() {
             // Grab all the sections, map them to their block_ids, then return as an Array
-            var sectionIds = $('.outline-section').map(function(){return this.id;}).get()
+            var sectionIds = $('.outline-section').map(function() { return this.id; }).get();
             // Grab all the subsections, map them to their block_ids, then return as an Array
-            var subsectionIds = $('.outline-subsection').map(function(){return this.id;}).get()
+            var subsectionIds = $('.outline-subsection').map(function() { return this.id; }).get();
             var relative_weeks_due = null;
             if (this.getValue() < 19 && this.getValue() > 0 && $('#grading_type').val() !== 'notgraded') {
-                relative_weeks_due = this.getValue()
+                relative_weeks_due = this.getValue();
             }
             window.analytics.track('edx.bi.studio.relative_date.saved', {
                 block_id: this.model.get('id'),
@@ -466,14 +463,14 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 order_in_sections: sectionIds.indexOf(this.parent.options.parentInfo.get('id')) + 1,
                 order_in_subsections: subsectionIds.indexOf(this.model.get('id')) + 1,
                 org_key: course.get('org'),
-                relative_weeks_due: relative_weeks_due,
+                relative_weeks_due: relative_weeks_due
             });
             return {
                 metadata: {
                     relative_weeks_due: relative_weeks_due
                 }
             };
-        },
+        }
     });
 
     ReleaseDateEditor = BaseDateEditor.extend({
@@ -741,7 +738,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         templateName: 'grading-editor',
         className: 'edit-settings-grading',
         events: {
-            'change #grading_type': 'handleGradingSelect',
+            'change #grading_type': 'handleGradingSelect'
         },
 
         handleGradingSelect: function(event) {

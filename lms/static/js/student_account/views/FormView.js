@@ -64,7 +64,7 @@
                             HtmlUtils: HtmlUtils
                         })
                     )
-                )
+                );
                 this.postRender();
 
                 return this;
