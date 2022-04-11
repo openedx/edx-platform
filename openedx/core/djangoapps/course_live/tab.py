@@ -22,6 +22,11 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
     allow_multiple = False
     is_dynamic = True
     title = gettext_lazy("Live")
+    ROLE_MAP = {
+        'student': 'Student',
+        'staff': 'Administrator',
+        'instructor': 'Administrator',
+    }
 
     @request_cached()
     def _get_lti_config(self, course: CourseBlock) -> LtiConfiguration:

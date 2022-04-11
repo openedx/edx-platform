@@ -3,9 +3,11 @@ Test for course live app views
 """
 import json
 
+from django.test import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from lti_consumer.models import CourseAllowPIISharingInLTIFlag
+from lti_consumer.models import CourseAllowPIISharingInLTIFlag, LtiConfiguration
+from markupsafe import Markup
 from rest_framework.test import APITestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
@@ -266,3 +268,80 @@ class TestCourseLiveProvidersView(ModuleStoreTestCase, APITestCase):
         response = self.client.get(self.url)
         content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected_data)
+
+
+class TestCourseLiveIFrameView(ModuleStoreTestCase, APITestCase):
+    """
+    Unit tests for course live iframe view
+    """
+
+    def setUp(self):
+        super().setUp()
+        store = ModuleStoreEnum.Type.split
+        self.course = CourseFactory.create(default_store=store)
+        self.user = self.create_user_for_course(self.course, user_type=CourseUserType.GLOBAL_STAFF)
+
+    @property
+    def url(self):
+        """
+        Returns the course live iframe API url.
+        """
+        return reverse(
+            'live_iframe', kwargs={'course_id': str(self.course.id)}
+        )
+
+    def test_api_returns_live_iframe(self):
+        request = RequestFactory().get(self.url)
+        request.user = self.user
+        live_config = CourseLiveConfiguration.objects.create(
+            course_key=self.course.id,
+            enabled=True,
+            provider_type="zoom",
+        )
+        live_config.lti_configuration = LtiConfiguration.objects.create(
+            config_store=LtiConfiguration.CONFIG_ON_DB,
+            lti_config={
+                "pii_share_username": 'true',
+                "pii_share_email": 'true',
+                "additional_parameters": {
+                    "custom_instructor_email": "test@gmail.com"
+                }
+            },
+            lti_1p1_launch_url='http://test.url',
+            lti_1p1_client_key='test_client_key',
+            lti_1p1_client_secret='test_client_secret',
+        )
+        live_config.save()
+        with override_waffle_flag(ENABLE_COURSE_LIVE, True):
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, 200)
+            self.assertIsInstance(response.data['iframe'], Markup)
+            self.assertIn('iframe', str(response.data['iframe']))
+
+    def test_non_authenticated_user(self):
+        """
+        Verify that 401 is returned if user is not authenticated.
+        """
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 401)
+
+    def test_not_enrolled_user(self):
+        """
+        Verify that 403 is returned if user is not enrolled.
+        """
+        self.user = self.create_user_for_course(self.course, user_type=CourseUserType.UNENROLLED)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_live_configuration_disabled(self):
+        """
+        Verify that proper error message is returned if live configuration is disabled.
+        """
+        CourseLiveConfiguration.objects.create(
+            course_key=self.course.id,
+            enabled=False,
+            provider_type="zoom",
+        )
+        response = self.client.get(self.url)
+        self.assertEqual(response.data['developer_message'], 'Course live is not enabled for this course.')
