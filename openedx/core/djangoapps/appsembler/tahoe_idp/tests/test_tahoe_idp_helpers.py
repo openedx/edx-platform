@@ -1,11 +1,11 @@
 """
-Tests for `tahoe_idp_helpers`.
+Tests for `tahoe_idp.helpers`.
 """
 import pytest
 
 from site_config_client.openedx.test_helpers import override_site_config
 
-from openedx.core.djangoapps.site_configuration import tahoe_idp_helpers
+from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
 
 
 @pytest.mark.parametrize('global_flags,site_flags,should_be_enabled,message', [

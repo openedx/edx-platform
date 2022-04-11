@@ -1,5 +1,5 @@
 """
-Tests for the hacks we have to enable the tahoe-idp package.
+Tests for the hacks we have to enable the tahoe-idp package with the Third Party Auth in Open edX.
 """
 
 import unittest
@@ -18,7 +18,7 @@ SITE_DOMAIN_B = 'somethingelse.example.com'
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 @ddt.ddt
 class TahoeIdpIntegrationHackTests(testutil.TestCase):
-    """Tests registry discovery and operation."""
+    """Tests TPA registry discovery and operation with tahoe-idp."""
 
     def test_is_idp_disabled_for_no_tahoe_idp(self):
         prov = self.configure_oauth_provider(enabled=True, backend_name="dummy")

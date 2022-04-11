@@ -8,8 +8,6 @@ from django.conf import settings
 
 from site_config_client.openedx import api as config_client_api
 
-TAHOE_IDP_BACKEND_NAME = 'tahoe-idp'
-
 
 def is_tahoe_idp_enabled():
     """

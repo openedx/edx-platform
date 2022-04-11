@@ -6,9 +6,10 @@ import logging
 import beeline
 import tahoe_sites.api
 
-from . import course_roles
+from openedx.core.djangoapps.appsembler.auth import course_roles
 
-TAHOE_IDP_BACKEND_NAME = 'tahoe-idp'
+from .constants import TAHOE_IDP_BACKEND_NAME
+
 log = logging.getLogger(__name__)
 
 
