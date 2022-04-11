@@ -2,13 +2,11 @@
 View for course live app
 """
 from typing import Dict
-from django.contrib.auth.models import AbstractBaseUser
 
 import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lti_consumer.api import get_lti_pii_sharing_state_for_course
-from lti_consumer.models import LtiConfiguration
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status
 from rest_framework.request import Request
@@ -17,12 +15,10 @@ from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 
 from common.djangoapps.util.views import ensure_valid_course_key
-from common.lib.xmodule.xmodule.course_module import CourseBlock
-from lms.djangoapps.courseware.access import get_user_role
 from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.course_live.permissions import IsEnrolledOrStaff, IsStaffOrInstructor
+from openedx.core.djangoapps.course_live.tab import CourseLiveTab
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-from openedx.features.lti_course_tab.tab import LtiCourseLaunchMixin
 
 from ...lib.api.view_utils import verify_course_exists
 from .models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
@@ -217,7 +213,7 @@ class CourseLiveProvidersView(APIView):
         }
 
 
-class CourseLiveIframeView(APIView, LtiCourseLaunchMixin):
+class CourseLiveIframeView(APIView):
     """
     A view for retrieving course live iFrame.
 
@@ -261,24 +257,6 @@ class CourseLiveIframeView(APIView, LtiCourseLaunchMixin):
     )
     permission_classes = (permissions.IsAuthenticated, IsEnrolledOrStaff)
 
-    ROLE_MAP = {
-        'student': 'Student',
-        'staff': 'Administrator',
-        'instructor': 'Administrator',
-    }
-
-    def _get_lti_config(self, course: CourseBlock) -> LtiConfiguration:
-        """
-        Get course live configurations
-        """
-        return CourseLiveConfiguration.get(course.id).lti_configuration
-
-    def _get_lti_roles(self, user: AbstractBaseUser, course_key: CourseKey) -> str:
-        return self.ROLE_MAP.get(
-            get_user_role(user, course_key),
-            self.DEFAULT_ROLE,
-        )
-
     @ensure_valid_course_key
     @verify_course_exists()
     def get(self, request, course_id: str, **_kwargs) -> Response:
@@ -286,23 +264,16 @@ class CourseLiveIframeView(APIView, LtiCourseLaunchMixin):
         Handle HTTP/GET requests
         """
         course_key = CourseKey.from_string(course_id)
+        course_live_tab = CourseLiveTab({})
+        course = get_course_with_access(request.user, 'load', course_key)
 
-        is_course_live_configured = CourseLiveConfiguration.get(course_key)
-        if not is_course_live_configured:
-            error_data = {
-                "developer_message": "Course live is not configured for this course."
-            }
-            return Response(error_data, status=status.HTTP_200_OK)
-
-        is_course_live_enabled = CourseLiveConfiguration.is_enabled(course_key)
-        if not is_course_live_enabled:
+        if not course_live_tab.is_enabled(course, request.user):
             error_data = {
                 "developer_message": "Course live is not enabled for this course."
             }
             return Response(error_data, status=status.HTTP_200_OK)
 
-        course = get_course_with_access(request.user, 'load', course_key)
-        iframe = self.render_to_fragment(request, course)
+        iframe = course_live_tab.render_to_fragment(request, course)
         data = {
             "iframe": iframe.content
         }

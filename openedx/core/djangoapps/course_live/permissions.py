@@ -41,4 +41,8 @@ class IsEnrolledOrStaff(BasePermission):
         if GlobalStaff().has_user(request.user):
             return True
 
-        return CourseEnrollment.is_enrolled(request.user, course_key)
+        return (
+            CourseInstructorRole(course_key).has_user(request.user) or
+            CourseStaffRole(course_key).has_user(request.user) or
+            CourseEnrollment.is_enrolled(request.user, course_key)
+        )

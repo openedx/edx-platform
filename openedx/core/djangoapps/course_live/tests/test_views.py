@@ -312,10 +312,11 @@ class TestCourseLiveIFrameView(ModuleStoreTestCase, APITestCase):
             lti_1p1_client_secret='test_client_secret',
         )
         live_config.save()
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.data['iframe'], Markup)
-        self.assertIn('iframe', str(response.data['iframe']))
+        with override_waffle_flag(ENABLE_COURSE_LIVE, True):
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, 200)
+            self.assertIsInstance(response.data['iframe'], Markup)
+            self.assertIn('iframe', str(response.data['iframe']))
 
     def test_non_authenticated_user(self):
         """
@@ -344,10 +345,3 @@ class TestCourseLiveIFrameView(ModuleStoreTestCase, APITestCase):
         )
         response = self.client.get(self.url)
         self.assertEqual(response.data['developer_message'], 'Course live is not enabled for this course.')
-
-    def test_course_live_not_configured(self):
-        """
-        Verify that proper error message is returned if live configuration does not exist.
-        """
-        response = self.client.get(self.url)
-        self.assertEqual(response.data['developer_message'], 'Course live is not configured for this course.')
