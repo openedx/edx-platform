@@ -100,7 +100,6 @@ def send_email(request, email, data):
     Send email through Braze
     """
     event_properties = _get_event_properties(request, data)
-    print("\n\n\nevent properties>>>", event_properties)
     braze_client = BrazeClient(
         api_key=settings.EDX_BRAZE_API_KEY,
         api_url=settings.EDX_BRAZE_API_SERVER,
