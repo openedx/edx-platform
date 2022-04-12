@@ -80,6 +80,7 @@
     "edx-custom-a11y-rules": "2.0.1",
     "enzyme": "3.3.0",
     "enzyme-adapter-react-16": "1.1.1",
+    "es-check": "6.2.1",
     "eslint-import-resolver-webpack": "0.8.4",
     "jasmine-core": "2.6.4",
     "jasmine-jquery": "git+https://github.com/velesin/jasmine-jquery.git#ebad463d592d3fea00c69f26ea18a930e09c7b58",
