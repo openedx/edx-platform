@@ -66,7 +66,7 @@ def _get_event_properties(request, data):
                 'max_effort': data.get('max_effort'),
                 'pacing_type': 'Self-paced' if course.self_paced else 'Instructor-led',
                 'type': 'course',
-                'price': price,
+                'price': 'Free' if price == 0 else f'${price} USD',
             }
         })
 
@@ -100,6 +100,7 @@ def send_email(request, email, data):
     Send email through Braze
     """
     event_properties = _get_event_properties(request, data)
+    print("\n\n\nevent properties>>>", event_properties)
     braze_client = BrazeClient(
         api_key=settings.EDX_BRAZE_API_KEY,
         api_url=settings.EDX_BRAZE_API_SERVER,
