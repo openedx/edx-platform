@@ -1007,10 +1007,8 @@ super-csv==3.0.0
     # via
     #   -r requirements/edx/base.in
     #   edx-bulk-grades
-sympy==1.6.2
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   openedx-calc
+sympy==1.10.1
+    # via openedx-calc
 tableauserverclient==0.18.0
     # via edx-enterprise
 testfixtures==6.18.5
