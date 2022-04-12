@@ -102,3 +102,16 @@ class RegistrationApiViewTestsV2(TestCase):
             'name': 'Batman'
         })
         self.assertContains(res, 'Both email and username already exist', status_code=status.HTTP_409_CONFLICT)
+
+    def test_similar_username_password(self):
+        """
+        When username and password are similar, return error msg from UserAttributeSimilarityValidator
+        """
+        similar_user_data = {
+            'username': 'foobar',
+            'password': 'foobar',
+            'email': 'mr.robot@example.com',
+            'name': 'Mr Robot'
+        }
+        res = self.client.post(self.url, similar_user_data)
+        self.assertContains(res, "The password is too similar to the username.", status_code=status.HTTP_400_BAD_REQUEST)
