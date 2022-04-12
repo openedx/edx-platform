@@ -129,10 +129,11 @@ export class StudentAccountDeletion extends React.Component {
           id="delete-account-btn"
           className={['btn-outline-primary']}
           disabled={showError}
-          label={gettext('Delete My Account')}
           inputRef={(input) => { this.modalTrigger = input; }}
           onClick={this.loadDeletionModal}
-        />
+        >
+          {gettext('Delete My Account')}
+        </Button>
         {showError &&
           <StatusAlert
             dialog={(

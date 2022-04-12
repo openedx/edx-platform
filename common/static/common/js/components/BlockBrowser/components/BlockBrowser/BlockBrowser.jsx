@@ -43,13 +43,15 @@ export const BlockList = ({ blocks, selectedBlock, onSelectBlock, onChangeRoot }
         <Button
           className={['block-name']}
           onClick={() => onSelectBlock(block.id)}
-          label={block.display_name}
-        />
+        >
+          {block.display_name}
+        </Button>
         {block.children &&
         <Button
           onClick={() => onChangeRoot(block.id)}
-          label={RightIcon}
-        />
+        >
+          {RightIcon}
+        </Button>
         }
       </li>
     ))}
@@ -76,8 +78,9 @@ export const BlockBrowser = ({ blocks, selectedBlock, onSelectBlock, onChangeRoo
         <Button
           disabled={!blocks.parent}
           onClick={() => blocks.parent && onChangeRoot(blocks.parent)}
-          label={UpIcon}
-        />
+        >
+          {UpIcon}
+        </Button>
         <span className="title">
           {gettext('Browsing')} {gettext(BLOCK_TYPE_NAME[blocks.type])} &quot;
           <a

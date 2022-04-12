@@ -95,8 +95,9 @@ class AnnouncementList extends React.Component {
           <Button
             className={["announcement-button", "prev"]}
             onClick={() => this.renderPrevPage()}
-            label="← previous"
-          />
+          >
+            ← previous
+          </Button>
           <span className="sr-only">{this.state.start_index + " - " + this.state.end_index + ") of " + this.state.count}</span>
         </div>
       );
@@ -108,8 +109,9 @@ class AnnouncementList extends React.Component {
           <Button
             className={["announcement-button", "next"]}
             onClick={() => this.renderNextPage()}
-            label="next →"
-          />
+          >
+            next →
+          </Button>
           <span className="sr-only">{this.state.start_index + " - " + this.state.end_index + ") of " + this.state.count}</span>
         </div>
       );

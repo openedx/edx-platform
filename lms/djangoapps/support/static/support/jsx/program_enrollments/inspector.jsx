@@ -179,11 +179,12 @@ export const ProgramEnrollmentsInspectorPage = props => (
       </div>
       <Button
         id="search_button"
-        label="Search"
         type="submit"
         className={['btn', 'btn-primary']}
         inputRef={(input) => { self.button = input; }}
-      />
+      >
+        Search
+      </Button>
     </form>
   </div>
 );
