@@ -153,6 +153,7 @@ cffi==1.15.0
 chardet==4.0.0
     # via
     #   -r requirements/edx/testing.txt
+    #   diff-cover
     #   pysrt
 charset-normalizer==2.0.12
     # via
@@ -253,10 +254,8 @@ deprecated==1.2.13
     #   -r requirements/edx/testing.txt
     #   jwcrypto
     #   redis
-diff-cover==4.0.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.txt
+diff-cover==6.4.5
+    # via -r requirements/edx/testing.txt
 dill==0.3.4
     # via
     #   -r requirements/edx/testing.txt
@@ -746,10 +745,6 @@ importlib-metadata==4.11.3
     #   sphinx
 importlib-resources==5.6.0
     # via jsonschema
-inflect==5.5.2
-    # via
-    #   -r requirements/edx/testing.txt
-    #   jinja2-pluralize
 inflection==0.5.1
     # via
     #   -r requirements/edx/testing.txt
@@ -782,12 +777,7 @@ jinja2==3.1.1
     #   code-annotations
     #   coreschema
     #   diff-cover
-    #   jinja2-pluralize
     #   sphinx
-jinja2-pluralize==0.3.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   diff-cover
 jmespath==0.10.0
     # via
     #   -r requirements/edx/testing.txt
