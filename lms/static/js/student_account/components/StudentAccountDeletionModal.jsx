@@ -190,10 +190,11 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
           closeText={gettext('Cancel')}
           buttons={[
             <Button
-              label={gettext('Yes, Delete')}
               onClick={this.deleteAccount}
               disabled={password.length === 0 || passwordSubmitted}
-            />,
+            >
+              {gettext('Yes, Delete')}
+            </Button>
           ]}
         />
       </div>
