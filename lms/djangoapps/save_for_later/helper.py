@@ -10,6 +10,8 @@ from eventtracking import tracker
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
+from common.djangoapps.course_modes.models import CourseMode
+
 log = logging.getLogger(__name__)
 
 USER_SENT_EMAIL_SAVE_FOR_LATER = 'edx.bi.user.saveforlater.email.sent'
@@ -25,6 +27,13 @@ def _get_program_pacing(course_runs):
     return 'Self-paced' if pacing == 'self_paced' else 'Instructor-led'
 
 
+def _get_course_price(course):
+    """
+        Get price of a course
+    """
+    return CourseMode.min_course_price_for_currency(course_id=str(course.id), currency='USD')
+
+
 def _get_event_properties(request, data):
     """
     set event properties for course and program which are required in braze email template
@@ -38,6 +47,7 @@ def _get_event_properties(request, data):
     if data.get('type') == 'course':
         course = data.get('course')
         data = request.data
+        price = _get_course_price(course)
         org_img_url = data.get('org_img_url')
         marketing_url = data.get('marketing_url')
         event_properties.update({
@@ -56,6 +66,7 @@ def _get_event_properties(request, data):
                 'max_effort': data.get('max_effort'),
                 'pacing_type': 'Self-paced' if course.self_paced else 'Instructor-led',
                 'type': 'course',
+                'price': price,
             }
         })
 
