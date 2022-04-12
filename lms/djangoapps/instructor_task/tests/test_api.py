@@ -2,9 +2,11 @@
 Test for LMS instructor background task queue management
 """
 
+import datetime
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
+import pytz
 import ddt
 from celery.states import FAILURE
 
@@ -389,3 +391,17 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
                 {},
                 ''
             )
+
+    @patch("lms.djangoapps.instructor_task.api.schedule_task")
+    @patch("lms.djangoapps.instructor_task.api.submit_task")
+    def test_submit_bulk_course_email_with_schedule(self, mock_submit_task, mock_schedule_task):
+        email_id = self._define_course_email()
+        schedule = datetime.datetime(2030, 8, 15, 8, 15, 12, 0, pytz.utc)
+        submit_bulk_course_email(
+            self.create_task_request(self.instructor),
+            self.course.id,
+            email_id,
+            schedule
+        )
+        mock_schedule_task.assert_called_once()
+        mock_submit_task.assert_not_called()

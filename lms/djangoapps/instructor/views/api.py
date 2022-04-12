@@ -7,12 +7,15 @@ Many of these GETs may become PUTs in the future.
 """
 
 import csv
+import datetime
 import json
 import logging
 import string
 import random
 import re
 
+import dateutil
+import pytz
 import edx_api_doc_tools as apidocs
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -71,8 +74,7 @@ from common.djangoapps.util.file import (
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
 from common.djangoapps.util.views import require_global_staff
-from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
-from lms.djangoapps.bulk_email.models import CourseEmail
+from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled, create_course_email
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateStatuses
@@ -2692,6 +2694,7 @@ def send_email(request, course_id):
     - 'message' specifies email's content
     """
     course_id = CourseKey.from_string(course_id)
+    course_overview = CourseOverview.get_from_id(course_id)
 
     if not is_bulk_email_feature_enabled(course_id):
         log.warning('Email is not enabled for course %s', course_id)
@@ -2700,51 +2703,45 @@ def send_email(request, course_id):
     targets = json.loads(request.POST.get("send_to"))
     subject = request.POST.get("subject")
     message = request.POST.get("message")
+    # optional, this is a date and time in the form of an ISO8601 string
+    schedule = request.POST.get("schedule", "")
+    # optional, this is the timezone captured from the author's browser when requesting a scheduled email
+    browser_timezone = request.POST.get("browser_timezone", "")
 
-    # allow two branding points to come from Site Configuration: which CourseEmailTemplate should be used
-    # and what the 'from' field in the email should be
-    #
-    # If these are None (there is no site configuration enabled for the current site) than
-    # the system will use normal system defaults
-    course_overview = CourseOverview.get_from_id(course_id)
-    from_addr = configuration_helpers.get_value('course_email_from_addr')
-    if isinstance(from_addr, dict):
-        # If course_email_from_addr is a dict, we are customizing
-        # the email template for each organization that has courses
-        # on the site. The dict maps from addresses by org allowing
-        # us to find the correct from address to use here.
-        from_addr = from_addr.get(course_overview.display_org_with_default)
+    # If this is a scheduled bulk email request then we try to convert the requested schedule date to UTC. We do this
+    # before we attempt to create the email object instance in case there is an issue as we don't want to have an
+    # orphaned email object that will never be sent.
+    if schedule:
+        try:
+            schedule = _convert_schedule_to_utc_from_local(schedule, browser_timezone, request.user)
+            _determine_valid_schedule(schedule)
+        except ValueError as error:
+            error_message = f"Error occurred while attempting to create a scheduled bulk email task: {error}"
+            log.error(f"{error_message}")
+            return HttpResponseBadRequest(repr(error_message))
 
-    template_name = configuration_helpers.get_value('course_email_template_name')
-    if isinstance(template_name, dict):
-        # If course_email_template_name is a dict, we are customizing
-        # the email template for each organization that has courses
-        # on the site. The dict maps template names by org allowing
-        # us to find the correct template to use here.
-        template_name = template_name.get(course_overview.display_org_with_default)
+    # Retrieve the customized email "from address" and email template from site configuration for the course/partner. If
+    # there is no site configuration enabled for the current site then we use system defaults for both.
+    from_addr = _get_branded_email_from_address(course_overview)
+    template_name = _get_branded_email_template(course_overview)
 
-    # Create the CourseEmail object.  This is saved immediately, so that
-    # any transaction that has been pending up to this point will also be
-    # committed.
-    # TODO: convert to use bulk_email app's `create_course_email` API function and remove direct import and use of
-    # bulk_email model
+    # Create the CourseEmail object. This is saved immediately so that any transaction that has been pending up to this
+    # point will also be committed.
     try:
-        email = CourseEmail.create(
+        email = create_course_email(
             course_id,
             request.user,
             targets,
             subject,
             message,
             template_name=template_name,
-            from_addr=from_addr
+            from_addr=from_addr,
         )
     except ValueError as err:
-        log.exception('Cannot create course email for course %s requested by user %s for targets %s',
-                      course_id, request.user, targets)
         return HttpResponseBadRequest(repr(err))
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    task_api.submit_bulk_course_email(request, course_id, email.id)
+    task_api.submit_bulk_course_email(request, course_id, email.id, schedule)
 
     response_payload = {
         'course_id': str(course_id),
@@ -3560,3 +3557,91 @@ def _get_certificate_for_user(course_key, student):
         )
 
     return certificate
+
+
+def _get_branded_email_from_address(course_overview):
+    """
+    Checks and retrieves a customized "from address", if one exists for the course/org. This is the email address that
+    learners will see the message coming from.
+
+    Args:
+        course_overview (CourseOverview): The course overview instance for the course-run.
+
+    Returns:
+        String: The customized "from address" to be used in messages sent by the bulk course email tool for this
+                course or org.
+    """
+    from_addr = configuration_helpers.get_value('course_email_from_addr')
+    if isinstance(from_addr, dict):
+        # If course_email_from_addr is a dict, we are customizing the email template for each organization that has
+        # courses on the site. The dict maps from addresses by org allowing us to find the correct from address to use
+        # here.
+        from_addr = from_addr.get(course_overview.display_org_with_default)
+
+    return from_addr
+
+
+def _get_branded_email_template(course_overview):
+    """
+    Checks and retrieves the custom email template, if one exists for the course/org, to style messages sent by the bulk
+    course email tool.
+
+    Args:
+        course_overview (CourseOverview): The course overview instance for the course-run.
+
+    Returns:
+        String: The name of the custom email template to use for this course or org.
+    """
+    template_name = configuration_helpers.get_value('course_email_template_name')
+    if isinstance(template_name, dict):
+        # If course_email_template_name is a dict, we are customizing the email template for each organization that has
+        # courses on the site. The dict maps template names by org allowing us to find the correct template to use here.
+        template_name = template_name.get(course_overview.display_org_with_default)
+
+    return template_name
+
+
+def _convert_schedule_to_utc_from_local(schedule, browser_timezone, user):
+    """
+    Utility function to help convert the schedule of an instructor task from the requesters local time and timezone
+    (taken from the request) to a UTC datetime.
+
+    Args:
+        schedule (String): The desired time to execute a scheduled task, in local time, in the form of an ISOString.
+        timezone (String): The time zone, as captured by the user's web browser, in the form of a string.
+        user (User): The user requesting the action, captured from the originating web request. Used to lookup the
+                     the time zone preference as set in the user's account settings.
+
+    Returns:
+        DateTime: A datetime instance describing when to execute this schedule task converted to the UTC timezone.
+    """
+    # look up the requesting user's timezone from their account settings
+    preferred_timezone = get_user_preference(user, 'time_zone', username=user.username)
+    # use the user's preferred timezone (if available), otherwise use the browser timezone.
+    timezone = preferred_timezone if preferred_timezone else browser_timezone
+
+    # convert the schedule to UTC
+    log.info(f"Converting requested schedule from local time '{schedule}' with the timezone '{timezone}' to UTC")
+
+    local_tz = dateutil.tz.gettz(timezone)
+    if local_tz is None:
+        raise ValueError(
+            "Unable to determine the time zone to use to convert the schedule to UTC"
+        )
+    local_dt = dateutil.parser.parse(schedule).replace(tzinfo=local_tz)
+    schedule_utc = local_dt.astimezone(pytz.utc)
+
+    return schedule_utc
+
+
+def _determine_valid_schedule(schedule):
+    """
+    Utility function that determines if the requested schedule is in the future. Raises ValueError if the schedule time
+    has already lapsed.
+
+    Args:
+        schedule (DateTime): UTC DateTime representing the desired date and time to process a scheduled instructor task.
+    """
+    now = datetime.datetime.now(pytz.utc)
+    if schedule < now:
+        raise ValueError(f"The requested schedule '{schedule}' is in the past")
