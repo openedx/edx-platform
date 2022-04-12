@@ -9,7 +9,6 @@ import ddt
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
-from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -25,7 +24,6 @@ from common.djangoapps.student.tests.factories import OrgInstructorFactory
 from common.djangoapps.student.tests.factories import OrgStaffFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
-from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_date_signals.utils import MAX_DURATION, MIN_DURATION
@@ -44,7 +42,6 @@ from openedx.features.course_experience.tests.views.helpers import add_course_mo
 
 # pylint: disable=no-member
 @ddt.ddt
-@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
     """Tests to verify the get_user_course_expiration_date function is working correctly"""
     def setUp(self):
@@ -80,14 +77,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
     def get_courseware(self):
         """Returns a response from a GET on a courseware section"""
-        courseware_url = reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': str(self.course.id),
-                'chapter': self.chapter.location.block_id,
-                'section': self.sequential.location.block_id,
-            },
-        )
+        courseware_url = reverse('render_xblock', args=[str(self.sequential.location)])
         return self.client.get(courseware_url, follow=True)
 
     def test_enrollment_mode(self):

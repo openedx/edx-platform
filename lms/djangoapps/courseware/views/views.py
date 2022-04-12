@@ -119,7 +119,6 @@ from openedx.features.course_duration_limits.access import generate_course_expir
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.url_helpers import (
-    ExperienceOption,
     get_courseware_url,
     get_learning_mfe_home_url,
     is_request_from_learning_mfe
@@ -410,19 +409,10 @@ def jump_to(request, course_id, location):
     except InvalidKeyError as exc:
         raise Http404("Invalid course_key or usage_key") from exc
 
-    experience_param = request.GET.get("experience", "").lower()
-    if experience_param == "new":
-        experience = ExperienceOption.NEW
-    elif experience_param == "legacy":
-        experience = ExperienceOption.LEGACY
-    else:
-        experience = ExperienceOption.ACTIVE
-
     try:
         redirect_url = get_courseware_url(
             usage_key=usage_key,
             request=request,
-            experience=experience,
         )
     except (ItemNotFoundError, NoPathToItem):
         # We used to 404 here, but that's ultimately a bad experience. There are real world use cases where a user
@@ -432,7 +422,6 @@ def jump_to(request, course_id, location):
         redirect_url = get_courseware_url(
             usage_key=course_location_from_key(course_key),
             request=request,
-            experience=experience,
         )
 
     return redirect(redirect_url)
