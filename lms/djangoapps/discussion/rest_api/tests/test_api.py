@@ -2558,7 +2558,8 @@ class UpdateThreadTest(
             'anonymous_to_peers': ['False'],
             'closed': ['False'],
             'pinned': ['False'],
-            'read': ['False']
+            'read': ['False'],
+            'editing_user_id': [str(self.user.id)],
         }
 
     def test_nonexistent_thread(self):
@@ -2859,6 +2860,38 @@ class UpdateThreadTest(
             assert role_name == FORUM_ROLE_STUDENT
             assert error.message_dict == {"edit_reason_code": ["This field is not editable."]}
 
+    @ddt.data(
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_STUDENT,
+    )
+    @mock.patch("lms.djangoapps.discussion.rest_api.serializers.CLOSE_REASON_CODES", {
+        "test-close-reason": "Test Close Reason",
+    })
+    def test_update_thread_with_close_reason_code(self, role_name):
+        """
+        Test editing comments, specifying and retrieving edit reason codes.
+        """
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
+        self.register_thread()
+        try:
+            result = update_thread(self.request, "test_thread", {
+                "closed": True,
+                "close_reason_code": "test-close-reason",
+            })
+            assert role_name != FORUM_ROLE_STUDENT
+            assert result["closed"]
+            request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
+            assert request_body["close_reason_code"] == ["test-close-reason"]
+            assert request_body["closing_user_id"] == [str(self.user.id)]
+        except ValidationError as error:
+            assert role_name == FORUM_ROLE_STUDENT
+            assert error.message_dict == {
+                "closed": ["This field is not editable."],
+                "close_reason_code": ["This field is not editable."],
+            }
+
 
 @ddt.ddt
 @disable_signal(api, 'comment_edited')
@@ -2966,7 +2999,8 @@ class UpdateCommentTest(
             'user_id': [str(self.user.id)],
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],
-            'endorsed': ['False']
+            'endorsed': ['False'],
+            'editing_user_id': [str(self.user.id)],
         }
 
     def test_nonexistent_comment(self):
