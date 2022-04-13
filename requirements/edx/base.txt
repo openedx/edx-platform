@@ -834,9 +834,8 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/base.in
     #   edxval
-python-dateutil==2.4.0
+python-dateutil==2.8.2
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   analytics-python
     #   botocore
