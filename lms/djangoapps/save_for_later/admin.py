@@ -10,7 +10,7 @@ class SavedCourseAdmin(admin.ModelAdmin):
     Admin for the Saved Course table.
     """
 
-    list_display = ['email', 'course_id']
+    list_display = ['email', 'course_id', 'email_sent_count', 'reminder_email_sent']
 
     search_fields = ['email', 'course_id']
 
@@ -20,7 +20,7 @@ class SavedProgramAdmin(admin.ModelAdmin):
     Admin for the Saved Program table.
     """
 
-    list_display = ['email', 'program_uuid']
+    list_display = ['email', 'program_uuid', 'email_sent_count', 'reminder_email_sent']
 
     search_fields = ['email', 'program_uuid']
 
