@@ -110,6 +110,9 @@ from lms.envs.common import (
 
     # Enterprise service settings
     ENTERPRISE_CATALOG_INTERNAL_ROOT_URL,
+    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_KEY,
+    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_SECRET,
+    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL,
 
     # Methods to derive settings
     _make_mako_template_dirs,

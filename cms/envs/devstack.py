@@ -213,6 +213,8 @@ IDA_LOGOUT_URI_LIST = [
     'http://localhost:18150/logout/',  # credentials
 ]
 
+ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://edx.devstack.lms/oauth2"
+
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 

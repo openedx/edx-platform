@@ -1,7 +1,9 @@
 """ Commerce API Service. """
 
 
+import requests
 from django.conf import settings
+from edx_rest_api_client.auth import SuppliedJwtAuth
 from edx_rest_api_client.client import EdxRestApiClient
 from eventtracking import tracker
 
@@ -31,7 +33,11 @@ def is_commerce_service_configured():
 
 
 def ecommerce_api_client(user, session=None):
-    """ Returns an E-Commerce API client setup with authentication for the specified user. """
+    """
+    Returns an E-Commerce API client setup with authentication for the specified user.
+
+    DEPRECATED: To be replaced with get_ecommerce_api_client as part of FC-0001.
+    """
     claims = {'tracking_context': create_tracking_context(user)}
     scopes = [
         'user_id',
@@ -45,3 +51,21 @@ def ecommerce_api_client(user, session=None):
         jwt=jwt,
         session=session
     )
+
+
+def get_ecommerce_api_client(user):
+    """
+    Returns an E-Commerce API client setup with authentication for the specified user.
+    """
+    claims = {'tracking_context': create_tracking_context(user)}
+    scopes = [
+        'user_id',
+        'email',
+        'profile'
+    ]
+    jwt = create_jwt_for_user(user, additional_claims=claims, scopes=scopes)
+
+    client = requests.Session()
+    client.auth = SuppliedJwtAuth(jwt)
+
+    return client
