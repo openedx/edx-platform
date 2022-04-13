@@ -678,6 +678,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
         username = request.data.get('user', request.user.username)
         course_id = request.data.get('course_details', {}).get('course_id')
+        create_consent_record = request.data.get('create_consent_record', True)
 
         if not course_id:
             return Response(
@@ -756,12 +757,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
                                   "for user [%s] in course run [%s]", username, course_id)
                     raise CourseEnrollmentError(str(error))  # lint-amnesty, pylint: disable=raise-missing-from
-                kwargs = {
-                    'username': username,
-                    'course_id': str(course_id),
-                    'enterprise_customer_uuid': explicit_linked_enterprise,
-                }
-                consent_client.provide_consent(**kwargs)
+
+                if create_consent_record:
+                    kwargs = {
+                        'username': username,
+                        'course_id': str(course_id),
+                        'enterprise_customer_uuid': explicit_linked_enterprise,
+                    }
+                    consent_client.provide_consent(**kwargs)
 
             enrollment_attributes = request.data.get('enrollment_attributes')
             enrollment = api.get_enrollment(username, str(course_id))
