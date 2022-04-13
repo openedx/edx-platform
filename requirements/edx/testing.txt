@@ -1110,9 +1110,8 @@ pytest-randomly==3.12.0
     # via -r requirements/edx/testing.in
 pytest-xdist[psutil]==2.5.0
     # via -r requirements/edx/testing.in
-python-dateutil==2.4.0
+python-dateutil==2.8.2
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   analytics-python
     #   botocore

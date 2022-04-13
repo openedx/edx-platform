@@ -16,6 +16,7 @@ import re
 
 import pytz
 import edx_api_doc_tools as apidocs
+from dateutil.zoneinfo import gettz
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist, PermissionDenied, ValidationError

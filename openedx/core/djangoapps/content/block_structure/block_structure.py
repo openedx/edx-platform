@@ -11,8 +11,11 @@ The following internal data structures are implemented:
 
 
 from copy import deepcopy
+from datetime import datetime
 from functools import partial
 from logging import getLogger
+
+from dateutil.tz import tzlocal
 
 from openedx.core.lib.graph_traversals import traverse_post_order, traverse_topologically
 
@@ -464,7 +467,20 @@ class BlockStructureBlockData(BlockStructure):
                 not found.
         """
         block_data = self._block_data_map.get(usage_key)
-        return getattr(block_data, field_name, default) if block_data else default
+        xblock_field = getattr(block_data, field_name, default) if block_data else default
+
+        if isinstance(xblock_field, datetime):
+            # Creating a new datetime object to avoid issues occuring due to upgrading
+            # python-datetuil version from 2.4.0
+            #
+            # More info: https://openedx.atlassian.net/browse/BOM-2245
+            if isinstance(xblock_field.tzinfo, tzlocal) and not hasattr(xblock_field.tzinfo, '_hasdst'):
+                return datetime(
+                    year=xblock_field.year, month=xblock_field.month, day=xblock_field.day,
+                    hour=xblock_field.hour, minute=xblock_field.minute, second=xblock_field.second,
+                    tzinfo=tzlocal()
+                )
+        return xblock_field
 
     def override_xblock_field(self, usage_key, field_name, override_data):
         """

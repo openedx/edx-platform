@@ -15,6 +15,7 @@ import ddt
 import pytest
 import pytz
 from boto.exception import BotoServerError
+from dateutil.zoneinfo import gettz
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
@@ -3400,7 +3401,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         delete_user_preference(self.instructor, 'time_zone', username=self.instructor.username)
 
     def _get_expected_schedule(self, schedule, timezone):
-        local_tz = dateutil.tz.gettz(timezone)
+        local_tz = gettz(timezone)
         local_dt = dateutil.parser.parse(schedule).replace(tzinfo=local_tz)
         return local_dt.astimezone(pytz.utc)
 
@@ -3550,7 +3551,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         self.full_test_message['schedule'] = "Blub Glub"
         self.full_test_message['browser_timezone'] = "America/New_York"
         expected_messages = [
-            "Error occurred while attempting to create a scheduled bulk email task: unknown string format",
+            "Error occurred while attempting to create a scheduled bulk email task: Unknown string format: Blub Glub",
         ]
 
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
