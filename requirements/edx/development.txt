@@ -702,9 +702,8 @@ filelock==3.6.0
     #   -r requirements/edx/testing.txt
     #   tox
     #   virtualenv
-freezegun==0.3.12
+freezegun==1.1.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
 frozenlist==1.3.0
     # via
@@ -1181,9 +1180,8 @@ pytest-randomly==3.11.0
     # via -r requirements/edx/testing.txt
 pytest-xdist[psutil]==2.5.0
     # via -r requirements/edx/testing.txt
-python-dateutil==2.4.0
+python-dateutil==2.8.2
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   analytics-python
     #   botocore
@@ -1350,7 +1348,6 @@ six==1.16.0
     #   edx-rbac
     #   edx-sphinx-theme
     #   event-tracking
-    #   freezegun
     #   fs
     #   fs-s3fs
     #   html5lib
