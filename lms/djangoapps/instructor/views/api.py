@@ -17,6 +17,7 @@ import re
 import dateutil
 import pytz
 import edx_api_doc_tools as apidocs
+from dateutil.zoneinfo import gettz
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist, PermissionDenied, ValidationError
@@ -3623,7 +3624,7 @@ def _convert_schedule_to_utc_from_local(schedule, browser_timezone, user):
     # convert the schedule to UTC
     log.info(f"Converting requested schedule from local time '{schedule}' with the timezone '{timezone}' to UTC")
 
-    local_tz = dateutil.tz.gettz(timezone)
+    local_tz = gettz(timezone)
     if local_tz is None:
         raise ValueError(
             "Unable to determine the time zone to use to convert the schedule to UTC"
