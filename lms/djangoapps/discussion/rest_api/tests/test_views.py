@@ -1306,7 +1306,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'updated_at': 'Test Updated Date',
             'comment_count': 1,
             'read': True,
-            'response_count': 2
+            'response_count': 2,
         })
         assert parsed_body(httpretty.last_request()) == {
             'course_id': [str(self.course.id)],
@@ -1319,7 +1319,8 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'anonymous_to_peers': ['False'],
             'closed': ['False'],
             'pinned': ['False'],
-            'read': ['True']
+            'read': ['True'],
+            'editing_user_id': [str(self.user.id)],
         }
 
     def test_error(self):
@@ -2022,7 +2023,8 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             'user_id': [str(self.user.id)],
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],
-            'endorsed': ['False']
+            'endorsed': ['False'],
+            'editing_user_id': [str(self.user.id)],
         }
 
     def test_error(self):
