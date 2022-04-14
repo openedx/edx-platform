@@ -334,11 +334,8 @@ class DatesTab(EnrolledTab):
     view_name = "dates"
 
     def __init__(self, tab_dict):
-        def link_func(course, reverse_func):
-            if course_home_legacy_is_active(course.id):
-                return reverse_func(self.view_name, args=[str(course.id)])
-            else:
-                return get_learning_mfe_home_url(course_key=course.id, url_fragment=self.view_name)
+        def link_func(course, _reverse_func):
+            return get_learning_mfe_home_url(course_key=course.id, url_fragment='dates')
 
         tab_dict['link_func'] = link_func
         super().__init__(tab_dict)

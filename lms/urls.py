@@ -57,7 +57,6 @@ from common.djangoapps.util import views as util_views
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
 RENDER_VIDEO_XBLOCK_NAME = 'render_public_video_xblock'
-COURSE_DATES_NAME = 'dates'
 COURSE_PROGRESS_NAME = 'progress'
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -507,14 +506,8 @@ urlpatterns += [
         name=COURSE_PROGRESS_NAME,
     ),
 
-    # dates page
-    re_path(
-        r'^courses/{}/dates'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        courseware_views.dates,
-        name=COURSE_DATES_NAME,
-    ),
+    # dates page (no longer functional, just redirects to MFE)
+    re_path(r'^courses/{}/dates'.format(settings.COURSE_ID_PATTERN), courseware_views.dates, name='dates'),
 
     # Takes optional student_id for instructor use--shows profile as that student sees it.
     re_path(
