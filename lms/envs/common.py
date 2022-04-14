@@ -2693,11 +2693,17 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 ################################# CELERY ######################################
 
-CELERY_IMPORTS = (
+CELERY_IMPORTS = [
     # Since xblock-poll is not a Django app, and XBlocks don't get auto-imported
     # by celery workers, its tasks will not get auto-discovered:
     'poll.tasks',
-)
+]
+
+# .. setting_name: CELERY_EXTRA_IMPORTS
+# .. setting_default: []
+# .. setting_description: Adds extra packages that don't get auto-imported (Example: XBlocks).
+#    These packages are added in addition to those added by CELERY_IMPORTS.
+CELERY_EXTRA_IMPORTS = []
 
 # Message configuration
 
