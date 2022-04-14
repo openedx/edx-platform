@@ -8,6 +8,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
@@ -21,7 +22,6 @@ from openedx.features.calendar_sync.api import (
     subscribe_user_to_calendar,
     unsubscribe_user_to_calendar
 )
-from openedx.features.course_experience import course_home_url
 
 
 class CalendarSyncView(View):
@@ -54,4 +54,4 @@ class CalendarSyncView(View):
         else:
             return HttpResponse('Toggle data was not provided or had unknown value.',
                                 status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        return redirect(course_home_url(course_key))
+        return redirect(reverse('openedx.course_experience.course_home', args=[course_id]))

@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from edx_django_utils.cache import TieredCache
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -19,11 +20,12 @@ from lms.djangoapps.courseware.context_processor import get_user_timezone_or_las
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 
-_GOAL_KEY_CHOICES = Choices(
-    ('certify', 'Earn a certificate'),
-    ('complete', 'Complete the course'),
-    ('explore', 'Explore the course'),
-    ('unsure', 'Not sure yet'),
+# Each goal is represented by a goal key and a string description.
+GOAL_KEY_CHOICES = Choices(
+    ('certify', _('Earn a certificate')),
+    ('complete', _('Complete the course')),
+    ('explore', _('Explore the course')),
+    ('unsure', _('Not sure yet')),
 )
 
 User = get_user_model()
@@ -55,9 +57,7 @@ class CourseGoal(models.Model):
     unsubscribe_token = models.UUIDField(null=True, blank=True, unique=True, editable=False, default=uuid.uuid4,
                                          help_text='Used to validate unsubscribe requests without requiring a login')
 
-    # Deprecated and unused - replaced by days_per_week and its subscription-based approach to goals
-    goal_key = models.CharField(max_length=100, choices=_GOAL_KEY_CHOICES, default=_GOAL_KEY_CHOICES.unsure)
-
+    goal_key = models.CharField(max_length=100, choices=GOAL_KEY_CHOICES, default=GOAL_KEY_CHOICES.unsure)
     history = HistoricalRecords()
 
     def __str__(self):

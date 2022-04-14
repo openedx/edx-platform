@@ -28,7 +28,7 @@ from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperienc
 from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangolib.translation_utils import translate_date
-from openedx.features.course_experience import course_home_url
+from openedx.features.course_experience import course_home_url_name
 
 LOG = logging.getLogger(__name__)
 
@@ -542,8 +542,9 @@ def _get_trackable_course_home_url(course_id):
 
     Args:
         course_id (CourseKey): The course to get the home page URL for.
-U
+
     Returns:
-        A URL to the course home page.
+        A relative path to the course home page.
     """
-    return course_home_url(course_id)
+    course_url_name = course_home_url_name(course_id)
+    return reverse(course_url_name, args=[str(course_id)])
