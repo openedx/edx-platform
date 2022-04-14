@@ -206,13 +206,13 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         enrollment = CourseEnrollment.objects.get(course_id=course_key)
         assert enrollment.user.username == 'test'
 
-        # Check that the redirect was to the correct outline page for either lms or studio
+        # Check that the redirect was to the course info/outline page
         if settings.ROOT_URLCONF == 'lms.urls':
-            expected_redirect_url = f'http://learning-mfe/course/{course_id}/home'
+            url_pattern = '/course/'
         else:
-            expected_redirect_url = f'/course/{course_id}'
+            url_pattern = f'/course/{str(course_key)}'
 
-        assert response.url == expected_redirect_url
+        assert response.url.endswith(url_pattern)
 
     def test_redirect_to_main(self):
         # Create user and redirect to 'home' (cms) or 'dashboard' (lms)

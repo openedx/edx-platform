@@ -1,0 +1,41 @@
+## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%block name="content">
+<div class="welcome-message">
+    <div class="dismiss-message">
+        <button type="button" class="btn-link">
+            <span class="sr">${_("Dismiss")}</span>
+            <span class="icon fa fa-times" aria-hidden="true"></span>
+        </button>
+    </div>
+
+    <div id="welcome-message-content" class="welcome-message-content">
+        ${HTML(welcome_message_html)}
+    </div>
+
+    <button type="button"
+            id="welcome-message-show-more"
+            class="btn btn-primary welcome-message-show-more"
+            aria-live="polite"
+            data-state="more"
+            hidden
+    >
+      ${_("Show More")}
+    </button>
+</div>
+</%block>
+
+<%static:webpack entry="WelcomeMessage">
+    new WelcomeMessage({
+        dismissUrl: "${dismiss_url | n, js_escaped_string}",
+    });
+</%static:webpack>

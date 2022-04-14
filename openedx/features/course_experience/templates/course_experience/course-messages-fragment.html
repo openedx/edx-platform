@@ -1,0 +1,40 @@
+## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.utils.translation import get_language_bidi
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import CourseHomeMessages
+%>
+
+<%
+is_rtl = get_language_bidi()
+%>
+
+% if course_home_messages:
+    % for message in course_home_messages:
+        <div class="course-message">
+            % if not is_rtl:
+                <img class="message-author" alt="" src="${static.url(image_src)}"/>
+            % endif
+            <div class="message-content" aria-live="polite">
+                ${HTML(message.message_html)}
+            </div>
+            % if is_rtl:
+                <img class="message-author" alt="" src="${static.url(image_src)}"/>
+            % endif
+        </div>
+    % endfor
+% endif
+
+<%static:webpack entry="CourseGoals">
+    new CourseGoals({
+        goalApiUrl: "${goal_api_url | n, js_escaped_string}",
+        courseId: "${course_id | n, js_escaped_string}",
+        username: "${username | n, js_escaped_string}",
+    });
+</%static:webpack>
