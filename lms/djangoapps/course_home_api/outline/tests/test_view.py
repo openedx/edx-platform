@@ -19,7 +19,6 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
-from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, CourseVisibility
 from openedx.core.djangoapps.course_date_signals.utils import MIN_DURATION
@@ -146,13 +145,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     def test_get_unknown_course(self):
         url = reverse('course-home:outline-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
-        assert response.status_code == 404
-
-    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
-    @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
-    def test_legacy_view_enabled(self, enrollment_mode):
-        CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
-        response = self.client.get(self.url)
         assert response.status_code == 404
 
     @ddt.data(True, False)

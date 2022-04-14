@@ -25,6 +25,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.learning_sequences.api import get_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData
 from openedx.core.lib.api.view_utils import LazySequence
+from openedx.features.course_experience import course_home_url
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -285,8 +286,7 @@ def get_course_run_url(request, course_id):
     Returns:
         (string): the URL to the course run associated with course_id
     """
-    course_run_url = reverse('openedx.course_experience.course_home', args=[course_id])
-    return request.build_absolute_uri(course_run_url)
+    return request.build_absolute_uri(course_home_url(course_id))
 
 
 def get_course_members(course_key):
