@@ -8,20 +8,23 @@ Pending
 Context
 =======
 Currently, courses are being stored in Modulestore(MongoDB) and the libraries are stored
-in both Modulestore(libraries v1) and the Blockstore(libraries v2).There has to be a
+in both Modulestore (libraries v1) and the Blockstore (libraries v2). There has to be a
 content reuse mechanism that allows authors to incorporate content (XBlocks) by
-referencing it from blockstore-based content libraries(libraries v2) into the courses
-instead of making copies of content in Modulestore(libraries v1).
+referencing it from blockstore-based content libraries (libraries v2) into the courses
+instead of making copies of content in Modulestore (libraries v1).
 
-There is work going on in building out the functionality of libraries v2, and
-to migrate all usage of content libraries onto Blockstore. The benefits of using the
+There is work going on in building out the functionality of libraries v2 and
+migrating all usage of content libraries onto Blockstore. The benefits of using the
 blockstore-backed v2 content libraries are:
 
-#. Blockstore can store anything that can be represented as a file - unlike modulestore,
-   which only stores courses built out of XBlocks.
-#. Blockstore is being moved into the edx-platform as a separate Django application.
-#. Blockstore is simpler to maintain.
-#. Blockstore increases re-usability of the content.
+#. Blockstore has been designed to support use cases like content libraries and is
+   easier for developers to work with compared to Modulestore, which is not really
+   designed for content libraries.
+#. Blockstore-backed v2 content libraries support any XBlock type, while Modulestore
+   (libraries v1) only supports a few types
+#. Blockstore-backed v2 content libraries can store large asset files (like images,
+   videos, and PDFs) required by each XBlock, and each file is only stored once no
+   matter how many times it is used.
 
 Terminology Used
 ^^^^^^^^^^^^^^^^
@@ -32,42 +35,39 @@ Terminology Used
 
 Decisions
 =========
-As of now, blockstore-backed content libraries(libraries v2) stores the blocks in
+As of now, blockstore-backed content libraries (libraries v2) stores the blocks in
 blockstore and when the library is used in a course, the blocks are copied from
 Blockstore to Modulestore with the help of LibrarySourcedBlock.
 
 The coping of blocks from Blockstore to Modulestore occupies a lot of space and
 Modulestore has a lot of complexity which causes performance issues. The complete
 elimination of Modulestore doesn't seem to be a pragmatic solution since it is required
-for backward compatibility of courses. Pragmatic solution here is to use Modulestore
+for backward compatibility of courses. The pragmatic solution here is to use Modulestore
 more efficiently.
 
 Hence, instead of storing blocks, the Modulestore will now store a reference of blocks
-from blockstore-backed content libraries. The LmsXBlockRuntime will use unit_compositor
-which helps to replace each reference with it's corresponding library block definitions
+from blockstore-backed v2 content libraries. The LmsXBlockRuntime will use unit_compositor
+which helps to replace each reference with its corresponding library block definitions
 and apply the required course-author-specified customizations.
 
-The user flow for the above process will be:
-
-#. Author chooses a library.
-#. Author can choose to reference one or multiple blocks.
-#. If multiple blocks of the same type are selected, ask for randomization
-#. If no randomization, then ask for ordering
+Studio will provide authors with two separate workflows, once for selecting one or
+more specific blocks and adding those specific blocks to the course, and another
+workflow for selecting a randomized set of blocks, so that each student will see a
+random block out of the set selected by the author.
 
 Current Architecture/Implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Currently, the courses are stored in modulestore and the libraries can either be
-stored in Modulestore or Blockstore. The course lives in the Modulestore and some
-of the libraries in Blockstore, the [library_sourced_block](https://github.com/openedx/edx-platform/blob/master/common/lib/xmodule/xmodule/library_sourced_block.py)
-is used to make a copy of that blockstore based library block and store it in Modulestore
-itself as the child.
+Currently, the courses are stored in Modulestore and the libraries can either be
+stored in Modulestore or Blockstore. The [library_sourced_block](https://github.com/openedx/edx-platform/blob/master/common/lib/xmodule/xmodule/library_sourced_block.py)
+is used to make a copy of blockstore-based v2 content library block and store it in
+Modulestore itself as the child.
 
 
 Proposed Implementation
 ^^^^^^^^^^^^^^
 The library referencing flow would be implemented within the Studio and/or LMS processes
 of a single Open edX instance. The library content would be stored and rendered outside
-the modulestore.
+the Modulestore.
 
 This is achieved by a unit_compositor subsystem. Like learning_sequences, the subsystem
 would be populated by CMS upon course publish. It would store a read-optimized form of:
@@ -90,9 +90,9 @@ particular user, [the unit_compositor would](https://openedx.atlassian.net/wiki/
 
 Goals
 =====
-#. Move towards a unit composition system. This would provide long term stability.
+#. Move towards a unit composition system. This would provide long-term stability.
 #. Referenced content will be presented as separate blocks. This will help us take
-   advantage of the atomicity of LMS that is currently being using in courseware
+   advantage of the atomicity of LMS that is currently being used in courseware
    (problem grade report, gradebook etc.)
-#. Extendable to support structural libraries i.e the libraries with unit, sequence
+#. Extendable to support structural libraries i.e the libraries with units, sequences,
    and chapters just like how courses are structured right now.
