@@ -542,7 +542,7 @@ edx-drf-extensions==8.0.1
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.44.0
+edx-enterprise==3.43.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -582,7 +582,7 @@ edx-proctoring==4.10.2
     #   edx-proctoring-proctortrack
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.txt
-edx-rbac==1.7.0
+edx-rbac==1.6.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
