@@ -1421,9 +1421,8 @@ webob==1.8.7
     #   -r requirements/edx/base.txt
     #   xblock
     #   xmodule
-wrapt==1.11.2
+wrapt==1.14.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   astroid
     #   deprecated

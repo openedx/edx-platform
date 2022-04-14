@@ -49,9 +49,6 @@ pandas==0.22.0
 # networkx>=2.6 requires pandas>=1.1
 networkx<2.6
 
-# Constraint from astroid 2.3.3
-wrapt==1.11.*
-
 # tests failing for pymongo==3.11
 pymongo<3.11
 

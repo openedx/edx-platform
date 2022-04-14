@@ -1063,9 +1063,8 @@ webob==1.8.7
     # via
     #   xblock
     #   xmodule
-wrapt==1.11.2
+wrapt==1.14.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.txt
     #   deprecated
 xblock==1.6.1
