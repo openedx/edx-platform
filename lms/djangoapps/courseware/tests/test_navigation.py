@@ -126,7 +126,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             assert ('course-navigation' in response.content.decode('utf-8')) == accordion
 
         self.assertTabInactive('progress', response)
-        self.assertTabActive('home', response)
+        self.assertTabActive('courseware', response)
 
         response = self.client.get(reverse('courseware_section', kwargs={
             'course_id': str(self.course.id),
@@ -135,7 +135,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         }))
 
         self.assertTabActive('progress', response)
-        self.assertTabInactive('home', response)
+        self.assertTabInactive('courseware', response)
 
     @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=1)
     def test_inactive_session_timeout(self):

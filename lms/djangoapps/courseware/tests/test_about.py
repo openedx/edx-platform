@@ -9,7 +9,6 @@ from unittest import mock
 from unittest.mock import patch
 import ddt
 import pytz
-from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -29,13 +28,11 @@ from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from common.djangoapps.course_modes.models import CourseMode
-from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, course_home_url
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
-from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
-from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.track.tests import EventTrackingTestCase
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
 
@@ -47,7 +44,6 @@ SHIB_ERROR_STR = "The currently logged-in user account does not have permission 
 
 
 @ddt.ddt
-@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTrackingTestCase, MilestonesTestCaseMixin):
     """
     Tests about xblock.
@@ -124,13 +120,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         self.setup_user()
         url = reverse('about_course', args=[str(self.course.id)])
         resp = self.client.get(url)
-        # should be redirected
-        assert resp.status_code == 302
-        # follow this time, and check we're redirected to the course home page
-        resp = self.client.get(url, follow=True)
-        target_url = resp.redirect_chain[-1][0]
-        course_home_url = reverse('openedx.course_experience.course_home', args=[str(self.course.id)])
-        assert target_url.endswith(course_home_url)
+        self.assertRedirects(resp, course_home_url(self.course.id), fetch_redirect_response=False)
 
     @patch.dict(settings.FEATURES, {'ENABLE_COURSE_HOME_REDIRECT': False})
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
@@ -229,7 +219,6 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
             self.assertContains(resp, "Enroll Now")
 
 
-@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the course about page
@@ -273,7 +262,6 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertContains(resp, self.xml_data)
 
 
-@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course has a capped enrollment
@@ -316,7 +304,6 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
         self.assertNotContains(resp, REG_STR)
 
 
-@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutWithInvitationOnly(SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course is invitation only.
@@ -356,7 +343,6 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
         self.assertContains(resp, REG_STR)
 
 
-@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutWithClosedEnrollment(ModuleStoreTestCase):
     """
     This test case will check the About page for a course that has enrollment start/end
@@ -393,7 +379,6 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
     """
     This test case will check the About page for the content in the HTML sidebar.
@@ -433,38 +418,3 @@ class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
                 self.assertContains(resp, itemfactory_data)
             else:
                 self.assertNotContains(resp, '<section class="about-sidebar-html">')
-
-
-class CourseAboutTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
-    """
-    Test for unenrolled student tries to access ccx.
-    Note: Only CCX coach can enroll a student in CCX. In sum self-registration not allowed.
-    """
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course = CourseFactory.create()
-
-    def setUp(self):
-        super().setUp()
-
-        # Create ccx coach account
-        self.coach = coach = AdminFactory.create(password="test")
-        self.client.login(username=coach.username, password="test")
-
-    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
-    def test_redirect_to_dashboard_unenrolled_ccx(self):
-        """
-        Assert that when unenrolled user tries to access CCX do not allow the user to self-register.
-        Redirect them to their student dashboard
-        """
-
-        # create ccx
-        ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, str(ccx.id))
-
-        self.setup_user()
-        url = reverse('openedx.course_experience.course_home', args=[ccx_locator])
-        response = self.client.get(url)
-        expected = reverse('dashboard')
-        self.assertRedirects(response, expected, status_code=302, target_status_code=200)

@@ -69,7 +69,7 @@ from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active, course_home_mfe_progress_tab_is_active
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, check_public_access
 from lms.djangoapps.courseware.courses import (
@@ -124,7 +124,7 @@ from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
-from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url_name
+from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.url_helpers import (
     ExperienceOption,
@@ -488,7 +488,7 @@ def course_info(request, course_id):
 
     # If the unified course experience is enabled, redirect to the "Course" tab
     if not DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
-        return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
+        return redirect(course_home_url(course_key))
 
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)
@@ -922,7 +922,7 @@ def course_about(request, course_id):
 
     # If user needs to be redirected to course home then redirect
     if _course_home_redirect_enabled():
-        return redirect(reverse(course_home_url_name(course_key), args=[str(course_key)]))
+        return redirect(course_home_url(course_key))
 
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
@@ -935,10 +935,7 @@ def course_about(request, course_id):
         studio_url = get_studio_url(course, 'settings/details')
 
         if request.user.has_perm(VIEW_COURSE_HOME, course):
-            if course_home_legacy_is_active(course.id):
-                course_target = reverse(course_home_url_name(course.id), args=[str(course.id)])
-            else:
-                course_target = get_learning_mfe_home_url(course_key=course.id, url_fragment='home')
+            course_target = course_home_url(course.id)
         else:
             course_target = reverse('about_course', args=[str(course.id)])
 
@@ -1489,7 +1486,7 @@ def course_survey(request, course_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key, check_survey_complete=False)
 
-    redirect_url = reverse(course_home_url_name(course.id), args=[course_id])
+    redirect_url = course_home_url(course_key)
 
     # if there is no Survey associated with this course,
     # then redirect to the course instead
@@ -1629,9 +1626,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
     """
-    from lms.urls import RESET_COURSE_DEADLINES_NAME
-    from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
-
     usage_key = UsageKey.from_string(usage_key_string)
 
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
@@ -1738,12 +1732,11 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'missed_deadlines': missed_deadlines,
             'missed_gated_content': missed_gated_content,
             'has_ended': course.has_ended(),
-            'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id]),
+            'web_app_course_url': get_learning_mfe_home_url(course_key=course.id, url_fragment='home'),
             'on_courseware_page': True,
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'is_learning_mfe': is_learning_mfe,
             'is_mobile_app': is_mobile_app,
-            'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
             'render_course_wide_assets': True,
 
             **optimization_flags,

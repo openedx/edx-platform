@@ -40,6 +40,7 @@ from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_duration_limits.access import get_user_course_duration, get_user_course_expiration_date
+from openedx.features.course_experience import course_home_url
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.db import outer_atomic
@@ -413,7 +414,7 @@ class ChooseModeView(View):
             302 to the course if possible or the dashboard if not.
         """
         if course.has_started() or user.is_staff:
-            return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
+            return redirect(course_home_url(course_key))
         else:
             return redirect(reverse('dashboard'))
 

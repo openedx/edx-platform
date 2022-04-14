@@ -7,15 +7,15 @@ perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 from django.conf import settings
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_noop
+from xmodule.tabs import CourseTab, CourseTabList, key_checker
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
-from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active, course_home_mfe_progress_tab_is_active
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from openedx.core.lib.course_tabs import CourseTabPluginManager
-from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, default_course_url_name
+from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, default_course_url
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from common.djangoapps.student.models import CourseEnrollment
-from xmodule.tabs import CourseTab, CourseTabList, course_reverse_func_from_name_func, key_checker  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class EnrolledTab(CourseTab):
@@ -41,13 +41,8 @@ class CoursewareTab(EnrolledTab):
     supports_preview_menu = True
 
     def __init__(self, tab_dict):
-        def link_func(course, reverse_func):
-            if course_home_legacy_is_active(course.id):
-                reverse_name_func = lambda course: default_course_url_name(course.id)
-                url_func = course_reverse_func_from_name_func(reverse_name_func)
-                return url_func(course, reverse_func)
-            else:
-                return get_learning_mfe_home_url(course_key=course.id, url_fragment='home')
+        def link_func(course, _reverse_func):
+            return default_course_url(course.id)
 
         tab_dict['link_func'] = link_func
         super().__init__(tab_dict)

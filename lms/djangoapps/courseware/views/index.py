@@ -40,7 +40,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     DISABLE_COURSE_OUTLINE_PAGE_FLAG,
-    default_course_url_name
+    default_course_url
 )
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
@@ -417,8 +417,7 @@ class CoursewareIndex(View):
         Also returns the table of contents for the courseware.
         """
 
-        course_url_name = default_course_url_name(self.course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': str(self.course.id)})
+        course_url = default_course_url(self.course.id)
         show_search = (
             settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH') or
             (settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF') and self.is_staff)
