@@ -14,6 +14,18 @@ var optimizedConfig = Merge.smart(commonConfig, {
     output: {
         filename: '[name].[chunkhash].js'
     },
+    optimization: {
+        runtimeChunk: "single", // enable "runtime" chunk
+        splitChunks: {
+            cacheGroups: {
+              commons: {
+                name: 'commons',
+                filename: 'commons.[chunkhash].js',
+                minChunks: 3
+              }
+            }
+          }
+    },
     devtool: false,
     plugins: [
         new webpack.DefinePlugin({
@@ -24,13 +36,6 @@ var optimizedConfig = Merge.smart(commonConfig, {
             minimize: true
         }),
         new webpack.optimize.UglifyJsPlugin(),
-        new webpack.optimize.CommonsChunkPlugin({
-            // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html
-            name: 'commons',
-            filename: 'commons.[chunkhash].js',
-            minChunks: 3
-        })
     ]
 }});
 
@@ -52,15 +57,18 @@ var requireCompatConfig = Merge.smart(optimizedConfig, {
     output: {
         filename: '[name].js'
     },
-    plugins: [
-        new webpack.optimize.CommonsChunkPlugin({
-            // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html
-            name: 'commons',
-            filename: 'commons.js',
-            minChunks: 3
-        })
-    ]
+    optimization: {
+        runtimeChunk: "single", // enable "runtime" chunk
+        splitChunks: {
+            cacheGroups: {
+              commons: {
+                name: 'commons',
+                filename: 'commons.js',
+                minChunks: 3
+              }
+            }
+          }
+    },
 }});
 
 // Step 2: Remove the plugin entries that generate the webpack-stats.json files
