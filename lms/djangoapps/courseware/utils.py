@@ -6,6 +6,7 @@ import hashlib
 import logging
 
 from django.conf import settings
+from django.http import HttpResponse, HttpResponseBadRequest
 from edx_rest_api_client.client import OAuthAPIClient
 from oauth2_provider.models import Application
 from pytz import utc  # lint-amnesty, pylint: disable=wrong-import-order
@@ -180,20 +181,21 @@ def create_financial_assistance_application(form_data):
         "income": <income_from_range>,
         "learner_reasons": <TEST_LONG_STRING>,
         "learner_goals": <TEST_LONG_STRING>,
-        "learner_plans": <TEST_LONG_STRING>
+        "learner_plans": <TEST_LONG_STRING>,
+        "allow_for_marketing": <Boolean>
     }
-    TODO: marketing checkmark field will be added in the backend and needs to be updated here.
     """
     response = _request_financial_assistance(
         'POST', f"{settings.CREATE_FINANCIAL_ASSISTANCE_APPLICATION_URL}/", data=form_data
     )
     if response.status_code == status.HTTP_200_OK:
-        return True, None
+        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
     elif response.status_code == status.HTTP_400_BAD_REQUEST:
-        return False, response.json().get('message')
+        log.error(response.json().get('message'))
+        return HttpResponseBadRequest(response.content)
     else:
         log.error('%s %s', UNEXPECTED_ERROR_CREATE_APPLICATION, response.content)
-        return False, UNEXPECTED_ERROR_CREATE_APPLICATION
+        return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 def get_course_hash_value(course_key):

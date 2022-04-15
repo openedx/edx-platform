@@ -44,15 +44,9 @@ from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from web_fragments.fragment import Fragment
-from xmodule.course_module import (
-    COURSE_VISIBILITY_PUBLIC,
-    COURSE_VISIBILITY_PUBLIC_OUTLINE
-)
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import (
-    ItemNotFoundError,
-    NoPathToItem
-)
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
 
@@ -72,6 +66,7 @@ from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, check_public_access
+from lms.djangoapps.courseware.config import ENABLE_NEW_FINANCIAL_ASSISTANCE_FLOW
 from lms.djangoapps.courseware.courses import (
     can_self_enroll_in_course,
     course_open_for_self_enrollment,
@@ -90,13 +85,10 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student, setup_masquerade
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
-from lms.djangoapps.courseware.permissions import (
-    MASQUERADE_AS_STUDENT,
-    VIEW_COURSE_HOME,
-    VIEW_COURSEWARE,
-)
+from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
 from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.utils import create_financial_assistance_application
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -111,7 +103,6 @@ from openedx.core.djangoapps.credit.api import (
     is_credit_course,
     is_user_eligible_for_credit
 )
-from openedx.core.lib.courses import get_course_by_id
 from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -122,6 +113,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url
@@ -1971,6 +1963,48 @@ def financial_assistance_request(request):
 
 
 @login_required
+@require_POST
+def financial_assistance_request_v2(request):
+    """
+    Uses the new financial assistance application flow.
+    Creates a post request to edx-financial-assistance backend.
+    """
+    try:
+        data = json.loads(request.body.decode('utf8'))
+        username = data['username']
+        # Simple sanity check that the session belongs to the user
+        # submitting an FA request
+        if request.user.username != username:
+            return HttpResponseForbidden()
+
+        lms_user_id = request.user.id
+        course_id = data['course']
+        income = data['income']
+        learner_reasons = data['reason_for_applying']
+        learner_goals = data['goals']
+        learner_plans = data['effort']
+        allowed_for_marketing = data['mktg-permission']
+
+    except ValueError:
+        # Thrown if JSON parsing fails
+        return HttpResponseBadRequest('Could not parse request JSON.')
+    except KeyError as err:
+        # Thrown if fields are missing
+        return HttpResponseBadRequest(f'The field {str(err)} is required.')
+
+    form_data = {
+        'lms_user_id': lms_user_id,
+        'course_id': course_id,
+        'income': income,
+        'learner_reasons': learner_reasons,
+        'learner_goals': learner_goals,
+        'learner_plans': learner_plans,
+        'allowed_for_marketing': allowed_for_marketing
+    }
+    return create_financial_assistance_application(form_data)
+
+
+@login_required
 def financial_assistance_form(request):
     """Render the financial assistance application form page."""
     user = request.user
@@ -1982,6 +2016,11 @@ def financial_assistance_form(request):
     annual_incomes = [
         {'name': _(income), 'value': income} for income in incomes  # lint-amnesty, pylint: disable=translation-of-non-string
     ]
+    if ENABLE_NEW_FINANCIAL_ASSISTANCE_FLOW.is_enabled():
+        submit_url = 'submit_financial_assistance_request_v2'
+    else:
+        submit_url = 'submit_financial_assistance_request'
+
     return render_to_response('financial-assistance/apply.html', {
         'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER),
         'student_faq_url': marketing_link('FAQ'),
@@ -1994,7 +2033,7 @@ def financial_assistance_form(request):
             'name': user.profile.name,
             'country': str(user.profile.country.name),
         },
-        'submit_url': reverse('submit_financial_assistance_request'),
+        'submit_url': reverse(submit_url),
         'fields': [
             {
                 'name': 'course',

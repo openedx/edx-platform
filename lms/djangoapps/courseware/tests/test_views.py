@@ -13,13 +13,12 @@ from urllib.parse import urlencode
 from uuid import uuid4
 
 import ddt
-from capa.tests.response_xml_factory import \
-    MultipleChoiceResponseXMLFactory
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.http.request import QueryDict
 from django.test import RequestFactory, TestCase
 from django.test.client import Client
@@ -31,24 +30,17 @@ from markupsafe import escape
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
+from rest_framework import status
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
-from xmodule.course_module import (
-    COURSE_VISIBILITY_PRIVATE,
-    COURSE_VISIBILITY_PUBLIC,
-    COURSE_VISIBILITY_PUBLIC_OUTLINE
-)
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import (
-    CourseFactory,
-    ItemFactory,
-    check_mongo_calls
-)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 import lms.djangoapps.courseware.views.views as views
 from common.djangoapps.course_modes.models import CourseMode
@@ -957,9 +949,9 @@ class ViewsTestCase(BaseViewsTestCase):
 
         self.assertContains(response, str(course))
 
-    def _submit_financial_assistance_form(self, data):
+    def _submit_financial_assistance_form(self, data, submit_url='submit_financial_assistance_request'):
         """Submit a financial assistance request."""
-        url = reverse('submit_financial_assistance_request')
+        url = reverse(submit_url)
         return self.client.post(url, json.dumps(data), content_type='application/json')
 
     @patch.object(views, 'create_zendesk_ticket', return_value=200)
@@ -1020,15 +1012,33 @@ class ViewsTestCase(BaseViewsTestCase):
         })
         assert response.status_code == 500
 
+    @patch.object(
+        views, 'create_financial_assistance_application', return_value=HttpResponse(status=status.HTTP_204_NO_CONTENT)
+    )
+    def test_submit_financial_assistance_request_v2(self, create_application_mock):
+        form_data = {
+            'username': self.user.username,
+            'course': 'course-v1:test+TestX+Test_Course',
+            'income': '$25,000 - $40,000',
+            'reason_for_applying': "It's just basic chemistry, yo.",
+            'goals': "I don't know if it even matters, but... work with my hands, I guess.",
+            'effort': "I'm done, okay? You just give me my money, and you and I, we're done.",
+            'mktg-permission': False
+        }
+        response = self._submit_financial_assistance_form(
+            form_data, submit_url='submit_financial_assistance_request_v2'
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
     @ddt.data(
         ({}, 400),
         ({'username': 'wwhite'}, 403),
         ({'username': 'dummy', 'course': 'bad course ID'}, 400)
     )
     @ddt.unpack
-    def test_submit_financial_assistance_errors(self, data, status):
+    def test_submit_financial_assistance_errors(self, data, response_status):
         response = self._submit_financial_assistance_form(data)
-        assert response.status_code == status
+        assert response.status_code == response_status
 
     def test_financial_assistance_login_required(self):
         for url in (
