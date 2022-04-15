@@ -40,8 +40,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     CourseDiscussionSettings,
     DiscussionsIdMapping,
-    Role
-)
+    Role,
+    FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR)
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
@@ -144,6 +144,25 @@ def is_user_community_ta(user, course_id):
     Boolean operation to check whether a user's role is Community TA or not
     """
     return has_forum_access(user, course_id, FORUM_ROLE_COMMUNITY_TA)
+
+
+def get_users_with_moderator_roles(course_id):
+    """
+    Get all users within course with moderator roles
+    :param course_id:
+    :return:
+    """
+    moderators = {
+        user
+        for role in Role.objects.filter(
+            name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR,
+                      FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_GROUP_MODERATOR],
+            course_id=course_id
+        )
+        for user in role.users.all()
+    }
+
+    return moderators
 
 
 def get_discussion_id_map_entry(xblock):
