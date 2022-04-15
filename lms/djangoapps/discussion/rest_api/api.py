@@ -27,6 +27,7 @@ from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
@@ -51,6 +52,8 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_deleted,
     thread_edited,
     thread_voted,
+    thread_flagged,
+    comment_flagged,
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
@@ -1018,6 +1021,11 @@ def _handle_abuse_flagged_field(form_value, user, cc_content):
     """mark or unmark thread/comment as abused"""
     if form_value:
         cc_content.flagAbuse(user, cc_content)
+        if reported_content_email_notification_enabled(CourseKey.from_string(cc_content.course_id)):
+            if cc_content.type == 'thread':
+                thread_flagged.send(sender='flag_abuse_for_thread', user=user, post=cc_content)
+            else:
+                comment_flagged.send(sender='flag_abuse_for_comment', user=user, post=cc_content)
     else:
         cc_content.unFlagAbuse(user, cc_content, removeAll=False)
 
