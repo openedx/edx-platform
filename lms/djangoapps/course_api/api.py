@@ -11,6 +11,7 @@ from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
 from edx_when.api import get_dates_for_course
 from opaque_keys.edx.django.models import CourseKeyField
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
@@ -286,7 +287,8 @@ def get_course_run_url(request, course_id):
     Returns:
         (string): the URL to the course run associated with course_id
     """
-    return request.build_absolute_uri(course_home_url(course_id))
+    course_key = CourseKey.from_string(str(course_id))
+    return request.build_absolute_uri(course_home_url(course_key))
 
 
 def get_course_members(course_key):
