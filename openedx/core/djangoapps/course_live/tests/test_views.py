@@ -234,7 +234,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         self.assertEqual(data, {
             'tab_id': 'lti_live',
             'title': 'Live',
-            'url': f'http://testserver/courses/{self.course.id}/tab/lti_live/'
+            'url': f'http://learning-mfe/course/{self.course.id}/live'
         })
 
 
