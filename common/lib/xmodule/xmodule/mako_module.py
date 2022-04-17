@@ -5,7 +5,7 @@ Code to handle mako templating for XModules and XBlocks.
 
 from web_fragments.fragment import Fragment
 
-from .x_module import DescriptorSystem, XModuleDescriptor, shim_xmodule_js
+from .x_module import DescriptorSystem, shim_xmodule_js
 
 
 class MakoDescriptorSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstract-method
@@ -71,7 +71,8 @@ class MakoTemplateBlockBase:
         return fragment
 
 
-class MakoModuleDescriptor(MakoTemplateBlockBase, XModuleDescriptor):  # pylint: disable=abstract-method
+@XBlock.needs("i18n")
+class MakoModuleDescriptor(MakoTemplateBlockBase, XModuleMixin):  # pylint: disable=abstract-method
     """
     Mixin to use for XModule descriptors.
     """

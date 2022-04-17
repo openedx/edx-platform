@@ -259,14 +259,10 @@ class HTMLSnippet:
 
     @classmethod
     def get_studio_view_js(cls):
-        if issubclass(cls, XModuleDescriptor):
-            return cls.get_javascript()
         return cls.studio_view_js
 
     @classmethod
     def get_studio_view_js_bundle_name(cls):
-        if issubclass(cls, XModuleDescriptor):
-            return cls.__name__
         return cls.__name__ + 'Studio'
 
     @classmethod
@@ -291,8 +287,6 @@ class HTMLSnippet:
 
     @classmethod
     def get_studio_view_css(cls):
-        if issubclass(cls, XModuleDescriptor):
-            return cls.get_css()
         return cls.studio_view_css
 
     def get_html(self):
@@ -1765,18 +1759,6 @@ class CombinedSystem:
         self._module_system = module_system
         self._descriptor_system = descriptor_system
 
-    def _get_student_block(self, block):
-        """
-        If block is an XModuleDescriptor that has been bound to a student, return
-        the corresponding XModule, instead of the XModuleDescriptor.
-
-        Otherwise, return block.
-        """
-        if isinstance(block, XModuleDescriptor) and block.xmodule_runtime:
-            return block._xmodule  # pylint: disable=protected-access
-        else:
-            return block
-
     def render(self, block, view_name, context=None):
         """
         Render a block by invoking its view.
@@ -1791,9 +1773,6 @@ class CombinedSystem:
 
         """
         context = context or {}
-        if view_name in PREVIEW_VIEWS:
-            block = self._get_student_block(block)
-
         return self.__getattr__('render')(block, view_name, context)
 
     def service(self, block, service_name):
