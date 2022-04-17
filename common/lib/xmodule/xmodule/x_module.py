@@ -822,11 +822,6 @@ class XModuleMixin(XModuleFields, XBlock):
         return Fragment(alert_html.format(display_text))
 
 
-module_attr = partial(ProxyAttribute, '_xmodule')  # pylint: disable=invalid-name
-descriptor_attr = partial(ProxyAttribute, 'descriptor')  # pylint: disable=invalid-name
-module_runtime_attr = partial(ProxyAttribute, 'xmodule_runtime')  # pylint: disable=invalid-name
-
-
 class XModuleToXBlockMixin:
     """
     Common code needed by XModule and XBlocks converted from XModules.
