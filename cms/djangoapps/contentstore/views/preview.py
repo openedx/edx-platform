@@ -25,7 +25,7 @@ from xmodule.services import SettingsService, TeamsConfigurationService
 from xmodule.studio_editable import has_author_view
 from xmodule.util.sandboxing import SandboxService
 from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem, XModule, XModuleDescriptor
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem, XModuleDescriptor
 from cms.djangoapps.xblock_config.models import StudioConfig
 from cms.lib.xblock.field_data import CmsFieldData
 from common.djangoapps.static_replace.services import ReplaceURLService
@@ -307,7 +307,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'language': getattr(course, 'language', None)
         }
 
-        if isinstance(xblock, (XModule, XModuleDescriptor)):
+        if isinstance(xblock, XModuleDescriptor):
             # Add the webpackified asset tags
             class_name = getattr(xblock.__class__, 'unmixed_class', xblock.__class__).__name__
             add_webpack_to_fragment(frag, class_name)

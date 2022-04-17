@@ -67,7 +67,6 @@ from common.djangoapps.util.milestones_helpers import (
 from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import XModule  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -151,9 +150,6 @@ def has_access(user, action, obj, course_key=None):
 
     if isinstance(obj, ErrorBlock):
         return _has_access_error_desc(user, action, obj, course_key)
-
-    if isinstance(obj, XModule):
-        return _has_access_xmodule(user, action, obj, course_key)
 
     # NOTE: any descriptor access checkers need to go above this
     if isinstance(obj, XBlock):

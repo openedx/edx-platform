@@ -33,7 +33,7 @@ from xmodule.util.xmodule_django import add_webpack_to_fragment  # lint-amnesty,
 from xmodule.vertical_block import VerticalBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import (  # lint-amnesty, pylint: disable=wrong-import-order
     PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW,
-    XModule, XModuleDescriptor, shim_xmodule_js,
+    XModuleDescriptor, shim_xmodule_js,
 )
 
 log = logging.getLogger(__name__)
@@ -114,7 +114,7 @@ def wrap_xblock(
     if view == STUDENT_VIEW and getattr(block, 'HIDDEN', False):
         css_classes.append('is-hidden')
 
-    if isinstance(block, (XModule, XModuleDescriptor)) or getattr(block, 'uses_xmodule_styles_setup', False):
+    if isinstance(block, XModuleDescriptor) or getattr(block, 'uses_xmodule_styles_setup', False):
         if view in PREVIEW_VIEWS:
             # The block is acting as an XModule
             css_classes.append('xmodule_display')
@@ -124,7 +124,7 @@ def wrap_xblock(
 
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
 
-    if isinstance(block, (XModule, XModuleDescriptor)):
+    if isinstance(block, XModuleDescriptor)):
         data['type'] = block.js_module_name
         shim_xmodule_js(frag, block.js_module_name)
 
@@ -155,7 +155,7 @@ def wrap_xblock(
     else:
         template_context['js_init_parameters'] = ""
 
-    if isinstance(block, (XModule, XModuleDescriptor)):
+    if isinstance(block, XModuleDescriptor)):
         # Add the webpackified asset tags
         add_webpack_to_fragment(frag, class_name)
 

@@ -251,14 +251,10 @@ class HTMLSnippet:
 
     @classmethod
     def get_preview_view_js(cls):
-        if issubclass(cls, XModule):
-            return cls.get_javascript()
         return cls.preview_view_js
 
     @classmethod
     def get_preview_view_js_bundle_name(cls):
-        if issubclass(cls, XModule):
-            return cls.__name__
         return cls.__name__ + 'Preview'
 
     @classmethod
@@ -291,8 +287,6 @@ class HTMLSnippet:
 
     @classmethod
     def get_preview_view_css(cls):
-        if issubclass(cls, XModule):
-            return cls.get_css()
         return cls.preview_view_css
 
     @classmethod
