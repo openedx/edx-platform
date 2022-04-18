@@ -91,7 +91,6 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     DISABLE_COURSE_OUTLINE_PAGE_FLAG,
-    DISABLE_UNIFIED_COURSE_TAB_FLAG,
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.course_experience.url_helpers import (
@@ -1021,19 +1020,6 @@ class ViewsTestCase(BaseViewsTestCase):
             self.client.logout()
             response = self.client.get(url)
             self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
-
-    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
-    def test_bypass_course_info(self):
-        course_id = str(self.course_key)
-
-        response = self.client.get(reverse('info', args=[course_id]))
-        assert response.status_code == 200
-
-        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
-        assert response.status_code == 200
-
-        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER='foo')
-        assert response.status_code == 200
 
 
 # Patching 'lms.djangoapps.courseware.views.views.get_programs' would be ideal,

@@ -1661,9 +1661,6 @@ INSTALLED_APPS = [
     # edx-milestones service
     'milestones',
 
-    # Self-paced course configuration
-    'openedx.core.djangoapps.self_paced',
-
     # Coursegraph
     'cms.djangoapps.coursegraph.apps.CoursegraphConfig',
 

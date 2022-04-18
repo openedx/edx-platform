@@ -113,7 +113,7 @@ class TabsPageTests(CourseTestCase):
     def test_reorder_tabs_invalid_tab(self):
         """Test re-ordering of tabs with invalid tab"""
 
-        invalid_tab_ids = ['courseware', 'info', 'invalid_tab_id']
+        invalid_tab_ids = ['courseware', 'invalid_tab_id']
 
         # post the request
         resp = self.client.ajax_post(
@@ -189,16 +189,14 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
         course = CourseFactory.create()
         with self.assertRaises(ValueError):
             tabs.primitive_delete(course, 0)
-        with self.assertRaises(ValueError):
-            tabs.primitive_delete(course, 1)
         with self.assertRaises(IndexError):
-            tabs.primitive_delete(course, 7)
+            tabs.primitive_delete(course, 6)
 
-        assert course.tabs[2] != {'type': 'dates', 'name': 'Dates'}
-        tabs.primitive_delete(course, 2)
+        assert course.tabs[1] != {'type': 'dates', 'name': 'Dates'}
+        tabs.primitive_delete(course, 1)
         assert {'type': 'progress'} not in course.tabs
         # Check that dates has shifted up
-        assert course.tabs[2] == {'type': 'dates', 'name': 'Dates'}
+        assert course.tabs[1] == {'type': 'dates', 'name': 'Dates'}
 
     def test_insert(self):
         """Test primitive tab insertion."""

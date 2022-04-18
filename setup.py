@@ -20,7 +20,6 @@ setup(
         "openedx.course_tab": [
             "ccx = lms.djangoapps.ccx.plugins:CcxCourseTab",
             "courseware = lms.djangoapps.courseware.tabs:CoursewareTab",
-            "course_info = lms.djangoapps.courseware.tabs:CourseInfoTab",
             "dates = lms.djangoapps.courseware.tabs:DatesTab",
             "discussion = lms.djangoapps.discussion.plugins:DiscussionTab",
             "edxnotes = lms.djangoapps.edxnotes.plugins:EdxNotesTab",
