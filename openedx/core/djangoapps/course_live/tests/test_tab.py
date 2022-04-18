@@ -33,7 +33,7 @@ class CourseLiveTabTestCase(TabTestCase):
             lti_1p1_client_secret='test_client_secret',
         )
         self.course_live_config.save()
-        self.url = self.reverse('course_tab_view', args=[str(self.course.id), CourseLiveTab.type])
+        self.url = f"http://learning-mfe/course/{str(self.course.id)}/live"
 
     def check_course_live_tab(self):
         """
