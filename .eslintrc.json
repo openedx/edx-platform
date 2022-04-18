@@ -1,5 +1,5 @@
 {
-  "extends": "@edx/eslint-config",
+  "extends": "eslint-config-edx-es5",
   "globals": {  // Try to avoid adding any new globals.
     // Old compatibility things and hacks
     "edx": true,
