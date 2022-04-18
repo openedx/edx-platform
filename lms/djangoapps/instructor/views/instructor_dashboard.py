@@ -749,6 +749,7 @@ def _section_open_response_assessment(request, course, openassessment_blocks, ac
             'parent_name': parents[block_parent_id].display_name,
             'staff_assessment': 'staff-assessment' in block.assessment_steps,
             'peer_assessment': 'peer-assessment' in block.assessment_steps,
+            'team_assignment': block.teams_enabled,
             'url_base': reverse('xblock_view', args=[course.id, block.location, 'student_view']),
             'url_grade_available_responses': reverse('xblock_view', args=[course.id, block.location,
                                                                           'grade_available_responses_view']),
