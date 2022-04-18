@@ -167,7 +167,7 @@ class InitializeSerializer(serializers.Serializer):
     courseMetadata = CourseMetadataSerializer()
     oraMetadata = OpenResponseMetadataSerializer()
     submissions = serializers.DictField(child=SubmissionMetadataSerializer())
-    isEnabled = serializers.BooleanField()
+    isEnabled = serializers.SerializerMethodField()
 
     class Meta:
         fields = [
@@ -177,6 +177,13 @@ class InitializeSerializer(serializers.Serializer):
             "isEnabled"
         ]
         read_only_fields = fields
+
+    def get_isEnabled(self, obj):
+        """
+        Only enable ESG if the flag is enabled and also this is not a Team ORA
+        Revert back to BooleanField in AU-617 when ESG officially supports team ORAs
+        """
+        return obj['isEnabled'] and not obj['oraMetadata'].teams_enabled
 
 
 class UploadedFileSerializer(serializers.Serializer):
