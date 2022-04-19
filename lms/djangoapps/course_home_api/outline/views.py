@@ -33,7 +33,6 @@ from lms.djangoapps.courseware.context_processor import user_timezone_locale_pre
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
-from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.content.learning_sequences.api import get_user_course_outline
@@ -268,8 +267,11 @@ class OutlineTabView(RetrieveAPIView):
                     'Please contact your degree administrator or '
                     '{platform_name} Support if you have questions.'
                 ).format(platform_name=settings.PLATFORM_NAME)
-            elif course_is_invitation_only(course):
+            elif CourseEnrollment.is_enrollment_closed(request.user, course_overview):
                 enroll_alert['can_enroll'] = False
+            elif CourseEnrollment.objects.is_course_full(course_overview):
+                enroll_alert['can_enroll'] = False
+                enroll_alert['extra_text'] = _('Course is full')
 
         # Sometimes there are sequences returned by Course Blocks that we
         # don't actually want to show to the user, such as when a sequence is
