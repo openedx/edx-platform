@@ -11,7 +11,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
+from lms.djangoapps.courseware.tests.helpers import set_preview_mode
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -25,7 +25,7 @@ TEST_VERIFICATION_SOCK_LOCATOR = '<div class="verification-sock"'
 
 
 @ddt.ddt
-@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
+@set_preview_mode(True)
 class TestCourseSockView(SharedModuleStoreTestCase):
     """
     Tests for the course verification sock fragment view.
@@ -47,7 +47,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
 
     def setUp(self):
         super().setUp()
-        self.user = UserFactory.create()
+        self.user = UserFactory.create(is_staff=True)
 
         # Enroll the user in the four courses
         CourseEnrollmentFactory.create(user=self.user, course_id=self.standard_course.id)

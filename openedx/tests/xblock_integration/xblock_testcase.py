@@ -48,14 +48,12 @@ import pytz
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
 from xblock.plugin import Plugin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 import lms.djangoapps.lms_xblock.runtime
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 
 
 class XBlockEventTestMixin:
@@ -273,14 +271,7 @@ class XBlockScenarioTestCaseMixin:
                     )
                     cls.xblocks[xblock_config['urlname']] = xblock
 
-                scenario_url = str(reverse(
-                    'courseware_section',
-                    kwargs={
-                        'course_id': str(cls.course.id),
-                        'chapter': "ch_" + chapter_config['urlname'],
-                        'section': "sec_" + chapter_config['urlname']
-                    }
-                ))
+                scenario_url = reverse('render_xblock', args=[str(section.location)])
 
                 cls.scenario_urls[chapter_config['urlname']] = scenario_url
 
@@ -337,7 +328,6 @@ class XBlockStudentTestCaseMixin:
         self.login(email, password)
 
 
-@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class XBlockTestCase(XBlockStudentTestCaseMixin,
                      XBlockScenarioTestCaseMixin,
                      XBlockEventTestMixin,

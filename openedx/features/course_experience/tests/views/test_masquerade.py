@@ -5,8 +5,7 @@ Tests for masquerading functionality on course_experience
 from django.urls import reverse
 
 from edx_toggles.toggles.testutils import override_waffle_flag
-from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
-from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
+from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, set_preview_mode
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -62,12 +61,12 @@ class MasqueradeTestBase(SharedModuleStoreTestCase, MasqueradeMixin):
         return None
 
 
+@set_preview_mode(True)
 class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
     """
     Tests for the course verification upgrade messages while the user is being masqueraded.
     """
 
-    @override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_masquerade_as_student(self):
         # Elevate the staff user to be student
@@ -75,7 +74,6 @@ class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
         response = self.client.get(reverse('courseware', kwargs={'course_id': str(self.verified_course.id)}))
         self.assertContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
 
-    @override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_masquerade_as_verified_student(self):
         user_group_id = self.get_group_id_by_course_mode_name(
@@ -87,7 +85,6 @@ class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
         response = self.client.get(reverse('courseware', kwargs={'course_id': str(self.verified_course.id)}))
         self.assertNotContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
 
-    @override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_masquerade_as_masters_student(self):
         user_group_id = self.get_group_id_by_course_mode_name(
