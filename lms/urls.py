@@ -943,6 +943,11 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             'financial-assistance/submit/',
             courseware_views.financial_assistance_request,
             name='submit_financial_assistance_request'
+        ),
+        path(
+            'financial-assistance_v2/submit/',
+            courseware_views.financial_assistance_request_v2,
+            name='submit_financial_assistance_request_v2'
         )
     ]
 

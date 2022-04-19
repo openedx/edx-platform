@@ -127,21 +127,7 @@ class TestFinancialAssistanceViews(TestCase):
             assert has_application is False
             assert reason == response_data.get('content').get('message')
 
-    @ddt.data(
-        {
-            'status': status.HTTP_400_BAD_REQUEST,
-            'content': {'message': 'Invalid course id provided'},
-            'message': 'Invalid course id provided',
-            'created': False
-        },
-        {
-            'status': status.HTTP_200_OK,
-            'content': {'success': True},
-            'message': None,
-            'created': True
-        }
-    )
-    def test_create_financial_assistance_application(self, response_data):
+    def test_create_financial_assistance_application(self):
         """
         Tests the functionality of create_financial_assistance_application which calls edx-financial-assistance backend
         to create a new financial assistance application given a form data.
@@ -149,10 +135,26 @@ class TestFinancialAssistanceViews(TestCase):
         test_form_data = {
             'lms_user_id': self.user.id,
             'course_id': self.test_course_id,
-            'income': '85K_TO_100K'
+            'income': '$85,000 - $100,000'
         }
         with patch.object(OAuthAPIClient, 'request') as oauth_mock:
-            oauth_mock.return_value = self._mock_response(response_data.get('status'), response_data.get('content'))
-            created, message = create_financial_assistance_application(form_data=test_form_data)
-            assert created is response_data.get('created')
-            assert message == response_data.get('message')
+            oauth_mock.return_value = self._mock_response(status.HTTP_200_OK, {'success': True})
+            response = create_financial_assistance_application(form_data=test_form_data)
+            assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    def test_create_financial_assistance_application_bad_request(self):
+        """
+        Tests the functionality of create_financial_assistance_application which calls edx-financial-assistance backend
+        to create a new financial assistance application given a form data.
+        """
+        test_form_data = {
+            'lms_user_id': self.user.id,
+            'course_id': 'invalid_course_id',
+            'income': '$85,000 - $100,000'
+        }
+        error_response = {'message': 'Invalid course id provided'}
+        with patch.object(OAuthAPIClient, 'request') as oauth_mock:
+            oauth_mock.return_value = self._mock_response(status.HTTP_400_BAD_REQUEST, error_response)
+            response = create_financial_assistance_application(form_data=test_form_data)
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            assert json.loads(response.content.decode('utf-8')) == error_response
