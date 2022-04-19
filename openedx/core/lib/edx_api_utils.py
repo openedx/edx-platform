@@ -124,7 +124,7 @@ def get_api_data(api_config, resource, api_client, base_api_url, resource_id=Non
                  querystring=None, cache_key=None, many=True,
                  traverse_pagination=True, fields=None, long_term_cache=False):
     """
-    GET data from an edX REST API_client.
+    GET data from an edX REST API endpoint using the API client.
 
     DRY utility for handling caching and pagination.
 
