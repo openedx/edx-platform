@@ -893,7 +893,7 @@ openedx-events==0.8.2
     # via -r requirements/edx/base.txt
 openedx-filters==0.6.1
     # via -r requirements/edx/base.txt
-ora2==4.1.2
+ora2==4.2.0
     # via -r requirements/edx/base.txt
 packaging==21.3
     # via
