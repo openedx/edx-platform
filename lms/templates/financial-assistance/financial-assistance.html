@@ -5,47 +5,54 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
+
 %>
 
 <div class="financial-assistance-wrapper">
 
-  <div class="financial-assistance financial-assistance-header">
-    <h1>${_("Financial Assistance Application")}</h1>
-    % for line in header_text:
-      <p>${line}</p>
-    % endfor
-  </div>
+  % if reason:
+    <p>This course is not eligible for Financial Assistance for the following reason: <b>${reason}</b></p>
+  % else:
+    <div class="financial-assistance financial-assistance-header">
+      <h1>${_("Financial Assistance Application")}</h1>
+      % for line in header_text:
+        <p>${line}</p>
+      % endfor
+    </div>
+    <div class="financial-assistance financial-assistance-body">
+      <h2>${_("A Note to Learners")}</h2>
+      ## Translators: This string will not be used in Open edX installations.
+      <p>${_("Dear edX Learner,")}</p>
 
-  <div class="financial-assistance financial-assistance-body">
-    <h2>${_("A Note to Learners")}</h2>
-    ## Translators: This string will not be used in Open edX installations.
-    <p>${_("Dear edX Learner,")}</p>
+      ## Translators: This string will not be used in Open edX installations.
+      <p>${_("EdX Financial Assistance is a program we created to give learners in all financial circumstances a chance to earn a Verified Certificate upon successful completion of an edX course.")}</p>
 
-    ## Translators: This string will not be used in Open edX installations.
-    <p>${_("EdX Financial Assistance is a program we created to give learners in all financial circumstances a chance to earn a Verified Certificate upon successful completion of an edX course.")}</p>
+      ## Translators: This string will not be used in Open edX installations.
+      <p>${_("If you are interested in working toward a Verified Certificate, but cannot afford to pay the fee, please apply now. Please note that financial assistance is limited and may not be awarded to all eligible candidates.")}</p>
 
-    ## Translators: This string will not be used in Open edX installations.
-    <p>${_("If you are interested in working toward a Verified Certificate, but cannot afford to pay the fee, please apply now. Please note that financial assistance is limited and may not be awarded to all eligible candidates.")}</p>
+      ## Translators: This string will not be used in Open edX installations.
+      <p>${_("In order to be eligible for edX Financial Assistance, you must demonstrate that paying the Verified Certificate fee would cause you economic hardship. To apply, you will be asked to answer a few questions about why you are applying and how the Verified Certificate will benefit you.")}</p>
 
-    ## Translators: This string will not be used in Open edX installations.
-    <p>${_("In order to be eligible for edX Financial Assistance, you must demonstrate that paying the Verified Certificate fee would cause you economic hardship. To apply, you will be asked to answer a few questions about why you are applying and how the Verified Certificate will benefit you.")}</p>
+      ## Translators: This string will not be used in Open edX installations.
+      <p>${_("If your application is approved, we'll give you instructions for verifying your identity on edx.org so you can start working toward completing your edX course.")}</p>
 
-    ## Translators: This string will not be used in Open edX installations.
-    <p>${_("If your application is approved, we'll give you instructions for verifying your identity on edx.org so you can start working toward completing your edX course.")}</p>
+      ## Translators: This string will not be used in Open edX installations.
+      <p>${_("EdX is committed to making it possible for you to take high quality courses from leading institutions regardless of your financial situation, earn a Verified Certificate, and share your success with others.")}</p>
+      ## Translators: This string will not be used in Open edX installations. Do not translate the name "Anant".
+      <p class="signature">${_("Sincerely, Anant")}</p>
+    </div>
+  % endif
 
-    ## Translators: This string will not be used in Open edX installations.
-    <p>${_("EdX is committed to making it possible for you to take high quality courses from leading institutions regardless of your financial situation, earn a Verified Certificate, and share your success with others.")}</p>
-    ## Translators: This string will not be used in Open edX installations. Do not translate the name "Anant".
-    <p class="signature">${_("Sincerely, Anant")}</p>
-  </div>
 
   <div class="financial-assistance-footer">
-    <%
-      faq_link = marketing_link('FAQ')
-    %>
-    % if faq_link != '#':
-      <a class="faq-link" href="${faq_link}">${_("Back to Student FAQs")}</a>
-    % endif
-    <a class="action-link" href="${reverse('financial_assistance_form')}">${_("Apply for Financial Assistance")}</a>
+  <%
+    faq_link = marketing_link('FAQ')
+  %>
+  % if faq_link != '#':
+    <a class="faq-link" href="${faq_link}">${_("Back to Student FAQs")}</a>
+  % endif
+  % if not reason:
+    <a class="action-link" href="${apply_url}">${_("Apply for Financial Assistance")}</a>
+  % endif
   </div>
 </div>
