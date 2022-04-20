@@ -100,8 +100,3 @@ mistune<2.0.0
 # The PR https://github.com/celery/django-celery-results/pull/292 fixing this issue has been merged but
 # new version hasn't been released yet with the fix so pinning the version until django-celery-results>2.3.0 is out.
 django-celery-results<2.3.0
-
-# bleach==5.0.0 contains breaking changes related to clean() function used to sanitize css
-# Code needs to be refactored to fix the test failures with the new version.
-# Will be done in https://openedx.atlassian.net/browse/BOM-3374
-bleach<5.0.0
