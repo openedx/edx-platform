@@ -7,9 +7,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import InstructorFactory
-from lms.djangoapps.bulk_email.api import create_course_email
+from lms.djangoapps.bulk_email.api import create_course_email, get_course_email
 from lms.djangoapps.bulk_email.data import BulkEmailTargetChoices
 from openedx.core.lib.html_to_text import html_to_text
+
+LOG_PATH = "lms.djangoapps.bulk_email.api"
 
 
 class CreateCourseEmailTests(ModuleStoreTestCase):
@@ -77,10 +79,10 @@ class CreateCourseEmailTests(ModuleStoreTestCase):
         """
         targets = ["humpty dumpty"]
 
-        expected_messages = [
+        expected_message = (
             f"Cannot create course email for {self.course.id} requested by user {self.instructor} for targets "
-            f"{targets}",
-        ]
+            f"{targets}"
+        )
 
         with self.assertRaises(ValueError):
             with LogCapture() as log:
@@ -92,5 +94,33 @@ class CreateCourseEmailTests(ModuleStoreTestCase):
                     self.html_message
                 )
 
-        for index, message in enumerate(expected_messages):
-            assert message in log.records[index].getMessage()
+        log.check_present(
+            (LOG_PATH, "ERROR", expected_message),
+        )
+
+    def test_get_course_email(self):
+        """
+        A test to verify the happy path behavior of the `get_course_email` utility function and the presence of an
+        expected log message when an email instance can't be found for a given id.
+        """
+        course_email = create_course_email(
+            self.course.id,
+            self.instructor,
+            self.target,
+            self.subject,
+            self.html_message,
+        )
+
+        email_instance = get_course_email(course_email.id)
+        assert email_instance.id == course_email.id
+
+        email_id_dne = 3463435
+        expected_message = (
+            f"CourseEmail instance with id '{email_id_dne}' could not be found"
+        )
+        with LogCapture() as log:
+            get_course_email(email_id_dne)
+
+        log.check_present(
+            (LOG_PATH, "ERROR", expected_message),
+        )

@@ -16,11 +16,13 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import normalize_repr
-from lms.djangoapps.bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
+from lms.djangoapps.bulk_email.api import create_course_email
+from lms.djangoapps.bulk_email.data import BulkEmailTargetChoices
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
+    generate_anonymous_ids,
     generate_certificates_for_students,
     get_instructor_task_history,
     get_running_instructor_tasks,
@@ -42,7 +44,6 @@ from lms.djangoapps.instructor_task.api import (
     submit_rescore_problem_for_student,
     submit_reset_problem_attempts_for_all_students,
     submit_reset_problem_attempts_in_entrance_exam,
-    generate_anonymous_ids
 )
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import PROGRESS, SCHEDULED, InstructorTask
@@ -217,12 +218,15 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
     def _define_course_email(self):
         """Create CourseEmail object for testing."""
-        # TODO: convert to use bulk_email app's `create_course_email` API function and remove direct import and use of
-        # bulk_email model
-        course_email = CourseEmail.create(
+        email_recipient_groups = [
+            BulkEmailTargetChoices.SEND_TO_MYSELF,
+            BulkEmailTargetChoices.SEND_TO_STAFF,
+            BulkEmailTargetChoices.SEND_TO_LEARNERS
+        ]
+        course_email = create_course_email(
             self.course.id,
             self.instructor,
-            [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS],
+            email_recipient_groups,
             "Test Subject",
             "<p>This is a test message</p>"
         )

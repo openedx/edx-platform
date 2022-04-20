@@ -2,8 +2,6 @@
 """
 Python APIs exposed by the bulk_email app to other in-process apps.
 """
-
-# Public Bulk Email Functions
 import logging
 
 from django.conf import settings
@@ -12,7 +10,6 @@ from django.urls import reverse
 from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.bulk_email.models_api import (
     is_bulk_email_disabled_for_course,
-    is_bulk_email_enabled_for_course,
     is_bulk_email_feature_enabled,
     is_user_opted_out_for_course
 )
@@ -41,7 +38,6 @@ def get_emails_enabled(user, course_id):
 
 def get_unsubscribed_link(username, course_id):
     """
-
     :param username: username
     :param course_id:
     :return: AES encrypted token based on the user email
@@ -87,3 +83,21 @@ def create_course_email(course_id, sender, targets, subject, html_message, text_
     except ValueError as err:
         log.exception(f"Cannot create course email for {course_id} requested by user {sender} for targets {targets}")
         raise ValueError from err
+
+
+def get_course_email(email_id):
+    """
+    Utility function for retrieving a CourseEmail instance from a given CourseEmail id.
+
+    Args:
+        email_id (int): The ID of the CourseEmail instance you want to retrieve.
+
+    Returns:
+        CourseEmail: The CourseEmail instance, if it exists.
+    """
+    try:
+        return CourseEmail.objects.get(id=email_id)
+    except CourseEmail.DoesNotExist:
+        log.exception(f"CourseEmail instance with id '{email_id}' could not be found")
+
+    return None
