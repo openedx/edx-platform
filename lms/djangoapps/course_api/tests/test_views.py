@@ -23,6 +23,7 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.auth import add_users
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -417,14 +418,14 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.setup_user(self.audit_user)
 
         # These query counts were found empirically
-        query_counts = [54, 46, 46, 46, 46, 46, 46, 46, 46, 46, 16]
+        query_counts = [50, 46, 46, 46, 46, 46, 46, 46, 46, 46, 16]
         ordered_course_ids = sorted([str(cid) for cid in (course_ids + [c.id for c in self.courses])])
 
         self.clear_caches()
 
         for page in range(1, 12):
             RequestCache.clear_all_namespaces()
-            with self.assertNumQueries(query_counts[page - 1]):
+            with self.assertNumQueries(query_counts[page - 1], table_blacklist=WAFFLE_TABLES):
                 response = self.verify_response(params={'page': page, 'page_size': 30})
 
                 assert 'results' in response.data
