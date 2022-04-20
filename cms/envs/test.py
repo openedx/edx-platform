@@ -337,3 +337,7 @@ RESET_PASSWORD_API_RATELIMIT = '2/m'
 
 ############### Settings for proctoring  ###############
 PROCTORING_USER_OBFUSCATION_KEY = 'test_key'
+
+#################### Network configuration ####################
+# Tests are not behind any proxies
+CLOSEST_CLIENT_IP_FROM_HEADERS = []
