@@ -21,6 +21,7 @@ from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.student.models import PendingEmailChange, UserProfile
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory, RegistrationFactory
@@ -182,7 +183,7 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         Internal helper to perform the actual assertion
         """
-        with self.assertNumQueries(queries):
+        with self.assertNumQueries(queries, table_ignorelist=WAFFLE_TABLES):
             response = self.send_get(self.client, expected_status=expected_status)
         if expected_status == 200:
             data = response.data
@@ -467,7 +468,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(27):
+        with self.assertNumQueries(27, table_ignorelist=WAFFLE_TABLES):
             response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
@@ -482,7 +483,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(27):
+        with self.assertNumQueries(27, table_ignorelist=WAFFLE_TABLES):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response)
 
@@ -604,7 +605,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             """
             Internal helper to perform the actual assertions
             """
-            with self.assertNumQueries(queries):
+            with self.assertNumQueries(queries, table_ignorelist=WAFFLE_TABLES):
                 response = self.send_get(self.client)
             data = response.data
             assert 30 == len(data)
@@ -650,7 +651,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        with self.assertNumQueries(25):
+        with self.assertNumQueries(25, table_ignorelist=WAFFLE_TABLES):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "state", "bio",):
             assert response.data[empty_field] is None

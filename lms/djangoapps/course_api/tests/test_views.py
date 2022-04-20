@@ -23,6 +23,7 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.auth import add_users
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -424,7 +425,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
 
         for page in range(1, 12):
             RequestCache.clear_all_namespaces()
-            with self.assertNumQueries(query_counts[page - 1]):
+            with self.assertNumQueries(query_counts[page - 1], table_ignorelist=WAFFLE_TABLES):
                 response = self.verify_response(params={'page': page, 'page_size': 30})
 
                 assert 'results' in response.data
