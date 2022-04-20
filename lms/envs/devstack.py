@@ -442,3 +442,7 @@ PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
+
+#################### Network configuration ####################
+# Devstack is directly exposed to the caller
+CLOSEST_CLIENT_IP_FROM_HEADERS = []
