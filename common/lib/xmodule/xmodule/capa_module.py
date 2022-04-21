@@ -41,7 +41,6 @@ from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
     ResourceTemplates,
-    XModuleDescriptorToXBlockMixin,
     XModuleMixin,
     XModuleToXBlockMixin,
     shim_xmodule_js
@@ -132,7 +131,6 @@ class ProblemBlock(
     RawMixin,
     XmlMixin,
     EditingMixin,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,
@@ -163,11 +161,6 @@ class ProblemBlock(
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"
     has_author_view = True
-
-    # The capa format specifies that what we call max_attempts in the code
-    # is the attribute `attempts`. This will do that conversion
-    metadata_translations = dict(XmlMixin.metadata_translations)
-    metadata_translations['attempts'] = 'max_attempts'
 
     icon_class = 'problem'
 

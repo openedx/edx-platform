@@ -2,7 +2,7 @@
      Take note of this name exactly, you'll need to use it everywhere. -->
 <course>
   <chapter url_name="Staff"/>
-  <chapter name="Problems with Condition">
+  <chapter display_name="Problems with Condition">
         <sequential>
             <problem url_name="choiceprob" />
             <conditional url_name="condone"/>

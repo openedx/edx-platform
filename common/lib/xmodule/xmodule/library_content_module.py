@@ -35,7 +35,6 @@ from xmodule.x_module import (
     shim_xmodule_js,
     STUDENT_VIEW,
     XModuleMixin,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
 )
 
@@ -75,7 +74,6 @@ def _get_capa_types():
 class LibraryContentBlock(
     MakoTemplateBlockBase,
     XmlMixin,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,
