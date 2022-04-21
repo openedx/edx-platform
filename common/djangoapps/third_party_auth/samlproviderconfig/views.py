@@ -2,7 +2,7 @@
 Viewset for auth/saml/v0/samlproviderconfig
 """
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_list_or_404
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import permissions, viewsets, status
@@ -54,12 +54,21 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         """
         if self.requested_enterprise_uuid is None:
             raise ParseError('Required enterprise_customer_uuid is missing')
-        enterprise_customer_idp = get_object_or_404(
+        enterprise_customer_idps = get_list_or_404(
             EnterpriseCustomerIdentityProvider,
             enterprise_customer__uuid=self.requested_enterprise_uuid
         )
-        return SAMLProviderConfig.objects.current_set().filter(
-            slug=convert_saml_slug_provider_id(enterprise_customer_idp.provider_id))
+        slug_list  = []
+        config_list = []
+        for idp in enterprise_customer_idps:
+            slug_list.append(convert_saml_slug_provider_id(idp.provider_id))
+
+        for config in SAMLProviderConfig.objects.current_set():
+            slug = convert_saml_slug_provider_id(config.provider_id)
+            if slug in slug_list: 
+                config_list.append(config)
+
+        return config_list
 
     @property
     def requested_enterprise_uuid(self):
