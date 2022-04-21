@@ -65,7 +65,7 @@ asgiref==3.5.0
     #   -r requirements/edx/testing.txt
     #   django
     #   uvicorn
-astroid==2.11.2
+astroid==2.11.3
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -83,7 +83,7 @@ attrs==21.4.0
     #   jsonschema
     #   openedx-events
     #   pytest
-babel==2.9.1
+babel==2.10.1
     # via
     #   -r requirements/edx/testing.txt
     #   enmerkar
@@ -659,7 +659,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==13.3.4
+faker==13.3.5
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -832,9 +832,8 @@ loremipsum==1.0.5
     #   ora2
 lti-consumer-xblock==3.4.6
     # via -r requirements/edx/testing.txt
-lxml==4.5.0
+lxml==4.8.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edxval
     #   lti-consumer-xblock
@@ -1071,7 +1070,7 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/testing.txt
     #   olxcleaner
-pylint==2.13.5
+pylint==2.13.7
     # via
     #   -r requirements/edx/testing.txt
     #   edx-lint

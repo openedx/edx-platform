@@ -56,7 +56,7 @@ attrs==21.4.0
     #   aiohttp
     #   edx-ace
     #   openedx-events
-babel==2.9.1
+babel==2.10.1
     # via
     #   -r requirements/edx/base.in
     #   enmerkar
@@ -623,9 +623,8 @@ loremipsum==1.0.5
     # via ora2
 lti-consumer-xblock==3.4.6
     # via -r requirements/edx/base.in
-lxml==4.5.0
+lxml==4.8.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edxval
     #   lti-consumer-xblock
