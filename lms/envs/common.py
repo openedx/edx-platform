@@ -1085,6 +1085,7 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
+    'openedx.core.lib.blockstore_api.db_routers.BlockstoreRouter',
     'edx_django_utils.db.read_replica.ReadReplicaRouter',
 ]
 
@@ -3243,6 +3244,9 @@ INSTALLED_APPS = [
 
     # For save for later
     'lms.djangoapps.save_for_later',
+
+    # Blockstore
+    'blockstore.apps.bundles',
 ]
 
 ######################### CSRF #########################################
@@ -4970,6 +4974,10 @@ MAILCHIMP_NEW_USER_LIST_ID = ""
 BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
 BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 
+# Disable the Blockstore app API by default.
+# See openedx.core.lib.blockstore_api.config for details.
+BLOCKSTORE_USE_BLOCKSTORE_APP_API = False
+
 # .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
 # .. setting_default: default
 # .. setting_description: The django cache key of the cache to use for storing anonymous user state for XBlocks.
@@ -4984,6 +4992,40 @@ XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 #     We use a default of 3000s (50mins) because temporary URLs are often
 #     configured to expire after one hour.
 BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 3000
+
+# .. setting_name: BUNDLE_ASSET_URL_STORAGE_KEY
+# .. setting_default: None
+# .. setting_description: When this is set, `BUNDLE_ASSET_URL_STORAGE_SECRET` is
+#  set, and `boto3` is installed, this is used as an AWS IAM access key for
+#  generating signed, read-only URLs for blockstore assets stored in S3.
+#  Otherwise, URLs are generated based on the default storage configuration.
+#  See `blockstore.apps.bundles.storage.LongLivedSignedUrlStorage` for details.
+BUNDLE_ASSET_URL_STORAGE_KEY = None
+
+# .. setting_name: BUNDLE_ASSET_URL_STORAGE_SECRET
+# .. setting_default: None
+# .. setting_description: When this is set, `BUNDLE_ASSET_URL_STORAGE_KEY` is
+#  set, and `boto3` is installed, this is used as an AWS IAM secret key for
+#  generating signed, read-only URLs for blockstore assets stored in S3.
+#  Otherwise, URLs are generated based on the default storage configuration.
+#  See `blockstore.apps.bundles.storage.LongLivedSignedUrlStorage` for details.
+BUNDLE_ASSET_URL_STORAGE_SECRET = None
+
+# .. setting_name: BUNDLE_ASSET_STORAGE_SETTINGS
+# .. setting_default: dict, appropriate for file system storage.
+# .. setting_description: When this is set, `BUNDLE_ASSET_URL_STORAGE_KEY` is
+#  set, and `boto3` is installed, this provides the bucket name and location for blockstore assets stored in S3.
+#  See `blockstore.apps.bundles.storage.LongLivedSignedUrlStorage` for details.
+BUNDLE_ASSET_STORAGE_SETTINGS = dict(
+    # Backend storage
+    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_KWARGS=dict(bucket='bundle-asset-bucket', location='/path-to-bundles/'),
+    STORAGE_CLASS='django.core.files.storage.FileSystemStorage',
+    STORAGE_KWARGS=dict(
+        location=MEDIA_ROOT,
+        base_url=MEDIA_URL,
+    ),
+)
 
 ######################### MICROSITE ###############################
 MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'

@@ -4,6 +4,8 @@
 #
 #    make upgrade
 #
+-e git+https://github.com/openedx/blockstore.git@1.2.1#egg=blockstore==1.2.1
+    # via -r requirements/edx/base.txt
 -e common/lib/capa
     # via
     #   -r requirements/edx/base.txt
@@ -74,6 +76,7 @@ attrs==21.4.0
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
+    #   blockstore
     #   edx-ace
     #   openedx-events
     #   outcome
@@ -255,6 +258,7 @@ distlib==0.3.4
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
+    #   blockstore
     #   django-appconf
     #   django-classy-tags
     #   django-config-models
@@ -349,6 +353,10 @@ django-crum==0.7.9
     #   edx-rbac
     #   edx-toggles
     #   super-csv
+django-environ==0.8.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   blockstore
 django-fernet-fields==0.6
     # via
     #   -r requirements/edx/base.txt
@@ -357,6 +365,7 @@ django-fernet-fields==0.6
 django-filter==21.1
     # via
     #   -r requirements/edx/base.txt
+    #   blockstore
     #   edx-enterprise
     #   lti-consumer-xblock
 django-ipware==4.0.2
@@ -442,6 +451,7 @@ django-user-tasks==3.0.0
 django-waffle==2.4.1
     # via
     #   -r requirements/edx/base.txt
+    #   blockstore
     #   edx-django-utils
     #   edx-drf-extensions
     #   edx-enterprise
@@ -455,8 +465,10 @@ django-webpack-loader==0.7.0
 djangorestframework==3.12.4
     # via
     #   -r requirements/edx/base.txt
+    #   blockstore
     #   django-config-models
     #   django-user-tasks
+    #   djangorestframework-expander
     #   drf-jwt
     #   drf-yasg
     #   edx-api-doc-tools
@@ -469,6 +481,10 @@ djangorestframework==3.12.4
     #   edx-submissions
     #   ora2
     #   super-csv
+djangorestframework-expander==0.2.3
+    # via
+    #   -r requirements/edx/base.txt
+    #   blockstore
 djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/base.txt
@@ -495,11 +511,15 @@ drf-yasg==1.20.0
 edx-ace==1.5.0
     # via -r requirements/edx/base.txt
 edx-api-doc-tools==1.6.0
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   blockstore
 edx-auth-backends==4.1.0
     # via -r requirements/edx/base.txt
 edx-braze-client==0.1.3
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   blockstore
 edx-bulk-grades==1.0.0
     # via
     #   -r requirements/edx/base.txt
@@ -514,12 +534,15 @@ edx-celeryutils==1.2.1
 edx-completion==4.2.0
     # via -r requirements/edx/base.txt
 edx-django-release-util==1.2.0
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.txt
 edx-django-utils==4.6.0
     # via
     #   -r requirements/edx/base.txt
+    #   blockstore
     #   django-config-models
     #   edx-drf-extensions
     #   edx-enterprise
@@ -864,6 +887,7 @@ mysqlclient==2.1.0
 newrelic==7.10.0.175
     # via
     #   -r requirements/edx/base.txt
+    #   blockstore
     #   edx-django-utils
 nltk==3.7
     # via
@@ -966,6 +990,10 @@ py2neo==2021.2.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
+pyblake2==1.1.2
+    # via
+    #   -r requirements/edx/base.txt
+    #   blockstore
 pycodestyle==2.8.0
     # via -r requirements/edx/testing.in
 pycountry==22.3.5
@@ -1122,6 +1150,7 @@ pytz==2022.1
     # via
     #   -r requirements/edx/base.txt
     #   babel
+    #   blockstore
     #   celery
     #   django
     #   django-ses
@@ -1297,6 +1326,7 @@ soupsieve==2.3.2.post1
 sqlparse==0.4.2
     # via
     #   -r requirements/edx/base.txt
+    #   blockstore
     #   django
 staff-graded-xblock==2.0.1
     # via -r requirements/edx/base.txt
