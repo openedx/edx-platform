@@ -9,12 +9,14 @@ from config_models.models import cache as config_cache
 from django.conf import settings
 from django.core.cache import cache as django_cache
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_switch
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
+from openedx.core.djangoapps.util.ip import USE_LEGACY_IP
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from ..models import IPFilter, RestrictedCourse
 from ..test_utils import restrict_course
@@ -77,18 +79,18 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     @ddt.data(
-        # request_ip, blacklist, whitelist, is_enabled, allow_access
-        ('173.194.123.35', ['173.194.123.35'], [], True, False),
-        ('173.194.123.35', ['173.194.0.0/16'], [], True, False),
-        ('173.194.123.35', ['127.0.0.0/32', '173.194.0.0/16'], [], True, False),
-        ('173.195.10.20', ['173.194.0.0/16'], [], True, True),
-        ('173.194.123.35', ['173.194.0.0/16'], ['173.194.0.0/16'], True, False),
-        ('173.194.123.35', [], ['173.194.0.0/16'], True, True),
-        ('192.178.2.3', [], ['173.194.0.0/16'], True, True),
-        ('173.194.123.35', ['173.194.123.35'], [], False, True),
+        # request ip chain, blacklist, whitelist, is_enabled, allow_access
+        (['192.178.2.3'], [], [], True, True),  # confirm that test setup & no config allows users by default
+        (['173.194.123.35'], ['173.194.123.35'], [], True, False),
+        (['173.194.123.35'], ['173.194.0.0/16'], [], True, False),
+        (['173.194.123.35'], ['127.0.0.0/32', '173.194.0.0/16'], [], True, False),
+        (['173.195.10.20'], ['173.194.0.0/16'], [], True, True),
+        (['173.194.123.35'], ['173.194.0.0/16'], ['173.194.0.0/16'], True, False),  # blacklist checked before whitelist
+        (['173.194.123.35', '192.178.2.3'], ['173.194.123.35'], [], True, False),  # earlier ip can still be blocked
+        (['173.194.123.35'], ['173.194.123.35'], [], False, True),  # blacklist disabled
     )
     @ddt.unpack
-    def test_ip_access_rules(self, request_ip, blacklist, whitelist, is_enabled, allow_access):
+    def test_ip_blacklist_rules(self, request_ips, blacklist, whitelist, is_enabled, allow_access):
         # Ensure that IP blocking works for anonymous users
         self.client.logout()
 
@@ -101,9 +103,9 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
 
         # Check that access is enforced
         response = self.client.get(
-            "/",
-            HTTP_X_FORWARDED_FOR=request_ip,
-            REMOTE_ADDR=request_ip
+            self.courseware_url,
+            HTTP_X_FORWARDED_FOR=','.join(request_ips),
+            REMOTE_ADDR=request_ips[-1],
         )
 
         if allow_access:
@@ -114,6 +116,127 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
                 kwargs={
                     'access_point': 'courseware',
                     'message_key': 'embargo'
+                }
+            )
+            self.assertRedirects(response, redirect_url)
+
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @ddt.data(
+        # request ip chain, blacklist, whitelist, is_enabled, allow_access
+        (['192.178.2.3'], [], [], True, False),  # confirm that test setup & no config blocks users by default
+        (['173.194.123.35', '192.178.2.3'], [], ['173.194.123.35'], True, False),  # whitelist only looks at last ip
+        (['192.178.2.3', '173.194.123.35'], [], ['173.194.0.0/16'], True, True),
+        (['192.178.2.3'], [], ['173.194.0.0/16'], True, False),
+        (['173.194.123.35'], [], ['173.194.123.35'], False, False),  # whitelist disabled
+    )
+    @ddt.unpack
+    def test_ip_whitelist_rules(self, request_ips, blacklist, whitelist, is_enabled, allow_access):
+        # Ensure that IP blocking works for anonymous users
+        self.client.logout()
+
+        # Set up the IP rules
+        IPFilter.objects.create(
+            blacklist=", ".join(blacklist),
+            whitelist=", ".join(whitelist),
+            enabled=is_enabled
+        )
+
+        # Check that access is enforced (restrict course by default, so that allow-list logic is actually tested)
+        with restrict_course(self.course.id):
+            response = self.client.get(
+                self.courseware_url,
+                HTTP_X_FORWARDED_FOR=','.join(request_ips),
+                REMOTE_ADDR=request_ips[-1],
+            )
+
+        if allow_access:
+            assert response.status_code == 200
+        else:
+            redirect_url = reverse(
+                'embargo:blocked_message',
+                kwargs={
+                    'access_point': 'courseware',
+                    'message_key': 'default'
+                }
+            )
+            self.assertRedirects(response, redirect_url)
+
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_waffle_switch(USE_LEGACY_IP, True)
+    @ddt.data(
+        # request ip chain, blacklist, whitelist, allow_access
+        (['192.178.2.3'], [], [], False),  # confirm that test setup & no config blocks users by default
+        (['173.194.123.35', '192.178.2.3'], [], ['192.178.2.3'], False),  # whitelist ignores last (safest) ip
+        (['173.194.123.35', '192.178.2.3'], [], ['173.194.0.0/16'], True),  # whitelist does look at first ip though
+    )
+    @ddt.unpack
+    def test_ip_legacy_whitelist_rules(self, request_ips, blacklist, whitelist, allow_access):
+        # Ensure that IP blocking works for anonymous users
+        self.client.logout()
+
+        # Set up the IP rules
+        IPFilter.objects.create(
+            blacklist=", ".join(blacklist),
+            whitelist=", ".join(whitelist),
+            enabled=True,
+        )
+
+        # Check that access is enforced (restrict course by default, so that allow-list logic is actually tested)
+        with restrict_course(self.course.id):
+            response = self.client.get(
+                self.courseware_url,
+                HTTP_X_FORWARDED_FOR=','.join(request_ips),
+                REMOTE_ADDR=request_ips[-1],
+            )
+
+        if allow_access:
+            assert response.status_code == 200
+        else:
+            redirect_url = reverse(
+                'embargo:blocked_message',
+                kwargs={
+                    'access_point': 'courseware',
+                    'message_key': 'default',
+                }
+            )
+            self.assertRedirects(response, redirect_url)
+
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @override_waffle_switch(USE_LEGACY_IP, True)
+    @ddt.data(
+        # request ip chain, blacklist, whitelist, allow_access
+        (['192.178.2.3'], [], [], True),  # confirm that test setup & no config allows users by default
+        (['173.194.123.35', '192.178.2.3'], ['192.178.2.3'], [], True),  # blacklist ignores last (safest) ip
+        (['173.194.123.35', '192.178.2.3'], ['173.194.123.35'], [], False),  # blacklist looks at first though
+        (['192.178.2.3'], ['192.178.2.3'], ['192.178.2.3'], False),  # blacklist overrides whitelist
+    )
+    @ddt.unpack
+    def test_ip_legacy_blacklist_rules(self, request_ips, blacklist, whitelist, allow_access):
+        # Ensure that IP blocking works for anonymous users
+        self.client.logout()
+
+        # Set up the IP rules
+        IPFilter.objects.create(
+            blacklist=", ".join(blacklist),
+            whitelist=", ".join(whitelist),
+            enabled=True,
+        )
+
+        # Check that access is enforced
+        response = self.client.get(
+            self.courseware_url,
+            HTTP_X_FORWARDED_FOR=','.join(request_ips),
+            REMOTE_ADDR=request_ips[-1],
+        )
+
+        if allow_access:
+            assert response.status_code == 200
+        else:
+            redirect_url = reverse(
+                'embargo:blocked_message',
+                kwargs={
+                    'access_point': 'courseware',
+                    'message_key': 'embargo',
                 }
             )
             self.assertRedirects(response, redirect_url)
@@ -145,27 +268,4 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
             HTTP_X_FORWARDED_FOR="192.168.10.20",
             REMOTE_ADDR="192.168.10.20"
         )
-        assert response.status_code == 200
-
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
-    def test_whitelist_ip_skips_country_access_checks(self):
-        # Whitelist an IP address
-        IPFilter.objects.create(
-            whitelist="192.168.10.20",
-            enabled=True
-        )
-
-        # Set up country access rules so the user would
-        # be restricted from the course.
-        with restrict_course(self.course.id):
-            # Make a request from the whitelisted IP address
-            response = self.client.get(
-                self.courseware_url,
-                HTTP_X_FORWARDED_FOR="192.168.10.20",
-                REMOTE_ADDR="192.168.10.20"
-            )
-
-        # Expect that we were still able to access the page,
-        # even though we would have been blocked by country
-        # access rules.
         assert response.status_code == 200

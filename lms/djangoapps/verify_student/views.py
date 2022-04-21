@@ -22,7 +22,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
 from edx_rest_api_client.exceptions import SlumberBaseException
-from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -235,12 +234,7 @@ class PayAndVerifyView(View):
 
         # Check whether the user has access to this course
         # based on country access rules.
-        redirect_url = embargo_api.redirect_if_blocked(
-            course_key,
-            user=request.user,
-            ip_address=get_client_ip(request)[0],
-            url=request.path
-        )
+        redirect_url = embargo_api.redirect_if_blocked(request, course_key)
         if redirect_url:
             return redirect(redirect_url)
 
