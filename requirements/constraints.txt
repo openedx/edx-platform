@@ -30,10 +30,6 @@ edx-enterprise==3.44.4
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
 
-# 4.5.1 introduced a bug when used together with xmlsec: https://bugs.launchpad.net/lxml/+bug/1880251
-# Tests passed, but hit a problem in stage
-lxml<4.5.1
-
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
 
