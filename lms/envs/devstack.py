@@ -19,7 +19,6 @@ from .production import *  # pylint: disable=wildcard-import, unused-wildcard-im
 
 # Don't use S3 in devstack, fall back to filesystem
 del DEFAULT_FILE_STORAGE
-MEDIA_ROOT = "/edx/var/edxapp/uploads"
 ORA2_FILEUPLOAD_BACKEND = 'django'
 
 
