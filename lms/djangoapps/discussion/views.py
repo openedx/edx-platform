@@ -723,7 +723,8 @@ def _discussions_mfe_context(query_params: Dict,
         return {"show_banner": False, "show_mfe": False}
     discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
     discussions_mfe_enabled_for_everyone = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key)
-    enable_mfe = is_educator_or_staff if discussions_mfe_enabled else discussions_mfe_enabled_for_everyone
+    enabled_for_educator_or_staff = is_educator_or_staff and discussions_mfe_enabled
+    enable_mfe = enabled_for_educator_or_staff or discussions_mfe_enabled_for_everyone
     # Show the MFE if the new MFE is enabled,
     # and if the legacy experience is not requested via query param
     # and if the current view isn't only that's only supported by the legacy view
