@@ -126,7 +126,6 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'is_self_paced': getattr(course, 'self_paced', False),
             'is_enrolled': user_is_enrolled,
             'course_access': load_access.to_json(),
-            'can_load_courseware': True,  # can be removed once the MFE no longer references this field
             'celebrations': celebrations,
             'user_timezone': user_timezone,
             'can_view_certificate': certificates_viewable_for_course(course),

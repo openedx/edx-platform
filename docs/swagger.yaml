@@ -7431,7 +7431,6 @@ definitions:
       - original_user_is_staff
       - tabs
       - title
-      - can_load_courseware
       - celebrations
     type: object
     properties:
@@ -7479,9 +7478,6 @@ definitions:
         title: Title
         type: string
         minLength: 1
-      can_load_courseware:
-        title: Can load courseware
-        type: boolean
       celebrations:
         title: Celebrations
         type: object
