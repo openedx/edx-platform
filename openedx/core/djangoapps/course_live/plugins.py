@@ -26,9 +26,7 @@ class LiveCourseApp(CourseApp):
     name = _("Live")
     description = _("Enable in-platform video conferencing by configuring live")
     documentation_links = {
-        # TODO: add the actual documentation link once it exists
         "learn_more_configuration": settings.COURSE_LIVE_HELP_URL
-,
     }
 
     @classmethod
