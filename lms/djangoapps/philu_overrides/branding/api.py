@@ -157,7 +157,7 @@ def _auth_footer_courses_communities_links():
             "class": link_class
         }
         for link_name, link_url, link_title, link_target, link_class in [
-            ("explore_course", "/courses", _("Explore our Courses"), "_self", ""),
+            ("explore_course", "/courses", _("Explore our Courses"), "_self", "track-gtm-event"),
             ("mentors", "https://philanthropyu.org/ecosystem", "Mentors", "_blank", ""),
             ("google-ad-grants", "https://philanthropyu.org/adgrants", "Google Ad Grants", "_blank", ""),
         ]
@@ -172,10 +172,11 @@ def _footer_navigation_links():
             "title": link_title,
             "url": link_url,
             "target": link_target,
+            "class": link_class
         }
-        for link_name, link_url, link_title, link_target in [
-            ("about", "https://philanthropyu.org/", "About Philanthropy University", "_blank"),
-            ("perks", "https://philanthropyu.org/ecosystem", "Perks", "_blank"),
+        for link_name, link_url, link_title, link_target, link_class in [
+            ("explore_course", "/courses", _("Explore our Courses"), "_self", "track-gtm-event"),
+            ("perks", "https://philanthropyu.org/ecosystem", "Perks", "_blank", ""),
         ]
     ]
 
