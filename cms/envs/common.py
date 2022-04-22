@@ -505,7 +505,6 @@ FEATURES = {
     #   This also hides the "Unenroll" button on the Learner Dashboard.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-10-11
-    # .. toggle_target_removal_date: None
     # .. toggle_warnings: For consistency in user experience, keep the value in sync with the setting of the same name
     #   in the LMS and CMS.
     # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
