@@ -22,7 +22,6 @@ from datetime import date, datetime, timedelta  # lint-amnesty, pylint: disable=
 from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
 from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
 from urllib.parse import urlencode  # lint-amnesty, pylint: disable=wrong-import-order
-import warnings  # lint-amnesty, pylint: disable=wrong-import-order
 
 from config_models.models import ConfigurationModel
 from django.apps import apps
@@ -162,12 +161,11 @@ class AnonymousUserId(models.Model):
     course_id = LearningContextKeyField(db_index=True, max_length=255, blank=True)
 
 
-def anonymous_id_for_user(user, course_id, save='DEPRECATED'):
+def anonymous_id_for_user(user, course_id):
     """
     Inputs:
         user: User model
         course_id: string or None
-        save: Deprecated and ignored: ID is always saved in an AnonymousUserId object
 
     Return a unique id for a (user, course_id) pair, suitable for inserting
     into e.g. personalized survey links.
@@ -179,13 +177,6 @@ def anonymous_id_for_user(user, course_id, save='DEPRECATED'):
 
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
-
-    if save != 'DEPRECATED':
-        warnings.warn(
-            "anonymous_id_for_user no longer accepts save param and now "
-            "always saves the ID in the database",
-            DeprecationWarning
-        )
 
     if user.is_anonymous:
         return None
@@ -876,20 +867,11 @@ class UserSignupSource(models.Model):
     site = models.CharField(max_length=255, db_index=True)
 
 
-def unique_id_for_user(user, save='DEPRECATED'):
+def unique_id_for_user(user):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
-
-    Keyword arguments:
-    save -- Deprecated and ignored: ID is always saved in an AnonymousUserId object
     """
-    if save != 'DEPRECATED':
-        warnings.warn(
-            "unique_id_for_user no longer accepts save param and now "
-            "always saves the ID in the database",
-            DeprecationWarning
-        )
     # Setting course_id to '' makes it not affect the generated hash,
     # and thus produce the old per-student anonymous id
     return anonymous_id_for_user(user, None)
