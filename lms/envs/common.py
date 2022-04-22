@@ -5039,10 +5039,6 @@ BUNDLE_ASSET_STORAGE_SETTINGS = dict(
     ),
 )
 
-######################### MICROSITE ###############################
-MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
-MICROSITE_CONFIGURATION = {}
-
 SYSLOG_SERVER = ''
 FEEDBACK_SUBMISSION_EMAIL = ''
 GITHUB_REPO_ROOT = '/edx/var/edxapp/data'

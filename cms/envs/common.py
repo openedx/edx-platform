@@ -2530,10 +2530,6 @@ BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 3000
 ###################### LEARNER PORTAL ################################
 LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
 
-######################### MICROSITE ###############################
-MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
-MICROSITE_CONFIGURATION = {}
-
 ############################ JWT #################################
 JWT_ISSUER = 'http://127.0.0.1:8000/oauth2'
 DEFAULT_JWT_ISSUER = {
