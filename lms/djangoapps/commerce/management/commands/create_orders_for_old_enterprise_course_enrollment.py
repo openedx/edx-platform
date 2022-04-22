@@ -8,18 +8,18 @@ Management command to
 import time
 import traceback
 from textwrap import dedent
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from enterprise.models import EnterpriseCourseEnrollment
 from opaque_keys.edx.keys import CourseKey
-from requests import Timeout
-from slumber.exceptions import HttpServerError, SlumberBaseException
+from requests.exceptions import RequestException
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.query import use_read_replica_if_available
-from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 
 User = get_user_model()
 
@@ -33,7 +33,7 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
-        self.client = ecommerce_api_client(service_user)
+        self.client = get_ecommerce_api_client(service_user)
 
     def _get_enrollments_queryset(self, start_index, end_index):
         """
@@ -60,15 +60,14 @@ class Command(BaseCommand):
         Returns (success_count, fail_count)
         """
         try:
-            order_response = self.client.manual_course_enrollment_order.post(
-                {
-                    "enrollments": enrollments
-                }
-            )
-        except (SlumberBaseException, ConnectionError, Timeout, HttpServerError) as exc:
+            api_url = urljoin(f"{get_ecommerce_api_base_url()}/", "manual_course_enrollment_order/")
+            response = self.client.post(api_url, data={"enrollments": enrollments})
+            response.raise_for_status()
+            order_response = response.json()
+        except RequestException as exc:
             self.stderr.write(
-                "\t\t\tFailed to create order for manual enrollments for the following enrollments: {}. Reason: {}"
-                .format(enrollments, exc)
+                "\t\t\tFailed to create order for manual enrollments for the following "
+                f"enrollments: {enrollments}. Reason: {exc}"
             )
             return 0, 0, len(enrollments), []
 

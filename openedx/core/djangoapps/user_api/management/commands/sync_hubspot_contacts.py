@@ -8,18 +8,18 @@ Management command to sync platform users with hubspot
 import json
 import time
 import traceback
+import urllib.parse  # pylint: disable=import-error
 from datetime import datetime, timedelta
 from textwrap import dedent
 
-import urllib.parse  # pylint: disable=import-error
+import requests
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
-from edx_rest_api_client.client import EdxRestApiClient
-from slumber.exceptions import HttpClientError, HttpServerError
+from requests.exceptions import HTTPError
 
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from common.djangoapps.student.models import UserAttribute
 from common.djangoapps.util.query import use_read_replica_if_available
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 HUBSPOT_API_BASE_URL = 'https://api.hubapi.com'
 
@@ -139,13 +139,14 @@ class Command(BaseCommand):
             contacts.append(contact)
 
         api_key = site_conf.get_value('HUBSPOT_API_KEY')
-        client = EdxRestApiClient(urllib.parse.urljoin(HUBSPOT_API_BASE_URL, 'contacts/v1/contact'))
+        api_url = urllib.parse.urljoin(f"{HUBSPOT_API_BASE_URL}/", 'contacts/v1/contact/batch/')
         try:
-            client.batch.post(contacts, hapikey=api_key)
+            response = requests.post(api_url, json=contacts, params={"hapikey": api_key})
+            response.raise_for_status()
             return len(contacts)
-        except (HttpClientError, HttpServerError) as ex:
+        except HTTPError as ex:
             message = 'An error occurred while syncing batch of contacts for site {domain}, {message}'.format(
-                domain=site_conf.site.domain, message=ex.message  # lint-amnesty, pylint: disable=no-member
+                domain=site_conf.site.domain, message=str(ex)
             )
             self.stderr.write(message)
             return 0
