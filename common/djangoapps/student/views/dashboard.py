@@ -514,6 +514,10 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     empty_dashboard_message = configuration_helpers.get_value(
         'EMPTY_DASHBOARD_MESSAGE', None
     )
+    disable_unenrollment = configuration_helpers.get_value(
+        'DISABLE_UNENROLLMENT',
+        settings.FEATURES.get('DISABLE_UNENROLLMENT')
+    )
 
     disable_course_limit = request and 'course_limit' in request.GET
     course_limit = get_dashboard_course_limit() if not disable_course_limit else None
@@ -797,6 +801,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         # TODO START: clean up as part of REVEM-199 (START)
         'course_info': get_dashboard_course_info(user, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (END)
+        'disable_unenrollment': disable_unenrollment,
     }
 
     # Include enterprise learner portal metadata and messaging

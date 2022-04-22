@@ -209,7 +209,12 @@ from common.djangoapps.student.models import CourseEnrollment
                 cert_status = cert_statuses.get(session_id)
                 can_refund_entitlement = entitlement and entitlement.is_entitlement_refundable()
                 partner_managed_enrollment = enrollment.mode == 'masters'
-                can_unenroll = False if partner_managed_enrollment else (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
+                # checks if we can unenroll based on the value of partner_managed_enrollment
+                can_unenroll_partner_managed_enrollment = False if partner_managed_enrollment else (not cert_status)
+                # checks if we can unenroll based on the value of unfulfilled_entitlement
+                can_unenroll_unfulfilled_entitlement = cert_status.get('can_unenroll') if cert_status and not unfulfilled_entitlement else False
+                # compares the three different parameters by which we can unenroll
+                can_unenroll = (can_unenroll_partner_managed_enrollment or can_unenroll_unfulfilled_entitlement) and not disable_unenrollment
                 credit_status = credit_statuses.get(session_id)
                 course_mode_info = all_course_modes.get(session_id)
                 is_paid_course = True if entitlement else (session_id in enrolled_courses_either_paid)

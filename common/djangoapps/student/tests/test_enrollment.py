@@ -358,6 +358,22 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase, OpenEdxEventsTest
         resp = self._change_enrollment('unenroll', course_id="edx/")
         assert resp.status_code == 400
 
+    @patch.dict(settings.FEATURES, {'DISABLE_UNENROLLMENT': True})
+    def test_unenroll_when_unenrollment_disabled(self):
+        """
+        Tests that a user cannot unenroll when unenrollment has been disabled.
+        """
+        # Enroll the student in the course
+        CourseEnrollment.enroll(self.user, self.course.id, mode="honor")
+
+        # Attempt to unenroll
+        resp = self._change_enrollment('unenroll')
+        assert resp.status_code == 400
+
+        # Verify that user is still enrolled
+        is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)
+        assert is_enrolled
+
     def test_enrollment_limit(self):
         """
         Assert that in a course with max student limit set to 1, we can enroll staff and instructor along with
