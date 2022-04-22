@@ -118,10 +118,29 @@ COPY . .
 # all requirements from scratch.
 RUN pip install -r requirements/edx/base.txt
 
+##################################################
+# Define LMS docker-based non-dev target.
+FROM base as lms-docker
+ENV SERVICE_VARIANT lms
+ARG LMS_CFG_OVERRIDE
+RUN echo "$LMS_CFG_OVERRIDE"
+ENV LMS_CFG="${LMS_CFG_OVERRIDE:-$LMS_CFG}"
+RUN echo "$LMS_CFG"
+ENV EDX_PLATFORM_SETTINGS='docker-production'
+ENV DJANGO_SETTINGS_MODULE="lms.envs.$EDX_PLATFORM_SETTINGS"
+EXPOSE 8000
+CMD gunicorn \
+    -c /edx/app/edxapp/edx-platform/lms/docker_lms_gunicorn.py \
+    --name lms \
+    --bind=0.0.0.0:8000 \
+    --max-requests=1000 \
+    --access-logfile \
+    - lms.wsgi:application
 
 ##################################################
 # Define LMS non-dev target.
 FROM base as lms
+ENV LMS_CFG="$CONFIG_ROOT/lms.yml"
 ENV SERVICE_VARIANT lms
 ENV DJANGO_SETTINGS_MODULE="lms.envs.$EDX_PLATFORM_SETTINGS"
 EXPOSE 8000

@@ -434,6 +434,11 @@ class ThreadSerializer(_ContentSerializer):
     def update(self, instance, validated_data):
         for key, val in validated_data.items():
             instance[key] = val
+            requesting_user_id = self.context["cc_requester"]["id"]
+            if key == "closed" and val:
+                instance["closing_user_id"] = requesting_user_id
+            if key == "body" and val:
+                instance["editing_user_id"] = requesting_user_id
         instance.save()
         return instance
 
@@ -573,8 +578,11 @@ class CommentSerializer(_ContentSerializer):
             # TODO: The comments service doesn't populate the endorsement
             # field on comment creation, so we only provide
             # endorsement_user_id on update
+            requesting_user_id = self.context["cc_requester"]["id"]
             if key == "endorsed":
-                instance["endorsement_user_id"] = self.context["cc_requester"]["id"]
+                instance["endorsement_user_id"] = requesting_user_id
+            if key == "body" and val:
+                instance["editing_user_id"] = requesting_user_id
 
         instance.save()
         return instance

@@ -8,6 +8,7 @@ on:
 
 jobs:
   run-tests:
+    if: github.repository == 'openedx/edx-platform' || github.repository == 'edx/edx-platform-private'
     runs-on: [ edx-platform-runner ]
     strategy:
       matrix:
@@ -53,41 +54,14 @@ jobs:
           sudo chmod -R a+rw /data/db
           mongod &
 
-      - name: set settings path
-        run: |
-          echo "settings_path=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} --output settings )" >> $GITHUB_ENV
-
-#      - name: set pytest randomly option
-#        run: |
-#          echo "pytest_randomly_option=$(if [ '${{ env.module_name }}' = 'cms' ] || [ '${{ env.module_name }}' = 'common' ]; then echo '-p no:randomly'; else echo '' ; fi)" >> $GITHUB_ENV
-
       - name: install requirements
         run: |
           sudo pip install -r requirements/pip.txt
           sudo pip install -r requirements/edx/testing.txt
           sudo pip install "django~=${{ matrix.django-version }}.0"
 
-      - name: get unit tests for shard
-        run: |
-          echo "unit_test_paths=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} )" >> $GITHUB_ENV
-
-      - name: run tests
-        run: |
-          python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}
-
-      - name: rename warnings json file
-        if: success()
-        run: |
-          cd test_root/log
-          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}.json
-
-      - name: save pytest warnings json file
-        if: success()
-        uses: actions/upload-artifact@v2
-        with:
-          name: pytest-warnings-json
-          path: |
-            test_root/log/pytest_warnings*.json
+      - name: Setup and run tests
+        uses: ./.github/actions/unit-tests
 
   compile-warnings-report:
     runs-on: [ edx-platform-runner ]

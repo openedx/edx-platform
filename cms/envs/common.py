@@ -110,6 +110,13 @@ from lms.envs.common import (
 
     # Enterprise service settings
     ENTERPRISE_CATALOG_INTERNAL_ROOT_URL,
+    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_KEY,
+    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_SECRET,
+    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL,
+
+    # Blockstore
+    BLOCKSTORE_USE_BLOCKSTORE_APP_API,
+    BUNDLE_ASSET_STORAGE_SETTINGS,
 
     # Methods to derive settings
     _make_mako_template_dirs,
@@ -541,6 +548,30 @@ ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-669
 ENABLE_AUTHN_REGISTER_HIBP_POLICY = False
 HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3
+
+# .. toggle_name: ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle activates the use of the password validation
+#   on Authn MFE's login.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2022-03-29
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-668
+ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY = False
+HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
+
+# .. toggle_name: ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle activates the use of the password validation
+#   on Authn MFE's login.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2022-03-29
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-667
+ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
+HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
@@ -1611,7 +1642,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.self_paced',
 
     # Coursegraph
-    'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
+    'cms.djangoapps.coursegraph.apps.CoursegraphConfig',
 
     # Credit courses
     'openedx.core.djangoapps.credit.apps.CreditConfig',
@@ -1722,6 +1753,9 @@ INSTALLED_APPS = [
 
     # For edx ace template tags
     'edx_ace',
+
+    # Blockstore
+    'blockstore.apps.bundles',
 ]
 
 
@@ -2078,6 +2112,7 @@ ENABLE_COMPREHENSIVE_THEMING = False
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
+    'openedx.core.lib.blockstore_api.db_routers.BlockstoreRouter',
 ]
 
 ############################ Cache Configuration ###############################
@@ -2235,7 +2270,33 @@ POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 # .. setting_default: value of LOW_PRIORITY_QUEUE
 # .. setting_description: The name of the Celery queue to which CourseGraph refresh
 #      tasks will be sent
-COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
+COURSEGRAPH_JOB_QUEUE: str = LOW_PRIORITY_QUEUE
+
+# .. setting_name: COURSEGRAPH_CONNECTION
+# .. setting_default: 'bolt+s://localhost:7687', in dictionary form.
+# .. setting_description: Dictionary specifying Neo4j connection parameters for
+#      CourseGraph refresh. Accepted keys are protocol ('bolt' or 'http'),
+#      secure (bool), host (str), port (int), user (str), and password (str).
+#      See https://py2neo.org/2021.1/profiles.html#individual-settings for a
+#      a description of each of those keys.
+COURSEGRAPH_CONNECTION: dict = {
+    "protocol": "bolt",
+    "secure": True,
+    "host": "localhost",
+    "port": 7687,
+    "user": "neo4j",
+    "password": None,
+}
+
+# .. toggle_name: COURSEGRAPH_DUMP_COURSE_ON_PUBLISH
+# .. toggle_implementation: DjangoSetting
+# .. toggle_creation_date: 2022-01-27
+# .. toggle_use_cases: open_edx
+# .. toggle_default: False
+# .. toggle_description: Whether, upon publish, a course should automatically
+#      be exported to Neo4j via the connection parameters specified in
+#      `COURSEGRAPH_CONNECTION`.
+COURSEGRAPH_DUMP_COURSE_ON_PUBLISH: bool = False
 
 ########## Settings for video transcript migration tasks ############
 VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE

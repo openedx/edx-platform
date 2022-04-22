@@ -347,6 +347,7 @@ class TestInitializeSerializer(TestCase):
             "courseMetadata": self.mock_course_metadata,
             "oraMetadata": self.mock_ora_instance,
             "submissions": self.mock_submissions_data,
+            "isEnabled": True,
         }
 
         output_data = InitializeSerializer(input_data).data
@@ -364,6 +365,7 @@ class TestInitializeSerializer(TestCase):
         assert output_data["courseMetadata"] == expected_course_data
         assert output_data["oraMetadata"] == expected_ora_data
         assert output_data["submissions"] == expected_submissions_data
+        assert output_data["isEnabled"] is True
 
 
 class TestRubricConfigSerializer(TestCase):

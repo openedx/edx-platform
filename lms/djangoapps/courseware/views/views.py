@@ -32,7 +32,6 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
-from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from ipware.ip import get_client_ip
 from markupsafe import escape
@@ -45,15 +44,9 @@ from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from web_fragments.fragment import Fragment
-from xmodule.course_module import (
-    COURSE_VISIBILITY_PUBLIC,
-    COURSE_VISIBILITY_PUBLIC_OUTLINE
-)
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import (
-    ItemNotFoundError,
-    NoPathToItem
-)
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
 
@@ -70,14 +63,14 @@ from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active, course_home_mfe_progress_tab_is_active
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, check_public_access
+from lms.djangoapps.courseware.config import ENABLE_NEW_FINANCIAL_ASSISTANCE_FLOW
 from lms.djangoapps.courseware.courses import (
     can_self_enroll_in_course,
     course_open_for_self_enrollment,
     get_course,
-    get_course_date_blocks,
     get_course_overview_with_access,
     get_course_with_access,
     get_courses,
@@ -92,13 +85,10 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student, setup_masquerade
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
-from lms.djangoapps.courseware.permissions import (
-    MASQUERADE_AS_STUDENT,
-    VIEW_COURSE_HOME,
-    VIEW_COURSEWARE,
-)
+from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
 from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.utils import create_financial_assistance_application
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -123,13 +113,12 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
-from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url_name
+from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.url_helpers import (
-    ExperienceOption,
     get_courseware_url,
     get_learning_mfe_home_url,
     is_request_from_learning_mfe
@@ -140,7 +129,6 @@ from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBA
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 
-from ..context_processor import user_timezone_locale_prefs
 from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
 from ..tabs import _get_dynamic_tabs
@@ -421,19 +409,10 @@ def jump_to(request, course_id, location):
     except InvalidKeyError as exc:
         raise Http404("Invalid course_key or usage_key") from exc
 
-    experience_param = request.GET.get("experience", "").lower()
-    if experience_param == "new":
-        experience = ExperienceOption.NEW
-    elif experience_param == "legacy":
-        experience = ExperienceOption.LEGACY
-    else:
-        experience = ExperienceOption.ACTIVE
-
     try:
         redirect_url = get_courseware_url(
             usage_key=usage_key,
             request=request,
-            experience=experience,
         )
     except (ItemNotFoundError, NoPathToItem):
         # We used to 404 here, but that's ultimately a bad experience. There are real world use cases where a user
@@ -443,7 +422,6 @@ def jump_to(request, course_id, location):
         redirect_url = get_courseware_url(
             usage_key=course_location_from_key(course_key),
             request=request,
-            experience=experience,
         )
 
     return redirect(redirect_url)
@@ -491,7 +469,7 @@ def course_info(request, course_id):
 
     # If the unified course experience is enabled, redirect to the "Course" tab
     if not DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
-        return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
+        return redirect(course_home_url(course_key))
 
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)
@@ -925,7 +903,7 @@ def course_about(request, course_id):
 
     # If user needs to be redirected to course home then redirect
     if _course_home_redirect_enabled():
-        return redirect(reverse(course_home_url_name(course_key), args=[str(course_key)]))
+        return redirect(course_home_url(course_key))
 
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
@@ -938,10 +916,7 @@ def course_about(request, course_id):
         studio_url = get_studio_url(course, 'settings/details')
 
         if request.user.has_perm(VIEW_COURSE_HOME, course):
-            if course_home_legacy_is_active(course.id):
-                course_target = reverse(course_home_url_name(course.id), args=[str(course.id)])
-            else:
-                course_target = get_learning_mfe_home_url(course_key=course.id, url_fragment='home')
+            course_target = course_home_url(course.id)
         else:
             course_target = reverse('about_course', args=[str(course.id)])
 
@@ -1053,82 +1028,12 @@ def program_marketing(request, program_uuid):
     return render_to_response('courseware/program_marketing.html', context)
 
 
-@login_required
-@ensure_csrf_cookie
 @ensure_valid_course_key
 def dates(request, course_id):
     """
-    Display the course's dates.html, or 404 if there is no such course.
-    Assumes the course_id is in a valid format.
+    Simply redirects to the MFE dates tab, as this legacy view for dates no longer exists.
     """
-    from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
-
-    course_key = CourseKey.from_string(course_id)
-    if not (course_home_legacy_is_active(course_key) or request.user.is_staff):
-        raise Redirect(get_learning_mfe_home_url(
-            course_key=course_key, url_fragment=COURSE_DATES_NAME, params=request.GET,
-        ))
-
-    # Enable NR tracing for this view based on course
-    monitoring_utils.set_custom_attribute('course_id', str(course_key))
-    monitoring_utils.set_custom_attribute('user_id', request.user.id)
-    monitoring_utils.set_custom_attribute('is_staff', request.user.is_staff)
-
-    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
-
-    masquerade = None
-    can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
-    if can_masquerade:
-        masquerade, masquerade_user = setup_masquerade(
-            request,
-            course.id,
-            can_masquerade,
-            reset_masquerade_data=True,
-        )
-        request.user = masquerade_user
-
-    user_is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key)
-    user_is_staff = bool(has_access(request.user, 'staff', course_key))
-
-    # Render the full content to enrolled users, as well as to course and global staff.
-    # Unenrolled users who are not course or global staff are redirected to the Outline Tab.
-    if not user_is_enrolled and not user_is_staff:
-        raise CourseAccessRedirect(reverse('openedx.course_experience.course_home', args=[course_id]))
-
-    course_date_blocks = get_course_date_blocks(course, request.user, request,
-                                                include_access=True, include_past_dates=True)
-
-    learner_is_full_access = not ContentTypeGatingConfig.enabled_for_enrollment(request.user, course_key)
-
-    # User locale settings
-    user_timezone_locale = user_timezone_locale_prefs(request)
-    user_timezone = user_timezone_locale['user_timezone']
-    user_language = user_timezone_locale['user_language']
-
-    missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
-
-    context = {
-        'course': course,
-        'course_date_blocks': course_date_blocks,
-        'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
-        'learner_is_full_access': learner_is_full_access,
-        'user_timezone': user_timezone,
-        'user_language': user_language,
-        'supports_preview_menu': True,
-        'can_masquerade': can_masquerade,
-        'masquerade': masquerade,
-        'on_dates_tab': True,
-        'content_type_gating_enabled': ContentTypeGatingConfig.enabled_for_enrollment(
-            user=request.user,
-            course_key=course_key,
-        ),
-        'missed_deadlines': missed_deadlines,
-        'missed_gated_content': missed_gated_content,
-        'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
-        'has_ended': course.has_ended(),
-    }
-
-    return render_to_response('courseware/dates.html', context)
+    raise Redirect(get_learning_mfe_home_url(course_key=course_id, url_fragment='dates', params=request.GET))
 
 
 @transaction.non_atomic_requests
@@ -1562,7 +1467,7 @@ def course_survey(request, course_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key, check_survey_complete=False)
 
-    redirect_url = reverse(course_home_url_name(course.id), args=[course_id])
+    redirect_url = course_home_url(course_key)
 
     # if there is no Survey associated with this course,
     # then redirect to the course instead
@@ -1702,9 +1607,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
     """
-    from lms.urls import RESET_COURSE_DEADLINES_NAME
-    from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
-
     usage_key = UsageKey.from_string(usage_key_string)
 
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
@@ -1811,15 +1713,66 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'missed_deadlines': missed_deadlines,
             'missed_gated_content': missed_gated_content,
             'has_ended': course.has_ended(),
-            'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id]),
+            'web_app_course_url': get_learning_mfe_home_url(course_key=course.id, url_fragment='home'),
             'on_courseware_page': True,
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'is_learning_mfe': is_learning_mfe,
             'is_mobile_app': is_mobile_app,
-            'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
             'render_course_wide_assets': True,
 
             **optimization_flags,
+        }
+        return render_to_response('courseware/courseware-chromeless.html', context)
+
+
+@require_http_methods(["GET"])
+@ensure_valid_usage_key
+@xframe_options_exempt
+@transaction.non_atomic_requests
+def render_public_video_xblock(request, usage_key_string):
+    """
+    Returns an HttpResponse with HTML content for the Video xBlock with the given usage_key.
+    The returned HTML is a chromeless rendering of the Video xBlock (excluding content of the containing courseware).
+    """
+    view = 'public_view'
+
+    usage_key = UsageKey.from_string(usage_key_string)
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+    course_key = usage_key.course_key
+
+    # usage key block type must be `video` else raise 404
+    if usage_key.block_type != 'video':
+        raise Http404("Video not found.")
+
+    with modulestore().bulk_operations(course_key):
+        course = get_course_by_id(course_key, 0)
+
+        block, _ = get_module_by_usage_id(
+            request,
+            str(course_key),
+            str(usage_key),
+            disable_staff_debug_info=True,
+            course=course,
+            will_recheck_access=False
+        )
+
+        # video must be public (`Public Access` field set to True) by course author in studio in video advanced settings
+        if not block.public_access:
+            raise Http404("Video not found.")
+
+        fragment = block.render(view, context={})
+
+        context = {
+            'fragment': fragment,
+            'course': course,
+            'disable_accordion': False,
+            'allow_iframing': True,
+            'disable_header': False,
+            'disable_footer': False,
+            'disable_window_wrap': True,
+            'edx_notes_enabled': False,
+            'is_learning_mfe': True,
+            'is_mobile_app': False,
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
 
@@ -1999,6 +1952,48 @@ def financial_assistance_request(request):
 
 
 @login_required
+@require_POST
+def financial_assistance_request_v2(request):
+    """
+    Uses the new financial assistance application flow.
+    Creates a post request to edx-financial-assistance backend.
+    """
+    try:
+        data = json.loads(request.body.decode('utf8'))
+        username = data['username']
+        # Simple sanity check that the session belongs to the user
+        # submitting an FA request
+        if request.user.username != username:
+            return HttpResponseForbidden()
+
+        lms_user_id = request.user.id
+        course_id = data['course']
+        income = data['income']
+        learner_reasons = data['reason_for_applying']
+        learner_goals = data['goals']
+        learner_plans = data['effort']
+        allowed_for_marketing = data['mktg-permission']
+
+    except ValueError:
+        # Thrown if JSON parsing fails
+        return HttpResponseBadRequest('Could not parse request JSON.')
+    except KeyError as err:
+        # Thrown if fields are missing
+        return HttpResponseBadRequest(f'The field {str(err)} is required.')
+
+    form_data = {
+        'lms_user_id': lms_user_id,
+        'course_id': course_id,
+        'income': income,
+        'learner_reasons': learner_reasons,
+        'learner_goals': learner_goals,
+        'learner_plans': learner_plans,
+        'allowed_for_marketing': allowed_for_marketing
+    }
+    return create_financial_assistance_application(form_data)
+
+
+@login_required
 def financial_assistance_form(request):
     """Render the financial assistance application form page."""
     user = request.user
@@ -2010,6 +2005,11 @@ def financial_assistance_form(request):
     annual_incomes = [
         {'name': _(income), 'value': income} for income in incomes  # lint-amnesty, pylint: disable=translation-of-non-string
     ]
+    if ENABLE_NEW_FINANCIAL_ASSISTANCE_FLOW.is_enabled():
+        submit_url = 'submit_financial_assistance_request_v2'
+    else:
+        submit_url = 'submit_financial_assistance_request'
+
     return render_to_response('financial-assistance/apply.html', {
         'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER),
         'student_faq_url': marketing_link('FAQ'),
@@ -2022,7 +2022,7 @@ def financial_assistance_form(request):
             'name': user.profile.name,
             'country': str(user.profile.country.name),
         },
-        'submit_url': reverse('submit_financial_assistance_request'),
+        'submit_url': reverse(submit_url),
         'fields': [
             {
                 'name': 'course',

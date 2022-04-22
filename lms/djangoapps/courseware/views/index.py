@@ -40,7 +40,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     DISABLE_COURSE_OUTLINE_PAGE_FLAG,
-    default_course_url_name
+    default_course_url
 )
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
@@ -64,10 +64,7 @@ from ..masquerade import check_content_start_date_for_masquerade_user, setup_mas
 from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
-from ..toggles import (
-    courseware_legacy_is_visible,
-    courseware_mfe_is_advertised
-)
+from ..toggles import courseware_mfe_is_active
 from .views import CourseTabView
 
 log = logging.getLogger("edx.courseware.views.index")
@@ -172,23 +169,11 @@ class CoursewareIndex(View):
 
     def _redirect_to_learning_mfe(self):
         """
-        Can the user access this sequence in Legacy courseware? If not, redirect to MFE.
-
-        We specifically allow users to stay in the Legacy frontend for special
-        (ie timed/proctored) exams since they're not yet supported by the MFE.
+        Can the user access this sequence in the courseware MFE? If so, redirect to MFE.
         """
-        # STAY: if the course run as a whole is visible in the Legacy experience.
-        if courseware_legacy_is_visible(
-                course_key=self.course_key,
-                is_global_staff=self.request.user.is_staff,
-        ):
-            return
-        # STAY: if we are in a special (ie proctored/timed) exam, which isn't yet
-        #       supported on the MFE.
-        if getattr(self.section, 'is_time_limited', False):
-            return
-        # REDIRECT otherwise.
-        raise Redirect(self.microfrontend_url)
+        # If the MFE is active, prefer that
+        if courseware_mfe_is_active():
+            raise Redirect(self.microfrontend_url)
 
     @property
     def microfrontend_url(self):
@@ -417,8 +402,7 @@ class CoursewareIndex(View):
         Also returns the table of contents for the courseware.
         """
 
-        course_url_name = default_course_url_name(self.course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': str(self.course.id)})
+        course_url = default_course_url(self.course.id)
         show_search = (
             settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH') or
             (settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF') and self.is_staff)
@@ -497,16 +481,6 @@ class CoursewareIndex(View):
 
             if self.section.position and self.section.has_children:
                 self._add_sequence_title_to_context(courseware_context)
-
-        # Courseware MFE link
-        if courseware_mfe_is_advertised(
-                is_global_staff=request.user.is_staff,
-                is_course_staff=staff_access,
-                course_key=self.course.id,
-        ):
-            courseware_context['microfrontend_link'] = self.microfrontend_url
-        else:
-            courseware_context['microfrontend_link'] = None
 
         return courseware_context
 

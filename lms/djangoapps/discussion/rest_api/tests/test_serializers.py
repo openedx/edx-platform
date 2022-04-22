@@ -592,7 +592,8 @@ class ThreadSerializerDeserializationTest(
             'closed': ['False'],
             'pinned': ['False'],
             'user_id': [str(self.user.id)],
-            'read': [str(read)]
+            'read': [str(read)],
+            'editing_user_id': [str(self.user.id)],
         }
         for key in data:
             assert saved[key] == data[key]
@@ -877,7 +878,8 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],
             'endorsed': ['True'],
-            'endorsement_user_id': [str(self.user.id)]
+            'endorsement_user_id': [str(self.user.id)],
+            'editing_user_id': [str(self.user.id)],
         }
         for key in data:
             assert saved[key] == data[key]

@@ -56,7 +56,7 @@ from common.djangoapps.util import views as util_views
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
-COURSE_DATES_NAME = 'dates'
+RENDER_VIDEO_XBLOCK_NAME = 'render_public_video_xblock'
 COURSE_PROGRESS_NAME = 'progress'
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -318,6 +318,11 @@ urlpatterns += [
         courseware_views.render_xblock,
         name=RENDER_XBLOCK_NAME,
     ),
+    re_path(
+        fr'^videos/{settings.USAGE_KEY_PATTERN}$',
+        courseware_views.render_public_video_xblock,
+        name=RENDER_VIDEO_XBLOCK_NAME,
+    ),
 
     # xblock Resource URL
     re_path(
@@ -501,14 +506,8 @@ urlpatterns += [
         name=COURSE_PROGRESS_NAME,
     ),
 
-    # dates page
-    re_path(
-        r'^courses/{}/dates'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        courseware_views.dates,
-        name=COURSE_DATES_NAME,
-    ),
+    # dates page (no longer functional, just redirects to MFE)
+    re_path(r'^courses/{}/dates'.format(settings.COURSE_ID_PATTERN), courseware_views.dates, name='dates'),
 
     # Takes optional student_id for instructor use--shows profile as that student sees it.
     re_path(
@@ -668,14 +667,6 @@ urlpatterns += [
         include('openedx.features.calendar_sync.urls'),
     ),
 
-    # Course search
-    re_path(
-        r'^courses/{}/search/'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        include('openedx.features.course_search.urls'),
-    ),
-
     # Learner profile
     path(
         'u/',
@@ -809,12 +800,6 @@ if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW', settings.FEATU
     urlpatterns += [
         path('api/bulk_enroll/v1/', include('lms.djangoapps.bulk_enroll.urls')),
     ]
-
-# Course goals
-urlpatterns += [
-    path('api/course_goals/', include(('lms.djangoapps.course_goals.urls', 'lms.djangoapps.course_goals'),
-                                      namespace='course_goals_api')),
-]
 
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
@@ -958,6 +943,11 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             'financial-assistance/submit/',
             courseware_views.financial_assistance_request,
             name='submit_financial_assistance_request'
+        ),
+        path(
+            'financial-assistance_v2/submit/',
+            courseware_views.financial_assistance_request_v2,
+            name='submit_financial_assistance_request_v2'
         )
     ]
 

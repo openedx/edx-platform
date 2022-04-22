@@ -1,22 +1,35 @@
 """
-This is the common settings file, intended to set sane defaults. If you have a
-piece of configuration that's dependent on a set of feature flags being set,
-then create a function that returns the calculated value based on the value of
-FEATURES[...]. Modules that extend this one can change the feature
-configuration in an environment specific config file and re-calculate those
-values.
+This is the common settings file, intended to set sane defaults.
 
-We should make a method that calls all these config methods so that you just
-make one call at the end of your site-specific dev file to reset all the
-dependent variables (like INSTALLED_APPS) for you.
+If you wish to override some of the settings set here without needing to specify
+everything, you should create a new settings file that imports the content of this
+one and then overrides anything you wish to make overridable.
 
-Longer TODO:
-1. Right now our treatment of static content in general and in particular
-   course-specific static content is haphazard.
-2. We should have a more disciplined approach to feature flagging, even if it
-   just means that we stick them in a dict called FEATURES.
-3. We need to handle configuration for multiple courses. This could be as
-   multiple sites, but we do need a way to map their data assets.
+Some known files that extend this one:
+
+- `production.py` - This file loads overrides from a yaml settings file and uses that
+    to override the settings set in this file.
+
+
+Conventions
+-----------
+
+1. Extending a List Setting
+
+    Sometimes settings take the form of a list and rather than replacing the
+    whole list, we want to add items to the list. eg. CELERY_IMPORTS.
+
+    In this case, it is recommended that a new variable created in your extended
+    file that contains the word `EXTRA` and enough of the base variable to easily
+    let people map between the two items.
+
+    Examples:
+        - CELERY_EXTRA_IMPORTS  (preferred format)
+        - EXTRA_MIDDLEWARE_CLASSES
+        - XBLOCK_EXTRA_MIXINS  (preferred format)
+
+    The preferred format for the name of the new setting (e.g. `CELERY_EXTRA_IMPORTS`) is to use
+    the same prefix (e.g. `CELERY`) of the setting that is being appended (e.g. `CELERY_IMPORTS`).
 """
 
 # We intentionally define lots of variables that aren't used
@@ -1023,8 +1036,6 @@ SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
 SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
 
 RETRY_CALENDAR_SYNC_EMAIL_MAX_ATTEMPTS = 5
-# Deadline message configurations
-COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
 
 MARKETING_EMAILS_OPT_IN = False
 
@@ -1040,6 +1051,9 @@ ENABLE_COPPA_COMPLIANCE = False
 
 # VAN-741 - save for later api put behind a flag to make it only available for edX
 ENABLE_SAVE_FOR_LATER = False
+
+# VAN-887 - save for later reminder emails threshold days
+SAVE_FOR_LATER_REMINDER_EMAIL_THRESHOLD = 15
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
@@ -1071,6 +1085,7 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
+    'openedx.core.lib.blockstore_api.db_routers.BlockstoreRouter',
     'edx_django_utils.db.read_replica.ReadReplicaRouter',
 ]
 
@@ -2677,11 +2692,17 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 ################################# CELERY ######################################
 
-CELERY_IMPORTS = (
+CELERY_IMPORTS = [
     # Since xblock-poll is not a Django app, and XBlocks don't get auto-imported
     # by celery workers, its tasks will not get auto-discovered:
     'poll.tasks',
-)
+]
+
+# .. setting_name: CELERY_EXTRA_IMPORTS
+# .. setting_default: []
+# .. setting_description: Adds extra packages that don't get auto-imported (Example: XBlocks).
+#    These packages are added in addition to those added by CELERY_IMPORTS.
+CELERY_EXTRA_IMPORTS = []
 
 # Message configuration
 
@@ -3083,10 +3104,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'lms.djangoapps.course_blocks',
 
-
-    # Coursegraph
-    'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
-
     # Mailchimp Syncing
     'lms.djangoapps.mailing',
 
@@ -3168,7 +3185,6 @@ INSTALLED_APPS = [
     'openedx.features.calendar_sync',
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
-    'openedx.features.course_search',
     'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
     'openedx.features.learner_profile',
     'openedx.features.course_duration_limits',
@@ -3228,6 +3244,9 @@ INSTALLED_APPS = [
 
     # For save for later
     'lms.djangoapps.save_for_later',
+
+    # Blockstore
+    'blockstore.apps.bundles',
 ]
 
 ######################### CSRF #########################################
@@ -4608,6 +4627,18 @@ COURSE_ENROLLMENT_MODES = {
         "display_name": _("Paid Executive Education"),
         "min_price": 1
     },
+    "unpaid-bootcamp": {
+        "id": 11,
+        "slug": "unpaid-bootcamp",
+        "display_name": _("Unpaid Bootcamp"),
+        "min_price": 0
+    },
+    "paid-bootcamp": {
+        "id": 12,
+        "slug": "paid-bootcamp",
+        "display_name": _("Paid Bootcamp"),
+        "min_price": 1
+    },
 }
 
 CONTENT_TYPE_GATE_GROUP_IDS = {
@@ -4833,6 +4864,30 @@ ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
 ENABLE_AUTHN_REGISTER_HIBP_POLICY = False
 HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3
 
+# .. toggle_name: ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle activates the use of the password validation
+#   on Authn MFE's login.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2022-03-29
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-668
+ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY = False
+HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
+
+# .. toggle_name: ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle activates the use of the password validation
+#   on Authn MFE's login.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2022-03-29
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-667
+ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
+HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
+
 ############### Settings for the ace_common plugin #################
 ACE_ENABLED_CHANNELS = ['django_email']
 ACE_ENABLED_POLICIES = ['bulk_email_optout']
@@ -4919,6 +4974,10 @@ MAILCHIMP_NEW_USER_LIST_ID = ""
 BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
 BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 
+# Disable the Blockstore app API by default.
+# See openedx.core.lib.blockstore_api.config for details.
+BLOCKSTORE_USE_BLOCKSTORE_APP_API = False
+
 # .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
 # .. setting_default: default
 # .. setting_description: The django cache key of the cache to use for storing anonymous user state for XBlocks.
@@ -4933,6 +4992,40 @@ XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 #     We use a default of 3000s (50mins) because temporary URLs are often
 #     configured to expire after one hour.
 BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 3000
+
+# .. setting_name: BUNDLE_ASSET_URL_STORAGE_KEY
+# .. setting_default: None
+# .. setting_description: When this is set, `BUNDLE_ASSET_URL_STORAGE_SECRET` is
+#  set, and `boto3` is installed, this is used as an AWS IAM access key for
+#  generating signed, read-only URLs for blockstore assets stored in S3.
+#  Otherwise, URLs are generated based on the default storage configuration.
+#  See `blockstore.apps.bundles.storage.LongLivedSignedUrlStorage` for details.
+BUNDLE_ASSET_URL_STORAGE_KEY = None
+
+# .. setting_name: BUNDLE_ASSET_URL_STORAGE_SECRET
+# .. setting_default: None
+# .. setting_description: When this is set, `BUNDLE_ASSET_URL_STORAGE_KEY` is
+#  set, and `boto3` is installed, this is used as an AWS IAM secret key for
+#  generating signed, read-only URLs for blockstore assets stored in S3.
+#  Otherwise, URLs are generated based on the default storage configuration.
+#  See `blockstore.apps.bundles.storage.LongLivedSignedUrlStorage` for details.
+BUNDLE_ASSET_URL_STORAGE_SECRET = None
+
+# .. setting_name: BUNDLE_ASSET_STORAGE_SETTINGS
+# .. setting_default: dict, appropriate for file system storage.
+# .. setting_description: When this is set, `BUNDLE_ASSET_URL_STORAGE_KEY` is
+#  set, and `boto3` is installed, this provides the bucket name and location for blockstore assets stored in S3.
+#  See `blockstore.apps.bundles.storage.LongLivedSignedUrlStorage` for details.
+BUNDLE_ASSET_STORAGE_SETTINGS = dict(
+    # Backend storage
+    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_KWARGS=dict(bucket='bundle-asset-bucket', location='/path-to-bundles/'),
+    STORAGE_CLASS='django.core.files.storage.FileSystemStorage',
+    STORAGE_KWARGS=dict(
+        location=MEDIA_ROOT,
+        base_url=MEDIA_URL,
+    ),
+)
 
 ######################### MICROSITE ###############################
 MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
@@ -5017,3 +5110,13 @@ DISCUSSION_MODERATION_CLOSE_REASON_CODES = {
     "duplicate": _("Post is a duplicate"),
     "off-topic": _("Post is off-topic"),
 }
+
+################# Settings for edx-financial-assistance #################
+IS_ELIGIBLE_FOR_FINANCIAL_ASSISTANCE_URL = '/core/api/course_eligibility/'
+FINANCIAL_ASSISTANCE_APPLICATION_STATUS_URL = "/core/api/financial_assistance_application/status/"
+CREATE_FINANCIAL_ASSISTANCE_APPLICATION_URL = '/core/api/financial_assistance_applications'
+
+######################## Enterprise API Client ########################
+ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_KEY = "enterprise-backend-service-key"
+ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_SECRET = "enterprise-backend-service-secret"
+ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://127.0.0.1:8000/oauth2"

@@ -134,7 +134,12 @@ class Programs(APIView):
             """
             transformed_authoring_organizations = []
             for authoring_organization in authoring_organizations:
-                transformed_authoring_organizations.append({'key': authoring_organization['key']})
+                transformed_authoring_organizations.append(
+                    {
+                        'key': authoring_organization['key'],
+                        'logo_image_url': authoring_organization['logo_image_url']
+                    }
+                )
 
             return transformed_authoring_organizations
 

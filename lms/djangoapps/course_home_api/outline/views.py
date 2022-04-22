@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from completion.exceptions import UnavailableCompletionData  # lint-amnesty, pylint: disable=wrong-import-order
 from completion.utilities import get_key_to_last_completed_block  # lint-amnesty, pylint: disable=wrong-import-order
 from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
-from django.http.response import Http404  # lint-amnesty, pylint: disable=wrong-import-order
 from django.shortcuts import get_object_or_404  # lint-amnesty, pylint: disable=wrong-import-order
 from django.urls import reverse  # lint-amnesty, pylint: disable=wrong-import-order
 from django.utils.translation import gettext as _  # lint-amnesty, pylint: disable=wrong-import-order
@@ -29,15 +28,11 @@ from lms.djangoapps.course_goals.api import (
 )
 from lms.djangoapps.course_goals.models import CourseGoal
 from lms.djangoapps.course_home_api.outline.serializers import OutlineTabSerializer
-from lms.djangoapps.course_home_api.toggles import (
-    course_home_legacy_is_active,
-)
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
-from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.content.learning_sequences.api import get_user_course_outline
@@ -54,7 +49,6 @@ from openedx.features.course_experience.url_helpers import get_learning_mfe_home
 from openedx.features.course_experience.utils import get_course_outline_block_tree, get_start_block
 from openedx.features.discounts.utils import generate_offer_data
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class UnableToDismissWelcomeMessage(APIException):
@@ -166,10 +160,6 @@ class OutlineTabView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):  # pylint: disable=too-many-statements
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
-        course_usage_key = modulestore().make_course_usage_key(course_key)  # pylint: disable=unused-variable
-
-        if course_home_legacy_is_active(course_key):
-            raise Http404
 
         # Enable NR tracing for this view based on course
         monitoring_utils.set_custom_attribute('course_id', course_key_string)
@@ -198,10 +188,7 @@ class OutlineTabView(RetrieveAPIView):
         user_timezone_locale = user_timezone_locale_prefs(request)
         user_timezone = user_timezone_locale['user_timezone']
 
-        if course_home_legacy_is_active(course.id):
-            dates_tab_link = request.build_absolute_uri(reverse('dates', args=[course.id]))
-        else:
-            dates_tab_link = get_learning_mfe_home_url(course_key=course.id, url_fragment='dates')
+        dates_tab_link = get_learning_mfe_home_url(course_key=course.id, url_fragment='dates')
 
         # Set all of the defaults
         access_expiration = None
@@ -280,8 +267,11 @@ class OutlineTabView(RetrieveAPIView):
                     'Please contact your degree administrator or '
                     '{platform_name} Support if you have questions.'
                 ).format(platform_name=settings.PLATFORM_NAME)
-            elif course_is_invitation_only(course):
+            elif CourseEnrollment.is_enrollment_closed(request.user, course_overview):
                 enroll_alert['can_enroll'] = False
+            elif CourseEnrollment.objects.is_course_full(course_overview):
+                enroll_alert['can_enroll'] = False
+                enroll_alert['extra_text'] = _('Course is full')
 
         # Sometimes there are sequences returned by Course Blocks that we
         # don't actually want to show to the user, such as when a sequence is
@@ -387,7 +377,6 @@ def dismiss_welcome_message(request):  # pylint: disable=missing-function-docstr
 @permission_classes((IsAuthenticated,))
 def save_course_goal(request):  # pylint: disable=missing-function-docstring
     course_id = request.data.get('course_id')
-    goal_key = request.data.get('goal_key')
     days_per_week = request.data.get('days_per_week')
     subscribed_to_reminders = request.data.get('subscribed_to_reminders')
 

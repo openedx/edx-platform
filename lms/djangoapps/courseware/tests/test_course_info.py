@@ -293,7 +293,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         assert expected_title == content('.page-title').contents()[0].strip()
 
         if expected_subtitle is None:
-            assert [] == content('.page-subtitle')
+            assert not content('.page-subtitle')
         else:
             assert expected_subtitle == content('.page-subtitle').contents()[0].strip()
 

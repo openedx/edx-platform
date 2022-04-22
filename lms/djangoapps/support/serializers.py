@@ -3,13 +3,12 @@ Serializers for use in the support app.
 """
 import json
 
-from django.urls import reverse
 from rest_framework import serializers
 
 from common.djangoapps.student.models import CourseEnrollment, ManualEnrollmentAudit
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from openedx.core.djangoapps.catalog.utils import get_programs_by_uuids
-from openedx.features.course_experience import default_course_url_name
+from openedx.features.course_experience import default_course_url
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 # pylint: disable=abstract-method
@@ -47,8 +46,7 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
         model = ProgramCourseEnrollment
 
     def get_course_url(self, obj):
-        course_url_name = default_course_url_name(obj.course_key)
-        return reverse(course_url_name, kwargs={'course_id': obj.course_key})
+        return default_course_url(obj.course_key)
 
 
 class ProgramEnrollmentSerializer(serializers.Serializer):

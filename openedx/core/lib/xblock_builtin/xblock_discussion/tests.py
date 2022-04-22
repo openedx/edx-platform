@@ -29,9 +29,9 @@ AttributePair = namedtuple("AttributePair", ["name", "value"])
 AttributePair.__repr__ = attribute_pair_repr
 
 
-ID_ATTR_NAMES = ("discussion_id", "id",)
+ID_ATTR_NAMES = ("discussion_id",)
 CATEGORY_ATTR_NAMES = ("discussion_category",)
-TARGET_ATTR_NAMES = ("discussion_target", "for", )
+TARGET_ATTR_NAMES = ("discussion_target",)
 
 
 def _random_string():

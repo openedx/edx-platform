@@ -116,7 +116,7 @@ class TestInitializeView(BaseViewTest):
             self.api_url, {PARAM_ORA_LOCATION: self.ora_usage_key}
         )
 
-        expected_keys = set(["courseMetadata", "oraMetadata", "submissions"])
+        expected_keys = set(["courseMetadata", "oraMetadata", "submissions", "isEnabled"])
         assert response.status_code == 200
         assert response.data.keys() == expected_keys
 
@@ -543,6 +543,99 @@ class TestSubmissionLockView(BaseViewTest):
         mock_delete_lock.return_value = {"android": "Roy Batty"}
 
         response = self.delete_lock(self.test_lock_params)
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {"error": ERR_UNKNOWN}
+
+
+class TestBatchSubmissionLockView(BaseViewTest):
+    """
+    Tests for the /lock view, locking or unlocking a submission for grading
+    """
+
+    view_name = "ora-staff-grader:batch-unlock"
+
+    test_submission_uuids = [str(uuid4()) for _ in range(3)]
+    test_anon_user_id = "anon-user-id"
+    test_other_anon_user_id = "anon-user-id-2"
+    test_timestamp = "2020-08-29T02:14:00-04:00"
+
+    def setUp(self):
+        super().setUp()
+
+        # Batch unlock includes the ORA location in the params...
+        self.test_request_params = {
+            PARAM_ORA_LOCATION: self.ora_usage_key,
+        }
+
+        # and a list of submission UUIDs in the body
+        self.test_request_body = {
+            "submissionUUIDs": self.test_submission_uuids
+        }
+
+        self.log_in()
+
+    def batch_unlock(self, params, body):
+        """Wrapper for easier calling of 'batch_unlock'"""
+        return self.client.post(self.url_with_params(params), body, format="json")
+
+    @patch("lms.djangoapps.ora_staff_grader.views.batch_delete_submission_locks")
+    def test_batch_unlock_invalid_ora(self, mock_batch_delete):
+        """An invalid ORA returns a 400"""
+        self.test_request_params[PARAM_ORA_LOCATION] = "not_a_real_location"
+
+        response = self.batch_unlock(self.test_request_params, self.test_request_body)
+
+        assert response.status_code == 400
+        assert json.loads(response.content) == {"error": ERR_BAD_ORA_LOCATION}
+        mock_batch_delete.assert_not_called()
+
+    @patch("lms.djangoapps.ora_staff_grader.views.batch_delete_submission_locks")
+    def test_batch_unlock_missing_submisison_list(self, mock_batch_delete):
+        """An invalid ORA returns a 400"""
+
+        response = self.batch_unlock(self.test_request_params, {})
+
+        assert response.status_code == 400
+        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
+        mock_batch_delete.assert_not_called()
+
+    @patch("lms.djangoapps.ora_staff_grader.views.batch_delete_submission_locks")
+    def test_batch_unlock(self, mock_batch_delete):
+        """POST tries to delete a group of submission locks. Success returns empty 200"""
+        mock_batch_delete.return_value = None
+
+        response = self.batch_unlock(self.test_request_params, self.test_request_body)
+
+        assert response.status_code == 200
+        assert json.loads(response.content) == {}
+        mock_batch_delete.assert_called()
+
+    @patch("lms.djangoapps.ora_staff_grader.views.batch_delete_submission_locks")
+    def test_batch_unlock_internal_error(self, mock_batch_delete):
+        """Any internal errors to this API get surfaced as an internal error"""
+        mock_batch_delete.side_effect = XBlockInternalError(
+            context={"handler": "batch_delete_submission_locks"}
+        )
+
+        response = self.batch_unlock(self.test_request_params, self.test_request_body)
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {
+            "error": ERR_INTERNAL,
+            "handler": "batch_delete_submission_locks",
+        }
+
+    @patch("lms.djangoapps.ora_staff_grader.views.batch_delete_submission_locks")
+    def test_batch_unlock_generic_exception(
+        self,
+        mock_batch_delete,
+    ):
+        """In the even more unlikely event of an unhandled error, shrug exuberantly"""
+        # Mock a generic error inside the API
+        mock_batch_delete.side_effect = Exception()
+
+        response = self.batch_unlock(self.test_request_params, self.test_request_body)
 
         assert response.status_code == 500
         assert json.loads(response.content) == {"error": ERR_UNKNOWN}

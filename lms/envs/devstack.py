@@ -19,7 +19,6 @@ from .production import *  # pylint: disable=wildcard-import, unused-wildcard-im
 
 # Don't use S3 in devstack, fall back to filesystem
 del DEFAULT_FILE_STORAGE
-MEDIA_ROOT = "/edx/var/edxapp/uploads"
 ORA2_FILEUPLOAD_BACKEND = 'django'
 
 
@@ -391,6 +390,8 @@ MKTG_URLS = {
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 
+ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://edx.devstack.lms:18000/oauth2"
+
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
 COURSE_CATALOG_URL_ROOT = 'http://edx.devstack.discovery:18381'
@@ -445,6 +446,10 @@ PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
+
+#################### Network configuration ####################
+# Devstack is directly exposed to the caller
+CLOSEST_CLIENT_IP_FROM_HEADERS = []
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

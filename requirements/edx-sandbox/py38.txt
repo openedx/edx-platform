@@ -10,7 +10,7 @@ cffi==1.15.0
     # via cryptography
 chem==1.2.0
     # via -r requirements/edx-sandbox/py38.in
-click==8.0.4
+click==8.1.2
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   nltk
@@ -22,11 +22,10 @@ decorator==4.4.2
     # via networkx
 joblib==1.1.0
     # via nltk
-kiwisolver==1.4.0
+kiwisolver==1.4.2
     # via matplotlib
-lxml==4.5.0
+lxml==4.8.0
     # via
-    #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   openedx-calc
 markupsafe==2.1.1
@@ -56,11 +55,11 @@ numpy==1.16.6
     #   scipy
 openedx-calc==3.0.1
     # via -r requirements/edx-sandbox/py38.in
-pillow==9.0.1
+pillow==9.1.0
     # via matplotlib
 pycparser==2.21
     # via cffi
-pyparsing==3.0.7
+pyparsing==3.0.8
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
@@ -84,10 +83,9 @@ six==1.16.0
     # via
     #   chem
     #   python-dateutil
-sympy==1.6.2
+sympy==1.10.1
     # via
-    #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   openedx-calc
-tqdm==4.63.1
+tqdm==4.64.0
     # via nltk

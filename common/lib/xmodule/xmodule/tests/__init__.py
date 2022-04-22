@@ -82,6 +82,10 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     def get_asides(self, block):
         return []
 
+    @property
+    def resources_fs(self):
+        return Mock(name='TestModuleSystem.resources_fs', root_path='.'),
+
     def __repr__(self):
         """
         Custom hacky repr.
@@ -149,7 +153,6 @@ def get_test_system(
         static_url='/static',
         track_function=Mock(name='get_test_system.track_function'),
         get_module=get_module,
-        filestore=Mock(name='get_test_system.filestore', root_path='.'),
         debug=True,
         hostname="edx.org",
         services={

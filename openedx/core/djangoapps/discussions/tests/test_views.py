@@ -47,7 +47,8 @@ DEFAULT_LEGACY_CONFIGURATION = {
     'divided_course_wide_discussions': [],
     'division_scheme': 'none',
     'available_division_schemes': [],
-
+    'reported_content_email_notifications': False,
+    'reported_content_email_notifications_flag': False,
 }
 DEFAULT_LTI_CONFIGURATION = {
     'lti_1p1_client_key': '',
@@ -350,6 +351,7 @@ class DataTest(AuthorizedApiTest):
             'plugin_configuration': {
                 'allow_anonymous': False,
                 'custom_field': 'custom_value',
+                'reported_content_email_notifications': True,
             },
         }
         response = self._post(payload)
@@ -357,6 +359,7 @@ class DataTest(AuthorizedApiTest):
         assert data['plugin_configuration'] == {
             'allow_anonymous': False,
             'custom_field': 'custom_value',
+            'reported_content_email_notifications': True,
         }
 
         course = self.store.get_course(self.course.id)

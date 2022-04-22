@@ -72,7 +72,6 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
             'courserun_key': str(self.course.id),
             'days_per_week': 1,
             'subscribed_to_reminders': True,
-            'goal_key': 'unsure',
         })
 
         current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)
@@ -89,7 +88,6 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
             'courserun_key': str(self.course.id),
             'days_per_week': 1,
             'subscribed_to_reminders': True,
-            'goal_key': 'unsure',
         })
 
         self.save_course_goal(3, True)
@@ -97,7 +95,6 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
             'courserun_key': str(self.course.id),
             'days_per_week': 3,
             'subscribed_to_reminders': True,
-            'goal_key': 'unsure',
         })
 
         self.save_course_goal(5, False)
@@ -105,7 +102,6 @@ class TestCourseGoalsAPI(SharedModuleStoreTestCase):
             'courserun_key': str(self.course.id),
             'days_per_week': 5,
             'subscribed_to_reminders': False,
-            'goal_key': 'unsure',
         })
 
         current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)

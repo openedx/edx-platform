@@ -8,23 +8,29 @@ arguments.
 """
 
 
+import datetime
 import hashlib
+import logging
 from collections import Counter
 
+import pytz
 from celery.states import READY_STATES
 
 from common.djangoapps.util import milestones_helpers
 from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api_helper import (
+    QueueConnectionError,
     check_arguments_for_overriding,
     check_arguments_for_rescoring,
     check_entrance_exam_problems_for_rescoring,
     encode_entrance_exam_and_student_input,
     encode_problem_and_student_input,
-    submit_task
+    schedule_task,
+    submit_task,
+    submit_scheduled_task,
 )
-from lms.djangoapps.instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule, SCHEDULED
 from lms.djangoapps.instructor_task.tasks import (
     calculate_grades_csv,
     calculate_may_enroll_csv,
@@ -46,6 +52,8 @@ from lms.djangoapps.instructor_task.tasks import (
     generate_anonymous_ids_for_course
 )
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+
+log = logging.getLogger(__name__)
 
 
 class SpecificStudentIdMissingError(Exception):
@@ -292,7 +300,7 @@ def submit_delete_entrance_exam_state_for_student(request, usage_key, student): 
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
-def submit_bulk_course_email(request, course_key, email_id):
+def submit_bulk_course_email(request, course_key, email_id, schedule=None):
     """
     Request to have bulk email sent as a background task.
 
@@ -321,6 +329,10 @@ def submit_bulk_course_email(request, course_key, email_id):
     task_key_stub = str(email_id)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
+
+    if schedule:
+        return schedule_task(request, task_type, course_key, task_input, task_key, schedule)
+
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
@@ -560,3 +572,18 @@ def generate_anonymous_ids(request, course_key):
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def process_scheduled_tasks():
+    """
+    Utility function that retrieves tasks whose schedules have elapsed and should be processed. Only retrieves
+    instructor tasks that are in the `SCHEDULED` state. Then submits these tasks for processing by Celery.
+    """
+    now = datetime.datetime.now(pytz.utc)
+    due_schedules = InstructorTaskSchedule.objects.filter(task__task_state=SCHEDULED).filter(task_due__lte=now)
+    for schedule in due_schedules:
+        try:
+            log.info(f"Attempting to queue scheduled task with id '{schedule.task.id}'")
+            submit_scheduled_task(schedule)
+        except QueueConnectionError as exc:
+            log.error(f"Error processing scheduled task with task id '{schedule.task.id}': {exc}")
