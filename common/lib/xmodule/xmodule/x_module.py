@@ -1990,6 +1990,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         # explicit field_data during construct_xblock.
         kwargs.setdefault('id_reader', getattr(descriptor_runtime, 'id_reader', OpaqueKeyReader()))
         kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
+        super().__init__(**kwargs)
 
         self.STATIC_URL = static_url
         self.track_function = track_function
