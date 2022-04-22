@@ -724,6 +724,10 @@ def get_module_system_for_user(
     field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
     field_data = LmsFieldData(field_data, student_data)
 
+    error_descriptor_class = ErrorBlock
+    if not has_access(user, 'staff', descriptor.location, course_id):
+        error_descriptor_class = NonStaffErrorBlock
+
     system = LmsModuleSystem(
         track_function=track_function,
         static_url=settings.STATIC_URL,
@@ -754,7 +758,8 @@ def get_module_system_for_user(
             'cache': CacheService(cache),
             'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
             'xqueue': xqueue_service,
-            'replace_urls': replace_url_service
+            'replace_urls': replace_url_service,
+            'error_descriptor_class': error_descriptor_class
         },
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
@@ -775,12 +780,6 @@ def get_module_system_for_user(
     system.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
     system.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
     system.set('days_early_for_beta', descriptor.days_early_for_beta)
-
-    # make an ErrorBlock -- assuming that the descriptor's system is ok
-    if has_access(user, 'staff', descriptor.location, course_id):
-        system.error_descriptor_class = ErrorBlock
-    else:
-        system.error_descriptor_class = NonStaffErrorBlock
 
     return system, field_data
 

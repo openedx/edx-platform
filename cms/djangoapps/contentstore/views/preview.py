@@ -206,7 +206,6 @@ def _preview_module_system(request, descriptor, field_data):
         # Set up functions to modify the fragment produced by student_view
         wrappers=wrappers,
         wrappers_asides=wrappers_asides,
-        error_descriptor_class=ErrorBlock,
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
@@ -223,7 +222,8 @@ def _preview_module_system(request, descriptor, field_data):
             "teams_configuration": TeamsConfigurationService(),
             "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
             "cache": CacheService(cache),
-            'replace_urls': replace_url_service
+            'replace_urls': replace_url_service,
+            'error_descriptor_class': ErrorBlock
         },
     )
 

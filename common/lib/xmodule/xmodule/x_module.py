@@ -1205,7 +1205,8 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):  # lint-a
         """
         if self.xmodule_runtime is None:
             raise UndefinedContext()
-        assert self.xmodule_runtime.error_descriptor_class is not None
+        error_descriptor_class = self.xmodule_runtime._services.get('error_descriptor_class')
+        assert error_descriptor_class is not None
         if self.xmodule_runtime.xmodule_instance is None:
             try:
                 self.xmodule_runtime.construct_xblock_from_class(
@@ -1221,12 +1222,12 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):  # lint-a
                 # we need to clean it out so that we can set up the ErrorBlock instead
                 self.xmodule_runtime.xmodule_instance = None
 
-                if isinstance(self, self.xmodule_runtime.error_descriptor_class):
+                if isinstance(self, error_descriptor_class):
                     log.exception('Error creating an ErrorBlock from an ErrorBlock')
                     raise
 
                 log.exception('Error creating xmodule')
-                descriptor = self.xmodule_runtime.error_descriptor_class.from_descriptor(
+                descriptor = error_descriptor_class.from_descriptor(
                     self,
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
@@ -1926,6 +1927,19 @@ class ModuleSystemShim:
         )
         return self.resources_fs
 
+    @property
+    def error_descriptor_class(self):
+        """
+        A XModuleDescriptor class. The class to use to render XModules with errors.
+
+        Deprecated in favor of error_descriptor_class service.
+        """
+        warnings.warn(
+            'runtime.error_descriptor_class is deprecated. Please use the error_descriptor_class service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        return self._services.get('error_descriptor_class')
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1943,9 +1957,8 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
     def __init__(
             self, static_url, track_function, get_module,
             descriptor_runtime, debug=False, hostname="", publish=None,
-            node_path="", course_id=None, error_descriptor_class=None,
-            field_data=None, rebind_noauth_module_to_user=None,
-            **kwargs):
+            node_path="", course_id=None, field_data=None,
+            rebind_noauth_module_to_user=None, **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1966,7 +1979,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         publish(event) - A function that allows XModules to publish events (such as grade changes)
 
-        error_descriptor_class - The class to use to render XModules with errors
 
         field_data - the `FieldData` to use for backing XBlock storage.
 
@@ -1990,7 +2002,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         if publish:
             self.publish = publish
-        self.error_descriptor_class = error_descriptor_class
         self.xmodule_instance = None
 
         self.descriptor_runtime = descriptor_runtime

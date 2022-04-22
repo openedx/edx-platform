@@ -166,11 +166,11 @@ def get_test_system(
                 waittime=10,
                 construct_callback=Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
             ),
-            'replace_urls': replace_url_service
+            'replace_urls': replace_url_service,
+            'error_descriptor_class': ErrorBlock
         },
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         course_id=course_id,
-        error_descriptor_class=ErrorBlock,
         descriptor_runtime=descriptor_system,
     )
 

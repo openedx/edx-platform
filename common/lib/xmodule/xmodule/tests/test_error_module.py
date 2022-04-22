@@ -140,8 +140,10 @@ class TestErrorBlockConstruction(unittest.TestCase):
             ScopeIds(None, None, None,
                      BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'broken', 'name'))
         )
-        self.descriptor.xmodule_runtime = TestRuntime(Mock(spec=IdReader), field_data)
-        self.descriptor.xmodule_runtime.error_descriptor_class = ErrorBlock
+        self.descriptor.xmodule_runtime = TestRuntime(
+            Mock(spec=IdReader), field_data, services={
+                'error_descriptor_class': ErrorBlock
+            })
         self.descriptor.xmodule_runtime.xmodule_instance = None
 
     def test_broken_block(self):
