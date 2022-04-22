@@ -403,7 +403,10 @@ def change_enrollment(request, check_access=True):
         # Otherwise, there is only one mode available (the default)
         return HttpResponse()
     elif action == "unenroll":
-        if settings.FEATURES.get('DISABLE_UNENROLLMENT'):
+        if configuration_helpers.get_value(
+            "DISABLE_UNENROLLMENT",
+            settings.FEATURES.get("DISABLE_UNENROLLMENT")
+        ):
             return HttpResponseBadRequest(_("Unenrollment is currently disabled"))
 
         enrollment = CourseEnrollment.get_enrollment(user, course_id)
