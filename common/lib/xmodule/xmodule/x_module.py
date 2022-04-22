@@ -1917,7 +1917,7 @@ class ModuleSystemShim:
     @property
     def filestore(self):
         """
-        A filestore ojbect. Defaults to an instance of OSFS based at settings.DATA_DIR.
+        A filestore object. Defaults to an instance of OSFS based at settings.DATA_DIR.
 
         Deprecated in favor of runtime.resources_fs property.
         """
@@ -1978,7 +1978,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         course_id - the course_id containing this module
 
         publish(event) - A function that allows XModules to publish events (such as grade changes)
-
 
         field_data - the `FieldData` to use for backing XBlock storage.
 
