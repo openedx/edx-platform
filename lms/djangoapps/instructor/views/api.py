@@ -103,6 +103,7 @@ from lms.djangoapps.instructor.views.instructor_task_helpers import extract_emai
 from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic, csvs as instructor_analytics_csvs
 from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
+from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2115,7 +2116,7 @@ def list_background_email_tasks(request, course_id):
     List background email tasks.
     """
     course_id = CourseKey.from_string(course_id)
-    task_type = 'bulk_course_email'
+    task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
     # Specifying for the history of a single task type
     tasks = task_api.get_instructor_task_history(
         course_id,
@@ -2137,7 +2138,7 @@ def list_email_content(request, course_id):
     List the content of bulk emails sent
     """
     course_id = CourseKey.from_string(course_id)
-    task_type = 'bulk_course_email'
+    task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
     # First get tasks list of bulk emails sent
     emails = task_api.get_instructor_task_history(course_id, task_type=task_type)
 
