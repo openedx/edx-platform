@@ -58,8 +58,8 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
             EnterpriseCustomerIdentityProvider,
             enterprise_customer__uuid=self.requested_enterprise_uuid
         )
-        slug_list = [ idp.provider_id for idp in enterprise_customer_idps ]
-        return [ config for config in SAMLProviderConfig.objects.current_set() if config.provider_id in slug_list ]
+        slug_list = [idp.provider_id for idp in enterprise_customer_idps]
+        return [config for config in SAMLProviderConfig.objects.current_set() if config.provider_id in slug_list]
 
     @property
     def requested_enterprise_uuid(self):
