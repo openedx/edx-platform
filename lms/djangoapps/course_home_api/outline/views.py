@@ -289,7 +289,7 @@ class OutlineTabView(RetrieveAPIView):
 
             # course_blocks is a reference to the root of the course, so we go
             # through the chapters (sections) to look for sequences to remove.
-            for chapter_data in course_blocks['children']:
+            for chapter_data in course_blocks.get('children', []):
                 chapter_data['children'] = [
                     seq_data
                     for seq_data in chapter_data['children']
