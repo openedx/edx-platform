@@ -1926,6 +1926,20 @@ class ModuleSystemShim:
         )
         return self.resources_fs
 
+    @property
+    def field_data(self):
+        """
+        Returns whether the current user has staff access to the course.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.field_data is deprecated. Please use the field-data service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        field_data = self._services.get('field-data')
+        return field_data
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1944,7 +1958,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
             self, static_url, track_function, get_module,
             descriptor_runtime, debug=False, hostname="", publish=None,
             node_path="", course_id=None, error_descriptor_class=None,
-            field_data=None, rebind_noauth_module_to_user=None,
+            rebind_noauth_module_to_user=None,
             **kwargs):
         """
         Create a closure around the system environment.
@@ -1968,8 +1982,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         error_descriptor_class - The class to use to render XModules with errors
 
-        field_data - the `FieldData` to use for backing XBlock storage.
-
         rebind_noauth_module_to_user - rebinds module bound to AnonymousUser to a real user...used in LTI
            modules, which have an anonymous handler, to set legitimate users' data
         """
@@ -1978,7 +1990,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         # explicit field_data during construct_xblock.
         kwargs.setdefault('id_reader', getattr(descriptor_runtime, 'id_reader', OpaqueKeyReader()))
         kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
-        super().__init__(field_data=field_data, **kwargs)
 
         self.STATIC_URL = static_url
         self.track_function = track_function
