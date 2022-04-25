@@ -57,7 +57,7 @@ from lms.djangoapps.ora_staff_grader.utils import require_params
 from openedx.core.djangoapps.content.course_overviews.api import (
     get_course_overview_or_none,
 )
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 log = logging.getLogger(__name__)
@@ -98,10 +98,12 @@ class InitializeView(StaffGraderBaseView):
     def _is_staff_grader_enabled(self, course_key):
         """ Helper to evaluate if the staff grader flag / overrides are enabled """
         # This toggle is documented on the edx-ora2 repo in openassessment/xblock/config_mixin.py
+        # Note: Do not copy this practice of directly using a toggle from a library.
+        #  Instead, see docs for exposing a wrapper api:
+        #  https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/implement_the_right_toggle_type.html#using-other-toggles pylint: disable=line-too-long
         # pylint: disable=toggle-missing-annotation
         enhanced_staff_grader_flag = CourseWaffleFlag(
-            WAFFLE_NAMESPACE,
-            ENHANCED_STAFF_GRADER,
+            f"{WAFFLE_NAMESPACE}.{ENHANCED_STAFF_GRADER}",
             module_name='openassessment.xblock.config_mixin'
         )
         return enhanced_staff_grader_flag.is_enabled(course_key)
