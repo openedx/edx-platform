@@ -7,7 +7,7 @@
     "@edx/edx-proctoring": "^1.5.0",
     "@edx/frontend-component-cookie-policy-banner": "1.0.0",
     "@edx/paragon": "2.6.4",
-    "@edx/studio-frontend": "^1.17.0",
+    "@edx/studio-frontend": "1.17.0",
     "axios": "^0.21.1",
     "babel-core": "6.26.0",
     "babel-loader": "6.4.1",
