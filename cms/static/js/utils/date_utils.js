@@ -145,7 +145,12 @@ function($, date, TriggerChangeEventOnEnter, moment) {
 
         // instrument as date and time pickers
         timefield.timepicker({timeFormat: 'H:i'});
-        datefield.datepicker();
+        var placeholder = datefield.attr('placeholder');
+        if (placeholder == 'DD/MM/YYYY') {
+            datefield.datepicker({dateFormat: 'dd/mm/yy'});
+        } else {
+            datefield.datepicker();
+        }
 
         // Using the change event causes setfield to be triggered twice, but it is necessary
         // to pick up when the date is typed directly in the field.
