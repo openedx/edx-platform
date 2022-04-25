@@ -182,6 +182,11 @@ FAVICON_PATH = 'images/favicon.ico'
 #   templates.
 STUDIO_NAME = _("Your Platform Studio")
 STUDIO_SHORT_NAME = _("Studio")
+
+# .. setting_name: SCHEDULE_DETAIL_FORMAT
+# .. setting_default: MM/DD/YYYY'
+# .. setting_description: Settings to configure the date format in Schedule & Details page
+SCHEDULE_DETAIL_FORMAT = 'MM/DD/YYYY'
 FEATURES = {
     'GITHUB_PUSH': False,
 
@@ -516,6 +521,7 @@ FEATURES = {
     #   in the LMS and CMS.
     # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
     'DISABLE_UNENROLLMENT': False,
+
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
