@@ -1621,6 +1621,19 @@ class ModuleSystemShim:
             DeprecationWarning, stacklevel=3
         )
 
+    @property
+    def hostname(self):
+        """
+        Hostname of the site as set in the Django settings `LMS_BASE`
+        Deprecated in favour of direct import of `django.conf.settings`
+        """
+        warnings.warn(
+            'runtime.hostname is deprecated. Please use `LMS_BASE` from `django.conf.settings`.',
+            DeprecationWarning, stacklevel=3,
+        )
+        from django.conf import settings
+        return settings.LMS_BASE
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1636,11 +1649,18 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
     """
 
     def __init__(
-            self, static_url, track_function, get_module,
-            descriptor_runtime, hostname="", publish=None,
-            course_id=None, error_descriptor_class=None,
-            field_data=None, rebind_noauth_module_to_user=None,
-            **kwargs):
+        self,
+        static_url,
+        track_function,
+        get_module,
+        descriptor_runtime,
+        publish=None,
+        course_id=None,
+        error_descriptor_class=None,
+        field_data=None,
+        rebind_noauth_module_to_user=None,
+        **kwargs,
+    ):
         """
         Create a closure around the system environment.
 
@@ -1678,7 +1698,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         self.STATIC_URL = static_url
         self.track_function = track_function
         self.get_module = get_module
-        self.HOSTNAME = self.hostname = hostname
         self.course_id = course_id
 
         if publish:
