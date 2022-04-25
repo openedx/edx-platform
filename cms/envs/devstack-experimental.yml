@@ -352,8 +352,6 @@ LOG_DIR: /edx/var/log/edx
 MAINTENANCE_BANNER_TEXT: Sample banner message
 MEDIA_ROOT: /edx/var/edxapp/media/
 MEDIA_URL: /media/
-MICROSITE_CONFIGURATION: {}
-MICROSITE_ROOT_DIR: /edx/app/edxapp/edx-microsite
 MKTG_URLS: {}
 MKTG_URL_LINK_MAP: {}
 MOBILE_STORE_URLS: {}
