@@ -15,7 +15,6 @@ import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
 import uuid  # lint-amnesty, pylint: disable=wrong-import-order
-import warnings
 from collections import defaultdict, namedtuple  # lint-amnesty, pylint: disable=wrong-import-order
 from datetime import date, datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
@@ -47,12 +46,7 @@ from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
 from opaque_keys.edx.keys import CourseKey
-from openedx_events.learning.data import (
-    CourseData,
-    CourseEnrollmentData,
-    UserData,
-    UserPersonalData,
-)
+from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
 from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CHANGED,
     COURSE_ENROLLMENT_CREATED,
@@ -68,7 +62,7 @@ import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from common.djangoapps.student.email_helpers import (
     generate_proctoring_requirements_email_context,
-    should_send_proctoring_requirements_email
+    should_send_proctoring_requirements_email,
 )
 from common.djangoapps.student.emails import send_proctoring_requirements_email
 from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
