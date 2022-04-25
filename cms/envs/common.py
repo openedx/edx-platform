@@ -182,6 +182,11 @@ FAVICON_PATH = 'images/favicon.ico'
 #   templates.
 STUDIO_NAME = _("Your Platform Studio")
 STUDIO_SHORT_NAME = _("Studio")
+
+# .. setting_name: SCHEDULE_DETAIL_FORMAT
+# .. setting_default: 'MM/DD/YYYY'
+# .. setting_description: Settings to configure the date format in Schedule & Details page
+SCHEDULE_DETAIL_FORMAT = 'MM/DD/YYYY'
 FEATURES = {
     'GITHUB_PUSH': False,
 
