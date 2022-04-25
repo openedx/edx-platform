@@ -282,6 +282,7 @@ distlib==0.3.4
     #   django-wiki
     #   djangorestframework
     #   drf-jwt
+    #   drf-nested-routers
     #   drf-yasg
     #   edx-ace
     #   edx-api-doc-tools
@@ -468,8 +469,8 @@ djangorestframework==3.12.4
     #   blockstore
     #   django-config-models
     #   django-user-tasks
-    #   djangorestframework-expander
     #   drf-jwt
+    #   drf-nested-routers
     #   drf-yasg
     #   edx-api-doc-tools
     #   edx-completion
@@ -481,10 +482,6 @@ djangorestframework==3.12.4
     #   edx-submissions
     #   ora2
     #   super-csv
-djangorestframework-expander==0.2.3
-    # via
-    #   -r requirements/edx/base.txt
-    #   blockstore
 djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/base.txt
@@ -504,6 +501,10 @@ drf-jwt==1.19.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-drf-extensions
+drf-nested-routers==0.93.4
+    # via
+    #   -r requirements/edx/base.txt
+    #   blockstore
 drf-yasg==1.20.0
     # via
     #   -r requirements/edx/base.txt
@@ -514,12 +515,13 @@ edx-api-doc-tools==1.6.0
     # via
     #   -r requirements/edx/base.txt
     #   blockstore
+    #   edx-name-affirmation
 edx-auth-backends==4.1.0
-    # via -r requirements/edx/base.txt
-edx-braze-client==0.1.3
     # via
     #   -r requirements/edx/base.txt
     #   blockstore
+edx-braze-client==0.1.3
+    # via -r requirements/edx/base.txt
 edx-bulk-grades==1.0.0
     # via
     #   -r requirements/edx/base.txt
@@ -662,7 +664,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==13.3.5
+faker==13.4.0
     # via factory-boy
 fastapi==0.75.2
     # via pact-python
@@ -700,10 +702,6 @@ future==0.18.2
     #   pyjwkest
 geoip2==4.5.0
     # via -r requirements/edx/base.txt
-gitdb==4.0.9
-    # via gitpython
-gitpython==3.1.27
-    # via transifex-client
 glob2==0.7
     # via -r requirements/edx/base.txt
 gunicorn==20.1.0
@@ -883,11 +881,12 @@ multidict==6.0.2
     #   aiohttp
     #   yarl
 mysqlclient==2.1.0
-    # via -r requirements/edx/base.txt
-newrelic==7.10.0.175
     # via
     #   -r requirements/edx/base.txt
     #   blockstore
+newrelic==7.10.0.175
+    # via
+    #   -r requirements/edx/base.txt
     #   edx-django-utils
 nltk==3.7
     # via
@@ -1010,7 +1009,7 @@ pycryptodomex==3.14.1
     #   pyjwkest
 pydantic==1.9.0
     # via fastapi
-pygments==2.11.2
+pygments==2.12.0
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
@@ -1052,7 +1051,7 @@ pylint-plugin-utils==0.7
     #   pylint-django
 pylint-pytest==0.3.0
     # via -r requirements/edx/testing.in
-pylti1p3==1.10.0
+pylti1p3==1.11.0
     # via -r requirements/edx/base.txt
 pymongo==3.10.1
     # via
@@ -1078,7 +1077,7 @@ pysrt==1.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-pytest==7.1.1
+pytest==7.1.2
     # via
     #   -r requirements/edx/testing.in
     #   pylint-pytest
@@ -1128,12 +1127,10 @@ python-levenshtein==0.12.2
     # via -r requirements/edx/base.txt
 python-memcached==1.59
     # via -r requirements/edx/base.txt
-python-slugify==4.0.1
+python-slugify==6.1.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   code-annotations
-    #   transifex-client
 python-swiftclient==3.13.1
     # via
     #   -r requirements/edx/base.txt
@@ -1181,7 +1178,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
 redis==4.2.2
     # via -r requirements/edx/base.txt
-regex==2022.3.15
+regex==2022.4.24
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1206,7 +1203,6 @@ requests==2.27.1
     #   slumber
     #   social-auth-core
     #   tableauserverclient
-    #   transifex-client
 requests-oauthlib==1.3.1
     # via
     #   -r requirements/edx/base.txt
@@ -1292,7 +1288,6 @@ six==1.16.0
     #   python-swiftclient
     #   singledispatch
     #   tox
-    #   transifex-client
     #   virtualenv
 slumber==0.7.1
     # via
@@ -1300,8 +1295,6 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-smmap==5.0.0
-    # via gitdb
 sniffio==1.2.0
     # via anyio
 social-auth-app-django==5.0.0
@@ -1382,8 +1375,6 @@ tqdm==4.64.0
     # via
     #   -r requirements/edx/base.txt
     #   nltk
-transifex-client==0.14.4
-    # via -r requirements/edx/testing.in
 typing-extensions==4.2.0
     # via
     #   -r requirements/edx/base.txt
@@ -1411,7 +1402,6 @@ urllib3==1.26.9
     #   py2neo
     #   requests
     #   selenium
-    #   transifex-client
 user-util==1.0.0
     # via -r requirements/edx/base.txt
 uvicorn==0.17.6
