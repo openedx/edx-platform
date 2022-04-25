@@ -12,23 +12,24 @@ import ddt
 import pytest
 
 from django.conf import settings
-from django.test.utils import override_settings
 from django.core.cache import cache
 from django.db import connection
+from django.test.client import RequestFactory
+from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_switch
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
-    ModuleStoreTestCase, mixed_store_config
-)
 from common.djangoapps.student.roles import (
     GlobalStaff, CourseRole, OrgRole,
     CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole
 )
-
 from common.djangoapps.util.testing import UrlResetMixin
+from openedx.core.djangoapps.util.ip import USE_LEGACY_IP
+
 from ..models import (
     RestrictedCourse, Country, CountryAccessRule,
 )
@@ -96,7 +97,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         with self._mock_geoip(ip_country):
             # Call the API.  Note that the IP address we pass in doesn't
             # matter, since we're injecting a mock for geo-location
-            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_addresses=['0.0.0.0'])
 
         # Verify that the access rules were applied correctly
         assert result == allow_access
@@ -110,7 +111,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 
         # The user is set to None, because the user has not been authenticated.
         with self._mock_geoip(""):
-            result = embargo_api.check_course_access(self.course.id, ip_address='0.0.0.0')
+            result = embargo_api.check_course_access(self.course.id, ip_addresses=['0.0.0.0'])
         assert result
 
     def test_no_user_blocked(self):
@@ -122,7 +123,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 
         with self._mock_geoip('US'):
             # The user is set to None, because the user has not been authenticated.
-            result = embargo_api.check_course_access(self.course.id, ip_address='0.0.0.0')
+            result = embargo_api.check_course_access(self.course.id, ip_addresses=['0.0.0.0'])
             assert not result
 
     def test_course_not_restricted(self):
@@ -130,18 +131,18 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         # so all access checks should be skipped.
         unrestricted_course = CourseFactory.create()
         with self.assertNumQueries(1):
-            embargo_api.check_course_access(unrestricted_course.id, user=self.user, ip_address='0.0.0.0')
+            embargo_api.check_course_access(unrestricted_course.id, user=self.user, ip_addresses=['0.0.0.0'])
 
         # The second check should require no database queries
         with self.assertNumQueries(0):
-            embargo_api.check_course_access(unrestricted_course.id, user=self.user, ip_address='0.0.0.0')
+            embargo_api.check_course_access(unrestricted_course.id, user=self.user, ip_addresses=['0.0.0.0'])
 
     def test_ip_v6(self):
         # Test the scenario that will go through every check
         # (restricted course, but pass all the checks)
         with self._mock_geoip('US'):
             result = embargo_api.check_course_access(self.course.id, user=self.user,
-                                                     ip_address='FE80::0202:B3FF:FE1E:8329')
+                                                     ip_addresses=['FE80::0202:B3FF:FE1E:8329'])
         assert result
 
     def test_country_access_fallback_to_continent_code(self):
@@ -149,7 +150,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         # instead of a country code.  In this case, we should
         # allow the user access.
         with self._mock_geoip('EU'):
-            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_addresses=['0.0.0.0'])
             assert result
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
@@ -167,7 +168,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 
         # Verify that we can check the user's access without error
         with self._mock_geoip('US'):
-            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_addresses=['0.0.0.0'])
         assert result
 
     def test_caching(self):
@@ -177,20 +178,20 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
             # This is the worst case, so it will hit all of the
             # caching code.
             with self.assertNumQueries(3):
-                embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+                embargo_api.check_course_access(self.course.id, user=self.user, ip_addresses=['0.0.0.0'])
 
             with self.assertNumQueries(0):
-                embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+                embargo_api.check_course_access(self.course.id, user=self.user, ip_addresses=['0.0.0.0'])
 
     def test_caching_no_restricted_courses(self):
         RestrictedCourse.objects.all().delete()
         cache.clear()
 
         with self.assertNumQueries(1):
-            embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+            embargo_api.check_course_access(self.course.id, user=self.user, ip_addresses=['0.0.0.0'])
 
         with self.assertNumQueries(0):
-            embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+            embargo_api.check_course_access(self.course.id, user=self.user, ip_addresses=['0.0.0.0'])
 
     @ddt.data(
         GlobalStaff,
@@ -209,7 +210,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 
         # Appear to make a request from an IP in the blocked country
         with self._mock_geoip('US'):
-            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_addresses=['0.0.0.0'])
 
         # Expect that the user is blocked, because the user isn't staff
         assert not result, "User should not have access because the user isn't staff."
@@ -227,9 +228,53 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 
         # Now the user should have access
         with self._mock_geoip('US'):
-            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+            result = embargo_api.check_course_access(self.course.id, user=self.user, ip_addresses=['0.0.0.0'])
 
         assert result, 'User should have access because the user is staff.'
+
+    @ddt.data(
+        # (Note that any '0.x.x.x' IP _should_ be blocked in this test.)
+        # ips, legacy, allow access
+        (['0.0.0.0', '1.1.1.1'], True, False),  # legacy looks at first IP and blocks
+        (['1.1.1.1', '0.0.0.0'], True, True),  # legacy fails to look at later IPs and allows
+        (['1.1.1.1', '2.2.2.2'], False, True),  # normal chain of access
+        (['1.1.1.1', '0.0.0.0', '2.2.2.2'], False, False),  # tried to sneak a blocked IP in, but we caught it
+    )
+    @ddt.unpack
+    @mock.patch('openedx.core.djangoapps.embargo.api.country_code_from_ip')
+    def test_redirect_if_blocked_ips(self, ips, use_legacy, allow_access, mock_country):
+        # Block the US
+        CountryAccessRule.objects.create(
+            rule_type=CountryAccessRule.BLACKLIST_RULE,
+            restricted_course=self.restricted_course,
+            country=Country.objects.get(country='US')
+        )
+
+        # Treat any ip that starts with zero as from the US
+        mock_country.side_effect = lambda x: 'US' if x.startswith('0.') else 'XX'
+
+        request = RequestFactory().get('', HTTP_X_FORWARDED_FOR=','.join(ips))
+        request.user = self.user
+
+        with override_waffle_switch(USE_LEGACY_IP, use_legacy):
+            assert (embargo_api.redirect_if_blocked(request, self.course.id) is None) == allow_access
+
+    @ddt.data(
+        # access point, check disabled, allow access
+        ('enrollment', False, False),  # 'enrollment' never changes blocked status
+        ('enrollment', True, False),  # 'enrollment' never changes blocked status
+        ('courseware', False, False),  # 'courseware' normally also leaves blocked status in place
+        ('courseware', True, True),  # Unless the access check has been disabled, then we allow them
+    )
+    @ddt.unpack
+    @mock.patch('openedx.core.djangoapps.embargo.api.check_course_access', return_value=False)
+    def test_redirect_if_blocked_courseware(self, access_point, check_disabled, allow_access, _mock_access):
+        self.restricted_course.disable_access_check = check_disabled
+        self.restricted_course.save()
+
+        request = RequestFactory().get('')
+        maybe_url = embargo_api.redirect_if_blocked(request, self.course.id, access_point=access_point, user=self.user)
+        assert (maybe_url is None) == allow_access
 
     @contextmanager
     def _mock_geoip(self, country_code):
