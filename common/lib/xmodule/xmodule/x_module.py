@@ -1926,20 +1926,6 @@ class ModuleSystemShim:
         )
         return self.resources_fs
 
-    @property
-    def field_data(self):
-        """
-        Returns whether the current user has staff access to the course.
-
-        Deprecated in favor of the user service.
-        """
-        warnings.warn(
-            'runtime.field_data is deprecated. Please use the field-data service instead.',
-            DeprecationWarning, stacklevel=3,
-        )
-        field_data = self._services.get('field-data')
-        return field_data
-
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
