@@ -209,6 +209,7 @@ django==3.2.13
     #   django-wiki
     #   djangorestframework
     #   drf-jwt
+    #   drf-nested-routers
     #   drf-yasg
     #   edx-ace
     #   edx-api-doc-tools
@@ -383,8 +384,8 @@ djangorestframework==3.12.4
     #   blockstore
     #   django-config-models
     #   django-user-tasks
-    #   djangorestframework-expander
     #   drf-jwt
+    #   drf-nested-routers
     #   drf-yasg
     #   edx-api-doc-tools
     #   edx-completion
@@ -396,8 +397,6 @@ djangorestframework==3.12.4
     #   edx-submissions
     #   ora2
     #   super-csv
-djangorestframework-expander==0.2.3
-    # via blockstore
 djangorestframework-xml==2.0.0
     # via edx-enterprise
 docopt==0.6.2
@@ -410,6 +409,8 @@ done-xblock==2.0.4
     # via -r requirements/edx/base.in
 drf-jwt==1.19.2
     # via edx-drf-extensions
+drf-nested-routers==0.93.4
+    # via blockstore
 drf-yasg==1.20.0
     # via edx-api-doc-tools
 edx-ace==1.5.0
@@ -418,8 +419,11 @@ edx-api-doc-tools==1.6.0
     # via
     #   -r requirements/edx/base.in
     #   blockstore
+    #   edx-name-affirmation
 edx-auth-backends==4.1.0
-    # via -r requirements/edx/base.in
+    # via
+    #   -r requirements/edx/base.in
+    #   blockstore
 edx-braze-client==0.1.3
     # via -r requirements/edx/base.in
 edx-bulk-grades==1.0.0
@@ -698,11 +702,12 @@ multidict==6.0.2
     #   aiohttp
     #   yarl
 mysqlclient==2.1.0
-    # via -r requirements/edx/base.in
-newrelic==7.10.0.175
     # via
     #   -r requirements/edx/base.in
     #   blockstore
+newrelic==7.10.0.175
+    # via
+    #   -r requirements/edx/base.in
     #   edx-django-utils
 nltk==3.7
     # via
@@ -786,7 +791,7 @@ pycryptodomex==3.14.1
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pygments==2.11.2
+pygments==2.12.0
     # via
     #   -r requirements/edx/base.in
     #   py2neo
@@ -807,7 +812,7 @@ pyjwt[crypto]==2.3.0
     #   social-auth-core
 pylatexenc==2.10
     # via olxcleaner
-pylti1p3==1.10.0
+pylti1p3==1.11.0
     # via -r requirements/edx/base.in
 pymongo==3.10.1
     # via
@@ -898,7 +903,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
 redis==4.2.2
     # via -r requirements/edx/base.in
-regex==2022.3.15
+regex==2022.4.24
     # via nltk
 requests==2.27.1
     # via
