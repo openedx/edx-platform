@@ -10,6 +10,7 @@ import json
 import os
 import re
 from collections import Counter
+from xml.sax.saxutils import escape
 
 from write_to_html import HtmlOutlineWriter  # noqa pylint: disable=import-error,useless-suppression
 
@@ -191,7 +192,7 @@ def write_html_report(warnings_data, html_path):
         for category, group_in_category, category_count in category_sorted_by_count:
             # xss-lint: disable=python-wrap-html
             html = '<span class="count">{category}, count: {count}</span> '.format(
-                category=category, count=category_count
+                category=escape(category), count=category_count
             )
             html_writer.start_section(html, klass="category")
             locations_sorted_by_count = group_and_sort_by_sumof(
@@ -205,7 +206,7 @@ def write_html_report(warnings_data, html_path):
             ) in locations_sorted_by_count:
                 # xss-lint: disable=python-wrap-html
                 html = '<span class="count">{location}, count: {count}</span> '.format(
-                    location=location, count=location_count
+                    location=escape(location), count=location_count
                 )
                 html_writer.start_section(html, klass="location")
                 message_group_sorted_by_count = group_and_sort_by_sumof(
@@ -218,7 +219,7 @@ def write_html_report(warnings_data, html_path):
                 ) in message_group_sorted_by_count:
                     # xss-lint: disable=python-wrap-html
                     html = '<span class="count">{warning_text}, count: {count}</span> '.format(
-                        warning_text=message, count=message_count
+                        warning_text=escape(message), count=message_count
                     )
                     html_writer.start_section(html, klass="warning_text")
                     # warnings_object[location][warning_text] is a list
