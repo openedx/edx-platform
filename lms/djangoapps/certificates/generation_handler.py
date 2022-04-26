@@ -179,7 +179,7 @@ def _can_generate_certificate_common(user, course_key, enrollment_mode):
 
     # If the IDV check fails we then check if the course-run requires ID verification. Honor and Professional-No-ID
     # modes do not require IDV for certificate generation.
-    if _required_verification_missing(user):
+    if _id_verification_enforced_and_missing(user):
         if enrollment_mode not in CourseMode.NON_VERIFIED_MODES:
             log.info(f'{user.id} does not have a verified id. Certificate cannot be generated for {course_key}.')
             return False
@@ -232,7 +232,7 @@ def _set_regular_cert_status(user, course_key, enrollment_mode, course_grade):
     if status is not None:
         return status
 
-    if not _required_verification_missing(user) \
+    if not _id_verification_enforced_and_missing(user) \
             and not _is_passing_grade(course_grade) \
             and cert is not None:
         if cert.status != CertificateStatuses.notpassing:
@@ -255,8 +255,9 @@ def _get_cert_status_common(user, course_key, enrollment_mode, course_grade, cer
             cert.invalidate(mode=enrollment_mode, source='certificate_generation')
         return CertificateStatuses.unavailable
 
-    if _required_verification_missing(user) and _has_passing_grade_or_is_allowlisted(user, course_key,
-                                                                                     course_grade):
+    if _id_verification_enforced_and_missing(user) and _has_passing_grade_or_is_allowlisted(
+        user, course_key, course_grade
+    ):
         if cert is None:
             _generate_certificate_task(user=user, course_key=course_key, enrollment_mode=enrollment_mode,
                                        course_grade=course_grade, status=CertificateStatuses.unverified,
@@ -419,8 +420,9 @@ def _is_mode_now_eligible(enrollment_mode, cert):
     return False
 
 
-def _required_verification_missing(user):
+def _id_verification_enforced_and_missing(user):
     """
     Return true if IDV is required for this course and the user does not have it
     """
-    return not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE') and not IDVerificationService.user_is_verified(user)
+    return settings.FEATURES.get(
+        'ENABLE_CERTIFICATES_IDV_REQUIREMENT') and not IDVerificationService.user_is_verified(user)

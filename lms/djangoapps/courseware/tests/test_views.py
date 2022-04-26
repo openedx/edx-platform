@@ -1537,6 +1537,7 @@ class ProgressPageTests(ProgressPageBaseTests):
                 ), check_mongo_calls(2):
                     self._get_progress_page()
 
+    @patch.dict(settings.FEATURES, {'ENABLE_CERTIFICATES_IDV_REQUIREMENT': True})
     @ddt.data(
         *itertools.product(
             (
@@ -1848,7 +1849,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         assert response.title == 'Your certificate will be available soon!'
 
     @ddt.data(True, False)
-    def test_no_certs_generated_and_not_verified(self, enable_integrity_signature):
+    def test_no_certs_generated_and_not_verified(self, enable_cert_idv_requirement):
         """
         Verify if the learner is not ID Verified, and the certs are not yet generated,
         but the learner is eligible, the get_cert_data would return cert status Unverified
@@ -1857,14 +1858,14 @@ class ProgressPageTests(ProgressPageBaseTests):
         CertificateGenerationCourseSetting(
             course_key=self.course.id, self_generation_enabled=True
         ).save()
-        with patch.dict(settings.FEATURES, ENABLE_INTEGRITY_SIGNATURE=enable_integrity_signature):
+        with patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_cert_idv_requirement):
             with patch(
                 'lms.djangoapps.certificates.api.certificate_downloadable_status',
                 return_value=self.mock_certificate_downloadable_status()
             ):
                 response = views.get_cert_data(self.user, self.course, CourseMode.VERIFIED, MagicMock(passed=True))
 
-        if enable_integrity_signature:
+        if not enable_cert_idv_requirement:
             assert response.cert_status == 'requesting'
             assert response.title == 'Congratulations, you qualified for a certificate!'
         else:
