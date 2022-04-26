@@ -207,10 +207,11 @@ class TestBadgingService(ModuleStoreTestCase):
         premade_badge_class = BadgeClassFactory.create()
         # Ignore additional parameters. This class already exists.
         # We should get back the first class we created, rather than a new one.
-        badge_class = badge_service.get_badge_class(
-            slug='test_slug', issuing_component='test_component', description='Attempted override',
-            criteria='test', display_name='Testola', image_file_handle=get_image('good')
-        )
+        with get_image('good') as image_handle:
+            badge_class = badge_service.get_badge_class(
+                slug='test_slug', issuing_component='test_component', description='Attempted override',
+                criteria='test', display_name='Testola', image_file_handle=image_handle
+            )
         # These defaults are set on the factory.
         assert badge_class.criteria == 'https://example.com/syllabus'
         assert badge_class.display_name == 'Test Badge'
