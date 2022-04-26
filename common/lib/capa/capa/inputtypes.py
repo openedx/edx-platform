@@ -1427,40 +1427,6 @@ class DragAndDropInput(InputTypeBase):
 
 
 @registry.register
-class EditAMoleculeInput(InputTypeBase):
-    """
-    An input type for edit-a-molecule.  Integrates with the molecule editor java applet.
-
-    Example:
-
-    <editamolecule size="50"/>
-
-    options: size -- width of the textbox.
-    """
-
-    template = "editamolecule.html"
-    tags = ['editamoleculeinput']
-
-    @classmethod
-    def get_attributes(cls):
-        """
-        Can set size of text field.
-        """
-        return [Attribute('file'),
-                Attribute('missing', None)]
-
-    def _extra_context(self):
-        context = {
-            'applet_loader': '{static_url}js/capa/editamolecule.js'.format(
-                static_url=self.capa_system.STATIC_URL),
-        }
-
-        return context
-
-#-----------------------------------------------------------------------------
-
-
-@registry.register
 class DesignProtein2dInput(InputTypeBase):
     """
     An input type for design of a protein in 2D. Integrates with the Protex java applet.
