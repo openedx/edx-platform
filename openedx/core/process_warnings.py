@@ -27,7 +27,7 @@ columns = [
 columns_index_dict = {key: index for index, key in enumerate(columns)}
 
 
-def seperate_warnings_by_location(warnings_data):
+def separate_warnings_by_location(warnings_data):
     """
     Warnings originate from multiple locations, this function takes in list of warning objects
     and separates them based on their filename location
@@ -81,7 +81,6 @@ def read_warning_data(dir_path):
     During test runs in jenkins, multiple warning json files are output. This function finds all files
     and aggregates the warnings in to one large list
     """
-    # pdb.set_trace()
     dir_path = os.path.expanduser(dir_path)
     # find all files that exist in given directory
     files_in_dir = [
@@ -128,6 +127,24 @@ def compress_similar_warnings(warnings_data):
     return output
 
 
+def canonical_message(msg):
+    """
+    Remove noise from a warning message.
+
+    The "same" warning can produce different messages because of data in
+    the message.  This returns a new message with the data converted to
+    placeholders.
+    """
+    hex = r"[0-9a-fA-F]"
+    # Temp files are test_Abcd123.csv etc...
+    msg = re.sub(r"\btest_\w{7}\.", "test_TMP.", msg)
+    # Guids, SHA hashes, and numbers in general get replaced.
+    msg = re.sub(rf"\b{hex}{{8}}-{hex}{{4}}-{hex}{{4}}-{hex}{{4}}-{hex}{{12}}\b", "GUID", msg)
+    msg = re.sub(rf"\b{hex}{{32}}\b", "SHA", msg)
+    msg = re.sub(r"\b\d+(\.\d+)*\b", "#", msg)
+    return msg
+
+
 def process_warnings_json(dir_path):
     """
     Master function to process through all warnings and output a dict
@@ -150,7 +167,8 @@ def process_warnings_json(dir_path):
         warnings_object[columns_index_dict["deprecated"]] = bool(
             "deprecated" in warnings_object[columns_index_dict["message"]]
         )
-    warnings_data = seperate_warnings_by_location(warnings_data)
+        warnings_object[columns_index_dict["message"]] = canonical_message(warnings_object[columns_index_dict["message"]])
+    warnings_data = separate_warnings_by_location(warnings_data)
     compressed_warnings_data = compress_similar_warnings(warnings_data)
     return compressed_warnings_data
 
