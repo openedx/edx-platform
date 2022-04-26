@@ -16,7 +16,7 @@ from django.template.context_processors import csrf
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
@@ -444,7 +444,8 @@ class CoursewareIndex(View):
             'section_title': None,
             'sequence_title': None,
             'disable_accordion': not DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
-            'show_search': show_search
+            'show_search': show_search,
+            'render_course_wide_assets': True,
         }
         courseware_context.update(
             get_experiment_user_metadata_context(

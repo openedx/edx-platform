@@ -6,7 +6,7 @@ from datetime import datetime
 
 import pytz
 from django.utils.translation import get_language
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.djangoapps.course_modes.models import format_course_price, get_course_prices
 from lms.djangoapps.experiments.models import ExperimentData

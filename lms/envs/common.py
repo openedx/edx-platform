@@ -35,7 +35,7 @@ import os
 import django
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from enterprise.constants import (
     ENTERPRISE_ADMIN_ROLE,
     ENTERPRISE_CATALOG_ADMIN_ROLE,
@@ -730,7 +730,7 @@ FEATURES = {
     # .. toggle_description: When set to True, language selector will be visible in the footer.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-05-25
-    # .. toggle_warnings: LANGUAGE_COOKIE is required to use footer-language-selector, set it if it has not been set.
+    # .. toggle_warnings: LANGUAGE_COOKIE_NAME is required to use footer-language-selector, set it if it has not been set.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15133
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
 
@@ -988,6 +988,11 @@ SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
 RETRY_CALENDAR_SYNC_EMAIL_MAX_ATTEMPTS = 5
 # Deadline message configurations
 COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
+
+MARKETING_EMAILS_OPT_IN = False
+
+# VAN-754 - Year of birth field put behind a flag to make it available for OpenedX.
+COLLECT_YEAR_OF_BIRTH = True
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
@@ -1624,6 +1629,29 @@ CODE_JAIL = {
 #   ]
 COURSES_WITH_UNSAFE_CODE = []
 
+# Cojail REST service
+ENABLE_CODEJAIL_REST_SERVICE = False
+# .. setting_name: CODE_JAIL_REST_SERVICE_REMOTE_EXEC
+# .. setting_default: 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+# .. setting_description: Set the python package.module.function that is reponsible of
+#   calling the remote service in charge of jailed code execution
+CODE_JAIL_REST_SERVICE_REMOTE_EXEC = 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+# .. setting_name: CODE_JAIL_REST_SERVICE_HOST
+# .. setting_default: 'http://127.0.0.1:8550'
+# .. setting_description: Set the codejail remote service host
+CODE_JAIL_REST_SERVICE_HOST = 'http://127.0.0.1:8550'
+# .. setting_name: CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT
+# .. setting_default: 0.5
+# .. setting_description: Set the number of seconds LMS will wait to establish an internal
+#   connection to the codejail remote service.
+CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT = 0.5  # time in seconds
+# .. setting_name: CODE_JAIL_REST_SERVICE_READ_TIMEOUT
+# .. setting_default: 3.5
+# .. setting_description: Set the number of seconds LMS will wait for a response from the
+#   codejail remote service endpoint.
+CODE_JAIL_REST_SERVICE_READ_TIMEOUT = 3.5  # time in seconds
+
+
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG in your environment settings files, not here
 DEBUG = False
@@ -1708,14 +1736,13 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # these languages display right to left
 LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
 
-LANGUAGE_COOKIE = "openedx-language-preference"
+LANGUAGE_COOKIE_NAME = "openedx-language-preference"
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = [
     ('en', 'English'),
     ('rtl', 'Right-to-Left Test Language'),
     ('eo', 'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
-    ('fake2', 'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
     ('am', 'አማርኛ'),  # Amharic
     ('ar', 'العربية'),  # Arabic
@@ -3410,7 +3437,8 @@ LOGIN_REDIRECT_WHITELIST = []
 #   'terms_of_service': 'hidden', 'city': 'hidden', 'country': 'hidden'}
 # .. setting_description: The signup form may contain extra fields that are presented to every user. For every field, we
 #   can specifiy whether it should be "required": to display the field, and make it mandatory; "optional": to display
-#   the field, and make it non-mandatory; "hidden": to not display the field.
+#   the optional field as part of a toggled input field list; "optional-exposed": to display the optional fields among
+#   the required fields, and make it non-mandatory; "hidden": to not display the field.
 #   When the terms of service are not visible and agreement to the honor code is required (the default), the signup page
 #   includes a paragraph that links to the honor code page (defined my MKTG_URLS["HONOR"]). This page might not be
 #   available for all Open edX platforms. In such cases, the "honor_code" registration field should be "hidden".
@@ -4656,7 +4684,6 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 # .. setting_name: LEARNING_MICROFRONTEND_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based courseware page.
-# .. setting_warning: Also set site's courseware.courseware_mfe waffle flag.
 LEARNING_MICROFRONTEND_URL = None
 
 ############### Settings for the ace_common plugin #################

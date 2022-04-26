@@ -20,7 +20,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
@@ -41,6 +41,7 @@ from common.djangoapps.track import segment
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.password_policy_validators import normalize_password
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
+from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangoapps.user_authn.cookies import get_response_with_refreshed_jwt_cookies, set_logged_in_cookies
@@ -302,7 +303,7 @@ def _handle_successful_authentication_and_login(user, request):
         request.session.set_expiry(604800 * 4)
         log.debug("Setting user session expiry to 4 weeks")
 
-        # Announce user's login
+        # .. event_implemented_name: SESSION_LOGIN_COMPLETED
         SESSION_LOGIN_COMPLETED.send_event(
             user=UserData(
                 pii=UserPersonalData(
@@ -558,8 +559,7 @@ def login_user(request, api_version='v1'):
             if possibly_authenticated_user and password_policy_compliance.should_enforce_compliance_on_login():
                 # Important: This call must be made AFTER the user was successfully authenticated.
                 _enforce_password_policy_compliance(request, possibly_authenticated_user)
-                is_internal_user = user.email.split('@')[1] == 'edx.org'
-                check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), is_internal_user)
+                check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), user.is_staff)
 
         if possibly_authenticated_user is None or not possibly_authenticated_user.is_active:
             _handle_failed_authentication(user, possibly_authenticated_user)
@@ -593,6 +593,7 @@ def login_user(request, api_version='v1'):
         set_custom_attribute('login_user_auth_failed_error', False)
         set_custom_attribute('login_user_response_status', response.status_code)
         set_custom_attribute('login_user_redirect_url', redirect_url)
+        mark_user_change_as_expected(response, user.id)
         return response
     except AuthFailedError as error:
         response_content = error.get_response()

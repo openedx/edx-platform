@@ -10,7 +10,7 @@ from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
 
@@ -100,7 +100,7 @@ class VerifiedTrackCohortedCourse(models.Model):
     """
     course_key = CourseKeyField(
         max_length=255, db_index=True, unique=True,
-        help_text=ugettext_lazy("The course key for the course we would like to be auto-cohorted.")
+        help_text=gettext_lazy("The course key for the course we would like to be auto-cohorted.")
     )
 
     verified_cohort_name = models.CharField(max_length=100, default=DEFAULT_VERIFIED_COHORT_NAME)

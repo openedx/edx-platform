@@ -85,7 +85,7 @@ class BulkUserRetirementViewTests(APITestCase):
                 "usernames": f'{self.user3.username},{self.user4.username}'
             })
             assert response.status_code == 200
-            assert response.data == expected_response
+            assert sorted(response.data['successful_user_retirements']) == sorted(expected_response['successful_user_retirements'])  # pylint: disable=line-too-long
 
             retirement_status_1 = UserRetirementStatus.objects.get(user__username=self.user3.username)
             assert retirement_status_1.current_state == self.pending_state
@@ -107,7 +107,7 @@ class BulkUserRetirementViewTests(APITestCase):
                 )
             })
             assert response.status_code == 200
-            assert response.data == expected_response
+            assert sorted(response.data['successful_user_retirements']) == sorted(expected_response['successful_user_retirements'])  # pylint: disable=line-too-long
 
             retirement_status_1 = UserRetirementStatus.objects.get(user__username=self.user3.username)
             assert retirement_status_1.current_state == self.pending_state

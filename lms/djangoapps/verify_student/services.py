@@ -9,7 +9,7 @@ from urllib.parse import quote
 
 from django.conf import settings
 from django.utils.timezone import now
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import User

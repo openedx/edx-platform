@@ -6,6 +6,7 @@ Tests courseware views.py
 import html
 import itertools
 import json
+import re
 from datetime import datetime, timedelta
 from uuid import uuid4
 
@@ -49,6 +50,7 @@ from lms.djangoapps.certificates.tests.factories import (
 )
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from lms.djangoapps.courseware import access_utils
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
@@ -65,6 +67,7 @@ from lms.djangoapps.courseware.toggles import (
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.grades.config.waffle import waffle_switch as grades_waffle_switch
+from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -88,6 +91,7 @@ from openedx.features.course_experience import (
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.course_experience.url_helpers import (
     get_courseware_url,
+    get_learning_mfe_home_url,
     make_learning_mfe_courseware_url,
     ExperienceOption,
 )
@@ -129,6 +133,13 @@ def _set_preview_mfe_flag(active: bool):
     A decorator/contextmanager to force the courseware MFE educator preview flag on or off.
     """
     return override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, active=active)
+
+
+def _set_course_home_mfe_flag(activate_mfe: bool):
+    """
+    A decorator/contextmanager to force the courseware home MFE flag on or off.
+    """
+    return override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=(not activate_mfe))
 
 
 @ddt.ddt
@@ -377,8 +388,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 164),
-        (ModuleStoreEnum.Type.split, 4, 160),
+        (ModuleStoreEnum.Type.mongo, 10, 227),
+        (ModuleStoreEnum.Type.split, 4, 210),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -577,6 +588,33 @@ class ViewsTestCase(BaseViewsTestCase):
         assert response.status_code == 200
         self.assertNotContains(response, 'Problem 1')
         self.assertNotContains(response, 'Problem 2')
+
+    @ddt.data(False, True)
+    def test_mfe_link_from_about_page(self, activate_mfe):
+        """
+        Verify course about page links to the MFE when enabled.
+        """
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+        CourseEnrollment.enroll(self.user, course.id)
+        assert self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+        legacy_url = reverse(
+            'openedx.course_experience.course_home',
+            kwargs={
+                'course_id': str(course.id),
+            }
+        )
+        mfe_url = get_learning_mfe_home_url(course_key=course.id, view_name='home')
+
+        with _set_course_home_mfe_flag(activate_mfe):
+            response = self.client.get(reverse('about_course', args=[str(course.id)]))
+            if activate_mfe:
+                self.assertContains(response, mfe_url)
+                self.assertNotContains(response, legacy_url)
+            else:
+                self.assertNotContains(response, mfe_url)
+                self.assertContains(response, legacy_url)
 
     def _create_url_for_enroll_staff(self):
         """
@@ -1256,7 +1294,7 @@ class StartDateTests(ModuleStoreTestCase):
     @patch('common.djangoapps.util.date_utils.pgettext', fake_pgettext(translations={
         ("abbreviated month name", "Sep"): "SEPTEMBER",
     }))
-    @patch('common.djangoapps.util.date_utils.ugettext', fake_ugettext(translations={
+    @patch('common.djangoapps.util.date_utils.gettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "%Y-%b-%d",
     }))
     def test_format_localized_in_studio_course(self):
@@ -1559,8 +1597,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 63, 44),
-        (True, 55, 38)
+        (False, 63, 45),
+        (True, 55, 39)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -3743,3 +3781,64 @@ class ContentOptimizationTestCase(ModuleStoreTestCase):
         response = self.client.get(url)
         assert response.status_code == 200
         assert b"MathJax.Hub.Config" in response.content
+
+
+@ddt.ddt
+class TestCourseWideResources(ModuleStoreTestCase):
+    """
+    Tests that custom course-wide resources are rendered in course pages
+    """
+
+    @ddt.data(
+        ('courseware', 'course_id', False, True),
+        ('dates', 'course_id', False, False),
+        ('progress', 'course_id', False, False),
+        ('instructor_dashboard', 'course_id', True, False),
+        ('forum_form_discussion', 'course_id', False, False),
+        ('render_xblock', 'usage_key_string', False, True),
+    )
+    @ddt.unpack
+    def test_course_wide_resources(self, url_name, param, is_instructor, is_rendered):
+        """
+        Tests that the <script> and <link> tags are created for course-wide custom resources.
+        Also, test that the order which the resources are added match the given order.
+        """
+        user = UserFactory()
+
+        js = ['/test.js', 'https://testcdn.com/js/lib.min.js', '//testcdn.com/js/lib2.js']
+        css = ['https://testcdn.com/css/lib.min.css', '//testcdn.com/css/lib2.css', '/test.css']
+
+        course = CourseFactory.create(course_wide_js=js, course_wide_css=css)
+        chapter = ItemFactory.create(parent=course, category='chapter')
+        sequence = ItemFactory.create(parent=chapter, category='sequential', display_name='Sequence')
+
+        CourseOverview.load_from_module_store(course.id)
+        CourseEnrollmentFactory(user=user, course_id=course.id)
+        if is_instructor:
+            allow_access(course, user, 'instructor')
+        assert self.client.login(username=user.username, password='test')
+
+        kwargs = None
+        if param == 'course_id':
+            kwargs = {'course_id': str(course.id)}
+        elif param == 'usage_key_string':
+            kwargs = {'usage_key_string': str(sequence.location)}
+        response = self.client.get(reverse(url_name, kwargs=kwargs))
+
+        content = response.content.decode('utf-8')
+        js_match = [re.search(f'<script .*src=[\'"]{j}[\'"].*>', content) for j in js]
+        css_match = [re.search(f'<link .*href=[\'"]{c}[\'"].*>', content) for c in css]
+
+        # custom resources are included
+        if is_rendered:
+            assert None not in js_match
+            assert None not in css_match
+
+            # custom resources are added in order
+            for i in range(len(js) - 1):
+                assert js_match[i].start() < js_match[i + 1].start()
+            for i in range(len(css) - 1):
+                assert css_match[i].start() < css_match[i + 1].start()
+        else:
+            assert js_match == [None, None, None]
+            assert css_match == [None, None, None]

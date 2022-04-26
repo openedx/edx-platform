@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
 from django.utils.translation import override as override_language
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_name_affirmation.name_change_validator import NameChangeValidator
 from edx_name_affirmation.toggles import is_verified_name_enabled
 from pytz import UTC
@@ -243,9 +243,13 @@ def _validate_name_change(user_profile, data, field_errors):
         return None
 
     old_name = user_profile.name
+    new_name = data['name']
+
+    if old_name == new_name:
+        return None
 
     try:
-        validate_name(data['name'])
+        validate_name(new_name)
     except ValidationError as err:
         field_errors["name"] = {
             "developer_message": f"Error thrown from validate_name: '{err.message}'",
@@ -253,7 +257,7 @@ def _validate_name_change(user_profile, data, field_errors):
         }
         return None
 
-    if _does_name_change_require_verification(user_profile, old_name, data['name']):
+    if _does_name_change_require_verification(user_profile, old_name, new_name):
         err_msg = 'This name change requires ID verification.'
         field_errors['name'] = {
             'developer_message': err_msg,

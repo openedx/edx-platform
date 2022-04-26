@@ -6,7 +6,7 @@ import logging
 from django.conf import settings
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from eventtracking import tracker
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes

@@ -177,7 +177,10 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 
 ########################## Course Discovery #######################
-LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': 'Language'}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+LANGUAGE_MAP = {
+    'terms': dict(ALL_LANGUAGES),
+    'name': 'Language',
+}
 COURSE_DISCOVERY_MEANINGS = {
     'org': {
         'name': 'Organization',
@@ -439,3 +442,7 @@ PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
+
+#################### Network configuration ####################
+# Devstack is directly exposed to the caller
+CLOSEST_CLIENT_IP_FROM_HEADERS = []

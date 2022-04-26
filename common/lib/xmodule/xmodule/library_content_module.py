@@ -12,6 +12,7 @@ from gettext import ngettext
 import bleach
 from lazy import lazy
 from lxml import etree
+from lxml.etree import XMLSyntaxError
 from opaque_keys.edx.locator import LibraryLocator
 from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
@@ -664,10 +665,20 @@ class LibraryContentBlock(
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        children = [
-            system.process_xml(etree.tostring(child)).scope_ids.usage_id
-            for child in xml_object.getchildren()
-        ]
+        children = []
+
+        for child in xml_object.getchildren():
+            try:
+                children.append(system.process_xml(etree.tostring(child)).scope_ids.usage_id)
+            except (XMLSyntaxError, AttributeError):
+                msg = (
+                    "Unable to load child when parsing Library Content Block. "
+                    "This can happen when a comment is manually added to the course export."
+                )
+                logger.error(msg)
+                if system.error_tracker is not None:
+                    system.error_tracker(msg)
+
         definition = {
             attr_name: json.loads(attr_value)
             for attr_name, attr_value in xml_object.attrib.items()

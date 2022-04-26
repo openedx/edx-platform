@@ -2457,11 +2457,11 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
         )
 
     @ddt.data(
-        ['name', [name for name in testutils.VALID_NAMES]],  # lint-amnesty, pylint: disable=unnecessary-comprehension
-        ['email', [email for email in testutils.VALID_EMAILS]],  # lint-amnesty, pylint: disable=unnecessary-comprehension, line-too-long
-        ['password', [password for password in testutils.VALID_PASSWORDS]],  # lint-amnesty, pylint: disable=unnecessary-comprehension, line-too-long
-        ['username', [username for username in testutils.VALID_USERNAMES]],  # lint-amnesty, pylint: disable=unnecessary-comprehension, line-too-long
-        ['country', [country for country in testutils.VALID_COUNTRIES]]  # lint-amnesty, pylint: disable=unnecessary-comprehension, line-too-long
+        ['name', list(testutils.VALID_NAMES)],
+        ['email', list(testutils.VALID_EMAILS)],
+        ['password', list(testutils.VALID_PASSWORDS)],
+        ['username', list(testutils.VALID_USERNAMES)],
+        ['country', list(testutils.VALID_COUNTRIES)],
     )
     @ddt.unpack
     def test_positive_validation_decision(self, form_field_name, user_data):
@@ -2475,11 +2475,11 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
 
     @ddt.data(
         # Skip None type for invalidity checks.
-        ['name', [name for name in testutils.INVALID_NAMES[1:]]],  # lint-amnesty, pylint: disable=unnecessary-comprehension,  line-too-long
-        ['email', [email for email in testutils.INVALID_EMAILS[1:]]],  # lint-amnesty, pylint: disable=unnecessary-comprehension, line-too-long
-        ['password', [password for password in testutils.INVALID_PASSWORDS[1:]]],  # lint-amnesty, pylint: disable=unnecessary-comprehension, line-too-long
-        ['username', [username for username in testutils.INVALID_USERNAMES[1:]]],  # lint-amnesty, pylint: disable=unnecessary-comprehension,  line-too-long
-        ['country', [country for country in testutils.INVALID_COUNTRIES[1:]]]  # lint-amnesty, pylint: disable=unnecessary-comprehension, line-too-long
+        ['name', testutils.INVALID_NAMES[1:]],
+        ['email', testutils.INVALID_EMAILS[1:]],
+        ['password', testutils.INVALID_PASSWORDS[1:]],
+        ['username', testutils.INVALID_USERNAMES[1:]],
+        ['country', testutils.INVALID_COUNTRIES[1:]],
     )
     @ddt.unpack
     def test_negative_validation_decision(self, form_field_name, user_data):

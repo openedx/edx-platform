@@ -20,7 +20,7 @@ from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey

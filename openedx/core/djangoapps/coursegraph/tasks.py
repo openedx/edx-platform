@@ -11,7 +11,16 @@ from django.utils import timezone
 from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
-from py2neo import Graph, Node, Relationship, NodeMatcher
+
+import py2neo  # pylint: disable=unused-import
+from py2neo import Graph, Node, Relationship
+
+try:
+    from py2neo.matching import NodeMatcher
+except ImportError:
+    from py2neo import NodeMatcher
+else:
+    pass
 
 
 log = logging.getLogger(__name__)

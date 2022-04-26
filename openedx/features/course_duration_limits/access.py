@@ -4,7 +4,7 @@ and course access based on these limits.
 """
 
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_django_utils.cache import RequestCache
 from web_fragments.fragment import Fragment
 

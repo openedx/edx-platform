@@ -58,7 +58,7 @@ class OuterAtomic(transaction.Atomic):
         if django.VERSION >= (3, 2):
             super().__init__(using, savepoint, durable)   # pylint: disable=too-many-function-args
         else:
-            super().__init__(using, savepoint)
+            super().__init__(using, savepoint)  # lint-amnesty, pylint: disable=no-value-for-parameter
 
     def __enter__(self):
 

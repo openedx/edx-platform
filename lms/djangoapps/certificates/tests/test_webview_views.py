@@ -647,12 +647,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
 
         user_language = 'fr'
-        self.client.cookies[settings.LANGUAGE_COOKIE] = user_language
+        self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = user_language
         response = self.client.get(test_url)
         self.assertContains(response, '<html class="no-js" lang="fr">')
 
         user_language = 'ar'
-        self.client.cookies[settings.LANGUAGE_COOKIE] = user_language
+        self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = user_language
         response = self.client.get(test_url)
         self.assertContains(response, '<html class="no-js" lang="ar">')
 

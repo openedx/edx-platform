@@ -5,12 +5,14 @@ import re
 import urllib.parse as parse  # pylint: disable=import-error
 from urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 
+import bleach
 from django.conf import settings
 from django.contrib.auth import logout
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from oauth2_provider.models import Application
 
+from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from common.djangoapps.third_party_auth import pipeline as tpa_pipeline
@@ -57,7 +59,7 @@ class LogoutView(TemplateView):
         #  >> /courses/course-v1:ARTS+D1+2018_T/course/
         #  to handle this scenario we need to encode our URL using quote_plus and then unquote it again.
         if target_url:
-            target_url = parse.unquote(parse.quote_plus(target_url))
+            target_url = bleach.clean(parse.unquote(parse.quote_plus(target_url)))
 
         use_target_url = target_url and is_safe_login_or_logout_redirect(
             redirect_to=target_url,
@@ -69,7 +71,6 @@ class LogoutView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         # We do not log here, because we have a handler registered to perform logging on successful logouts.
-        request.is_from_logout = True
 
         # Get third party auth provider's logout url
         self.tpa_logout_url = tpa_pipeline.get_idp_logout_url_from_running_pipeline(request)
@@ -81,6 +82,7 @@ class LogoutView(TemplateView):
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)
 
+        mark_user_change_as_expected(response, None)
         return response
 
     def _build_logout_url(self, url):

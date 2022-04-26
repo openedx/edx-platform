@@ -69,6 +69,7 @@ class TestCorsMiddlewareProcessRequest(TestCase):
         'https://foo.com', 'https://www.foo.com', 'https://learning.edge.foo.bar']
     )
     @ddt.data(
+        'https://foo.com', 'https://foo.com/',
         'https://foo.com/bar/', 'https://foo.com/bar/baz/', 'https://www.foo.com/bar/baz/',
         'https://learning.edge.foo.bar', 'https://learning.edge.foo.bar/foo'
     )

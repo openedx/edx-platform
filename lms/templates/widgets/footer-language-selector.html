@@ -1,6 +1,6 @@
 ## Language-selection widget for the footer.
 ##
-## Requires settings.LANGUAGE_COOKIE.
+## Requires settings.LANGUAGE_COOKIE_NAME.
 <%page expression_filter="h"/>
 <%!
   from babel import Locale
@@ -11,9 +11,9 @@
   from openedx.core.djangoapps.lang_pref.api import released_languages
   from openedx.core.djangolib.js_utils import js_escaped_string
 
-  # Make sure LANGUAGE_COOKIE is present.
-  if not settings.LANGUAGE_COOKIE:
-      raise ValueError('settings.LANGUAGE_COOKIE is required to use footer-language-selector.')
+  # Make sure LANGUAGE_COOKIE_NAME is present.
+  if not settings.LANGUAGE_COOKIE_NAME:
+      raise ValueError('settings.LANGUAGE_COOKIE_NAME is required to use footer-language-selector.')
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -61,7 +61,7 @@
         },
 
         setLanguageCookie: function(value, callback) {
-            var cookie = '${settings.LANGUAGE_COOKIE | n, js_escaped_string}=' + value + ';path=/';
+            var cookie = '${settings.LANGUAGE_COOKIE_NAME | n, js_escaped_string}=' + value + ';path=/';
 
             <% session_cookie_domain = static.get_value('SESSION_COOKIE_DOMAIN', settings.SESSION_COOKIE_DOMAIN) %>
             % if session_cookie_domain:

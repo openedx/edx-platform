@@ -25,7 +25,6 @@ import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
 from edx_django_utils.plugins import add_plugins
-from importlib.metadata import version
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
@@ -83,6 +82,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'CELERY_QUEUES',
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
+        'REST_FRAMEWORK',
     ]
     for key in KEYS_WITH_MERGED_VALUES:
         if key in __config_copy__:
@@ -157,6 +157,12 @@ SESSION_COOKIE_HTTPONLY = ENV_TOKENS.get('SESSION_COOKIE_HTTPONLY', True)
 
 DCS_SESSION_COOKIE_SAMESITE = ENV_TOKENS.get('DCS_SESSION_COOKIE_SAMESITE', DCS_SESSION_COOKIE_SAMESITE)
 DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = ENV_TOKENS.get('DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL', DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL)  # lint-amnesty, pylint: disable=line-too-long
+
+# As django-cookies-samesite package is set to be removed from base requirements when we upgrade to Django 3.2,
+# we should follow the settings name provided by Django.
+# https://docs.djangoproject.com/en/3.2/ref/settings/#session-cookie-samesite
+if django.VERSION >= (3, 1):
+    SESSION_COOKIE_SAMESITE = DCS_SESSION_COOKIE_SAMESITE
 
 AWS_SES_REGION_NAME = ENV_TOKENS.get('AWS_SES_REGION_NAME', 'us-east-1')
 AWS_SES_REGION_ENDPOINT = ENV_TOKENS.get('AWS_SES_REGION_ENDPOINT', 'email.us-east-1.amazonaws.com')
@@ -295,6 +301,8 @@ TIME_ZONE = ENV_TOKENS.get('CELERY_TIMEZONE', CELERY_TIMEZONE)
 # Translation overrides
 LANGUAGE_DICT = dict(LANGUAGES)
 
+LANGUAGE_COOKIE_NAME = ENV_TOKENS.get('LANGUAGE_COOKIE', None) or ENV_TOKENS.get('LANGUAGE_COOKIE_NAME')
+
 # Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     INSTALLED_APPS.append(app)
@@ -357,12 +365,6 @@ CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS', [])
 if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
-
-    # values are already updated above with default CORS_ORIGIN_WHITELIST values but in
-    # case of new version of django_cors_headers they will get override.
-    cors_major_version = int(version('django_cors_headers').split('.')[0])
-    if cors_major_version >= 3 and CORS_ORIGIN_WHITELIST and ENV_TOKENS.get('CORS_ORIGIN_WHITELIST_WITH_SCHEME'):
-        CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST_WITH_SCHEME')
 
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
@@ -749,7 +751,7 @@ if FEATURES.get('CUSTOM_COURSES_EDX'):
 ##### Individual Due Date Extensions #####
 if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     FIELD_OVERRIDE_PROVIDERS += (
-        'courseware.student_field_overrides.IndividualStudentOverrideProvider',
+        'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
 
 ##### Show Answer Override for Self-Paced Courses #####
@@ -1052,3 +1054,6 @@ SHOW_ACCOUNT_ACTIVATION_CTA = ENV_TOKENS.get('SHOW_ACCOUNT_ACTIVATION_CTA', SHOW
 CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = ENV_TOKENS.get(
     'CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN', CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN
 )
+
+############## DRF overrides ##############
+REST_FRAMEWORK.update(ENV_TOKENS.get('REST_FRAMEWORK', {}))

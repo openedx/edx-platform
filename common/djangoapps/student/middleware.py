@@ -7,7 +7,7 @@ disabled accounts from accessing the site.
 from django.conf import settings
 from django.http import HttpResponseForbidden
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.student.models import UserStanding

@@ -66,7 +66,7 @@ class BulkUsersRetirementView(APIView):
                 log.exception(f'500 error retiring account {exc}')
                 failed_user_retirements.append(username)
 
-        successful_user_retirements = list(set(usernames_to_retire).difference(failed_user_retirements))
+        successful_user_retirements = sorted(set(usernames_to_retire).difference(failed_user_retirements))
 
         return Response(
             status=status.HTTP_200_OK,

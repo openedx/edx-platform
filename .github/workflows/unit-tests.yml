@@ -1,0 +1,68 @@
+name: unit-tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - open-release/*.master
+
+jobs:
+  run-tests:
+    runs-on: [ edx-platform-runner ]
+    strategy:
+      matrix:
+        python-version: ['3.8']
+        django-version: ["3.2"]
+        shard_name: [
+            "lms-1",
+            "lms-2",
+            "lms-3",
+            "lms-4",
+            "lms-5",
+            "lms-6",
+            "openedx-1",
+            "openedx-2",
+            "cms-1",
+            "cms-2",
+            "common-1",
+            "common-2",
+        ]
+
+
+    name: python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
+    steps:
+      - name: sync directory owner
+        run: sudo chown runner:runner -R .*
+      - uses: actions/checkout@v2
+      - name: start mongod server for tests
+        run: |
+          sudo mkdir -p /data/db
+          sudo chmod -R a+rw /data/db
+          mongod &
+
+      - name: set top-level module name
+        run: |
+          echo "module_name=$(echo '${{ matrix.shard_name }}' | awk -F '-' '{print $1}')" >> $GITHUB_ENV
+
+      - name: set settings path
+        run: |
+          echo "settings_path=$(if [ '${{ env.module_name }}' = 'cms' ]; then echo 'cms.envs.test'; else echo 'lms.envs.test' ; fi)" >> $GITHUB_ENV
+
+#      - name: set pytest randomly option
+#        run: |
+#          echo "pytest_randomly_option=$(if [ '${{ env.module_name }}' = 'cms' ] || [ '${{ env.module_name }}' = 'common' ]; then echo '-p no:randomly'; else echo '' ; fi)" >> $GITHUB_ENV
+
+      - name: install requirements
+        run: |
+          sudo pip install -r requirements/pip.txt
+          sudo pip install -r requirements/edx/testing.txt
+          sudo pip install "django~=${{ matrix.django-version }}.0"
+
+      - name: get unit tests for shard
+        run: |
+          echo "unit_test_paths=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} )" >> $GITHUB_ENV
+
+      - name: run tests
+        run: |
+          python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}

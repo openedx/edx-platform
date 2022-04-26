@@ -43,7 +43,6 @@ defusedxml
 Django                              # Web application framework
 django-appconf
 django-celery-results               # Only used for the CacheBackend for celery results
-django-cookies-samesite             # Middleware which allows SameSite=None flag for session and csrf cookies in Django<3.0.5
 django-config-models                # Configuration models for Django allowing config management with auditing
 django-cors-headers                 # Used to allow to configure CORS headers for cross-domain requests
 django-countries                    # Country data for Django forms and model fields
@@ -106,7 +105,7 @@ help-tokens
 html5lib                            # HTML parser, used for capa problems
 icalendar                           # .ics generator, used by calendar_sync
 ipaddress                           # Ip network support for Embargo feature
-jsonfield2                          # Django model field for validated JSON; used in several apps
+jsonfield                           # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 lxml                                # XML parser
 lti-consumer-xblock
@@ -141,7 +140,6 @@ python3-openid ; python_version>='3'
 python3-saml
 pyuca                               # For more accurate sorting of translated country names in django-countries
 recommender-xblock                  # https://github.com/edx/RecommenderXBlock
-rest-condition                      # DRF's recommendation for supporting complex permissions
 social-auth-core
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
 pytz                                # Time zone information database

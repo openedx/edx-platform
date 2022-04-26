@@ -97,11 +97,3 @@ In a given course, which units contain problems with custom Python grading code?
       c.course_key = '<course_key>'
   RETURN
       u.location
-
-
-Query Archive
-*************
-
-edX currently maintains a running archive `Coursegraph queries we have found useful`_ which may serve as a helpful reference.
-
-.. _Coursegraph queries we have found useful: https://openedx.atlassian.net/wiki/spaces/SUST/pages/135102646/CourseGraph+Queries

@@ -1,18 +1,18 @@
 """Course app config for courseware apps."""
-from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
 from typing import Dict, Optional
 
 from django import urls
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext_noop as _
+from django.utils.translation import gettext_noop as _
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from xmodule.modulestore.django import modulestore
 
+from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_apps.plugins import CourseApp
+from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.lib.courses import get_course_by_id
 
 User = get_user_model()

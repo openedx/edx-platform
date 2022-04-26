@@ -127,16 +127,9 @@ Test Gametrailers
 >>> markdown.markdown(s, ['video'])
 u'<p><object data="http://www.gametrailers.com/remote_wrap.php?mid=58079" height="392" type="application/x-shockwave-flash" width="480"><param name="movie" value="http://www.gametrailers.com/remote_wrap.php?mid=58079" /><param name="allowFullScreen" value="true" /></object></p>'
 """
-
+from xml.etree import ElementTree
 
 import markdown
-
-try:
-    # Markdown 2.1.0 changed from 2.0.3. We try importing the new version first,
-    # but import the 2.0.3 version if it fails
-    from markdown.util import etree
-except ImportError:
-    from markdown import etree
 
 
 version = "0.1.6"
@@ -254,7 +247,7 @@ class Yahoo(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=m
         width = self.ext.config['yahoo_width'][0]
         height = self.ext.config['yahoo_height'][0]
         obj = flash_object(url, width, height)
-        param = etree.Element('param')
+        param = ElementTree.Element('param')
         param.set('name', 'flashVars')
         param.set('value', "id={}&vid={}".format(m.group('yahooid'), m.group('yahoovid')))
         obj.append(param)
@@ -271,16 +264,16 @@ class Youtube(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable
 
 
 def flash_object(url, width, height):  # lint-amnesty, pylint: disable=missing-function-docstring
-    obj = etree.Element('object')
+    obj = ElementTree.Element('object')
     obj.set('type', 'application/x-shockwave-flash')
     obj.set('width', width)
     obj.set('height', height)
     obj.set('data', url)
-    param = etree.Element('param')
+    param = ElementTree.Element('param')
     param.set('name', 'movie')
     param.set('value', url)
     obj.append(param)
-    param = etree.Element('param')
+    param = ElementTree.Element('param')
     param.set('name', 'allowFullScreen')
     param.set('value', 'true')
     obj.append(param)

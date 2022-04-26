@@ -159,8 +159,8 @@ class TabsPageTests(CourseTestCase):
 
     def test_toggle_tab_visibility(self):
         """Test toggling of tab visibility"""
-        self.check_toggle_tab_visiblity('wiki', True)
         self.check_toggle_tab_visiblity('wiki', False)
+        self.check_toggle_tab_visiblity('wiki', True)
 
     def test_toggle_invalid_tab_visibility(self):
         """Test toggling visibility of an invalid tab"""

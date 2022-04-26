@@ -137,6 +137,9 @@ Here are the different integration points that python plugins can use:
    * - Pluggable override (``edx_django_utils.plugins.pluggable_override.pluggable_override``)
      - Trial, Stable
      - This decorator allows overriding any function or method by pointing to an alternative implementation in settings. Read the |pluggable_override docstring|_ to learn more.
+   * - Open edX Events
+     - Adopt, Stable
+     - Events are part of the greater Hooks Extension Framework for open extension of edx-platform. Events are a stable way for plugin developers to react to learner or author events. They are defined by a `separate events library`_ that developers can include in their requirements to develop and test the code without creating a dependency on this large repo. For more information see the `hooks guide`_.
 
 .. _Application: https://docs.djangoproject.com/en/3.0/ref/applications/
 .. _Django app plugin documentation: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
@@ -151,6 +154,8 @@ Here are the different integration points that python plugins can use:
 .. _UserPartition docstring: https://github.com/edx/edx-platform/blob/f8cc58618a39c9f7b8e9e1001eb2d7a10395797e/common/lib/xmodule/xmodule/partitions/partitions.py#L105-L120
 .. |pluggable_override docstring| replace:: ``pluggable_override`` docstring
 .. _pluggable_override docstring: https://github.com/edx/edx-django-utils/blob/master/edx_django_utils/plugins/pluggable_override.py
+.. _separate events library: https://github.com/eduNEXT/openedx-events/
+.. _hooks guide: https://github.com/edx/edx-platform/blob/master/docs/guides/hooks/index.rst
 
 Platform Look & Feel
 ====================

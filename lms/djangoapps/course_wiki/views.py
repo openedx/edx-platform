@@ -8,7 +8,7 @@ import re
 
 from django.conf import settings
 from django.shortcuts import redirect
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 from wiki.core.exceptions import NoRootURL
 from wiki.models import Article, URLPath

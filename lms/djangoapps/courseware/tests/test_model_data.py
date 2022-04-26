@@ -111,7 +111,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_state, 2, LOCATION('usage_id'))  # user_id=2, not 1
     existing_field_name = "a_field"
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
 
     def setUp(self):
         super().setUp()
@@ -241,7 +241,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
 
 class TestMissingStudentModule(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = set(connections)
 
     def setUp(self):
         super().setUp()

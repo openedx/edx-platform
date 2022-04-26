@@ -18,7 +18,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from edx_django_utils.monitoring import set_custom_attribute
@@ -99,8 +99,10 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
+MARKETING_EMAILS_OPT_IN = 'marketing_emails_opt_in'
 # used to announce a registration
-REGISTER_USER = Signal(providing_args=["user", "registration"])
+# providing_args=["user", "registration"]
+REGISTER_USER = Signal()
 
 
 # .. toggle_name: registration.enable_failure_logging
@@ -255,6 +257,7 @@ def create_account_with_params(request, params):
     # Announce registration
     REGISTER_USER.send(sender=None, user=user, registration=registration)
 
+    # .. event_implemented_name: STUDENT_REGISTRATION_COMPLETED
     STUDENT_REGISTRATION_COMPLETED.send_event(
         user=UserData(
             pii=UserPersonalData(
@@ -271,6 +274,7 @@ def create_account_with_params(request, params):
 
     try:
         _record_registration_attributions(request, new_user)
+        _record_marketing_emails_opt_in_attribute(params.get('marketing_emails_opt_in'), new_user)
     # Don't prevent a user from registering due to attribution errors.
     except Exception:   # pylint: disable=broad-except
         log.exception('Error while attributing cookies to user registration.')
@@ -284,8 +288,7 @@ def create_account_with_params(request, params):
 def is_new_user(request, user):
     if user is not None:
         AUDIT_LOG.info(f"Login success on new account creation - {user.username}")
-        is_internal_user = user.email.split('@')[1] == 'edx.org'
-        check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), is_internal_user)
+        check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), user.is_staff)
 
 
 def _link_user_to_third_party_provider(
@@ -359,6 +362,8 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
                 'address': profile.mailing_address,
                 'gender': profile.gender_display,
                 'country': str(profile.country),
+                'email_subscribe': 'unsubscribed' if settings.MARKETING_EMAILS_OPT_IN and
+                                   params.get('marketing_emails_opt_in') == 'false' else 'subscribed',
             }
         ]
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
@@ -378,6 +383,10 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'total_registration_time': round(float(params.get('totalRegistrationTime', '0'))),
             'activation_key': registration.activation_key if registration else None,
         }
+        # VAN-738 - added below properties to experiment marketing emails opt in/out events on Braze.
+        if params.get('marketing_emails_opt_in') and settings.MARKETING_EMAILS_OPT_IN:
+            properties['marketing_emails_opt_in'] = params.get('marketing_emails_opt_in') == 'true'
+
         # DENG-803: For segment events forwarded along to Hubspot, duplicate the `properties` section of
         # the event payload into the `traits` section so that they can be received. This is a temporary
         # fix until we implement this behavior outside of the LMS.
@@ -448,6 +457,14 @@ def _skip_activation_email(user, running_pipeline, third_party_provider):
         settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
         (third_party_provider and third_party_provider.skip_email_verification and valid_email)
     )
+
+
+def _record_marketing_emails_opt_in_attribute(opt_in, user):
+    """
+    Attribute this user's registration based on form data
+    """
+    if settings.MARKETING_EMAILS_OPT_IN and user and opt_in:
+        UserAttribute.set_user_attribute(user, MARKETING_EMAILS_OPT_IN, opt_in)
 
 
 def _record_registration_attributions(request, user):

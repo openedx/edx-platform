@@ -18,9 +18,8 @@ from collections import OrderedDict
 from uuid import uuid4
 
 import openid.oidutil
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 from edx_django_utils.plugins import add_plugins
-from importlib.metadata import version
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
@@ -378,8 +377,8 @@ openid.oidutil.log = lambda message, level=0: None
 
 # Include a non-ascii character in PLATFORM_NAME and PLATFORM_DESCRIPTION to uncover possible
 # UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
-PLATFORM_NAME = ugettext_lazy("édX")
-PLATFORM_DESCRIPTION = ugettext_lazy("Open édX Platform")
+PLATFORM_NAME = gettext_lazy("édX")
+PLATFORM_DESCRIPTION = gettext_lazy("Open édX Platform")
 
 SITE_NAME = "edx.org"
 
@@ -599,11 +598,8 @@ REGISTRATION_RATELIMIT = '5/minute'
 RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '2/m'
 RESET_PASSWORD_API_RATELIMIT = '2/m'
 
-CORS_ORIGIN_WHITELIST = ['sandbox.edx.org']
-CORS_ORIGIN_WHITELIST_WITH_SCHEME = ['https://sandbox.edx.org']
+CORS_ORIGIN_WHITELIST = ['https://sandbox.edx.org']
 
-# values are already updated above with default CORS_ORIGIN_WHITELIST values but in
-# case of new version django_cors_headers they will get override.
-cors_major_version = int(version('django_cors_headers').split('.')[0])
-if cors_major_version >= 3 and CORS_ORIGIN_WHITELIST and CORS_ORIGIN_WHITELIST_WITH_SCHEME:
-    CORS_ORIGIN_WHITELIST = CORS_ORIGIN_WHITELIST_WITH_SCHEME
+#################### Network configuration ####################
+# Tests are not behind any proxies
+CLOSEST_CLIENT_IP_FROM_HEADERS = []

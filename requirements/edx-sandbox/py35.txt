@@ -8,7 +8,7 @@ common/lib/sandbox-packages
     # via -r requirements/edx-sandbox/py35.in
 common/lib/symmath
     # via -r requirements/edx-sandbox/py35.in
-cffi==1.14.6
+cffi==1.15.0
     # via cryptography
 chem==1.2.0
     # via -r requirements/edx-sandbox/py35.in
@@ -51,7 +51,7 @@ networkx==2.2
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py35.in
-nltk==3.6.3
+nltk==3.6.2
     # via
     #   -r requirements/edx-sandbox/py35.in
     #   chem
@@ -77,11 +77,11 @@ python-dateutil==2.4.0
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   matplotlib
-pytz==2021.1
+pytz==2021.3
     # via matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py35.in
-regex==2021.9.24
+regex==2021.10.8
     # via nltk
 scipy==1.2.1
     # via

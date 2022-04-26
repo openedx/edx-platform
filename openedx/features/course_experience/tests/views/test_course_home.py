@@ -5,13 +5,13 @@ Tests for the course home page.
 
 from datetime import datetime, timedelta
 from unittest import mock
+from urllib.parse import quote_plus
 
 import ddt
 from django.conf import settings
 from django.http import QueryDict
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.http import urlquote_plus
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
@@ -205,7 +205,7 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(72, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(73, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -371,7 +371,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         """
         url = course_home_url(self.course)
         response = self.client.get(url)
-        self.assertContains(response, f'/login?next={urlquote_plus(url)}')
+        self.assertContains(response, f'/login?next={quote_plus(url)}')
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_non_live_course(self):

@@ -4,17 +4,23 @@ Test the views served by third_party_auth.
 
 
 import unittest
+from unittest.mock import patch
 
 import ddt
 import pytest
 from django.conf import settings
+from django.test import TestCase, override_settings
+from django.test.client import RequestFactory
 from django.urls import reverse
 from lxml import etree
 from onelogin.saml2.errors import OneLogin_Saml2_Error
 
+from common.djangoapps.student.models import Registration
+from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth import pipeline
 # Define some XML namespaces:
 from common.djangoapps.third_party_auth.tasks import SAML_XML_NS
+from common.djangoapps.third_party_auth.views import inactive_user_view
 
 from .testutil import AUTH_FEATURE_ENABLED, AUTH_FEATURES_KEY, SAMLTestCase
 
@@ -196,3 +202,55 @@ class IdPRedirectViewTest(SAMLTestCase):
             idp_redirect_url=reverse('idp_redirect', kwargs={'provider_slug': provider_slug}),
             next_destination=next_destination,
         )
+
+
+@unittest.skipUnless(AUTH_FEATURE_ENABLED, AUTH_FEATURES_KEY + ' not enabled')
+class InactiveUserViewTests(TestCase):
+    """Test inactive user view """
+    @patch('common.djangoapps.third_party_auth.views.redirect')
+    @override_settings(LOGIN_REDIRECT_WHITELIST=['courses.edx.org'])
+    def test_inactive_user_view_allows_valid_redirect(self, mock_redirect):
+        inactive_user = UserFactory(is_active=False)
+        Registration().register(inactive_user)
+        request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL, {'next': 'https://courses.edx.org'})
+        request.user = inactive_user
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
+            with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
+                inactive_user_view(request)
+                mock_redirect.assert_called_with('https://courses.edx.org')
+
+    @patch('common.djangoapps.third_party_auth.views.redirect')
+    def test_inactive_user_view_prevents_invalid_redirect(self, mock_redirect):
+        inactive_user = UserFactory(is_active=False)
+        Registration().register(inactive_user)
+        request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL, {'next': 'https://evil.com'})
+        request.user = inactive_user
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
+            with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
+                inactive_user_view(request)
+                mock_redirect.assert_called_with('dashboard')
+
+    @patch('common.djangoapps.third_party_auth.views.redirect')
+    def test_inactive_user_view_redirects_back_to_host(self, mock_redirect):
+        inactive_user = UserFactory(is_active=False)
+        Registration().register(inactive_user)
+        request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL, {'next': 'https://myedxhost.com'},
+                                       HTTP_HOST='myedxhost.com')
+        request.user = inactive_user
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
+            with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
+                inactive_user_view(request)
+                mock_redirect.assert_called_with('https://myedxhost.com')
+
+    @patch('common.djangoapps.third_party_auth.views.redirect')
+    @override_settings(LOGIN_REDIRECT_WHITELIST=['courses.edx.org'])
+    def test_inactive_user_view_does_not_redirect_https_to_http(self, mock_redirect):
+        inactive_user = UserFactory(is_active=False)
+        Registration().register(inactive_user)
+        request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL, {'next': 'http://courses.edx.org'},
+                                       secure=True)
+        request.user = inactive_user
+        with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
+            with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
+                inactive_user_view(request)
+                mock_redirect.assert_called_with('dashboard')

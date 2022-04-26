@@ -7,7 +7,7 @@ import json
 import logging
 from collections import defaultdict
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id

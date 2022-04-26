@@ -2,12 +2,12 @@
 Utilities related to API views
 """
 
-from collections import Sequence  # lint-amnesty, pylint: disable=no-name-in-module, deprecated-class
+from collections.abc import Sequence
 from functools import wraps
 
 from django.core.exceptions import NON_FIELD_ERRORS, ObjectDoesNotExist, ValidationError
 from django.http import Http404, HttpResponseBadRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError

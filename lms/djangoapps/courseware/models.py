@@ -23,7 +23,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.db import models
 from django.db.models.signals import post_save
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, LearningContextKeyField, UsageKeyField
 from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
@@ -485,3 +485,18 @@ class OrgDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineMixin, 
         default=False,
         help_text=_('Disable the dynamic upgrade deadline for this organization.')
     )
+
+
+class LastSeenCoursewareTimezone(models.Model):
+    """
+    The timezone in the user's account is frequently not set.
+    This model stores a user's recent timezone that can be used as a fallback
+
+    .. no_pii:
+    """
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    last_seen_courseware_timezone = models.CharField(max_length=255, db_index=True)
+
+    class Meta:
+        app_label = "courseware"

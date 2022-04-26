@@ -16,7 +16,6 @@ from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 from edx_django_utils.plugins import add_plugins
-from importlib.metadata import version
 from path import Path as path
 
 
@@ -75,6 +74,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'CELERY_QUEUES',
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
+        'REST_FRAMEWORK',
     ]
     for key in KEYS_WITH_MERGED_VALUES:
         if key in __config_copy__:
@@ -561,12 +561,6 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
 
-    # values are already updated above with default CORS_ORIGIN_WHITELIST values but in
-    # case of new version django_cors_headers they will get override.
-    cors_major_version = int(version('django_cors_headers').split('.')[0])
-    if cors_major_version >= 3 and CORS_ORIGIN_WHITELIST and ENV_TOKENS.get('CORS_ORIGIN_WHITELIST_WITH_SCHEME'):
-        CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST_WITH_SCHEME')
-
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
@@ -607,3 +601,8 @@ COURSE_OLX_VALIDATION_IGNORE_LIST = ENV_TOKENS.get(
 
 ################# show account activate cta after register ########################
 SHOW_ACCOUNT_ACTIVATION_CTA = ENV_TOKENS.get('SHOW_ACCOUNT_ACTIVATION_CTA', SHOW_ACCOUNT_ACTIVATION_CTA)
+
+LANGUAGE_COOKIE_NAME = ENV_TOKENS.get('LANGUAGE_COOKIE', None) or ENV_TOKENS.get('LANGUAGE_COOKIE_NAME')
+
+############## DRF overrides ##############
+REST_FRAMEWORK.update(ENV_TOKENS.get('REST_FRAMEWORK', {}))

@@ -4,30 +4,30 @@ URLs for static_template_view app
 
 
 from django.conf import settings
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from lms.djangoapps.static_template_view import views
 
 urlpatterns = [
     # Semi-static views (these need to be rendered and have the login bar, but don't change)
-    url(r'^404$', views.render, {'template': '404.html'}, name="404"),
+    path('404', views.render, {'template': '404.html'}, name="404"),
     # display error page templates, for testing purposes
-    url(r'^404$', views.render_404, name='static_template_view.views.render_404'),
-    url(r'^500$', views.render_500, name='static_template_view.views.render_500'),
+    path('404', views.render_404, name='static_template_view.views.render_404'),
+    path('500', views.render_500, name='static_template_view.views.render_500'),
 
-    url(r'^blog$', views.render, {'template': 'blog.html'}, name="blog"),
-    url(r'^contact$', views.render, {'template': 'contact.html'}, name="contact"),
-    url(r'^donate$', views.render, {'template': 'donate.html'}, name="donate"),
-    url(r'^faq$', views.render, {'template': 'faq.html'}, name="faq"),
-    url(r'^help$', views.render, {'template': 'help.html'}, name="help_edx"),
-    url(r'^jobs$', views.render, {'template': 'jobs.html'}, name="jobs"),
-    url(r'^news$', views.render, {'template': 'news.html'}, name="news"),
-    url(r'^press$', views.render, {'template': 'press.html'}, name="press"),
-    url(r'^media-kit$', views.render, {'template': 'media-kit.html'}, name="media-kit"),
-    url(r'^copyright$', views.render, {'template': 'copyright.html'}, name="copyright"),
+    path('blog', views.render, {'template': 'blog.html'}, name="blog"),
+    path('contact', views.render, {'template': 'contact.html'}, name="contact"),
+    path('donate', views.render, {'template': 'donate.html'}, name="donate"),
+    path('faq', views.render, {'template': 'faq.html'}, name="faq"),
+    path('help', views.render, {'template': 'help.html'}, name="help_edx"),
+    path('jobs', views.render, {'template': 'jobs.html'}, name="jobs"),
+    path('news', views.render, {'template': 'news.html'}, name="news"),
+    path('press', views.render, {'template': 'press.html'}, name="press"),
+    path('media-kit', views.render, {'template': 'media-kit.html'}, name="media-kit"),
+    path('copyright', views.render, {'template': 'copyright.html'}, name="copyright"),
 
     # Press releases
-    url(r'^press/([_a-zA-Z0-9-]+)$', views.render_press_release, name='press_release'),
+    re_path(r'^press/([_a-zA-Z0-9-]+)$', views.render_press_release, name='press_release'),
 ]
 
 # Only enable URLs for those marketing links actually enabled in the
@@ -50,4 +50,4 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
 
     # Make the assumption that the URL we want is the lowercased
     # version of the map key
-    urlpatterns.append(url(r'^%s$' % key.lower(), views.render, {'template': template}, name=value))
+    urlpatterns.append(re_path(r'^%s$' % key.lower(), views.render, {'template': template}, name=value))

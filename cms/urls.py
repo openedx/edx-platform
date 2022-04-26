@@ -6,7 +6,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from auth_backends.urls import oauth2_urlpatterns
 from edx_api_doc_tools import make_docs_urls
 from ratelimitbackend import admin
