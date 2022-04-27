@@ -63,7 +63,7 @@ class LTIBlockTest(TestCase):
             """)
         self.system = get_test_system()
         self.system.publish = Mock()
-        self.system.rebind_noauth_module_to_user = Mock()
+        self.system._services['rebind_user'] = Mock()  # pylint: disable=protected-access
 
         self.xmodule = LTIBlock(
             self.system,

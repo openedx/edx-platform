@@ -79,7 +79,7 @@ class LTI20BlockMixin:
         except LTIError:
             return Response(status=401)  # Unauthorized in this case.  401 is right
 
-        real_user = self.system.service(self, 'user').get_user_by_anonymous_id(anon_id)
+        real_user = self.runtime.service(self, 'user').get_user_by_anonymous_id(anon_id)
         if not real_user:  # that means we can't save to database, as we do not have real user id.
             msg = f"[LTI]: Real user not found against anon_id: {anon_id}"
             log.info(msg)
@@ -171,7 +171,7 @@ class LTI20BlockMixin:
             "@context": "http://purl.imsglobal.org/ctx/lis/v2/Result",
             "@type": "Result"
         }
-        self.system.rebind_noauth_module_to_user(self, real_user)
+        self.runtime.service(self, 'rebind_user').rebind_noauth_module_to_user(self, real_user)
         if self.module_score is None:  # In this case, no score has been ever set
             return Response(json.dumps(base_json_obj).encode('utf-8'), content_type=LTI_2_0_JSON_CONTENT_TYPE)
 
@@ -254,10 +254,10 @@ class LTI20BlockMixin:
         else:
             scaled_score = None
 
-        self.system.rebind_noauth_module_to_user(self, user)
+        self.runtime.service(self, 'rebind_user').rebind_noauth_module_to_user(self, user)
 
         # have to publish for the progress page...
-        self.system.publish(
+        self.runtime.publish(
             self,
             'grade',
             {
