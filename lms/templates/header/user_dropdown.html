@@ -4,6 +4,7 @@
 
 <%!
 import json
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.urls import reverse
@@ -49,7 +50,7 @@ should_show_order_history = should_redirect_to_order_history_microfrontend() and
             <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL}/${enterprise_customer_portal.get('slug')}" role="menuitem">${_("Dashboard")}</a></div>
         % endif
 
-        <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('learner_profile', kwargs={'username': username})}" role="menuitem">${_("Profile")}</a></div>
+        <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${urljoin(settings.PROFILE_MICROFRONTEND_URL + '/', user.username)}" role="menuitem">${_("Profile")}</a></div>
         <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('account_settings')}" role="menuitem">${_("Account")}</a></div>
         % if should_show_order_history:
             <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${settings.ORDER_HISTORY_MICROFRONTEND_URL}" role="menuitem">${_("Order History")}</a></div>

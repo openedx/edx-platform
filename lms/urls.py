@@ -667,12 +667,6 @@ urlpatterns += [
         include('openedx.features.calendar_sync.urls'),
     ),
 
-    # Learner profile
-    path(
-        'u/',
-        include('openedx.features.learner_profile.urls'),
-    ),
-
     # Survey Report
     re_path(
         fr'^survey_report/',

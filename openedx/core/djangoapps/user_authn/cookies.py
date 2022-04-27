@@ -6,6 +6,7 @@ Utility functions for setting "logged in" cookies used by subdomains.
 import json
 import logging
 import time
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -245,7 +246,7 @@ def _get_user_info_cookie_data(request, user):
     # (most likely just hiding the links).
     try:
         header_urls['account_settings'] = reverse('account_settings')
-        header_urls['learner_profile'] = reverse('learner_profile', kwargs={'username': user.username})
+        header_urls['learner_profile'] = urljoin(settings.PROFILE_MICROFRONTEND_URL + '/', user.username)
     except NoReverseMatch:
         pass
 
