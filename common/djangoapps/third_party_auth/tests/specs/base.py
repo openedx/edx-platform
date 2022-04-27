@@ -28,7 +28,6 @@ from openedx.core.djangoapps.user_authn.views.login_form import login_and_regist
 from openedx.core.djangoapps.user_authn.views.register import RegistrationView
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from common.djangoapps.student import models as student_models
 from common.djangoapps.student.tests.factories import UserFactory
 
@@ -611,7 +610,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
         # First we expect that we're in the unlinked state, and that there
         # really is no association in the backend.
-        self.assert_account_settings_context_looks_correct(account_settings_context(get_request), linked=False)
         self.assert_social_auth_does_not_exist_for_user(get_request.user, strategy)
 
         # We should be redirected back to the complete page, setting
@@ -630,7 +628,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
         # Now we expect to be in the linked state, with a backend entry.
         self.assert_social_auth_exists_for_user(get_request.user, strategy)
-        self.assert_account_settings_context_looks_correct(account_settings_context(get_request), linked=True)
 
     def test_full_pipeline_succeeds_for_unlinking_account(self):
         # First, create, the GET request and strategy that store pipeline state,
@@ -662,7 +659,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         get_request.user = post_request.user
 
         # First we expect that we're in the linked state, with a backend entry.
-        self.assert_account_settings_context_looks_correct(account_settings_context(get_request), linked=True)
         self.assert_social_auth_exists_for_user(get_request.user, strategy)
 
         # Fire off the disconnect pipeline to unlink.
@@ -676,7 +672,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         )
 
         # Now we expect to be in the unlinked state, with no backend entry.
-        self.assert_account_settings_context_looks_correct(account_settings_context(get_request), linked=False)
         self.assert_social_auth_does_not_exist_for_user(user, strategy)
 
     def test_linking_already_associated_account_raises_auth_already_associated(self):
@@ -733,9 +728,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         middleware.ExceptionMiddleware().process_exception(
             post_request,
             exceptions.AuthAlreadyAssociated(self.provider.backend_name, 'account is already in use.'))
-
-        self.assert_account_settings_context_looks_correct(
-            account_settings_context(post_request), duplicate=True, linked=True)
 
     @mock.patch('common.djangoapps.third_party_auth.pipeline.segment.track')
     def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self, _mock_segment_track):
@@ -795,7 +787,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.assert_redirect_after_pipeline_completes(
             self.do_complete(strategy, get_request, partial_pipeline_token, partial_data, user)
         )
-        self.assert_account_settings_context_looks_correct(account_settings_context(get_request))
 
     def test_signin_fails_if_account_not_active(self):
         _, strategy = self.get_request_and_strategy(
@@ -937,7 +928,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         )
         # Now the user has been redirected to the dashboard. Their third party account should now be linked.
         self.assert_social_auth_exists_for_user(created_user, strategy)
-        self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=True)
 
     def test_new_account_registration_assigns_distinct_username_on_collision(self):
         original_username = self.get_username()

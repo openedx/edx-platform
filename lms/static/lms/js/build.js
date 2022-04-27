@@ -33,7 +33,6 @@
             'js/discussions_management/views/discussions_dashboard_factory',
             'js/header_factory',
             'js/student_account/logistration_factory',
-            'js/student_account/views/account_settings_factory',
             'js/student_account/views/finish_auth_factory',
             'js/views/message_banner',
             'lms/js/preview/preview_factory',

@@ -519,7 +519,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     """
     user = request.user
     if not UserProfile.objects.filter(user=user).exists():
-        return redirect(reverse('account_settings'))
+        return redirect(settings.ACCOUNT_MICROFRONTEND_URL)
 
     if should_redirect_to_learner_home_mfe(user):
         return redirect(settings.LEARNER_HOME_MICROFRONTEND_URL)
@@ -624,7 +624,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
                         "Go to {link_start}your Account Settings{link_end}.")
                 ).format(
                     link_start=HTML("<a href='{account_setting_page}'>").format(
-                        account_setting_page=reverse('account_settings'),
+                        account_setting_page=settings.ACCOUNT_MICROFRONTEND_URL,
                     ),
                     link_end=HTML("</a>")
                 )
