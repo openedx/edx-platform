@@ -1,7 +1,6 @@
 """Tests for util.db module."""
 
 from io import StringIO
-import unittest
 
 import ddt
 from django.core.management import call_command
@@ -122,9 +121,6 @@ class MigrationTests(TestCase):
     """
 
     @override_settings(MIGRATION_MODULES={})
-    @unittest.skip(
-        "Temporary skip for https://openedx.atlassian.net/browse/PROD-2423 where a column is to be removed"
-    )
     def test_migrations_are_in_sync(self):
         """
         Tests that the migration files are in sync with the models.
