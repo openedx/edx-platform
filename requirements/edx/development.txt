@@ -727,14 +727,6 @@ future==0.18.2
     #   pyjwkest
 geoip2==4.5.0
     # via -r requirements/edx/testing.txt
-gitdb==4.0.9
-    # via
-    #   -r requirements/edx/testing.txt
-    #   gitpython
-gitpython==3.1.27
-    # via
-    #   -r requirements/edx/testing.txt
-    #   transifex-client
 glob2==0.7
     # via -r requirements/edx/testing.txt
 gunicorn==20.1.0
@@ -1204,12 +1196,10 @@ python-levenshtein==0.12.2
     # via -r requirements/edx/testing.txt
 python-memcached==1.59
     # via -r requirements/edx/testing.txt
-python-slugify==4.0.1
+python-slugify==6.1.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   code-annotations
-    #   transifex-client
 python-swiftclient==3.13.1
     # via
     #   -r requirements/edx/testing.txt
@@ -1286,7 +1276,6 @@ requests==2.27.1
     #   social-auth-core
     #   sphinx
     #   tableauserverclient
-    #   transifex-client
 requests-oauthlib==1.3.1
     # via
     #   -r requirements/edx/testing.txt
@@ -1374,7 +1363,6 @@ six==1.16.0
     #   singledispatch
     #   sphinxcontrib-httpdomain
     #   tox
-    #   transifex-client
     #   virtualenv
 slumber==0.7.1
     # via
@@ -1382,10 +1370,6 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-smmap==5.0.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   gitdb
 sniffio==1.2.0
     # via
     #   -r requirements/edx/testing.txt
@@ -1499,8 +1483,6 @@ tqdm==4.64.0
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
-transifex-client==0.14.4
-    # via -r requirements/edx/testing.txt
 typing-extensions==4.2.0
     # via
     #   -r requirements/edx/testing.txt
@@ -1529,7 +1511,6 @@ urllib3==1.26.9
     #   py2neo
     #   requests
     #   selenium
-    #   transifex-client
 user-util==1.0.0
     # via -r requirements/edx/testing.txt
 uvicorn==0.17.6

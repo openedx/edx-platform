@@ -48,10 +48,8 @@ pygments==2.12.0
     # via sphinx
 pyparsing==3.0.8
     # via packaging
-python-slugify==4.0.1
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   code-annotations
+python-slugify==6.1.1
+    # via code-annotations
 pytz==2022.1
     # via babel
 pyyaml==6.0
