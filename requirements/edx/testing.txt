@@ -213,7 +213,7 @@ coverage[toml]==6.3.2
     #   pytest-cov
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.txt
-cryptography==36.0.2
+cryptography==37.0.1
     # via
     #   -r requirements/edx/base.txt
     #   django-fernet-fields
@@ -664,11 +664,11 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==13.4.0
+faker==13.6.0
     # via factory-boy
 fastapi==0.75.2
     # via pact-python
-fastavro==1.4.10
+fastavro==1.4.11
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
@@ -910,7 +910,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
-openedx-events==0.8.2
+openedx-events==0.8.3
     # via -r requirements/edx/base.txt
 openedx-filters==0.6.1
     # via -r requirements/edx/base.txt
@@ -1127,7 +1127,7 @@ python-levenshtein==0.12.2
     # via -r requirements/edx/base.txt
 python-memcached==1.59
     # via -r requirements/edx/base.txt
-python-slugify==6.1.1
+python-slugify==6.1.2
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
