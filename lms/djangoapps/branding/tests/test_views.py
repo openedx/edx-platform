@@ -35,11 +35,6 @@ class TestFooter(CacheIsolationTestCase):
         (None, "application/json", "application/json; charset=utf-8", "Open edX"),
         (None, "text/html", "text/html; charset=utf-8", "lms-footer.css"),
         (None, "text/html", "text/html; charset=utf-8", "Open edX"),
-
-        # EdX.org version
-        ("edx.org", "application/json", "application/json; charset=utf-8", "edX Inc"),
-        ("edx.org", "text/html", "text/html; charset=utf-8", "lms-footer-edx.css"),
-        ("edx.org", "text/html", "text/html; charset=utf-8", "edX Inc"),
     )
     @ddt.unpack
     def test_footer_content_types(self, theme, accepts, content_type, content):
@@ -51,10 +46,9 @@ class TestFooter(CacheIsolationTestCase):
         self.assertContains(resp, content)
 
     @mock.patch.dict(settings.FEATURES, {'ENABLE_FOOTER_MOBILE_APP_LINKS': True})
-    @ddt.data("edx.org", None)
-    def test_footer_json(self, theme):
+    def test_footer_json(self):
         self._set_feature_flag(True)
-        with with_comprehensive_theme_context(theme):
+        with with_comprehensive_theme_context(None):
             resp = self._get_footer()
 
         assert resp.status_code == 200
@@ -145,10 +139,6 @@ class TestFooter(CacheIsolationTestCase):
         # OpenEdX
         (None, "en", "lms-footer.css"),
         (None, "ar", "lms-footer-rtl.css"),
-
-        # EdX.org
-        ("edx.org", "en", "lms-footer-edx.css"),
-        ("edx.org", "ar", "lms-footer-edx-rtl.css"),
     )
     @ddt.unpack
     def test_language_rtl(self, theme, language, static_path):
@@ -163,10 +153,6 @@ class TestFooter(CacheIsolationTestCase):
         # OpenEdX
         (None, True),
         (None, False),
-
-        # EdX.org
-        ("edx.org", True),
-        ("edx.org", False),
     )
     @ddt.unpack
     def test_show_openedx_logo(self, theme, show_logo):
@@ -185,10 +171,6 @@ class TestFooter(CacheIsolationTestCase):
         # OpenEdX
         (None, False),
         (None, True),
-
-        # EdX.org
-        ("edx.org", False),
-        ("edx.org", True),
     )
     @ddt.unpack
     def test_include_dependencies(self, theme, include_dependencies):
@@ -207,11 +189,6 @@ class TestFooter(CacheIsolationTestCase):
         (None, None, '1'),
         (None, 'eo', '1'),
         (None, None, ''),
-
-        # EdX.org
-        ('edx.org', None, '1'),
-        ('edx.org', 'eo', '1'),
-        ('edx.org', None, '')
     )
     @ddt.unpack
     def test_include_language_selector(self, theme, language, include_language_selector):
