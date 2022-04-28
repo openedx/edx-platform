@@ -965,8 +965,7 @@ FEATURES = {
     # .. toggle_name: FEATURES['ENABLE_INTEGRITY_SIGNATURE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Whether to replace ID verification course/certificate requirement
-    # with an in-course Honor Code agreement
+    # .. toggle_description: Whether to display honor code agreement for learners before their first grade assignment
     # (https://github.com/edx/edx-name-affirmation)
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-02-15
@@ -1010,6 +1009,16 @@ FEATURES = {
     #   in the LMS and CMS.
     # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
     'DISABLE_UNENROLLMENT': False,
+
+    # .. toggle_name: FEATURES['ENABLE_CERTIFICATES_IDV_REQUIREMENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Whether to enforce ID Verification requirements for couse certificates generation
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2022-04-26
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1458'
+    'ENABLE_CERTIFICATES_IDV_REQUIREMENT': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
