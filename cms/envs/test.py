@@ -27,6 +27,7 @@ from .common import *
 
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.test import (  # pylint: disable=wrong-import-order
+    ACCOUNT_MICROFRONTEND_URL,  # pylint: disable=unused-import
     BLOCKSTORE_USE_BLOCKSTORE_APP_API,
     BLOCKSTORE_API_URL,
     COMPREHENSIVE_THEME_DIRS,  # unimport:skip
@@ -37,8 +38,10 @@ from lms.envs.test import (  # pylint: disable=wrong-import-order
     LOGIN_ISSUE_SUPPORT_LINK,
     MEDIA_ROOT,
     MEDIA_URL,
+    ORDER_HISTORY_MICROFRONTEND_URL,  # pylint: disable=unused-import
     PLATFORM_DESCRIPTION,
     PLATFORM_NAME,
+    PROFILE_MICROFRONTEND_URL,  # pylint: disable=unused-import
     REGISTRATION_EXTRA_FIELDS,
     GRADES_DOWNLOAD,
     SITE_NAME,
