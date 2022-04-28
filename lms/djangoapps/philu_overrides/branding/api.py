@@ -186,7 +186,7 @@ def _auth_footer_legal_links():
     links = [
         ("terms_of_service_and_honor_code", "https://philanthropyu.org/terms-of-use/", _("Terms of Use"), "_blank"),
         ("privacy_policy", "https://philanthropyu.org/privacy-policy/", _("Privacy Policy"), "_blank"),
-        ("faq", "https://philanthropyu.org/faq/", _("FAQ"), "_blank")
+        ("faq", "https://support.philanthropyu.org", _("FAQ"), "_blank")
     ]
 
     return [
@@ -207,7 +207,7 @@ def my_footer_legal_links():
     links = [
         ("terms_of_service_and_honor_code", "https://philanthropyu.org/terms-of-use/", _("Terms of Use"), "_blank"),
         ("privacy_policy", "https://philanthropyu.org/privacy-policy/", _("Privacy Policy"), "_blank"),
-        ("faq", "https://philanthropyu.org/faq/", _("FAQ"), "_blank")
+        ("faq", "https://support.philanthropyu.org", _("FAQ"), "_blank")
     ]
 
     return [
