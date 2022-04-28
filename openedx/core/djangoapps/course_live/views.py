@@ -57,16 +57,9 @@ class CourseLiveConfigurationView(APIView):
         """
         Handle HTTP/GET requests
         """
-        pii_sharing_allowed = get_lti_pii_sharing_state_for_course(course_id)
-        if not pii_sharing_allowed:
-            return Response({
-                "pii_sharing_allowed": pii_sharing_allowed,
-                "message": "PII sharing is not allowed on this course"
-            })
-
         configuration = CourseLiveConfiguration.get(course_id) or CourseLiveConfiguration()
         serializer = CourseLiveConfigurationSerializer(configuration, context={
-            "pii_sharing_allowed": pii_sharing_allowed,
+            "pii_sharing_allowed": get_lti_pii_sharing_state_for_course(course_id),
             "course_id": course_id
         })
 

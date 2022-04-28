@@ -71,7 +71,19 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         response = self._get()
         self.assertEqual(response.status_code, 200)
-        expected_data = {'pii_sharing_allowed': False, 'message': 'PII sharing is not allowed on this course'}
+        expected_data = {
+            'course_key': None,
+            'provider_type': '',
+            'enabled': True,
+            'lti_configuration': {
+                'lti_1p1_client_key': '',
+                'lti_1p1_client_secret': '',
+                'lti_1p1_launch_url': '',
+                'version': 'lti_1p1',
+                'lti_config': {}
+            },
+            'pii_sharing_allowed': False
+        }
         self.assertEqual(response.data, expected_data)
 
     def test_pii_sharing_is_allowed(self):
