@@ -504,6 +504,18 @@ FEATURES = {
     # .. toggle_warnings: For consistency in user-experience, keep the value in sync with the setting of the same name
     #   in the LMS and CMS.
     'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': False,
+
+    # .. toggle_name: FEATURES['DISABLE_UNENROLLMENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to disable self-unenrollments via REST API.
+    #   This also hides the "Unenroll" button on the Learner Dashboard.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2021-10-11
+    # .. toggle_warnings: For consistency in user experience, keep the value in sync with the setting of the same name
+    #   in the LMS and CMS.
+    # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
+    'DISABLE_UNENROLLMENT': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -2518,10 +2530,6 @@ BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 3000
 ###################### LEARNER PORTAL ################################
 LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
 
-######################### MICROSITE ###############################
-MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
-MICROSITE_CONFIGURATION = {}
-
 ############################ JWT #################################
 JWT_ISSUER = 'http://127.0.0.1:8000/oauth2'
 DEFAULT_JWT_ISSUER = {
@@ -2646,3 +2654,4 @@ TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-runn
 TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
+COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_assets/course_live.html"

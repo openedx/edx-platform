@@ -19,7 +19,9 @@ from .views.program_enrollments import (
     SAMLProvidersWithOrg,
     ProgramEnrollmentsInspectorAPIView,
 )
-from .views.sso_records import SsoView
+from .views.sso_records import (
+    SsoView,
+)
 from .views.onboarding_status import OnboardingView
 
 COURSE_ENTITLEMENTS_VIEW = EntitlementSupportView.as_view()

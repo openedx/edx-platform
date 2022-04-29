@@ -15,6 +15,7 @@ file and check it in at the same time as your model changes. To do that,
 import ipaddress
 import json
 import logging
+from typing import List, Optional
 
 from config_models.models import ConfigurationModel
 from django.core.cache import cache
@@ -26,6 +27,7 @@ from django.utils.translation import gettext_lazy
 from django_countries import countries
 from django_countries.fields import CountryField
 from opaque_keys.edx.django.models import CourseKeyField
+from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 
@@ -158,37 +160,35 @@ class RestrictedCourse(models.Model):
     )
 
     @classmethod
-    def is_restricted_course(cls, course_id):
+    def is_restricted_course(cls, course_key: CourseKey) -> bool:
         """
         Check if the course is in restricted list
 
         Args:
-            course_id (str): course_id to look for
+            course_key: course to look for
 
         Returns:
-            Boolean
-            True if course is in restricted course list.
+            True if the course is in the restricted course list.
         """
-        return str(course_id) in cls._get_restricted_courses_from_cache()
+        return str(course_key) in cls._get_restricted_courses_from_cache()
 
     @classmethod
-    def is_disabled_access_check(cls, course_id):
+    def is_disabled_access_check(cls, course_key: CourseKey) -> bool:
         """
         Check if the course is in restricted list has disabled_access_check
 
         Args:
-            course_id (str): course_id to look for
+            course_key: course to look for
 
         Returns:
-            Boolean
             disabled_access_check attribute of restricted course
         """
 
         # checking is_restricted_course method also here to make sure course exists in the list otherwise in case of
         # no course found it will throw the key not found error on 'disable_access_check'
         return (
-            cls.is_restricted_course(str(course_id))
-            and cls._get_restricted_courses_from_cache().get(str(course_id))["disable_access_check"]
+            cls.is_restricted_course(course_key)
+            and cls._get_restricted_courses_from_cache().get(str(course_key))["disable_access_check"]
         )
 
     @classmethod
@@ -244,7 +244,7 @@ class RestrictedCourse(models.Model):
             ]
         }
 
-    def message_key_for_access_point(self, access_point):
+    def message_key_for_access_point(self, access_point: str) -> Optional[str]:
         """Determine which message to show the user.
 
         The message can be configured per-course and depends
@@ -252,11 +252,10 @@ class RestrictedCourse(models.Model):
         (trying to enroll or accessing courseware).
 
         Arguments:
-            access_point (str): Either "courseware" or "enrollment"
+            access_point: Either "courseware" or "enrollment"
 
         Returns:
-            str: The message key.  If the access point is not valid,
-                returns None instead.
+            The message key. If the access point is not valid, returns None instead.
 
         """
         if access_point == 'enrollment':
@@ -268,19 +267,18 @@ class RestrictedCourse(models.Model):
         return str(self.course_key)
 
     @classmethod
-    def message_url_path(cls, course_key, access_point):
+    def message_url_path(cls, course_key: CourseKey, access_point: str) -> str:
         """Determine the URL path for the message explaining why the user was blocked.
 
         This is configured per-course.  See `RestrictedCourse` in the `embargo.models`
         module for more details.
 
         Arguments:
-            course_key (CourseKey): The location of the course.
-            access_point (str): How the user was trying to access the course.
-                Can be either "enrollment" or "courseware".
+            course_key: The location of the course.
+            access_point: How the user was trying to access the course. Can be either "enrollment" or "courseware".
 
         Returns:
-            unicode: The URL path to a page explaining why the user was blocked.
+            The URL path to a page explaining why the user was blocked.
 
         Raises:
             InvalidAccessPoint: Raised if access_point is not a supported value.
@@ -306,16 +304,15 @@ class RestrictedCourse(models.Model):
         return url
 
     @classmethod
-    def _get_message_url_path_from_db(cls, course_key, access_point):
+    def _get_message_url_path_from_db(cls, course_key: CourseKey, access_point: str) -> str:
         """Retrieve the "blocked" message from the database.
 
         Arguments:
-            course_key (CourseKey): The location of the course.
-            access_point (str): How the user was trying to access the course.
-                Can be either "enrollment" or "courseware".
+            course_key: The location of the course.
+            access_point: How the user was trying to access the course. Can be either "enrollment" or "courseware".
 
         Returns:
-            unicode: The URL path to a page explaining why the user was blocked.
+            The URL path to a page explaining why the user was blocked.
 
         """
         # Fallback in case we're not able to find a message path
@@ -355,7 +352,7 @@ class RestrictedCourse(models.Model):
             return default_path
 
     @classmethod
-    def invalidate_cache_for_course(cls, course_key):
+    def invalidate_cache_for_course(cls, course_key: CourseKey) -> None:
         """Invalidate the caches for the restricted course. """
         cache.delete(cls.COURSE_LIST_CACHE_KEY)
         log.info("Invalidated cached list of restricted courses.")
@@ -450,18 +447,16 @@ class CountryAccessRule(models.Model):
     ALL_COUNTRIES = {code[0] for code in list(countries)}
 
     @classmethod
-    def check_country_access(cls, course_id, country):
+    def check_country_access(cls, course_key: CourseKey, country: str) -> bool:
         """
         Check if the country is either in whitelist or blacklist of countries for the course_id
 
         Args:
-            course_id (str): course_id to look for
-            country (str): A 2 characters code of country
+            course_key: course to look for
+            country: A 2 characters code of country
 
         Returns:
-            Boolean
-            True if country found in allowed country
-            otherwise check given country exists in list
+            True if country found in allowed country, otherwise check given country exists in list
         """
         # If the country code is not in the list of all countries,
         # we don't want to automatically exclude the user.
@@ -471,25 +466,24 @@ class CountryAccessRule(models.Model):
         if country not in cls.ALL_COUNTRIES:
             return True
 
-        cache_key = cls.CACHE_KEY.format(course_key=course_id)
+        cache_key = cls.CACHE_KEY.format(course_key=course_key)
         allowed_countries = cache.get(cache_key)
         if allowed_countries is None:
-            allowed_countries = cls._get_country_access_list(course_id)
+            allowed_countries = cls._get_country_access_list(course_key)
             cache.set(cache_key, allowed_countries)
 
         return country == '' or country in allowed_countries
 
     @classmethod
-    def _get_country_access_list(cls, course_id):
+    def _get_country_access_list(cls, course_key: CourseKey) -> List[str]:
         """
         if a course is blacklist for two countries then course can be accessible from
         any where except these two countries.
         if a course is whitelist for two countries then course can be accessible from
         these countries only.
         Args:
-            course_id (str): course_id to look for
+            course_key: course to look for
         Returns:
-            List
             Consolidated list of accessible countries for given course
         """
 
@@ -498,7 +492,7 @@ class CountryAccessRule(models.Model):
 
         # Retrieve all rules in one database query, performing the "join" with the Country table
         rules_for_course = CountryAccessRule.objects.select_related('country').filter(
-            restricted_course__course_key=course_id
+            restricted_course__course_key=course_key
         )
 
         # Filter the rules into a whitelist and blacklist in one pass
@@ -529,7 +523,7 @@ class CountryAccessRule(models.Model):
             )
 
     @classmethod
-    def invalidate_cache_for_course(cls, course_key):
+    def invalidate_cache_for_course(cls, course_key: CourseKey) -> None:
         """Invalidate the cache. """
         cache_key = cls.CACHE_KEY.format(course_key=course_key)
         cache.delete(cache_key)

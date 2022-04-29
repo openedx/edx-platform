@@ -129,7 +129,7 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
             expected |= {"anonymous_to_peers"}
         assert actual == expected
 
-    @ddt.data(*itertools.product(*[[True, False] for _ in range(5)], ["question", "discussion"]))
+    @ddt.data(*itertools.product(*[[True, False] for _ in range(6)], ["question", "discussion"]))
     @ddt.unpack
     def test_comment(
         self,
@@ -138,9 +138,14 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
         is_privileged,
         allow_anonymous,
         allow_anonymous_to_peers,
+        has_parent,
         thread_type
     ):
-        comment = Comment(user_id="5" if is_author else "6", type="comment")
+        comment = Comment(
+            user_id="5" if is_author else "6",
+            type="comment",
+            parent_id="parent-id" if has_parent else None,
+        )
         context = _get_context(
             requester_id="5",
             is_requester_privileged=is_privileged,
@@ -154,7 +159,7 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
             expected |= {"edit_reason_code"}
         if is_author or is_privileged:
             expected |= {"raw_body"}
-        if (is_thread_author and thread_type == "question") or is_privileged:
+        if not has_parent and ((is_thread_author and thread_type == "question") or is_privileged):
             expected |= {"endorsed"}
         if is_author and allow_anonymous:
             expected |= {"anonymous"}

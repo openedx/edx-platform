@@ -122,7 +122,7 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
         "title": is_thread and (is_author or is_privileged),
         "group_id": is_thread and is_privileged and context["discussion_division_enabled"],
         "endorsed": (
-            is_comment and
+            (is_comment and cc_content.get("parent_id", None) is None) and
             (is_privileged or
              (_is_author(context["thread"], context) and context["thread"]["thread_type"] == "question"))
         ),

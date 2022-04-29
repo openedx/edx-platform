@@ -10,6 +10,7 @@ import json
 import os
 import re
 from collections import Counter
+from xml.sax.saxutils import escape
 
 from write_to_html import HtmlOutlineWriter  # noqa pylint: disable=import-error,useless-suppression
 
@@ -26,7 +27,7 @@ columns = [
 columns_index_dict = {key: index for index, key in enumerate(columns)}
 
 
-def seperate_warnings_by_location(warnings_data):
+def separate_warnings_by_location(warnings_data):
     """
     Warnings originate from multiple locations, this function takes in list of warning objects
     and separates them based on their filename location
@@ -80,7 +81,6 @@ def read_warning_data(dir_path):
     During test runs in jenkins, multiple warning json files are output. This function finds all files
     and aggregates the warnings in to one large list
     """
-    # pdb.set_trace()
     dir_path = os.path.expanduser(dir_path)
     # find all files that exist in given directory
     files_in_dir = [
@@ -127,6 +127,24 @@ def compress_similar_warnings(warnings_data):
     return output
 
 
+def canonical_message(msg):
+    """
+    Remove noise from a warning message.
+
+    The "same" warning can produce different messages because of data in
+    the message.  This returns a new message with the data converted to
+    placeholders.
+    """
+    hex = r"[0-9a-fA-F]"
+    # Temp files are test_Abcd123.csv etc...
+    msg = re.sub(r"\btest_\w{7}\.", "test_TMP.", msg)
+    # Guids, SHA hashes, and numbers in general get replaced.
+    msg = re.sub(rf"\b{hex}{{8}}-{hex}{{4}}-{hex}{{4}}-{hex}{{4}}-{hex}{{12}}\b", "GUID", msg)
+    msg = re.sub(rf"\b{hex}{{32}}\b", "SHA", msg)
+    msg = re.sub(r"\b\d+(\.\d+)*\b", "#", msg)
+    return msg
+
+
 def process_warnings_json(dir_path):
     """
     Master function to process through all warnings and output a dict
@@ -149,7 +167,8 @@ def process_warnings_json(dir_path):
         warnings_object[columns_index_dict["deprecated"]] = bool(
             "deprecated" in warnings_object[columns_index_dict["message"]]
         )
-    warnings_data = seperate_warnings_by_location(warnings_data)
+        warnings_object[columns_index_dict["message"]] = canonical_message(warnings_object[columns_index_dict["message"]])
+    warnings_data = separate_warnings_by_location(warnings_data)
     compressed_warnings_data = compress_similar_warnings(warnings_data)
     return compressed_warnings_data
 
@@ -191,7 +210,7 @@ def write_html_report(warnings_data, html_path):
         for category, group_in_category, category_count in category_sorted_by_count:
             # xss-lint: disable=python-wrap-html
             html = '<span class="count">{category}, count: {count}</span> '.format(
-                category=category, count=category_count
+                category=escape(category), count=category_count
             )
             html_writer.start_section(html, klass="category")
             locations_sorted_by_count = group_and_sort_by_sumof(
@@ -205,7 +224,7 @@ def write_html_report(warnings_data, html_path):
             ) in locations_sorted_by_count:
                 # xss-lint: disable=python-wrap-html
                 html = '<span class="count">{location}, count: {count}</span> '.format(
-                    location=location, count=location_count
+                    location=escape(location), count=location_count
                 )
                 html_writer.start_section(html, klass="location")
                 message_group_sorted_by_count = group_and_sort_by_sumof(
@@ -218,7 +237,7 @@ def write_html_report(warnings_data, html_path):
                 ) in message_group_sorted_by_count:
                     # xss-lint: disable=python-wrap-html
                     html = '<span class="count">{warning_text}, count: {count}</span> '.format(
-                        warning_text=message, count=message_count
+                        warning_text=escape(message), count=message_count
                     )
                     html_writer.start_section(html, klass="warning_text")
                     # warnings_object[location][warning_text] is a list

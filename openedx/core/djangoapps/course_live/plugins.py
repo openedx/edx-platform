@@ -2,6 +2,7 @@
 Course app configuration for live.
 """
 from typing import Dict, Optional
+from django.conf import settings
 
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_noop as _
@@ -25,8 +26,7 @@ class LiveCourseApp(CourseApp):
     name = _("Live")
     description = _("Enable in-platform video conferencing by configuring live")
     documentation_links = {
-        # TODO: add the actual documentation link once it exists
-        "learn_more_configuration": '',
+        "learn_more_configuration": settings.COURSE_LIVE_HELP_URL
     }
 
     @classmethod
