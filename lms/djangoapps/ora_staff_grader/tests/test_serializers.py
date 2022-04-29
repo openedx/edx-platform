@@ -308,7 +308,7 @@ class TestInitializeSerializer(TestCase):
     """
 
     def set_up_ora(self):
-        """Create a mock Open Repsponse Assessment for serialization"""
+        """Create a mock Open Response Assessment for serialization"""
         ora_data = {
             "display_name": "Week 1: Time Travel Paradoxes",
             "prompts": [
@@ -507,7 +507,7 @@ class TestAssessmentCriteriaSerializer(TestCase):
     def test_assessment_criteria_serializer__feedback_only(self):
         """Test for serialization behavior of a feedback-only criterion"""
         input_data = {
-            "name": "SomeCriterioOn",
+            "name": "SomeCriterion",
             "feedback": "Pathetic Effort",
             "points": None,
             "option": None,
