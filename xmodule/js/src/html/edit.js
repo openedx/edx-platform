@@ -99,8 +99,7 @@
         var tinyMceConfig = {
           script_url: baseUrl + "js/vendor/tinymce/js/tinymce/tinymce.full.min.js",
           font_formats: _getFonts(),
-          theme: "modern",
-          skin: 'studio-tmce4',
+          theme: "silver",
           schema: "html5",
           entity_encoding: "raw",
 
@@ -125,9 +124,12 @@
           Disable visual aid on borderless table.
            */
           visual: false,
-          plugins: "textcolor, link, image, codemirror",
+          plugins: "textcolor,link,image,codemirror",
           codemirror: {
-            path: baseUrl + "js/vendor"
+            path: baseUrl + "js/vendor",
+            disableFilesMerge: true,
+            jsFiles: ["codemirror-compressed.js"],
+            cssFiles: ["CodeMirror/codemirror.css"]
           },
           image_advtab: true,
 
@@ -149,7 +151,7 @@
               heading6: gettext("Heading 6")
             }),
           width: '100%',
-          height: '400px',
+          height: '435px',
           menubar: false,
           statusbar: false,
 
@@ -1233,25 +1235,25 @@
     }
 
     HTMLEditingDescriptor.prototype.setupTinyMCE = function(ed) {
-      ed.addButton('wrapAsCode', {
+      ed.ui.registry.addButton('wrapAsCode', {
 
         /*
         Translators: this is a toolbar button tooltip from the raw HTML editor displayed in the browser when a user needs to edit HTML
          */
-        title: gettext('Code block'),
+        tooltip: gettext('Code block'),
         image: baseUrl + "images/ico-tinymce-code.png",
-        onclick: function() {
+        onAction: function() {
           return ed.formatter.toggle('code');
         }
       });
-      ed.addButton('insertImage', {
+      ed.ui.registry.addButton('insertImage', {
 
         /*
         Translators: this is a toolbar button tooltip from the raw HTML editor displayed in the browser when a user needs to edit HTML
          */
-        title: gettext('Insert/Edit Image'),
+        tooltip: gettext('Insert/Edit Image'),
         icon: 'image',
-        onclick: this.openImageModal
+        onAction: this.openImageModal
       });
       this.visualEditor = ed;
       this.imageModal = $('#edit-image-modal #modalWrapper');
@@ -1266,7 +1268,7 @@
       ed.on('EditLink', this.editLink);
       ed.on('ShowCodeEditor', this.showCodeEditor);
       ed.on('SaveCodeEditor', this.saveCodeEditor);
-       $(".action-cancel").on('click', this.cancelButton)
+      $(".action-cancel").on('click', this.cancelButton);
 
       this.imageModal.on('closeModal', this.closeImageModal);
       return this.imageModal.on('submitForm', this.editImageSubmit);
@@ -1386,7 +1388,7 @@
       haven't dirtied the Editor. Store the raw content so we can compare it later.
        */
       this.starting_content = visualEditor.getContent({
-        format: "raw",
+        format: "text",
         no_events: 1
       });
       return visualEditor.focus();
@@ -1406,7 +1408,7 @@
       if (this.editor_choice === 'visual') {
         visualEditor = this.getVisualEditor();
         raw_content = visualEditor.getContent({
-          format: "raw",
+          format: "text",
           no_events: 1
         });
         if (this.starting_content !== raw_content) {
