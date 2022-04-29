@@ -100,6 +100,7 @@
           script_url: baseUrl + "js/vendor/tinymce/js/tinymce/tinymce.full.min.js",
           font_formats: _getFonts(),
           theme: "silver",
+          skin: "studio-tmce5",
           schema: "html5",
           entity_encoding: "raw",
 
@@ -124,22 +125,23 @@
           Disable visual aid on borderless table.
            */
           visual: false,
-          plugins: "textcolor,link,image,codemirror",
+          plugins: "lists, link, image, codemirror",
           codemirror: {
             path: baseUrl + "js/vendor",
             disableFilesMerge: true,
             jsFiles: ["codemirror-compressed.js"],
             cssFiles: ["CodeMirror/codemirror.css"]
           },
+
           image_advtab: true,
 
           /*
           We may want to add "styleselect" when we collect all styles used throughout the LMS
            */
-          toolbar: "formatselect | fontselect | bold italic underline forecolor wrapAsCode | " +
-            "alignleft aligncenter alignright alignjustify | " +
-            "bullist numlist outdent indent blockquote | link unlink " +
-            ((this.new_image_modal ? 'insertImage' : 'image') + " | code"),
+          toolbar: "formatselect fontselect bold italic underline forecolor wrapAsCode " +
+            "alignleft aligncenter alignright alignjustify " +
+            "bullist numlist outdent indent blockquote link unlink " +
+            ((this.new_image_modal ? 'insertImage' : 'image') + " code"),
           block_formats: edx.StringUtils.interpolate(
             gettext("{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"),
             {
@@ -1241,7 +1243,7 @@
         Translators: this is a toolbar button tooltip from the raw HTML editor displayed in the browser when a user needs to edit HTML
          */
         tooltip: gettext('Code block'),
-        image: baseUrl + "images/ico-tinymce-code.png",
+        icon: 'code-sample',
         onAction: function() {
           return ed.formatter.toggle('code');
         }
