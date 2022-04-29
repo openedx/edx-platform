@@ -271,6 +271,76 @@ class TestFetchSubmissionView(BaseViewTest):
 
 
 @ddt.ddt
+class TestFilesFetchView(BaseViewTest):
+    """
+    Tests for the SubmissionFilesFetchView
+    """
+
+    view_name = "ora-staff-grader:fetch-files"
+
+    def setUp(self):
+        super().setUp()
+        self.log_in()
+
+    @ddt.data({}, {PARAM_ORA_LOCATION: "", PARAM_SUBMISSION_ID: ""})
+    def test_missing_params(self, query_params):
+        """Missing or blank params should return 400 and error message"""
+        response = self.client.get(self.api_url, query_params)
+
+        assert response.status_code == 400
+        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
+
+
+    @patch("lms.djangoapps.ora_staff_grader.views.get_submission_info")
+    def test_fetch_files(self, mock_get_submission_info):
+        """Successfull file fetch returns the list of files for a submission"""
+        mock_get_submission_info.return_value = test_data.example_submission
+
+        ora_location, submission_uuid = Mock(), Mock()
+        response = self.client.get(
+            self.api_url,
+            {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid},
+        )
+
+        assert response.status_code == 200
+        assert response.data.keys() == set(["files"])
+        assert len(test_data.example_submission["files"]) == len(response.data['files'])
+
+    @patch("lms.djangoapps.ora_staff_grader.views.get_submission_info")
+    def test_fetch_files_generic_exception(self, mock_get_submission_info):
+        """Other generic exceptions should return the "unknown" error response"""
+        mock_get_submission_info.side_effect = Exception()
+
+        ora_location, submission_uuid = Mock(), Mock()
+        response = self.client.get(
+            self.api_url,
+            {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid},
+        )
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {"error": ERR_UNKNOWN}
+
+    @patch("lms.djangoapps.ora_staff_grader.views.get_submission_info")
+    def test_fetch_files_xblock_exception(self, mock_get_submission_info):
+        """An exception in any XBlock handler returns an error response"""
+        mock_get_submission_info.side_effect = XBlockInternalError(
+            context={"handler": "get_submission_info"}
+        )
+
+        ora_location, submission_uuid = Mock(), Mock()
+        response = self.client.get(
+            self.api_url,
+            {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid},
+        )
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {
+            "error": ERR_INTERNAL,
+            "handler": "get_submission_info",
+        }
+
+
+@ddt.ddt
 class TestFetchSubmissionStatusView(BaseViewTest):
     """
     Tests for the submission fetch view

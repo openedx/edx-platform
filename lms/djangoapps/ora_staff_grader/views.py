@@ -51,6 +51,7 @@ from lms.djangoapps.ora_staff_grader.serializers import (
     StaffAssessSerializer,
     SubmissionFetchSerializer,
     SubmissionStatusFetchSerializer,
+    UploadedFileSerializer,
 )
 from lms.djangoapps.ora_staff_grader.utils import require_params
 from openedx.core.djangoapps.content.course_overviews.api import (
@@ -252,6 +253,55 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
                     "assessment_info": assessment_info,
                     "lock_info": lock_info,
                 }
+            ).data
+
+            log.info(response_data)
+            return Response(response_data)
+
+        # Issues with the XBlock handlers
+        except XBlockInternalError as ex:
+            log.error(ex)
+            return InternalErrorResponse(context=ex.context)
+
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
+            return UnknownErrorResponse()
+
+
+class SubmissionFilesFetchView(StaffGraderBaseView):
+    """
+    GET file metadata for a submission.
+
+    Used to get updated file download links to avoid signed download link expiration
+    issues.
+
+    Response: {
+        files: [
+            downloadUrl (url),
+            description (string),
+            name (string),
+            size (bytes),
+        ]
+    }
+
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
+    - XBlockInternalError (HTTP 500) for an issue with ORA
+    - UnknownError (HTTP 500) for other errors
+    """
+
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
+    def get(self, request, ora_location, submission_uuid, *args, **kwargs):
+        try:
+            submission_info = get_submission_info(
+                request, ora_location, submission_uuid
+            )
+
+            response_data = {}
+            response_data['files'] = UploadedFileSerializer(
+                submission_info.get('files', []),
+                many=True,
             ).data
 
             log.info(response_data)
