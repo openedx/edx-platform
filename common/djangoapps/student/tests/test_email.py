@@ -31,7 +31,6 @@ from common.djangoapps.third_party_auth.views import inactive_user_view
 from common.djangoapps.util.testing import EventTestMixin
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -125,12 +124,6 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
 
     @ddt.data('plain_text', 'html')
     def test_activation_email(self, test_body_type):
-        self._create_account()
-        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS, test_body_type)
-
-    @with_comprehensive_theme("edx.org")
-    @ddt.data('plain_text', 'html')
-    def test_activation_email_edx_domain(self, test_body_type):
         self._create_account()
         self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS, test_body_type)
 
