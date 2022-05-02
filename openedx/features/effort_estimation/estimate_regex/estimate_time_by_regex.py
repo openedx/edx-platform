@@ -74,8 +74,6 @@ def estimate_time_by_regex(text):
 
 	last_line = no_accent_vietnamese(last_line)
 
-	if 'gio' in last_line or 'phut' in last_line:
-		return None
 	# Old method: extract minute and hour from last line
 	# hour = _get_hour_time(last_line)
 	# minute = _get_minute_time(last_line)
@@ -100,6 +98,9 @@ def estimate_time_by_regex(text):
 
 	# if time is not None than round it to 5 min
 	if time_by_regex is not None:
-		time_by_regex = math.ceil(time_by_regex / 5) * 5
+		if 'gio' in last_line or 'phut' in last_line:
+			time_by_regex = math.ceil(time_by_regex / 5) * 5
+		else:
+			return None
 
 	return time_by_regex
