@@ -290,7 +290,6 @@ class TestFilesFetchView(BaseViewTest):
         assert response.status_code == 400
         assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
 
-
     @patch("lms.djangoapps.ora_staff_grader.views.get_submission_info")
     def test_fetch_files(self, mock_get_submission_info):
         """Successfull file fetch returns the list of files for a submission"""
