@@ -154,6 +154,7 @@ def _update_certificate_context(context, course, user_certificate, platform_name
         context['certificate_type_description'] = certificate_type_description
 
     # EOL
+    context['eol_certificate_date'] = date
     grade_cutoff = min(course.grade_cutoffs.values())  # Get the min value
     try:
         grade_percent = float(user_certificate.grade)
