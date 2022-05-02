@@ -219,13 +219,13 @@ class TestFetchSubmissionView(BaseViewTest):
     @patch("lms.djangoapps.ora_staff_grader.views.get_submission_info")
     @patch("lms.djangoapps.ora_staff_grader.views.get_assessment_info")
     @patch("lms.djangoapps.ora_staff_grader.views.check_submission_lock")
-    def test_fetch_submission_generic_exception(
+    def test_fetch_submission_xblock_exception(
         self,
         mock_check_submission_lock,
         mock_get_assessment_info,
         mock_get_submission_info,
     ):
-        """Other generic exceptions should return the "unknown" error response"""
+        """An exception in any XBlock handler returns an error response"""
         mock_get_submission_info.return_value = test_data.example_submission
         # Mock an error in getting the assessment info
         mock_get_assessment_info.side_effect = XBlockInternalError(
@@ -248,13 +248,13 @@ class TestFetchSubmissionView(BaseViewTest):
     @patch("lms.djangoapps.ora_staff_grader.views.get_submission_info")
     @patch("lms.djangoapps.ora_staff_grader.views.get_assessment_info")
     @patch("lms.djangoapps.ora_staff_grader.views.check_submission_lock")
-    def test_fetch_submission_xblock_exception(
+    def test_fetch_submission_generic_exception(
         self,
         mock_check_submission_lock,
         mock_get_assessment_info,
         mock_get_submission_info,
     ):
-        """An exception in any XBlock handler returns an error response"""
+        """Other generic exceptions should return the "unknown" error response"""
         mock_get_submission_info.return_value = test_data.example_submission
         mock_get_assessment_info.return_value = test_data.example_assessment
         # Mock a bad data shape to break serialization
@@ -268,6 +268,75 @@ class TestFetchSubmissionView(BaseViewTest):
 
         assert response.status_code == 500
         assert json.loads(response.content) == {"error": ERR_UNKNOWN}
+
+
+@ddt.ddt
+class TestFilesFetchView(BaseViewTest):
+    """
+    Tests for the SubmissionFilesFetchView
+    """
+
+    view_name = "ora-staff-grader:fetch-files"
+
+    def setUp(self):
+        super().setUp()
+        self.log_in()
+
+    @ddt.data({}, {PARAM_ORA_LOCATION: "", PARAM_SUBMISSION_ID: ""})
+    def test_missing_params(self, query_params):
+        """Missing or blank params should return 400 and error message"""
+        response = self.client.get(self.api_url, query_params)
+
+        assert response.status_code == 400
+        assert json.loads(response.content) == {"error": ERR_MISSING_PARAM}
+
+    @patch("lms.djangoapps.ora_staff_grader.views.get_submission_info")
+    def test_fetch_files(self, mock_get_submission_info):
+        """Successfull file fetch returns the list of files for a submission"""
+        mock_get_submission_info.return_value = test_data.example_submission
+
+        ora_location, submission_uuid = Mock(), Mock()
+        response = self.client.get(
+            self.api_url,
+            {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid},
+        )
+
+        assert response.status_code == 200
+        assert response.data.keys() == set(["files"])
+        assert len(test_data.example_submission["files"]) == len(response.data['files'])
+
+    @patch("lms.djangoapps.ora_staff_grader.views.get_submission_info")
+    def test_fetch_files_generic_exception(self, mock_get_submission_info):
+        """Other generic exceptions should return the "unknown" error response"""
+        mock_get_submission_info.side_effect = Exception()
+
+        ora_location, submission_uuid = Mock(), Mock()
+        response = self.client.get(
+            self.api_url,
+            {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid},
+        )
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {"error": ERR_UNKNOWN}
+
+    @patch("lms.djangoapps.ora_staff_grader.views.get_submission_info")
+    def test_fetch_files_xblock_exception(self, mock_get_submission_info):
+        """An exception in any XBlock handler returns an error response"""
+        mock_get_submission_info.side_effect = XBlockInternalError(
+            context={"handler": "get_submission_info"}
+        )
+
+        ora_location, submission_uuid = Mock(), Mock()
+        response = self.client.get(
+            self.api_url,
+            {PARAM_ORA_LOCATION: ora_location, PARAM_SUBMISSION_ID: submission_uuid},
+        )
+
+        assert response.status_code == 500
+        assert json.loads(response.content) == {
+            "error": ERR_INTERNAL,
+            "handler": "get_submission_info",
+        }
 
 
 @ddt.ddt
@@ -343,7 +412,6 @@ class TestFetchSubmissionStatusView(BaseViewTest):
         self, mock_check_submission_lock, mock_get_assessment_info
     ):
         """Exceptions within an XBlock return an internal error response"""
-        # Mock a bad data shape to throw a serializer exception
         mock_get_assessment_info.return_value = {}
         mock_check_submission_lock.side_effect = XBlockInternalError(
             context={"handler": "claim_submission_lock"}
@@ -482,7 +550,7 @@ class TestSubmissionLockView(BaseViewTest):
         mock_claim_lock,
     ):
         """In the even more unlikely event of an unhandled error, shrug exuberantly"""
-        # Mock a bad data shape to break serialiation and raise a generic exception
+        # Mock a bad data shape to break serialization and raise a generic exception
         mock_claim_lock.return_value = {"android": "Rachel"}
 
         response = self.claim_lock(self.test_lock_params)
@@ -539,7 +607,7 @@ class TestSubmissionLockView(BaseViewTest):
     @patch("lms.djangoapps.ora_staff_grader.views.delete_submission_lock")
     def test_delete_lock_generic_exception(self, mock_delete_lock):
         """In the even more unlikely event of an unhandled error, shrug exuberantly"""
-        # Mock a bad data shape to break serialiation and raise a generic exception
+        # Mock a bad data shape to break serialization and raise a generic exception
         mock_delete_lock.return_value = {"android": "Roy Batty"}
 
         response = self.delete_lock(self.test_lock_params)
@@ -591,7 +659,7 @@ class TestBatchSubmissionLockView(BaseViewTest):
         mock_batch_delete.assert_not_called()
 
     @patch("lms.djangoapps.ora_staff_grader.views.batch_delete_submission_locks")
-    def test_batch_unlock_missing_submisison_list(self, mock_batch_delete):
+    def test_batch_unlock_missing_submission_list(self, mock_batch_delete):
         """An invalid ORA returns a 400"""
 
         response = self.batch_unlock(self.test_request_params, {})

@@ -202,6 +202,12 @@ class ResponseSerializer(serializers.Serializer):
     text = serializers.ListField(child=serializers.CharField(), allow_empty=True)
 
 
+class FileListSerializer(serializers.Serializer):
+    """Serializer for a list of files in a submission"""
+
+    files = serializers.ListField(child=UploadedFileSerializer(), allow_empty=True)
+
+
 class AssessmentCriteriaSerializer(serializers.Serializer):
     """Serializer for information about a criterion, in the context of a completed assessment"""
 
