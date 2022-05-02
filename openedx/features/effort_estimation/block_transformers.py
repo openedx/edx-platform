@@ -88,7 +88,10 @@ class EffortEstimationTransformer(BlockStructureTransformer):
             # Some bit of required data is missing. Likely some duration info is missing from the video pipeline.
             # Rather than attempt to work around it, just set a note for ourselves to not show durations for this
             # course at all. Better no estimate than a misleading estimate.
-            block_structure.set_transformer_data(cls, cls.DISABLE_ESTIMATION, True)
+
+            # Funix ==> Disable this code
+            # block_structure.set_transformer_data(cls, cls.DISABLE_ESTIMATION, True)
+            pass
 
     @classmethod
     def _collect_html_effort(cls, block_structure, block_key, xblock, _cache):
