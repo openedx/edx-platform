@@ -49,7 +49,6 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
-from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.features.enterprise_support.api import enterprise_enabled
 from common.djangoapps.student import views as student_views
 from common.djangoapps.util import views as util_views
@@ -606,13 +605,6 @@ urlpatterns += [
         ),
         discussion_views.discussion_topics,
         name='discussion_topics',
-    ),
-    re_path(
-        r'^courses/{}/verified_track_content/settings'.format(
-            settings.COURSE_KEY_PATTERN,
-        ),
-        verified_track_content_views.cohorting_settings,
-        name='verified_track_cohorting',
     ),
 
     # LTI endpoints listing
