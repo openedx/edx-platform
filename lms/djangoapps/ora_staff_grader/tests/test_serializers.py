@@ -11,6 +11,7 @@ from lms.djangoapps.ora_staff_grader.errors import ERR_UNKNOWN, ErrorSerializer
 from lms.djangoapps.ora_staff_grader.serializers import (
     AssessmentCriteriaSerializer,
     CourseMetadataSerializer,
+    FileListSerializer,
     GradeDataSerializer,
     InitializeSerializer,
     LockStatusSerializer,
@@ -486,6 +487,48 @@ class TestResponseSerializer(TestCase):
             else [],
         }
         assert data == expected_value
+
+
+@ddt.ddt
+class TestFileListSerializer(TestCase):
+    """
+    Tests for FileListSerializer - this is basically a stripped down ResponseSerializer
+    """
+
+    def test_file_list_serializer__empty(self):
+        """Empty fields should be allowed"""
+        input_data = {"files": [], "text": []}
+        expected_output = {"files": []}
+        assert FileListSerializer(input_data).data == expected_output
+
+    def test_file_list_serializer(self):
+        """Base serialization behavior"""
+        input_data = {
+            "files": [{
+                "name": Mock(),
+                "description": Mock(),
+                "download_url": Mock(),
+                "size": 12345,
+            }, {
+                "name": Mock(),
+                "description": Mock(),
+                "download_url": Mock(),
+                "size": 54321,
+            }],
+            "text": "",
+        }
+
+        output_data = FileListSerializer(input_data).data
+        assert output_data.keys() == set(["files"])
+
+        for i, input_file in enumerate(input_data["files"]):
+            output_file = output_data["files"][i]
+            assert output_file.keys() == set(["name", "description", "downloadUrl", "size"])
+
+            assert output_file["name"] == str(input_file["name"])
+            assert output_file["description"] == str(input_file["description"])
+            assert output_file["downloadUrl"] == str(input_file["download_url"])
+            assert output_file["size"] == input_file["size"]
 
 
 class TestAssessmentCriteriaSerializer(TestCase):

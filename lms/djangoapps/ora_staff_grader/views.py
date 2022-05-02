@@ -46,12 +46,12 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
+    FileListSerializer,
     InitializeSerializer,
     LockStatusSerializer,
     StaffAssessSerializer,
     SubmissionFetchSerializer,
     SubmissionStatusFetchSerializer,
-    UploadedFileSerializer,
 )
 from lms.djangoapps.ora_staff_grader.utils import require_params
 from openedx.core.djangoapps.content.course_overviews.api import (
@@ -298,11 +298,7 @@ class SubmissionFilesFetchView(StaffGraderBaseView):
                 request, ora_location, submission_uuid
             )
 
-            response_data = {}
-            response_data['files'] = UploadedFileSerializer(
-                submission_info.get('files', []),
-                many=True,
-            ).data
+            response_data = FileListSerializer(submission_info).data
 
             log.info(response_data)
             return Response(response_data)
