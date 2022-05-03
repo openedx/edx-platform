@@ -3,7 +3,7 @@ Togglable settings for Teams behavior
 """
 from edx_toggles.toggles import SettingDictToggle
 
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Course Waffle inherited from edx/edx-ora2
 WAFFLE_NAMESPACE = "openresponseassessment"

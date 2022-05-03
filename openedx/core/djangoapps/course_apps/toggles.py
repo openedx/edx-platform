@@ -1,7 +1,7 @@
 """
 Toggles for course apps.
 """
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 #: Namespace for use by course apps for creating availability toggles
 COURSE_APPS_WAFFLE_NAMESPACE = 'course_apps'

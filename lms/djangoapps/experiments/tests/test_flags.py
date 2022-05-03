@@ -18,7 +18,7 @@ from lms.djangoapps.experiments.factories import ExperimentKeyValueFactory
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 

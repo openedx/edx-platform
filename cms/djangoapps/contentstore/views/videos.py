@@ -50,7 +50,7 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
 )
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.video_module.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 

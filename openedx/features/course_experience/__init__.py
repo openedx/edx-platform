@@ -5,7 +5,7 @@ Unified course experience settings and helper methods.
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from edx_toggles.toggles import WaffleFlag
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 
 # Namespace for course experience waffle flags.

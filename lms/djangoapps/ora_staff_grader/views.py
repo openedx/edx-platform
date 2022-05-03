@@ -57,7 +57,7 @@ from lms.djangoapps.ora_staff_grader.utils import require_params
 from openedx.core.djangoapps.content.course_overviews.api import (
     get_course_overview_or_none,
 )
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 log = logging.getLogger(__name__)
