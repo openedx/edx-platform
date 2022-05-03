@@ -81,6 +81,7 @@ class UserIndexViewSetTest(TestCase):
         assert data['username'] == user.username
         assert data['fullname'] == user.profile.name
         assert data['email'] == user.email
+        assert data['date_joined'] == user.date_joined.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def test_get_all_users_for_site(self):
         url = reverse('tahoe-api:v1:users-list')
