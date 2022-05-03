@@ -50,5 +50,5 @@ urllib3==1.26.9
     # via requests
 watchdog==2.1.7
     # via -r requirements/edx/paver.in
-wrapt==1.14.0
+wrapt==1.14.1
     # via -r requirements/edx/paver.in
