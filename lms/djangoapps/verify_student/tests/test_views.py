@@ -624,6 +624,9 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
             PayAndVerifyView.WEBCAM_REQ,
         ])
 
+    # TODO: replace override_switch with override_waffle_switch when the
+    # DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH will be defined as actual WaffleSwitch. Now
+    # we have only switch name defined in the settings
     @override_switch(settings.DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH, active=True)
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_disable_account_activation_requirement_flag_active(self, payment_flow):
