@@ -3499,20 +3499,13 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         self.full_test_message['schedule'] = schedule
         self.full_test_message['browser_timezone'] = timezone
         expected_schedule = self._get_expected_schedule(schedule, timezone)
-        expected_messages = [
-            f"Converting requested schedule from local time '{schedule}' with the timezone '{timezone}' to UTC",
-        ]
 
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
-        with LogCapture() as log:
-            response = self.client.post(url, self.full_test_message)
+        response = self.client.post(url, self.full_test_message)
 
         assert response.status_code == 200
         _, _, _, arg_schedule = mock_task_api.call_args.args
         assert arg_schedule == expected_schedule
-        log.check_present(
-            (LOG_PATH, "INFO", expected_messages[0]),
-        )
 
     @patch("lms.djangoapps.instructor.views.api.task_api.submit_bulk_course_email")
     def test_send_email_with_schedule_and_no_browser_timezone(self, mock_task_api):

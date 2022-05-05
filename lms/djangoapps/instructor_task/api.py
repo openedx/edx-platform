@@ -6,18 +6,17 @@ already been submitted, filtered either by running state or input
 arguments.
 
 """
-
-
 import datetime
 import hashlib
 import logging
 from collections import Counter
 
+import dateutil
 import pytz
 from celery.states import READY_STATES
 
 from common.djangoapps.util import milestones_helpers
-from lms.djangoapps.bulk_email.models import CourseEmail
+from lms.djangoapps.bulk_email.api import get_course_email
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api_helper import (
     QueueConnectionError,
@@ -51,6 +50,7 @@ from lms.djangoapps.instructor_task.tasks import (
     send_bulk_course_email,
     generate_anonymous_ids_for_course
 )
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
@@ -314,7 +314,7 @@ def submit_bulk_course_email(request, course_key, email_id, schedule=None):
     # appropriate access to the course. But make sure that the email exists.
     # We also pull out the targets argument here, so that is displayed in
     # the InstructorTask status.
-    email_obj = CourseEmail.objects.get(id=email_id)
+    email_obj = get_course_email(email_id)
     # task_input has a limit to the size it can store, so any target_type with count > 1 is combined and counted
     targets = Counter([target.target_type for target in email_obj.targets.all()])
     targets = [
@@ -587,3 +587,37 @@ def process_scheduled_tasks():
             submit_scheduled_task(schedule)
         except QueueConnectionError as exc:
             log.error(f"Error processing scheduled task with task id '{schedule.task.id}': {exc}")
+
+
+def convert_schedule_to_utc_from_local(schedule, browser_timezone, user):
+    """
+    Utility function to help convert the schedule of an instructor task from the requesters local time and timezone
+    (taken from the request) to a UTC datetime.
+
+    Args:
+        schedule (String): The desired time to execute a scheduled task, in local time, in the form of an ISO8601
+            string.
+        timezone (String): The time zone, as captured by the user's web browser, in the form of a string.
+        user (User): The user requesting the action, captured from the originating web request. Used to lookup the
+            the time zone preference as set in the user's account settings.
+
+    Returns:
+        DateTime: A datetime instance describing when to execute this schedule task converted to the UTC timezone.
+    """
+    # look up the requesting user's timezone from their account settings
+    preferred_timezone = get_user_preference(user, 'time_zone', username=user.username)
+    # use the user's preferred timezone (if available), otherwise use the browser timezone.
+    timezone = preferred_timezone if preferred_timezone else browser_timezone
+
+    # convert the schedule to UTC
+    log.info(f"Converting requested schedule from local time '{schedule}' with the timezone '{timezone}' to UTC")
+
+    local_tz = dateutil.tz.gettz(timezone)
+    if local_tz is None:
+        raise ValueError(
+            "Unable to determine the time zone to use to convert the schedule to UTC"
+        )
+    local_dt = dateutil.parser.parse(schedule).replace(tzinfo=local_tz)
+    schedule_utc = local_dt.astimezone(pytz.utc)
+
+    return schedule_utc
