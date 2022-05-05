@@ -2,13 +2,14 @@
 Toggles for course home experience.
 """
 
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from edx_toggles.toggles import LegacyWaffleFlagNamespace
 
-WAFFLE_FLAG_NAMESPACE = 'course_home'
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
-COURSE_HOME_MICROFRONTEND_PROGRESS_TAB = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    f'{WAFFLE_FLAG_NAMESPACE}.course_home_mfe_progress_tab', __name__
-)
+WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='course_home')
+
+COURSE_HOME_MICROFRONTEND_PROGRESS_TAB = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'course_home_mfe_progress_tab',  # lint-amnesty, pylint: disable=toggle-missing-annotation
+                                                          __name__)
 
 
 def course_home_mfe_progress_tab_is_active(course_key):

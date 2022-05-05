@@ -34,7 +34,7 @@ from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.grades.config.waffle import BULK_MANAGEMENT, WRITABLE_GRADEBOOK
+from lms.djangoapps.grades.config.waffle import BULK_MANAGEMENT, WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade import CourseGrade
@@ -270,7 +270,7 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
         assert resp.status_code == status.HTTP_200_OK
         assert resp.data['can_see_bulk_management'] is True
 
-    @override_waffle_flag(BULK_MANAGEMENT, active=True)
+    @override_waffle_flag(waffle_flags()[BULK_MANAGEMENT], active=True)
     def test_can_see_bulk_management_force_enabled(self):
         # Given a course without (or with) a master's track where bulk management is enabled with the config flag
         # When getting course grading view
@@ -290,7 +290,7 @@ class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.namespaced_url = 'grades_api:v1:course_gradebook'
-        cls.waffle_flag = WRITABLE_GRADEBOOK
+        cls.waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
 
         cls.course = CourseFactory.create(display_name='test-course', run='run-1')
         cls.course_key = cls.course.id

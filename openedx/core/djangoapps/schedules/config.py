@@ -3,12 +3,13 @@ Contains configuration for schedules app
 """
 
 from crum import get_current_request
-from edx_toggles.toggles import WaffleFlag, WaffleSwitch
+from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleFlagNamespace, LegacyWaffleSwitchNamespace, WaffleFlag
 
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from lms.djangoapps.experiments.models import ExperimentData
 
-WAFFLE_NAMESPACE = 'schedules'
+WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='schedules')
+WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name='schedules')
 
 # .. toggle_name: schedules.enable_debugging
 # .. toggle_implementation: WaffleFlag
@@ -16,10 +17,12 @@ WAFFLE_NAMESPACE = 'schedules'
 # .. toggle_description: Enable debug level of logging for schedules messages.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2017-09-17
-DEBUG_MESSAGE_WAFFLE_FLAG = WaffleFlag(f'{WAFFLE_NAMESPACE}.enable_debugging', __name__)
+DEBUG_MESSAGE_WAFFLE_FLAG = WaffleFlag('schedules.enable_debugging', __name__)
 
-COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    f'{WAFFLE_NAMESPACE}.course_update_show_unsubscribe', __name__
+COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH = LegacyWaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
+    WAFFLE_SWITCH_NAMESPACE,
+    'course_update_show_unsubscribe',
+    __name__
 )
 
 # This experiment waffle is supporting an A/B test we are running on sending course updates from an external service,
@@ -28,11 +31,9 @@ COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH = WaffleSwitch(  # lint-amnesty, py
 # methods below. We save this flag decision at enrollment time and don't change it even if the flag changes. So you
 # can't just directly look at flag result.
 _EXTERNAL_COURSE_UPDATES_EXPERIMENT_ID = 18
-_EXTERNAL_COURSE_UPDATES_FLAG = ExperimentWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    f'{WAFFLE_NAMESPACE}.external_updates', __name__,
-    experiment_id=_EXTERNAL_COURSE_UPDATES_EXPERIMENT_ID,
-    use_course_aware_bucketing=False
-)
+_EXTERNAL_COURSE_UPDATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'external_updates', __name__,  # lint-amnesty, pylint: disable=toggle-missing-annotation
+                                                     experiment_id=_EXTERNAL_COURSE_UPDATES_EXPERIMENT_ID,
+                                                     use_course_aware_bucketing=False)
 
 
 def set_up_external_updates_for_enrollment(user, course_key):

@@ -1,8 +1,7 @@
 """
 Togglable settings for Course Grading behavior
 """
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
-
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 WAFFLE_NAMESPACE = 'grades'
 
@@ -10,7 +9,9 @@ WAFFLE_NAMESPACE = 'grades'
 MATERIAL_RECOMPUTE_ONLY = 'MATERIAL_RECOMPUTE_ONLY'
 
 MATERIAL_RECOMPUTE_ONLY_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    f'{WAFFLE_NAMESPACE}.{MATERIAL_RECOMPUTE_ONLY}', __name__
+    waffle_namespace=WAFFLE_NAMESPACE,
+    flag_name=MATERIAL_RECOMPUTE_ONLY,
+    module_name=__name__,
 )
 
 

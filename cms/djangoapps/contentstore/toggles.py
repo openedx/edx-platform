@@ -1,7 +1,7 @@
 """
 CMS feature toggles.
 """
-from edx_toggles.toggles import SettingDictToggle, WaffleFlag
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace, SettingDictToggle, WaffleFlag
 
 # .. toggle_name: FEATURES['ENABLE_EXPORT_GIT']
 # .. toggle_implementation: SettingDictToggle
@@ -19,23 +19,23 @@ EXPORT_GIT = SettingDictToggle(
 )
 
 # Namespace for studio dashboard waffle flags.
-CONTENTSTORE_NAMESPACE = 'contentstore'
-CONTENTSTORE_LOG_PREFIX = 'Contentstore: '
+WAFFLE_NAMESPACE = 'contentstore'
+WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='Contentstore: ')
 
-# .. toggle_name: contentstore.split_library_on_studio_dashboard
+# .. toggle_name: split_library_on_studio_dashboard
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Enables data new view for library on studio dashboard.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-07-8
 # .. toggle_tickets: TNL-7536
-SPLIT_LIBRARY_ON_DASHBOARD = WaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.split_library_on_studio_dashboard',
-    __name__,
-    CONTENTSTORE_LOG_PREFIX,
+SPLIT_LIBRARY_ON_DASHBOARD = LegacyWaffleFlag(
+    waffle_namespace=LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE),
+    flag_name='split_library_on_studio_dashboard',
+    module_name=__name__
 )
 
-# .. toggle_name: contentstore.bypass_olx_failure
+# .. toggle_name: bypass_olx_failure
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Enables bypassing olx validation failures during course import.
@@ -43,10 +43,10 @@ SPLIT_LIBRARY_ON_DASHBOARD = WaffleFlag(
 # .. toggle_creation_date: 2021-04-15
 # .. toggle_target_removal_date: 2021-05-15
 # .. toggle_tickets: TNL-8214
-BYPASS_OLX_FAILURE = WaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.bypass_olx_failure',
-    __name__,
-    CONTENTSTORE_LOG_PREFIX,
+BYPASS_OLX_FAILURE = LegacyWaffleFlag(
+    waffle_namespace=LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE),
+    flag_name='bypass_olx_failure',
+    module_name=__name__
 )
 
 
