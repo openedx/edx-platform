@@ -2,15 +2,15 @@
 Public views
 """
 
+from urllib.parse import quote_plus
 
 from django.conf import settings
+from django.http.response import Http404
 from django.shortcuts import redirect
-from urllib.parse import quote_plus  # lint-amnesty, pylint: disable=wrong-import-order
-from waffle.decorators import waffle_switch
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 
-from ..config import waffle
+from ..config.waffle import ENABLE_ACCESSIBILITY_POLICY_PAGE
 
 __all__ = [
     'register_redirect_to_lms', 'login_redirect_to_lms', 'howitworks', 'accessibility',
@@ -69,12 +69,12 @@ def howitworks(request):
         return render_to_response('howitworks.html', {})
 
 
-@waffle_switch(f'{waffle.WAFFLE_NAMESPACE}.{waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE}')
 def accessibility(request):
     """
     Display the accessibility accommodation form.
     """
-
-    return render_to_response('accessibility.html', {
-        'language_code': request.LANGUAGE_CODE
-    })
+    if ENABLE_ACCESSIBILITY_POLICY_PAGE.is_enabled():
+        return render_to_response('accessibility.html', {
+            'language_code': request.LANGUAGE_CODE
+        })
+    raise Http404

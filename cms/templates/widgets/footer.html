@@ -6,7 +6,7 @@ from django.urls import reverse
 from datetime import datetime
 from django.conf import settings
 import pytz
-from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILITY_POLICY_PAGE
+from cms.djangoapps.contentstore.config.waffle import ENABLE_ACCESSIBILITY_POLICY_PAGE
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
@@ -30,7 +30,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
               </li>
             % endif
-            % if waffle().is_enabled(ENABLE_ACCESSIBILITY_POLICY_PAGE):
+            % if ENABLE_ACCESSIBILITY_POLICY_PAGE.is_enabled():
               <li class="nav-item nav-peripheral-aar">
                 <a href="${reverse('accessibility')}">${_("Accessibility Accommodation Request")}</a>
               </li>
@@ -62,4 +62,3 @@ from openedx.core.djangolib.markup import HTML, Text
     </div>
   </footer>
 </div>
-

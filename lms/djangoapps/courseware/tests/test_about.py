@@ -31,7 +31,6 @@ from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, course_home_url
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
-from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.track.tests import EventTrackingTestCase
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
@@ -397,13 +396,7 @@ class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
     )
     @ddt.unpack
     def test_html_sidebar_enabled(self, itemfactory_display_name, itemfactory_data, waffle_switch_value):
-        with override_switch(
-            '{}.{}'.format(
-                COURSE_EXPERIENCE_WAFFLE_NAMESPACE,
-                ENABLE_COURSE_ABOUT_SIDEBAR_HTML
-            ),
-            active=waffle_switch_value
-        ):
+        with override_switch(ENABLE_COURSE_ABOUT_SIDEBAR_HTML.name, active=waffle_switch_value):
             if itemfactory_display_name:
                 ItemFactory.create(
                     category="about",

@@ -1,7 +1,7 @@
 """
 Discussions feature toggles
 """
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
 
 WAFFLE_FLAG_NAMESPACE = "discussions"
 
@@ -12,7 +12,7 @@ WAFFLE_FLAG_NAMESPACE = "discussions"
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-11-05
 # .. toggle_target_removal_date: 2022-03-05
-ENABLE_DISCUSSIONS_MFE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_discussions_mfe', __name__)
+ENABLE_DISCUSSIONS_MFE = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.enable_discussions_mfe', __name__)
 
 # .. toggle_name: discussions.enable_discussions_mfe_for_everyone
 # .. toggle_implementation: CourseWaffleFlag
@@ -22,7 +22,7 @@ ENABLE_DISCUSSIONS_MFE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_discuss
 # .. toggle_creation_date: 2021-04-21
 # .. toggle_target_removal_date: 2022-03-05
 ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'enable_discussions_mfe_for_everyone', __name__
+    f'{WAFFLE_FLAG_NAMESPACE}.enable_discussions_mfe_for_everyone', __name__
 )
 
 # .. toggle_name: discussions.enable_new_structure_discussions
@@ -32,7 +32,9 @@ ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE = CourseWaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2022-02-22
 # .. toggle_target_removal_date: 2022-09-22
-ENABLE_NEW_STRUCTURE_DISCUSSIONS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_new_structure_discussions', __name__)
+ENABLE_NEW_STRUCTURE_DISCUSSIONS = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.enable_new_structure_discussions', __name__
+)
 
 # .. toggle_name: discussions.enable_learners_tab_in_discussions_mfe
 # .. toggle_implementation: CourseWaffleFlag
@@ -42,7 +44,9 @@ ENABLE_NEW_STRUCTURE_DISCUSSIONS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enab
 # .. toggle_creation_date: 2022-02-21
 # .. toggle_target_removal_date: 2022-05-21
 # lint-amnesty, pylint: disable=line-too-long
-ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_learners_tab_in_discussions_mfe', __name__)
+ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.enable_learners_tab_in_discussions_mfe', __name__
+)
 
 # .. toggle_name: discussions.enable_moderation_reason_codes
 # .. toggle_implementation: CourseWaffleFlag
@@ -52,9 +56,7 @@ ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE,
 # .. toggle_creation_date: 2022-02-22
 # .. toggle_target_removal_date: 2022-09-22
 ENABLE_DISCUSSION_MODERATION_REASON_CODES = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE,
-    'enable_moderation_reason_codes',
-    __name__,
+    f'{WAFFLE_FLAG_NAMESPACE}.enable_moderation_reason_codes', __name__
 )
 
 # .. toggle_name: discussions.enable_reported_content_email_notifications
@@ -65,7 +67,5 @@ ENABLE_DISCUSSION_MODERATION_REASON_CODES = CourseWaffleFlag(
 # .. toggle_creation_date: 2022-03-08
 # .. toggle_target_removal_date: 2022-12-31
 ENABLE_REPORTED_CONTENT_EMAIL_NOTIFICATIONS = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE,
-    'enable_reported_content_email_notifications',
-    __name__,
+    f'{WAFFLE_FLAG_NAMESPACE}.enable_reported_content_email_notifications', __name__
 )
