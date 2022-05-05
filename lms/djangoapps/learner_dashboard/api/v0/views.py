@@ -221,7 +221,7 @@ class ProgramProgressDetailView(APIView):
                     "program_listing_url": "/dashboard/programs/",
                     "track_selection_url": "/course_modes/choose/",
                     "commerce_api_url": "/api/commerce/v0/baskets/",
-                    "buy_button_url": "http://ecommerce.com/basket/add/?",
+                    "buy_button_url": "http://localhost:1998/?",
                     "program_record_url": "https://credentials.example.com/records/programs/121234235525242344"
                 },
                 "program_data": {

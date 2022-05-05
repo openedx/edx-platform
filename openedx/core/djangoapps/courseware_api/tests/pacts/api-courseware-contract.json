@@ -66,7 +66,7 @@
             "currency_symbol": "$",
             "price": 149,
             "sku": "8CF08E5",
-            "upgrade_url": "http://localhost:18130/basket/add/?sku=8CF08E5"
+            "upgrade_url": "http://localhost:1998/?sku=8CF08E5"
           },
           "show_calculator": false,
           "original_user_is_staff": true,

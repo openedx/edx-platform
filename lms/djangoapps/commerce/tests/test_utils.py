@@ -30,10 +30,9 @@ if settings.ROOT_URLCONF == 'lms.urls':
     from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 
 
-def update_commerce_config(enabled=False, checkout_page='/test_basket/add/'):
+def update_commerce_config(checkout_page='/test_basket/add/'):
     """ Enable / Disable CommerceConfiguration model """
     CommerceConfiguration.objects.create(
-        checkout_on_ecommerce_service=enabled,
         basket_checkout_page=checkout_page,
     )
 
@@ -60,7 +59,7 @@ class EcommerceServiceTests(TestCase):
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
-        update_commerce_config(enabled=True)
+        update_commerce_config()
         super().setUp()
 
     def test_is_enabled(self):

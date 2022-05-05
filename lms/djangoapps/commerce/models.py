@@ -24,14 +24,9 @@ class CommerceConfiguration(ConfigurationModel):
     DEFAULT_RECEIPT_PAGE_URL = '/checkout/receipt/?order_number='
     DEFAULT_ORDER_DASHBOARD_URL = '/dashboard/orders/'
 
-    checkout_on_ecommerce_service = models.BooleanField(
-        default=False,
-        help_text=_('Use the checkout page hosted by the E-Commerce service.')
-    )
-
     basket_checkout_page = models.CharField(
         max_length=255,
-        default='/basket/add/',
+        default='http://localhost:1998',
         help_text=_('Path to course(s) checkout page hosted by the E-Commerce service.')
     )
     cache_ttl = models.PositiveIntegerField(

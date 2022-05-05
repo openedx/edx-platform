@@ -137,8 +137,7 @@ class Command(BaseCommand):
         Enable the commerce configuration.
         """
         CommerceConfiguration.objects.get_or_create(
-            enabled=True,
-            checkout_on_ecommerce_service=True
+            enabled=True
         )
 
     def _update_default_clients(self):

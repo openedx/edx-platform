@@ -93,15 +93,15 @@ class EcommerceService:
         """
         user_is_active = user.is_active or is_account_activation_requirement_disabled()
         allow_user = user_is_active or user.is_anonymous
-        return allow_user and self.config.checkout_on_ecommerce_service
+        return allow_user
 
     def payment_page_url(self):
         """ Return the URL for the checkout page.
 
         Example:
-            http://localhost:8002/basket/add/
+            http://localhost:1998
         """
-        return self.get_absolute_ecommerce_url(self.config.basket_checkout_page)
+        return self.config.basket_checkout_page
 
     def get_checkout_page_url(self, *skus, **kwargs):
         """ Construct the URL to the ecommerce checkout page and include products.
@@ -114,8 +114,8 @@ class EcommerceService:
             Absolute path to the ecommerce checkout page showing basket that contains specified products.
 
         Example:
-            http://localhost:8002/basket/add/?sku=5H3HG5&sku=57FHHD
-            http://localhost:8002/basket/add/?sku=5H3HG5&sku=57FHHD&bundle=3bdf1dd1-49be-4a15-9145-38901f578c5a
+            http://localhost:1998/?sku=5H3HG5&sku=57FHHD
+            http://localhost:1998/?sku=5H3HG5&sku=57FHHD&bundle=3bdf1dd1-49be-4a15-9145-38901f578c5a
         """
         program_uuid = kwargs.get('program_uuid')
         enterprise_catalog_uuid = kwargs.get('catalog')
@@ -124,7 +124,7 @@ class EcommerceService:
             query_params.update({'catalog': enterprise_catalog_uuid})
 
         url = '{checkout_page_path}?{query_params}'.format(
-            checkout_page_path=self.get_absolute_ecommerce_url(self.config.basket_checkout_page),
+            checkout_page_path=self.payment_page_url(),
             query_params=urlencode(query_params, doseq=True),
         )
         if program_uuid:

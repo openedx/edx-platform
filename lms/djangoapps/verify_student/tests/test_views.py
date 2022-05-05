@@ -181,23 +181,22 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
     @httpretty.activate
     @override_settings(
         ECOMMERCE_API_URL=TEST_API_URL,
-        ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT
     )
     def test_start_flow_with_ecommerce(self):
         """Verify user gets redirected to ecommerce checkout when ecommerce checkout is enabled."""
         sku = 'TESTSKU'
         # When passing a SKU ecommerce api gets called.
         _mock_payment_processors()
-        configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
-        checkout_page = configuration.basket_checkout_page
+        checkout_page = 'http://localhost:1998'
+        CommerceConfiguration.objects.create(basket_checkout_page=checkout_page)
         checkout_page += "?utm_source=test"
-        httpretty.register_uri(httpretty.GET, f"{TEST_PUBLIC_URL_ROOT}{checkout_page}")
+        httpretty.register_uri(httpretty.GET, f"{checkout_page}")
 
         course = self._create_course('verified', sku=sku)
         self._enroll(course.id)
 
         # Verify that utm params are included in the url used for redirect
-        url_with_utm = 'http://www.example.com/basket/add/?utm_source=test&sku=TESTSKU'
+        url_with_utm = 'http://localhost:1998/?utm_source=test&sku=TESTSKU'
         with mock.patch.object(EcommerceService, 'get_checkout_page_url', return_value=url_with_utm):
             response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
         expected_page = f'{TEST_PUBLIC_URL_ROOT}{checkout_page}&sku={sku}'

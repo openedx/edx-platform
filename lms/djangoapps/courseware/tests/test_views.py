@@ -660,7 +660,7 @@ class ViewsTestCase(BaseViewsTestCase):
             _id(bool): Tell the method to either expect an id in the href or not.
         """
         sku = 'TEST123'
-        configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
+        configuration = CommerceConfiguration.objects.create()
         course = CourseFactory.create()
         CourseModeFactory(mode_slug=CourseMode.PROFESSIONAL, course_id=course.id, sku=sku, min_price=1)
 

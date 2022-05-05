@@ -26,8 +26,7 @@ class TestCommerceConfigurationCommand(TestCase):
         commerce_configuration = CommerceConfiguration.current()
 
         assert commerce_configuration.enabled
-        assert commerce_configuration.checkout_on_ecommerce_service
-        assert commerce_configuration.basket_checkout_page == '/basket/add/'
+        assert commerce_configuration.basket_checkout_page == 'http://localhost:1998'
         assert commerce_configuration.cache_ttl == 0
 
         # Verify commerce configuration can be disabled from command
@@ -38,15 +37,6 @@ class TestCommerceConfigurationCommand(TestCase):
 
         commerce_configuration = CommerceConfiguration.current()
         assert not commerce_configuration.enabled
-
-        # Verify commerce configuration can be disabled from command
-        call_command(
-            "configure_commerce",
-            '--disable-checkout-on-ecommerce',
-        )
-
-        commerce_configuration = CommerceConfiguration.current()
-        assert not commerce_configuration.checkout_on_ecommerce_service
 
     def test_site_associated_commerce_configuration(self):
         """
