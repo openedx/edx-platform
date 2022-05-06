@@ -161,6 +161,7 @@ class IsStaffOrCourseTeamOrEnrolled(permissions.BasePermission):
             has_discussion_privileges(request.user, course_key)
         )
 
+
 class IsStaffOrAdmin(permissions.BasePermission):
     """
     Permission that checks if the user is staff or an admin.
@@ -171,10 +172,10 @@ class IsStaffOrAdmin(permissions.BasePermission):
         course_key = CourseKey.from_string(view.kwargs.get('course_id'))
         user_roles = get_user_role_names(request.user, course_key)
         is_user_staff = bool(user_roles & {
-                FORUM_ROLE_ADMINISTRATOR,
-                FORUM_ROLE_MODERATOR,
-                FORUM_ROLE_COMMUNITY_TA,
-            })
+            FORUM_ROLE_ADMINISTRATOR,
+            FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_COMMUNITY_TA,
+        })
         return (
             GlobalStaff().has_user(request.user) or
             request.user.is_staff or
