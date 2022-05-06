@@ -91,10 +91,10 @@ from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils.cache import RequestCache
+from edx_django_utils.logging import encrypt_for_log
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import SettingToggle
 
-from common.djangoapps.util.log_sensitive import encrypt_for_log
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
