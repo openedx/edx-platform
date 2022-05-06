@@ -16,7 +16,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.plugins import get_plugins_view_context
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from edx_toggles.toggles import WaffleFlag
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
@@ -61,7 +61,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 
 log = logging.getLogger("edx.student")
 
-experiments_namespace = LegacyWaffleFlagNamespace(name='student.experiments')
+EXPERIMENTS_NAMESPACE = 'student.experiments'
 
 
 def get_org_black_and_whitelist_for_site():
@@ -652,7 +652,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     inverted_programs = meter.invert_programs()
 
     urls, programs_data = {}, {}
-    bundles_on_dashboard_flag = LegacyWaffleFlag(experiments_namespace, 'bundles_on_dashboard', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
+    bundles_on_dashboard_flag = WaffleFlag(f'{EXPERIMENTS_NAMESPACE}.bundles_on_dashboard', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
     # TODO: Delete this code and the relevant HTML code after testing LEARNER-3072 is complete
     if bundles_on_dashboard_flag.is_enabled() and inverted_programs and list(inverted_programs.items()):

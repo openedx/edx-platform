@@ -26,7 +26,7 @@ from common.djangoapps.track.event_transaction_utils import create_new_event_tra
 from common.djangoapps.util.date_utils import to_timestamp
 from lms.djangoapps.grades import tasks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
-from lms.djangoapps.grades.config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
+from lms.djangoapps.grades.config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
@@ -490,7 +490,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
         super().setUp()
         self.users = [UserFactory.create() for _ in range(12)]
         self.user = self.users[0]
-        self.freeze_grade_flag = waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END]
+        self.freeze_grade_flag = ENFORCE_FREEZE_GRADE_AFTER_COURSE_END
 
     def _assert_log(self, mock_log, method_name):
         assert mock_log.info.called

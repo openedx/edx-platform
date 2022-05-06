@@ -3,12 +3,10 @@ This module contains various configuration settings via
 waffle switches for the discussions app.
 """
 
-from edx_toggles.toggles import LegacyWaffleFlagNamespace
-
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
 
 
-WAFFLE_NAMESPACE = LegacyWaffleFlagNamespace(name='discussions')
+WAFFLE_NAMESPACE = 'discussions'
 
 # .. toggle_name: discussions.override_discussion_legacy_settings
 # .. toggle_implementation: CourseWaffleFlag
@@ -20,9 +18,7 @@ WAFFLE_NAMESPACE = LegacyWaffleFlagNamespace(name='discussions')
 # .. toggle_warnings: When the flag is ON, the discussion settings will be available on legacy experience.
 # .. toggle_tickets: TNL-8389
 OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG = CourseWaffleFlag(
-    waffle_namespace=WAFFLE_NAMESPACE,
-    flag_name='override_discussion_legacy_settings',
-    module_name=__name__,
+    f'{WAFFLE_NAMESPACE}.override_discussion_legacy_settings', __name__
 )
 
 
@@ -36,7 +32,5 @@ OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG = CourseWaffleFlag(
 # .. toggle_warnings: When the flag is ON, the new experience for Pages and Resources will be enabled.
 # .. toggle_tickets: TNL-7791
 ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND = CourseWaffleFlag(
-    waffle_namespace=WAFFLE_NAMESPACE,
-    flag_name='pages_and_resources_mfe',
-    module_name=__name__,
+    f'{WAFFLE_NAMESPACE}.pages_and_resources_mfe', __name__
 )

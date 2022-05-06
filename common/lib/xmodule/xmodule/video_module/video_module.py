@@ -31,7 +31,7 @@ from xblock.runtime import KvsFieldData
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
-from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
+from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
@@ -198,7 +198,7 @@ class VideoBlock(
 
         # check if youtube has been deprecated and hls as primary playback
         # is enabled for this course
-        return waffle_flags()[DEPRECATE_YOUTUBE].is_enabled(self.location.course_key)
+        return DEPRECATE_YOUTUBE.is_enabled(self.location.course_key)
 
     def youtube_disabled_for_course(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if not self.location.context_key.is_course:

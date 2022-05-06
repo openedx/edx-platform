@@ -36,7 +36,7 @@ from waffle.testutils import override_flag
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from lms.djangoapps.courseware.tests.helpers import get_context_dict_from_string
-from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
+from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
@@ -1177,9 +1177,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         video_xml = '<video display_name="Video" edx_video_id="12345-67890" youtube_id_1_0="{}">[]</video>'.format(
             data['youtube']
         )
-        DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
-            with override_flag(DEPRECATE_YOUTUBE_FLAG.name, active=data['waffle_enabled']):
+            with override_flag(DEPRECATE_YOUTUBE.name, active=data['waffle_enabled']):
                 self.initialize_block(data=video_xml, metadata=metadata)
                 context = self.item_descriptor.render(STUDENT_VIEW).content
                 assert '"prioritizeHls": {}'.format(data['result']) in context

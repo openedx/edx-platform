@@ -1055,9 +1055,7 @@ class MiscCourseTests(ContentStoreTestCase):
             resp = self.client.get_html('/c4x/InvalidOrg/InvalidCourse/asset/invalid.png')
             self.assertEqual(resp.status_code, 404)
 
-    @override_switch(
-        f'{waffle.WAFFLE_NAMESPACE}.{waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE}',
-        active=False)
+    @override_switch(waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE.name, active=False)
     def test_disabled_accessibility_page(self):
         """
         Test that accessibility page returns 404 when waffle switch is disabled
@@ -2191,9 +2189,7 @@ class EntryPageTestCase(TestCase):
         # Logout redirects.
         self._test_page("/logout", 200)
 
-    @override_switch(
-        f'{waffle.WAFFLE_NAMESPACE}.{waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE}',
-        active=True)
+    @override_switch(waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE.name, active=True)
     def test_accessibility(self):
         self._test_page('/accessibility')
 
