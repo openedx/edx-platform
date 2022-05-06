@@ -2282,6 +2282,12 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         """Log the client in as the staff."""
         self.client.login(username=self.user.username, password=self.password)
 
+    def _login_as_discussion_staff(self):
+        user = UserFactory(username='abc', password='abc')
+        role = Role.objects.create(name='Administrator', course_id=self.course.id)
+        role.users.set([user])
+        self.client.login(username=user.username, password='abc')
+
     def _create_divided_discussions(self):
         """Create some divided discussions for testing."""
         divided_inline_discussions = ['Topic A', ]
@@ -2372,6 +2378,46 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
             })
         )
         assert response.status_code == 404
+
+    def test_patch_request_by_discussion_staff(self):
+        """Test the response when patch request is sent by a user with discussions staff role."""
+        self._login_as_discussion_staff()
+        response = self.patch_request(
+            {'always_divide_inline_discussions': True}
+        )
+        assert response.status_code == 403
+
+    def test_get_request_by_discussion_staff(self):
+        """Test the response when get request is sent by a user with discussions staff role."""
+        self._login_as_discussion_staff()
+        divided_inline_discussions, divided_course_wide_discussions = self._create_divided_discussions()
+        response = self.client.get(self.path)
+        assert response.status_code == 200
+        expected_response = self._get_expected_response()
+        expected_response['divided_course_wide_discussions'] = [
+            topic_name_to_id(self.course, name) for name in divided_course_wide_discussions
+        ]
+        expected_response['divided_inline_discussions'] = [
+            topic_name_to_id(self.course, name) for name in divided_inline_discussions
+        ]
+        content = json.loads(response.content.decode('utf-8'))
+        assert content == expected_response
+
+    def test_get_request_by_non_staff_user(self):
+        """Test the response when get request is sent by a regular user with no staff role."""
+        user = UserFactory(username='abc', password='abc')
+        self.client.login(username=user.username, password='abc')
+        response = self.client.get(self.path)
+        assert response.status_code == 403
+
+    def test_patch_request_by_non_staff_user(self):
+        """Test the response when patch request is sent by a regular user with no staff role."""
+        user = UserFactory(username='abc', password='abc')
+        self.client.login(username=user.username, password='abc')
+        response = self.patch_request(
+            {'always_divide_inline_discussions': True}
+        )
+        assert response.status_code == 403
 
     def test_get_settings(self):
         """Test the current discussion settings against the expected response."""

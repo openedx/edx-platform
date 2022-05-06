@@ -63,7 +63,7 @@ from ..rest_api.forms import (
     UserCommentListGetForm,
     UserOrdering,
 )
-from ..rest_api.permissions import IsStaffOrCourseTeamOrEnrolled
+from ..rest_api.permissions import IsStaffOrAdmin, IsStaffOrCourseTeamOrEnrolled
 from ..rest_api.serializers import (
     CourseMetadataSerailizer,
     DiscussionRolesListSerializer,
@@ -1096,7 +1096,7 @@ class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
         SessionAuthenticationAllowInactiveUser,
     )
     parser_classes = (JSONParser, MergePatchParser,)
-    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+    permission_classes = (permissions.IsAuthenticated, IsStaffOrAdmin)
 
     def _get_request_kwargs(self, course_id):
         return dict(course_id=course_id)

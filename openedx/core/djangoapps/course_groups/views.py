@@ -27,6 +27,7 @@ from rest_framework.serializers import Serializer
 from lms.djangoapps.courseware.courses import get_course, get_course_with_access
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.course_groups.models import CohortMembership
+from openedx.core.djangoapps.course_groups.permissions import IsStaffOrAdmin
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from common.djangoapps.student.auth import has_course_author_access
@@ -431,7 +432,7 @@ class APIPermissions(GenericAPIView):
         BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+    permission_classes = (permissions.IsAuthenticated, IsStaffOrAdmin)
     serializer_class = Serializer
 
 
@@ -505,7 +506,7 @@ class CohortHandler(DeveloperErrorViewMixin, APIPermissions):
         """
         Endpoint to get either one or all cohorts.
         """
-        course_key, course = _get_course_with_access(request, course_key_string)
+        course_key, course = _get_course_with_access(request, course_key_string, 'load')
         if not cohort_id:
             all_cohorts = cohorts.get_course_cohorts(course)
             paginator = NamespacedPageNumberPagination()
