@@ -79,7 +79,6 @@ attrs==21.4.0
     #   blockstore
     #   edx-ace
     #   openedx-events
-    #   outcome
     #   pytest
 babel==2.10.1
     # via
@@ -170,6 +169,7 @@ click==8.1.2
     #   click-plugins
     #   click-repl
     #   code-annotations
+    #   edx-django-utils
     #   edx-lint
     #   nltk
     #   pact-python
@@ -541,7 +541,7 @@ edx-django-release-util==1.2.0
     #   blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.txt
-edx-django-utils==4.6.0
+edx-django-utils==4.7.0
     # via
     #   -r requirements/edx/base.txt
     #   blockstore
@@ -1062,7 +1062,9 @@ pymongo==3.10.1
     #   mongodbproxy
     #   mongoengine
 pynacl==1.5.0
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-django-utils
 pynliner==0.8.0
     # via -r requirements/edx/base.txt
 pyparsing==3.0.8
