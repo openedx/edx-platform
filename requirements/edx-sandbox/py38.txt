@@ -10,11 +10,11 @@ cffi==1.15.0
     # via cryptography
 chem==1.2.0
     # via -r requirements/edx-sandbox/py38.in
-click==8.1.2
+click==8.1.3
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   nltk
-cryptography==36.0.2
+cryptography==37.0.1
     # via -r requirements/edx-sandbox/py38.in
 cycler==0.11.0
     # via matplotlib

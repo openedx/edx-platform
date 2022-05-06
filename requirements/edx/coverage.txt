@@ -10,7 +10,7 @@ coverage==6.3.2
     # via -r requirements/edx/coverage.in
 diff-cover==6.5.0
     # via -r requirements/edx/coverage.in
-jinja2==3.1.1
+jinja2==3.1.2
     # via diff-cover
 markupsafe==2.1.1
     # via jinja2
