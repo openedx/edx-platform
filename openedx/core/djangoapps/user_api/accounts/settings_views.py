@@ -16,9 +16,12 @@ from django_countries import countries
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
-from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import all_languages, released_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -28,13 +31,10 @@ from openedx.core.djangoapps.user_api.accounts.toggles import (
     should_redirect_to_order_history_microfrontend
 )
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
-from openedx.core.lib.edx_api_utils import get_edx_api_data
+from openedx.core.lib.edx_api_utils import get_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import update_account_settings_context_for_enterprise
-from common.djangoapps.student.models import UserProfile
-from common.djangoapps.third_party_auth import pipeline
-from common.djangoapps.util.date_utils import strftime_localized
 
 log = logging.getLogger(__name__)
 
@@ -195,9 +195,13 @@ def get_user_orders(user):
 
     use_cache = commerce_configuration.is_cache_enabled
     cache_key = commerce_configuration.CACHE_KEY + '.' + str(user.id) if use_cache else None
-    api = ecommerce_api_client(user)
-    commerce_user_orders = get_edx_api_data(
-        commerce_configuration, 'orders', api=api, querystring=user_query, cache_key=cache_key
+    commerce_user_orders = get_api_data(
+        commerce_configuration,
+        'orders',
+        api_client=get_ecommerce_api_client(user),
+        base_api_url=get_ecommerce_api_base_url(),
+        querystring=user_query,
+        cache_key=cache_key
     )
 
     for order in commerce_user_orders:

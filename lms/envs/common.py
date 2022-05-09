@@ -4507,7 +4507,7 @@ ENTERPRISE_INTEGRATIONS_EMAIL = "enterprise-integrations@edx.org"
 INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = {}
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
-# The LMS communicates with the Enterprise service via the EdxRestApiClient class
+# The LMS communicates with the Enterprise service via the requests.Session() client
 # These default settings are utilized by the LMS when interacting with the service,
 # and are overridden by the configuration parameter accessors defined in production.py
 

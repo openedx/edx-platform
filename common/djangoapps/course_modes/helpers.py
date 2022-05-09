@@ -2,15 +2,14 @@
 
 
 import logging
+from urllib.parse import urljoin
+
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from urllib.parse import urljoin  # lint-amnesty, pylint: disable=wrong-import-order
-
-from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
-from slumber.exceptions import SlumberBaseException
+from requests.exceptions import RequestException
 
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 
 DISPLAY_VERIFIED = "verified"
 DISPLAY_HONOR = "honor"
@@ -89,11 +88,17 @@ def get_course_final_price(user, sku, course_price):
     """
     price_details = {}
     try:
-        price_details = ecommerce_api_client(user).baskets.calculate.get(
-            sku=[sku],
-            username=user.username,
+        api_url = urljoin(f"{get_ecommerce_api_base_url()}/", "baskets/calculate/")
+        response = get_ecommerce_api_client(user).get(
+            api_url,
+            params={
+                "sku": [sku],
+                "username": user.username,
+            }
         )
-    except (SlumberBaseException, ConnectionError, Timeout) as exc:
+        response.raise_for_status()
+        price_details = response.json()
+    except RequestException as exc:
         LOGGER.info(
             '[e-commerce calculate endpoint] Exception raise for sku [%s] - user [%s] and exception: %s',
             sku,

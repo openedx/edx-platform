@@ -881,7 +881,7 @@ INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = ENV_TOKENS.get(
 )
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
-# The LMS communicates with the Enterprise service via the EdxRestApiClient class
+# The LMS communicates with the Enterprise service via the requests.Session() client
 # The below environmental settings are utilized by the LMS when interacting with
 # the service, and override the default parameters which are defined in common.py
 
