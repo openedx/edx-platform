@@ -61,6 +61,24 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         slug_list = [idp.provider_id for idp in enterprise_customer_idps]
         return [config for config in SAMLProviderConfig.objects.current_set() if config.provider_id in slug_list]
 
+    def destroy(self, request, *args, **kwargs):
+        saml_provider_config = self.get_object()
+        config_id = saml_provider_config.id
+        provider_config_provider_id = saml_provider_config.provider_id
+        customer_uuid = self.requested_enterprise_uuid
+        try:
+            enterprise_customer = EnterpriseCustomer.objects.get(pk=customer_uuid)
+        except EnterpriseCustomer.DoesNotExist:
+            raise ValidationError(f'Enterprise customer not found at uuid: {customer_uuid}')  # lint-amnesty, pylint: disable=raise-missing-from
+
+        enterprise_saml_provider = EnterpriseCustomerIdentityProvider.objects.filter(
+            enterprise_customer=enterprise_customer,
+            provider_id=provider_config_provider_id,
+        )
+        enterprise_saml_provider.delete()
+        saml_provider_config.delete()
+        return Response(data=config_id, status=status.HTTP_200_OK)
+
     @property
     def requested_enterprise_uuid(self):
         """
