@@ -1024,3 +1024,8 @@ if settings.ENABLE_SAVE_FOR_LATER:
 urlpatterns += [
     path('api/ora_staff_grader/', include('lms.djangoapps.ora_staff_grader.urls', 'ora-staff-grader')),
 ]
+
+# Scheduled Bulk Email (Instructor Task) URLs
+urlpatterns += [
+    path('api/instructor_task/', include('lms.djangoapps.instructor_task.rest_api.urls')),
+]

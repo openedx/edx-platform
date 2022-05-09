@@ -203,7 +203,7 @@ class InstructorTaskSchedule(TimeStampedModel):
     class Meta:
         app_label = "instructor_task"
 
-    task = models.OneToOneField(InstructorTask, on_delete=models.CASCADE)
+    task = models.OneToOneField(InstructorTask, on_delete=models.DO_NOTHING)
     task_args = models.TextField(null=False, blank=False)
     task_due = models.DateTimeField(null=False)
 
