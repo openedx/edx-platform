@@ -45,7 +45,8 @@ def _get_event_properties(data):
         'name': data.get('braze_event'),
     }
 
-    if data.get('type') == 'course':
+    event_type = data.get('type')
+    if event_type == 'course':
         course = data.get('course')
         price = _get_course_price(course)
         event_properties.update({
@@ -64,12 +65,12 @@ def _get_event_properties(data):
                 'min_effort': data.get('min_effort'),
                 'max_effort': data.get('max_effort'),
                 'pacing_type': 'Self-paced' if course.self_paced else 'Instructor-led',
-                'type': 'course',
+                'type': event_type,
                 'price': 'Free' if price == 0 else f'${price} USD',
             }
         })
 
-    if data.get('type') == 'program':
+    if event_type == 'program':
         program = data.get('program')
         price = int(program.get('price_ranges')[0].get('total'))
         event_properties.update({
@@ -88,7 +89,7 @@ def _get_event_properties(data):
                 'pacing_type': _get_program_pacing(program.get('courses')[0].get('course_runs')),
                 'price': f'${price} USD',
                 'registered': bool(program.get('type') in ['MicroMasters', 'MicroBachelors']),
-                'type': 'program',
+                'type': event_type,
             }
         })
     return event_properties
@@ -124,16 +125,17 @@ def send_email(email, data):
 
         braze_client.track_user(events=[event_properties], attributes=attributes)
 
+        event_type = data.get('type')
         event_data = {
             'user_id': data.get('user_id'),
             'category': 'save-for-later',
-            'type': event_properties.get('type'),
+            'type': event_type,
             'send_to_self': data.get('send_to_self'),
         }
-        if data.get('type') == 'program':
+        if event_type == 'program':
             program = data.get('program')
             event_data.update({'program_uuid': program.get('uuid')})
-        elif data.get('type') == 'course':
+        elif event_type == 'course':
             course = data.get('course')
             event_data.update({'course_key': str(course.id)})
 
