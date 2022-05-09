@@ -82,6 +82,9 @@ class LtiSerializer(serializers.ModelSerializer):
         return instance
 
     def pii_sharing_allowed(self):
+        """
+        Check if email and username sharing is required and allowed
+        """
         pii_sharing_allowed = self.context.get('pii_sharing_allowed', False)
         provider = AVAILABLE_PROVIDERS.get(self.context.get('provider_type', None))
 
