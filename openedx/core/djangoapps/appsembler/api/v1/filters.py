@@ -71,12 +71,12 @@ class CourseEnrollmentFilter(django_filters.FilterSet):
 
 
 class UserIndexFilter(django_filters.FilterSet):
-    '''Provides filtering for the User model objects in the UserIndexViewSet.
-
-    '''
+    """Provides filtering for the User model objects in the UserIndexViewSet.
+    """
 
     email_exact = django_filters.CharFilter(field_name='email', lookup_expr='iexact')
+    date_joined = django_filters.DateFilter(field_name='date_joined__date')
 
     class Meta:
         model = get_user_model()
-        fields = ['email_exact']
+        fields = ['email_exact', 'date_joined', ]
