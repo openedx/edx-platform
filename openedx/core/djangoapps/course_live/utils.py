@@ -8,7 +8,7 @@ def provider_requires_pii_sharing(provider_type):
     """
     Check if provider requires any PII ie username or email
     """
-    provider =AVAILABLE_PROVIDERS.get(provider_type, None)
+    provider = AVAILABLE_PROVIDERS.get(provider_type, None)
     if provider:
         return provider['pii_sharing']['email'] or provider['pii_sharing']['username']
     return False

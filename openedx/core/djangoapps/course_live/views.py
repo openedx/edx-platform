@@ -115,7 +115,7 @@ class CourseLiveConfigurationView(APIView):
         Handle HTTP/POST requests
         """
         pii_sharing_allowed = get_lti_pii_sharing_state_for_course(course_id)
-        if not pii_sharing_allowed and provider_requires_pii_sharing(request.data.get('provider_type','')):
+        if not pii_sharing_allowed and provider_requires_pii_sharing(request.data.get('provider_type', '')):
             return Response({
                 "pii_sharing_allowed": pii_sharing_allowed,
                 "message": "PII sharing is not allowed on this course"
