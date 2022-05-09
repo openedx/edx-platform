@@ -158,7 +158,7 @@ class ProgramLTI(ABC):
     """
       Encapsulates methods for program LTI iframe rendering.
     """
-    DEFAULT_ROLE = 'Student'
+    DEFAULT_ROLE = 'Student,Learner'
     ADMIN_ROLE = 'Administrator'
 
     def __init__(self, program_uuid, request):
