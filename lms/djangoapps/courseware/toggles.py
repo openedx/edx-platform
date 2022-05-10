@@ -4,7 +4,7 @@ Toggles for courseware in-course experience.
 
 from edx_toggles.toggles import SettingToggle, WaffleSwitch
 
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = 'courseware'

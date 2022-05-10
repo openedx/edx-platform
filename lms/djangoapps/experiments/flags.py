@@ -12,7 +12,7 @@ from edx_django_utils.cache import RequestCache
 
 from common.djangoapps.track import segment
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 log = logging.getLogger(__name__)
 

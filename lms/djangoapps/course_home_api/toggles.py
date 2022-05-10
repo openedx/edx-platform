@@ -2,7 +2,7 @@
 Toggles for course home experience.
 """
 
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 WAFFLE_FLAG_NAMESPACE = 'course_home'
 

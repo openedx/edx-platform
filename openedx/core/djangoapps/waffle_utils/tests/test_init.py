@@ -12,8 +12,8 @@ from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from waffle.testutils import override_flag
 
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag as LegacyCourseWaffleFlag
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel, WaffleFlagOrgOverrideModel
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
@@ -83,20 +83,18 @@ class TestCourseWaffleFlag(CacheIsolationTestCase):
         (False, WaffleFlagCourseOverrideModel.ALL_CHOICES.unset, False),
     )
     @ddt.unpack
-    def test_legacy_course_waffle_flag(self, waffle_enabled, course_override, result):
+    def test_future_course_waffle_flag(self, waffle_enabled, course_override, result):
         """
-        Tests various combinations of a legacy flag being set in waffle and overridden for a course.
+        Tests various combinations of a __future__ flag being set in waffle and overridden for a course.
         """
-        test_legacy_course_flag = LegacyCourseWaffleFlag(
-            self.NAMESPACE_NAME,
-            self.FLAG_NAME,
-            __name__,
+        test_future_course_flag = FutureCourseWaffleFlag(
+            self.NAMESPACED_FLAG_NAME, __name__
         )
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=course_override):
             with override_flag(self.NAMESPACED_FLAG_NAME, active=waffle_enabled):
                 # check twice to test that the result is properly cached
-                assert test_legacy_course_flag.is_enabled(self.TEST_COURSE_KEY) == result
-                assert test_legacy_course_flag.is_enabled(self.TEST_COURSE_KEY) == result
+                assert test_future_course_flag.is_enabled(self.TEST_COURSE_KEY) == result
+                assert test_future_course_flag.is_enabled(self.TEST_COURSE_KEY) == result
                 # result is cached, so override check should happen only once
                 # pylint: disable=no-member
                 WaffleFlagCourseOverrideModel.override_value.assert_called_once_with(
@@ -108,11 +106,11 @@ class TestCourseWaffleFlag(CacheIsolationTestCase):
         if course_override == WaffleFlagCourseOverrideModel.ALL_CHOICES.unset:
             # When course override wasn't set for the first course, the second course will get the same
             # cached value from waffle.
-            assert test_legacy_course_flag.is_enabled(self.TEST_COURSE_2_KEY) == waffle_enabled
+            assert test_future_course_flag.is_enabled(self.TEST_COURSE_2_KEY) == waffle_enabled
         else:
             # When course override was set for the first course, it should not apply to the second
             # course which should get the default value of False.
-            assert test_legacy_course_flag.is_enabled(self.TEST_COURSE_2_KEY) is False
+            assert test_future_course_flag.is_enabled(self.TEST_COURSE_2_KEY) is False
 
     @ddt.data(
         (False, WaffleFlagOrgOverrideModel.ALL_CHOICES.unset, False),

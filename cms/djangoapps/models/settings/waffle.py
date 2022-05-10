@@ -1,7 +1,7 @@
 """
 Togglable settings for Course Grading behavior
 """
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 
 WAFFLE_NAMESPACE = 'grades'

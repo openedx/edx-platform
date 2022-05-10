@@ -5,7 +5,7 @@ for the Video Pipeline app.
 
 from edx_toggles.toggles import WaffleFlag
 
-from openedx.core.djangoapps.waffle_utils.__future__ import FutureCourseWaffleFlag as CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Videos Namespace
 WAFFLE_NAMESPACE = 'videos'
