@@ -270,7 +270,7 @@ class DataTest(AuthorizedApiTest):
         assert data['lti_configuration'] == DEFAULT_LTI_CONFIGURATION
         assert data['plugin_configuration'] == DEFAULT_LEGACY_CONFIGURATION
 
-    def _configure_lti_discussion_provider(self, provider=Provider.PIAZZA):
+    def _configure_lti_discussion_provider(self, provider=Provider.ED_DISCUSS):
         """
         Configure an LTI-based discussion provider for a course.
         """
@@ -319,7 +319,6 @@ class DataTest(AuthorizedApiTest):
     @ddt.data(
         Provider.ED_DISCUSS,
         Provider.INSCRIBE,
-        Provider.PIAZZA,
         Provider.YELLOWDIG,
     )
     def test_add_valid_configuration(self, provider_type):
@@ -347,7 +346,7 @@ class DataTest(AuthorizedApiTest):
         provider from edx provider to other provider.
         """
         payload = {
-            'provider_type': Provider.PIAZZA,
+            'provider_type': Provider.ED_DISCUSS,
             'plugin_configuration': {
                 'allow_anonymous': False,
                 'custom_field': 'custom_value',
@@ -365,7 +364,7 @@ class DataTest(AuthorizedApiTest):
         course = self.store.get_course(self.course.id)
         # Only configuration fields not stored in the course, or
         # directly in the model should be stored here.
-        assert course.discussions_settings['piazza'] == {'custom_field': 'custom_value'}
+        assert course.discussions_settings['ed-discuss'] == {'custom_field': 'custom_value'}
 
     @ddt.data(
         # If the legacy provider is selected show the legacy provider only
@@ -378,8 +377,8 @@ class DataTest(AuthorizedApiTest):
         (Provider.OPEN_EDX, [Provider.OPEN_EDX], Provider.LEGACY, True),
         # If some other provider is selected show the new provider
         # if the mfe is enabled
-        (Provider.PIAZZA, [Provider.LEGACY], Provider.OPEN_EDX, False),
-        (Provider.PIAZZA, [Provider.OPEN_EDX, Provider.LEGACY], 'dummy', True),
+        (Provider.ED_DISCUSS, [Provider.LEGACY], Provider.OPEN_EDX, False),
+        (Provider.ED_DISCUSS, [Provider.OPEN_EDX, Provider.LEGACY], 'dummy', True),
     )
     @ddt.unpack
     def test_available_providers_legacy(
@@ -420,7 +419,7 @@ class DataTest(AuthorizedApiTest):
         """
         payload = {
             'enabled': True,
-            'provider_type': Provider.PIAZZA,
+            'provider_type': Provider.ED_DISCUSS,
             'lti_configuration': {
                 key: value,
             }
@@ -429,7 +428,7 @@ class DataTest(AuthorizedApiTest):
 
         data = self.get()
         assert data['enabled']
-        assert data['provider_type'] == Provider.PIAZZA
+        assert data['provider_type'] == Provider.ED_DISCUSS
         assert data['lti_configuration'][key] == value
 
     def test_post_lti_invalid(self):
@@ -441,7 +440,7 @@ class DataTest(AuthorizedApiTest):
         for key, value in DATA_POST_LTI_CONFIGURATION.items():
             payload = {
                 'enabled': True,
-                'provider_type': Provider.PIAZZA,
+                'provider_type': Provider.ED_DISCUSS,
                 'lti_configuration': {
                     key: value,
                     'ignored-key': 'ignored value',
@@ -451,7 +450,7 @@ class DataTest(AuthorizedApiTest):
             assert response.status_code == status.HTTP_200_OK
             data = self.get()
             assert data['enabled']
-            assert data['provider_type'] == Provider.PIAZZA
+            assert data['provider_type'] == Provider.ED_DISCUSS
             assert data['lti_configuration'][key] == value
             assert 'ignored-key' not in data['lti_configuration']
 
@@ -562,7 +561,7 @@ class DataTest(AuthorizedApiTest):
             ["enable_in_context", "enable_graded_units", "unit_level_visibility"],
             [True, False],
         ),
-        ("provider_type", Provider.PIAZZA),
+        ("provider_type", Provider.ED_DISCUSS),
     )
     @ddt.unpack
     def test_change_course_fields(self, field, value):
@@ -604,7 +603,7 @@ class DataTest(AuthorizedApiTest):
 
         response = self._post({
             'enabled': True,
-            'provider_type': 'piazza',
+            'provider_type': 'ed-discuss',
         })
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -625,7 +624,7 @@ class DataTest(AuthorizedApiTest):
 
         response = self._post({
             'enabled': True,
-            'provider_type': 'piazza',
+            'provider_type': 'ed-discuss',
         })
         assert response.status_code == status.HTTP_200_OK
 
@@ -752,7 +751,6 @@ class PIISettingsAPITests(DataTest):
     @ddt.data(
         Provider.ED_DISCUSS,
         Provider.INSCRIBE,
-        Provider.PIAZZA,
         Provider.YELLOWDIG,
     )
     def test_post_everything_with_pii_disabled(self, provider):
@@ -775,7 +773,6 @@ class PIISettingsAPITests(DataTest):
     @ddt.data(
         Provider.ED_DISCUSS,
         Provider.INSCRIBE,
-        Provider.PIAZZA,
         Provider.YELLOWDIG,
     )
     def test_post_everything_with_pii_enabled(self, provider):
