@@ -93,6 +93,7 @@ def send_ace_message(context):  # lint-amnesty, pylint: disable=missing-function
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
 def send_ace_message_for_reported_content(context):  # lint-amnesty, pylint: disable=missing-function-docstring
+    log.info('Reported content email notification task started.')
     context['course_id'] = CourseKey.from_string(context['course_id'])
     context['course_name'] = modulestore().get_course(context['course_id']).display_name
 
@@ -104,7 +105,7 @@ def send_ace_message_for_reported_content(context):  # lint-amnesty, pylint: dis
         return
     for moderator in moderators:
         with emulate_http_request(site=context['site'], user=User.objects.get(id=context['user_id'])):
-            message_context = _build_message_context_for_reported_content(context)
+            message_context = _build_message_context_for_reported_content(context, moderator)
             message = ReportedContentNotification().personalize(
                 Recipient(moderator.id, moderator.email),
                 _get_course_language(context['course_id']),
@@ -113,6 +114,7 @@ def send_ace_message_for_reported_content(context):  # lint-amnesty, pylint: dis
             log.info(f'Sending forum reported content email notification with context {message_context}')
             ace.send(message)
             # TODO: add tracking for reported content email
+    log.info('Reported content email notification task completed.')
 
 
 def _track_notification_sent(message, context):
@@ -215,11 +217,12 @@ def _build_message_context(context):  # lint-amnesty, pylint: disable=missing-fu
     return message_context
 
 
-def _build_message_context_for_reported_content(context):  # lint-amnesty, pylint: disable=missing-function-docstring
+def _build_message_context_for_reported_content(context, moderator):  # lint-amnesty, pylint: disable=missing-function-docstring
     message_context = get_base_template_context(context['site'])
     message_context.update(context)
     message_context.update({
         'post_link': _get_thread_url(context),
+        'moderator_email': moderator.email,
     })
     return message_context
 
