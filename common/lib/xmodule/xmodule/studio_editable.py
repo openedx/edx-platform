@@ -2,7 +2,7 @@
 Mixin to support editing in Studio.
 """
 from xblock.core import XBlock, XBlockMixin
-from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW, module_attr
+from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 
 
 @XBlock.needs('mako')
@@ -49,17 +49,6 @@ class StudioEditableBlock(XBlockMixin):
 
 
 StudioEditableModule = StudioEditableBlock
-
-
-class StudioEditableDescriptor:
-    """
-    Helper mixin for supporting Studio editing of xmodules.
-
-    This class is only intended to be used with an XModule Descriptor. This class assumes that the associated
-    XModule will have an "author_view" method for returning an editable preview view of the module.
-    """
-    author_view = module_attr(AUTHOR_VIEW)
-    has_author_view = True
 
 
 def has_author_view(descriptor):
