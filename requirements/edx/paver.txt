@@ -24,7 +24,7 @@ path==16.4.0
     # via -r requirements/edx/paver.in
 paver==1.3.4
     # via -r requirements/edx/paver.in
-pbr==5.8.1
+pbr==5.9.0
     # via stevedore
 psutil==5.9.0
     # via -r requirements/edx/paver.in
