@@ -107,5 +107,3 @@ class TahoeConfigurationValueModifier:
 def init_configuration_modifier_for_site_config(sender, instance, **kwargs):
     if ENABLE_CONFIG_VALUES_MODIFIER.is_enabled():
         instance.tahoe_config_modifier = TahoeConfigurationValueModifier(site_config_instance=instance)
-    else:
-        log.info('ENABLE_CONFIG_VALUES_MODIFIER: switch is not enabled, not using TahoeConfigurationValueModifier')
