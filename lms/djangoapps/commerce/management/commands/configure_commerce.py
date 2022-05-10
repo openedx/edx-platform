@@ -42,7 +42,6 @@ class Command(BaseCommand):
 
         options:
             disable (bool):    if True then disable configuration, enable otherwise
-            checkout_on_ecommerce (bool): Enable E-Commerce checkout if True, disable otherwise.
         """
         disable = options.get('disable')
 
@@ -53,9 +52,4 @@ class Command(BaseCommand):
                 'enabled': not disable,
             }
         )
-        logger.info(
-            'Commerce Configuration {configuration_status} with checkout on ecommerce {checkout_status}.'.format(
-                configuration_status="disabled" if disable else "enabled",
-                checkout_status="enabled" if checkout_on_ecommerce else "disabled",
-            ),
-        )
+        logger.info(f'Commerce Configuration {"disabled" if disable else "enabled"}.')

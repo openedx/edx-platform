@@ -15,7 +15,6 @@ import ddt
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.http.request import QueryDict
 from django.test import RequestFactory, TestCase
@@ -66,7 +65,6 @@ from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory
 )
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
 from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback
@@ -683,10 +681,7 @@ class ViewsTestCase(BaseViewsTestCase):
 
     @ddt.data(True, False)
     def test_ecommerce_checkout(self, is_anonymous):
-        if not is_anonymous:
-            self.assert_enrollment_link_present(is_anonymous=is_anonymous)
-        else:
-            assert EcommerceService().is_enabled(AnonymousUser()) is False
+        self.assert_enrollment_link_present(is_anonymous=is_anonymous)
 
     def test_user_groups(self):
         # deprecated function

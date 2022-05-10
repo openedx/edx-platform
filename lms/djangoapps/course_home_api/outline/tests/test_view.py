@@ -19,6 +19,7 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
@@ -349,6 +350,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             assert response.data['can_show_upgrade_sock'] == sock_enabled
 
     def test_verified_mode(self):
+        update_commerce_config()
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
@@ -359,7 +361,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             'currency_symbol': '$',
             'price': 149,
             'sku': 'ABCD1234',
-            'upgrade_url': '/dashboard'
+            'upgrade_url': 'http://payment-mfe?sku=ABCD1234'
         }
 
     def test_hide_learning_sequences(self):

@@ -147,7 +147,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # Configure whether we're upgrading or not
         url = reverse('course_modes_choose', args=[str(prof_course.id)])
         response = self.client.get(url)
-        self.assertRedirects(response, '/test_basket/add/?sku=TEST', fetch_redirect_response=False)
+        self.assertRedirects(response, 'http://payment-mfe?sku=TEST', fetch_redirect_response=False)
 
     @httpretty.activate
     @ddt.data(

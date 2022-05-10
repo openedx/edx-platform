@@ -277,7 +277,7 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
         self.setup_user()
         url = reverse('about_course', args=[str(self.course.id)])
         resp = self.client.get(url)
-        self.assertContains(resp, '<a href="#" class="register">')
+        self.assertContains(resp, '<a href="" class="register">')
 
         self.enroll(self.course, verify=True)
 

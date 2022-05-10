@@ -15,6 +15,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.date_utils import strftime_localized
+from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.models import Schedule
@@ -46,6 +47,7 @@ class TestAccess(ModuleStoreTestCase):
         assert 'data-datetime="%s"' % date.isoformat() in message
 
     def test_get_access_expiration_data(self):
+        update_commerce_config()
         enrollment = CourseEnrollmentFactory()
         overview = enrollment.course
         user = enrollment.user
@@ -71,7 +73,7 @@ class TestAccess(ModuleStoreTestCase):
                    'expiration_date': expiration_date,
                    'masquerading_expired_course': False,
                    'upgrade_deadline': upgrade_deadline,
-                   'upgrade_url': '/dashboard'
+                   'upgrade_url': 'http://payment-mfe?sku=None'
                }
 
     @ddt.data(

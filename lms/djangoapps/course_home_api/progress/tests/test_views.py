@@ -16,6 +16,7 @@ from xmodule.modulestore.tests.factories import ItemFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.models import DisableProgressPageStackedConfig
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND_PROGRESS_TAB
@@ -145,14 +146,20 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert response.json()['user_has_passing_grade']
 
     def test_verified_mode(self):
+        update_commerce_config()
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
         response = self.client.get(self.url)
         assert response.status_code == 200
-        assert response.data['verified_mode'] == {'access_expiration_date': (enrollment.created + MIN_DURATION),
-                                                  'currency': 'USD', 'currency_symbol': '$', 'price': 149,
-                                                  'sku': 'ABCD1234', 'upgrade_url': '/dashboard'}
+        assert response.data['verified_mode'] == {
+            'access_expiration_date': (enrollment.created + MIN_DURATION),
+            'currency': 'USD',
+            'currency_symbol': '$',
+            'price': 149,
+            'sku': 'ABCD1234',
+            'upgrade_url': 'http://payment-mfe?sku=ABCD1234'
+        }
 
     def test_page_respects_stacked_config(self):
         CourseEnrollment.enroll(self.user, self.course.id)
