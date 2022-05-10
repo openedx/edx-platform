@@ -1,15 +1,17 @@
 """
 Field Descriptions
 """
+import logging
 from django import forms
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext as _
 
 from common.djangoapps.student.models import UserProfile
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn.api.constants import SUPPORTED_FIELDS_TYPES
+
+log = logging.getLogger(__name__)
 
 FIELD_TYPE_MAP = {
     forms.CharField: "text",
@@ -22,7 +24,7 @@ FIELD_TYPE_MAP = {
 }
 
 
-def add_extension_form_field(field_name, custom_form, field_description, field_type='required'):
+def add_extension_form_field(field_name, custom_form, field_description, field_type):
     """
     Returns Extension form field values
     """
@@ -36,11 +38,11 @@ def add_extension_form_field(field_name, custom_form, field_description, field_t
     field_options = getattr(
         getattr(custom_form, 'Meta', None), 'serialization_options', {}
     ).get(field_name, {})
-    field_type = field_options.get('field_type', FIELD_TYPE_MAP.get(field_description.__class__))
+    custom_field_type = field_options.get('field_type', FIELD_TYPE_MAP.get(field_description.__class__))
 
-    if not field_type:
-        raise ImproperlyConfigured(
-            f'Field type {field_type} not recognized for registration extension field {field_name}.'
+    if not custom_field_type:
+        log.info(
+            f'Field type {custom_field_type} not recognized for registration extension field {field_name}.'
         )
 
     return {
@@ -52,12 +54,11 @@ def add_extension_form_field(field_name, custom_form, field_description, field_t
         'options': getattr(field_description, 'choices', None),
         'error_message': field_description.error_messages if field_type == 'required' else '',
         'restrictions': restrictions,
-        'type': field_type,
-
+        'type': custom_field_type
     }
 
 
-def _add_field_with_configurable_select_options(field_name, field_label, is_field_required, error_message=''):
+def _add_field_with_configurable_select_options(field_name, field_label, is_field_required=False, error_message=''):
     """
     Returns a field description
         If select options are given for this field in EXTRA_FIELD_OPTIONS, it
@@ -84,7 +85,7 @@ def _add_field_with_configurable_select_options(field_name, field_label, is_fiel
     return field_attributes
 
 
-def add_level_of_education_field(is_field_required):
+def add_level_of_education_field(is_field_required=False):
     """
     Returns the level of education field description
     """
@@ -107,7 +108,7 @@ def add_level_of_education_field(is_field_required):
     }
 
 
-def add_gender_field(is_field_required):
+def add_gender_field(is_field_required=False):
     """
     Returns the gender field description
     """
@@ -126,7 +127,7 @@ def add_gender_field(is_field_required):
     }
 
 
-def add_year_of_birth_field(is_field_required):
+def add_year_of_birth_field(is_field_required=False):
     """
     Returns the year of birth field description
     """
@@ -144,7 +145,7 @@ def add_year_of_birth_field(is_field_required):
     }
 
 
-def add_goals_field(is_field_required):
+def add_goals_field(is_field_required=False):
     """
     Returns the goals field description
     """
@@ -162,7 +163,7 @@ def add_goals_field(is_field_required):
     }
 
 
-def add_profession_field(is_field_required):
+def add_profession_field(is_field_required=False):
     """
     Returns the profession field description
     """
@@ -174,7 +175,7 @@ def add_profession_field(is_field_required):
     )
 
 
-def add_specialty_field(is_field_required):
+def add_specialty_field(is_field_required=False):
     """
     Returns the user speciality field description
     """
@@ -186,7 +187,7 @@ def add_specialty_field(is_field_required):
     )
 
 
-def add_company_field(is_field_required):
+def add_company_field(is_field_required=False):
     """
     Returns the company field descriptions
     """
@@ -196,7 +197,7 @@ def add_company_field(is_field_required):
     return _add_field_with_configurable_select_options('company', company_label, is_field_required)
 
 
-def add_title_field(is_field_required):
+def add_title_field(is_field_required=False):
     """
     Returns the title field description
     """
@@ -206,7 +207,7 @@ def add_title_field(is_field_required):
     return _add_field_with_configurable_select_options('title', title_label, is_field_required)
 
 
-def add_job_title_field(is_field_required):
+def add_job_title_field(is_field_required=False):
     """
     Returns the title field description
     """
@@ -216,7 +217,7 @@ def add_job_title_field(is_field_required):
     return _add_field_with_configurable_select_options('job_title', job_title_label, is_field_required)
 
 
-def add_first_name_field(is_field_required):
+def add_first_name_field(is_field_required=False):
     """
     Returns the first name field description
     """
@@ -232,7 +233,7 @@ def add_first_name_field(is_field_required):
     }
 
 
-def add_last_name_field(is_field_required):
+def add_last_name_field(is_field_required=False):
     """
     Returns the last name field description
     """
@@ -248,7 +249,7 @@ def add_last_name_field(is_field_required):
     }
 
 
-def add_mailing_address_field(is_field_required):
+def add_mailing_address_field(is_field_required=False):
     """
     Returns the mailing address field description
     """
@@ -264,7 +265,7 @@ def add_mailing_address_field(is_field_required):
     }
 
 
-def add_state_field(is_field_required):
+def add_state_field(is_field_required=False):
     """
     Returns a State/Province/Region field description
     """
@@ -280,7 +281,7 @@ def add_state_field(is_field_required):
     }
 
 
-def add_city_field(is_field_required):
+def add_city_field(is_field_required=False):
     """
     Returns a city field description
     """
@@ -296,11 +297,19 @@ def add_city_field(is_field_required):
     }
 
 
-def add_honor_code_field(is_field_required, separate_honor_and_tos=False):
+def add_honor_code_field(is_field_required=False):
     """
     Returns a honor code field description and this field will be displayed
     directly on AuthnMFE
     """
+    fields_setting = configuration_helpers.get_value('REGISTRATION_EXTRA_FIELDS')
+    if not fields_setting:
+        fields_setting = settings.REGISTRATION_EXTRA_FIELDS
+    separate_honor_and_tos = False
+    terms_of_service = fields_setting.get('terms_of_service')
+    if terms_of_service in ['required', 'optional', 'optional-exposed']:
+        separate_honor_and_tos = True
+
     terms_type = "honor_code" if separate_honor_and_tos else "tos_and_honor_code"
     terms_label = "Honor Code" if separate_honor_and_tos else "Terms of Service and Honor Code"
     platform_name = configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
@@ -315,7 +324,7 @@ def add_honor_code_field(is_field_required, separate_honor_and_tos=False):
     }
 
 
-def add_terms_of_service_field(is_field_required):
+def add_terms_of_service_field(is_field_required=False):
     """
     Returns terms of condition field description
     """
@@ -331,7 +340,7 @@ def add_terms_of_service_field(is_field_required):
     }
 
 
-def add_country_field(is_field_required):
+def add_country_field(is_field_required=False):
     """
     Returns country field description. This field is configurable on frontend, we just need
     to send the field name and whether or not we want to show error message if this field is

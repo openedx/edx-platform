@@ -4,7 +4,6 @@ Registration Fields View used by optional and required fields view.
 import copy
 
 from django.conf import settings
-
 from rest_framework.views import APIView
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -16,7 +15,8 @@ class RegistrationFieldsContext(APIView):
     """
     Registration Fields View used by optional and required fields view.
     """
-    FIELD_TYPE = None
+    # allow to define custom set of required/optional/hidden fields via configuration
+    FIELD_TYPE = 'hidden'
 
     EXTRA_FIELDS = [
         'confirm_email',
@@ -100,11 +100,6 @@ class RegistrationFieldsContext(APIView):
             else:
                 field_handler = getattr(form_fields, f'add_{field}_field', None)
                 if field_handler:
-                    if field == 'honor_code':
-                        terms_of_services = self._fields_setting.get('terms_of_service')
-                        if terms_of_services in ['required', 'optional', 'optional-exposed']:
-                            response[field] = field_handler(self.FIELD_TYPE == 'required', bool(terms_of_services))
-                            continue
                     response[field] = field_handler(self.FIELD_TYPE == 'required')
 
         return response
