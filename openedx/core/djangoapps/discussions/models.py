@@ -40,7 +40,6 @@ class Provider:
     LEGACY = 'legacy'
     ED_DISCUSS = 'ed-discuss'
     INSCRIBE = 'inscribe'
-    PIAZZA = 'piazza'
     YELLOWDIG = 'yellowdig'
     OPEN_EDX = 'openedx'
 
@@ -228,31 +227,6 @@ AVAILABLE_PROVIDER_MAP = {
         'messages': [pii_sharing_required_message('InScribe')],
         'has_full_support': False,
         'admin_only_config': True,
-    },
-    Provider.PIAZZA: {
-        'features': [
-            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
-            Features.BASIC_CONFIGURATION.value,
-            Features.QUESTION_DISCUSSION_SUPPORT.value,
-            Features.COMMUNITY_TA_SUPPORT.value,
-            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-            Features.LTI_ADVANCED_SHARING_MODE.value,
-            Features.ANONYMOUS_POSTING.value,
-            Features.EMAIL_NOTIFICATIONS.value,
-            Features.WCAG_2_0_SUPPORT.value,
-            Features.BLACKOUT_DISCUSSION_DATES.value,
-        ],
-        'supports_lti': True,
-        'external_links': ProviderExternalLinks(
-            learn_more='https://piazza.com/product/overview',
-            configuration='https://support.piazza.com/support/solutions/articles/48001065447-configure-piazza-within-edx',  # pylint: disable=line-too-long
-            general='https://support.piazza.com/',
-            accessibility='https://piazza.com/product/accessibility',
-            contact_email='team@piazza.com',
-        )._asdict(),
-        'messages': [],
-        'has_full_support': False,
-        'admin_only_config': True
     },
     Provider.YELLOWDIG: {
         'features': [
