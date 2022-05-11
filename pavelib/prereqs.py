@@ -37,11 +37,6 @@ PRIVATE_REQS = 'requirements/private.txt'
 if os.path.exists(PRIVATE_REQS):
     PYTHON_REQ_FILES.append(PRIVATE_REQS)
 
-# Appsembler: Install appsembler.txt requirements files during devstack provisioning.
-APPSEMBLER_REQS = 'requirements/edx/appsembler.txt'
-if os.path.exists(APPSEMBLER_REQS):
-    PYTHON_REQ_FILES.append(APPSEMBLER_REQS)
-
 
 def str2bool(s):
     s = str(s)
