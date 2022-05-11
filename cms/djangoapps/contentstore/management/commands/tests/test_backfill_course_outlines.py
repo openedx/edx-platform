@@ -40,7 +40,6 @@ class BackfillCourseOutlinesTest(SharedModuleStoreTestCase):
         """
         super().setUpClass()
         course_run_ids = [
-            "OpenEdX/OutlineCourse/OldMongoRun1",
             "course-v1:OpenEdX+OutlineCourse+Run2",
             "course-v1:OpenEdX+OutlineCourse+Run3",
         ]
@@ -48,12 +47,7 @@ class BackfillCourseOutlinesTest(SharedModuleStoreTestCase):
             CourseKey.from_string(course_run_id) for course_run_id in course_run_ids
         ]
         for course_key in cls.course_keys:
-            if course_key.deprecated:
-                store_type = ModuleStoreEnum.Type.mongo
-            else:
-                store_type = ModuleStoreEnum.Type.split
-
-            with cls.store.default_store(store_type):
+            with cls.store.default_store(ModuleStoreEnum.Type.split):
                 course = CourseFactory.create(
                     org=course_key.org,
                     number=course_key.course,

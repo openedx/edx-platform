@@ -542,7 +542,7 @@ class CourseGradingTest(CourseTestCase):
     @mock.patch('common.djangoapps.track.event_transaction_utils.uuid4')
     @mock.patch('cms.djangoapps.models.settings.course_grading.tracker')
     @mock.patch('cms.djangoapps.contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_update_from_json(self, store, send_signal, tracker, uuid):
         uuid.return_value = "mockUUID"
         self.course = CourseFactory.create(default_store=store)

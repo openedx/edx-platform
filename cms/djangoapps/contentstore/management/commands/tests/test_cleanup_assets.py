@@ -31,6 +31,9 @@ class ExportAllCourses(ModuleStoreTestCase):
         super().setUp()
         self.content_store = contentstore()
         # pylint: disable=protected-access
+        # TODO: This only tests Old Mongo courses, but this management command
+        #       probably works for both, so we should update this test rather
+        #       than deleting it and the management command entirely.
         self.module_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
         self.addCleanup(remove_temp_files_from_list, list(DOT_FILES_DICT.keys()), self.course_dir / "static")
         add_temp_files_from_dict(DOT_FILES_DICT, self.course_dir / "static")
