@@ -413,6 +413,8 @@ done-xblock==2.0.4
     # via -r requirements/edx/base.in
 drf-jwt==1.19.2
     # via edx-drf-extensions
+drf-nested-routers==0.93.4
+    # via blockstore
 drf-yasg==1.20.0
     # via edx-api-doc-tools
 edx-ace==1.5.0
