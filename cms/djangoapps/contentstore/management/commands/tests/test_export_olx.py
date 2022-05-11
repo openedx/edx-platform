@@ -83,13 +83,3 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         call_command('export_olx', '--output', filename, str(test_course_key))
         with tarfile.open(filename) as tar_file:
             self.check_export_file(tar_file, test_course_key)
-
-    @ddt.data(ModuleStoreEnum.Type.split)
-    def test_export_course_stdout(self, store_type):
-        test_course_key = self.create_dummy_course(store_type)
-        out = StringIO()
-        call_command('export_olx', str(test_course_key), stdout=out)
-        out.seek(0)
-        output = out.read()
-        with tarfile.open(fileobj=StringIO(output)) as tar_file:
-            self.check_export_file(tar_file, test_course_key)

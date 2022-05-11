@@ -268,7 +268,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
         super().setUpClass()
 
-        names_and_prefixes = [(ModuleStoreEnum.Type.split, 'split'), (ModuleStoreEnum.Type.mongo, 'old')]
+        names_and_prefixes = [(ModuleStoreEnum.Type.split, 'split')]
         for store, prefix in names_and_prefixes:
             with cls.store.default_store(store):
                 cls.courses[prefix] = CourseFactory.create(org='a', course='b', run=prefix)
