@@ -57,7 +57,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
             user=self.user, course_id=self.verified_course_already_enrolled.id, mode=CourseMode.VERIFIED
         )
 
-        CommerceConfiguration.objects.create(enabled=True)
+        CommerceConfiguration.objects.create(enabled=True, checkout_on_ecommerce_service=True)
 
         # Log the user in
         self.client.login(username=self.user.username, password=TEST_PASSWORD)

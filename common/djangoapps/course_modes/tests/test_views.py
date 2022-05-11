@@ -136,7 +136,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         prof_course = CourseFactory.create()
         CourseModeFactory(mode_slug=CourseMode.NO_ID_PROFESSIONAL_MODE, course_id=prof_course.id,
                           min_price=100, sku='TEST', bulk_sku="BULKTEST")
-        ecomm_test_utils.update_commerce_config()
+        ecomm_test_utils.update_commerce_config(enabled=True)
         # Enroll the user in the test course
         CourseEnrollmentFactory(
             is_active=False,
@@ -148,6 +148,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         url = reverse('course_modes_choose', args=[str(prof_course.id)])
         response = self.client.get(url)
         self.assertRedirects(response, 'http://payment-mfe?sku=TEST', fetch_redirect_response=False)
+        ecomm_test_utils.update_commerce_config(enabled=False)
 
     @httpretty.activate
     @ddt.data(

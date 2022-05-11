@@ -27,6 +27,11 @@ class Command(BaseCommand):
     help = 'Enable/Disable commerce configuration, including configuration of E-Commerce checkout.'
 
     def add_arguments(self, parser):
+        parser.add_argument('--disable-checkout-on-ecommerce',
+                            dest='checkout_on_ecommerce',
+                            action='store_false',
+                            default=True,
+                            help='Do not checkout to E-Commerce even when configuration is enabled.')
         parser.add_argument('--disable',
                             dest='disable',
                             action='store_true',
@@ -42,14 +47,22 @@ class Command(BaseCommand):
 
         options:
             disable (bool):    if True then disable configuration, enable otherwise
+            checkout_on_ecommerce (bool): Enable E-Commerce checkout if True, disable otherwise.
         """
         disable = options.get('disable')
+        checkout_on_ecommerce = options.get('checkout_on_ecommerce')
 
         # We are keeping id=1, because as of now, there are only one commerce configuration for the system.
         CommerceConfiguration.objects.update_or_create(
             id=1,
             defaults={
                 'enabled': not disable,
+                'checkout_on_ecommerce_service': checkout_on_ecommerce,
             }
         )
-        logger.info(f'Commerce Configuration {"disabled" if disable else "enabled"}.')
+        logger.info(
+            'Commerce Configuration {configuration_status} with checkout on ecommerce {checkout_status}.'.format(
+                configuration_status="disabled" if disable else "enabled",
+                checkout_status="enabled" if checkout_on_ecommerce else "disabled",
+            ),
+        )

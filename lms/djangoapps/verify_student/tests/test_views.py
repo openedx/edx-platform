@@ -31,7 +31,7 @@ from common.djangoapps.student.tests.factories import AdminFactory, CourseEnroll
 from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import MockS3BotoMixin, XssTestMixin
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA, TEST_PUBLIC_URL_ROOT
+from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
@@ -187,8 +187,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         sku = 'TESTSKU'
         # When passing a SKU ecommerce api gets called.
         _mock_payment_processors()
-        checkout_page = 'http://localhost:1998'
-        CommerceConfiguration.objects.create(basket_checkout_page=checkout_page)
+        checkout_page = 'http://payment-mfe'
+        CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True, basket_checkout_page=checkout_page)
         checkout_page += "?utm_source=test"
         httpretty.register_uri(httpretty.GET, f"{checkout_page}")
 
@@ -196,10 +196,10 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         self._enroll(course.id)
 
         # Verify that utm params are included in the url used for redirect
-        url_with_utm = 'http://localhost:1998/?utm_source=test&sku=TESTSKU'
+        url_with_utm = 'http://payment-mfe?utm_source=test&sku=TESTSKU'
         with mock.patch.object(EcommerceService, 'get_checkout_page_url', return_value=url_with_utm):
             response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
-        expected_page = f'{TEST_PUBLIC_URL_ROOT}{checkout_page}&sku={sku}'
+        expected_page = f'{checkout_page}&sku={sku}'
         self.assertRedirects(response, expected_page, fetch_redirect_response=False)
 
     @ddt.data(

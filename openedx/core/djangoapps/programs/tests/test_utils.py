@@ -928,7 +928,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
     def test_student_enrollment_status(self, is_enrolled, enrolled_mode, is_upgrade_required, mock_get_mode):
         """Verify that program data is supplemented with the student's enrollment status."""
         expected_upgrade_url = f'{self.checkout_path}?sku={self.sku}'
-        update_commerce_config(checkout_page=self.checkout_path)
+        update_commerce_config(enabled=True, checkout_page=self.checkout_path)
 
         mock_mode = mock.Mock()
         mock_mode.sku = self.sku
@@ -950,7 +950,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         """
         Verify that a student with an inactive enrollment isn't encouraged to upgrade.
         """
-        update_commerce_config(checkout_page=self.checkout_path)
+        update_commerce_config(enabled=True, checkout_page=self.checkout_path)
 
         CourseEnrollmentFactory(
             user=self.user,
@@ -962,6 +962,23 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         data = ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(data)
+
+    @mock.patch(UTILS_MODULE + '.CourseMode.mode_for_course')
+    def test_ecommerce_disabled(self, mock_get_mode):
+        """
+        Verify that the utility can operate when the ecommerce service is disabled.
+        """
+        update_commerce_config(enabled=False, checkout_page=self.checkout_path)
+
+        mock_mode = mock.Mock()
+        mock_mode.sku = self.sku
+        mock_get_mode.return_value = mock_mode
+
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=MODES.audit)
+
+        data = ProgramDataExtender(self.program, self.user).extend()
+
+        self._assert_supplemented(data, is_enrolled=True, upgrade_url=None)
 
     @ddt.data(
         (1, 1, False),

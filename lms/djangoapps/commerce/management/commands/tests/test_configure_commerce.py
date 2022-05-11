@@ -38,6 +38,15 @@ class TestCommerceConfigurationCommand(TestCase):
         commerce_configuration = CommerceConfiguration.current()
         assert not commerce_configuration.enabled
 
+        # Verify commerce configuration can be disabled from command
+        call_command(
+            "configure_commerce",
+            '--disable-checkout-on-ecommerce',
+        )
+
+        commerce_configuration = CommerceConfiguration.current()
+        assert not commerce_configuration.checkout_on_ecommerce_service
+
     def test_site_associated_commerce_configuration(self):
         """
         This test is added here to fail when site_id field is added.

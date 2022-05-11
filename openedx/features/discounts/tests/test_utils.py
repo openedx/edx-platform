@@ -1,7 +1,7 @@
 """
 Tests of the openedx.features.discounts.utils module.
 """
-from unittest.mock import Mock, patch
+from unittest.mock import patch, Mock
 
 import ddt
 from django.contrib.auth.models import AnonymousUser
@@ -13,7 +13,6 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG, get_discount_expiration_date
 
@@ -72,14 +71,13 @@ class TestOfferData(TestCase):
         CourseEnrollment.enroll(self.user, self.overview.id, CourseMode.AUDIT)
 
     def test_happy_path(self):
-        update_commerce_config()
         assert utils.generate_offer_data(self.user, self.overview) == {
             'code': 'EDXWELCOME',
             'expiration_date': get_discount_expiration_date(self.user, self.overview),
             'original_price': '$149',
             'discounted_price': '$126.65',
             'percentage': 15,
-            'upgrade_url': 'http://payment-mfe?sku=None'
+            'upgrade_url': '/dashboard'
         }
 
     def test_spanish_code(self):

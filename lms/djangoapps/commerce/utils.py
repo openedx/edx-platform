@@ -93,7 +93,7 @@ class EcommerceService:
         """
         user_is_active = user.is_active or is_account_activation_requirement_disabled()
         allow_user = user_is_active or user.is_anonymous
-        return allow_user
+        return allow_user and self.config.checkout_on_ecommerce_service
 
     def payment_page_url(self):
         """ Return the URL for the checkout page.

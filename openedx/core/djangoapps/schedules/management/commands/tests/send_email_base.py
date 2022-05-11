@@ -99,7 +99,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pyli
         ScheduleConfigFactory.create(site=self.site_config.site)
 
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
-        CommerceConfiguration.objects.create()
+        CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
 
         self._courses_with_verified_modes = set()
 

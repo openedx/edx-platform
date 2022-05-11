@@ -449,7 +449,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_ecommerce_checkout_redirect(self):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""
         sku = 'TESTSKU'
-        configuration = CommerceConfiguration.objects.create()
+        configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
         course = create_course_run()
         user = create_user()
         course_mode = CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED)
