@@ -507,6 +507,10 @@ drf-jwt==1.19.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-drf-extensions
+drf-nested-routers==0.93.4
+    # via
+    #   -r requirements/edx/base.txt
+    #   blockstore
 drf-yasg==1.20.0
     # via
     #   -r requirements/edx/base.txt
