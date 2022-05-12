@@ -53,7 +53,9 @@
                          header_text: context.header_text,
                          platform_name: context.platform_name,
                          student_faq_url: context.student_faq_url,
-                         account_settings_url: context.account_settings_url
+                         account_settings_url: context.account_settings_url,
+                         applications_status_response: context.applications_status_response,
+                         hide_form: context.hide_form
                      };
 
                     // Make the value accessible to this View

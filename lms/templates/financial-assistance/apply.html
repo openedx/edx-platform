@@ -18,7 +18,9 @@ FinancialAssistanceFactory({
     dashboard_url: '${dashboard_url | n, js_escaped_string}',
     account_settings_url: '${account_settings_url | n, js_escaped_string}',
     platform_name: '${platform_name | n, js_escaped_string}',
-    submit_url: '${submit_url | n, js_escaped_string}'
+    submit_url: '${submit_url | n, js_escaped_string}',
+    applications_status_response: ${applications_status_response | n, dump_js_escaped_json},
+    hide_form: ${bool(hide_form) | n, dump_js_escaped_json}
 });
 </%static:require_module>
 </%block>

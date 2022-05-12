@@ -167,6 +167,7 @@ def get_financial_assistance_application_status(user_id, course_id):
     if response.status_code == status.HTTP_200_OK:
         return True, response.json()
     elif response.status_code in (status.HTTP_400_BAD_REQUEST, status.HTTP_404_NOT_FOUND):
+        log.error(response.json().get('message'))
         return False, response.json().get('message')
     else:
         log.error('%s %s', UNEXPECTED_ERROR_APPLICATION_STATUS, response.content)

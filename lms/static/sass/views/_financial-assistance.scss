@@ -6,6 +6,26 @@
   color: $m-gray-d2;
 }
 
+
+
+.financial-assistance-applications-list {
+  .financial-assistance-table {
+    font-size: smaller;
+    width: 100%;
+    th {
+      margin: 0;
+      padding: 0.5rem;
+      border-bottom: 1px solid black;
+      text-align: left;
+    }
+    td {
+      margin: 0;
+      padding: 0.5rem;
+      border-bottom: 1px solid silver;
+    }
+  }
+}
+
 .financial-assistance-wrapper {
   margin: auto;
   padding: $baseline ($baseline/2);
