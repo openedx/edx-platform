@@ -1272,7 +1272,6 @@
     "Text to display": "Teks untuk ditampilkan",
     "Textbook Name": "Nama textbook",
     "Textbook information": "Informasi textbook",
-    "Thank you for setting your course goal to {goal}!": "Terima kasih sudah membuat {goal} sebagai tujuan kursus Anda!",
     "Thank you for submitting your financial assistance application for {course_name}! You can expect a response in 2-4 business days.": "Terimakasih sudah mengirimkan aplikasi bantuan finansial untuk {course_name}. Anda dapat mengharapkan balasan dalam 2-4 hari kerja.",
     "Thank you for submitting your photos. We will review them shortly. You can now sign up for any %(platformName)s course that offers verified certificates. Verification is good for one year. After one year, you must submit photos for verification again.": "Terimakasih sudah mengirimkan foto Anda. Kami akan meninjaunya segera. Anda dapat mengikuti kursus %(platformName)s apapun yang menawarkan sertifikat terverifikasi. Verifikasi berlaku selamat satu tahun. Setelah itu, Anda harus mengirimkan foto untuk verifikasi lagi.",
     "The URL you entered seems to be an email address. Do you want to add the required mailto: prefix?": "URL anda tampak seperti alamat email. Apakah anda ingin menambahkan prefiks mailto:?",
@@ -1328,7 +1327,6 @@
     "There was a problem creating the report. Select \"Create Executive Summary\" to try again.": "Terdapat permasalahan dalam membuat laporan. Pilih \"Buat Ringkasan Eksekutif\" untuk mencoba kembali.",
     "There was an error obtaining email content history for this course.": "Ada kesalahan dalam pengambilan sejarah konten email untuk kelas ini.",
     "There was an error obtaining email task history for this course.": "Terjadi kesalahan saat mengambil surel yang lampau untuk kursus ini.",
-    "There was an error updating your goal.": "Terjadi kesalahan ketika memperbarui tujuan Anda.",
     "There was an error when trying to add learners:": [
       "{numErrors} pembelajar tidak dapat ditambahkan dalam kohort ini:"
     ],
@@ -1410,7 +1408,6 @@
     "Titles more than 100 characters may prevent students from printing their certificate on a single page.": "Judul yang lebih dari 100 karakter dapat membuat siswa tidak dapat mencetak sertifikat mereka pada satu halaman.",
     "To access the course, select a session.": "Untuk mengakses kursus, pilih sesi.",
     "To be sure all students can access the video, we recommend providing both an .mp4 and a .webm version of your video. Click below to add a URL for another version. These URLs cannot be YouTube URLs. The first listed video that's compatible with the student's computer will play.": "Pastikan semua pelajar dapat mengakses video, kami menyarankan menyediakan kedua versi .mp4 dan .webcam video anda, klik dibawah untuk menambah URL untuk versi lain. URLs tidak dapat menjadi URLs You Tube, video  pertama yang telah terdaftar harus kompatibel dengan komputer pelajar yang akan menghidupkannya",
-    "To complete the program, you must earn a verified certificate for each course.": "Untuk menyelesaikan program, Anda harus mendapatkan sertifikat terverifikasi untuk setiap kursus.",
     "To continue learning with this account, sign in below.": "Untuk melanjutkan belajar dengan akun ini, masuk di bawah.",
     "To pass this exam, you must complete the problems in the time allowed.": "Untuk lulus ujian, Anda harus menyelesaikan masalah dalam waktu yang telah ditentukan.",
     "To receive a certificate, you must also verify your identity.": "Untuk mendapatkan sertifikat, Anda harus memverifikasi identitas Anda.",
@@ -1619,7 +1616,6 @@
     "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Anda telah memilih tindakan, tetapi Anda belum menyimpan perubahan ke masing-masing bidang. Silakan klik OK untuk menyimpan. Anda harus menjalankan kembali tindakan tersebut.",
     "You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.": "Anda telah menyetel bahasa menjadi {beta_language}, yang belum seluruhnya diterjemahkan. Anda dapat membantu kami menerjemahkan ke bahasa ini seluruhnya dengan bergabung dengan komunitas Transifex dan menambahkan terjemahan dari Bahasa Inggris untuk peserta yang berbicara {beta_language}.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "Anda telah berhasil masuk ke %(currentProvider)s, namun akun %(currentProvider)s Anda tidak memiliki akun %(platformName)s yang terhubung. Untuk menghubungkan akun Anda, masuk sekarang dengan menggunakan kata sandi %(platformName)s Anda.",
-    "You have successfully updated your goal.": "Anda telah berhasil memperbarui tujuan Anda",
     "You have unsaved changes are you sure you want to navigate away?": "Terdapat perubahan yang belum disimpan apakah anda yakin akan meninggalkan halaman ini?",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Beberapa perubahan bidang yang Anda lakukan belum tersimpan. Perubahan yang telah dilakukan akan hilang.",
     "You haven't added any assets to this course yet.": "Anda belum menambahkan beberapa aset dalam kursus ini",
