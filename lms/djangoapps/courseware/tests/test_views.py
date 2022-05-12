@@ -843,6 +843,17 @@ class ViewsTestCase(BaseViewsTestCase):
         assert response.status_code == 200
         self.assertContains(response, 'Financial Assistance Application')
 
+    @patch('lms.djangoapps.courseware.views.views._use_new_financial_assistance_flow', return_value=True)
+    @patch('lms.djangoapps.courseware.views.views.is_eligible_for_financial_aid', return_value=(False, 'error reason'))
+    def test_new_financial_assistance_page_course_ineligible(self, *args):
+        """
+        Test to verify the financial_assistance view against an ineligible course returns an error page.
+        """
+        url = reverse('financial_assistance_v2', args=['course-v1:test+TestX+Test_Course'])
+        response = self.client.get(url)
+        assert response.status_code == 200
+        self.assertContains(response, 'This course is not eligible for Financial Assistance for the following reason:')
+
     @ddt.data(([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, True, YESTERDAY),
               ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, True, None),
               ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, False, None),
@@ -902,10 +913,11 @@ class ViewsTestCase(BaseViewsTestCase):
 
         self.assertContains(response, str(course))
 
-    def _submit_financial_assistance_form(self, data, submit_url='submit_financial_assistance_request'):
+    def _submit_financial_assistance_form(self, data, submit_url='submit_financial_assistance_request',
+                                          referrer_url=None):
         """Submit a financial assistance request."""
         url = reverse(submit_url)
-        return self.client.post(url, json.dumps(data), content_type='application/json')
+        return self.client.post(url, json.dumps(data), content_type='application/json', HTTP_REFERER=referrer_url)
 
     @patch.object(views, 'create_zendesk_ticket', return_value=200)
     def test_submit_financial_assistance_request(self, mock_create_zendesk_ticket):
@@ -968,7 +980,12 @@ class ViewsTestCase(BaseViewsTestCase):
     @patch.object(
         views, 'create_financial_assistance_application', return_value=HttpResponse(status=status.HTTP_204_NO_CONTENT)
     )
-    def test_submit_financial_assistance_request_v2(self, create_application_mock):
+    @ddt.data(
+        ('/financial-assistance/course-v1:test+TestX+Test_Course/apply/', status.HTTP_204_NO_CONTENT),
+        ('/financial-assistance/course-v1:invalid+ErrorX+Invalid_Course/apply/', status.HTTP_400_BAD_REQUEST)
+    )
+    @ddt.unpack
+    def test_submit_financial_assistance_request_v2(self, referrer_url, expected_status, *args):
         form_data = {
             'username': self.user.username,
             'course': 'course-v1:test+TestX+Test_Course',
@@ -979,9 +996,11 @@ class ViewsTestCase(BaseViewsTestCase):
             'mktg-permission': False
         }
         response = self._submit_financial_assistance_form(
-            form_data, submit_url='submit_financial_assistance_request_v2'
+            form_data,
+            submit_url='submit_financial_assistance_request_v2',
+            referrer_url=referrer_url
         )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.status_code == expected_status
 
     @ddt.data(
         ({}, 400),
