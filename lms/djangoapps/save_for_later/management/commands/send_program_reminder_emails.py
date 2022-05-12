@@ -74,7 +74,7 @@ class Command(BaseCommand):
                         'reminder': True,
                         'braze_event': USER_SEND_SAVE_FOR_LATER_REMINDER_EMAIL,
                     }
-                    if user and get_program_enrollment(program_uuid=saved_program.uuid, user=user):
+                    if user and get_program_enrollment(program_uuid=saved_program.program_uuid, user=user):
                         continue
                     email_sent = send_email(saved_program.email, program_data)
                     if email_sent:
