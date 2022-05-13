@@ -5,11 +5,12 @@ module.exports = {
   "modulePaths": [
     "common/static/common/js/components",
   ],
-  "setupTestFrameworkScriptFile": "<rootDir>/setupTests.js",
+  "setupFilesAfterEnv": ["<rootDir>/setupTests.js"],
   "testMatch": [
     "/**/*.test.jsx",
     "common/static/common/js/components/**/?(*.)+(spec|test).js?(x)",
   ],
+  "testEnvironment": "jsdom",
   "transform": {
     "^.+\\.jsx$": "babel-jest",
     "^.+\\.js$": "babel-jest",
