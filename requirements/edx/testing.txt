@@ -628,7 +628,7 @@ edx-tincan-py35==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-edx-toggles==4.3.1
+edx-toggles==5.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
@@ -917,7 +917,7 @@ openedx-filters==0.6.2
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
-ora2==4.3.0
+ora2==4.4.0
     # via -r requirements/edx/base.txt
 packaging==21.3
     # via

@@ -523,7 +523,7 @@ edx-submissions==3.5.1
     #   ora2
 edx-tincan-py35==1.0.0
     # via edx-enterprise
-edx-toggles==4.3.1
+edx-toggles==5.0.0
     # via
     #   -r requirements/edx/base.in
     #   edx-completion
@@ -737,7 +737,7 @@ openedx-filters==0.6.2
     # via
     #   -r requirements/edx/base.in
     #   lti-consumer-xblock
-ora2==4.3.0
+ora2==4.4.0
     # via -r requirements/edx/base.in
 packaging==21.3
     # via

@@ -121,7 +121,7 @@ oauthlib                            # OAuth specification support for authentica
 openedx-calc                        # Library supporting mathematical calculations for Open edX
 openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
-ora2>=4.3.0
+ora2>=4.4.0
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
 py2neo                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
