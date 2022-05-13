@@ -7,15 +7,17 @@ import json
 import shutil
 from collections import OrderedDict
 from tempfile import mkdtemp
-from uuid import uuid4
 from unittest.mock import MagicMock, Mock, patch
-import pytest
+from uuid import uuid4
+
 import ddt
+import pytest
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.test import TestCase
 from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_flag
 from edxval.api import (
     ValCannotCreateError,
     ValVideoNotFoundError,
@@ -25,31 +27,30 @@ from edxval.api import (
     create_video_transcript,
     get_video_info,
     get_video_transcript,
-    get_video_transcript_data
+    get_video_transcript_data,
 )
 from edxval.utils import create_file_in_fs
 from fs.osfs import OSFS
 from fs.path import combine
 from lxml import etree
 from path import Path as path
-from waffle.testutils import override_flag
+from xmodule.contentstore.content import StaticContent
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.tests.test_import import DummySystem
+from xmodule.tests.test_video import VideoBlockTestBase
+from xmodule.video_module import VideoBlock, bumper_utils, video_utils
+from xmodule.video_module.transcripts_utils import Transcript, save_to_store, subs_filename
+from xmodule.video_module.video_module import EXPORT_IMPORT_COURSE_DIR, EXPORT_IMPORT_STATIC_DIR
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from lms.djangoapps.courseware.tests.helpers import get_context_dict_from_string
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.inheritance import own_metadata  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tests.test_import import DummySystem  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tests.test_video import VideoBlockTestBase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_module import VideoBlock, bumper_utils, video_utils  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_module.transcripts_utils import Transcript, save_to_store, subs_filename  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_module.video_module import EXPORT_IMPORT_COURSE_DIR, EXPORT_IMPORT_STATIC_DIR  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .test_video_handlers import BaseTestVideoXBlock, TestVideo
 from .test_video_xml import SOURCE_XML
@@ -1178,7 +1179,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             data['youtube']
         )
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
-            with override_flag(DEPRECATE_YOUTUBE.name, active=data['waffle_enabled']):
+            with override_waffle_flag(DEPRECATE_YOUTUBE, active=data['waffle_enabled']):
                 self.initialize_block(data=video_xml, metadata=metadata)
                 context = self.item_descriptor.render(STUDENT_VIEW).content
                 assert '"prioritizeHls": {}'.format(data['result']) in context

@@ -26,7 +26,6 @@ from edxval.api import (
     get_transcript_preferences,
     get_video_info
 )
-from waffle.testutils import override_flag
 
 from cms.djangoapps.contentstore.models import VideoUploadConfig
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -541,7 +540,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret', AWS_SECURITY_TOKEN='token')
     @patch('boto.s3.key.Key')
     @patch('boto.s3.connection.S3Connection')
-    @override_flag(ENABLE_DEVSTACK_VIDEO_UPLOADS.name, active=True)
+    @override_waffle_flag(ENABLE_DEVSTACK_VIDEO_UPLOADS, active=True)
     def test_devstack_upload_connection(self, mock_conn, mock_key):
         files = [{'file_name': 'first.mp4', 'content_type': 'video/mp4'}]
         mock_key_instances = [
@@ -647,7 +646,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
         expected_args = ('course_video_upload_token', self.test_token)
 
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
-            with override_flag(DEPRECATE_YOUTUBE.name, active=data['global_waffle']):
+            with override_waffle_flag(DEPRECATE_YOUTUBE, active=data['global_waffle']):
                 response = self.client.post(
                     self.url,
                     json.dumps({'files': [file_data]}),
