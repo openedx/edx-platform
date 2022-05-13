@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -46,7 +46,7 @@
 # 陳子琦 <christtabris@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -75,9 +75,9 @@
 # 陳子琦 <christtabris@gmail.com>, 2014
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (https://www.transifex.com/open-edx/teams/6205/zh_TW/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2022.
 #
 # Translators:
 # Xaver Y.R. Chen <yrchen@atcity.org>, 2019
@@ -86,7 +86,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/)
-# Copyright (C) 2021 edX
+# Copyright (C) 2022 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -106,7 +106,7 @@
 # Zhen-Rong Chen <zhenrc@gmail.com>, 2014-2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/)
-# Copyright (C) 2021 edX
+# Copyright (C) 2022 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -132,9 +132,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-26 20:42+0000\n"
-"PO-Revision-Date: 2021-11-07 20:44+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2022-05-08 20:42+0000\n"
+"PO-Revision-Date: 2014-06-11 15:18+0000\n"
+"Last-Translator: Andrew Lau <alau52@yahoo.com>, 2017\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/open-edx/edx-platform/language/zh_TW/)\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
@@ -5231,36 +5231,6 @@ msgstr ""
 msgid "Bookmark this page"
 msgstr ""
 
-#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
-msgid "Thank you for setting your course goal to {goal}!"
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr ""
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "展開全部"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "折疊所有"
-
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr ""
-
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result found for \"{search_term}\""
 msgid_plural "{total_results} results found for \"{search_term}\""
@@ -6800,6 +6770,11 @@ msgstr "動作"
 msgid "Unscheduled"
 msgstr "未排程"
 
+#: cms/templates/js/discussion-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Discussion"
+msgstr ""
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -7030,10 +7005,6 @@ msgid "follow this post"
 msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
-msgid "post anonymously"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously to classmates"
 msgstr ""
 
@@ -7095,10 +7066,6 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Discussion"
 msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
@@ -7482,6 +7449,14 @@ msgid "This catalog's courses:"
 msgstr ""
 
 #: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "展開全部"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "折疊所有"
+
+#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "開始日期"
 
@@ -7563,6 +7538,14 @@ msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
 msgstr "如收到信用的問題，在您選擇\"結束我的測驗\"之前，您必須為每個問題點擊\"提交\"按鈕。"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -8172,13 +8155,6 @@ msgstr ""
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
-msgstr ""
-
-#: lms/templates/learner_dashboard/program_details_tab_view.underscore
-#: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"To complete the program, you must earn a verified certificate for each "
-"course."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
@@ -9736,6 +9712,10 @@ msgstr ""
 msgid "Post"
 msgstr ""
 
+#: cms/templates/js/discussion-editor.underscore
+msgid "Enable discussion"
+msgstr ""
+
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
 msgstr ""
@@ -9952,6 +9932,7 @@ msgstr ""
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear"
 msgstr ""
@@ -9961,6 +9942,7 @@ msgstr ""
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr ""
@@ -10195,19 +10177,6 @@ msgstr ""
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
 "Learners do not see whether their answers to assessments were correct or "
-"incorrect, nor the score received, until after the course end date has "
-"passed."
-msgstr ""
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"If the course does not have an end date, learners always see their scores "
-"when they submit answers to assessments."
-msgstr ""
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"Learners do not see whether their answers to assessments were correct or "
 "incorrect, nor the score received, until after the due date for the "
 "subsection has passed."
 msgstr ""
@@ -10349,17 +10318,17 @@ msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This subsection was released to learners as a special exam, but was reverted"
-" back to a basic exam. You may not configure it as a special exam now. "
-"Contact edX Support for assistance."
+"This subsection was released to learners as a proctored exam, but was "
+"reverted back to a basic or timed exam. You may not configure it as a "
+"proctored exam now. Contact edX Support for assistance."
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This special exam has been released to learners. You may not convert it to "
-"another type of special exam. You may revert this subsection back to being a"
-" basic exam by selecting 'None', but you will NOT be able to configure it as"
-" a special exam in the future."
+"This proctored exam has been released to learners. You may not convert it to"
+" another type of special exam. You may revert this subsection back to being "
+"a basic exam by selecting 'None', or a timed exam, but you will NOT be able "
+"to configure it as a proctored exam in the future."
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
