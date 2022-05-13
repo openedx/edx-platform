@@ -124,5 +124,4 @@ def send_message(comment, site):  # lint-amnesty, pylint: disable=missing-functi
 
 def send_message_for_reported_content(user, post, site, sender):  # lint-amnesty, pylint: disable=missing-function-docstring
     context = create_message_context_for_reported_content(user, post, site, sender)
-    log.info('Reported content email notification task prepared.')
     tasks.send_ace_message_for_reported_content.apply_async(args=[context], countdown=120)
