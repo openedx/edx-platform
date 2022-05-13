@@ -348,7 +348,7 @@ django-sekizai==4.0.0
     #   django-wiki
 django-ses==3.2.0
     # via -r requirements/edx/base.in
-django-simple-history==3.0.0
+django-simple-history==3.1.1
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.in
