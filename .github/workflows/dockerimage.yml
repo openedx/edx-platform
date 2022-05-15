@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: 'Build the Docker images'
+      - name: 'Build the Tutor Docker images'
         shell: bash
         run: |
           # Build both images at once corresponding to `edx-platform` branch names
@@ -32,7 +32,17 @@ jobs:
           password: ${{ secrets.DOCKERPASSWORD }}
         if: ${{ env.BRANCH == 'main' || env.BRANCH == 'prod' }}
 
-      - name: 'Push the docker images after merge to `main` and `prod`'
+      - name: 'build devstack image (push after merge to `main`)'
+        shell: bash
+        run: |
+          # This overrides same-day merges on `main` but it's devstack so it doesn't matter much
+          DATE=$(date --iso-8601)
+          make DATE="$DATE" devstack-docker-build
+          if [ "$BRANCH" == "main" ]; then
+            make DATE="$DATE" devstack-docker-push
+          fi
+
+      - name: 'Push the Tutor docker images after merge to `main` and `prod`'
         shell: bash
         run: |
           IMAGE_NAME="appsembler/edxapp-juniper"
