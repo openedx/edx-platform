@@ -74,7 +74,7 @@ shell: ## launch a bash shell in a Docker container with all edx-platform depend
 
 DATE := $(shell date --iso-8601)
 devstack-docker-build:
-	docker build --no-cache --squash -f Dockerfile.devstack \
+	docker build --no-cache -f Dockerfile.devstack \
           -t appsembler/edxapp:juniper.master \
           -t appsembler/edxapp:juniper.manual-$(DATE) .
 
