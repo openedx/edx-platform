@@ -11,6 +11,7 @@ pyparsing                           # Python Parsing module
 random2                             # Implementation of random module that works identically under Python 2 and 3
 scipy                               # Math, science, and engineering library
 sympy                               # Symbolic math library
+codejail-includes                   # CodeJail manages execution of untrusted code in secure sandboxes.
 
 # numpy>=1.17.0 caused failures in importing numpy in code-jail environment.
 # The issue will be investigated and fixed in https://openedx.atlassian.net/browse/BOM-2841.
@@ -19,4 +20,5 @@ numpy>=1.16.0,<1.17.0
 # Install these packages from the edx-platform working tree
 # NOTE: if you change code in these packages, you MUST change the version
 # number in its setup.py or the code WILL NOT be installed during deploy.
--e common/lib/sandbox-packages
+
+
