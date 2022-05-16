@@ -93,7 +93,6 @@ def send_ace_message(context):  # lint-amnesty, pylint: disable=missing-function
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
 def send_ace_message_for_reported_content(context):  # lint-amnesty, pylint: disable=missing-function-docstring
-    log.info('Reported content email notification task started.')
     context['course_id'] = CourseKey.from_string(context['course_id'])
     context['course_name'] = modulestore().get_course(context['course_id']).display_name
 
@@ -114,7 +113,6 @@ def send_ace_message_for_reported_content(context):  # lint-amnesty, pylint: dis
             log.info(f'Sending forum reported content email notification with context {message_context}')
             ace.send(message)
             # TODO: add tracking for reported content email
-    log.info('Reported content email notification task completed.')
 
 
 def _track_notification_sent(message, context):
