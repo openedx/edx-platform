@@ -105,7 +105,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-08 20:43+0000\n"
+"POT-Creation-Date: 2022-05-15 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -10320,7 +10320,6 @@ msgid "Student"
 msgstr "Siswa"
 
 #: openedx/core/djangoapps/embargo/forms.py
-#: openedx/core/djangoapps/verified_track_content/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
 msgstr ""
 "MATA PELAJARAN TIDAK DITEMUKAN. Mohon cek apakah ID mata pelajaran valid."
@@ -10372,6 +10371,10 @@ msgstr "Daftar putihkan {country} untuk {course}"
 #, python-brace-format
 msgid "Blacklist {country} for {course}"
 msgstr "Daftar hitamkan {country} untuk {course}"
+
+#: openedx/core/djangoapps/learner_pathway/apps.py
+msgid "Learner Pathways"
+msgstr ""
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -11596,10 +11599,6 @@ msgstr "{header_open}{title}{header_close}"
 #: openedx/core/djangoapps/util/user_messages.py
 msgid "Dismiss"
 msgstr "Abaikan"
-
-#: openedx/core/djangoapps/verified_track_content/models.py
-msgid "The course key for the course we would like to be auto-cohorted."
-msgstr ""
 
 #: openedx/core/djangoapps/video_pipeline/models.py
 msgid "Oauth client name of VEM service."

@@ -71,7 +71,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-08 20:42+0000\n"
+"POT-Creation-Date: 2022-05-15 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: YAHAYA MWAVURIZI <translations_1@camara.ie>, 2017\n"
 "Language-Team: Swahili (Kenya) (http://www.transifex.com/open-edx/edx-platform/language/sw_KE/)\n"
@@ -3727,27 +3727,6 @@ msgstr ""
 
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
-msgstr ""
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/certificates.js
