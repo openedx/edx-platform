@@ -9,8 +9,8 @@ import unittest
 import ddt
 from lxml import etree
 
-from capa.tests.helpers import test_capa_system
-from capa.util import (
+from xmodule.capa.tests.helpers import test_capa_system
+from xmodule.capa.util import (
     compare_with_tolerance,
     contextualize_text,
     get_inner_html_from_xpath,

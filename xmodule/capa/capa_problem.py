@@ -27,13 +27,13 @@ import six
 from lxml import etree
 from pytz import UTC
 
-import capa.customrender as customrender
-import capa.inputtypes as inputtypes
-import capa.responsetypes as responsetypes
-import capa.xqueue_interface as xqueue_interface
-from capa.correctmap import CorrectMap
-from capa.safe_exec import safe_exec
-from capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_module
+import xmodule.capa.customrender as customrender
+import xmodule.capa.inputtypes as inputtypes
+import xmodule.capa.responsetypes as responsetypes
+import xmodule.capa.xqueue_interface as xqueue_interface
+from xmodule.capa.correctmap import CorrectMap
+from xmodule.capa.safe_exec import safe_exec
+from xmodule.capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_module
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.edx_six import get_gettext
 from xmodule.stringify import stringify_children

@@ -32,10 +32,10 @@ from mock import ANY, patch
 from pyparsing import ParseException
 from six.moves import zip
 
-from capa import inputtypes
-from capa.checker import DemoSystem
-from capa.tests.helpers import test_capa_system
-from capa.xqueue_interface import XQUEUE_TIMEOUT
+from xmodule.capa import inputtypes
+from xmodule.capa.checker import DemoSystem
+from xmodule.capa.tests.helpers import test_capa_system
+from xmodule.capa.xqueue_interface import XQUEUE_TIMEOUT
 from openedx.core.djangolib.markup import HTML
 
 # just a handy shortcut
@@ -606,7 +606,7 @@ class MatlabTest(unittest.TestCase):
 
             assert context == expected
 
-    @patch('capa.inputtypes.time.time', return_value=10)
+    @patch('xmodule.capa.inputtypes.time.time', return_value=10)
     def test_rendering_while_queued(self, time):  # lint-amnesty, pylint: disable=unused-argument
         state = {
             'value': 'print "good evening"',
@@ -658,7 +658,7 @@ class MatlabTest(unittest.TestCase):
         assert 'queuekey' not in self.the_input.input_state
         assert 'queuestate' not in self.the_input.input_state
 
-    @patch('capa.inputtypes.time.time', return_value=10)
+    @patch('xmodule.capa.inputtypes.time.time', return_value=10)
     def test_ungraded_response_success(self, time):  # lint-amnesty, pylint: disable=unused-argument
         queuekey = 'abcd'
         input_state = {'queuekey': queuekey, 'queuestate': 'queued', 'queuetime': 5}
@@ -677,7 +677,7 @@ class MatlabTest(unittest.TestCase):
         assert input_state['queuestate'] is None
         assert input_state['queue_msg'] == inner_msg
 
-    @patch('capa.inputtypes.time.time', return_value=10)
+    @patch('xmodule.capa.inputtypes.time.time', return_value=10)
     def test_ungraded_response_key_mismatch(self, time):  # lint-amnesty, pylint: disable=unused-argument
         queuekey = 'abcd'
         input_state = {'queuekey': queuekey, 'queuestate': 'queued', 'queuetime': 5}
@@ -696,7 +696,7 @@ class MatlabTest(unittest.TestCase):
         assert input_state['queuestate'] == 'queued'
         assert 'queue_msg' not in input_state
 
-    @patch('capa.inputtypes.time.time', return_value=20)
+    @patch('xmodule.capa.inputtypes.time.time', return_value=20)
     def test_matlab_response_timeout_not_exceeded(self, time):  # lint-amnesty, pylint: disable=unused-argument
 
         state = {'input_state': {'queuestate': 'queued', 'queuetime': 5}}
@@ -705,7 +705,7 @@ class MatlabTest(unittest.TestCase):
         the_input = self.input_class(test_capa_system(), elt, state)
         assert the_input.status == 'queued'
 
-    @patch('capa.inputtypes.time.time', return_value=45)
+    @patch('xmodule.capa.inputtypes.time.time', return_value=45)
     def test_matlab_response_timeout_exceeded(self, time):  # lint-amnesty, pylint: disable=unused-argument
 
         state = {'input_state': {'queuestate': 'queued', 'queuetime': 5}}
@@ -715,7 +715,7 @@ class MatlabTest(unittest.TestCase):
         assert the_input.status == 'unsubmitted'
         assert the_input.msg == 'No response from Xqueue within {} seconds. Aborted.'.format(XQUEUE_TIMEOUT)
 
-    @patch('capa.inputtypes.time.time', return_value=20)
+    @patch('xmodule.capa.inputtypes.time.time', return_value=20)
     def test_matlab_response_migration_of_queuetime(self, time):  # lint-amnesty, pylint: disable=unused-argument
         """
         Test if problem was saved before queuetime was introduced.
@@ -1212,7 +1212,7 @@ class ChemicalEquationTest(unittest.TestCase):
         With parse errors, ChemicalEquationInput should give an error message
         """
         # Simulate answering a problem that raises the exception
-        with patch('capa.inputtypes.chemcalc.render_to_html') as mock_render:
+        with patch('xmodule.capa.inputtypes.chemcalc.render_to_html') as mock_render:
             mock_render.side_effect = ParseException("ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
             response = self.the_input.handle_ajax(
                 "preview_chemcalc",
@@ -1222,12 +1222,12 @@ class ChemicalEquationTest(unittest.TestCase):
         assert 'error' in response
         assert "Couldn't parse formula" in response['error']
 
-    @patch('capa.inputtypes.log')
+    @patch('xmodule.capa.inputtypes.log')
     def test_ajax_other_err(self, mock_log):
         """
         With other errors, test that ChemicalEquationInput also logs it
         """
-        with patch('capa.inputtypes.chemcalc.render_to_html') as mock_render:
+        with patch('xmodule.capa.inputtypes.chemcalc.render_to_html') as mock_render:
             mock_render.side_effect = Exception()
             response = self.the_input.handle_ajax(
                 "preview_chemcalc",
@@ -1360,7 +1360,7 @@ class FormulaEquationTest(unittest.TestCase):
         With parse errors, FormulaEquationInput should give an error message
         """
         # Simulate answering a problem that raises the exception
-        with patch('capa.inputtypes.latex_preview') as mock_preview:
+        with patch('xmodule.capa.inputtypes.latex_preview') as mock_preview:
             mock_preview.side_effect = ParseException("Oopsie")
             response = self.the_input.handle_ajax(
                 "preview_formcalc",
@@ -1370,12 +1370,12 @@ class FormulaEquationTest(unittest.TestCase):
         assert 'error' in response
         assert response['error'] == "Sorry, couldn't parse formula"
 
-    @patch('capa.inputtypes.log')
+    @patch('xmodule.capa.inputtypes.log')
     def test_ajax_other_err(self, mock_log):
         """
         With other errors, test that FormulaEquationInput also logs it
         """
-        with patch('capa.inputtypes.latex_preview') as mock_preview:
+        with patch('xmodule.capa.inputtypes.latex_preview') as mock_preview:
             mock_preview.side_effect = Exception()
             response = self.the_input.handle_ajax(
                 "preview_formcalc",
