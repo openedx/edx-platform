@@ -558,7 +558,7 @@ frozenlist==1.3.0
     # via
     #   aiohttp
     #   aiosignal
-fs==2.0.18
+fs==2.0.27
     # via
     #   -r requirements/edx/base.in
     #   django-pyfs
