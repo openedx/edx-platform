@@ -1,0 +1,14 @@
+<selfassessment attempts='10'>
+    <prompt>
+        What is the meaning of life?
+    </prompt>
+    <rubric>
+        This is a rubric.
+    </rubric>
+    <submitmessage>
+        Thanks for your submission!
+    </submitmessage>
+    <hintprompt>
+        Enter a hint below:
+    </hintprompt>
+</selfassessment>

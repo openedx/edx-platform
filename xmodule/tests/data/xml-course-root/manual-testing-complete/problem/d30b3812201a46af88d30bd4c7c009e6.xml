@@ -1,0 +1,15 @@
+<problem display_name="Numerical Input" markdown="A numerical input problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.&#10;&#10;The answer is correct if it is within a specified numerical tolerance of the expected answer.&#10;&#10;&gt;&gt;Enter the numerical value of Pi:&lt;&lt;&#10;= 3.14159 +- .02&#10;&#10;[explanation]&#10;Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.&#10;[explanation]&#10;">
+  <p>A numerical input problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.</p>
+  <p>The answer is correct if it is within a specified numerical tolerance of the expected answer.</p>
+  <p>Enter the numerical value of Pi:</p>
+  <numericalresponse answer="3.14159">
+    <responseparam type="tolerance" default=".02"/>
+    <formulaequationinput label="Enter the numerical value of Pi:"/>
+  </numericalresponse>
+  <solution>
+    <div class="detailed-solution">
+      <p>Explanation</p>
+      <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
+    </div>
+  </solution>
+</problem>

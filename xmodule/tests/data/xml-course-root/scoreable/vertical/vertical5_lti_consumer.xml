@@ -1,0 +1,3 @@
+<vertical display_name="LTI Consumer">
+  <lti_consumer url_name="04fe04404d284ffd8dc754a6b70dc8f1" xblock-family="xblock.v1" weight="2.0" has_score="true" button_text="Launch" lti_id="lti" launch_url="http://example.com"/>
+</vertical>

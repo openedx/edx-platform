@@ -1,0 +1,31 @@
+<problem weight="null" max_attempts="10" markdown="null">
+  <script type="loncapa/python">
+
+def two_d_grader(expect,ans):
+  import json
+  ans=json.loads(ans)
+  if "ERROR" in ans["protex_answer"]:
+    raise ValueError("Protex did not understand your answer... try folding the protein")
+  return ans["protex_answer"]=="CORRECT"
+
+
+</script>
+  <text>
+    <customresponse cfn="two_d_grader">
+      <designprotein2dinput width="855" height="500" target_shape="W;W;W;W;W;W;W"/>
+    </customresponse>
+  </text>
+  <p>Be sure to click "Fold" to fold your protein before you click "Check".</p>
+  <solution>
+    <p>
+            There are many protein sequences that will fold to the shape we asked you
+            about. Here is a sample sequence that will work. You can play around with
+            it if you are curious.
+        </p>
+    <ul>
+      <li>
+                Stick: RRRRRRR
+            </li>
+    </ul>
+  </solution>
+</problem>

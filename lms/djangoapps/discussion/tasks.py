@@ -21,7 +21,7 @@ from six.moves.urllib.parse import urljoin
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.track import segment
-from common.lib.xmodule.xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore
 from lms.djangoapps.discussion.django_comment_client.utils import (
     permalink,
     get_users_with_moderator_roles,

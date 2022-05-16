@@ -1,0 +1,27 @@
+<course display_name="A Simple Course" org="edX" course="simple" graceperiod="1 day 5 hours 59 minutes 59 seconds" url_name="2012_Fall">
+  <chapter display_name="Overview">
+    <video name="Welcome" youtube_id_0_75="izygArpw-Qo" youtube_id_1_0="p2Q6BrNhdh8" youtube_id_1_25="1EeWXzPdhSA" youtube_id_1_5="rABDYkeK0x8"/>
+    <sequential format="Lecture Sequence" display_name="A simple sequence">
+      <html display_name="toylab" filename="toylab"/>
+      <video name="S0V1: Video Resources" youtube_id_0_75="EuzkdzfR0i8" youtube_id_1_0="1bK-WdDi6Qw" youtube_id_1_25="0v1VzoDVUTM" youtube_id_1_5="Bxk_-ZJb240"/>
+    </sequential>
+    <sequential display_name="Lecture 2">
+      <video youtube_id_1_0="TBvX7HzxexQ"/>
+      <problem display_name="L1 Problem 1" points="1" type="lecture" showanswer="attempted" filename="L1_Problem_1" rerandomize="never"/>
+    </sequential>
+  </chapter>
+  <chapter display_name="Chapter 2" url_name='chapter_2'>
+    <sequential display_name="Problem Set 1">
+      <problem type="lecture" showanswer="attempted" rerandomize="true" display_name="Simple coding problem" filename="ps01-simple" url_name="ps01-simple"/>
+    </sequential>
+    <video name="Lost Video" youtube_id_1_0="TBvX7HzxexQ"/>
+    <sequential format="Lecture Sequence" url_name='test_sequence'>
+      <vertical url_name='test_vertical'>
+        <html url_name='test_html'>
+          Foobar
+        </html>
+        <discussion url_name="custom_id" discussion_id="custom"></discussion>
+      </vertical>
+    </sequential>
+  </chapter>
+</course>

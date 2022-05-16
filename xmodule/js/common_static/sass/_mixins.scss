@@ -1,0 +1,478 @@
+// common - utilities - mixins and extends
+// ====================
+
+// Table of Contents
+// * +Font Sizing - Mixin
+// * +Line Height - Mixin
+// * +Sizing - Mixin
+// * +Square - Mixin
+// * +Placeholder Styling - Mixin
+// * +Flex Support - Mixin
+// * +Flex Polyfill - Extends
+// * +UI - Wrapper - Extends
+// * +UI - Window - Extend
+// * +UI - Visual Link - Extend
+// * +UI - Functional Disable - Extend
+// * +UI - Visual Link - Extend
+// * +UI - Depth Levels - Extends
+// * +UI - Clear Children - Extends
+// * +UI - Buttons - Extends
+// * +UI - Well Archetype - Extends
+// * +Content - No List - Extends
+// * +Content - Hidden Image Text - Extend
+// * +Content - Screenreader Text - Extend
+// * +Content - Text Wrap - Extend
+// * +Content - Text Truncate - Extend
+// * +Icon - Font-Awesome  - Extend
+// * +Icon - SSO icon images
+
+// +Font Sizing - Mixin
+// ====================
+@mixin font-size($sizeValue: 16) {
+  font-size: $sizeValue + px;
+  font-size: ($sizeValue/10) + rem;
+}
+
+// +Line Height - Mixin
+// ====================
+@mixin line-height($fontSize: auto) {
+  line-height: ($fontSize*1.48) + px;
+  line-height: (($fontSize/10)*1.48) + rem;
+}
+
+// +Sizing - Mixin
+// ====================
+@mixin size($width: $baseline, $height: $baseline) {
+  height: $height;
+  width: $width;
+}
+
+// +Square - Mixin
+// ====================
+@mixin square($size: $baseline) {
+  @include size($size);
+}
+
+// +Placeholder Styling - Mixin
+// ====================
+@mixin placeholder($color) {
+  :-moz-placeholder {
+    color: $color;
+  }
+
+  ::-webkit-input-placeholder {
+    color: $color;
+  }
+
+  :-ms-input-placeholder {
+    color: $color;
+  }
+}
+
+// +Flex Support - Mixin
+// ====================
+@mixin ui-flexbox() {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+
+// +Flex PolyFill - Extends
+// ====================
+
+// justify-content right for display:flex alignment in older browsers
+%ui-justify-right-flex {
+  -webkit-box-pack: flex-end;
+  -moz-box-pack: flex-end;
+  -ms-flex-pack: flex-end;
+  -webkit-justify-content: flex-end;
+  justify-content: flex-end;
+}
+
+// justify-content left for display:flex alignment in older browsers
+%ui-justify-left-flex {
+  -webkit-box-pack: flex-start;
+  -moz-box-pack: flex-start;
+  -ms-flex-pack: flex-start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+}
+
+// align items center for display:flex alignment in older browsers
+%ui-align-center-flex {
+  -webkit-flex-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+
+// +UI - Wrapper - Extends
+// ====================
+// used for page/view-level wrappers (for centering/grids)
+%ui-wrapper {
+  @include clearfix();
+
+  box-sizing: border-box;
+  width: 100%;
+}
+
+// layout placeholders
+.ui-col-wide {
+  width: flex-grid(9, 12);
+
+  @include margin-right(flex-gutter());
+  @include float(left);
+}
+
+.ui-col-narrow {
+  width: flex-grid(3, 12);
+
+  @include float(left);
+}
+
+// +UI - Window - Extends
+// ====================
+%ui-window {
+  @include clearfix();
+
+  border-radius: ($baseline/10);
+  box-shadow: 0 1px 1px $shadow-l2;
+  margin-bottom: $baseline;
+  border: 1px solid $gray-l2;
+  background: $white;
+
+  // STATE: hover/active
+  &:hover,
+  &:active {
+    box-shadow: 0 1px 1px $shadow;
+  }
+}
+
+// +UI - Visual Link - Extends
+// ====================
+%ui-fake-link {
+  cursor: pointer;
+}
+
+// +UI - Functional Disable - Extends
+// ====================
+%ui-disabled {
+  pointer-events: none;
+  outline: none;
+  cursor: default;
+}
+
+// +UI - Depth Levels - Extends
+// ====================
+%ui-depth0 { z-index: 0; }
+%ui-depth1 { z-index: 10; }
+%ui-depth2 { z-index: 100; }
+%ui-depth3 { z-index: 1000; }
+%ui-depth4 { z-index: 10000; }
+%ui-depth5 { z-index: 100000; }
+
+
+// +UI - Clear Children - Extends
+// ====================
+// extends - UI - utility - first child clearing
+%wipe-first-child {
+  &:first-child {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+// extends - UI - utility - last child clearing
+%wipe-last-child {
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+// +UI - Buttons - Extends
+// ====================
+%ui-btn {
+  box-sizing: border-box;
+
+  @include transition(color $tmg-f2 ease-in-out 0s, border-color $tmg-f2 ease-in-out 0s, background $tmg-f2 ease-in-out 0s, box-shadow $tmg-f2 ease-in-out 0s);
+
+  display: inline-block;
+  cursor: pointer;
+
+  &.disabled,
+  &[disabled],
+  &.is-disabled {
+    cursor: default;
+    pointer-events: none;
+    border: 1px solid $gray-l3;
+    background-color: $gray-l3;
+    color: $gray-l5;
+  }
+
+  .icon-inline {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+  }
+}
+
+// pill button
+%ui-btn-pill {
+  border-radius: ($baseline/5);
+}
+
+%ui-btn-rounded {
+  border-radius: ($baseline/2);
+}
+
+// primary button
+%ui-btn-primary {
+  @extend %ui-btn;
+  @extend %ui-btn-pill;
+  @extend %t-strong;
+
+  padding: ($baseline/2) $baseline;
+  border-width: 1px;
+  border-style: solid;
+  box-shadow: none;
+  line-height: 1.5em;
+  text-align: center;
+
+  &:hover,
+  &:active,
+  &:focus {
+    box-shadow: 0 2px 1px $shadow;
+  }
+
+  &.current,
+  &.active {
+    box-shadow: inset 1px 1px 2px $shadow-d1;
+
+    &:hover,
+    &:active,
+    &:focus {
+      box-shadow: inset 1px 1px 1px $shadow-d1;
+    }
+  }
+}
+
+// secondary button
+%ui-btn-secondary {
+  @extend %ui-btn;
+  @extend %ui-btn-pill;
+
+  border-width: 1px;
+  border-style: solid;
+  padding: ($baseline/2) $baseline;
+  background: transparent;
+  line-height: 1.5em;
+  text-align: center;
+}
+
+%ui-btn-flat-outline {
+  @include transition(all 0.15s);
+
+  @extend %t-strong;
+  @extend %t-action4;
+
+  text-align: center;
+  border-radius: ($baseline/4);
+  border: 1px solid theme-color("primary");
+  padding: 1px ($baseline/2) 2px ($baseline/2);
+  background-color: theme-color("inverse");
+  color: theme-color("primary");
+
+  &:hover,
+  &:focus {
+    border: 1px solid $uxpl-blue-hover-active;
+    background-color: $uxpl-blue-hover-active;
+    color: theme-color("inverse");
+  }
+
+  &.is-disabled,
+  &[disabled="disabled"] {
+    border: 1px solid $gray-l2;
+    background-color: $gray-l4;
+    color: $gray-l2;
+    pointer-events: none;
+  }
+}
+
+// button with no button shell until hover for understated actions
+%ui-btn-non {
+  @include transition(all 0.15s);
+
+  @extend %ui-btn-pill;
+
+  @include transition(all $tmg-f2 linear 0s);
+
+  display: inline-block;
+  vertical-align: middle;
+  border: none;
+  padding: 3px ($baseline/2);
+  background: none;
+  color: $gray-l1;
+
+  &:hover,
+  &:focus {
+    background-color: $gray-l1;
+    color: $white;
+  }
+}
+
+// button with no button shell until hover for understated actions
+%ui-btn-non-blue {
+  @extend %ui-btn-non;
+
+  &:hover,
+  &:focus {
+    background-color: theme-color("primary");
+    color: theme-color("inverse");
+  }
+}
+
+// +UI - Well Archetype - Extends
+// ====================
+%ui-well {
+  box-shadow: inset 0 1px 2px 1px $shadow;
+  padding: ($baseline*0.75) $baseline;
+}
+
+%no-content {
+  @extend %ui-well;
+
+  padding: ($baseline*2);
+  background-color: $gray-l4;
+  text-align: center;
+  color: $gray;
+
+  .button,
+  .action {
+    @extend %btn-primary-green;
+    @extend %t-action3;
+
+    margin-left: $baseline;
+
+    .icon {
+      margin-right: ($baseline/2);
+    }
+  }
+}
+
+.ui-loading {
+  @include animation(fadeIn $tmg-f2 linear 1);
+
+  @extend %ui-well;
+  @extend %t-copy-base;
+
+  opacity: 0.6;
+  background-color: $white;
+  padding: ($baseline*1.5) $baseline;
+  text-align: center;
+
+  .spin {
+    @extend %anim-rotateCW;
+
+    display: inline-block;
+  }
+
+  .copy {
+    padding-left: ($baseline/4);
+  }
+}
+
+.is-hidden {
+  display: none;
+}
+
+// +Content - No List - Extends
+// ====================
+// removes list styling/spacing when using uls, ols for navigation and less content-centric cases
+%cont-no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+
+  li {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// +Content - Hidden Image Text - Extend
+// ====================
+// image-replacement hidden text
+%cont-text-hide {
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+// +Content - Screenreader Text - Extend
+// ====================
+%cont-text-sr {
+  // clip has been deprecated but is still supported
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  position: absolute;
+  margin: -1px;
+  height: 1px;
+  width: 1px;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  // ensure there are spaces in sr text
+  word-wrap: normal;
+}
+
+// +Content - Text Wrap - Extend
+// ====================
+%cont-text-wrap {
+  word-wrap: break-word;
+}
+
+// +Content - Text Truncate - Extend
+// ====================
+%cont-truncated {
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// * +Icon - Font-Awesome  - Extend
+// ====================
+%use-font-awesome {
+  display: inline-block;
+  font-family: FontAwesome;
+  -webkit-font-smoothing: antialiased;
+  speak: none;
+}
+
+%btn-no-style {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+
+// * +Icon - SSO icon images
+// ====================
+
+%sso-icon {
+  .icon-image {
+    width: auto;
+    height: auto;
+    max-height: 2em;
+    max-width: 2em;
+    margin-top: -2px;
+  }
+}

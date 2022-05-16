@@ -1,0 +1,4 @@
+<library xblock-family="xblock.v1" display_name="Test Problems" org="TestOrg" library="TestProbs100">
+  <problem url_name="afe9dbb29b724181944f56617c72b3e5"/>
+  <problem url_name="ba28f97e8f33414e9a5de0068508f7fa"/>
+</library>

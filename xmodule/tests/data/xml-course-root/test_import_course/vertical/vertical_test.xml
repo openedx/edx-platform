@@ -1,0 +1,9 @@
+<sequential>
+    <video display_name="default" youtube_id_0_75="JMD_ifUUfsU" youtube_id_1_0="OEoXaMPEzfM" youtube_id_1_25="AKqURZnYqpk" youtube_id_1_5="DYpADpL7jAY" name="sample_video"/>
+    <video url_name="separate_file_video"/>
+    <poll_question name="T1_changemind_poll_foo_2" display_name="Change your answer" reset="false">
+        <p>Have you changed your mind?</p>
+        <answer id="yes">Yes</answer>
+        <answer id="no">No</answer>
+    </poll_question>
+</sequential>

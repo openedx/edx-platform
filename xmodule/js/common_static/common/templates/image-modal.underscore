@@ -1,0 +1,42 @@
+<div class="wrapper-modal wrapper-modal-image">
+  <section class="image-link">
+    <%= smallHTML%> <% // xss-lint: disable=underscore-not-escaped %>
+    <a href="#" class="modal-ui-icon action-fullscreen" role="button">
+      <span class="label">
+        <span class="icon fa fa-arrows-alt fa-large" aria-hidden="true"></span> <%- gettext("Fullscreen") %>
+      </span>
+    </a>
+  </section>
+
+  <section class="image-modal">
+    <section class="image-content">
+      <div class="image-wrapper">
+        <img alt="<%- largeALT %>, <%- gettext('Large') %>" src="<%- largeSRC %>" />
+      </div>
+
+      <a href="#" class="modal-ui-icon action-close" role="button">
+        <span class="label">
+          <span class="icon fa fa-remove fa-large" aria-hidden="true"></span> <%- gettext("Close") %>
+        </span>
+      </a>
+
+      <ul class="image-controls">
+        <li class="image-control">
+          <a href="#" class="modal-ui-icon action-zoom-in" role="button">
+            <span class="label">
+              <span class="icon fa fa fa-search-plus fa-large" aria-hidden="true"></span> <%- gettext("Zoom In") %>
+            </span>
+          </a>
+        </li>
+
+        <li class="image-control">
+          <a href="#" class="modal-ui-icon action-zoom-out is-disabled" aria-disabled="true" role="button">
+            <span class="label">
+              <span class="icon fa fa fa-search-minus fa-large" aria-hidden="true"></span> <%- gettext("Zoom Out") %>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </section>
+</div>

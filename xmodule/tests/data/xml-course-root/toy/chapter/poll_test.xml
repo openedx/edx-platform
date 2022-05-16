@@ -1,0 +1,7 @@
+<sequential>
+	<poll_question name="T1_changemind_poll_foo" display_name="Change your answer" reset="false">
+        <p>Have you changed your mind? ’</p>
+        <answer id="yes">Yes</answer>
+        <answer id="no">No</answer>
+    </poll_question>
+</sequential>

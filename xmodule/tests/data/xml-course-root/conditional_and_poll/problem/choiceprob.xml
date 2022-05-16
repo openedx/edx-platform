@@ -1,0 +1,22 @@
+<problem display_name="S3E2: Lorentz Force">
+
+<startouttext/>
+<p>Consider a hypothetical magnetic field pointing out of your computer screen. Now imagine an electron traveling from right to left in the plane of your screen. A diagram of this situation is show below…</p>
+<center><img width="400" src="/static/images/LSQimages/LSQ_W01_8.png"/></center>
+
+<p>a. The magnitude of the force experienced by the electron is proportional the product of which of the following? (Select all that apply.)</p>
+<endouttext/>
+<choiceresponse>
+<checkboxgroup>
+<!-- include ellipses to test non-ascii characters -->
+<choice correct="true"><text>Magnetic field strength…</text></choice>
+<choice correct="false"><text>Electric field strength…</text></choice>
+<choice correct="true"><text>Electric charge of the electron…</text></choice>
+<choice correct="false"><text>Radius of the electron…</text></choice>
+<choice correct="false"><text>Mass of the electron…</text></choice>
+<choice correct="true"><text>Velocity of the electron…</text></choice>
+
+</checkboxgroup>
+</choiceresponse>
+
+</problem>

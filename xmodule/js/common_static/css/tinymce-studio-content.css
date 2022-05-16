@@ -1,0 +1,160 @@
+/* NOTE: This file, which customizes mid-editing styling to match xmodule preview rendering, is 3 of 3 CSS files compiled in our production pipeline  */
+.mce-content-body {
+    padding: 10px;
+    background-color: #fff;
+    /* keep font-family in sync with CUSTOM_FONTS constant in Html editor XModule
+     * (edx-platform/common/lib/xmodule/xmodule/js/src/html/edit.js)
+     * and with acceptance tests in cms/djangoapps/contentstore/features/html-editor.feature
+     */
+    font-family: 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #3c3c3c;
+    scrollbar-3dlight-color: #F0F0EE;
+    scrollbar-arrow-color: #676662;
+    scrollbar-base-color: #F0F0EE;
+    scrollbar-darkshadow-color: #DDDDDD;
+    scrollbar-face-color: #E0E0DD;
+    scrollbar-highlight-color: #F0F0EE;
+    scrollbar-shadow-color: #F0F0EE;
+    scrollbar-track-color: #F5F5F5;
+}
+
+.mce-content-body h1,
+.mce-content-body .hd-1 {
+    color: #3c3c3c;
+    font-weight: normal;
+    font-size: 2em;
+    line-height: 1.4em;
+    margin: 0 0 1.41575em 0;
+}
+
+.mce-content-body h2,
+.mce-content-body .hd-2,
+.mce-content-body h3 {
+    color: #646464;
+    font-weight: 300;
+    font-size: 1.6em;
+    line-height: 1.4em;
+    margin-bottom: 1.6em;
+}
+
+.mce-content-body .hd-3,
+.mce-content-body h4,
+.mce-content-body .hd-4,
+.mce-content-body h5,
+.mce-content-body .hd-5,
+.mce-content-body h6,
+.mce-content-body .hd-6 {
+    margin: 0 0 10px 0;
+    font-weight: 600;
+}
+
+.mce-content-body h4,
+.mce-content-body .hd-4 {
+    font-size: 1.4em;
+}
+
+.mce-content-body h5,
+.mce-content-body .hd-5 {
+    font-size: 1.2em;
+}
+
+.mce-content-body h6,
+.mce-content-body .hd-6 {
+    font-size: 1em;
+}
+
+.mce-content-body p {
+    margin-bottom: 1.416em;
+    font-size: 1em;
+    line-height: 1.6em !important;
+    color: #3c3c3c;
+}
+
+.mce-content-body em, .mce-content-body i {
+    font-style: italic;
+}
+
+.mce-content-body strong, .mce-content-body b {
+    font-style: bold;
+}
+
+.mce-content-body p + p, .mce-content-body ul + p, .mce-content-body ol + p {
+    margin-top: 20px;
+}
+
+.mce-content-body ol, .mce-content-body ul {
+    margin: 1em 0;
+    padding: 0 0 0 1em;
+    color: #3c3c3c;
+
+}
+
+.mce-content-body ol li, .mce-content-body ul li {
+    margin-bottom: 0.708em;
+}
+
+.mce-content-body ol {
+    list-style: decimal outside none;
+}
+
+.mce-content-body ul {
+    list-style: disc outside none;
+}
+
+.mce-content-body a, .mce-content-body a:link, .mce-content-body a:visited, .mce-content-body a:hover, .mce-content-body a:active {
+    color: #1d9dd9;
+}
+
+.mce-content-body img {
+    max-width: 100%;
+    height: auto;
+}
+
+.mce-content-body pre {
+  margin: 1em 0;
+  color: #3c3c3c;
+  font-family: monospace, serif;
+  font-size: 1em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.mce-content-body code {
+    font-family: monospace, serif;
+    background: none;
+    color: #3c3c3c;
+    padding: 0;
+}
+
+.mce-content-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+.mce-content-body th {
+    background: #eee;
+    font-weight: bold;
+}
+
+.mce-content-body table td, .mce-content-body th {
+    margin: 20px 0;
+    padding: 10px;
+    border: 1px solid #ccc !important;
+    text-align: left;
+    font-size: 14px;
+}
+
+.mce-content-body table td.cont-justified-left, .mce-content-body table th.cont-justified-left {
+    text-align: left;
+}
+
+.mce-content-body table td.cont-justified-right, .mce-content-body table th.cont-justified-right {
+    text-align: right;
+}
+
+.mce-content-body table td.cont-justified-center, .mce-content-body table th.cont-justified-center {
+    text-align: center;
+}

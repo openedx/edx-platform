@@ -1,0 +1,4 @@
+<course advanced_modules="[&quot;lti&quot;, &quot;lti_consumer&quot;, &quot;library_content&quot;, &quot;split_test&quot;, &quot;conditional&quot;, &quot;randomize&quot;, &quot;drag-and-drop-v2&quot;, &quot;library&quot;, &quot;acid_parent&quot;, &quot;done&quot;, &quot;wrapper&quot;, &quot;edx_sga&quot;, &quot;bookmarks&quot;]" cert_html_view_enabled="true" display_name="Introduction to problems." graceperiod="" language="en" minimum_grade_credit="0.8" start="&quot;2030-01-01T00:00:00+00:00&quot;">
+  <chapter url_name="chapter1"/>
+  <wiki slug="edX.jcd101.2016-10-11"/>
+</course>
