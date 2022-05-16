@@ -17,7 +17,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 from xblock.runtime import DictKeyValueStore
 
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory
 from lms.djangoapps.courseware.masquerade import (
     MASQUERADE_SETTINGS_KEY,
     CourseMasquerade,

@@ -32,10 +32,10 @@ from mock import ANY, patch
 from pyparsing import ParseException
 from six.moves import zip
 
-from capa import inputtypes
-from capa.checker import DemoSystem
-from capa.tests.helpers import test_capa_system
-from capa.xqueue_interface import XQUEUE_TIMEOUT
+from xmodule.capa import inputtypes
+from xmodule.capa.checker import DemoSystem
+from xmodule.capa.tests.helpers import test_capa_system
+from xmodule.capa.xqueue_interface import XQUEUE_TIMEOUT
 from openedx.core.djangolib.markup import HTML
 
 # just a handy shortcut
