@@ -102,7 +102,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-08 20:42+0000\n"
+"POT-Creation-Date: 2022-05-15 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Andrey Kryachko, 2018\n"
 "Language-Team: Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)\n"
@@ -3879,37 +3879,6 @@ msgstr "Когорти увімкнені"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Когорти вимкнені"
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-"Цей курс використовує автоматичний когортинг для перевірених для перевірених"
-" учасників треку. Ви не можете вимкнути когорти, і ви не можете "
-"перейменувати вручну  назву когорти '{verifiedCohortName}'. Щоб змінити "
-"конфігурацію перевірених доріжок когорт, зверніться до менеджера партнерів "
-"edX."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-"Цей курс має автоматичний когортинг для перевірених учнів, але необхідна "
-"когорта не існує. Вам необхідно створити когорту вручну, з назвою "
-"'{verifiedCohortName}', щоб функція працювала."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
-msgstr ""
-"Цей курс має автоматичний когортінг для перевірених учнів. але наразі "
-"когорти відключені. Ви повинні ввімкнути когорти для функціонування роботи. "
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
