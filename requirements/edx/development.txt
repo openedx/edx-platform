@@ -339,10 +339,8 @@ django-cache-memoize==0.1.10
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-django-celery-results==2.2.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.txt
+django-celery-results==2.3.1
+    # via -r requirements/edx/testing.txt
 django-classy-tags==3.0.1
     # via
     #   -r requirements/edx/testing.txt
@@ -353,7 +351,7 @@ django-config-models==2.3.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==3.11.0
+django-cors-headers==3.12.0
     # via -r requirements/edx/testing.txt
 django-countries==7.3.2
     # via
@@ -422,7 +420,7 @@ django-multi-email-field==0.6.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-django-mysql==4.5.0
+django-mysql==4.6.0
     # via -r requirements/edx/testing.txt
 django-oauth-toolkit==1.3.2
     # via
@@ -689,7 +687,7 @@ faker==13.11.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.77.0
+fastapi==0.77.1
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -1135,7 +1133,7 @@ pynacl==1.5.0
     #   edx-django-utils
 pynliner==0.8.0
     # via -r requirements/edx/testing.txt
-pyparsing==3.0.8
+pyparsing==3.0.9
     # via
     #   -r requirements/edx/testing.txt
     #   chem
@@ -1177,7 +1175,7 @@ pytest-metadata==1.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-json-report
-pytest-randomly==3.11.0
+pytest-randomly==3.12.0
     # via -r requirements/edx/testing.txt
 pytest-xdist[psutil]==2.5.0
     # via -r requirements/edx/testing.txt
@@ -1428,7 +1426,7 @@ sqlparse==0.4.2
     #   django-debug-toolbar
 staff-graded-xblock==2.0.1
     # via -r requirements/edx/testing.txt
-starlette==0.19.0
+starlette==0.19.1
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi

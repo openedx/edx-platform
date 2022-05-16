@@ -80,7 +80,3 @@ scipy<1.8.0
 # See issue: https://github.com/sphinx-contrib/openapi/issues/123
 mistune<2.0.0
 
-# django-celery-results==2.3.0 requires psycopg2 as dependency but hasn't explicitly added in package requirements.
-# The PR https://github.com/celery/django-celery-results/pull/292 fixing this issue has been merged but
-# new version hasn't been released yet with the fix so pinning the version until django-celery-results>2.3.0 is out.
-django-celery-results<2.3.0
