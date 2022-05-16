@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-12 19:13+0000\n"
-"PO-Revision-Date: 2022-05-12 19:13:49.680734\n"
+"POT-Creation-Date: 2022-05-16 21:49+0000\n"
+"PO-Revision-Date: 2022-05-16 21:49:53.208974\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -10657,7 +10657,6 @@ msgid "Student"
 msgstr "Sʇndǝnʇ"
 
 #: openedx/core/djangoapps/embargo/forms.py
-#: openedx/core/djangoapps/verified_track_content/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
 msgstr "ȻØɄɌSɆ NØŦ FØɄNĐ.  Ᵽlǝɐsǝ ɔɥǝɔʞ ʇɥɐʇ ʇɥǝ ɔønɹsǝ ƗĐ ᴉs ʌɐlᴉd."
 
@@ -12021,10 +12020,6 @@ msgstr "{header_open}{title}{header_close}"
 #: cms/templates/course_outline.html cms/templates/index.html
 msgid "Dismiss"
 msgstr "Đᴉsɯᴉss"
-
-#: openedx/core/djangoapps/verified_track_content/models.py
-msgid "The course key for the course we would like to be auto-cohorted."
-msgstr "Ŧɥǝ ɔønɹsǝ ʞǝʎ ɟøɹ ʇɥǝ ɔønɹsǝ ʍǝ ʍønld lᴉʞǝ ʇø bǝ ɐnʇø-ɔøɥøɹʇǝd."
 
 #: openedx/core/djangoapps/video_pipeline/models.py
 msgid "Oauth client name of VEM service."
