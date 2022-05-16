@@ -4,6 +4,7 @@
 #
 #    make upgrade
 #
+-e git+https://github.com/awais786/sandbox-packages.git@27d84916ee5061fc0bd1b7bc7db90f98ff389a65#egg=sandbox-packages
     # via -r requirements/edx-sandbox/py38.in
 cffi==1.15.0
     # via cryptography
