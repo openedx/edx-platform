@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: 'edx-platform'
+  description: "The Monolith"
+  links:
+    - url: "http://github.com/openedx/edx-platform"
+      title: "Source Code"
+      icon: "Code"
+  annotations:
+    openedx.org/arch-interest-groups: "feanil,djoy,dormsbee,nedbat"
+spec:
+  owner: group:tcril-engineering
+  type: 'source-code'
+  lifecycle: 'production'
