@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-08 20:42+0000\n"
+"POT-Creation-Date: 2022-05-15 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Aleks Ada, 2022\n"
 "Language-Team: Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)\n"
@@ -3858,37 +3858,6 @@ msgstr "Kohorty włączone"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Kohorty wyłączone"
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-"Ten kurs wykorzystuje system automatycznych kohort dla studentów ścieżki "
-"zweryfikowanej. Nie możesz wyłączyć kohort, ani zmienić nazwy kohorty "
-"'{verifiedCohortName}'. Aby zmienić konfigurację kohort ścieżki "
-"zweryfikowanej, skontaktuj się ze swoim Opiekunem Partnera."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-"Ten kurs wykorzystuje system automatycznych kohort dla studentów ścieżki "
-"zweryfikowanej, jednak wymagana kohorta nie istnieje. Musisz utworzyć "
-"ręcznie przydzieloną kohortę o nazwie '{verifiedCohortName}'."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
-msgstr ""
-"Ten kurs wykorzystuje system automatycznych kohort dla studentów ścieżki "
-"zweryfikowanej, jednak system kohort został wyłączony. Chcąc korzystać z "
-"tego rozwiązania musisz włączyć system kohort."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
