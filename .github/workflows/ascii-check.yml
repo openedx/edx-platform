@@ -1,0 +1,13 @@
+#verifies setup.cfg doesn't have any non-ascii characters
+
+name: ASCII check
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+
+jobs:
+  ascii-check:
+    uses: openedx/.github/.github/workflows/ascii-check.yml@jawayria/ascii-check
