@@ -27,9 +27,11 @@ from xmodule.util.sandboxing import SandboxService
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem
 from cms.djangoapps.xblock_config.models import StudioConfig
+from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id
 from cms.lib.xblock.field_data import CmsFieldData
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
+from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
@@ -194,6 +196,17 @@ def _preview_module_system(request, descriptor, field_data):
         # stick the license wrapper in front
         wrappers.insert(0, partial(wrap_with_license, mako_service=mako_service))
 
+    preview_anonymous_user_id = 'student'
+    if individualize_anonymous_user_id(course_id):
+        # There are blocks (capa, html, and video) where we do not want to scope
+        # the anonymous_user_id to specific courses. These are captured in the
+        # block attribute 'requires_per_student_anonymous_id'. Please note,
+        # the course_id field in AnynomousUserID model is blank if value is None.
+        if getattr(descriptor, 'requires_per_student_anonymous_id', False):
+            preview_anonymous_user_id = anonymous_id_for_user(request.user, None)
+        else:
+            preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
+
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -216,8 +229,8 @@ def _preview_module_system(request, descriptor, field_data):
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(
                 request.user,
-                anonymous_user_id='student',
                 user_role=get_user_role(request.user, course_id),
+                anonymous_user_id=preview_anonymous_user_id,
             ),
             "partitions": StudioPartitionService(course_id=course_id),
             "teams_configuration": TeamsConfigurationService(),
