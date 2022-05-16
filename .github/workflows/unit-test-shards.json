@@ -121,6 +121,7 @@
       "openedx/core/djangoapps/header_control/",
       "openedx/core/djangoapps/heartbeat/",
       "openedx/core/djangoapps/lang_pref/",
+      "openedx/core/djangoapps/learner_pathway/",
       "openedx/core/djangoapps/models/",
       "openedx/core/djangoapps/monkey_patch/",
       "openedx/core/djangoapps/oauth_dispatch/",
