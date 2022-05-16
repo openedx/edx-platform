@@ -3268,6 +3268,9 @@ INSTALLED_APPS = [
 
     # Blockstore
     'blockstore.apps.bundles',
+
+    # for learner pathways
+    'openedx.core.djangoapps.learner_pathway.apps.LearnerPathwayConfig',
 ]
 
 ######################### CSRF #########################################
