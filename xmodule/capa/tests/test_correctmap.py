@@ -6,7 +6,7 @@ Tests to verify that CorrectMap behaves correctly
 import datetime
 import unittest
 import pytest
-from capa.correctmap import CorrectMap
+from xmodule.capa.correctmap import CorrectMap
 
 
 class CorrectMapTest(unittest.TestCase):

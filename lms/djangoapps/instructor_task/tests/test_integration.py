@@ -20,8 +20,8 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from capa.responsetypes import StudentInputError
-from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
+from xmodule.capa.responsetypes import StudentInputError
+from xmodule.capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
 from lms.djangoapps.courseware.model_data import StudentModule
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor_task.api import (
