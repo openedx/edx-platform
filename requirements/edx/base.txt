@@ -46,7 +46,7 @@ aniso8601==9.0.1
     # via edx-tincan-py35
 appdirs==1.4.4
     # via fs
-asgiref==3.5.1
+asgiref==3.5.2
     # via django
 async-timeout==4.0.2
     # via
