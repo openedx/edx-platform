@@ -5,4 +5,4 @@
 -e common/lib/xmodule
 
 -e openedx/core/lib/xblock_builtin/xblock_discussion
--e git+https://github.com/awais786/sandbox-packages.git@27d84916ee5061fc0bd1b7bc7db90f98ff389a65#egg=sandbox-packages
+aq-codejail-includes
