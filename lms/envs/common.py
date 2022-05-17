@@ -3081,6 +3081,9 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
 
+    # GenZ Custom Features
+    'openedx.features.genz_features',
+
     'lms.djangoapps.experiments',
 
     # DRF filters
