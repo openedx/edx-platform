@@ -22,6 +22,7 @@ from datetime import date, datetime, timedelta  # lint-amnesty, pylint: disable=
 from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
 from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
 from urllib.parse import urlencode  # lint-amnesty, pylint: disable=wrong-import-order
+import warnings  # lint-amnesty, pylint: disable=wrong-import-order
 
 from config_models.models import ConfigurationModel
 from django.apps import apps
@@ -85,7 +86,7 @@ from lms.djangoapps.courseware.models import (
 )
 from lms.djangoapps.courseware.toggles import streak_celebration_is_active
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview , LiveClasses
 from openedx.core.djangoapps.enrollments.api import (
     _default_course_mode,
     get_enrollment_attributes,
@@ -161,11 +162,12 @@ class AnonymousUserId(models.Model):
     course_id = LearningContextKeyField(db_index=True, max_length=255, blank=True)
 
 
-def anonymous_id_for_user(user, course_id):
+def anonymous_id_for_user(user, course_id, save='DEPRECATED'):
     """
     Inputs:
         user: User model
         course_id: string or None
+        save: Deprecated and ignored: ID is always saved in an AnonymousUserId object
 
     Return a unique id for a (user, course_id) pair, suitable for inserting
     into e.g. personalized survey links.
@@ -177,6 +179,13 @@ def anonymous_id_for_user(user, course_id):
 
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
+
+    if save != 'DEPRECATED':
+        warnings.warn(
+            "anonymous_id_for_user no longer accepts save param and now "
+            "always saves the ID in the database",
+            DeprecationWarning
+        )
 
     if user.is_anonymous:
         return None
@@ -519,6 +528,7 @@ class UserProfile(models.Model):
     # for users imported from our first class.
     location = models.CharField(blank=True, max_length=255, db_index=True)
 
+
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now(UTC).year
     VALID_YEARS = list(range(this_year, this_year - 120, -1))
@@ -620,6 +630,9 @@ class UserProfile(models.Model):
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
+    #attendance = models.CharField(max_length=250, null=True, db_index=True)
+    user_attendance = models.CharField(max_length=250, null=True, db_index=True)
+
 
     @property
     def has_profile_image(self):
@@ -867,11 +880,20 @@ class UserSignupSource(models.Model):
     site = models.CharField(max_length=255, db_index=True)
 
 
-def unique_id_for_user(user):
+def unique_id_for_user(user, save='DEPRECATED'):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
+
+    Keyword arguments:
+    save -- Deprecated and ignored: ID is always saved in an AnonymousUserId object
     """
+    if save != 'DEPRECATED':
+        warnings.warn(
+            "unique_id_for_user no longer accepts save param and now "
+            "always saves the ID in the database",
+            DeprecationWarning
+        )
     # Setting course_id to '' makes it not affect the generated hash,
     # and thus produce the old per-student anonymous id
     return anonymous_id_for_user(user, None)
@@ -1217,6 +1239,16 @@ class CourseEnrollmentManager(models.Manager):
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
 
 
+
+
+class LiveClassEnrollment(models.Model):
+
+    live_class = models.ForeignKey(LiveClasses, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -1250,6 +1282,7 @@ class CourseEnrollment(models.Model):
     # If is_active is False, then the student is not considered to be enrolled
     # in the course (is_enrolled() will return False)
     is_active = models.BooleanField(default=True)
+
 
     # Represents the modes that are possible. We'll update this later with a
     # list of possible values.
@@ -2822,7 +2855,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         ),
     )
 
-    def is_enabled(self, *key_fields):  # pylint: disable=arguments-differ
+    def is_enabled(self, *key_fields):
         """
         Checks both the model itself and share_settings to see if LinkedIn Add to Profile is enabled
         """

@@ -19,6 +19,7 @@ from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import views as contentstore_views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 from openedx.core.apidocs import api_info
+from cms.djangoapps.contentstore.views.course import LiveClassesApiListView , LiveClassesDeleteApiView
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
@@ -92,6 +93,9 @@ urlpatterns = oauth2_urlpatterns + [
     path('howitworks', contentstore_views.howitworks, name='howitworks'),
     path('signin_redirect_to_lms', contentstore_views.login_redirect_to_lms, name='login_redirect_to_lms'),
     path('request_course_creator', contentstore_views.request_course_creator, name='request_course_creator'),
+    path('live_class/details/', LiveClassesApiListView.as_view(), name='user_live_class' ),
+    path('live_class/<id>', LiveClassesDeleteApiView.as_view(), name='live_class_delete' ),
+
     re_path(fr'^course_team/{COURSELIKE_KEY_PATTERN}(?:/(?P<email>.+))?$',
             contentstore_views.course_team_handler, name='course_team_handler'),
     re_path(fr'^course_info/{settings.COURSE_KEY_PATTERN}$', contentstore_views.course_info_handler,

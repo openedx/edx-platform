@@ -12,6 +12,32 @@ import string
 from collections import defaultdict
 from typing import Dict
 
+
+
+
+
+from openedx.core.djangoapps.enrollments.serializers import  LiveClassesSerializer
+from openedx.core.djangoapps.content.course_overviews.models import LiveClasses 
+from rest_framework.generics import ListAPIView , ListCreateAPIView , RetrieveDestroyAPIView ,RetrieveUpdateDestroyAPIView # lint-amnesty, pylint: disable=wrong-import-order
+
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
+
+
+from edx_rest_framework_extensions.auth.jwt.authentication import \
+    JwtAuthentication  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_rest_framework_extensions.auth.session.authentication import \
+    SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
+from opaque_keys import InvalidKeyError 
+from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
+
+
+
+
+
+
+
 import django.utils
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
@@ -559,11 +585,15 @@ def course_listing(request):
         'archived_courses': archived_courses,
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
+        'liveclass_enabled': True,
+        'liveclass_enabled_list': False,
         'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
+        'liveclass_authoring_mfe_url': '#',
         'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
         'libraries': [_format_library_for_view(lib, request) for lib in libraries],
         'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
         'user': user,
+          'show_new_liveclass_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(user),
         'rerun_creator_status': GlobalStaff().has_user(user),
@@ -587,6 +617,7 @@ def library_listing(request):
         'libraries_enabled': LIBRARIES_ENABLED,
         'libraries': [_format_library_for_view(lib, request) for lib in libraries],
         'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
+          'show_new_liveclass_button': LIBRARIES_ENABLED and request.user.is_active,
         'user': request.user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
@@ -856,9 +887,14 @@ def _create_or_rerun_course(request):
         start = request.json.get('start', CourseFields.start.default)
         run = request.json.get('run')
         has_course_creator_role = is_content_creator(request.user, org)
+        #log.info(org)
+        course_type = request.json.get('course_type')
 
         if not has_course_creator_role:
+            #log.info( request.user.id,org,course,)
+            # log.info(request)
             raise PermissionDenied()
+            #log.info(request)
 
         # allow/disable unicode characters in course_id according to settings
         if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
@@ -876,26 +912,35 @@ def _create_or_rerun_course(request):
         # existing xml courses this cannot be changed in CourseBlock.
         # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
         # w/ xmodule.course_module.CourseBlock.__init__
-        wiki_slug = f"{org}.{course}.{run}"
+        wiki_slug = f"{org}.{course}.{run}.{course_type}"
         definition_data = {'wiki_slug': wiki_slug}
         fields.update(definition_data)
 
         source_course_key = request.json.get('source_course_key')
+
+
         if source_course_key:
+            
             source_course_key = CourseKey.from_string(source_course_key)
-            destination_course_key = rerun_course(request.user, source_course_key, org, course, run, fields)
+            #log.info(source_course_key)
+            destination_course_key = rerun_course(request.user, source_course_key, org, course, run, fields , course_type)
+            #log.info( request.user.id,org,course,)
+            # log.info(request)
             return JsonResponse({
                 'url': reverse_url('course_handler'),
                 'destination_course_key': str(destination_course_key)
             })
+        
         else:
             try:
-                new_course = create_new_course(request.user, org, course, run, fields)
+                new_course = create_new_course(request.user, org, course, run, fields, course_type)
                 return JsonResponse({
                     'url': reverse_course_url('course_handler', new_course.id),
                     'course_key': str(new_course.id),
                 })
             except ValidationError as ex:
+                #log.info( request.user.id,org,course,)
+                # log.info(request)
                 return JsonResponse({'error': str(ex)}, status=400)
     except DuplicateCourseError:
         return JsonResponse({
@@ -923,6 +968,7 @@ def _create_or_rerun_course(request):
             request.user.id,
             org,
             course,
+            course_type,
         )
         return JsonResponse({
             'error': _('User does not have the permission to create courses in this organization '
@@ -931,7 +977,7 @@ def _create_or_rerun_course(request):
         )
 
 
-def create_new_course(user, org, number, run, fields):
+def create_new_course(user, org, number, run, fields , course_type):
     """
     Create a new course run.
 
@@ -946,12 +992,18 @@ def create_new_course(user, org, number, run, fields):
             'you selected does not exist in the system, you will need to add it to the system'
         ))
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
-    new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields)
+    new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields , course_type)
     add_organization_course(org_data, new_course.id)
+    #log.info(fields)
+    log.info( "-->>>>>>>>>>>>>>>>>>>>>",user,org ,course_type)
+    
     return new_course
 
+    
 
-def create_new_course_in_store(store, user, org, number, run, fields):
+
+
+def create_new_course_in_store(store, user, org, number, run, fields , course_type):
     """
     Create course in store w/ handling instructor enrollment, permissions, and defaulting the wiki slug.
     Separated out b/c command line course creation uses this as well as the web interface.
@@ -970,6 +1022,7 @@ def create_new_course_in_store(store, user, org, number, run, fields):
             number,
             run,
             user.id,
+            course_type,
             fields=fields,
         )
 
@@ -981,7 +1034,7 @@ def create_new_course_in_store(store, user, org, number, run, fields):
     return new_course
 
 
-def rerun_course(user, source_course_key, org, number, run, fields, background=True):
+def rerun_course(user, source_course_key, org, number, run, fields, course_type, background=True):
     """
     Rerun an existing course.
     """
@@ -992,7 +1045,7 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     # create destination course key
     store = modulestore()
     with store.default_store('split'):
-        destination_course_key = store.make_course_key(org, number, run)
+        destination_course_key = store.make_course_key(org, number, run, course_type)
 
     # verify org course and run don't already exist
     if store.has_course(destination_course_key, ignore_case=True):
@@ -1885,3 +1938,85 @@ def _get_course_creator_status(user):
         course_creator_status = 'granted'
 
     return course_creator_status
+
+
+
+class LiveClassesApiListView(DeveloperErrorViewMixin, ListCreateAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    serializer_class = LiveClassesSerializer
+    #pagination_class = LiveClassesSerializer
+    lookup_field = "username"
+
+    def get_queryset(self):
+        queryset = LiveClasses.objects.all()
+        usernames =self.kwargs.get('username')
+
+        if usernames:
+            queryset = queryset.filter(user__username__in=usernames)
+
+
+        return queryset
+
+
+
+
+        # validated_data['created_by_id']= self.context['user'].id
+        # return LiveClasses.objects.filter(created_by=validated_data)
+
+
+    def post(self, request, *args, **kwargs):
+        """Upload documents"""
+        try:
+            serializer = self.serializer_class(
+                data=request.data, context={'user':self.request.user}
+            )
+            serializer.is_valid(raise_exception=True)
+            
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class LiveClassesDeleteApiView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    serializer_class = LiveClassesSerializer
+    queryset = LiveClasses.objects.all()
+    model = LiveClasses
+    lookup_field = "id"
+
+ 
+            
+    def delete(self, request, *args, **kwargs):
+        
+
+        try:
+            live_class_id = self.model.objects.get(id=self.kwargs.get('id'))
+            live_class_id.delete()
+            return Response("Deleted Successfully", status=status.HTTP_200_OK)
+        except self.model.DoesNotExist:
+            return Response("Invalied Id", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+    def patch(self, request, *args, **kwargs):
+        try:
+            instance= self.get_object()
+            serializer = self.serializer_class(
+                data=request.data, instance= instance , context={'user': self.request.user}
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response("Updated Successfully", status=status.HTTP_200_OK)
+        except self.model.DoesNotExist:
+            return Response("Invalied Id", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+

@@ -17,8 +17,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section" title="Click to add a new section">
-                            <span class="icon fa fa-plus" aria-hidden="true"></span>New Section
+                        <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section" title="Click to add a new section"s>
+                            <span class="icon fa fa-plus" aria-hidden="true"></span>New sections
                         </a>
                     </li>
                     <li class="nav-item">

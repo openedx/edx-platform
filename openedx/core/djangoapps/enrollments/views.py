@@ -5,6 +5,7 @@ consist primarily of authentication, request validation, and serialization.
 """
 
 
+from cgitb import lookup
 import logging
 
 from django.core.exceptions import (  # lint-amnesty, pylint: disable=wrong-import-order
@@ -19,14 +20,16 @@ from edx_rest_framework_extensions.auth.session.authentication import \
 from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.generics import ListAPIView  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.generics import ListAPIView , ListCreateAPIView , RetrieveDestroyAPIView ,RetrieveUpdateDestroyAPIView # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.throttling import UserRateThrottle  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework import generics
 
 from common.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.content.course_overviews.models import LiveClasses 
 from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.student.models import CourseEnrollment, User ,LiveClassEnrollment
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
@@ -41,7 +44,7 @@ from openedx.core.djangoapps.enrollments.errors import (
 )
 from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
 from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination
-from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApiListSerializer
+from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApiListSerializer ,LiveClassesSerializer #, LiveClassEnrollmentSerializer
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
@@ -645,6 +648,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         Users who have the global staff permission can access all enrollment data for all
         courses.
         """
+        #import pdb; pdb.set_trace()
         username = request.GET.get('user', request.user.username)
         try:
             enrollment_data = api.get_enrollments(username)
@@ -973,3 +977,146 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         if usernames:
             queryset = queryset.filter(user__username__in=usernames)
         return queryset
+
+
+# class LiveClassesApiListView(DeveloperErrorViewMixin, ListCreateAPIView):
+#     authentication_classes = (
+#         JwtAuthentication,
+#         BearerAuthenticationAllowInactiveUser,
+#         SessionAuthenticationAllowInactiveUser,
+#     )
+#     permission_classes = (permissions.IsAdminUser,)
+#     throttle_classes = (EnrollmentUserThrottle,)
+#     serializer_class = LiveClassesSerializer
+#     #pagination_class = LiveClassesSerializer
+#     lookup_field = "username"
+
+#     def get_queryset(self):
+#         created_by_id = self.kwargs.get('username')
+
+#         return LiveClasses.objects.filter(created_by=created_by_id)
+
+
+
+
+#         # validated_data['created_by_id']= self.context['user'].id
+#         # return LiveClasses.objects.filter(created_by=validated_data)
+
+
+#     def post(self, request, *args, **kwargs):
+#         """Upload documents"""
+#         try:
+#             serializer = self.serializer_class(
+#                 data=request.data, context={'user':self.request.user}
+#             )
+#             serializer.is_valid(raise_exception=True)
+            
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# class LiveClassesDeleteApiView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView):
+#     authentication_classes = (
+#         JwtAuthentication,
+#         BearerAuthenticationAllowInactiveUser,
+#         SessionAuthenticationAllowInactiveUser,
+#     )
+#     permission_classes = (permissions.IsAdminUser,)
+#     throttle_classes = (EnrollmentUserThrottle,)
+#     serializer_class = LiveClassesSerializer
+#     queryset = LiveClasses.objects.all()
+#     model = LiveClasses
+#     lookup_field = "id"
+
+ 
+            
+#     def delete(self, request, *args, **kwargs):
+        
+
+#         try:
+#             live_class_id = self.model.objects.get(id=self.kwargs.get('id'))
+#             live_class_id.delete()
+#             return Response("Deleted Successfully", status=status.HTTP_200_OK)
+#         except self.model.DoesNotExist:
+#             return Response("Invalied Id", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+#     def patch(self, request, *args, **kwargs):
+#         try:
+#             instance= self.get_object()
+#             serializer = self.serializer_class(
+#                 data=request.data, instance= instance , context={'user': self.request.user}
+#             )
+#             serializer.is_valid(raise_exception=True)
+#             serializer.save()
+#             return Response("Updated Successfully", status=status.HTTP_200_OK)
+#         except self.model.DoesNotExist:
+#             return Response("Invalied Id", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+
+
+class LiveClassesListApiListView(DeveloperErrorViewMixin, ListAPIView):
+
+
+    
+    permission_classes = (permissions.IsAdminUser,)
+    throttle_classes = (EnrollmentUserThrottle,)
+    serializer_class = LiveClassesSerializer
+    #ypagination_class = CourseEnrollmentsApiListPagination
+    
+    
+    def get_queryset(self):
+
+
+        queryset = LiveClasses.objects.all()
+        usernames =self.kwargs.get('username')
+
+        if usernames:
+            queryset = queryset.filter(user__username__in=usernames)
+
+
+        return queryset
+
+
+    #     course_ids=self.request.query_params.getlist('course_id')
+    #     queryset = LiveClasses.objects.all()
+
+    #     if course_ids:
+    #         queryset = queryset.filter(course_id__in=course_ids)
+
+    #     return queryset
+
+
+
+
+
+
+
+
+# class LiveClassDetailsView(DeveloperErrorViewMixin, ListCreateAPIView):
+#     authentication_classes = (
+#         JwtAuthentication,
+#         BearerAuthenticationAllowInactiveUser,
+#         SessionAuthenticationAllowInactiveUser,
+#     )
+#     permission_classes = (permissions.IsAdminUser,)
+#     throttle_classes = (EnrollmentUserThrottle,)
+#     serializer_class = LiveClassEnrollmentSerializer
+#     #pagination_class = LiveClassesSerializer
+#     lookup_field = "username"
+
+
+#     # lookup_field = "username"
+
+#     # def get_queryset(self):
+#     #     created_by_id = self.kwargs.get('username')
+
+#     #     return LiveClasses.objects.filter(created_by=created_by_id)
+
+#     def get_queryset(self):
+#         username = self.kwargs.get('user_id')
+
+#         return LiveClassEnrollment.objects.filter(user_id=username)

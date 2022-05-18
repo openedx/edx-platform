@@ -1,6 +1,6 @@
 define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/views/utils/create_course_utils',
-    'js/views/utils/create_library_utils', 'common/js/components/utils/view_utils'],
-    function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibraryUtilsFactory, ViewUtils) {
+    'js/views/utils/create_library_utils','js/views/utils/create_liveclass_utils', 'js/views/utils/get_liveclass_utils','common/js/components/utils/view_utils'],
+    function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibraryUtilsFactory, CreateLiveClassUtilsFactory,GetiveClassUtilsFactory,ViewUtils) {
         'use strict';
         var CreateCourseUtils = new CreateCourseUtilsFactory({
             name: '.new-course-name',
@@ -38,6 +38,25 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
             disabled: 'is-disabled',
             error: 'error'
         });
+
+        var CreateLiveClassUtils = new CreateLiveClassUtilsFactory({
+            name: '.new-liveclass-name',
+            save: '.new-liveclass-save',
+            errorWrapper: '.create-liveclass .wrap-error',
+            errorMessage: '#liveclass_creation_error',
+            tipError: '.create-liveclass  span.tip-error',
+            error: '.create-liveclass .error',
+            allowUnicode: '.allow-unicode-liveclass-id'
+        }, {
+            shown: 'is-shown',
+            showing: 'is-showing',
+            hiding: 'is-hiding',
+            disabled: 'is-disabled',
+            error: 'error'
+        });
+
+        var GetLiveClassUtils = new GetiveClassUtilsFactory({
+        })
 
         var saveNewCourse = function(e) {
             e.preventDefault();
@@ -155,10 +174,84 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
             $('.new-library-save').on('click', saveNewLibrary);
             $cancelButton.bind('click', makeCancelHandler('library'));
             CancelOnEscape($cancelButton);
-
             CreateLibraryUtils.configureHandlers();
         };
 
+
+        var saveNewLiveClass= function(e) {
+            e.preventDefault();
+
+            // if (CreateLiveClassUtils.hasInvalidRequiredFields()) {
+            //     return;
+            // }
+           
+            var $newLiveClassForm = $(this).closest('#create-liveclass-form');
+           
+            var display_name = $newLiveClassForm.find('.new-liveclass-name').val();
+            
+            
+            let crt_room = {"name": display_name,
+            "privacy": "public",
+            "properties" : {
+              "start_audio_off":true,
+              "start_video_off":true,
+              //  nbf:start_unix,
+              //  exp:end_unix
+              }}
+              fetch("https://api.daily.co/v1/rooms/", {
+                method: "POST",
+                headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10'}, 
+                body: JSON.stringify(crt_room)
+              }).then(function(res){ return res.json(); })
+              .then(function(data){ 
+                var lib_info = {
+                    'topic_name':display_name,
+                    'is_recurrence_meeting':false,
+                    'meeting_link':data.url
+                };
+                analytics.track('Created a LiveClass', lib_info);
+
+                CreateLiveClassUtils.create(lib_info, function(errorMessage) {
+                    var msg = edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML('<p>'), errorMessage, edx.HtmlUtils.HTML('</p>'));
+                    $('.create-liveclass .wrap-error').addClass('is-shown');
+                    edx.HtmlUtils.setHtml($('#liveclass_creation_error'), msg);
+                    $('.new-liveclass-save').addClass('is-disabled').attr('aria-disabled', true);
+                });
+              
+          })  
+            
+        };
+
+        var addNewLiveClass = function(e) {
+            e.preventDefault();
+            $('.new-liveclass-button').addClass('is-disabled').attr('aria-disabled', true);
+            $('.new-liveclass-save').addClass('is-disabled').attr('aria-disabled', true);
+            var $newLiveClass = $('.wrapper-create-liveclass').addClass('is-shown');
+            var $cancelButton = $newLiveClass.find('.new-liveclass-cancel');
+            $('.new-liveclass-save').on('click', saveNewLiveClass);
+            
+            $cancelButton.bind('click', makeCancelHandler('liveclass'));
+            CancelOnEscape($cancelButton);
+            CreateLiveClassUtils.configureHandlers();
+        };
+        var checkClass = function(e) {
+           if(e.target.checked)
+           {
+            document.getElementById('field-liveclass-repeatcriteria').style.display = 'block';
+            document.getElementById('field-liveclass-date').style.display = 'none'
+           }
+           else
+           {
+            document.getElementById('field-liveclass-repeatcriteria').style.display = 'none';
+            document.getElementById('field-liveclass-date').style.display = 'block'
+           }
+        }
+        var loadData = function(e) {
+            var lib_info={}
+            GetLiveClassUtils.create(lib_info, function(res,errorMessage) {
+               //alert(res)
+            });
+        }
         var showTab = function(tab) {
             return function(e) {
                 e.preventDefault();
@@ -166,20 +259,36 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
                 $('.courses-tab').toggleClass('active', tab === 'courses-tab');
                 $('.archived-courses-tab').toggleClass('active', tab === 'archived-courses-tab');
                 $('.libraries-tab').toggleClass('active', tab === 'libraries-tab');
+                $('.liveclass-tab').toggleClass('active', tab === 'liveclass-tab');
 
             // Also toggle this course-related notice shown below the course tab, if it is present:
                 $('.wrapper-creationrights').toggleClass('is-hidden', tab !== 'courses-tab');
             };
         };
-
+        var libraryTab= function(tab) {
+            var output = document.getElementById('output');
+            output.style.display='none'
+        }
+        var courseTab= function(tab) {
+            var output = document.getElementById('output');
+            output.style.display='none'
+        }
+       
         var onReady = function() {
             var courseTabHref = $('#course-index-tabs .courses-tab a').attr('href');
             var libraryTabHref = $('#course-index-tabs .libraries-tab a').attr('href');
             var ArchivedTabHref = $('#course-index-tabs .archived-courses-tab a').attr('href');
-
+            var LiveClassTabHref = $('#course-index-tabs .liveclass-tab a').attr('href');
+            
+            $('.new-liveclass-recurrence').bind('click', checkClass);
             $('.new-course-button').bind('click', addNewCourse);
             $('.new-library-button').bind('click', addNewLibrary);
-
+            $('.new-liveclass-button').bind('click', addNewLiveClass);
+            $('.liveclass-tab').bind('click', loadData);
+            $('.libraries-tab').bind('click', libraryTab);
+            $('.courses-tab').bind('click', courseTab);
+            $('.new-liveclass-repeattype').bind('click', courseTab);
+            
             $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function() {
                 ViewUtils.reload();
             }));
@@ -192,6 +301,10 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
 
             if (libraryTabHref === '#') {
                 $('#course-index-tabs .libraries-tab').bind('click', showTab('libraries-tab'));
+            }
+
+            if (LiveClassTabHref === '#') {
+                $('#course-index-tabs .liveclass-tab').bind('click', showTab('liveclass-tab'));
             }
 
             if (ArchivedTabHref === '#') {

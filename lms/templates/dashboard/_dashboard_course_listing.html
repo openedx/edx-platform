@@ -74,15 +74,15 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
   % else:
     <% mode_class = '' %>
   % endif
-      <div class="course-container"
+      <div class="course-container" style="border: none;"
         % if getattr(course_overview, 'language'):
           lang="${course_overview.language}"
         % endif
       >
-<article class="course${mode_class}" aria-labelledby="course-title-${enrollment.course_id}" id="course-card-${course_card_index}">
+<article class="course${mode_class}" style="background: #fff; padding: 12px 24px;  border: none; border-radius: 12px;" aria-labelledby="course-title-${enrollment.course_id}" id="course-card-${course_card_index}">
   <% course_target = course_home_url(course_overview.id) %>
-  <section class="details" aria-labelledby="details-heading-${enrollment.course_id}">
-      <h2 class="hd hd-2 sr" id="details-heading-${enrollment.course_id}">${_('Course details')}</h2>
+  <section class="details" style="padding-right: 0;" aria-labelledby="details-heading-${enrollment.course_id}">   
+       <h2 class="hd hd-2 sr" id="details-heading-${enrollment.course_id}">${_('Course details')}</h2>
     <div class="wrapper-course-image" aria-hidden="true">
       % if show_courseware_link and not is_unfulfilled_entitlement:
         % if not is_course_expired:
@@ -113,7 +113,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
         <h3 class="course-title" id="course-title-${enrollment.course_id}">
           % if show_courseware_link and not is_unfulfilled_entitlement:
             % if not is_course_expired:
-              <a data-course-key="${enrollment.course_id}" href="${course_target}" class="course-target-link">${course_overview.display_name_with_default}</a>
+            <a data-course-key="${enrollment.course_id}" href="${course_target}"  style="color: #000; font-weight: 900;" class="course-target-link">${course_overview.display_name_with_default}</a>
             % else:
               <a class="disable-look" data-course-key="${enrollment.course_id}">${course_overview.display_name_with_default}</a>
             % endif
@@ -124,8 +124,8 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
         <div class="wrapper-course-info-actions">
           <div class="wrapper-course-info-row">
             <div class="course-info">
-              <span class="info-university">${course_overview.display_org_with_default} - </span>
-              <span class="info-course-id">${course_overview.display_number_with_default}</span>
+              <span class="info-university" style="color: #8499B1">${course_overview.display_org_with_default} - </span>
+              <span class="info-course-id" style="color: #8499B1">${course_overview.display_number_with_default}</span>
               <%
                 enrollment_date = course_overview.self_paced and enrollment and enrollment.created
                 if course_overview.start_date_is_still_default:
@@ -266,7 +266,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                         <span class="sr">&nbsp;
                           ${course_overview.display_name_with_default}
                         </span>
-                        <span class="fa fa-cog" aria-hidden="true"></span>
+                        <!-- <span class="fa fa-cog" aria-hidden="true"></span> -->
                       </button>
                       <div class="actions-dropdown" id="actions-dropdown-${dashboard_index}" tabindex="-1">
                         <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">

@@ -16,6 +16,7 @@ from django.utils.translation import gettext as _
   </a>
 % else:
   <a href="${course_target}"
+  style="background: #ff7f27; color: #fff; border-color: #ff7f27; border-bottom: 5px solid #f36426; border-radius: 12px; font-weight: 600;"
       class="course-target-link enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
       data-course-key="${enrollment.course_id}">
     ${_('View Course')}

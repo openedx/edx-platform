@@ -270,10 +270,48 @@ from common.djangoapps.student.models import CourseEnrollment
             </div>
           % endif
         </div>
+        <div class="sidepannel">
+          <h3 style="font-weight: 900; font-size: 20px;" class="header-courses">Learning Path</h3>
+          <div style="background: #fff; border-radius: 12px; margin-top: 30px;padding: 16px 24px">
+            <div class="calendar"></div>
+            <h3 style="font-weight: 900; margin-bottom: 36px; font-size: 20px;">Live Class</h3>
+            <ul style="list-style:none; padding: 0">
+              <li style="margin-bottom:20px; display: flex; align-items:flex-start; justify-content: space-between;">
+                <div>
+                  <h4 style="color: #000; line-height: 1.5; font-weight: 900; font-size: 16px; letter-spacing: 2px">Roblox Game Maker</h4>
+                  <small style="color: #8499B1;"> 15:00-16:00 hrs</small>
+                </div>
+                <button style="background: #ff7f27; color: #fff; font-weight: 600; padding: 4px 24px; border-radius: 12px; box-shadow: 0 0; font-weight: 900; font-size: 14px; border-color: #ff7f27; border-bottom: 5px solid #f36300; text-shadow: 0 0;">Join</button>
+              </li>
+              <li style="margin-bottom:20px;">
+                <div>
+                  <h4 style="color: #000; line-height: 1.5; font-weight: 900; font-size: 16px; letter-spacing: 2px">Roblox Game Maker</h4>
+                  <small style="color: #8499B1;"> 15:00-16:00 hrs</small>
+                </div>
+              </li>
+              <li style="margin-bottom:20px;">
+                <div>
+                  <h4 style="color: #000; line-height: 1.5; font-weight: 900; font-size: 16px; letter-spacing: 2px">Roblox Game Maker</h4>
+                  <small style="color: #8499B1;"> 15:00-16:00 hrs</small>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div style="margin-top: 60px;" class="announcement">
+            <h3 style="font-weight: 900; margin-bottom: 24px; font-size: 20px;">Announcements</h3>
+            <ul style="list-style: none; padding: 0; line-height: 1.5;">
+              <li style="color: #000; font-weight: 600; font-size: 12px; margin-bottom: 8px"><span style="width:10px; height:10px; border-radius: 10px; background: #ff7f27; box-shadow: 0 1px rgba(0,0,0,1); display: inline-block;margin-right: 6px;"></span>Today will be a test in python course</li>
+              <li style="color: #000; font-weight: 600; font-size: 12px; margin-bottom: 8px"><span style="width:10px; height:10px; border-radius: 10px; background: #ff7f27; box-shadow: 0 1px rgba(0,0,0,1); display: inline-block;margin-right: 6px;"></span>Announcement 2</li>
+              <li style="color: #000; font-weight: 600; font-size: 12px; margin-bottom: 8px"><span style="width:10px; height:10px; border-radius: 10px; background: #ff7f27; box-shadow: 0 1px rgba(0,0,0,1); display: inline-block;margin-right: 6px;"></span>Announcement 3</li>
+            </ul>
+          </div>
+        </div>
+
+
       </div>
-      <div class="side-container" role="complementary" aria-label="messages">
+      <!-- <div class="side-container" role="complementary" aria-label="messages"> -->
         %if display_sidebar_account_activation_message:
-          <div class="sidebar-notification">
+          <!-- <div class="sidebar-notification"> -->
             <%include file="${static.get_template_path('registration/account_activation_sidebar_notice.html')}" />
           </div>
         %endif
@@ -400,5 +438,7 @@ from common.djangoapps.student.models import CourseEnrollment
     </form>
   </div>
 </div>
-
+<script>
+  
+</script>
 <%include file="dashboard/_dashboard_entitlement_unenrollment_modal.html"/>
