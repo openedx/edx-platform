@@ -1211,14 +1211,6 @@ OAUTH_ENFORCE_SECURE = True
 OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS = 365
 OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
-# .. setting_name: JWT_ACCESS_TOKEN_EXPIRE_SECONDS
-# .. setting_default: 60 * 60
-# .. setting_description: The number of seconds a JWT access token remains valid. We use this
-#     custom setting for JWT formatted access tokens, rather than the django-oauth-toolkit setting
-#     ACCESS_TOKEN_EXPIRE_SECONDS, because the JWT is non-revocable and we want it to be shorter
-#     lived than the legacy Bearer (opaque) access tokens, and thus to have a smaller default.
-JWT_ACCESS_TOKEN_EXPIRE_SECONDS = 60 * 60
-
 ################################## THIRD_PARTY_AUTH CONFIGURATION #############################
 TPA_PROVIDER_BURST_THROTTLE = '10/min'
 TPA_PROVIDER_SUSTAINED_THROTTLE = '50/hr'
