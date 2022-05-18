@@ -61,6 +61,9 @@ def create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=None):
     access_token = oauth_adapter.get_access_token(token_dict['access_token'])
     client = oauth_adapter.get_client_for_token(access_token)
 
+    # use a JWT specific expiration
+    token_dict['expires_in'] = settings.JWT_ACCESS_TOKEN_EXPIRE_SECONDS
+
     # TODO (ARCH-204) put access_token as a JWT ID claim (jti)
     return _create_jwt(
         access_token.user,
