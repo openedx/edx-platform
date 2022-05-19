@@ -14,6 +14,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.bulk_email.api import create_course_email
 from lms.djangoapps.bulk_email.data import BulkEmailTargetChoices
 from lms.djangoapps.instructor_task.api_helper import QueueConnectionError, schedule_task, submit_scheduled_task
+from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import SCHEDULED, InstructorTask, InstructorTaskSchedule
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory, InstructorTaskScheduleFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
@@ -47,7 +48,7 @@ class ScheduledBulkEmailInstructorTaskTests(InstructorTaskCourseTestCase):
         self.targets = [BulkEmailTargetChoices.SEND_TO_MYSELF]
         self.course_email = self._create_course_email(self.targets)
         self.schedule = datetime.datetime.now(datetime.timezone.utc)
-        self.task_type = "bulk_course_email"
+        self.task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
         self.task_input = json.dumps(self._generate_bulk_email_task_input(self.course_email, self.targets))
         self.task_key = hashlib.md5(str(self.course_email.id).encode('utf-8')).hexdigest()
 
@@ -150,7 +151,7 @@ class ScheduledInstructorTaskSubmissionTests(InstructorTaskCourseTestCase):
         # create an instructor task instance
         task_id = str(uuid4())
         self.task = InstructorTaskFactory.create(
-            task_type="bulk_course_email",
+            task_type=InstructorTaskTypes.BULK_COURSE_EMAIL,
             course_id=self.course.id,
             task_input="{'email_id': 41, 'to_option': ['myself']}",
             task_key="3416a75f4cea9109507cacd8e2f2aefc",

@@ -87,6 +87,7 @@ from lms.djangoapps.instructor_task.api_helper import (
     QueueConnectionError,
     generate_already_running_error_message
 )
+from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
@@ -2664,7 +2665,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         response = self.client.post(url, {})
         assert response.status_code == 200
         # CSV generation already in progress:
-        task_type = 'may_enroll_info_csv'
+        task_type = InstructorTaskTypes.MAY_ENROLL_INFO_CSV
         already_running_status = generate_already_running_error_message(task_type)
         with patch('lms.djangoapps.instructor_task.api.submit_calculate_may_enroll_csv') as submit_task_function:
             error = AlreadyRunningError(already_running_status)
@@ -2843,7 +2844,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
     def test_get_ora2_responses_already_running(self):
         url = reverse('export_ora2_data', kwargs={'course_id': str(self.course.id)})
-        task_type = 'export_ora2_data'
+        task_type = InstructorTaskTypes.EXPORT_ORA2_DATA
         already_running_status = generate_already_running_error_message(task_type)
 
         with patch('lms.djangoapps.instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
@@ -2867,7 +2868,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
     def test_get_ora2_submission_files_already_running(self):
         url = reverse('export_ora2_submission_files', kwargs={'course_id': str(self.course.id)})
-        task_type = 'export_ora2_submission_files'
+        task_type = InstructorTaskTypes.EXPORT_ORA2_SUBMISSION_FILES
         already_running_status = generate_already_running_error_message(task_type)
 
         with patch(
@@ -2889,7 +2890,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
     def test_get_ora2_summary_responses_already_running(self):
         url = reverse('export_ora2_summary', kwargs={'course_id': str(self.course.id)})
-        task_type = 'export_ora2_summary'
+        task_type = InstructorTaskTypes.EXPORT_ORA2_SUMMARY
         already_running_status = generate_already_running_error_message(task_type)
 
         with patch('lms.djangoapps.instructor_task.api.submit_export_ora2_summary') as mock_submit_ora2_task:
