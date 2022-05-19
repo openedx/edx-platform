@@ -7,7 +7,7 @@ runs:
       shell: bash
       run: |
         echo "root_cms_unit_tests_count=$(pytest --collect-only --ds=cms.envs.test cms/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
-        echo "root_lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ common/lib/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+        echo "root_lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ common/lib/ xmodule/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
 
     - name: get GHA unit test paths
       shell: bash
