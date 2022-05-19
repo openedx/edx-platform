@@ -40,6 +40,10 @@ exclude+='|^common/test/data/?.*$'
 exclude+='|^common/lib$'
 exclude+='|^common/lib/(capa|sandbox-packages|xmodule)$'
 
+# xmodule data folder
+exclude+='|^xmodule/tests/data/xml-course-root/capa$'
+exclude+='|^xmodule/tests/data/xml-course-root/uploads/python_lib_zip$'
+
 # Docs, scripts.
 exclude+='|^docs/.*$'
 exclude+='|^lms/djangoapps/monitoring/scripts$'
