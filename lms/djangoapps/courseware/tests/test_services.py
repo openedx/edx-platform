@@ -3,16 +3,20 @@ Tests for courseware services.
 """
 
 
+from functools import partial
 import itertools
 import json
+from unittest.mock import Mock
 
 import ddt
 
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.courseware.services import UserStateService
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
+from lms.djangoapps.courseware.services import ModuleService, UserStateService
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -124,3 +128,55 @@ class TestUserStateService(ModuleStoreTestCase):
         self._create_student_module({'key_1': 'value_1'})
         state = UserStateService().get_state_as_dict(**params)
         assert not state
+
+
+class TestModuleService(SharedModuleStoreTestCase):
+    """
+    Tests the Module Service.
+    """
+    COURSE_ID = 'edX/LmsModuleShimTest/2021_Fall'
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up the course and descriptor used to instantiate the runtime.
+        """
+        super().setUpClass()
+        org, number, run = cls.COURSE_ID.split('/')
+        cls.course = CourseFactory.create(org=org, number=number, run=run)
+        cls.descriptor = ItemFactory(category="vertical", parent=cls.course)
+
+    def setUp(self):
+        """
+        Set up the user and other fields that will be used to instantiate the runtime.
+        """
+        super().setUp()
+        self.user = UserFactory(id=232)
+        self.student_data = Mock()
+        self.track_function = Mock()
+        self.request_token = Mock()
+        self.contentstore = contentstore()
+        self.module = get_module_for_descriptor_internal(
+            user=self.user,
+            descriptor=self.descriptor,
+            student_data=self.student_data,
+            course_id=self.course.id,
+            track_function=self.track_function,
+            request_token=self.request_token,
+            course=self.course
+        )
+
+    def test_get_module(self):
+        """
+        Test the get_module method of ModuleService
+        """
+        module_service = ModuleService(partial(
+            get_module_for_descriptor_internal,
+            user=self.user,
+            student_data=self.student_data,
+            course_id=self.course.id,
+            track_function=self.track_function,
+            request_token=self.request_token,
+            course=self.course
+        ))
+        assert module_service.get_module(self.descriptor) == self.module

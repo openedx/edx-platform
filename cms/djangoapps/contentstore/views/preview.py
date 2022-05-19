@@ -35,6 +35,7 @@ from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
+from lms.djangoapps.courseware.services import ModuleService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.cache_utils import CacheService
@@ -207,11 +208,12 @@ def _preview_module_system(request, descriptor, field_data):
         else:
             preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
 
+    module_service = ModuleService(partial(_load_preview_module, request=request))
+
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
         track_function=lambda event_type, event: None,
-        get_module=partial(_load_preview_module, request),
         debug=True,
         mixins=settings.XBLOCK_MIXINS,
         course_id=course_id,
@@ -236,7 +238,8 @@ def _preview_module_system(request, descriptor, field_data):
             "teams_configuration": TeamsConfigurationService(),
             "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
             "cache": CacheService(cache),
-            'replace_urls': replace_url_service
+            'replace_urls': replace_url_service,
+            'module': module_service
         },
     )
 

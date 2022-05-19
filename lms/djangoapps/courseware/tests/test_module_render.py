@@ -2717,3 +2717,25 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': str(self.runtime.course_id), 'module_id': ''})
         assert self.runtime.replace_jump_to_id_urls(html) == \
             static_replace.replace_jump_to_id_urls(html, self.runtime.course_id, jump_to_id_base_url)
+
+    def test_get_module(self):
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.student_data,
+            self.descriptor,
+            self.course.id,
+            self.track_function,
+            self.request_token,
+            course=self.course,
+        )
+        module = render.get_module_for_descriptor_internal(
+            user=self.user,
+            descriptor=self.descriptor,
+            student_data=self.student_data,
+            course_id=self.course.id,
+            track_function=self.track_function,
+            request_token=self.request_token,
+            course=self.course
+        )
+
+        assert runtime.get_module(self.descriptor) == module

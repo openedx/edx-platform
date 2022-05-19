@@ -125,6 +125,7 @@ def get_split_user_partitions(user_partitions):
 @XBlock.needs('mako')
 @XBlock.needs('partitions')
 @XBlock.needs('user')
+@XBlock.needs('module')
 class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     SplitTestFields,
     SequenceMixin,
@@ -192,7 +193,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         Return the user bound child block for the partition or None.
         """
         if self.child_descriptor is not None:
-            return self.system.get_module(self.child_descriptor)
+            return self.runtime.service(self, 'module').get_module(self.child_descriptor)
         else:
             return None
 
@@ -272,7 +273,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
         for child_location in self.children:  # pylint: disable=no-member
             child_descriptor = self.get_child_descriptor_by_location(child_location)
-            child = self.system.get_module(child_descriptor)
+            child = self.runtime.service(self, 'module').get_module(child_descriptor)
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_fragment_resources(rendered_child)
             group_name, updated_group_id = self.get_data_for_vertical(child)
@@ -347,7 +348,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         """
         html = ""
         for active_child_descriptor in children:
-            active_child = self.system.get_module(active_child_descriptor)
+            active_child = self.runtime.service(self, 'module').get_module(active_child_descriptor)
             rendered_child = active_child.render(StudioEditableBlock.get_preview_view_name(active_child), context)
             if active_child.category == 'vertical':
                 group_name, group_id = self.get_data_for_vertical(active_child)

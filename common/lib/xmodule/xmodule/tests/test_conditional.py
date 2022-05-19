@@ -1,11 +1,13 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
+from functools import partial
 import json
 import unittest
 from unittest.mock import Mock, patch
 
 from django.conf import settings
 from fs.memoryfs import MemoryFS
+from lms.djangoapps.courseware.services import ModuleService
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
@@ -131,9 +133,15 @@ class ConditionalFactory:
             ScopeIds(None, None, cond_location, cond_location)
         )
         cond_descriptor.xmodule_runtime = system
-        system.get_module = lambda desc: desc if visible_to_nonstaff_users(desc) else None
+
+        def _check_module_user_access(descriptor):
+            if visible_to_nonstaff_users(descriptor):
+                return descriptor
+            return None
+
+        system._services['module'] = ModuleService(partial(_check_module_user_access))
         cond_descriptor.get_required_blocks = [
-            system.get_module(source_descriptor),
+            system._services['module'].get_module(source_descriptor),
         ]
 
         # return dict:
@@ -229,7 +237,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
 
     def get_module_for_location(self, location):
         descriptor = self.modulestore.get_item(location, depth=None)
-        return self.test_system.get_module(descriptor)
+        return self.test_system._services['module'].get_module(descriptor)
 
     @patch('xmodule.x_module.descriptor_global_local_resource_url')
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': False})

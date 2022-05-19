@@ -39,6 +39,7 @@ _ = lambda text: text
 
 
 @XBlock.needs('mako')
+@XBlock.needs('module')
 class ConditionalBlock(
     SequenceMixin,
     MakoTemplateBlockBase,
@@ -317,7 +318,8 @@ class ConditionalBlock(
         """
         Returns a list of bound XBlocks instances upon which XBlock depends.
         """
-        return [self.system.get_module(descriptor) for descriptor in self.get_required_module_descriptors()]
+        module_service = self.runtime.service(self, 'module')
+        return [module_service.get_module(descriptor) for descriptor in self.get_required_module_descriptors()]
 
     def get_required_module_descriptors(self):
         """

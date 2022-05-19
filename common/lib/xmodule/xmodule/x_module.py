@@ -1609,6 +1609,21 @@ class ModuleSystemShim:
         )
         return self.resources_fs
 
+    @property
+    def get_module(self):
+        """
+        Returns a function to bind module system and user data to given descriptor
+
+        Deprecated in favor of module service.
+        """
+        warnings.warn(
+            'runtime.get_module is deprecated. Please use the module service instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        module_service = self._services.get('module')
+        if module_service:
+            return partial(module_service.get_module)
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1624,7 +1639,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
     """
 
     def __init__(
-            self, static_url, track_function, get_module,
+            self, static_url, track_function,
             descriptor_runtime, debug=False, hostname="", publish=None,
             node_path="", course_id=None, error_descriptor_class=None,
             field_data=None, rebind_noauth_module_to_user=None,
@@ -1638,10 +1653,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
                          or otherwise tracking the event.
                          TODO: Not used, and has inconsistent args in different
                          files.  Update or remove.
-
-        get_module - function that takes a descriptor and returns a corresponding
-                         module instance object.  If the current user does not have
-                         access to that location, returns None.
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
 
@@ -1665,7 +1676,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         self.STATIC_URL = static_url
         self.track_function = track_function
-        self.get_module = get_module
         self.DEBUG = self.debug = debug
         self.HOSTNAME = self.hostname = hostname
         self.node_path = node_path

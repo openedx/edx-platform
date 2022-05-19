@@ -28,7 +28,7 @@ from cms.djangoapps.xblock_config.models import StudioConfig
 from common.djangoapps import static_replace
 from common.djangoapps.student.tests.factories import UserFactory
 
-from ..preview import _preview_module_system, get_preview_fragment
+from ..preview import _preview_module_system, get_preview_fragment, _load_preview_module
 
 
 @ddt.ddt
@@ -178,6 +178,7 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
 @XBlock.needs("field-data")
 @XBlock.needs("i18n")
 @XBlock.needs("mako")
+@XBlock.needs("module")
 @XBlock.needs("replace_urls")
 @XBlock.needs("user")
 @XBlock.needs("teams_configuration")
@@ -210,7 +211,7 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         self.field_data = mock.Mock()
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
-    @ddt.data("user", "i18n", "field-data", "teams_configuration", "replace_urls")
+    @ddt.data("user", "i18n", "field-data", "teams_configuration", "replace_urls", "module")
     def test_expected_services_exist(self, expected_service):
         """
         Tests that the 'user' and 'i18n' services are provided by the Studio runtime.
@@ -297,6 +298,9 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         html = '<a href="/static/id">'
         assert self.runtime.replace_urls(html) == \
             static_replace.replace_static_urls(html, course_id=self.runtime.course_id)
+
+    def test_get_module(self):
+        assert self.runtime.get_module(self.descriptor) == _load_preview_module(self.request, self.descriptor)
 
     def test_anonymous_user_id_preview(self):
         assert self.runtime.anonymous_student_id == 'student'

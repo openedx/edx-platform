@@ -3,6 +3,7 @@ Tests of completion xblock runtime services
 """
 
 
+from functools import partial
 import ddt
 from completion.models import BlockCompletion
 from completion.services import CompletionService
@@ -15,6 +16,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 from xmodule.tests import get_test_system
 
+from lms.djangoapps.courseware.services import ModuleService
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 
@@ -128,12 +130,12 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         def get_module(descriptor):
             """Mocks module_system get_module function"""
             sub_module_system = get_test_system(course_id=module.location.course_key)
-            sub_module_system.get_module = get_module
+            sub_module_system._services['module'] = ModuleService(partial(get_module))  # pylint: disable=protected-access
             sub_module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
             descriptor.bind_for_student(sub_module_system, self.user.id)
             return descriptor
 
-        module_system.get_module = get_module
+        module_system._services['module'] = ModuleService(partial(get_module))  # pylint: disable=protected-access
         module.xmodule_runtime = module_system
 
     def test_completion_service(self):

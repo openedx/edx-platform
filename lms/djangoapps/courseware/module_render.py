@@ -59,7 +59,7 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
-from lms.djangoapps.courseware.services import UserStateService
+from lms.djangoapps.courseware.services import ModuleService, UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
 from lms.djangoapps.grades.api import signals as grades_signals
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
@@ -469,30 +469,6 @@ def get_module_system_for_user(
         waittime=settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS,
     )
 
-    def inner_get_module(descriptor):
-        """
-        Delegate to get_module_for_descriptor_internal() with all values except `descriptor` set.
-
-        Because it does an access check, it may return None.
-        """
-        # TODO: fix this so that make_xqueue_callback uses the descriptor passed into
-        # inner_get_module, not the parent's callback.  Add it as an argument....
-        return get_module_for_descriptor_internal(
-            user=user,
-            descriptor=descriptor,
-            student_data=student_data,
-            course_id=course_id,
-            track_function=track_function,
-            position=position,
-            wrap_xmodule_display=wrap_xmodule_display,
-            grade_bucket_type=grade_bucket_type,
-            static_asset_path=static_asset_path,
-            user_location=user_location,
-            request_token=request_token,
-            course=course,
-            will_recheck_access=will_recheck_access,
-        )
-
     def get_event_handler(event_type):
         """
         Return an appropriate function to handle the event.
@@ -724,10 +700,25 @@ def get_module_system_for_user(
     field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
     field_data = LmsFieldData(field_data, student_data)
 
+    module_service = ModuleService(partial(
+        get_module_for_descriptor_internal,
+        user=user,
+        student_data=student_data,
+        course_id=course_id,
+        track_function=track_function,
+        position=position,
+        wrap_xmodule_display=wrap_xmodule_display,
+        grade_bucket_type=grade_bucket_type,
+        static_asset_path=static_asset_path,
+        user_location=user_location,
+        request_token=request_token,
+        course=course,
+        will_recheck_access=will_recheck_access,
+    ))
+
     system = LmsModuleSystem(
         track_function=track_function,
         static_url=settings.STATIC_URL,
-        get_module=inner_get_module,
         user=user,
         debug=settings.DEBUG,
         hostname=settings.SITE_NAME,
@@ -754,7 +745,8 @@ def get_module_system_for_user(
             'cache': CacheService(cache),
             'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
             'xqueue': xqueue_service,
-            'replace_urls': replace_url_service
+            'replace_urls': replace_url_service,
+            'module': module_service
         },
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,

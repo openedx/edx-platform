@@ -3,10 +3,12 @@ Basic unit tests for LibraryContentBlock
 
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
+from functools import partial
 from unittest.mock import Mock, patch
 
 from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
+from lms.djangoapps.courseware.services import ModuleService
 from lxml import etree
 from search.search_engine_base import SearchEngine
 from web_fragments.fragment import Fragment
@@ -61,12 +63,12 @@ class LibraryContentTest(MixedSplitTestCase):
         def get_module(descriptor):
             """Mocks module_system get_module function"""
             sub_module_system = get_test_system(course_id=module.location.course_key)
-            sub_module_system.get_module = get_module
+            sub_module_system._services['module'] = ModuleService(partial(get_module))
             sub_module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
             descriptor.bind_for_student(sub_module_system, self.user_id)
             return descriptor
 
-        module_system.get_module = get_module
+        module_system._services['module'] = ModuleService(partial(get_module))
         module.xmodule_runtime = module_system
 
 

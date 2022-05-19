@@ -15,10 +15,11 @@ import sys
 import traceback
 import unittest
 from contextlib import contextmanager
-from functools import wraps
+from functools import partial, wraps
 from unittest.mock import Mock
 
 from django.test import TestCase
+from lms.djangoapps.courseware.services import ModuleService
 
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
@@ -152,7 +153,6 @@ def get_test_system(
     return TestModuleSystem(
         static_url='/static',
         track_function=Mock(name='get_test_system.track_function'),
-        get_module=get_module,
         debug=True,
         hostname="edx.org",
         services={
@@ -166,7 +166,8 @@ def get_test_system(
                 waittime=10,
                 construct_callback=Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
             ),
-            'replace_urls': replace_url_service
+            'replace_urls': replace_url_service,
+            'module': ModuleService(partial(get_module))
         },
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         course_id=course_id,

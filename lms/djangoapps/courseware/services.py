@@ -39,3 +39,18 @@ class UserStateService:
             return json.loads(student_module.state)
         except StudentModule.DoesNotExist:
             return {}
+
+
+class ModuleService:
+    """
+    A service to bind user data and module system to descriptor using the given callback functiion
+    """
+
+    def __init__(self, module_callback) -> None:
+        self.module_callback = module_callback
+
+    def get_module(self, descriptor):
+        """
+        Invokes the callback function to bind user data and module system to given descriptor
+        """
+        return self.module_callback(descriptor=descriptor)

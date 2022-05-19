@@ -18,6 +18,7 @@ from xblock.fields import ScopeIds
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.badges.tests.factories import BadgeClassFactory
 from lms.djangoapps.badges.tests.test_models import get_image
+from lms.djangoapps.courseware.services import ModuleService
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from xmodule.modulestore.django import ModuleI18nService  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -62,7 +63,9 @@ class TestHandlerUrl(TestCase):
         self.runtime = LmsModuleSystem(
             static_url='/static',
             track_function=Mock(),
-            get_module=Mock(),
+            services={
+                'module': ModuleService(Mock())
+            },
             course_id=self.course_key,
             user=Mock(),
             descriptor_runtime=Mock(),
@@ -127,7 +130,9 @@ class TestUserServiceAPI(TestCase):
         self.runtime = LmsModuleSystem(
             static_url='/static',
             track_function=Mock(),
-            get_module=Mock(),
+            services={
+                'module': ModuleService(Mock())
+            },
             user=self.user,
             course_id=self.course_id,
             descriptor_runtime=Mock(),
@@ -177,7 +182,9 @@ class TestBadgingService(ModuleStoreTestCase):
         return LmsModuleSystem(
             static_url='/static',
             track_function=Mock(),
-            get_module=Mock(),
+            services={
+                'module': ModuleService(Mock())
+            },
             course_id=self.course_id,
             user=self.user,
             descriptor_runtime=Mock(),
@@ -230,7 +237,9 @@ class TestI18nService(ModuleStoreTestCase):
         self.runtime = LmsModuleSystem(
             static_url='/static',
             track_function=Mock(),
-            get_module=Mock(),
+            services={
+                'module': ModuleService(Mock())
+            },
             course_id=self.course.id,
             user=Mock(),
             descriptor_runtime=Mock(),
