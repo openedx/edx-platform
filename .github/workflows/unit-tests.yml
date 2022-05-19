@@ -10,6 +10,7 @@ jobs:
   run-tests:
     if: github.repository == 'openedx/edx-platform' || github.repository == 'edx/edx-platform-private'
     runs-on: [ edx-platform-runner ]
+    continue-on-error: true
     strategy:
       matrix:
         python-version: ['3.8']
