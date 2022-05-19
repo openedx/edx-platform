@@ -558,7 +558,7 @@ edx-django-release-util==1.2.0
     #   blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/testing.txt
-edx-django-utils==4.8.1
+edx-django-utils==5.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
