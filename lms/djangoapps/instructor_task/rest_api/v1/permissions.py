@@ -6,7 +6,7 @@ from rest_framework import permissions
 from common.djangoapps.student.api import is_user_staff_or_instructor_in_course
 
 
-class CanViewOrDeleteScheduledBulkCourseEmails(permissions.BasePermission):
+class CanViewOrModifyScheduledBulkCourseEmailTasks(permissions.BasePermission):
     """
     Permission class that ensures a user is allowed to interact with the bulk course messages in a given course-run.
     """

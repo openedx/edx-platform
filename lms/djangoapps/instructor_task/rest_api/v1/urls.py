@@ -6,7 +6,7 @@ from django.urls import re_path
 
 from lms.djangoapps.instructor_task.rest_api.v1.views import (
     ListScheduledBulkEmailInstructorTasks,
-    DeleteScheduledBulkEmailInstructorTask
+    ModifyScheduledBulkEmailInstructorTask
 )
 
 
@@ -18,7 +18,7 @@ urlpatterns = [
     ),
     re_path(
         fr"schedules/{settings.COURSE_ID_PATTERN}/bulk_email/(?P<schedule_id>[0-9]+)$",
-        DeleteScheduledBulkEmailInstructorTask.as_view(),
-        name="delete-scheduled-bulk-email-messages"
+        ModifyScheduledBulkEmailInstructorTask.as_view(),
+        name="modify-scheduled-bulk-email-messages"
     )
 ]

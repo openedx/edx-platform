@@ -14,7 +14,6 @@ import string
 import random
 import re
 
-import dateutil
 import pytz
 import edx_api_doc_tools as apidocs
 from django.conf import settings
@@ -90,6 +89,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
 )
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
+from lms.djangoapps.instructor_task.api import convert_schedule_to_utc_from_local
 from lms.djangoapps.instructor.constants import INVOICE_KEY
 from lms.djangoapps.instructor.enrollment import (
     enroll_email,
@@ -2714,7 +2714,7 @@ def send_email(request, course_id):
     # orphaned email object that will never be sent.
     if schedule:
         try:
-            schedule = _convert_schedule_to_utc_from_local(schedule, browser_timezone, request.user)
+            schedule = convert_schedule_to_utc_from_local(schedule, browser_timezone, request.user)
             _determine_valid_schedule(schedule)
         except ValueError as error:
             error_message = f"Error occurred while attempting to create a scheduled bulk email task: {error}"
@@ -3600,39 +3600,6 @@ def _get_branded_email_template(course_overview):
         template_name = template_name.get(course_overview.display_org_with_default)
 
     return template_name
-
-
-def _convert_schedule_to_utc_from_local(schedule, browser_timezone, user):
-    """
-    Utility function to help convert the schedule of an instructor task from the requesters local time and timezone
-    (taken from the request) to a UTC datetime.
-
-    Args:
-        schedule (String): The desired time to execute a scheduled task, in local time, in the form of an ISOString.
-        timezone (String): The time zone, as captured by the user's web browser, in the form of a string.
-        user (User): The user requesting the action, captured from the originating web request. Used to lookup the
-                     the time zone preference as set in the user's account settings.
-
-    Returns:
-        DateTime: A datetime instance describing when to execute this schedule task converted to the UTC timezone.
-    """
-    # look up the requesting user's timezone from their account settings
-    preferred_timezone = get_user_preference(user, 'time_zone', username=user.username)
-    # use the user's preferred timezone (if available), otherwise use the browser timezone.
-    timezone = preferred_timezone if preferred_timezone else browser_timezone
-
-    # convert the schedule to UTC
-    log.info(f"Converting requested schedule from local time '{schedule}' with the timezone '{timezone}' to UTC")
-
-    local_tz = dateutil.tz.gettz(timezone)
-    if local_tz is None:
-        raise ValueError(
-            "Unable to determine the time zone to use to convert the schedule to UTC"
-        )
-    local_dt = dateutil.parser.parse(schedule).replace(tzinfo=local_tz)
-    schedule_utc = local_dt.astimezone(pytz.utc)
-
-    return schedule_utc
 
 
 def _determine_valid_schedule(schedule):

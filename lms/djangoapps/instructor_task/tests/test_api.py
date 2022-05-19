@@ -7,6 +7,7 @@ import json
 from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 
+import dateutil
 import pytest
 import pytz
 import ddt
@@ -21,6 +22,7 @@ from lms.djangoapps.bulk_email.data import BulkEmailTargetChoices
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api import (
+    convert_schedule_to_utc_from_local,
     SpecificStudentIdMissingError,
     generate_anonymous_ids,
     generate_certificates_for_students,
@@ -61,6 +63,7 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskTestCase,
     TestReportMixin
 )
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, delete_user_preference
 
 LOG_PATH = 'lms.djangoapps.instructor_task.api'
 
@@ -528,3 +531,77 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             process_scheduled_tasks()
 
         log.check_present((LOG_PATH, "ERROR", expected_messages[0]),)
+
+
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+class ScheduledInstructorTaskTests(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests API methods that support scheduled instructor tasks
+    """
+    def setUp(self):
+        super().setUp()
+        self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
+
+    def tearDown(self):
+        super().tearDown()
+        delete_user_preference(self.instructor, 'time_zone', self.instructor.username)
+
+    def _get_expected_schedule(self, schedule, timezone):
+        local_tz = dateutil.tz.gettz(timezone)
+        local_dt = dateutil.parser.parse(schedule).replace(tzinfo=local_tz)
+        return local_dt.astimezone(pytz.utc)
+
+    def test_convert_schedule_to_utc_from_local_no_user_preference(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies that we use
+        the browser provided timezone data if there is no preferred timezone set by the user in their account settings.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        browser_timezone = "America/New_York"
+        expected_schedule = self._get_expected_schedule(schedule, browser_timezone)
+
+        schedule_utc = convert_schedule_to_utc_from_local(schedule, browser_timezone, self.instructor)
+
+        assert schedule_utc == expected_schedule
+
+    def test_convert_schedule_to_utc_from_local_with_preferred_timezone(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies that we use the
+        preferred timezone if a user has set one in their account settings.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        preferred_timezone = "America/Anchorage"
+        set_user_preference(self.instructor, 'time_zone', preferred_timezone)
+        expected_schedule = self._get_expected_schedule(schedule, preferred_timezone)
+
+        schedule_utc = convert_schedule_to_utc_from_local(schedule, "", self.instructor)
+
+        assert schedule_utc == expected_schedule
+
+    def test_convert_schedule_to_utc_from_local_with_preferred_and_browser_timezone(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies that we use
+        the preferred timezone over the browser timezone when provided both values.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        browser_timezone = "America/New_York"
+        preferred_timezone = "America/Anchorage"
+        set_user_preference(self.instructor, 'time_zone', preferred_timezone)
+        expected_schedule = self._get_expected_schedule(schedule, preferred_timezone)
+
+        schedule_utc = convert_schedule_to_utc_from_local(schedule, browser_timezone, self.instructor)
+
+        assert schedule_utc == expected_schedule
+
+    def test_convert_schedule_to_utc_from_local_with_invalid_timezone(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies an error
+        condition if the application cannot determine a timezone to use for conversion.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        expected_error_message = "Unable to determine the time zone to use to convert the schedule to UTC"
+
+        with self.assertRaises(ValueError) as value_err:
+            convert_schedule_to_utc_from_local(schedule, "Flim/Flam", self.instructor)
+
+        assert str(value_err.exception) == expected_error_message
