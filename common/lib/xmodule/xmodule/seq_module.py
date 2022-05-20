@@ -994,6 +994,32 @@ class SequenceBlock(
         non_editable_fields.append(self.fields['is_entrance_exam'])  # pylint:disable=unsubscriptable-object
         return non_editable_fields
 
+@XBlock.needs('ticketing')
+class ExamSequenceBlock(SequenceBlock):
+
+    def student_view(self, context):
+        if self._validate_ticket(context):
+            # there is a bunch of existing proctoring stuff in the super which might be annoying
+            # but let's not worry about that for this sample
+            return super().student_view(context)
+        return Fragment()
+
+    def _validate_ticket(self, context):
+        ticket = context.get("ticket", None)
+        ticketsvc = self.runtime.service(self, "ticket")
+        if not ticket or not ticketsvc:
+            return False
+        # validate this ticket but only if it is from exam service, return it as a dict
+        valid_ticket = ticketsvc.validate(ticket, "exam")
+        if not valid_ticket:
+            return False
+        if valid_ticket["user"] != self.runtime.service(self, 'user').get_current_user().opt_attrs.get(
+            ATTR_KEY_USER_ID):
+            return False
+        if valid_ticket["course_id"] != self.course_id:
+            return False
+        if valid_ticket["content_id"] != self.location:
+            return False
 
 class HighlightsFields:
     """Only Sections have summaries now, but we may expand that later."""
