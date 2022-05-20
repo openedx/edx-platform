@@ -647,3 +647,6 @@ COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
     "SECRET": "***",
     "URL": "***",
 }
+
+################## MFE API ####################
+FEATURES['ENABLE_MFE_API'] = True
