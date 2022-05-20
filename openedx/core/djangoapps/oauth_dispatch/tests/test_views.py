@@ -374,7 +374,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
 
         data = json.loads(response.content.decode('utf-8'))
         assert 'expires_in' in data
-        assert data['expires_in'] > 0
+        assert data['expires_in'] == 60 * 60
         assert data['token_type'] == 'JWT'
 
 

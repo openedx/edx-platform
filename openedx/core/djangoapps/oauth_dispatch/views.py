@@ -136,25 +136,22 @@ class AccessTokenExchangeView(_DispatchingView):
 
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
-
-        token_type = request.POST.get('token_type',
-                                      request.META.get('HTTP_X_TOKEN_TYPE', 'no_token_type_supplied')).lower()
-        monitoring_utils.set_custom_attribute('oauth_token_type', token_type)
-        monitoring_utils.set_custom_attribute('oauth_grant_type', request.POST.get('grant_type', ''))
+        token_type = _get_token_type(request)
 
         if response.status_code == 200 and token_type == 'jwt':
-            self._replace_access_token_with_jwt_token(request, response)
+            response.data = self._get_jwt_data_from_access_token_data(request, response)
 
         return response
 
-    def _replace_access_token_with_jwt_token(self, request, response):
-        """ Builds the content of the response, including the JWT token. """
-        token_dict = response.data
-        jwt = create_jwt_from_token(token_dict, self.get_adapter(request))
-        response.data.update({
-            'access_token': jwt,
-            'token_type': 'JWT',
-        })
+    def _get_jwt_data_from_access_token_data(self, request, response):
+        """
+        Gets the JWT response data from the opaque token response data.
+
+        Includes the JWT token and token type in the response.
+        """
+        opaque_token_dict = response.data
+        jwt_token_dict = create_jwt_token_dict(opaque_token_dict, self.get_adapter(request))
+        return jwt_token_dict
 
 
 class RevokeTokenView(_DispatchingView):
