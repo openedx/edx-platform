@@ -154,6 +154,25 @@ class ProctoringFields:
     """
     Fields that are specific to Proctored or Timed Exams
     """
+
+    is_ticketed = True
+
+    def validate_ticket(self, ticket):
+        ticketsvc = self.runtime.service(self, "ticket")
+        if not ticketsvc:
+            return False
+        # validate this ticket but only if it is from exam service, return it as a dict
+        valid_ticket = ticketsvc.validate(ticket, "exam")
+        if not valid_ticket:
+            return False
+        if valid_ticket["user"] != self.runtime.service(self, 'user').get_current_user().opt_attrs.get(
+            ATTR_KEY_USER_ID):
+            return False
+        if valid_ticket["course_id"] != self.course_id:
+            return False
+        if valid_ticket["content_id"] != self.location:
+            return False
+
     is_time_limited = Boolean(
         display_name=_("Is Time Limited"),
         help=_(
@@ -473,6 +492,10 @@ class SequenceBlock(
                 # check if prerequisite has been met
                 prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
         if prereq_met:
+            if self.is_ticketed:
+                ticket = context.get("ticket", None)
+                if not self.validate_ticket(ticket):
+                    return Fragment() #or whatever, the point is don't continue
             special_html_view = self._hidden_content_student_view(context) or self._special_exam_student_view()
             if special_html_view:
                 masquerading_as_specific_student = context.get('specific_masquerade', False)
