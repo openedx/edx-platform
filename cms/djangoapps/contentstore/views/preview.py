@@ -35,6 +35,7 @@ from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
+from common.lib.xmodule.xmodule.x_module import AsideKeyGenerator, OpaqueKeyReader
 from lms.djangoapps.courseware.services import ModuleService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.lib.license import wrap_with_license
@@ -223,7 +224,6 @@ def _preview_module_system(request, descriptor, field_data):
         wrappers_asides=wrappers_asides,
         error_descriptor_class=ErrorBlock,
         # Get the raw DescriptorSystem, not the CombinedSystem
-        descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
             "field-data": field_data,
             "i18n": ModuleI18nService,
@@ -241,6 +241,8 @@ def _preview_module_system(request, descriptor, field_data):
             'replace_urls': replace_url_service,
             'module': module_service
         },
+        id_reader=getattr(descriptor._runtime, 'id_reader', OpaqueKeyReader()),  # pylint: disable=protected-access
+        id_generator=getattr(descriptor._runtime, 'id_generator', AsideKeyGenerator()),  # pylint: disable=protected-access
     )
 
 

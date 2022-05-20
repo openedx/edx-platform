@@ -1640,7 +1640,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
     def __init__(
             self, static_url, track_function,
-            descriptor_runtime, debug=False, hostname="", publish=None,
+            debug=False, hostname="", publish=None,
             node_path="", course_id=None, error_descriptor_class=None,
             field_data=None, rebind_noauth_module_to_user=None,
             **kwargs):
@@ -1653,8 +1653,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
                          or otherwise tracking the event.
                          TODO: Not used, and has inconsistent args in different
                          files.  Update or remove.
-
-        descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
 
         course_id - the course_id containing this module
 
@@ -1670,8 +1668,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         # Usage_store is unused, and field_data is often supplanted with an
         # explicit field_data during construct_xblock.
-        kwargs.setdefault('id_reader', getattr(descriptor_runtime, 'id_reader', OpaqueKeyReader()))
-        kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
         super().__init__(field_data=field_data, **kwargs)
 
         self.STATIC_URL = static_url
@@ -1686,7 +1682,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         self.error_descriptor_class = error_descriptor_class
         self.xmodule_instance = None
 
-        self.descriptor_runtime = descriptor_runtime
         self.rebind_noauth_module_to_user = rebind_noauth_module_to_user
 
     def get(self, attr):
@@ -1712,9 +1707,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         """
         assert self.xmodule_instance is not None
         return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
-
-    def get_block(self, block_id, for_parent=None):  # lint-amnesty, pylint: disable=arguments-differ
-        return self.get_module(self.descriptor_runtime.get_block(block_id, for_parent=for_parent))
 
     def resource_url(self, resource):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
@@ -1813,6 +1805,24 @@ class CombinedSystem:
             service = self._descriptor_system.service(block, service_name)
 
         return service
+
+    def get_block(self, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+        """
+        Get the block using the provided arguments (usually block_id and for_parent).
+
+        The method fetches the block from the DescriptorSystem using the given arguments.
+        If the ModuleSystem is initalized and contains the 'module' service, then the
+        user data and module system is bound to the block.
+        """
+        block_descriptor = self._descriptor_system.get_block(*args, **kwargs)
+
+        if (self._module_system and
+                hasattr(self._module_system, '_services') and
+                self._module_system._services.get('module')):
+            module_service = self._module_system._services.get('module')  # pylint: disable=protected-access
+            return module_service.get_module(block_descriptor)
+
+        return block_descriptor
 
     def __getattr__(self, name):
         """

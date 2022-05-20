@@ -172,7 +172,6 @@ def get_test_system(
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         course_id=course_id,
         error_descriptor_class=ErrorBlock,
-        descriptor_runtime=descriptor_system,
     )
 
 

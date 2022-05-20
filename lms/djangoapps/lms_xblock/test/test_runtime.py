@@ -68,7 +68,8 @@ class TestHandlerUrl(TestCase):
             },
             course_id=self.course_key,
             user=Mock(),
-            descriptor_runtime=Mock(),
+            id_reader=Mock(),
+            id_generator=Mock()
         )
 
     def test_trailing_characters(self):
@@ -135,7 +136,8 @@ class TestUserServiceAPI(TestCase):
             },
             user=self.user,
             course_id=self.course_id,
-            descriptor_runtime=Mock(),
+            id_reader=Mock(),
+            id_generator=Mock()
         )
         self.scope = 'course'
         self.key = 'key1'
@@ -187,7 +189,8 @@ class TestBadgingService(ModuleStoreTestCase):
             },
             course_id=self.course_id,
             user=self.user,
-            descriptor_runtime=Mock(),
+            id_reader=Mock(),
+            id_generator=Mock()
         )
 
     @patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
@@ -242,7 +245,8 @@ class TestI18nService(ModuleStoreTestCase):
             },
             course_id=self.course.id,
             user=Mock(),
-            descriptor_runtime=Mock(),
+            id_reader=Mock(),
+            id_generator=Mock()
         )
 
         self.mock_block = Mock()

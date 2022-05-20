@@ -2446,7 +2446,13 @@ class ViewCheckerBlock(XBlock):
         """
         msg = f"{self.state} != {self.scope_ids.usage_id}"
         assert self.state == str(self.scope_ids.usage_id), msg
-        fragments = self.runtime.render_children(self)
+
+        # TODO: uncomment this line and remove _render_children() once
+        # merger of ModuleSystem and DescriptorSystem is complete
+
+        # fragments = self.runtime.render_children(self)
+        fragments = self._render_children()
+
         result = Fragment(
             content="<p>ViewCheckerPassed: {}</p>\n{}".format(
                 str(self.scope_ids.usage_id),
@@ -2454,6 +2460,26 @@ class ViewCheckerBlock(XBlock):
             )
         )
         return result
+
+    def _render_children(self):
+        """
+        Use CombinedSystem runtime to get block and render each child individually.
+
+        The runtime.render_children() method was earlier used to render each child
+        However, this caused a problem, when we removed the get_block() and
+        descriptor_runtime properties from the ModuleSystem, as the render_children
+        method ran in the context of LmsModuleSystem which is a child class of
+        ModuleSystem.
+
+        This is intended to be a temporary method until deprecation of all properties
+        of ModuleSystem and merger of ModuleSystem and DescriptorSystem is complete.
+        """
+        results = []
+        for child_id in self.children:
+            child = self.runtime.get_block(child_id)
+            result = self.runtime.render_child(child)
+            results.append(result)
+        return results
 
 
 @ddt.ddt

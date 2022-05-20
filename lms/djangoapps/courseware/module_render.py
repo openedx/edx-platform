@@ -48,6 +48,7 @@ from xmodule.util.sandboxing import SandboxService
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID
+from common.lib.xmodule.xmodule.x_module import AsideKeyGenerator, OpaqueKeyReader
 from capa.xqueue_interface import XQueueService  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
@@ -748,9 +749,10 @@ def get_module_system_for_user(
             'replace_urls': replace_url_service,
             'module': module_service
         },
-        descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
         request_token=request_token,
+        id_reader=getattr(descriptor._runtime, 'id_reader', OpaqueKeyReader()),  # pylint: disable=protected-access
+        id_generator=getattr(descriptor._runtime, 'id_generator', AsideKeyGenerator()),  # pylint: disable=protected-access
     )
 
     # pass position specified in URL to module through ModuleSystem

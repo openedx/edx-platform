@@ -44,13 +44,39 @@ class UnitBlock(XBlock):
     def student_view(self, context=None):
         """Provide default student view."""
         result = Fragment()
-        child_frags = self.runtime.render_children(self, context=context)
+
+        # TODO: uncomment this line and remove _render_children() once
+        # merger of ModuleSystem and DescriptorSystem is complete
+
+        # child_frags = self.runtime.render_children(self, context=context)
+        child_frags = self._render_children(context)
+
         result.add_resources(child_frags)
         result.add_content('<div class="unit-xblock vertical">')
         for frag in child_frags:
             result.add_content(frag.content)
         result.add_content('</div>')
         return result
+
+    def _render_children(self, context):
+        """
+        Use CombinedSystem runtime to get block and render each child individually.
+
+        The runtime.render_children() method was earlier used to render each child
+        However, this caused a problem, when we removed the get_block() and
+        descriptor_runtime properties from the ModuleSystem, as the render_children
+        method ran in the context of LmsModuleSystem which is a child class of
+        ModuleSystem.
+
+        This is intended to be a temporary method until deprecation of all properties
+        of ModuleSystem and merger of ModuleSystem and DescriptorSystem is complete.
+        """
+        results = []
+        for child_id in self.children:
+            child = self.runtime.get_block(child_id)
+            result = self.runtime.render_child(child, context=context)
+            results.append(result)
+        return results
 
     public_view = student_view
 
