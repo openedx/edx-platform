@@ -98,7 +98,9 @@ define([
                 student_faq_url: '/faqs',
                 dashboard_url: '/dashboard',
                 platform_name: 'edx',
-                submit_url: '/api/financial/v1/assistance'
+                submit_url: '/api/financial/v1/assistance',
+                applications_status_response: null,
+                hide_form: false,
             },
             completeForm,
             validSubmission,
