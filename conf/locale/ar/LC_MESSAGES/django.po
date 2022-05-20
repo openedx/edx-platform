@@ -19852,7 +19852,8 @@ msgstr "تم تقديم التحقق"
 msgid ""
 "Your edX ID verification is pending. Your verification information has been "
 "submitted and will be reviewed shortly."
-msgstr ""
+msgstr "التحقق من معرف edX الخاص بك معلق. تم تقديم معلومات التحقق الخاصة بك وستتم "
+"مراجعتها قريبًا."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Denied"

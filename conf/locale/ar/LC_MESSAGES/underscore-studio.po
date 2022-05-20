@@ -1,0 +1,1970 @@
+# edX translation file
+# Copyright (C) 2022 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+#
+# Translators:
+# 6e68c7971a89e50e680ae9444d303c8f, 2016
+# Abdallah Nassif <a.nassif012@gmail.com>, 2014
+# Ali Hasan <ahasan@qrf.org>, 2016
+# Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
+# Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
+# Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015-2016
+# 11e20772453a5447f86b653d16e71bd3_f829fca <fc1a175da0e051e8f2220ae4e8c37e82_372655>, 2016
+# 11e20772453a5447f86b653d16e71bd3_f829fca <fc1a175da0e051e8f2220ae4e8c37e82_372655>, 2016
+# Ali Hasan <ahasan@qrf.org>, 2016
+# Anouar Benyaiche <anouar1_ben@hotmail.com>, 2020
+# 6e68c7971a89e50e680ae9444d303c8f, 2016
+# e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
+# Hassan Husseini <hassan@constructeducation.com>, 2020
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2017
+# may <may@qordoba.com>, 2014-2015
+# Mohamed Ibrahim <root.php@hotmail.com>, 2015
+# wd3bbas <mohed.alabbas@gmail.com>, 2014
+# Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
+# Ned Batchelder <ned@edx.org>, 2016-2017
+# NELC Open edX Translation <openedx@elc.edu.sa>, 2020
+# Omar Al-Ithawi <omar.al.dolaimy@gmail.com>, 2015-2016
+# Rama Alshebel, 2021
+# Roaa Nader <roaanader002005@gmail.com>, 2021
+# Sahbi BG <sahbi.g@gmail.com>, 2017
+# Saramami.mami <saramami.mami@yahoo.com>, 2014
+# Saramami.mami <saramami.mami@yahoo.com>, 2014
+# shefaa abu jabel <shefaa.aj@gmail.com>, 2016-2017
+# Soha Assali <soha+transifex@qordoba.com>, 2015-2016
+# waeldaoud2014 <wael.daoud@hotmail.com>, 2017
+# waeldaoud2014 <wael.daoud@hotmail.com>, 2017
+# wd3bbas <mohed.alabbas@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: edx-platform\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2022-05-19 13:31+0000\n"
+"PO-Revision-Date: 2014-06-11 15:18+0000\n"
+"Last-Translator: Roaa Nader <roaanader002005@gmail.com>, 2021\n"
+"Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: cms/templates/js/access-editor.underscore
+msgid "Limit Access"
+msgstr "الحدّ من صلاحية الوصول"
+
+#: cms/templates/js/access-editor.underscore
+msgid ""
+"Select a prerequisite subsection and enter a minimum score percentage and "
+"minimum completion percentage to limit access to this subsection. Allowed "
+"values are 0-100"
+msgstr ""
+"حدد قسماً فرعياً أساسياً وأدخل النسبة المئوية الأدنى للعلامة والحد الأدنى "
+"لنسبة الإنجاز من المساق لتحديد الوصول إلى هذا القسم الفرعي، القيم المسموح "
+"بها هي 0-100"
+
+#: cms/templates/js/access-editor.underscore
+msgid "Prerequisite:"
+msgstr "المتطلّب الأساسي:"
+
+#: cms/templates/js/access-editor.underscore
+msgid "No prerequisite"
+msgstr "لا يوجد متطلّبات أساسية"
+
+#: cms/templates/js/access-editor.underscore
+msgid "Minimum Score:"
+msgstr "الحدّ الأدنى للمجموع:"
+
+#: cms/templates/js/access-editor.underscore
+msgid "Minimum Completion:"
+msgstr "الحد الأدنى من الإنجاز:"
+
+#: cms/templates/js/access-editor.underscore
+msgid "The minimum score percentage must be a whole number between 0 and 100."
+msgstr "يجب أن تكون النسبة المئوية الدنيا للمجموع عددّا صحيحًا بين 0 و 100."
+
+#: cms/templates/js/access-editor.underscore
+msgid ""
+"The minimum completion percentage must be a whole number between 0 and 100."
+msgstr ""
+"يجب أن تكون النسبة المئوية للحد الأدنى من الإنجاز عدداً صحيحاً يتراوح بين 0 "
+"و 100."
+
+#: cms/templates/js/access-editor.underscore
+msgid "Use as a Prerequisite"
+msgstr "استخدمه كمتطلّب أساسي"
+
+#: cms/templates/js/access-editor.underscore
+msgid "Make this subsection available as a prerequisite to other content"
+msgstr "اجعل من محتوى هذه القسم الفرعي متوفرًا كمتطلب أساسي لمحتوى آخر."
+
+#: cms/templates/js/active-video-upload-list.underscore
+msgid "Active Uploads"
+msgstr "التحميلات النشطة"
+
+#: cms/templates/js/active-video-upload.underscore
+msgid "Read More"
+msgstr "لقراءة المزيد"
+
+#: cms/templates/js/active-video-upload.underscore
+msgid "details about the failure"
+msgstr "تفاصيل عن الفشل"
+
+#: cms/templates/js/add-xblock-component-button.underscore
+msgid "Add Component:"
+msgstr "إضافة مكوِّن:"
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+#: cms/templates/js/add-xblock-component-menu.underscore
+#, python-format
+msgid "%(type)s Component Template Menu"
+msgstr "قائمة نماذج مكوّنات %(type)s"
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+msgid "Common Problem Types"
+msgstr "أنواع المسائل الشائعة"
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
+msgid "Advanced"
+msgstr "إعدادات متقدّمة"
+
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+msgid "Supported"
+msgstr "مدعم"
+
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+msgid "Provisional"
+msgstr "مؤقت"
+
+#: cms/templates/js/add-xblock-component-support-legend.underscore
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Not Supported"
+msgstr "غير مدعوم"
+
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Fully Supported"
+msgstr "مدعوم تماماً"
+
+#: cms/templates/js/add-xblock-component-support-level.underscore
+msgid "Provisionally Supported"
+msgstr "مدعوم مؤقتاً"
+
+#: cms/templates/js/add-xblock-component.underscore
+msgid "Add New Component"
+msgstr "إضافة مكوِّن جديد"
+
+#: cms/templates/js/advanced_entry.underscore
+msgid "Deprecated"
+msgstr "مهمل"
+
+#: cms/templates/js/asset-library.underscore
+msgid "List of uploaded files and assets in this course"
+msgstr "قائمة بالملفات وبالمواد الملحقة المحمّلة ضمن هذا المساق"
+
+#: cms/templates/js/asset-library.underscore
+msgid "Preview"
+msgstr "معاينة"
+
+#: cms/templates/js/asset-library.underscore
+#: cms/templates/js/asset-library.underscore
+msgid "- Sortable"
+msgstr "- قابل للتصنيف"
+
+#: cms/templates/js/asset-library.underscore
+msgid "Show All"
+msgstr "عرض الكل"
+
+#: cms/templates/js/asset-library.underscore
+msgid "Other"
+msgstr "غير ذلك"
+
+#: cms/templates/js/asset-library.underscore
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Date Added"
+msgstr "تاريخ الإضافة "
+
+#: cms/templates/js/asset-library.underscore
+msgid "URL"
+msgstr "الرابط"
+
+#: cms/templates/js/asset-library.underscore
+msgid "You haven't added any assets to this course yet."
+msgstr "لم تُضِف أي مواد ملحقة بهذا المساق بعد. "
+
+#: cms/templates/js/asset-library.underscore
+msgid "Upload your first asset"
+msgstr "تحميل مادتك الملحقة الأولى"
+
+#: cms/templates/js/asset-upload-modal.underscore
+msgid "close"
+msgstr "إغلاق "
+
+#: cms/templates/js/asset-upload-modal.underscore
+msgid "Upload New File"
+msgstr "تحميل ملف جديد"
+
+#: cms/templates/js/asset-upload-modal.underscore
+msgid "Choose File"
+msgstr "اختر الملف"
+
+#: cms/templates/js/asset.underscore
+msgid "No description available"
+msgstr "لا يتوفّر أي وصف."
+
+#: cms/templates/js/asset.underscore
+msgid "Open/download this file"
+msgstr "فتح/تنزيل هذا الملفّ"
+
+#: cms/templates/js/asset.underscore
+msgid "Studio:"
+msgstr "استوديو:"
+
+#: cms/templates/js/asset.underscore
+msgid "Web:"
+msgstr "الويب:"
+
+#: cms/templates/js/asset.underscore
+msgid "Delete this asset"
+msgstr "حذف هذه المادة الملحقة"
+
+#: cms/templates/js/asset.underscore
+msgid "Lock this asset"
+msgstr "قفل هذه المادة الملحقة"
+
+#: cms/templates/js/asset.underscore
+msgid "Lock/unlock file"
+msgstr "قفل/فتح الملفّ"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
+msgid "ID"
+msgstr "الرقم التعريفي"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid "Certificate Details"
+msgstr "تفاصيل الشهادة"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid "Course Title"
+msgstr "عنوان المساق"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid "Course Title Override"
+msgstr "تجاوز عنوان المساق"
+
+#: cms/templates/js/certificate-details.underscore
+msgid "Course Number"
+msgstr "رقم المساق "
+
+#: cms/templates/js/certificate-details.underscore
+msgid "Course Number Override"
+msgstr "تجاوز رقم المساق"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid "Certificate Signatories"
+msgstr "الموقّعون على الشهادة"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid ""
+"It is strongly recommended that you include four or fewer signatories. If "
+"you include additional signatories, preview the certificate in Print View to"
+" ensure the certificate will print correctly on one page."
+msgstr ""
+"يُوصى بشدة بتضمين 4 موقعيّن على الأكثر. راجع الشهادة في وضع ’مراجعة "
+"الطباعة‘، في حال إضافتك للمزيد من الموقعّين، لضمان طباعة الشهادة بالشكل "
+"الصحيح على صفحة واحدة. "
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Certificate Information"
+msgstr "معلومات الشهادة"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Certificate Name"
+msgstr "اسم الشهادة"
+
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid "Name of the certificate"
+msgstr "اسم الشهادة"
+
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/certificate-editor.underscore
+msgid "Description of the certificate"
+msgstr "وصف الشهادة"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Course title"
+msgstr "عنوان المساق"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid ""
+"Specify an alternative to the official course title to display on "
+"certificates. Leave blank to use the official course title."
+msgstr ""
+"يُرجى تحديد بديل للعنوان الرسمي للمساق لوضعه على الشهادات. ويُرجى ترك هذا "
+"الحقل فارغًا لاستخدام العنوان الرسمي للمساق."
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "Add Additional Signatory"
+msgstr "إضافة مُوَقّع إضافي"
+
+#: cms/templates/js/certificate-editor.underscore
+msgid "(Add signatories for a certificate)"
+msgstr "(إضافة موقِّعين على شهادة معيّنة)"
+
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Create"
+msgstr "إنشاء "
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Choose mode"
+msgstr "اختر الوضع"
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Preview Certificate"
+msgstr "معاينة الشهادة"
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Activate"
+msgstr "تفعيل"
+
+#: cms/templates/js/certificate-web-preview.underscore
+msgid "Deactivate"
+msgstr "تعطيل"
+
+#: cms/templates/js/container-access.underscore
+msgid "unit"
+msgstr "وحدة"
+
+#: cms/templates/js/container-access.underscore
+msgid "component"
+msgstr "عنصر"
+
+#: cms/templates/js/container-access.underscore
+msgid "Access to this {blockType} is restricted to: {selectedGroupsLabel}"
+msgstr "الوصول إلى {blockType} مقتصر على : {selectedGroupsLabel}"
+
+#: cms/templates/js/container-access.underscore
+msgid ""
+"Access to some content in this {blockType} is restricted to specific groups "
+"of learners."
+msgstr ""
+"يقتصر الوصول إلى بعض المحتوى في هذا {blockType} على مجموعات محددة من "
+"المتعلمين."
+
+#: cms/templates/js/container-message.underscore
+msgid ""
+"Caution: The last published version of this unit is live. By publishing "
+"changes you will change the student experience."
+msgstr ""
+"تحذير: إن آخر نسخة منشورة من هذه الوحدة متاحة للطلاب عبر الإنترنت الآن، "
+"ستغيّر بمجرّد نشرك للتغييرات من تجربة الطالب."
+
+#: cms/templates/js/content-group-editor.underscore
+msgid "Content Group Name"
+msgstr "اسم مجموعة المحتوى:"
+
+#: cms/templates/js/content-group-editor.underscore
+msgid "Content Group ID"
+msgstr "الرقم التعريفي لمجموعة المحتوى"
+
+#: cms/templates/js/content-group-editor.underscore
+msgid "This is the name of the group"
+msgstr "إنه اسم المجموعة:"
+
+#: cms/templates/js/content-group-editor.underscore
+msgid "This content group is used in one or more units."
+msgstr "مجموعة المحتوى هذه مستخدمة في وحدة واحدة أو أكثر."
+
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
+msgid "Cannot delete when in use by a unit"
+msgstr "يتعذّر حذف العناصر المٌستخدمة من قبل الوحدة "
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid "Subsection Visibility"
+msgstr "رؤية القسم الفرعي"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid "Show entire subsection"
+msgstr "عرض القسم الفرعي بالكامل"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid "Learners see the published subsection and can access its content."
+msgstr "المتعلمون يرون القسم الفرعي المنشور ويمكنهم الوصول إلى محتواه."
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid "Hide content after course end date"
+msgstr "إخفاء المحتوى بعد تاريخ انتهاء المساق"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid "Hide content after due date"
+msgstr ""
+"إخفاء المحتوى بعد التاريخ المحدد\n"
+" "
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid ""
+"After the course\\'s end date has passed, learners can no longer access "
+"subsection content. The subsection remains included in grade calculations."
+msgstr ""
+"بعد مرور تاريخ انتهاء المساق/ات، لن يتمكن المتعلمين من الدخول إلى المحتوى "
+"الفرعي. ولكن سيبقى القسم الفرعي موجودًا عند احتساب الدرجة."
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid ""
+"After the subsection\\'s due date has passed, learners can no longer access "
+"its content. The subsection remains included in grade calculations."
+msgstr ""
+"بعد مرور التاريخ المحدد للقسم الفرعي، لم يعد المتعلمون قادرين بعد على الوصول"
+" إلى محتواه. يظل القسم الفرعي مدرجًا في حسابات المستوى."
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid "Hide entire subsection"
+msgstr "إخفاء القسم الفرعي بالكامل"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid ""
+"Learners do not see the subsection in the course outline. The subsection is "
+"not included in grade calculations."
+msgstr ""
+"لا يرى المتعلمون القسم الفرعي في مخطط الدورة التدريبية. لم يتم تضمين القسم "
+"الفرعي في حسابات المستوى."
+
+#: cms/templates/js/content-visibility-editor.underscore
+#, python-format
+msgid ""
+"If you select an option other than \"%(hide_label)s\", published units in "
+"this subsection become available to learners unless they are explicitly "
+"hidden."
+msgstr ""
+"عند بتحديد خيار آخر غير  \"%(hide_label)s\"، ستصبح الوحدات المنشورة في هذا "
+"القسم الفرعي متاحة للمتعلمين إلا إذا تم اخفائها عمداً."
+
+#: cms/templates/js/copy-clipboard-button.underscore
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr "نسخ موقع العناصر"
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Weekly Highlight Emails"
+msgstr "رسائل بريد تلميحات المساق"
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Enabled"
+msgstr "فعّال"
+
+#: cms/templates/js/course-highlights-enable.underscore
+msgid "Enable Now"
+msgstr "تفعيل الآن"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Name"
+msgstr "اسم المعلم"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the instructor's name"
+msgstr "الرجاء إضافة اسم المعلم"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Title"
+msgstr "لقب المعلم"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the instructor's title"
+msgstr "قم بإضافة لقب المعلم"
+
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
+msgid "Organization"
+msgstr "المؤسّسة"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Organization Name"
+msgstr "اسم المؤسسة"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the institute where the instructor is associated"
+msgstr "الرجاء إضافة المعهد الذي ينتسب له المعلم"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Biography"
+msgstr "سيرة"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Biography"
+msgstr "مسيرة المعلّم"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Please add the instructor's biography"
+msgstr "الرجاء إضافة سيرة المعلّم"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Photo"
+msgstr "صورة"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Photo"
+msgstr "صورة المعلّم"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Instructor Photo URL"
+msgstr "رابط صورة المعلّم"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid ""
+"Please add a photo of the instructor (Note: only JPEG or PNG format "
+"supported)"
+msgstr ""
+"قم بإضافة صورة للمعلم (ملاحظة: الصور بصيغة JPEG أو PNG هي فقط المدعومة)"
+
+#: cms/templates/js/course-instructor-details.underscore
+msgid "Upload Photo"
+msgstr "رفع صورة"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid "Prerequisite: %(prereq_display_name)s"
+msgstr "متطلّب أساسي: %(prereq_display_name)s"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Contains staff only content"
+msgstr "تحوي محتوىً خاص بطاقم المساق فقط."
+
+#: cms/templates/js/course-outline.underscore
+msgid "Unpublished changes to live content"
+msgstr "توجد تغييرات غير منشورة جرى إدخالها على المحتوى المتاح عبر الإنترنت"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Unpublished units will not be released"
+msgstr "لن يجري إصدار الوحدات غير المنشورة"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Unpublished changes to content that will release in the future"
+msgstr "تغييرات غير منشورة جرى إدخالها على المحتوى وسيجري إصدارها مستقبليًّا"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Access to this unit is restricted to: {selectedGroupsLabel}"
+msgstr "يقتصر الوصول إلى هذه الوحدة على: {selectedGroupsLabel}"
+
+#: cms/templates/js/course-outline.underscore
+msgid ""
+"Access to some content in this unit is restricted to specific groups of "
+"learners"
+msgstr ""
+"يقتصر الوصول إلى بعض المحتويات في هذه الوحدة على مجموعات محددة من المتعلمين"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Ungraded"
+msgstr "لم يجري تقييمه"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Onboarding Exam"
+msgstr "اختبار تهيئة"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Practice proctored Exam"
+msgstr "جرّب خوض امتحان مراقَب"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctored Exam"
+msgstr "امتحان مراقَب"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/xblock-outline.underscore
+#, python-format
+msgid "Collapse/Expand this %(xblock_type)s"
+msgstr "تصغير/تكبير هذه وحدات %(xblock_type)s"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-outline.underscore
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
+msgstr "إعدادات المراقبة"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+msgid "Publish"
+msgstr "نشر"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-outline.underscore
+msgid "Configure"
+msgstr "ضبط الإعدادات"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-outline.underscore
+msgid "Duplicate"
+msgstr "نسخة مطابقة"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-outline.underscore
+msgid "Drag to reorder"
+msgstr "اسحب لإعادة الترتيب"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Release Status:"
+msgstr "وضع الإصدار:"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+#: cms/templates/js/xblock-outline.underscore
+msgid "Released:"
+msgstr "صَدَر:"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+msgid "Scheduled:"
+msgstr "مجدوَل:"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/highlights-editor.underscore
+msgid "Section Highlights"
+msgstr "أبرز سمات القسم"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-outline.underscore
+msgid "Graded as:"
+msgstr "مقيَّم بدرجة:"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-outline.underscore
+msgid "Due:"
+msgstr "يُستَحقّ في:"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Subsection is hidden after course end date"
+msgstr "إخفاء القسم الفرعي بعد انتهاء المساق"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Subsection is hidden after due date"
+msgstr "القسم الفرعي مخفي بعد التاريخ المحدد"
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/xblock-outline.underscore
+msgid "You haven't added any content to this course yet."
+msgstr "لم تُضِف أي محتوى إلى هذا المساق بعد."
+
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/xblock-outline.underscore
+#: cms/templates/js/xblock-outline.underscore
+#, python-format
+msgid "Click to add a new %(xblock_type)s"
+msgstr "يُرجى النقر لإضافة وحدات %(xblock_type)s جديدة"
+
+#: cms/templates/js/course-settings-learning-fields.underscore
+msgid "Learning Outcome"
+msgstr "نتيجة  التعلم"
+
+#: cms/templates/js/course-settings-learning-fields.underscore
+msgid "Add a learning outcome here"
+msgstr "إضافة نتيجة تعليمية هنا"
+
+#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
+#: cms/templates/js/publish-xblock.underscore
+msgid "Discard Changes"
+msgstr "تجاهل التغييرات"
+
+#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
+msgid "Press discard changes to discard your changes."
+msgstr "اضغط تجاهل التغييرات لتجاهل التغييرات التي أجريتها."
+
+#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
+msgid "Update Settings"
+msgstr "تحديث الإعدادات"
+
+#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
+msgid "Press update settings to update the information for your organization."
+msgstr "اضغط على تحديث الإعدادات لتحديث معلومات مؤسستك."
+
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
+msgid "Press discard changes to discard changes."
+msgstr "اضغط تجاهل التغييرات لتجاهل التغييرات."
+
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
+msgid "Press update settings to update course video settings"
+msgstr "اضغط على تحديث الإعدادات لتحديث إعدادات فيديو المساق"
+
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
+msgid "Last updated"
+msgstr "آخر تحديث"
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Press close to hide course video settings"
+msgstr "اضغط على إغلاق لإخفاء إعدادات فيديو المساق"
+
+#: cms/templates/js/course-video-settings.underscore
+msgid "Course Video Settings"
+msgstr "إعدادات فيديو المساق"
+
+#: cms/templates/js/course-video-transcript-preferences.underscore
+msgid "Transcript Turnaround"
+msgstr "تحويل النص"
+
+#: cms/templates/js/course-video-transcript-preferences.underscore
+msgid "Transcript Fidelity"
+msgstr "دقة التفريغ النصي"
+
+#: cms/templates/js/course-video-transcript-preferences.underscore
+msgid "Video Source Language"
+msgstr "لغة الفيديو المصدر"
+
+#: cms/templates/js/course-video-transcript-preferences.underscore
+msgid "Transcript Languages"
+msgstr "لغات التفريغ النصي"
+
+#: cms/templates/js/course-video-transcript-preferences.underscore
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/video/metadata-translations-entry.underscore
+msgid "Add"
+msgstr "إضافة"
+
+#: cms/templates/js/course-video-transcript-preferences.underscore
+msgid "Press Add to language"
+msgstr "اضغط على إضافة إلى اللغة"
+
+#: cms/templates/js/course-video-transcript-provider-empty.underscore
+msgid "Automated Transcripts"
+msgstr "تفريغات النصوص الآلية"
+
+#: cms/templates/js/course-video-transcript-provider-selected.underscore
+msgid "Transcript Provider"
+msgstr "مزوّد التفريغ النصي"
+
+#: cms/templates/js/course-video-transcript-provider-selected.underscore
+msgid "Change"
+msgstr "تغيير"
+
+#: cms/templates/js/course-video-transcript-provider-selected.underscore
+msgid "Press change to change selected transcript provider."
+msgstr "اضغط على تغيير لتغيير مزود النص المحدد."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Assignment Type Name"
+msgstr "اسم نوع الواجب "
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The general category for this type of assignment, for example, Homework or "
+"Midterm Exam. This name is visible to learners."
+msgstr ""
+"فئة التصنيف العامّة لمهمّة من هذا النوع، مثل، الواجب البيتي أو الامتحان "
+"النصفي. سيكون هذا الاسم مرئيًّا من قبل المتعلمين."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Abbreviation"
+msgstr "الاختصار"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"This short name for the assignment type (for example, HW or Midterm) appears"
+" next to assignments on a learner's Progress page."
+msgstr ""
+"يظهر الاسم المختصر لنوع المهمّة (مثل HW أو Midterm) بجانب المهام في صفحة "
+"التطوّر الخاصّة بالمتعلّم."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Weight of Total Grade"
+msgstr "وزن الدرجة الإجمالية"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The weight of all assignments of this type as a percentage of the total "
+"grade, for example, 40. Do not include the percent symbol."
+msgstr ""
+"وزن جميع المهام من هذا النوع كنسبة مئوية للدرجة النهائية، مثل، 40. يجب عدم "
+"استخدام رمز النسبة المئوية."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Total Number"
+msgstr "العدد الإجمالي"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of subsections in the course that contain problems of this "
+"assignment type."
+msgstr ""
+"عدد الأقسام الفرعية لهذا المساق، التي تتضمن مسائل لمهمّة من هذا النوع."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Number of Droppable"
+msgstr "عدد المساقات التي يمكن الانسحاب منها"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of assignments of this type that will be dropped. The lowest "
+"scoring assignments are dropped first."
+msgstr ""
+"سيجري تخفيض عدد المهام من هذا النوع. سيتم إلغاء المهام ذات أقل مجموع درجات "
+"أولًا."
+
+#: cms/templates/js/course_info_handouts.underscore
+msgid "Course Handouts"
+msgstr "نشرات المساق"
+
+#: cms/templates/js/course_info_handouts.underscore
+msgid "You have no handouts defined"
+msgstr "ليس لديك أي نشرات محدّدة"
+
+#: cms/templates/js/course_info_handouts.underscore
+msgid ""
+"There is invalid code in your content. Please check to make sure it is valid"
+" HTML."
+msgstr ""
+"هناك تعليمات برمجية غير صحيحة في المحتوى الخاص بك. يُرجى التأكّد من صحّة "
+"تعليمات HTML المستخدمة."
+
+#: cms/templates/js/course_info_update.underscore
+msgid "Post"
+msgstr "نشر"
+
+#: cms/templates/js/due-date-editor.underscore
+msgid "Due Date:"
+msgstr "تاريخ الاستحقاق:"
+
+#: cms/templates/js/due-date-editor.underscore
+msgid "Due Time in UTC:"
+msgstr "توقيت الاستحقاق بحسب التوقيت العالمي المنسّق:"
+
+#: cms/templates/js/due-date-editor.underscore
+#: cms/templates/js/due-date-editor.underscore
+msgid "Clear Grading Due Date"
+msgstr "حذف تاريخ استحقاق التقييم"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Chapter Name"
+msgstr "اسم الفصل"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Chapter {order}"
+msgstr "فصل  {order}"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "provide the title/name of the chapter that will be used in navigating"
+msgstr "حدّد عنوان/ اسم الفصل الذي سيُستخدم في التصفّح "
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Chapter Asset"
+msgstr "مادة ملحقة بفصل"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "path/to/introductionToCookieBaking-CH{order}.pdf"
+msgstr "path/to/introductionToCookieBaking-CH{order}.pdf"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "upload a PDF file or provide the path to a Studio asset file"
+msgstr ""
+"تحميل ملف بصيغة PDF أو تحديد مسار أحد الملفّات الملحقة ببرنامج استوديو"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "Upload PDF"
+msgstr "تحميل ملف بصيغة PDF"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "delete chapter"
+msgstr "حذف الفصل"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Textbook information"
+msgstr "معلومات عن الكتاب "
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Textbook Name"
+msgstr "اسم الكتاب "
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Introduction to Cookie Baking"
+msgstr "مقدّمة عن طريقة خَبز الكعك"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid ""
+"provide the title/name of the text book as you would like your students to "
+"see it"
+msgstr "حدّد عنوان/اسم الكتاب كما تريد أن يراه طلابّك"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Chapter information"
+msgstr "معلومات عن الفصل"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid "Add a Chapter"
+msgstr "إضافة فصل"
+
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr "تحرير العنوان"
+
+#: cms/templates/js/grading-editor.underscore
+msgid "Grading"
+msgstr "التقييم"
+
+#: cms/templates/js/grading-editor.underscore
+msgid "Grade as:"
+msgstr "مقيّيم بدرجة: "
+
+#: cms/templates/js/grading-editor.underscore
+msgid "Not Graded"
+msgstr "غير مقيَّم"
+
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Cannot delete when in use by an experiment"
+msgstr "لا يمكن إجراء الحذف مادامت مستخدمة من قبل إحدى الاختبارات"
+
+#: cms/templates/js/group-configuration-details.underscore
+msgid "This Group Configuration is used in:"
+msgstr "إعدادات هذه المجموعة مستخدمة في:"
+
+#: cms/templates/js/group-configuration-details.underscore
+msgid ""
+"This Group Configuration is not in use. Start by adding a content experiment"
+" to any Unit via the {linkStart}Course Outline{linkEnd}."
+msgstr ""
+"لم يُستخدم إعداد المجموعة هذا. يُرجى البدء بإضافة محتوى التجارب إلى أي  وحدة"
+" بزيارة  {linkStart}نبذة عن المساق{linkEnd}."
+
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
+msgid "Course Outline"
+msgstr "المخطّط الكلّي للمساق"
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Group Configuration information"
+msgstr "معلومات إعدادات المجموعة"
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Group Configuration Name"
+msgstr "اسم إعدادات المجموعة"
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Group Configuration ID"
+msgstr "رمز تعريف إعدادات المجموعة"
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "This is the Name of the Group Configuration"
+msgstr "إنه اسم إعدادات المجموعة"
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Name or short description of the configuration"
+msgstr "اسم الإعدادات أو وصف موجَز عنها"
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "This is the Description of the Group Configuration"
+msgstr "إنه وصف إعدادات المجموعة"
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Optional long description"
+msgstr "وصف اختياري مطوَّل"
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Group information"
+msgstr "معلومات عن المجموعة"
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Groups"
+msgstr "الشُعب"
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid ""
+"Name of the groups that students will be assigned to, for example, Control, "
+"Video, Problems. You must have two or more groups."
+msgstr ""
+"اسم المجموعات التي سيُوزَّع عليها الطلاب، مثلاً ’التحكّم‘، أو ’الفيديو‘، أو "
+"’المسائل‘. يجب أن تتوفر لديك مجموعتان أو أكثر."
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Add another group"
+msgstr "إضافة مجموعة أخرى"
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid ""
+"This configuration is currently used in content experiments. If you make "
+"changes to the groups, you may need to edit those experiments."
+msgstr ""
+"هذا الإعداد مستخدم حاليًّا في اختبارات المحتوى. قد تحتاج لتعديل هذه "
+"الإختبارات في حال إدخلت أي تعدّيلات  على المجموعات."
+
+#: cms/templates/js/group-edit.underscore
+msgid "delete group"
+msgstr "حذف المجموعة"
+
+#: cms/templates/js/highlights-editor.underscore
+msgid ""
+"This feature is currently in testing. Course teams can enter highlights, but"
+" learners will not receive email messages."
+msgstr ""
+
+#: cms/templates/js/highlights-editor.underscore
+msgid ""
+"Enter 3-5 highlights to include in the email message that learners receive "
+"for this section (250 character limit)."
+msgstr ""
+"أدخل 3-5 سمات بارزة أو لمحات لتضمينها في رسالة البريد الإلكتروني التي "
+"يتلقاها الطلاب لهذا القسم (250 حرفاً كحد أقصى)."
+
+#: cms/templates/js/highlights-editor.underscore
+#: cms/templates/js/highlights-editor.underscore
+msgid "Highlight {highlight_index}"
+msgstr "سمات {highlight_index}"
+
+#: cms/templates/js/highlights-editor.underscore
+msgid "A highlight to look forward to this week."
+msgstr "سمة تشويقية لهذا الأسبوع."
+
+#: cms/templates/js/license-selector.underscore
+msgid "License Type"
+msgstr "نوع الإجازة"
+
+#: cms/templates/js/license-selector.underscore
+msgid "Learn more about {license_name}"
+msgstr "اعرف المزيد عن {license_name}"
+
+#: cms/templates/js/license-selector.underscore
+msgid "Options for {license_name}"
+msgstr "خيارات {license_name}"
+
+#: cms/templates/js/license-selector.underscore
+msgid "The following options are available for the {license_name} license."
+msgstr "تتوفّر الخيارات التالية للإجازة {license_name}"
+
+#: cms/templates/js/license-selector.underscore
+msgid "License Display"
+msgstr "عرض الإجازة"
+
+#: cms/templates/js/license-selector.underscore
+msgid ""
+"The following message will be displayed at the bottom of the courseware "
+"pages within your course:"
+msgstr "ستُعرَض الرسالة التالية في أسفل صفحات محتويات مساقك:"
+
+#: cms/templates/js/license-selector.underscore
+#: cms/templates/js/license-selector.underscore
+msgid "All Rights Reserved"
+msgstr "جميع الحقوق محفوظة"
+
+#: cms/templates/js/license-selector.underscore
+msgid "Creative Commons licensed content, with terms as follow:"
+msgstr "محتوى مرخّص كمشاه إبداعي وفق الشروط التالية:"
+
+#: cms/templates/js/license-selector.underscore
+msgid "Some Rights Reserved"
+msgstr "بعض الحقوق محفوظة"
+
+#: cms/templates/js/list.underscore
+#, python-format
+msgid "%(new_item_message)s"
+msgstr "رسائل %(new_item_message)s"
+
+#: cms/templates/js/list.underscore
+#, python-format
+msgid "New %(item_type)s"
+msgstr "%(item_type)s جديد"
+
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-file-uploader-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/metadata-number-entry.underscore
+#: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-string-entry.underscore
+msgid "Clear"
+msgstr "حذف"
+
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-file-uploader-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/metadata-number-entry.underscore
+#: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-string-entry.underscore
+msgid "Clear Value"
+msgstr "مسح القيمة"
+
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video-transcripts.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Replace"
+msgstr "استبدال"
+
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Upload"
+msgstr "تحميل"
+
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video-transcripts.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Download"
+msgstr "تنزيل"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "{categoryText} in {parentDisplayname}"
+msgstr "{categoryText} ضمن {parentDisplayname}"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "Current location"
+msgstr "الموقع الحالي"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "View child items"
+msgstr "عرض عناصر فرعية"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "Currently selected"
+msgstr "محدد حاليا"
+
+#: cms/templates/js/no-textbooks.underscore
+msgid "You haven't added any textbooks to this course yet."
+msgstr "لم تُضِف بعد أي كتب إلى هذا المساق."
+
+#: cms/templates/js/no-textbooks.underscore
+msgid "Add your first textbook"
+msgstr "أضِف أوّل كتاب لك."
+
+#: cms/templates/js/partition-group-details.underscore
+msgid "This group controls access to:"
+msgstr "تتحكم هذه المجموعة في الوصول إلى:"
+
+#: cms/templates/js/partition-group-details.underscore
+msgid ""
+"In the {linkStart}Course Outline{linkEnd}, use this group to control access "
+"to a component."
+msgstr ""
+"في {linkStart}مخطط المساق{linkEnd} ، استخدم هذه المجموعة للتحكم في الوصول "
+"إلى عنصر."
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Previous Uploads"
+msgstr "تحميلات سابقة"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Download available encodings (.csv)"
+msgstr "تنزيل الشيفرات المتاحة (بصيغة .csv)"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Thumbnail"
+msgstr "صورة مصغرة"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Video ID"
+msgstr "الرقم التعريفي للفيديو"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Transcripts"
+msgstr "النصوص"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Video Status"
+msgstr "حالة الفيديو"
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove this video"
+msgstr "حذف هذا الفيديو"
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove {video_name} video"
+msgstr "حذف الفيديو {video_name}"
+
+#: cms/templates/js/publish-history.underscore
+msgid "Never published"
+msgstr "لم تُنشَر قطّ"
+
+#: cms/templates/js/publish-history.underscore
+#, python-format
+msgid "Last published %(last_published_date)s by %(publish_username)s"
+msgstr ""
+"نُشرت آخر مرّة في %(last_published_date)s من قِبل %(publish_username)s."
+
+#: cms/templates/js/publish-history.underscore
+#: cms/templates/js/publish-xblock.underscore
+msgid "Previously published"
+msgstr "نُشرت في وقتٍ سابق"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Draft (Never published)"
+msgstr "مسودّة (لم تُنشَر قطّ) "
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Visible to Staff Only"
+msgstr "مرئيّة لطاقم المساق فقط"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Published and Live"
+msgstr "نُشرت ومتاحة الآن عبر الإنترنت"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Published (not yet released)"
+msgstr "نُشرت (لم تُصدر بعد)"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Draft (Unpublished changes)"
+msgstr "مسودّة (تغييرات غير منشورة)"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Release:"
+msgstr "الإصدار:"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Publishing Status"
+msgstr "حالة النشر"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid ""
+"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by "
+"{editedByStart}{editedBy}{editedByEnd}"
+msgstr ""
+"تم حفظ المسودة في {lastSavedStart}{editedOn}{lastSavedEnd} بواسطة "
+"{editedByStart}{editedBy}{editedByEnd}"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid ""
+"Last published {lastPublishedStart}{publishedOn}{lastPublishedEnd} by "
+"{publishedByStart}{publishedBy}{publishedByEnd}"
+msgstr ""
+"آخر نشر {lastPublishedStart}{publishedOn}{lastPublishedEnd} بواسطة "
+"{publishedByStart}{publishedBy}{publishedByEnd}"
+
+#: cms/templates/js/publish-xblock.underscore
+#, python-format
+msgid "with %(release_date_from)s"
+msgstr "مع %(release_date_from)s"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Is Visible To:"
+msgstr "مرئيٍّ من قِبَل:"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Will Be Visible To:"
+msgstr "سيصبح مرئيّ من: "
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Staff Only"
+msgstr "طاقم المساق فقط"
+
+#: cms/templates/js/publish-xblock.underscore
+#, python-format
+msgid "with %(section_or_subsection)s"
+msgstr "مع %(section_or_subsection)s"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Staff and Learners"
+msgstr "الموظفون والمتعلمون"
+
+#: cms/templates/js/publish-xblock.underscore
+#: cms/templates/js/staff-lock-editor.underscore
+msgid "Hide from learners"
+msgstr "إخفاء من المتعلمين"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid "Note: Do not hide graded assignments after they have been released."
+msgstr "ملاحظة: لا تقم بإخفاء المهام المتدرجة بعد إطلاقها. "
+
+#: cms/templates/js/release-date-editor.underscore
+msgid "Release Date and Time"
+msgstr "تاريخ وتوقيت الإصدار"
+
+#: cms/templates/js/release-date-editor.underscore
+msgid "Release Date:"
+msgstr "تاريخ الإصدار:"
+
+#: cms/templates/js/release-date-editor.underscore
+msgid "Release Time in UTC:"
+msgstr "توقيت الإصدار بحسب التوقيت العالمي المنسّق:"
+
+#: cms/templates/js/release-date-editor.underscore
+#: cms/templates/js/release-date-editor.underscore
+msgid "Clear Release Date/Time"
+msgstr "حذف تاريخ/توقيت الإصدار"
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Assessment Results Visibility"
+msgstr "إظهار نتائج التقييم"
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Always show assessment results"
+msgstr "عرض نتائج التقييم دائما"
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"When learners submit an answer to an assessment, they immediately see "
+"whether the answer is correct or incorrect, and the score received."
+msgstr ""
+"عندما یقدم المتعلمون إجابة علی نموذج تقییم، فسیظهر ما إذا کان الجواب صحیحاً "
+"أم لا، ويستلمون النتیجة فورًا."
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Never show assessment results"
+msgstr "عدم إظهار نتائج التقييم مطلقا"
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"Learners never see whether their answers to assessments are correct or "
+"incorrect, nor the score received."
+msgstr "لا يعرف المتعلمون صحة إجاباتهم من عدمها على نماذج التقييم."
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Show assessment results when subsection is past due"
+msgstr "عرض نتائج التقييم عند تمام موعد استحقاق القسم الفرعي "
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"Learners do not see whether their answers to assessments were correct or "
+"incorrect, nor the score received, until after the course end date has "
+"passed."
+msgstr ""
+"لا يعرف المتعلمون صحة إجاباتهم من عدمها على نماذج التقييم، ولا يحصلون على "
+"الدرجة النهائية إلا بعد تمام الموعد المستحق للقسم الفرعي."
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"If the course does not have an end date, learners always see their scores "
+"when they submit answers to assessments."
+msgstr ""
+"عند عدم وجود تاريخ استحقاق في القسم الفرعي فسيرى المتعلمون درجاتهم فور تقديم"
+" إجاباتهم على نماذج التقييم."
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"Learners do not see whether their answers to assessments were correct or "
+"incorrect, nor the score received, until after the due date for the "
+"subsection has passed."
+msgstr ""
+"لا يعرف المتعلمون صحة إجاباتهم من عدمها على نماذج التقييم، ولا يحصلون على "
+"الدرجة النهائية إلا بعد تمام الموعد المستحق للقسم الفرعي. "
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"If the subsection does not have a due date, learners always see their scores"
+" when they submit answers to assessments."
+msgstr ""
+"عند عدم وجود تاريخ استحقاق في القسم الفرعي فسيرى المتعلمون درجاتهم فور تقديم"
+" إجاباتهم على نماذج التقييم. "
+
+#: cms/templates/js/show-textbook.underscore
+msgid "PDF Chapters"
+msgstr "فصول PDF"
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "عرض النسخة الحالية المنشورة"
+
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/signatory-editor.underscore
+msgid "Signatory"
+msgstr "مُوقّع"
+
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/signatory-editor.underscore
+msgid "Signature Image"
+msgstr "صورة التوقيع"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Certificate Signatory Configuration"
+msgstr "إعدادات الموقِّع على الشهادة"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Name "
+msgstr "الاسم "
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Name of the signatory"
+msgstr "اسم الموقِّع"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "The name of this signatory as it should appear on certificates."
+msgstr "اسم هذا الموقّع كما يجب أن يظهر على الشهادات"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Title "
+msgstr "اللقب"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Title of the signatory"
+msgstr "لقب الموقِّع"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid ""
+"Titles more than 100 characters may prevent students from printing their "
+"certificate on a single page."
+msgstr ""
+"يمكن أن تمنع العناوين التي تزيد عن 100 حرفًا الطلاب من طباعة شهادتهم على "
+"صفحة واحدة"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Organization "
+msgstr "المؤسسة"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Organization of the signatory"
+msgstr "مؤسّسة الموقِّع"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid ""
+"The organization that this signatory belongs to, as it should appear on "
+"certificates."
+msgstr "المؤسّسة التي ينتمي إليها هذا الموقِّع، كما يجب أن تظهر على الشهادات."
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Path to Signature Image"
+msgstr "مسار موقع صورة التوقيع"
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Image must be in PNG format"
+msgstr "يجب أن تكون الصورة بصيغة PNG."
+
+#: cms/templates/js/signatory-editor.underscore
+msgid "Upload Signature Image"
+msgstr "تحميل صورة التوقيع"
+
+#: cms/templates/js/staff-lock-editor.underscore
+msgid "Unit Visibility"
+msgstr "رؤية الوحدة"
+
+#: cms/templates/js/staff-lock-editor.underscore
+msgid "Section Visibility"
+msgstr "رؤية القسم"
+
+#: cms/templates/js/staff-lock-editor.underscore
+msgid ""
+"If the unit was previously published and released to learners, any changes "
+"you made to the unit when it was hidden will now be visible to learners."
+msgstr ""
+"إذا كانت الوحدة منشورة في السابق وتم إطلاقها إلى المتعلمين، فإن أي تغييرات "
+"تقوم بإجرائها على الوحدة عندما كانت مخبأة ستكون مرئية للمتعلمين."
+
+#: cms/templates/js/staff-lock-editor.underscore
+#, python-format
+msgid ""
+"If you make this %(xblockType)s visible to learners, learners will be able "
+"to see its content after the release date has passed and you have published "
+"the unit. Only units that are explicitly hidden from learners will remain "
+"hidden after you clear this option for the %(xblockType)s."
+msgstr ""
+"إذا قمت بجعل %(xblockType)s مرئيًا للمتعلمين، سوف يكون المتعلمون قادرين على "
+"رؤية محتواه بعد مرور تاريخ الإطلاق ونشر الوحدة. فقط ستبقى الوحدات التي كانت "
+"مخبأة بشكل واضح من المتعلمين مخفية بعد حذف الخيار الخاص  بـ %(xblockType)s."
+
+#: cms/templates/js/team-member.underscore
+msgid "Current Role:"
+msgstr "الدور الحالي:"
+
+#: cms/templates/js/team-member.underscore
+msgid "You!"
+msgstr "أنت!"
+
+#: cms/templates/js/team-member.underscore
+msgid "send an email message to {email}"
+msgstr "أرسل رسالة إلكترونية إلى العنوان  {email} "
+
+#: cms/templates/js/team-member.underscore
+msgid "Promote another member to Admin to remove your admin rights"
+msgstr "يُرجى ترقية عضو آخر إلى درجة مشرِف لتتمكّن من إلغاء حقوقك كمشرِف."
+
+#: cms/templates/js/team-member.underscore
+msgid "Add {role} Access"
+msgstr "إضافة صلاحية الوصول الخاصة بـ {role}"
+
+#: cms/templates/js/team-member.underscore
+msgid "Remove {role} Access"
+msgstr "إلغاء صلاحية الوصول الخاصة بـ {role}"
+
+#: cms/templates/js/team-member.underscore
+msgid "Delete the user, {username}"
+msgstr "حذف المستخدم،  {username} "
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Set as a Special Exam"
+msgstr "عيّن امتحانًا مخصّصًا"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Exam Types"
+msgstr "أنواع الاختبار"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "None"
+msgstr "لا شيء"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Timed"
+msgstr "مؤقّت"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use a timed exam to limit the time learners can spend on problems in this "
+"subsection. Learners must submit answers before the time expires. You can "
+"allow additional time for individual learners through the Instructor "
+"Dashboard."
+msgstr ""
+"استخدم امتحانًا مؤقّتًا للحدّ من الوقت الذي يمكن للمتعلّمين قضاؤه في حل "
+"مسائل هذا القسم الفرعي. يجب أن يقدّم المتعلّمون الإجابات قبل انتهاء الوقت "
+"المحدّد. كما ويمكنك السماح لأحد المتعلّمين بوقت إضافي باستخدام لوحة معلومات "
+"الأستاذ."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Proctored"
+msgstr "مُراقب"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Proctored exams are timed and they record video of each learner taking the "
+"exam. The videos are then reviewed to ensure that learners follow all "
+"examination rules."
+msgstr ""
+"Proctored exams are timed and they record video of each learner taking the "
+"exam. The videos are then reviewed to ensure that learners follow all "
+"examination rules. Please note that setting this exam as proctored will "
+"change the visibility settings to \"Hide content after due date.\""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Onboarding"
+msgstr "تهيئة"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use Onboarding to introduce learners to proctoring, verify their identity, "
+"and create an onboarding profile. Learners must complete the onboarding "
+"profile step prior to taking a proctored exam. Profile reviews take 2+ "
+"business days."
+msgstr ""
+"استخدم خاصية التهيئة لتعريف المتعلمين بالمراقبة والتحقق من هويتهم وإنشاء ملف"
+" تعريف خاص. يجب على المتعلمين إكمال خطوة الملف الشخصي قبل إجراء اختبار "
+"مراقب. تستغرق مراجعات الملف الشخصي يومي عمل أو أكثر."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Practice Proctored"
+msgstr "تمرّن من خلال خوض امتحان مراقَب"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use a practice proctored exam to introduce learners to the proctoring tools "
+"and processes. Results of a practice exam do not affect a learner's grade."
+msgstr ""
+"استخدم امتحان تدريبي مراقب لتعريف المتعلّمين بإجراءات وأدوات المراقبة. لن "
+"تؤثر نتائج الامتحان التدريبي على الدرجة النهائية الممنوحة للمتعلّم."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Time Allotted (HH:MM):"
+msgstr "الوقت المخصَّص (HH:MM): "
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Select a time allotment for the exam. If it is over 24 hours, type in the "
+"amount of time. You can grant individual learners extra time to complete the"
+" exam through the Instructor Dashboard."
+msgstr ""
+"اختر فترة زمنية مخصّصة لإجراء الامتحان. إذا زادت القيمة عن 24 ساعة،أدخل "
+"مقدارًا من الوقت. يمكنك كمج متعلّمين محددين زمنًا إضافيًا لإجراء الامتحان من"
+" خلال لوحة معلومات الأستاذ."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Review Rules"
+msgstr "قواعد المراجعة"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Specify any rules or rule exceptions that the proctoring review team should "
+"enforce when reviewing the videos. For example, you could specify that "
+"calculators are allowed. These specified rules are visible to learners "
+"before the learners start the exam, along with the {linkStart}general "
+"proctored exam rules{linkEnd}."
+msgstr ""
+"حدد أية قواعد أو استثناءات يجب أن يفرضها فريق مراجعة المراقبة عند مراجعة "
+"مقاطع الفيديو. على سبيل المثال، يمكنك تحديد أن الآلات الحاسبة مسموح بها. هذه"
+" القواعد ستكون ظاهرة للمتعلمين قبل بدء الاختبار، إلى جانب {linkStart}القواعد"
+" العامة للإمتحان المراقب{linkEnd}."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "General Proctored Exam Rules"
+msgstr "القواعد العامة للإمتحان المراقب"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Specify any rules or rule exceptions that the proctoring review team should "
+"enforce when reviewing the videos. For example, you could specify that "
+"calculators are allowed. These specified rules are visible to learners "
+"before the learners start the exam."
+msgstr ""
+"حدد أية قواعد أو استثناءات يجب أن يفرضها فريق مراجعة المراقبة عند مراجعة "
+"مقاطع الفيديو. على سبيل المثال، يمكنك تحديد أن الآلات الحاسبة مسموح بها. هذه"
+" القواعد ستكون ظاهرة للمتعلمين قبل بدء الاختبار."
+
+#: cms/templates/js/transcript-organization-credentials.underscore
+msgid "Account"
+msgstr "حساب"
+
+#: cms/templates/js/transcript-organization-credentials.underscore
+msgid ""
+"This action updates the {provider} information for your entire organization."
+msgstr "يقوم هذا الإجراء بتحديث معلومات {provider} مؤسستك بأكملها."
+
+#: cms/templates/js/transcript-organization-credentials.underscore
+msgid "Enter the account information for your organization."
+msgstr "أدخل معلومات الحساب لمؤسستك."
+
+#: cms/templates/js/transcript-organization-credentials.underscore
+msgid "API Key"
+msgstr "مفتاح واجهة برمجة التطبيق API Key"
+
+#: cms/templates/js/transcript-organization-credentials.underscore
+msgid "API Secret"
+msgstr "كلمة سر واجهة برمجة التطبيق API Secret"
+
+#: cms/templates/js/unit-access-editor.underscore
+msgid "Unit Access"
+msgstr "الوصول إلى الوحدة"
+
+#: cms/templates/js/unit-access-editor.underscore
+msgid "Restrict access to:"
+msgstr "تقييد الوصول إلى:"
+
+#: cms/templates/js/unit-access-editor.underscore
+msgid "Select a group type"
+msgstr "حدد نوع المجموعة"
+
+#: cms/templates/js/unit-access-editor.underscore
+msgid "Select one or more groups:"
+msgstr "حدد مجموعة واحدة أو أكثر:"
+
+#: cms/templates/js/unit-access-editor.underscore
+msgid "Deleted Group"
+msgstr "مجموعة محذوفة"
+
+#: cms/templates/js/unit-access-editor.underscore
+msgid ""
+"This group no longer exists. Choose another group or do not restrict access "
+"to this unit."
+msgstr ""
+"تم حذف هذه المجموعة، يرجى اختيار مجموعة أخرى أو إلغاء تقييد الوصول إلى هذه "
+"الوحدة."
+
+#: cms/templates/js/upload-dialog.underscore
+msgid "File upload succeeded"
+msgstr "جرى تحميل الملف بنجاح"
+
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"Please check the following validation feedbacks and reflect them in your "
+"course settings:"
+msgstr ""
+"يُرجى الاطلاع على ملاحظات التحقّق التالية وإجراء ما يلزم من تعديلات على "
+"الإعدادات الخاصة بمساقك."
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Verification Checkpoint"
+msgstr "نقطة اختبار تخص عملية التحقّق"
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Must complete verification checkpoint"
+msgstr " يجب إتمام نقطة الاختبار الخاصّة بعملية التحقّق"
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid "Verification checkpoint to be completed"
+msgstr "يتوجّب إتمام نقطة الاختبار الخاصّة بعملية التحقّق"
+
+#: cms/templates/js/verification-access-editor.underscore
+msgid ""
+"Learners who require verification must pass the selected checkpoint to see "
+"the content in this unit. Learners who do not require verification see this "
+"content by default."
+msgstr ""
+"لاستعراض المحتوى المتوفّر في هذه الوحدة، لابدّ للمتعلمين، ممن هم بحاجة "
+"لإجراء عملية التحقّق، اجتياز نقطة اختبار بينما سيتمكّن المتعلمون ممن ليسوا "
+"بحاجة لإجراء عملية التحقّق من رؤية هذا المحتوى بشكل افتراضي."
+
+#: cms/templates/js/video-thumbnail.underscore
+msgid ""
+"Recommended image resolution is {imageResolution}, maximum image file size "
+"should be {maxFileSize} and format must be one of {supportedImageFormats}."
+msgstr ""
+"دقة الصورة المقترحة {imageResolution} ، يجب أن يكون الحد الأقصى لحجم ملف "
+"الصورة {maxFileSize} ويجب أن يكون التنسيق ضمن {supportedImageFormats}."
+
+#: cms/templates/js/video-transcript-upload-status.underscore
+msgid "Read more"
+msgstr "اقرأ المزيد"
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "No transcript uploaded."
+msgstr "لم يتم تحميل نص."
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "Show transcripts ({totalTranscripts})"
+msgstr "إظهار النصوص ({totalTranscripts})"
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
+msgstr "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
+
+#: cms/templates/js/xblock-access-editor.underscore
+msgid "Set Access"
+msgstr "تعيين الوصول"
+
+#: cms/templates/js/xblock-string-field-editor.underscore
+#, python-format
+msgid "Edit %(display_name)s (required)"
+msgstr "تعديل %(display_name)s (مطلوب)"
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"You have done a dry run of force publishing the course. Nothing has changed."
+" Had you run it, the following course versions would have been change."
+msgstr ""
+"لقد قمت بإجراء تنفيذ لنشر الدورة التدريبية. فلم يتغير شيء، عند التشغيل، "
+"إصدارات الدورة التالية قد يتم تغييرها."
+
+#: cms/templates/js/maintenance/force-published-course-response.underscore
+msgid ""
+"The published branch version, {published}, was reset to the draft branch "
+"version, {draft}."
+msgstr ""
+"تم إعادة ضبط الإصدار الفرعي المنشور {published} على مسودة الإصدار الفرعي، "
+"{draft}."
+
+#: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
+msgid "Add URLs for additional versions"
+msgstr "إضافة روابط للنسخات الإضافية"
+
+#: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
+msgid ""
+"To be sure all students can access the video, we recommend providing both an"
+" .mp4 and a .webm version of your video. Click below to add a URL for "
+"another version. These URLs cannot be YouTube URLs. The first listed video "
+"that's compatible with the student's computer will play."
+msgstr ""
+"لتتأكّد من تمكّن جميع الطلاب من الوصول إلى هذا الفيديو، نوصي بتحميل مقطع "
+"الفيديو ذاته بكل من صيغتَي .mp4 و .webm. يُرجى النقر أدناه لإضافة رابط لنسخة"
+" أخرى. لا يمكن لهذه الروابط أن تشير إلى موقع يوتيوب. وسيُعرَض أوّل فيديو "
+"مُدرَج ومتوافق مع نظام كومبيوتر الطالب."
+
+#: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
+msgid "Default Timed Transcript"
+msgstr "نص افتراضي محدَّد التوقيت"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid "Timed Transcript Conflict"
+msgstr "تضارب ضمن النص محدَّد التوقيت"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+msgid ""
+"The timed transcript for the first video file does not appear to be the same"
+" as the timed transcript for the second video file."
+msgstr ""
+"يبدو أنّ النص محدَّد التوقيت لملف الفيديو الأوّل يختلف عن النص محدَّد "
+"التوقيت لملف الفيديو الثاني."
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+msgid "Which timed transcript would you like to use?"
+msgstr "ما هو النص محدَّد التوقيت الذي ترغب باستخدامه؟"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Error."
+msgstr "خطأ."
+
+#: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
+#, python-format
+msgid "Timed Transcript from %(filename)s"
+msgstr "نص محدَّد التوقيت من %(filename)s"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+msgid "Timed Transcript Found"
+msgstr "وُجد نص محدَّد التوقيت"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+msgid ""
+"EdX has a timed transcript for this video. If you want to edit this "
+"transcript, you can download, edit, and re-upload the existing transcript. "
+"If you want to replace this transcript, upload a new .srt transcript file."
+msgstr ""
+"لدى EdX نص محدَّد التوقيت لهذا الفيديو. إذا رغبت في تعديل هذا النصّ، فيمكنك "
+"تنزيل النص الحالي، وتعديله، وإعادة تحميله من جديد. أمّا إذا رغبت في "
+"استبداله، فيُرجى تحميل ملف نص جديد بصيغة .srt."
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Upload New Transcript"
+msgstr "تحميل نصّ جديد"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid "Upload New .srt Transcript"
+msgstr "تحميل نص جديد بصيغة .srt "
+
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+msgid "Download Transcript for Editing"
+msgstr "تنزيل النص لتعديله"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid "No EdX Timed Transcript"
+msgstr "لا يوجد لدى EdX نص محدَّد التوقيت "
+
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid ""
+"EdX doesn't have a timed transcript for this video in Studio, but we found a"
+" transcript on YouTube. You can import the YouTube transcript or upload your"
+" own .srt transcript file."
+msgstr ""
+"لا تملك EdX نصًّا محدَّد التوقيت لهذا الفيديو في الاستديو، لكنّنا وجدنا "
+"نصًّا على اليوتيوب يمكنك استيراده أو تحميل ملف لنصّك الخاص بصيغة .srt."
+
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
+msgid "Import YouTube Transcript"
+msgstr "استيراد نص من يوتيوب"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+msgid "No Timed Transcript"
+msgstr "لا يوجد نص محدَّد التوقيت"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
+msgid ""
+"EdX doesn\\'t have a timed transcript for this video. Please upload an .srt "
+"file."
+msgstr ""
+"ليس لدى EdX نص محدَّد التوقيت لهذا الفيديو. يُرجى تحميل ملف بصيغة .srt."
+
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid ""
+"The timed transcript for this video on edX is out of date, but YouTube has a"
+" current timed transcript for this video."
+msgstr ""
+"يرتبط مقطع الفيديو هذا، في EdX، بنص قديم محدَّد التوقيت رغم توفّر نص أحدث "
+"لمقطع الفيديو ذاته، على موقع يوتيوب."
+
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid "Do you want to replace the edX transcript with the YouTube transcript?"
+msgstr "هل ترغب في استبدال نص EdX بنص يوتيوب؟"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
+msgid "Yes, replace the edX transcript with the YouTube transcript"
+msgstr "نعم، يٌرجى استبدال نص EdX بنص يوتيوب"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+msgid "Timed Transcript Uploaded Successfully"
+msgstr "جرى تحميل النص محدَّد التوقيت بنجاح"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
+msgid ""
+"EdX has a timed transcript for this video. If you want to replace this "
+"transcript, upload a new .srt transcript file. If you want to edit this "
+"transcript, you can download, edit, and re-upload the existing transcript."
+msgstr ""
+"يوجد لدى Edx نص محدَّد التوقيت لهذا الفيديو. إذا رغبت في استبدال هذا النص، "
+"يُرجى تحميل ملف نص جديد بصيغة .srt. أمّا إذا رغبت في تعديل هذا النصّ، فيمكنك"
+" تنزيل النص السابق وتعديله وإعادة تحميله من جديد.  "
+
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Confirm Timed Transcript"
+msgstr "أكّد النص محدَّد التوقيت"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid ""
+"You changed a video URL, but did not change the timed transcript file. Do "
+"you want to use the current timed transcript or upload a new .srt transcript"
+" file?"
+msgstr ""
+"لقد قُمت بتغيير رابط الفيديو دون أن تغيّر ملف النص محدَّد التوقيت المرتبط "
+"به. هل ترغب في استخدام النص محدَّد التوقيت الحالي أو تحميل ملف نص جديد بصيغة"
+" .srt؟"
+
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
+msgid "Use Current Transcript"
+msgstr "استخدم النص الحالي"
+
+#~ msgid "Description"
+#~ msgstr "الوصف"
+
+#~ msgid "Timed Exam"
+#~ msgstr "امتحان محدّد بوقت"
+
+#~ msgid "Date"
+#~ msgstr "التاريخ"
+
+#~ msgid "Enable discussion"
+#~ msgstr "تمكين المناقشة"
+
+#~ msgid "Due in:"
+#~ msgstr "ويرجع ذلك:"
+
+#~ msgid "weeks from learner enrollment date"
+#~ msgstr "الأسابيع منذ تاريخ انضمام المتعلم"
+
+#~ msgid ""
+#~ "If a learner starts on {startDate}, this subsection will be due on "
+#~ "{projectedDueIn}."
+#~ msgstr ""
+#~ "إذا بدأ طالب في {startDate} ، فسيكون هذا القسم الفرعي تبعا ل "
+#~ "{projectedDueIn}."
+
+#~ msgid ""
+#~ "The maximum number of weeks this subsection can be due in is 18 weeks from "
+#~ "the learner enrollment date."
+#~ msgstr ""
+#~ "الحد الأقصى لعدد الأسابيع التي يمكن أن يستحقها هذا القسم الفرعي هو 18 "
+#~ "أسبوعًا من تاريخ تسجيل طالب."
+
+#~ msgid ""
+#~ "The minimum number of weeks this subsection can be due in is 1 week from the"
+#~ " learner enrollment date."
+#~ msgstr ""
+#~ "الحد الأدنى لعدد الأسابيع التي يمكن أن يستحقها هذا القسم الفرعي هو أسبوع "
+#~ "واحد من تاريخ تسجيل المتعلم."
+
+#~ msgid ""
+#~ "This subsection was released to learners as a proctored exam, but was "
+#~ "reverted back to a basic or timed exam. You may not configure it as a "
+#~ "proctored exam now. Contact edX Support for assistance."
+#~ msgstr ""
+#~ "تم إصدار هذا القسم الفرعي للمتعلمين كاختبار مراقب ، ولكن تم إرجاعه مرة أخرى "
+#~ "إلى الاختبار الأساسي أو المحدد بوقت. لا يمكنك تكوينه كاختبار مراقب الآن. "
+#~ "اتصل بدعم edX للحصول على المساعدة."
+
+#~ msgid ""
+#~ "This proctored exam has been released to learners. You may not convert it to"
+#~ " another type of special exam. You may revert this subsection back to being "
+#~ "a basic exam by selecting 'None', or a timed exam, but you will NOT be able "
+#~ "to configure it as a proctored exam in the future."
+#~ msgstr ""
+#~ "تم إصدار هذا الاختبار المراقب للمتعلمين. لا يجوز لك تحويله إلى نوع آخر من "
+#~ "الاختبارات الخاصة. يمكنك إعادة هذا القسم الفرعي إلى كونه اختبارًا أساسيًا عن"
+#~ " طريق تحديد &quot;لا شيء&quot; ، أو اختبار محدد بوقت ، ولكن لن تتمكن من "
+#~ "تهيئته كاختبار مراقب في المستقبل."

@@ -56,6 +56,13 @@ codekit-config.json
 !django.mo
 !djangojs.po
 !djangojs.mo
+!conf/locale/ar/LC_MESSAGES/django-partial.po
+!conf/locale/ar/LC_MESSAGES/django-studio.po
+!conf/locale/ar/LC_MESSAGES/djangojs-partial.po
+!conf/locale/ar/LC_MESSAGES/mako-studio.po
+!conf/locale/ar/LC_MESSAGES/mako.po
+!conf/locale/ar/LC_MESSAGES/underscore-studio.po
+!conf/locale/ar/LC_MESSAGES/underscore.po
 conf/locale/en/LC_MESSAGES/*.mo
 conf/locale/fake*/LC_MESSAGES/*.po
 conf/locale/fake*/LC_MESSAGES/*.mo
