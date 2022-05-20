@@ -1609,6 +1609,18 @@ class ModuleSystemShim:
         )
         return self.resources_fs
 
+    @property
+    def node_path(self):
+        """
+        Path to node_modules. Doesn't seem to be used by any ModuleSystem dependent core XBlock anymore.
+
+        Deprecated.
+        """
+        warnings.warn(
+            'node_path is deprecated. Please use other methods of finding the node_modules location.',
+            DeprecationWarning, stacklevel=3
+        )
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1626,7 +1638,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
     def __init__(
             self, static_url, track_function, get_module,
             descriptor_runtime, debug=False, hostname="", publish=None,
-            node_path="", course_id=None, error_descriptor_class=None,
+            course_id=None, error_descriptor_class=None,
             field_data=None, rebind_noauth_module_to_user=None,
             **kwargs):
         """
@@ -1668,7 +1680,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         self.get_module = get_module
         self.DEBUG = self.debug = debug
         self.HOSTNAME = self.hostname = hostname
-        self.node_path = node_path
         self.course_id = course_id
 
         if publish:

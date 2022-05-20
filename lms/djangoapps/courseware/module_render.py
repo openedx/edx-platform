@@ -731,7 +731,6 @@ def get_module_system_for_user(
         user=user,
         debug=settings.DEBUG,
         hostname=settings.SITE_NAME,
-        node_path=settings.NODE_PATH,
         publish=publish,
         course_id=course_id,
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
