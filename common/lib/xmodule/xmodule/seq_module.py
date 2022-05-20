@@ -173,95 +173,15 @@ class ProctoringFields:
         if valid_ticket["content_id"] != self.location:
             return False
 
-    is_time_limited = Boolean(
-        display_name=_("Is Time Limited"),
-        help=_(
-            "This setting indicates whether students have a limited time"
-            " to view or interact with this courseware component."
-        ),
-        default=False,
-        scope=Scope.settings,
-    )
-
-    default_time_limit_minutes = Integer(
-        display_name=_("Time Limit in Minutes"),
-        help=_(
-            "The number of minutes available to students for viewing or interacting with this courseware component."
-        ),
-        default=None,
-        scope=Scope.settings,
-    )
-
-    is_proctored_enabled = Boolean(
-        display_name=_("Is Proctoring Enabled"),
-        help=_(
-            "This setting indicates whether this exam is a proctored exam."
-        ),
-        default=False,
-        scope=Scope.settings,
-    )
-
-    exam_review_rules = String(
-        display_name=_("Software Secure Review Rules"),
-        help=_(
-            "This setting indicates what rules the proctoring team should follow when viewing the videos."
-        ),
-        default='',
-        scope=Scope.settings,
-    )
-
-    is_practice_exam = Boolean(
-        display_name=_("Is Practice Exam"),
-        help=_(
-            "This setting indicates whether this exam is for testing purposes only. Practice exams are not verified."
-        ),
-        default=False,
-        scope=Scope.settings,
-    )
-
-    is_onboarding_exam = Boolean(
-        display_name=_("Is Onboarding Exam"),
-        help=_(
-            "This setting indicates whether this exam is an onboarding exam."
-        ),
-        default=False,
-        scope=Scope.settings,
-    )
-
+    # this might be used in a non-proctoring context in _hidden_content_student_view?
     def _get_course(self):
         """
         Return course by course id.
         """
         return self.runtime.modulestore.get_course(self.course_id)  # pylint: disable=no-member
 
-    @property
-    def is_timed_exam(self):
-        """
-        Alias the permutation of above fields that corresponds to un-proctored timed exams
-        to the more clearly-named is_timed_exam
-        """
-        return not self.is_proctored_enabled and not self.is_practice_exam and self.is_time_limited
 
-    @property
-    def is_proctored_exam(self):
-        """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
-        return self.is_proctored_enabled
-
-    @property
-    def allow_proctoring_opt_out(self):
-        """
-        Returns true if the learner should be given the option to choose between
-        taking a proctored exam, or opting out to take the exam without proctoring.
-        """
-        return self._get_course().allow_proctoring_opt_out
-
-    @is_proctored_exam.setter
-    def is_proctored_exam(self, value):
-        """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
-        self.is_proctored_enabled = value
-
-
-@XBlock.wants('proctoring')
+@XBlock.wants('ticketing')
 @XBlock.wants('gating')
 @XBlock.wants('credit')
 @XBlock.wants('completion')
@@ -526,24 +446,6 @@ class SequenceBlock(
             context['position'] = int(context['position'])
         return self._student_or_public_view(context, True, {}, view=AUTHOR_VIEW)
 
-    def _special_exam_student_view(self):
-        """
-        Checks whether this sequential is a special exam.  If so, returns
-        a banner_text or the fragment to display depending on whether
-        staff is masquerading.
-        """
-        _ = self.runtime.service(self, "i18n").ugettext
-
-        if self.is_time_limited:
-            if TIMED_EXAM_GATING_WAFFLE_FLAG.is_enabled():
-                # set the self.gated_sequence_paywall variable
-                self.gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems()
-            if self.gated_sequence_paywall is None:
-                special_exam_html = self._time_limited_student_view()
-                if special_exam_html:
-                    banner_text = _("This exam is hidden from the learner.")
-                    return banner_text, special_exam_html
-
     def _hidden_content_banner_text(self, course):
         """
         Chooses a banner message to show for hidden content
@@ -605,8 +507,6 @@ class SequenceBlock(
             'items': items,
             'element_id': self.location.html_id(),
             'item_id': str(self.location),
-            'is_time_limited': self.is_time_limited,
-            'is_proctored': self.is_proctored_enabled,
             'position': self.position,
             'tag': self.location.block_type,
             'next_url': context.get('next_url'),
@@ -736,10 +636,8 @@ class SequenceBlock(
             if not prereq_met:
                 return True
 
-        # Are we a time limited test that hasn't started yet?
-        if self.is_time_limited:
-            if self._time_limited_student_view() or self._hidden_content_student_view({}):
-                return True
+        if self.is_ticketed:
+            return True
 
         # Otherwise, nothing is blocking us.
         return False
@@ -882,7 +780,7 @@ class SequenceBlock(
         newrelic.agent.add_custom_parameter('seq.block_id', str(self.location))
         newrelic.agent.add_custom_parameter('seq.display_name', self.display_name or '')
         newrelic.agent.add_custom_parameter('seq.position', self.position)
-        newrelic.agent.add_custom_parameter('seq.is_time_limited', self.is_time_limited)
+        newrelic.agent.add_custom_parameter('seq.ticketed', self.is_ticketed)
 
     def _capture_full_seq_item_metrics(self, display_items):
         """
@@ -927,71 +825,6 @@ class SequenceBlock(
             curr_block_counts = collections.Counter(usage_key.block_type for usage_key in child_locs)
             for block_type, count in curr_block_counts.items():
                 newrelic.agent.add_custom_parameter(f'seq.current.block_counts.{block_type}', count)
-
-    def _time_limited_student_view(self):
-        """
-        Delegated rendering of a student view when in a time
-        limited view. This ultimately calls down into edx_proctoring
-        pip installed djangoapp
-        """
-
-        # None = no overridden view rendering
-        view_html = None
-
-        proctoring_service = self.runtime.service(self, 'proctoring')
-        credit_service = self.runtime.service(self, 'credit')
-
-        # Is this sequence designated as a Timed Examination, which includes
-        # Proctored Exams
-        feature_enabled = (
-            proctoring_service and
-            credit_service and
-            self.is_time_limited
-        )
-        if feature_enabled:
-            current_user = self.runtime.service(self, 'user').get_current_user()
-            user_id = current_user.opt_attrs.get(ATTR_KEY_USER_ID)
-            user_is_staff = current_user.opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
-            user_role_in_course = 'staff' if user_is_staff else 'student'
-            course_id = self.runtime.course_id
-            content_id = self.location
-
-            context = {
-                'display_name': self.display_name,
-                'default_time_limit_mins': (
-                    self.default_time_limit_minutes if
-                    self.default_time_limit_minutes else 0
-                ),
-                'is_practice_exam': self.is_practice_exam,
-                'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
-                'due_date': self.due,
-                'grace_period': self.graceperiod,  # lint-amnesty, pylint: disable=no-member
-            }
-
-            # inject the user's credit requirements and fulfillments
-            if credit_service:
-                credit_state = credit_service.get_credit_state(user_id, course_id)
-                if credit_state:
-                    context.update({
-                        'credit_state': credit_state
-                    })
-
-            # See if the edx-proctoring subsystem wants to present
-            # a special view to the student rather
-            # than the actual sequence content
-            #
-            # This will return None if there is no
-            # overridden view to display given the
-            # current state of the user
-            view_html = proctoring_service.get_student_view(
-                user_id=user_id,
-                course_id=course_id,
-                content_id=content_id,
-                context=context,
-                user_role=user_role_in_course
-            )
-
-        return view_html
 
     def get_icon_class(self):
         child_classes = {child.get_icon_class()
