@@ -185,7 +185,7 @@ class ScheduledInstructorTaskSubmissionTests(InstructorTaskCourseTestCase):
         expected_task_arguments = json.loads(schedule.task_args)
         expected_task_args = [schedule.task.id, expected_task_arguments]
         expected_messages = [
-            f"Submitting scheduled task {schedule.task.id} for processing",
+            f"Submitting scheduled task '{schedule.task.id}' for processing",
         ]
 
         with LogCapture() as log:
