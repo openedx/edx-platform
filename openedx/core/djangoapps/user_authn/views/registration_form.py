@@ -19,6 +19,7 @@ from django_countries import countries
 from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.plugins.plugins_hooks import run_extension_point
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_authn.utils import check_pwned_password, is_registration_api_v1 as is_api_v1
@@ -1076,6 +1077,11 @@ class RegistrationFormFactory:
             ),
             tos_link_end=HTML("</a>"),
         )
+        label_with_terms_of_service_and_privacy_policy = run_extension_point(
+            'PEARSON_CORE_REGISTRATION_FORM_MODULE',
+            platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        )
+        label = label_with_terms_of_service_and_privacy_policy or label
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.

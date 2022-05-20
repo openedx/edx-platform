@@ -3,59 +3,66 @@
 {% load i18n %}
 {% load static %}
 {% block content %}
-<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="box-shadow: 0px 0px 10px 2px #c8c8c8;">
     <tr>
-        <td>
-            <h1>
-                {% filter force_escape %}
-                {% blocktrans %}Welcome to {{ course_name }}{% endblocktrans %}
-                {% endfilter %}
-            </h1>
+        <td style="width: 100%;
+            max-width: 800px;
+            background-color: #FFF;
+            color: #000000;
+            margin: auto;
+            text-align: center;
+            padding: 20px;
+            ">
 
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                {% blocktrans %}To get started, please visit https://{{ site_name }}.{% endblocktrans %}
-                {% endfilter %}
-                <br />
-            </p>
+            <img src="https://mylearningx.pearson.com/static/pearson-pols-theme/images/PearsonLogo_Primary_Blk_RGB.png" style="width: 150px; padding: 5px; margin: auto;" />
 
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                {% blocktrans %}The login information for your account follows:{% endblocktrans %}
-                {% endfilter %}
-                <br />
-                {% filter force_escape %}
-                {% blocktrans %}email: {{ email_address }}{% endblocktrans %}
-                {% endfilter %}
-                <br />
-                {% filter force_escape %}
-                {% blocktrans %}password: {{ password }}{% endblocktrans %}
-                {% endfilter %}
-                <br />
-            </p>
+            <div style="width: 90%;
+                        background-color: #D4EAE4;
+                        text-align: left;
+                        padding: 2% 5%;
+                        background-image: url('https://mylearningx.pearson.com/static/pearson-pols-theme/images/laptop_transparent-bg.png');
+                        background-size: 50%;
+                        background-position: right bottom;
+                        background-repeat: no-repeat;
+                        padding-bottom: 35%;
+                        ">
 
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                {% blocktrans %}It is recommended that you change your password.{% endblocktrans %}
-                {% endfilter %}
-                <br />
-            </p>
+                <h1 style="font-family:'Playfair Display', serif; font-weight: 700; font-size: 1.7em; margin-top: 30px; margin-bottom: 20px;">
+                    {% blocktrans %}
+                    Welcome to {{ course_name }}
+                    {% endblocktrans %}
+                </h1>
+                <p style="padding: 0px;
+                          width: 50%;
+                          min-width: 300px;
+                          margin-top: 20px;
+                          ">
+                    {% blocktrans %}To get started, please visit https://{{ site_name }}.{% endblocktrans %}
+                    <br />
+                </p>
 
-            <p style="color: rgba(0,0,0,.75);">
-              <a href="{{ course_url }}">
-                {% filter force_escape %}
-                {% blocktrans %}You may access your course.{% endblocktrans %}
-                {% endfilter %}
-              </a>
-                <br />
-            </p>
+                <p style="padding: 0px;
+                          width: 50%;
+                          min-width: 300px;
+                          margin-top: 20px;
+                          ">
+                    {% blocktrans %}The login information for your account follows:{% endblocktrans %}
+                    <br />
+                    {% blocktrans %}email: {{ email_address }}{% endblocktrans %}
+                    <br />
+                    {% blocktrans %}password: {{ password }}{% endblocktrans %}
+                    <br />
+                </p>
+                <p style="padding: 0px;
+                          width: 50%;
+                          min-width: 300px;
+                          margin-top: 20px;
+                          ">
 
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                {% blocktrans %}Sincerely yours, The {{ course_name }} Team{% endblocktrans %}
-                {% endfilter %}
-                <br />
-            </p>
+                    {% blocktrans %}It is recommended that you change your password.{% endblocktrans %}
+                    <br />
+                </p>
+            </div>
         </td>
     </tr>
 </table>

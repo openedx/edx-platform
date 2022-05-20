@@ -3,31 +3,56 @@
 {% load i18n %}
 {% load static %}
 {% block content %}
-<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="box-shadow: 0px 0px 10px 2px #c8c8c8;">
     <tr>
+        <td style="width: 100%;
+            max-width: 800px;
+            background-color: #FFF;
+            color: #000000;
+            margin: auto;
+            text-align: center;
+            padding: 20px;
+            ">
+
+            <img src="https://mylearningx.pearson.com/static/pearson-pols-theme/images/PearsonLogo_Primary_Blk_RGB.png" style="width: 150px; padding: 5px; margin: auto;" />
+
+            <div style="width: 90%;
+                        background-color: #D4EAE4;
+                        text-align: left;
+                        padding: 2% 5%;
+                        background-image: url('https://mylearningx.pearson.com/static/pearson-pols-theme/images/laptop_transparent-bg.png');
+                        background-size: 50%;
+                        background-position: right bottom;
+                        background-repeat: no-repeat;">
+
+                <h1 style="font-family:'Playfair Display', serif; font-weight: 700;">
+                    {% trans "Email Change" %}
+                </h1>
+                <p style="padding: 0px;
+                          width: 50%;
+                          min-width: 300px;
+                          margin-top: 20px;
+                          ">
+                    {% if is_secondary_email_change_request %}
+                    {% blocktrans %}We received a request to change the secondary e-mail associated with your {{ site_name }} account to {{ new_email }}. If this is correct, please click below to confirm your new secondary e-mail address. {% endblocktrans %}
+                    {% else %}
+                    {% blocktrans %}We received a request to change the e-mail associated with your {{ site_name }} account from {{ old_email }} to {{ new_email }}. If this is correct, please click below to confirm your new e-mail address.{% endblocktrans %}
+                    {% endif %}
+                    <br />
+                </p>
+
+                {% trans "Confirm Email Change" as course_cta_text %}
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=confirm_link %}
+
+            </div>
+        </td>
+    </tr>
+    <tr style="background-color: #FFF;">
         <td>
-            <h1>
-                {% trans "Email Change" as tmsg %}{{ tmsg | force_escape }}
-            </h1>
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                {% blocktrans %}We received a request to change the e-mail associated with your {{ platform_name }} account from {{ old_email }} to {{ new_email }}. If this is correct, please confirm your new e-mail address by visiting:{% endblocktrans %}
-                {% endfilter %}
+            <p style="margin: 0 40px 40px 40px; text-align: center; color: #444; font-size: 0.9em;">
+                {% blocktrans %}If you didn't request this, you don't need to do anything; you won't receive any more email from us. Please do not reply to this e-mail; if you require assistance, check the help section of the {{ site_name }} web site.{% endblocktrans %}
                 <br />
             </p>
-
-            {% filter force_escape %}
-                {% blocktrans asvar course_cta_text %}Confirm Email Change{% endblocktrans %}
-            {% endfilter %}
-            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=confirm_link %}
-
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                {% blocktrans %}If you didn't request this, you don't need to do anything; you won't receive any more email from us. Please do not reply to this e-mail; if you require assistance, check the help section of the {{ platform_name }} web site.{% endblocktrans %}
-                {% endfilter %}
-                <br />
-            </p>
-
         </td>
     </tr>
 </table>
