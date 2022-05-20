@@ -2,7 +2,6 @@
 Adapter to isolate django-oauth-toolkit dependencies
 """
 
-from edx_django_utils.monitoring import set_custom_attribute
 from oauth2_provider import models
 
 from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
@@ -101,7 +100,6 @@ class DOTAdapter:
         filter_set = set()
         if hasattr(application, 'access') and application.access.filters:
             filter_set.update(application.access.filters)
-        filter_set = self._add_org_relation_filters_to_set(application, filter_set)
 
         # Allow applications configured with the client credentials grant type to access
         # data for all users. This will enable these applications to fetch data in bulk.
@@ -111,20 +109,3 @@ class DOTAdapter:
             filter_set.add(self.FILTER_USER_ME)
 
         return list(filter_set)
-
-    def _add_org_relation_filters_to_set(self, application, filter_set):
-        """
-        Adds Organization related filters to the filter_set.
-
-        TODO: BOM-1292: Retire Application Organizations once all filters have been migrated
-          to Application Access. When retiring, this entire function can be deleted.
-
-        """
-        filter_set_before_orgs = filter_set.copy()
-        filter_set.update([org_relation.to_jwt_filter_claim() for org_relation in application.organizations.all()])
-
-        set_custom_attribute('filter_set_before_orgs', list(filter_set_before_orgs))
-        set_custom_attribute('filter_set_after_orgs', list(filter_set))
-        set_custom_attribute('filter_set_difference', list(filter_set.difference(filter_set_before_orgs)))
-
-        return filter_set
