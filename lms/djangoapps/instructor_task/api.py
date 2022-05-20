@@ -575,13 +575,14 @@ def generate_anonymous_ids(request, course_key):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def process_scheduled_tasks():
+def process_scheduled_instructor_tasks():
     """
     Utility function that retrieves tasks whose schedules have elapsed and should be processed. Only retrieves
     instructor tasks that are in the `SCHEDULED` state. Then submits these tasks for processing by Celery.
     """
     now = datetime.datetime.now(pytz.utc)
     due_schedules = InstructorTaskSchedule.objects.filter(task__task_state=SCHEDULED).filter(task_due__lte=now)
+    log.info(f"Retrieved {due_schedules.count()} scheduled instructor tasks due for execution")
     for schedule in due_schedules:
         try:
             log.info(f"Attempting to queue scheduled task with id '{schedule.task.id}'")

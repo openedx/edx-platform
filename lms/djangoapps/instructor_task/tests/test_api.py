@@ -28,7 +28,7 @@ from lms.djangoapps.instructor_task.api import (
     generate_certificates_for_students,
     get_instructor_task_history,
     get_running_instructor_tasks,
-    process_scheduled_tasks,
+    process_scheduled_instructor_tasks,
     regenerate_certificates,
     submit_bulk_course_email,
     submit_calculate_may_enroll_csv,
@@ -508,7 +508,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         ]
 
         with LogCapture() as log:
-            process_scheduled_tasks()
+            process_scheduled_instructor_tasks()
 
         mock_submit_scheduled_task.assert_called_once_with(due_instructor_task_schedule)
         log.check_present((LOG_PATH, "INFO", expected_messages[0]),)
@@ -528,7 +528,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         ]
 
         with LogCapture() as log:
-            process_scheduled_tasks()
+            process_scheduled_instructor_tasks()
 
         log.check_present((LOG_PATH, "ERROR", expected_messages[0]),)
 
