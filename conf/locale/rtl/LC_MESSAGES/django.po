@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-16 21:49+0000\n"
-"PO-Revision-Date: 2022-05-16 21:49:53.208974\n"
+"POT-Creation-Date: 2022-05-22 20:42+0000\n"
+"PO-Revision-Date: 2022-05-22 20:42:06.061268\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -5555,6 +5555,7 @@ msgstr "Ⱥɔɔǝssᴉbᴉlᴉʇʎ Ᵽølᴉɔʎ"
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
@@ -7277,10 +7278,13 @@ msgid "Team"
 msgstr "Ŧǝɐɯ"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field
+#. which allows the user to input the city in which they live.
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -11277,6 +11281,14 @@ msgid "Enter your full name."
 msgstr "Ɇnʇǝɹ ʎønɹ ɟnll nɐɯǝ."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your first name."
+msgstr "Ɇnʇǝɹ ʎønɹ ɟᴉɹsʇ nɐɯǝ."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your last name."
+msgstr "Ɇnʇǝɹ ʎønɹ lɐsʇ nɐɯǝ."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "The email addresses do not match."
 msgstr "Ŧɥǝ ǝɯɐᴉl ɐddɹǝssǝs dø nøʇ ɯɐʇɔɥ."
 
@@ -11299,6 +11311,10 @@ msgstr "Ɇnʇǝɹ ʎønɹ dɹøɟǝssᴉøn."
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your specialty."
 msgstr "Ɇnʇǝɹ ʎønɹ sdǝɔᴉɐlʇʎ."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your state."
+msgstr "Ɇnʇǝɹ ʎønɹ sʇɐʇǝ."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your city."
@@ -11345,24 +11361,34 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr "Ŧɥǝ '{field_name}' ɟᴉǝld ɔɐnnøʇ bǝ ǝdᴉʇǝd."
 
+#. Translators: This label appears above a field which allows the
+#. user to input the First Name
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "First Name"
 msgstr "Fᴉɹsʇ Nɐɯǝ"
 
+#. Translators: This label appears above a field which allows the
+#. user to input the Last Name
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Last Name"
 msgstr "Łɐsʇ Nɐɯǝ"
 
+#. Translators: This label appears above a field
+#. which allows the user to input the State/Province/Region in which they
+#. live.
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "State/Province/Region"
 msgstr "Sʇɐʇǝ/Ᵽɹøʌᴉnɔǝ/Ɍǝƃᴉøn"
@@ -11400,9 +11426,12 @@ msgid "Job Title"
 msgstr "Ɉøb Ŧᴉʇlǝ"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field
+#. meant to hold the user's mailing address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's mailing address.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html
 msgid "Mailing address"
@@ -17206,6 +17235,14 @@ msgstr ""
 "ɐɔɔǝss ʇø ʇɥǝ ɔønɹsǝ ɯɐʇǝɹᴉɐl, nnløɔʞ bøʇɥ ƃɹɐdǝd ɐnd nøn-ƃɹɐdǝd "
 "ɐssᴉƃnɯǝnʇs, ɐnd ǝɐɹn ɐ {link_start}ʌǝɹᴉɟᴉǝd ɔǝɹʇᴉɟᴉɔɐʇǝ{link_end} ʇø "
 "sɥøʍɔɐsǝ øn ʎønɹ ɹǝsnɯé."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"{start_bold}Get the most out of your course!{end_bold} Upgrade to earn a "
+"{link_start}verified certificate{link_end} to showcase on your resumé."
+msgstr ""
+"{start_bold}Ǥǝʇ ʇɥǝ ɯøsʇ ønʇ øɟ ʎønɹ ɔønɹsǝ!{end_bold} Ʉdƃɹɐdǝ ʇø ǝɐɹn ɐ "
+"{link_start}ʌǝɹᴉɟᴉǝd ɔǝɹʇᴉɟᴉɔɐʇǝ{link_end} ʇø sɥøʍɔɐsǝ øn ʎønɹ ɹǝsnɯé."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
