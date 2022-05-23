@@ -5,9 +5,6 @@
 FROM overhangio/openedx:10.5.3 as edxapp-build
 MAINTAINER Appsembler <ops@appsembler.com>
 
-# TODO: Compile assets
-# TODO: Install theme
-# TODO: Compile i18n js messages, if it's needed
 # TODO: Consolidate requirements in a shared Ansible/Docker place in `edx-configs`
 
 RUN rm -rf /openedx/edx-platform/
@@ -42,6 +39,25 @@ RUN echo "Installing pip packages:" \
 EXPOSE 8000
 
 FROM edxapp-build as edxapp-build-experimental
+
+# Collect production assets. By default, only assets from the default theme
+# will be processed. This makes the docker image lighter and faster to build.
+# Only the custom themes added to /openedx/themes will be compiled.
+# Here, we don't run "paver update_assets" which is slow, compiles all themes
+# and requires a complex settings file. Instead, we decompose the commands
+# and run each one individually to collect the production static assets to
+# /openedx/staticfiles.
+# We need to rely on a separate openedx-assets command to accelerate asset processing.
+# For instance, we don't want to run all steps of asset collection every time the theme
+# is modified.
+RUN rm -rf /openedx/staticfiles/ \
+    && mkdir --mode=755 /openedx/staticfiles/ \
+    && npm install --verbose --registry=https://registry.npmjs.org/ \
+    && openedx-assets xmodule \
+    && openedx-assets npm \
+    && openedx-assets webpack --env=prod \
+    && openedx-assets common
+
 # Sync with `edx-configs` `appsembler/tahoe/us/juniper/staging/files/server-vars.yml`
 RUN echo "Installing pip packages:" \
     && pip install gestore==0.1.0-dev3 \
@@ -49,5 +65,16 @@ RUN echo "Installing pip packages:" \
     && pip install -e 'git+https://github.com/appsembler/tahoe-idp.git@main#egg=tahoe-idp' \
     && echo "Finished installing pip packages."
 
+RUN mkdir -p /openedx/themes/ \
+    && git clone https://github.com/appsembler/edx-theme-codebase.git --branch=juniper/main /openedx/themes/edx-theme-codebase \
+    && git clone https://github.com/appsembler/edx-theme-customers.git --branch=juniper/tahoe /openedx/themes/edx-theme-codebase/customer_specific \
+    && openedx-assets themes \
+    && openedx-assets collect --settings=tutor_assets \
+    && rdfind -makesymlinks true -followsymlinks true /openedx/staticfiles/ \
+    && mkdir -p /edx/var/edxapp \
+    && ln -sd /openedx/themes /edx/var/edxapp/themes \
+    && echo "Finished compiling theme."
+
+# TODO: Compile i18n using tutor.i18n settings like `overhangio/openedx:10.5.3`
 
 EXPOSE 8000
