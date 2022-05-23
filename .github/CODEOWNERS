@@ -3,7 +3,6 @@
 # Core
 common/djangoapps/student/
 common/djangoapps/third_party_auth/
-common/lib/xmodule/xmodule/
 lms/djangoapps/course_api/blocks
 lms/djangoapps/courseware/
 lms/djangoapps/grades/
@@ -15,6 +14,7 @@ openedx/core/djangoapps/oauth_dispatch
 openedx/core/djangoapps/user_api/
 openedx/core/djangoapps/user_authn/
 openedx/features/course_experience/
+xmodule/
 
 # Core Extensions
 common/lib/xmodule/xmodule/capa_module.py

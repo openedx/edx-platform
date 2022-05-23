@@ -3,6 +3,5 @@
 -e common/lib/capa
 -e common/lib/safe_lxml
 -e common/lib/sandbox-packages
--e common/lib/xmodule
 
 -e openedx/core/lib/xblock_builtin/xblock_discussion
