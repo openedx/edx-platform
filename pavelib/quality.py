@@ -203,7 +203,7 @@ def _count_pylint_violations(report_file):
     """
     num_violations_report = 0
     # An example string:
-    # common/lib/xmodule/xmodule/tests/test_conditional.py:21: [C0111(missing-docstring), DummySystem] Missing docstring
+    # xmodule/xmodule/tests/test_conditional.py:21: [C0111(missing-docstring), DummySystem] Missing docstring
     # More examples can be found in the unit tests for this method
     pylint_pattern = re.compile(r".(\d+):\ \[(\D\d+.+\]).")
 

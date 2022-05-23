@@ -4,13 +4,13 @@
 These test data read from xml, not from mongo.
 
 We have a ModuleStoreTestCase class defined in
-common/lib/xmodule/xmodule/modulestore/tests/django_utils.py.
+xmodule/modulestore/tests/django_utils.py.
 You can search for usages of this in the cms and lms tests for examples.
 You use this so that it will do things like point the modulestore
 setting to mongo, flush the contentstore before and after, load the
 templates, etc.
 You can then use the CourseFactory and XModuleItemFactory as defined in
-common/lib/xmodule/xmodule/modulestore/tests/factories.py to create the
+xmodule/modulestore/tests/factories.py to create the
 course, section, subsection, unit, etc.
 """
 

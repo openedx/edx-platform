@@ -57,7 +57,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
     USER_COUNT = 2
     COURSE_DATA = {}
 
-    # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
+    # Data from YAML xmodule/templates/NAME/default.yaml
     CATEGORY = "vertical"
     DATA = ''
     # METADATA must be overwritten for every instance that uses it. Otherwise,
