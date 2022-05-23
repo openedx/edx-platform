@@ -494,6 +494,8 @@ djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
+docopt==0.6.2
+    # via -r requirements/edx/testing.txt
 docutils==0.17.1
     # via
     #   -c requirements/edx/../constraints.txt

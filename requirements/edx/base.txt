@@ -392,6 +392,8 @@ djangorestframework==3.12.4
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
+docopt==0.6.2
+    # via -r requirements/edx/base.in
 docutils==0.17.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -473,6 +475,7 @@ edx-name-affirmation==2.3.4
     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.3.0
     # via
+    #   -r requirements/edx/base.in
     #   -r requirements/edx/paver.txt
     #   edx-bulk-grades
     #   edx-ccx-keys
@@ -737,6 +740,7 @@ pansi==2020.7.3
     # via py2neo
 path==16.4.0
     # via
+    #   -r requirements/edx/base.in
     #   -r requirements/edx/paver.txt
     #   edx-i18n-tools
     #   path-py
@@ -1076,7 +1080,9 @@ webencodings==0.5.1
     #   html5lib
     #   tinycss2
 webob==1.8.7
-    # via xblock
+    # via
+    #   -r requirements/edx/base.in
+    #   xblock
 wrapt==1.14.1
     # via
     #   -r requirements/edx/paver.txt
