@@ -82,7 +82,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-08 20:42+0000\n"
+"POT-Creation-Date: 2022-05-15 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
@@ -3811,38 +3811,6 @@ msgstr "Kohort Diaktifkan"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Kohort Dinonaktifkan"
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-"Kursus ini menggunakan kohort otomatis untuk pembelajar jalur terverifikasi."
-" Anda tidak dapat menonaktifkan kohort, dan Anda tidak dapat mengubah nama "
-"kohort manual bernama '{verifiedCohortName}'. Untuk mengubah konfigurasi "
-"kohort jalur terverifikasi, hubungi manajer mitra edX Anda."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-"Kursus ini memiliki kohort otomatis yang diaktifkan untuk pembelajar jalur "
-"terverifikasi, namun kohort yang diperlukan belum tersedia. Anda harus "
-"membuat kohort manual bernama '{verifiedCohortName}' agar fitur ini dapat "
-"bekerja."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
-msgstr ""
-"Kursus ini memiliki kohort otomatis yang diaktifkan untuk pembelajar jalur "
-"terverifikasi, namun kohort dinonaktifkan. Anda harus mengaktifkan kohort "
-"agar fitur ini dapat bekerja."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"

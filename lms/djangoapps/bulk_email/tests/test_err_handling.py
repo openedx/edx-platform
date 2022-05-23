@@ -206,8 +206,8 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the to_option in the email doesn't exist
         """
-        with self.assertRaisesRegex(ValueError, 'Course email being sent to unrecognized target: "IDONTEXIST" *'):
-            email = CourseEmail.create(  # pylint: disable=unused-variable
+        with self.assertRaisesRegex(ValueError, "Course email being sent to an unrecognized target: 'IDONTEXIST' *"):
+            CourseEmail.create(
                 self.course.id,
                 self.instructor,
                 ["IDONTEXIST"],
@@ -221,7 +221,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         Tests exception when the cohort or course mode doesn't exist
         """
         with self.assertRaisesRegex(ValueError, '.* IDONTEXIST does not exist .*'):
-            email = CourseEmail.create(  # pylint: disable=unused-variable
+            CourseEmail.create(
                 self.course.id,
                 self.instructor,
                 [f"{target_type}:IDONTEXIST"],

@@ -79,7 +79,7 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
-edx-django-utils>=4.7.0            # Utilities for cache, monitoring, and plugins
+edx-django-utils>=5.0.0            # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
 edx-enterprise
 edx-milestones
@@ -96,7 +96,7 @@ edx-user-state-client
 edx-when
 edxval
 event-tracking
-fs==2.0.18
+fs
 fs-s3fs==0.1.8
 geoip2                              # Python API for the GeoIP web services and databases
 glob2                               # Enhanced glob module, used in openedx.core.lib.rooted_paths

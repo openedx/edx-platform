@@ -2,6 +2,7 @@
 CMS feature toggles.
 """
 from edx_toggles.toggles import SettingDictToggle, WaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # .. toggle_name: FEATURES['ENABLE_EXPORT_GIT']
 # .. toggle_implementation: SettingDictToggle
@@ -138,3 +139,23 @@ def use_new_problem_editor():
     Returns a boolean if new problem editor is enabled
     """
     return ENABLE_NEW_PROBLEM_EDITOR_FLAG.is_enabled()
+
+
+# .. toggle_name: contentstore.individualize_anonymous_user_id
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of unique anonymous_user_id during studio preview
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2022-05-04
+# .. toggle_target_removal_date: 2022-05-30
+# .. toggle_tickets: MST-1455
+INDIVIDUALIZE_ANONYMOUS_USER_ID = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.individualize_anonymous_user_id', __name__
+)
+
+
+def individualize_anonymous_user_id(course_id):
+    """
+    Returns a boolean if individualized anonymous_user_id is enabled on the course
+    """
+    return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)

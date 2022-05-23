@@ -9,10 +9,12 @@ from unittest import mock
 import ddt
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_flag
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockAside
 
 from xmodule.contentstore.django import contentstore
+from xmodule.lti_module import LTIBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -21,6 +23,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from cms.djangoapps.contentstore.utils import reverse_usage_url
+from cms.djangoapps.contentstore.toggles import INDIVIDUALIZE_ANONYMOUS_USER_ID
 from cms.djangoapps.xblock_config.models import StudioConfig
 from common.djangoapps import static_replace
 from common.djangoapps.student.tests.factories import UserFactory
@@ -294,3 +297,28 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         html = '<a href="/static/id">'
         assert self.runtime.replace_urls(html) == \
             static_replace.replace_static_urls(html, course_id=self.runtime.course_id)
+
+    def test_anonymous_user_id_preview(self):
+        assert self.runtime.anonymous_student_id == 'student'
+
+    @override_waffle_flag(INDIVIDUALIZE_ANONYMOUS_USER_ID, active=True)
+    def test_anonymous_user_id_individual_per_student(self):
+        """Test anonymous_user_id on a block which uses per-student anonymous IDs"""
+        # Create the runtime with the flag turned on.
+        runtime = _preview_module_system(
+            self.request,
+            descriptor=ItemFactory(category="problem", parent=self.course),
+            field_data=mock.Mock(),
+        )
+        assert runtime.anonymous_student_id == '26262401c528d7c4a6bbeabe0455ec46'
+
+    @override_waffle_flag(INDIVIDUALIZE_ANONYMOUS_USER_ID, active=True)
+    def test_anonymous_user_id_individual_per_course(self):
+        """Test anonymous_user_id on a block which uses per-course anonymous IDs"""
+        # Create the runtime with the flag turned on.
+        runtime = _preview_module_system(
+            self.request,
+            descriptor=ItemFactory(category="lti", parent=self.course, spec=LTIBlock),
+            field_data=mock.Mock(),
+        )
+        assert runtime.anonymous_student_id == 'cf99fd26f9a41d4d9b4069739cc2be7b'
