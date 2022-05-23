@@ -114,7 +114,7 @@ REGISTER_USER = Signal()
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2020-04-30
 # .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+# .. toggle_warning: This temporary feature toggle does not have a target removal date.
 REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag('registration.enable_failure_logging', __name__)
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 

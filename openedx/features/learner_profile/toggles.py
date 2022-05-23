@@ -17,7 +17,7 @@ WAFFLE_FLAG_NAMESPACE = 'learner_profile'
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2019-02-19
 # .. toggle_target_removal_date: 2020-12-31
-# .. toggle_warnings: Also set settings.PROFILE_MICROFRONTEND_URL and site's ENABLE_PROFILE_MICROFRONTEND.
+# .. toggle_warning: Also set settings.PROFILE_MICROFRONTEND_URL and site's ENABLE_PROFILE_MICROFRONTEND.
 # .. toggle_tickets: DEPR-17
 REDIRECT_TO_PROFILE_MICROFRONTEND = WaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.redirect_to_microfrontend', __name__)
 

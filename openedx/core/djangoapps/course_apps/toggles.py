@@ -12,7 +12,7 @@ COURSE_APPS_WAFFLE_NAMESPACE = 'course_apps'
 # .. toggle_default: False
 # .. toggle_description: When enabled, users will be directed to a new proctoring settings
 #    modal on the Pages and Resources view when accessing proctored exam settings.
-# .. toggle_warnings: None
+# .. toggle_warning: None
 # .. toggle_creation_date: 2021-08-17
 # .. toggle_target_removal_date: None
 PROCTORING_SETTINGS_MODAL_VIEW = CourseWaffleFlag(

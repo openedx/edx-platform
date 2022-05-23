@@ -11,7 +11,7 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 #   valid "giturl" attribute. Exporting a course to git causes the course to be exported in the directory indicated by
 #   the GIT_REPO_EXPORT_DIR setting. Note that when this feature is disabled, courses can still be exported to git with
 #   the git_export management command.
-# .. toggle_warnings: To enable this feature, the GIT_REPO_EXPORT_DIR setting must be properly defined and point to an
+# .. toggle_warning: To enable this feature, the GIT_REPO_EXPORT_DIR setting must be properly defined and point to an
 #   existing directory.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2014-02-13
@@ -70,7 +70,7 @@ def bypass_olx_failure_enabled():
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
 # .. toggle_description: When enabled, users can access the new course authoring view for proctoring exams
-# .. toggle_warnings: None
+# .. toggle_warning: None
 # .. toggle_creation_date: 2020-07-23
 ENABLE_EXAM_SETTINGS_HTML_VIEW = SettingDictToggle(
     "FEATURES", "ENABLE_EXAM_SETTINGS_HTML_VIEW", default=False, module_name=__name__
@@ -92,7 +92,7 @@ def exam_setting_view_enabled():
 # .. toggle_creation_date: 2021-12-1
 # .. toggle_target_removal_date: 2022-1-30
 # .. toggle_tickets: TNL-9306
-# .. toggle_warnings:
+# .. toggle_warning:
 ENABLE_NEW_TEXT_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_text_editor', __name__)
 
 
@@ -111,7 +111,7 @@ def use_new_text_editor():
 # .. toggle_creation_date: 2021-12-1
 # .. toggle_target_removal_date: 2022-1-30
 # .. toggle_tickets: TNL-9306
-# .. toggle_warnings:
+# .. toggle_warning:
 ENABLE_NEW_VIDEO_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_video_editor', __name__)
 
 
@@ -130,7 +130,7 @@ def use_new_video_editor():
 # .. toggle_creation_date: 2021-12-1
 # .. toggle_target_removal_date: 2022-1-30
 # .. toggle_tickets: TNL-9306
-# .. toggle_warnings:
+# .. toggle_warning:
 ENABLE_NEW_PROBLEM_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_problem_editor', __name__)
 
 
