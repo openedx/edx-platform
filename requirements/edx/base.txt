@@ -7,9 +7,7 @@
 -e git+https://github.com/openedx/blockstore.git@1.2.1#egg=blockstore==1.2.1
     # via -r requirements/edx/github.in
 -e common/lib/capa
-    # via
-    #   -r requirements/edx/local.in
-    #   xmodule
+    # via -r requirements/edx/local.in
 -e git+https://github.com/edx/codejail.git@3.1.3#egg=codejail==3.1.3
     # via -r requirements/edx/github.in
 -e git+https://github.com/edx/django-wiki.git@1.1.0#egg=django-wiki
@@ -30,8 +28,6 @@
     # via -r requirements/edx/local.in
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
     # via -r requirements/edx/github.in
--e common/lib/xmodule
-    # via -r requirements/edx/local.in
 acid-xblock==0.2.1
     # via -r requirements/edx/base.in
 aiohttp==3.8.1
@@ -105,7 +101,7 @@ celery==5.2.6
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-certifi==2021.10.8
+certifi==2022.5.18.1
     # via
     #   -r requirements/edx/paver.txt
     #   elasticsearch
@@ -399,8 +395,6 @@ djangorestframework==3.12.4
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
-docopt==0.6.2
-    # via xmodule
 docutils==0.17.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -424,7 +418,7 @@ edx-auth-backends==4.1.0
     # via
     #   -r requirements/edx/base.in
     #   blockstore
-edx-braze-client==0.1.3
+edx-braze-client==0.1.4
     # via -r requirements/edx/base.in
 edx-bulk-grades==1.0.0
     # via
@@ -496,7 +490,6 @@ edx-opaque-keys[django]==2.3.0
     #   lti-consumer-xblock
     #   openedx-events
     #   ora2
-    #   xmodule
 edx-organizations==6.11.1
     # via -r requirements/edx/base.in
 edx-proctoring==4.10.2
@@ -552,7 +545,7 @@ event-tracking==2.1.0
     #   -r requirements/edx/base.in
     #   edx-proctoring
     #   edx-search
-fastavro==1.4.11
+fastavro==1.4.12
     # via openedx-events
 frozenlist==1.3.0
     # via
@@ -591,7 +584,7 @@ idna==3.3
     #   -r requirements/edx/paver.txt
     #   requests
     #   yarl
-importlib-metadata==4.11.3
+importlib-metadata==4.11.4
     # via markdown
 inflection==0.5.1
     # via drf-yasg
@@ -624,7 +617,7 @@ jsonfield==3.1.0
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
-jwcrypto==1.3
+jwcrypto==1.3.1
     # via pylti1p3
 kombu==5.2.4
     # via celery
@@ -647,6 +640,7 @@ lti-consumer-xblock==4.1.0
 lxml==4.8.0
     # via
     #   -r requirements/edx/base.in
+    #   capa
     #   edxval
     #   lti-consumer-xblock
     #   olxcleaner
@@ -715,7 +709,7 @@ nltk==3.7
     #   chem
 nodeenv==1.6.0
     # via -r requirements/edx/base.in
-numpy==1.22.3
+numpy==1.22.4
     # via
     #   chem
     #   openedx-calc
@@ -755,7 +749,6 @@ path-py==12.5.0
     #   edx-enterprise
     #   ora2
     #   staff-graded-xblock
-    #   xmodule
 paver==1.3.4
     # via -r requirements/edx/paver.txt
 pbr==5.9.0
@@ -764,7 +757,7 @@ pbr==5.9.0
     #   stevedore
 piexif==1.1.3
     # via -r requirements/edx/base.in
-pillow==9.1.0
+pillow==9.1.1
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -773,7 +766,7 @@ polib==1.1.1
     # via edx-i18n-tools
 prompt-toolkit==3.0.29
     # via click-repl
-psutil==5.9.0
+psutil==5.9.1
     # via
     #   -r requirements/edx/paver.txt
     #   edx-django-utils
@@ -858,7 +851,7 @@ python-memcached==1.59
     # via -r requirements/edx/paver.txt
 python-slugify==6.1.2
     # via code-annotations
-python-swiftclient==3.13.1
+python-swiftclient==4.0.0
     # via ora2
 python3-openid==3.2.0 ; python_version >= "3"
     # via
@@ -873,6 +866,7 @@ pytz==2022.1
     #   -r requirements/edx/base.in
     #   babel
     #   blockstore
+    #   capa
     #   celery
     #   django
     #   django-ses
@@ -987,7 +981,6 @@ six==1.16.0
     #   pyjwkest
     #   python-dateutil
     #   python-memcached
-    #   python-swiftclient
 slumber==0.7.1
     # via
     #   edx-bulk-grades
@@ -1086,9 +1079,7 @@ webencodings==0.5.1
     #   html5lib
     #   tinycss2
 webob==1.8.7
-    # via
-    #   xblock
-    #   xmodule
+    # via xblock
 wrapt==1.14.1
     # via
     #   -r requirements/edx/paver.txt
