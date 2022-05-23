@@ -175,7 +175,7 @@ def _footer_navigation_links():
             "class": link_class
         }
         for link_name, link_url, link_title, link_target, link_class in [
-            ("explore_course", "/courses", _("Explore our Courses"), "_self", "track-gtm-event"),
+            ("about", "https://philanthropyu.org", "About Philanthropy University", "blank", ""),
             ("perks", "https://philanthropyu.org/perks", "Perks", "_blank", ""),
         ]
     ]
