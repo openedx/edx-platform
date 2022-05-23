@@ -21,7 +21,7 @@ root = Path('../..').abspath()
 sys.path.insert(0, root)
 sys.path.append(root / "docs/guides")
 sys.path.append(root / "common/lib/capa")
-sys.path.append(root / "common/lib/xmodule")
+
 
 # Use a settings module that allows all LMS and Studio code to be imported
 # without errors.  If running sphinx-apidoc, we already set a different
@@ -225,6 +225,7 @@ modules = {
     'common/lib/xmodule/xmodule': 'common/lib/xmodule',
     'lms': 'lms',
     'openedx': 'openedx',
+    'xmodule': 'xmodule',
 }
 
 
