@@ -7,9 +7,7 @@
 -e git+https://github.com/openedx/blockstore.git@1.2.1#egg=blockstore==1.2.1
     # via -r requirements/edx/github.in
 -e common/lib/capa
-    # via
-    #   -r requirements/edx/local.in
-    #   xmodule
+    # via -r requirements/edx/local.in
 -e git+https://github.com/edx/codejail.git@3.1.3#egg=codejail==3.1.3
     # via -r requirements/edx/github.in
 -e git+https://github.com/edx/django-wiki.git@1.1.0#egg=django-wiki
@@ -28,8 +26,6 @@
     # via -r requirements/edx/local.in
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
     # via -r requirements/edx/github.in
--e common/lib/xmodule
-    # via -r requirements/edx/local.in
 acid-xblock==0.2.1
     # via -r requirements/edx/base.in
 aiohttp==3.8.1
@@ -396,8 +392,6 @@ djangorestframework==3.12.4
     #   super-csv
 djangorestframework-xml==2.0.0
     # via edx-enterprise
-docopt==0.6.2
-    # via xmodule
 docutils==0.17.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -493,7 +487,6 @@ edx-opaque-keys[django]==2.3.0
     #   lti-consumer-xblock
     #   openedx-events
     #   ora2
-    #   xmodule
 edx-organizations==6.11.1
     # via -r requirements/edx/base.in
 edx-proctoring==4.10.2
@@ -644,6 +637,7 @@ lti-consumer-xblock==4.1.0
 lxml==4.8.0
     # via
     #   -r requirements/edx/base.in
+    #   capa
     #   edxval
     #   lti-consumer-xblock
     #   olxcleaner
@@ -751,7 +745,6 @@ path-py==12.5.0
     #   edx-enterprise
     #   ora2
     #   staff-graded-xblock
-    #   xmodule
 paver==1.3.4
     # via -r requirements/edx/paver.txt
 pbr==5.9.0
@@ -869,6 +862,7 @@ pytz==2022.1
     #   -r requirements/edx/base.in
     #   babel
     #   blockstore
+    #   capa
     #   celery
     #   django
     #   django-ses
@@ -1081,9 +1075,7 @@ webencodings==0.5.1
     #   html5lib
     #   tinycss2
 webob==1.8.7
-    # via
-    #   xblock
-    #   xmodule
+    # via xblock
 wrapt==1.14.1
     # via
     #   -r requirements/edx/paver.txt
