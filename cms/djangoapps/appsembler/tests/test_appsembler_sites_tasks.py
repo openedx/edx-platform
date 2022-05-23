@@ -110,7 +110,8 @@ class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
 
     @patch('xmodule.modulestore.django.SignalHandler.course_published')
     @patch('openedx.core.djangoapps.appsembler.sites.tasks.current_year', Mock(return_value=2020))
-    def test_import_course_indexed(self, mock_course_published):
+    @patch('cms.djangoapps.contentstore.signals.handlers.listen_for_course_publish')
+    def test_import_course_indexed(self, mock_listen_for_course_publish, mock_course_published):
         """
         Ensure the task indexes the course.
         """
@@ -120,6 +121,10 @@ class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
         assert not task_exception, 'Should not fail'
         course_key = CourseLocator.from_string('course-v1:blue+TahoeWelcome+2020')
         mock_course_published.send.assert_called_once_with(
+            sender='openedx.core.djangoapps.appsembler.sites.tasks',
+            course_key=course_key,
+        )
+        mock_listen_for_course_publish.assert_called_once_with(
             sender='openedx.core.djangoapps.appsembler.sites.tasks',
             course_key=course_key,
         )

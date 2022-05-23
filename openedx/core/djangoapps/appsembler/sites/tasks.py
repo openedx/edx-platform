@@ -159,6 +159,9 @@ def import_course_on_site_creation(organization_id):
                 sender=__name__,
                 course_key=course_target_id,
             )
+            emit_course_published_signal_in_cms.delay(
+                str(course_target_id),
+            )
 
     # catch all exceptions so we can update the state and properly cleanup the course.
     except Exception as exc:  # pylint: disable=broad-except
@@ -188,3 +191,19 @@ def import_course_on_site_creation(organization_id):
     except Exception as exc:
         logging.exception('Error enrolling the user in default course')
         return 'exception: ' + str(exc)
+
+
+@task(routing_key=settings.CMS_UPDATE_SEARCH_INDEX_JOB_QUEUE)
+def emit_course_published_signal_in_cms(course_key):
+    """
+    An LMS-scheduled task to update CMS course search index and other tasks.
+
+    This is a "routing" task to schedule the `update_search_index` task from _LMS_ and run it in the _CMS_ queue among
+    other tasks. This is to work around the `cms.djangoapps.contentstore` module cannot be imported from LMS code.
+    """
+    from cms.djangoapps.contentstore.signals import handlers  # Local import that run only in CMS.
+
+    handlers.listen_for_course_publish(
+        sender=__name__,
+        course_key=CourseKey.from_string(course_key),
+    )
