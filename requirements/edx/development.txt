@@ -62,7 +62,7 @@ appdirs==1.4.4
     # via
     #   -r requirements/edx/testing.txt
     #   fs
-asgiref==3.5.1
+asgiref==3.5.2
     # via
     #   -r requirements/edx/testing.txt
     #   django
@@ -339,10 +339,8 @@ django-cache-memoize==0.1.10
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-django-celery-results==2.2.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.txt
+django-celery-results==2.3.1
+    # via -r requirements/edx/testing.txt
 django-classy-tags==3.0.1
     # via
     #   -r requirements/edx/testing.txt
@@ -560,7 +558,7 @@ edx-django-release-util==1.2.0
     #   blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/testing.txt
-edx-django-utils==4.8.1
+edx-django-utils==5.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
@@ -585,7 +583,7 @@ edx-drf-extensions==8.0.1
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.47.0
+edx-enterprise==3.49.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -597,7 +595,7 @@ edx-lint==5.2.2
     # via -r requirements/edx/testing.txt
 edx-milestones==0.4.0
     # via -r requirements/edx/testing.txt
-edx-name-affirmation==2.3.3
+edx-name-affirmation==2.3.4
     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.3.0
     # via
@@ -712,7 +710,7 @@ frozenlist==1.3.0
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   aiosignal
-fs==2.0.18
+fs==2.0.27
     # via
     #   -r requirements/edx/testing.txt
     #   django-pyfs

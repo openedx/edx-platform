@@ -216,7 +216,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-08 20:42+0000\n"
+"POT-Creation-Date: 2022-05-15 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: iderr <ibrahim@derraz.fr>, 2021-2022\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -4126,39 +4126,6 @@ msgstr "Cohortes activées"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Cohortes désactivées"
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-"Ce cours utilise des cohortes automatiques pour les apprenants vérifiés. "
-"Vous ne pouvez pas désactiver les cohortes, et vous ne pouvez pas renommer "
-"la cohorte manuelle nommée'{verifiedCohortName}'. Pour changer la "
-"configuration des cohortes vérifiées,contacter votre gestionnaire de "
-"partenariat edX."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-"Ce cours a les cohortes automatiques activées pour les apprenants vérifiés, "
-"mais la cohorte requise n'existe pas. Vous devez créer manuellement une "
-"cohorte nommée '{verifiedCohortName}' pour que cette fonctionnalité "
-"fonctionne."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
-msgstr ""
-"Ce cours a les cohortes automatiques activées pour les apprenants vérifiés, "
-"mais les cohortes sont désactivées. Vous devez activer les cohortes pour que"
-" cette fonctionnalité fonctionne."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"

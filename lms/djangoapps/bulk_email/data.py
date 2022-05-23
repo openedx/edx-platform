@@ -20,3 +20,12 @@ class BulkEmailTargetChoices:
     SEND_TO_LEARNERS = "learners"
     SEND_TO_COHORT = "cohort"
     SEND_TO_TRACK = "track"
+
+    TARGET_CHOICES = (SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_TRACK)
+
+    @classmethod
+    def is_valid_target(cls, target):
+        """
+        Given the target of a message, return a boolean indicating whether the target choice is valid.
+        """
+        return target in cls.TARGET_CHOICES

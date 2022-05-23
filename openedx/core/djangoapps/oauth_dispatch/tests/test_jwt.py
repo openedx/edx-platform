@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import ddt
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.timezone import now
 
 from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
@@ -65,6 +66,23 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
     def test_dot_create_jwt_for_token_with_asymmetric(self):
         jwt_token = self._create_jwt_for_token(DOTAdapter(), use_asymmetric_key=True)
         self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=True)
+
+    def test_create_jwt_for_token_default_expire_seconds(self):
+        oauth_adapter = DOTAdapter()
+        jwt_token = self._create_jwt_for_token(oauth_adapter, use_asymmetric_key=False)
+        expected_expires_in = 60 * 60
+        self.assert_valid_jwt_access_token(
+            jwt_token, self.user, self.default_scopes, expires_in=expected_expires_in,
+        )
+
+    def test_create_jwt_for_token_overridden_expire_seconds(self):
+        oauth_adapter = DOTAdapter()
+        expected_expires_in = 60
+        with override_settings(JWT_ACCESS_TOKEN_EXPIRE_SECONDS=expected_expires_in):
+            jwt_token = self._create_jwt_for_token(oauth_adapter, use_asymmetric_key=False)
+        self.assert_valid_jwt_access_token(
+            jwt_token, self.user, self.default_scopes, expires_in=expected_expires_in,
+        )
 
     @ddt.data((True, False))
     def test_dot_create_jwt_for_token(self, client_restricted):

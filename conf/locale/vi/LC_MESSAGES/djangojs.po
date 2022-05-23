@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-08 20:42+0000\n"
+"POT-Creation-Date: 2022-05-15 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Le Minh Tri <trilm@hihexa.com>, 2020\n"
 "Language-Team: Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)\n"
@@ -3799,36 +3799,6 @@ msgstr "Cho phép phân nhóm học viên"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Không cho phép phân nhóm học viên"
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-"Khóa học này tự động tạo nhóm cho những học viên thuộc loại có xác minh. Bạn"
-" không thể vô hiệu hoá các nhóm và bạn không thể đổi tên nhóm người dùng "
-"'{verifiedCohortName}'. Để thay đổi cấu hình cho nhóm xác minh, hãy liên hệ "
-"với người quản lý đối tác edX của bạn."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-"Khóa học này tự động tạo nhóm cho những học viên loại có xác minh, tuy nhiên"
-" nhóm được yêu cầu không tồn tại. Bạn phải tạo một nhóm được chỉ định theo "
-"cách thủ công có tên '{verifiedCohortName}' để cho tính năng này hoạt động."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
-msgstr ""
-"Khóa học này tự động tạo nhóm cho những học viên loại có xác minh, nhưng "
-"nhóm đã bị vô hiệu hóa. Bạn phải kích hoạt nhóm để tính năng này hoạt động."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
