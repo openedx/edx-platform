@@ -65,7 +65,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import PermissionDenied
 from django.core.validators import validate_unicode_slug
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError
 from django.utils.translation import gettext as _
 from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from lxml import etree
@@ -436,20 +436,18 @@ def create_library(
     )
     # Now create the library reference in our database:
     try:
-        # Atomic transaction required because if this fails,
-        # we need to delete the bundle in the exception handler.
-        with transaction.atomic():
-            ref = ContentLibrary.objects.create(
-                org=org,
-                slug=slug,
-                type=library_type,
-                bundle_uuid=bundle.uuid,
-                allow_public_learning=allow_public_learning,
-                allow_public_read=allow_public_read,
-                license=library_license,
-            )
+        ref = ContentLibrary.objects.create(
+            org=org,
+            slug=slug,
+            type=library_type,
+            bundle_uuid=bundle.uuid,
+            allow_public_learning=allow_public_learning,
+            allow_public_read=allow_public_read,
+            license=library_license,
+        )
     except IntegrityError:
-        delete_bundle(bundle.uuid)
+        # Note: the Content Library REST API view which calls this method is wrapped in an atomic transaction,
+        # so the bundle created above will be rolled back with the transaction.
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
     CONTENT_LIBRARY_CREATED.send(sender=None, library_key=ref.library_key)
     return ContentLibraryMetadata(
