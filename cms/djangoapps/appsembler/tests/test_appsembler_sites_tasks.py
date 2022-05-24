@@ -2,13 +2,18 @@
 Tests for appsembler.sites.tasks.
 """
 import datetime
+from opaque_keys.edx.locator import CourseLocator
+from unittest.mock import patch, Mock
 
 from django.test import override_settings
 from organizations.models import UserOrganizationMapping
 from organizations.tests.factories import OrganizationFactory
 
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.appsembler.sites.tasks import import_course_on_site_creation_apply_async
+from openedx.core.djangoapps.appsembler.sites.tasks import (
+    import_course_on_site_creation,
+    import_course_on_site_creation_apply_async,
+)
 from student.roles import CourseAccessRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
@@ -102,3 +107,24 @@ class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
         assert access_role.role == 'instructor', 'Set the permission to instructor (aka Course Admin).'
         assert access_role.org == self.organization_name, 'Correct org is used'  # TODO: Not sure if that's needed
         assert str(access_role.course_id) == self.get_course_id(use_new_format=True)
+
+    @patch('xmodule.modulestore.django.SignalHandler.course_published')
+    @patch('openedx.core.djangoapps.appsembler.sites.tasks.current_year', Mock(return_value=2020))
+    @patch('cms.djangoapps.contentstore.signals.handlers.listen_for_course_publish')
+    def test_import_course_indexed(self, mock_listen_for_course_publish, mock_course_published):
+        """
+        Ensure the task indexes the course.
+        """
+        assert not mock_course_published.send.called, 'Sanity check: signal should not be called.'
+
+        task_exception = import_course_on_site_creation(self.organization.id)
+        assert not task_exception, 'Should not fail'
+        course_key = CourseLocator.from_string('course-v1:blue+TahoeWelcome+2020')
+        mock_course_published.send.assert_called_once_with(
+            sender='openedx.core.djangoapps.appsembler.sites.tasks',
+            course_key=course_key,
+        )
+        mock_listen_for_course_publish.assert_called_once_with(
+            sender='openedx.core.djangoapps.appsembler.sites.tasks',
+            course_key=course_key,
+        )
