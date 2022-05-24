@@ -1,6 +1,6 @@
 # Do things in edx-platform
 .PHONY: clean extract_translations help pull pull_translations push_translations requirements shell upgrade
-.PHONY: api-docs docs guides swagger
+.PHONY: api-docs docs guides swagger post-requirements main-requirements
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
@@ -66,10 +66,15 @@ pull: ## update the Docker image used by "make shell"
 pre-requirements: ## install Python requirements for running pip-tools
 	pip install -qr requirements/edx/pip-tools.txt
 
-requirements: pre-requirements ## install development environment requirements
+main-requirements: ## install development environment requirements
 	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
 	@# of it if it does not.  Shell wildcarding can't do that with default options.
 	pip-sync -q requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
+
+post-requirements: ## install latest transifex go client 
+	curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
+
+requirements: pre-requirements main-requirements post-requirements
 
 shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
 	docker run -it -e "NO_PYTHON_UNINSTALL=1" -e "PIP_INDEX_URL=https://pypi.python.org/simple" -e TERM \
