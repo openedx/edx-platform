@@ -117,7 +117,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
         if enrollment is None:
             return (None, None, None)
 
-    if user.is_authenticated and can_show_verified_upgrade(user, enrollment, course):
+    if user.is_authenticated and can_show_verified_upgrade(enrollment):
         return (
             verified_upgrade_deadline_link(user, enrollment.course),
             enrollment.upgrade_deadline,

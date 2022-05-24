@@ -37,7 +37,6 @@ from lms.djangoapps.courseware.entrance_exams import course_has_entrance_exam, u
 from lms.djangoapps.courseware.masquerade import (
     is_masquerading_as_specific_student,
     setup_masquerade,
-    is_masquerading_as_non_audit_enrollment,
 )
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
@@ -292,14 +291,6 @@ class CoursewareMeta:
             and self.enrollment_object.mode in CourseMode.CREDIT_MODES + CourseMode.CREDIT_ELIGIBLE_MODES
         )
 
-        if not integrity_signature_required:
-            # Check masquerading as a non-audit enrollment
-            integrity_signature_required = is_masquerading_as_non_audit_enrollment(
-                self.effective_user,
-                self.course_key,
-                self.course_masquerade
-            )
-
         if integrity_signature_required:
             signature = get_integrity_signature(self.effective_user.username, str(self.course_key))
             if not signature:
@@ -346,18 +337,12 @@ class CoursewareMeta:
 
     @property
     def can_access_proctored_exams(self):
-        """Returns if the user is eligible to access proctored exams"""
-        if is_masquerading_as_non_audit_enrollment(
-            self.effective_user,
-            self.course_key,
-            self.course_masquerade
-        ):
-            # Masquerading should mimic the correct enrollment track behavior.
-            return True
-        else:
-            enrollment_mode = self.enrollment['mode']
-            enrollment_active = self.enrollment['is_active']
-            return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
+        """
+        Returns if the user is eligible to access proctored exams.
+        """
+        enrollment_mode = self.enrollment['mode']
+        enrollment_active = self.enrollment['is_active']
+        return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
 
 
 class CoursewareInformation(RetrieveAPIView):

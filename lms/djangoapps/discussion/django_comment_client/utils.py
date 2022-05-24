@@ -46,8 +46,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
-from xmodule.partitions.partitions_service import PartitionService
 
 log = logging.getLogger(__name__)
 
@@ -904,14 +902,7 @@ def get_group_id_for_user(user, course_discussion_settings):
     division_scheme = get_course_division_scheme(course_discussion_settings)
     if division_scheme == CourseDiscussionSettings.COHORT:
         return get_cohort_id(user, course_discussion_settings.course_id)
-    elif division_scheme == CourseDiscussionSettings.ENROLLMENT_TRACK:
-        partition_service = PartitionService(course_discussion_settings.course_id)
-        group_id = partition_service.get_user_group_id_for_partition(user, ENROLLMENT_TRACK_PARTITION_ID)
-        # We negate the group_ids from dynamic partitions so that they will not conflict
-        # with cohort IDs (which are an auto-incrementing integer field, starting at 1).
-        return -1 * group_id if group_id is not None else None
-    else:
-        return None
+    return None
 
 
 def is_comment_too_deep(parent):

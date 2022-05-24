@@ -61,7 +61,6 @@ setup(
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
             "cohort = openedx.core.djangoapps.course_groups.partition_scheme:CohortPartitionScheme",
             "verification = openedx.core.djangoapps.user_api.partition_schemes:ReturnGroup1PartitionScheme",
-            "enrollment_track = openedx.core.djangoapps.verified_track_content.partition_scheme:EnrollmentTrackPartitionScheme",  # lint-amnesty, pylint: disable=line-too-long
             "content_type_gate = openedx.features.content_type_gating.partitions:ContentTypeGatingPartitionScheme",
         ],
         "openedx.block_structure_transformer": [
@@ -135,7 +134,6 @@ setup(
             'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',
         ],
         'openedx.dynamic_partition_generator': [
-            'enrollment_track = common.lib.xmodule.xmodule.partitions.enrollment_track_partition_generator:create_enrollment_track_partition',  # lint-amnesty, pylint: disable=line-too-long
             'content_type_gating = openedx.features.content_type_gating.partitions:create_content_gating_partition'
         ],
     }

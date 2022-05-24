@@ -29,7 +29,7 @@ class CourseSockFragmentView(EdxFragmentView):
     @staticmethod
     def get_verification_context(request, course):  # lint-amnesty, pylint: disable=missing-function-docstring
         enrollment = CourseEnrollment.get_enrollment(request.user, course.id)
-        show_course_sock = can_show_verified_upgrade(request.user, enrollment, course)
+        show_course_sock = can_show_verified_upgrade(enrollment)
         if show_course_sock:
             upgrade_url = verified_upgrade_deadline_link(request.user, course=course)
             course_price, _ = format_strikeout_price(request.user, course)

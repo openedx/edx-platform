@@ -15,8 +15,6 @@ from openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion import 
 from openedx.core.types import User
 from xmodule.course_module import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, Group  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -94,8 +92,8 @@ def get_accessible_discussion_xblocks_by_course_id(
 def available_division_schemes(course_key: CourseKey) -> List[str]:
     """
     Returns a list of possible discussion division schemes for this course.
-    This takes into account if cohorts are enabled and if there are multiple
-    enrollment tracks. If no schemes are available, returns an empty list.
+
+    This takes into account if cohorts are enabled. If no schemes are available, returns an empty list.
     Args:
         course_key: CourseKey
 
@@ -104,8 +102,6 @@ def available_division_schemes(course_key: CourseKey) -> List[str]:
     available_schemes = []
     if is_course_cohorted(course_key):
         available_schemes.append(CourseDiscussionSettings.COHORT)
-    if enrollment_track_group_count(course_key) > 1:
-        available_schemes.append(CourseDiscussionSettings.ENROLLMENT_TRACK)
     return available_schemes
 
 
@@ -125,27 +121,6 @@ def has_required_keys(xblock: DiscussionXBlock):
     return True
 
 
-def enrollment_track_group_count(course_key: CourseKey) -> int:
-    """
-    Returns the count of possible enrollment track division schemes for this course.
-    Args:
-        course_key: CourseKey
-    Returns:
-        Count of enrollment track division scheme
-    """
-    return len(_get_enrollment_track_groups(course_key))
-
-
-def _get_enrollment_track_groups(course_key: CourseKey) -> List[Group]:
-    """
-    Helper method that returns an array of the Groups in the EnrollmentTrackUserPartition for the given course.
-    If no such partition exists on the course, an empty array is returned.
-    """
-    partition_service = PartitionService(course_key)
-    partition = partition_service.get_user_partition(ENROLLMENT_TRACK_PARTITION_ID)
-    return partition.groups if partition else []
-
-
 def get_group_names_by_id(course_discussion_settings: CourseDiscussionSettings) -> Dict[str, str]:
     """
     Creates of a dict of group_id to learner-facing group names, for the division_scheme
@@ -160,12 +135,7 @@ def get_group_names_by_id(course_discussion_settings: CourseDiscussionSettings) 
     course_key = course_discussion_settings.course_id
     if division_scheme == CourseDiscussionSettings.COHORT:
         return get_cohort_names(get_course_by_id(course_key))
-    elif division_scheme == CourseDiscussionSettings.ENROLLMENT_TRACK:
-        # We negate the group_ids from dynamic partitions so that they will not conflict
-        # with cohort IDs (which are an auto-incrementing integer field, starting at 1).
-        return {-1 * group.id: group.name for group in _get_enrollment_track_groups(course_key)}
-    else:
-        return {}
+    return {}
 
 
 def get_course_division_scheme(course_discussion_settings: CourseDiscussionSettings) -> str:
@@ -175,7 +145,7 @@ def get_course_division_scheme(course_discussion_settings: CourseDiscussionSetti
         course_discussion_settings (CourseDiscussionSettings): An instance of the CourseDiscussionSettings model
 
     Returns:
-        (string) Returns 'cohort', 'enrollment_track' or 'none'
+        (string) Returns 'cohort' or 'none'
             depending on the division scheme used by the course.
 
     """
@@ -183,11 +153,6 @@ def get_course_division_scheme(course_discussion_settings: CourseDiscussionSetti
     if (
         division_scheme == CourseDiscussionSettings.COHORT and
         not is_course_cohorted(course_discussion_settings.course_id)
-    ):
-        division_scheme = CourseDiscussionSettings.NONE
-    elif (
-        division_scheme == CourseDiscussionSettings.ENROLLMENT_TRACK and
-        enrollment_track_group_count(course_discussion_settings.course_id) <= 1
     ):
         division_scheme = CourseDiscussionSettings.NONE
     return division_scheme

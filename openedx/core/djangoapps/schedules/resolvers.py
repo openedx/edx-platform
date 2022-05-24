@@ -350,7 +350,7 @@ def _get_upsell_information_for_schedule(user, schedule):  # lint-amnesty, pylin
 
 def _get_verified_upgrade_link(user, schedule):
     enrollment = schedule.enrollment
-    if enrollment.dynamic_upgrade_deadline is not None and can_show_verified_upgrade(user, enrollment):
+    if enrollment.dynamic_upgrade_deadline is not None and can_show_verified_upgrade(enrollment):
         return verified_upgrade_deadline_link(user, enrollment.course)
 
 

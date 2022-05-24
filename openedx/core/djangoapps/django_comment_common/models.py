@@ -243,9 +243,8 @@ class CourseDiscussionSettings(models.Model):
     _divided_discussions = models.TextField(db_column='divided_discussions', null=True, blank=True)  # JSON list
 
     COHORT = 'cohort'
-    ENROLLMENT_TRACK = 'enrollment_track'
     NONE = 'none'
-    ASSIGNMENT_TYPE_CHOICES = ((NONE, 'None'), (COHORT, 'Cohort'), (ENROLLMENT_TRACK, 'Enrollment Track'))
+    ASSIGNMENT_TYPE_CHOICES = ((NONE, 'None'), (COHORT, 'Cohort'))
     division_scheme = models.CharField(max_length=20, choices=ASSIGNMENT_TYPE_CHOICES, default=NONE)
 
     class Meta:

@@ -42,7 +42,6 @@ from ..models import (
 from .permissions import can_see_all_content
 from .processors.content_gating import ContentGatingOutlineProcessor
 from .processors.enrollment import EnrollmentOutlineProcessor
-from .processors.enrollment_track_partition_groups import EnrollmentTrackPartitionGroupsOutlineProcessor
 from .processors.milestones import MilestonesOutlineProcessor
 from .processors.schedule import ScheduleOutlineProcessor
 from .processors.special_exams import SpecialExamsOutlineProcessor
@@ -327,7 +326,6 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         ('special_exams', SpecialExamsOutlineProcessor),
         ('visibility', VisibilityOutlineProcessor),
         ('enrollment', EnrollmentOutlineProcessor),
-        ('enrollment_track_partitions', EnrollmentTrackPartitionGroupsOutlineProcessor),
     ]
 
     # Run each OutlineProcessor in order to figure out what items we have to

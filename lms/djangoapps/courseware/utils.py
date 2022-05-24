@@ -11,9 +11,6 @@ from edx_rest_api_client.client import OAuthAPIClient
 from oauth2_provider.models import Application
 from pytz import utc  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework import status
-from xmodule.partitions.partitions import \
-    ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -52,55 +49,16 @@ def verified_upgrade_deadline_link(user, course=None, course_id=None):
     return EcommerceService().upgrade_url(user, course_id)
 
 
-def is_mode_upsellable(user, enrollment, course=None):
-    """
-    Return whether the user is enrolled in a mode that can be upselled to another mode,
-    usually audit upselled to verified.
-    The partition code allows this function to more accurately return results for masquerading users.
-
-    Arguments:
-        user (:class:`.AuthUser`): The user from the request.user property
-        enrollment (:class:`.CourseEnrollment`): The enrollment under consideration.
-        course (:class:`.ModulestoreCourse`): Optional passed in modulestore course.
-            If provided, it is expected to correspond to `enrollment.course.id`.
-            If not provided, the course will be loaded from the modulestore.
-            We use the course to retrieve user partitions when calculating whether
-            the upgrade link will be shown.
-    """
-    partition_service = PartitionService(enrollment.course.id, course=course)
-    enrollment_track_partition = partition_service.get_user_partition(ENROLLMENT_TRACK_PARTITION_ID)
-    group = partition_service.get_group(user, enrollment_track_partition)
-    current_mode = None
-    if group:
-        try:
-            current_mode = [
-                mode.get('slug') for mode in settings.COURSE_ENROLLMENT_MODES.values() if mode['id'] == group.id
-            ].pop()
-        except IndexError:
-            pass
-    upsellable_mode = not current_mode or current_mode in CourseMode.UPSELL_TO_VERIFIED_MODES
-    return upsellable_mode
-
-
-def can_show_verified_upgrade(user, enrollment, course=None):
+def can_show_verified_upgrade(enrollment):
     """
     Return whether this user can be shown upgrade message.
 
     Arguments:
-        user (:class:`.AuthUser`): The user from the request.user property
         enrollment (:class:`.CourseEnrollment`): The enrollment under consideration.
             If None, then the enrollment is not considered to be upgradeable.
-        course (:class:`.ModulestoreCourse`): Optional passed in modulestore course.
-            If provided, it is expected to correspond to `enrollment.course.id`.
-            If not provided, the course will be loaded from the modulestore.
-            We use the course to retrieve user partitions when calculating whether
-            the upgrade link will be shown.
     """
     if enrollment is None:
         return False  # this got accidentally flipped in 2017 (commit 8468357), but leaving alone to not switch again
-
-    if not is_mode_upsellable(user, enrollment, course):
-        return False
 
     upgrade_deadline = enrollment.upgrade_deadline
 

@@ -12,8 +12,8 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.role_helpers import has_staff_roles
 from xmodule.partitions.partitions import Group  # lint-amnesty, pylint: disable=wrong-import-order
 
-# Studio generates partition IDs starting at 100. There is already a manually generated
-# partition for Enrollment Track that uses ID 50, so we'll use 51.
+# Studio generates partition IDs starting at 100. There have already been a manually generated
+# partition for Enrollment Track (now deprecated and removed) that used ID 50, so we'll use 51.
 CONTENT_GATING_PARTITION_ID = 51
 
 CONTENT_TYPE_GATE_GROUP_IDS = {
@@ -80,16 +80,17 @@ def has_full_access_role_in_masquerade(user, course_key):
     """
     # The masquerade module imports from us, so avoid a circular dependency here
     from lms.djangoapps.courseware.masquerade import (
-        get_course_masquerade, is_masquerading_as_full_access, is_masquerading_as_non_audit_enrollment,
+        get_course_masquerade, is_masquerading_as_full_access,
         is_masquerading_as_specific_student, is_masquerading_as_staff,
     )
 
     course_masquerade = get_course_masquerade(user, course_key)
     if not course_masquerade or is_masquerading_as_specific_student(user, course_key):
         return None
-    return (is_masquerading_as_staff(user, course_key) or
-            is_masquerading_as_full_access(user, course_key, course_masquerade) or
-            is_masquerading_as_non_audit_enrollment(user, course_key, course_masquerade))
+    return (
+        is_masquerading_as_staff(user, course_key) or
+        is_masquerading_as_full_access(user, course_key, course_masquerade)
+    )
 
 
 def enrollment_date_for_fbe(user, course_key=None, course=None):

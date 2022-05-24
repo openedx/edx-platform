@@ -156,7 +156,6 @@ FEATURES:
   ENABLE_SOFTWARE_SECURE_FAKE: True
   # Disable instructor dash buttons for downloading course data when enrollment exceeds this number
   MAX_ENROLLMENT_INSTR_BUTTONS: 4
-  ENABLE_ENROLLMENT_TRACK_USER_PARTITION: True
   ENTRANCE_EXAMS: True
   ENABLE_SPECIAL_EXAMS: True
   PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS: True

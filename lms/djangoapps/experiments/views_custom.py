@@ -122,7 +122,7 @@ class Rev934(DeveloperErrorViewMixin, APIView):
             enrollment = CourseEnrollment.objects.select_related(
                 'course'
             ).get(user_id=user.id, course_id=course.id)
-            user_upsell = can_show_verified_upgrade(user, enrollment)
+            user_upsell = can_show_verified_upgrade(enrollment)
         except CourseEnrollment.DoesNotExist:
             user_upsell = True
 

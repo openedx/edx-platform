@@ -4,10 +4,7 @@
 import json
 import re
 
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
-from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 
 
 class GroupIdAssertionMixin:
@@ -101,20 +98,6 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
 
     def test_cohorted_topic_moderator_with_invalid_group_id(self, mock_request):
         invalid_id = self.student_cohort.id + self.moderator_cohort.id
-        response = self.call_view(mock_request, "cohorted_topic", self.moderator, invalid_id)  # lint-amnesty, pylint: disable=assignment-from-no-return
-        assert response.status_code == 500
-
-    def test_cohorted_topic_enrollment_track_invalid_group_id(self, mock_request):
-        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
-        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
-        discussion_settings = CourseDiscussionSettings.get(self.course.id)
-        discussion_settings.update({
-            'divided_discussions': ['cohorted_topic'],
-            'division_scheme': CourseDiscussionSettings.ENROLLMENT_TRACK,
-            'always_divide_inline_discussions': True,
-        })
-
-        invalid_id = -1000
         response = self.call_view(mock_request, "cohorted_topic", self.moderator, invalid_id)  # lint-amnesty, pylint: disable=assignment-from-no-return
         assert response.status_code == 500
 

@@ -1,7 +1,6 @@
 <%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="content_groups_help_token()"><% return "content_groups" %></%def>
-<%def name="enrollment_track_help_token()"><% return "enrollment_tracks" %></%def>
 <%def name="experiment_group_configurations_help_token()"><% return "group_configurations" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
@@ -34,7 +33,6 @@ from six.moves.urllib.parse import quote
           ${all_group_configurations | n, dump_js_escaped_json},
           "${group_configuration_url | n, js_escaped_string}",
           "${course_outline_url | n, js_escaped_string}",
-          ${should_show_enrollment_track | n, dump_js_escaped_json}
       );
   });
 </%block>
@@ -81,17 +79,6 @@ from six.moves.urllib.parse import quote
         % endif
       </article>
       <aside class="content-supplementary" role="complementary">
-      % if should_show_enrollment_track:
-        <div class="bit">
-          <div class="enrollment-track-doc">
-            <h3 class="title-3">${_("Enrollment Track Groups")}</h3>
-            <p>${_("Enrollment track groups allow you to offer different course content to learners in each enrollment track. Learners enrolled in each enrollment track in your course are automatically included in the corresponding enrollment track group.")}</p>
-            <p>${_("On unit pages in the course outline, you can restrict access to components to learners based on their enrollment track.")}</p>
-            <p>${_("You cannot edit enrollment track groups, but you can expand each group to view details of the course content that is designated for learners in the group.")}</p>
-            <p><a href="${get_online_help_info(enrollment_track_help_token())['doc_url']} rel="noopener" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
-          </div>
-        </div>
-      % endif
         <div class="bit">
           <div class="content-groups-doc">
               <h3 class="title-3">${_("Content Groups")}</h3>

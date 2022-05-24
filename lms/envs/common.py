@@ -788,9 +788,6 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1560
     'ENABLE_COOKIE_CONSENT': False,
 
-    # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
-    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
-
     # Enable one click program purchase
     # See LEARNER-493
     'ENABLE_ONE_CLICK_PROGRAM_PURCHASE': False,
@@ -3164,9 +3161,6 @@ INSTALLED_APPS = [
 
     # API access administration
     'openedx.core.djangoapps.api_admin',
-
-    # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
-    'openedx.core.djangoapps.verified_track_content',
 
     # Learner's dashboard
     'lms.djangoapps.learner_dashboard',

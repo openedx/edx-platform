@@ -515,15 +515,6 @@ def get_visibility_partition_info(xblock, course=None):
 
     """
     selectable_partitions = []
-    # We wish to display enrollment partitions before cohort partitions.
-    enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track"], course=course)
-
-    # For enrollment partitions, we only show them if there is a selected group or
-    # or if the number of groups > 1.
-    for partition in enrollment_user_partitions:
-        if len(partition["groups"]) > 1 or any(group["selected"] for group in partition["groups"]):
-            selectable_partitions.append(partition)
-
     course_key = xblock.scope_ids.usage_id.course_key
     is_library = isinstance(course_key, LibraryLocator)
     if not is_library and ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled:

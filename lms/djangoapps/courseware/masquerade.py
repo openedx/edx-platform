@@ -19,7 +19,6 @@ from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
-from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
@@ -29,7 +28,6 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.role_helpers import has_staff_roles
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions_service import get_all_partitions_for_course  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -283,30 +281,6 @@ def is_masquerading(user, course_key, course_masquerade=None):
     """
     course_masquerade = course_masquerade or get_course_masquerade(user, course_key)
     _is_masquerading = course_masquerade is not None
-    return _is_masquerading
-
-
-def is_masquerading_as_non_audit_enrollment(user, course_key, course_masquerade=None):
-    """
-    Return if the user is a staff member masquerading as a user
-    in _any_ enrollment track _except_ audit
-    """
-    group_id = _get_masquerade_group_id(ENROLLMENT_TRACK_PARTITION_ID, user, course_key, course_masquerade)
-    audit_mode_id = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.AUDIT, {}).get('id')
-    if group_id is not None:
-        if group_id != audit_mode_id:
-            return True
-    return False
-
-
-def is_masquerading_as_audit_enrollment(user, course_key, course_masquerade=None):
-    """
-    Return if the user is a staff member masquerading as a user
-    in the audit enrollment track
-    """
-    group_id = _get_masquerade_group_id(ENROLLMENT_TRACK_PARTITION_ID, user, course_key, course_masquerade)
-    audit_mode_id = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.AUDIT, {}).get('id')
-    _is_masquerading = group_id == audit_mode_id
     return _is_masquerading
 
 

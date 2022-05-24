@@ -21,7 +21,6 @@ MINIMUM_GROUP_ID = MINIMUM_STATIC_PARTITION_ID
 
 RANDOM_SCHEME = "random"
 COHORT_SCHEME = "cohort"
-ENROLLMENT_SCHEME = "enrollment_track"
 
 CONTENT_GROUP_CONFIGURATION_DESCRIPTION = _(
     'The groups in this configuration can be mapped to cohorts in the Instructor Dashboard.'

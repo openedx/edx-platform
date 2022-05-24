@@ -466,7 +466,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
 
     @lazy
     def is_allowed(self):
-        return can_show_verified_upgrade(self.user, self.enrollment, self.course)
+        return can_show_verified_upgrade(self.enrollment)
 
     @lazy
     def date(self):  # lint-amnesty, pylint: disable=invalid-overridden-method

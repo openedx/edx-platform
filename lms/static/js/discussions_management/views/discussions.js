@@ -17,10 +17,8 @@
 
             var HIDDEN_CLASS = 'hidden';
             var TWO_COLUMN_CLASS = 'two-column-layout';
-            var THREE_COLUMN_CLASS = 'three-column-layout';
             var COHORT = 'cohort';
             var NONE = 'none';
-            var ENROLLMENT_TRACK = 'enrollment_track';
 
             var DiscussionsView = BaseDashboardView.extend({
                 events: {
@@ -36,11 +34,9 @@
                 },
 
                 render: function() {
-                    var numberAvailableSchemes = this.discussionSettings.attributes.available_division_schemes.length;
-
                     HtmlUtils.setHtml(this.$el, this.template({
                         availableSchemes: this.getDivisionSchemeData(this.discussionSettings.attributes.division_scheme), //  eslint-disable-line max-len
-                        layoutClass: numberAvailableSchemes === 2 ? THREE_COLUMN_CLASS : TWO_COLUMN_CLASS
+                        layoutClass: TWO_COLUMN_CLASS
                     }));
                     this.updateTopicVisibility(this.getSelectedScheme(), this.getTopicNav());
                     this.renderTopics();
@@ -60,13 +56,6 @@
                             descriptiveText: gettext('Discussions are unified; all learners interact with posts from other learners, regardless of the group they are in.'), //  eslint-disable-line max-len
                             selected: selectedScheme === NONE,
                             enabled: true // always leave none enabled
-                        },
-                        {
-                            key: ENROLLMENT_TRACK,
-                            displayName: gettext('Enrollment Tracks'),
-                            descriptiveText: gettext('Use enrollment tracks as the basis for dividing discussions. All learners, regardless of their enrollment track, see the same discussion topics, but within divided topics, only learners who are in the same enrollment track see and respond to each others’ posts.'), //  eslint-disable-line max-len
-                            selected: selectedScheme === ENROLLMENT_TRACK,
-                            enabled: this.isSchemeAvailable(ENROLLMENT_TRACK) || selectedScheme === ENROLLMENT_TRACK
                         },
                         {
                             key: COHORT,
@@ -104,9 +93,6 @@
                         }
                     }
 
-                    if (!this.isSchemeAvailable(ENROLLMENT_TRACK)) {
-                        this.showDiscussionManagement(state.is_cohorted);
-                    }
                     if (this.getSelectedScheme() !== COHORT) {
                         this.showCohortSchemeControl(state.is_cohorted);
                     }
@@ -125,15 +111,8 @@
                 showCohortSchemeControl: function(show) {
                     if (!show) {
                         $('.division-scheme-item.cohort').addClass(HIDDEN_CLASS);
-                        // Since we are removing the cohort scheme, we can have at most 2 columns.
-                        $('.division-scheme-item').removeClass(THREE_COLUMN_CLASS).addClass(TWO_COLUMN_CLASS);
                     } else {
                         $('.division-scheme-item.cohort').removeClass(HIDDEN_CLASS);
-                        if (this.isSchemeAvailable(ENROLLMENT_TRACK)) {
-                            $('.division-scheme-item').removeClass(TWO_COLUMN_CLASS).addClass(THREE_COLUMN_CLASS);
-                        } else {
-                            $('.division-scheme-item').removeClass(THREE_COLUMN_CLASS).addClass(TWO_COLUMN_CLASS);
-                        }
                     }
                 },
 
@@ -179,9 +158,6 @@
                         switch (selectedScheme) {
                         case NONE:
                             details = gettext('Discussion topics in the course are not divided.');
-                            break;
-                        case ENROLLMENT_TRACK:
-                            details = gettext('Any divided discussion topics are divided based on enrollment track.'); //  eslint-disable-line max-len
                             break;
                         case COHORT:
                             details = gettext('Any divided discussion topics are divided based on cohort.');

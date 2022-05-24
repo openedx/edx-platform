@@ -47,7 +47,7 @@ define(['jquery',
                         last_name: '',
                         username: 'verified'
                     }],
-                    division_scheme: 'enrollment_track'
+                    division_scheme: 'cohort'
                 };
                 changeSelectedList('Group Moderator');
 

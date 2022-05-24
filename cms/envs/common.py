@@ -342,9 +342,6 @@ FEATURES = {
     # Allow public account creation
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
-    # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
-    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
-
     'ENABLE_PASSWORD_RESET_FAILURE_EMAIL': False,
 
     # Whether archived courses (courses with end dates in the past) should be
@@ -1630,9 +1627,6 @@ INSTALLED_APPS = [
 
     # for managing course modes
     'common.djangoapps.course_modes.apps.CourseModesConfig',
-
-    # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
-    'openedx.core.djangoapps.verified_track_content',
 
     # Dark-launching languages
     'openedx.core.djangoapps.dark_lang',

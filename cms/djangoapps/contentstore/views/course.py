@@ -83,7 +83,6 @@ from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException  # lint-
 
 from ..course_group_config import (
     COHORT_SCHEME,
-    ENROLLMENT_SCHEME,
     RANDOM_SCHEME,
     GroupConfiguration,
     GroupConfigurationsValidationError
@@ -1734,7 +1733,6 @@ def group_configurations_list_handler(request, course_key_string):
                 experiment_group_configurations = None
 
             all_partitions = GroupConfiguration.get_all_user_partition_details(store, course)
-            should_show_enrollment_track = False
             has_content_groups = False
             displayable_partitions = []
             for partition in all_partitions:
@@ -1747,12 +1745,6 @@ def group_configurations_list_handler(request, course_key_string):
                     # Add it to the front of the list if it should be shown.
                     if ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled:
                         displayable_partitions.append(partition)
-                elif partition['scheme'] == ENROLLMENT_SCHEME:
-                    should_show_enrollment_track = len(partition['groups']) > 1
-
-                    # Add it to the front of the list if it should be shown.
-                    if should_show_enrollment_track:
-                        displayable_partitions.insert(0, partition)
                 elif partition['scheme'] != RANDOM_SCHEME:
                     # Experiment group configurations are handled explicitly above. We don't
                     # want to display their groups twice.
@@ -1760,7 +1752,6 @@ def group_configurations_list_handler(request, course_key_string):
 
             # Set the sort-order. Higher numbers sort earlier
             scheme_priority = defaultdict(lambda: -1, {
-                ENROLLMENT_SCHEME: 1,
                 CONTENT_TYPE_GATING_SCHEME: 0
             })
             displayable_partitions.sort(key=lambda p: scheme_priority[p['scheme']], reverse=True)
@@ -1775,7 +1766,6 @@ def group_configurations_list_handler(request, course_key_string):
                 'experiment_group_configurations': experiment_group_configurations,
                 'should_show_experiment_groups': should_show_experiment_groups,
                 'all_group_configurations': displayable_partitions,
-                'should_show_enrollment_track': should_show_enrollment_track,
                 'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course.id),
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):

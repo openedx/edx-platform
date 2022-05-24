@@ -19,7 +19,6 @@ from edx_toggles.toggles import WaffleFlag
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.models import CourseEntitlement
-from lms.djangoapps.courseware.utils import is_mode_upsellable
 from lms.djangoapps.courseware.toggles import COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT
 from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
@@ -109,7 +108,7 @@ def can_show_streak_discount_coupon(user, course):
     except CourseEnrollment.DoesNotExist:
         return False
 
-    if not is_mode_upsellable(user, enrollment):
+    if enrollment.mode not in CourseMode.UPSELL_TO_VERIFIED_MODES:
         return False
 
     # We can't import this at Django load time within the openedx tests settings context

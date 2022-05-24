@@ -20,13 +20,16 @@ from django.utils.translation import gettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
+from edx_django_utils.plugins import get_plugins_view_context
 from edx_proctoring.api import does_backend_support_onboarding
 from edx_when.api import is_enabled_for_course
-from edx_django_utils.plugins import get_plugins_view_context
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from xmodule.html_module import HtmlBlock
+from xmodule.modulestore.django import modulestore
+from xmodule.tabs import CourseTab
 
 from common.djangoapps.course_modes.models import CourseMode, CourseModesArchive
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -35,7 +38,7 @@ from common.djangoapps.student.roles import (
     CourseFinanceAdminRole,
     CourseInstructorRole,
     CourseSalesAdminRole,
-    CourseStaffRole
+    CourseStaffRole,
 )
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
@@ -46,7 +49,7 @@ from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationHistory,
     CertificateInvalidation,
-    GeneratedCertificate
+    GeneratedCertificate,
 )
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_studio_url
@@ -56,17 +59,13 @@ from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
-from openedx.core.djangoapps.discussions.utils import available_division_schemes
-from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from openedx.core.djangoapps.plugins.constants import ProjectType
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
-from xmodule.html_module import HtmlBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .. import permissions
 from ..toggles import data_download_v2_is_enabled
@@ -514,12 +513,10 @@ def _section_cohort_management(course, access):
 def _section_discussions_management(course, access):  # lint-amnesty, pylint: disable=unused-argument
     """ Provide data for the corresponding discussion management section """
     course_key = course.id
-    enrollment_track_schemes = available_division_schemes(course_key)
     section_data = {
         'section_key': 'discussions_management',
         'section_display_name': _('Discussions'),
-        'is_hidden': (not is_course_cohorted(course_key) and
-                      CourseDiscussionSettings.ENROLLMENT_TRACK not in enrollment_track_schemes),
+        'is_hidden': not is_course_cohorted(course_key),
         'discussion_topics_url': reverse('discussion_topics', kwargs={'course_key_string': str(course_key)}),
         'course_discussion_settings': reverse(
             'course_discussions_settings',

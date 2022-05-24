@@ -29,7 +29,7 @@ def get_all_partitions_for_course(course, active_only=False):
     """
     A method that returns all `UserPartitions` associated with a course, as a List.
     This will include the ones defined in course.user_partitions, but it may also
-    include dynamically included partitions (such as the `EnrollmentTrackUserPartition`).
+    include dynamically included partitions (such as the `ContentTypeGatingPartition`).
 
     Args:
         course: the course for which user partitions should be returned.
