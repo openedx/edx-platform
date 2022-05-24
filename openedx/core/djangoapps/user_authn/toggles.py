@@ -15,7 +15,7 @@ from openedx.core.djangoapps.theming.helpers import get_current_request
 #   authentication with third party auth
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-09-16
-# .. toggle_warnings: Requires configuration of third party auth
+# .. toggle_warning: Requires configuration of third party auth
 
 
 def is_require_third_party_auth_enabled():
