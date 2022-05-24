@@ -15,8 +15,8 @@ jobs:
       matrix:
         os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
-        node-version: [ 12 ]
-
+        node-version: [ 12, 14, 16 ]
+        
     steps:
 
     - uses: actions/checkout@v2
@@ -38,6 +38,9 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
+
+    - name: Setup npm
+      run: npm i -g npm@8.5.x
 
     - name: Get pip cache dir
       id: pip-cache-dir
