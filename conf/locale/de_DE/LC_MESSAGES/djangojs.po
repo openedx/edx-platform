@@ -130,7 +130,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-08 20:42+0000\n"
+"POT-Creation-Date: 2022-05-15 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2021\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
@@ -4013,39 +4013,6 @@ msgstr "Kohort ausgewählt"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Kohort nicht ausgewählt"
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-"Dieser Kurs verwendet die automatische Kohortierung für Lerner im "
-"verifizierte Modus. Sie können Kohorten nicht deaktivieren und die manuelle "
-"Kohorte nicht in '{verifiedCohortName}' umbenennen. Um die Konfiguration für"
-" Kohorten des verifizierten Modus zu ändern, wenden Sie sich an Ihren edX "
-"Partnermanager."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-"In diesem Kurs ist die automatische Kohortierung für Lerner im verifizierten"
-" Modus aktiviert, aber die erforderliche Kohorte existiert nicht. Sie müssen"
-" eine manuell zugewiesene Kohorte mit dem Namen '{verifiedCohortName}'' "
-"erstellen, damit das Feature funktioniert."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
-msgstr ""
-"Dieser Kurs hat die automatische Kohortierung für Lerner im verifizierten "
-"Modus aktiviert, aber Kohorten sind deaktiviert. Sie müssen Kohorten "
-"aktivieren, damit das Merkmal funktioniert."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"

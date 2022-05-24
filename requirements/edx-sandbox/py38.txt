@@ -54,7 +54,7 @@ numpy==1.16.6
     #   scipy
 openedx-calc==3.0.1
     # via -r requirements/edx-sandbox/py38.in
-pillow==9.1.0
+pillow==9.1.1
     # via matplotlib
 pycparser==2.21
     # via cffi

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-12 19:13+0000\n"
-"PO-Revision-Date: 2022-05-12 19:13:49.680734\n"
+"POT-Creation-Date: 2022-05-22 20:42+0000\n"
+"PO-Revision-Date: 2022-05-22 20:42:06.061268\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -6454,6 +6454,7 @@ msgstr "Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
@@ -8430,10 +8431,13 @@ msgid "Team"
 msgstr "Téäm Ⱡ'σяєм ι#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field
+#. which allows the user to input the city in which they live.
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -12372,7 +12376,6 @@ msgid "Student"
 msgstr "Stüdént Ⱡ'σяєм ιρѕυм #"
 
 #: openedx/core/djangoapps/embargo/forms.py
-#: openedx/core/djangoapps/verified_track_content/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
 msgstr ""
 "ÇÖÛRSÉ NÖT FÖÛND.  Pléäsé çhéçk thät thé çöürsé ÌD ïs välïd. Ⱡ'σяєм ιρѕυм "
@@ -13109,6 +13112,14 @@ msgid "Enter your full name."
 msgstr "Éntér ýöür füll nämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your first name."
+msgstr "Éntér ýöür fïrst nämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your last name."
+msgstr "Éntér ýöür läst nämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "The email addresses do not match."
 msgstr ""
 "Thé émäïl äddréssés dö nöt mätçh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
@@ -13134,6 +13145,10 @@ msgstr "Éntér ýöür pröféssïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your specialty."
 msgstr "Éntér ýöür spéçïältý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your state."
+msgstr "Éntér ýöür stäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your city."
@@ -13184,24 +13199,34 @@ msgstr ""
 "Thé '{field_name}' fïéld çännöt ßé édïtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тє#"
 
+#. Translators: This label appears above a field which allows the
+#. user to input the First Name
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "First Name"
 msgstr "Fïrst Nämé Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
+#. Translators: This label appears above a field which allows the
+#. user to input the Last Name
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Last Name"
 msgstr "Läst Nämé Ⱡ'σяєм ιρѕυм ∂σł#"
 
+#. Translators: This label appears above a field
+#. which allows the user to input the State/Province/Region in which they
+#. live.
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "State/Province/Region"
 msgstr "Stäté/Prövïnçé/Régïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -13239,9 +13264,12 @@ msgid "Job Title"
 msgstr "Jöß Tïtlé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field
+#. meant to hold the user's mailing address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's mailing address.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html
 msgid "Mailing address"
@@ -13964,12 +13992,6 @@ msgstr "{header_open}{title}{header_close} Ⱡ'σяєм ιρѕυм ∂σł#"
 #: cms/templates/course_outline.html cms/templates/index.html
 msgid "Dismiss"
 msgstr "Dïsmïss Ⱡ'σяєм ιρѕυм #"
-
-#: openedx/core/djangoapps/verified_track_content/models.py
-msgid "The course key for the course we would like to be auto-cohorted."
-msgstr ""
-"Thé çöürsé kéý för thé çöürsé wé wöüld lïké tö ßé äütö-çöhörtéd. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: openedx/core/djangoapps/video_pipeline/models.py
 msgid "Oauth client name of VEM service."
@@ -19800,6 +19822,15 @@ msgstr ""
 "ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
 "яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
 "ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"{start_bold}Get the most out of your course!{end_bold} Upgrade to earn a "
+"{link_start}verified certificate{link_end} to showcase on your resumé."
+msgstr ""
+"{start_bold}Gét thé möst öüt öf ýöür çöürsé!{end_bold} Ûpgrädé tö éärn ä "
+"{link_start}vérïfïéd çértïfïçäté{link_end} tö shöwçäsé ön ýöür résümé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
