@@ -1356,24 +1356,6 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
         )
         assert utils.is_commentable_divided(course.id, 'random')
 
-    def test_is_commentable_divided_enrollment_track(self):
-        course = modulestore().get_course(self.toy_course_key)
-        set_discussion_division_settings(
-            course.id,
-            divided_discussions=[],
-            always_divide_inline_discussions=True,
-            division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK,
-        )
-
-        # Although division scheme is set to ENROLLMENT_TRACK, divided returns
-        # False because there is only a single enrollment mode.
-        assert not utils.is_commentable_divided(course.id, 'random')
-
-        # Now create 2 explicit course modes.
-        CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.AUDIT)
-        CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.VERIFIED)
-        assert utils.is_commentable_divided(course.id, 'random')
-
 
 class GroupIdForUserTestCase(ModuleStoreTestCase):
     """ Test the get_group_id_for_user method. """
@@ -1405,14 +1387,6 @@ class GroupIdForUserTestCase(ModuleStoreTestCase):
         course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
         assert CourseDiscussionSettings.COHORT == course_discussion_settings.division_scheme
         assert self.test_cohort.id == utils.get_group_id_for_user(self.test_user, course_discussion_settings)
-
-    def test_discussion_division_by_enrollment_track(self):
-        set_discussion_division_settings(
-            self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
-        )
-        course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
-        assert CourseDiscussionSettings.ENROLLMENT_TRACK == course_discussion_settings.division_scheme
-        assert (- 2) == utils.get_group_id_for_user(self.test_user, course_discussion_settings)
 
 
 class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
@@ -1447,19 +1421,6 @@ class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
         assert utils.course_discussion_division_enabled(CourseDiscussionSettings.get(self.course.id))
         assert [CourseDiscussionSettings.COHORT] == available_division_schemes(self.course.id)
 
-    def test_discussion_division_by_enrollment_track(self):
-        set_discussion_division_settings(
-            self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
-        )
-        # Only a single enrollment track exists, so discussion division is not enabled.
-        assert not utils.course_discussion_division_enabled(CourseDiscussionSettings.get(self.course.id))
-        assert [] == available_division_schemes(self.course.id)
-
-        # Now create a second CourseMode, which will cause discussions to be divided.
-        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
-        assert utils.course_discussion_division_enabled(CourseDiscussionSettings.get(self.course.id))
-        assert [CourseDiscussionSettings.ENROLLMENT_TRACK] == available_division_schemes(self.course.id)
-
 
 class GroupNameTestCase(ModuleStoreTestCase):
     """ Test the get_group_name and get_group_names_by_id methods. """
@@ -1492,17 +1453,6 @@ class GroupNameTestCase(ModuleStoreTestCase):
         course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
         assert {self.test_cohort_1.id: self.test_cohort_1.name, self.test_cohort_2.id: self.test_cohort_2.name} == get_group_names_by_id(course_discussion_settings)
         assert self.test_cohort_2.name == utils.get_group_name(self.test_cohort_2.id, course_discussion_settings)
-        # Test also with a group_id that doesn't exist.
-        assert utils.get_group_name((- 1000), course_discussion_settings) is None
-
-    def test_discussion_division_by_enrollment_track(self):
-        set_discussion_division_settings(
-            self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
-        )
-        course_discussion_settings = CourseDiscussionSettings.get(self.course.id)
-        assert {(- 1): 'audit course', (- 2): 'verified course'} == get_group_names_by_id(course_discussion_settings)
-
-        assert 'verified course' == utils.get_group_name((- 2), course_discussion_settings)
         # Test also with a group_id that doesn't exist.
         assert utils.get_group_name((- 1000), course_discussion_settings) is None
 

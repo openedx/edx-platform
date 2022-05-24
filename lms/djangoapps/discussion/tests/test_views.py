@@ -2132,15 +2132,12 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
         response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
-        expected_response['available_division_schemes'] = [CourseDiscussionSettings.ENROLLMENT_TRACK]
         assert response == expected_response
 
         # Enable cohorts
         config_course_cohorts(self.course, is_cohorted=True)
         response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
-        expected_response['available_division_schemes'] = [
-            CourseDiscussionSettings.COHORT, CourseDiscussionSettings.ENROLLMENT_TRACK
-        ]
+        expected_response['available_division_schemes'] = [CourseDiscussionSettings.COHORT]
         assert response == expected_response
 
 

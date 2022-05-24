@@ -77,8 +77,6 @@ FEATURES['EMBARGO'] = True
 # Enable the milestones app in tests to be consistent with it being enabled in production
 FEATURES['MILESTONES_APP'] = True
 
-FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
-
 FEATURES['ENABLE_BULK_ENROLLMENT_VIEW'] = True
 
 FEATURES['ENABLE_BULK_USER_RETIREMENT'] = True

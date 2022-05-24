@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from unittest.mock import Mock, PropertyMock, patch
 
 import ddt
-from django.conf import settings
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -34,12 +33,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
-from xmodule.partitions.partitions import (
-    ENROLLMENT_TRACK_PARTITION_ID,
-    MINIMUM_STATIC_PARTITION_ID,
-    Group,
-    UserPartition
-)
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
 from xmodule.partitions.tests.test_partitions import MockPartitionService
 from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 
@@ -50,7 +44,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.xblock_django.models import (
     XBlockConfiguration,
     XBlockStudioConfiguration,
-    XBlockStudioConfigurationFlag
+    XBlockStudioConfigurationFlag,
 )
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
@@ -390,19 +384,6 @@ class GetItemTest(ItemTest):
         # Check that the partition and group information was returned
         result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result["user_partitions"], [
-            {
-                "id": ENROLLMENT_TRACK_PARTITION_ID,
-                "name": "Enrollment Track Groups",
-                "scheme": "enrollment_track",
-                "groups": [
-                    {
-                        "id": settings.COURSE_ENROLLMENT_MODES["audit"]["id"],
-                        "name": "Audit",
-                        "selected": False,
-                        "deleted": False,
-                    }
-                ]
-            },
             {
                 "id": MINIMUM_STATIC_PARTITION_ID,
                 "name": "Random user partition",

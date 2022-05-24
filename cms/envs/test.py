@@ -271,8 +271,6 @@ FEATURES['ENABLE_LIBRARY_INDEX'] = True
 FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
-FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
-
 ####################### ELASTICSEARCH TESTS #######################
 # Enable this when testing elasticsearch-based code which couldn't be tested using the mock engine
 ENABLE_ELASTICSEARCH_FOR_TESTS = os.environ.get(

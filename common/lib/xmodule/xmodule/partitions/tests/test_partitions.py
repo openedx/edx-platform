@@ -14,14 +14,13 @@ from stevedore.extension import Extension, ExtensionManager
 
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from xmodule.partitions.partitions import (
-    ENROLLMENT_TRACK_PARTITION_ID,
     USER_PARTITION_SCHEME_NAMESPACE,
     Group,
     NoSuchUserPartitionGroupError,
     UserPartition,
     UserPartitionError
 )
-from xmodule.partitions.partitions_service import FEATURES, PartitionService, get_all_partitions_for_course
+from xmodule.partitions.partitions_service import PartitionService
 
 
 class TestGroup(TestCase):
@@ -116,15 +115,6 @@ class MockUserPartitionScheme:
         return groups[0]
 
 
-class MockEnrollmentTrackUserPartitionScheme(MockUserPartitionScheme):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    def create_user_partition(self, id, name, description, groups=None, parameters=None, active=True):  # pylint: disable=redefined-builtin, invalid-name
-        """
-        The EnrollmentTrackPartitionScheme provides this method to return a subclass of UserPartition.
-        """
-        return UserPartition(id, name, description, groups, self, parameters, active)
-
-
 class PartitionTestCase(TestCase):
     """Base class for test cases that require partitions"""
     TEST_ID = 0
@@ -133,23 +123,18 @@ class PartitionTestCase(TestCase):
     TEST_PARAMETERS = {"location": "block-v1:edX+DemoX+Demo+type@block@uuid"}
     TEST_GROUPS = [Group(0, 'Group 1'), Group(1, 'Group 2')]
     TEST_SCHEME_NAME = "mock"
-    ENROLLMENT_TRACK_SCHEME_NAME = "enrollment_track"
 
     def setUp(self):
         super().setUp()
         # Set up two user partition schemes: mock and random
         self.non_random_scheme = MockUserPartitionScheme(self.TEST_SCHEME_NAME)
         self.random_scheme = MockUserPartitionScheme("random")
-        self.enrollment_track_scheme = MockEnrollmentTrackUserPartitionScheme(self.ENROLLMENT_TRACK_SCHEME_NAME)
         extensions = [
             Extension(
                 self.non_random_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, self.non_random_scheme, None
             ),
             Extension(
                 self.random_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, self.random_scheme, None
-            ),
-            Extension(
-                self.enrollment_track_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, self.enrollment_track_scheme, None
             ),
         ]
         UserPartition.scheme_extensions = ExtensionManager.make_test_instance(
@@ -534,70 +519,3 @@ class TestPartitionService(PartitionServiceBaseClass):
         self.user_partition.scheme.current_group = groups[1]
         group2 = self.partition_service.get_group(self.user, self.user_partition)
         assert group2 == groups[1]
-
-
-class TestGetCourseUserPartitions(PartitionServiceBaseClass):
-    """
-    Test the helper method get_all_partitions_for_course.
-    """
-
-    def setUp(self):
-        super().setUp()
-        TestGetCourseUserPartitions._enable_enrollment_track_partition(True)
-
-    @staticmethod
-    def _enable_enrollment_track_partition(enable):
-        """
-        Enable or disable the feature flag for the enrollment track user partition.
-        """
-        FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = enable
-
-    def test_enrollment_track_partition_not_added_if_conflict(self):
-        """
-        Test that the dynamic enrollment track scheme is NOT added if a UserPartition exists with that ID.
-        """
-        self.user_partition = UserPartition(
-            ENROLLMENT_TRACK_PARTITION_ID,
-            self.TEST_NAME,
-            self.TEST_DESCRIPTION,
-            self.TEST_GROUPS,
-            self.non_random_scheme,
-            self.TEST_PARAMETERS,
-        )
-        self.course.user_partitions = [self.user_partition]
-        all_partitions = get_all_partitions_for_course(self.course)
-        assert 1 == len(all_partitions)
-        assert self.TEST_SCHEME_NAME == all_partitions[0].scheme.name
-
-    def test_enrollment_track_partition_not_added_if_disabled(self):
-        """
-        Test that the dynamic enrollment track scheme is NOT added if the settings FEATURE flag is disabled.
-        """
-        TestGetCourseUserPartitions._enable_enrollment_track_partition(False)
-        all_partitions = get_all_partitions_for_course(self.course)
-        assert 1 == len(all_partitions)
-        assert self.TEST_SCHEME_NAME == all_partitions[0].scheme.name
-
-    def test_filter_inactive_user_partitions(self):
-        """
-        Tests supplying the `active_only` parameter.
-        """
-        self.user_partition = UserPartition(
-            self.TEST_ID,
-            self.TEST_NAME,
-            self.TEST_DESCRIPTION,
-            self.TEST_GROUPS,
-            self.non_random_scheme,
-            self.TEST_PARAMETERS,
-            active=False
-        )
-        self.course.user_partitions = [self.user_partition]
-
-        all_partitions = get_all_partitions_for_course(self.course, active_only=True)
-        assert 1 == len(all_partitions)
-        assert self.ENROLLMENT_TRACK_SCHEME_NAME == all_partitions[0].scheme.name
-
-        all_partitions = get_all_partitions_for_course(self.course, active_only=False)
-        assert 2 == len(all_partitions)
-        assert self.TEST_SCHEME_NAME == all_partitions[0].scheme.name
-        assert self.ENROLLMENT_TRACK_SCHEME_NAME == all_partitions[1].scheme.name

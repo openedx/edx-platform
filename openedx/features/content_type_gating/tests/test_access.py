@@ -3,30 +3,37 @@ Test audit user's access to various content based on content-gating features.
 """
 import os
 from datetime import datetime, timedelta
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 import ddt
-from django.conf import settings
-from django.test.client import RequestFactory, Client
+from django.contrib.auth import get_user_model
+from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
-from django.contrib.auth import get_user_model
 from pyquery import PyQuery as pq
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
-from lms.djangoapps.course_api.blocks.api import get_blocks
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.tests.factories import BetaTesterFactory
-from common.djangoapps.student.tests.factories import GlobalStaffFactory
-from common.djangoapps.student.tests.factories import InstructorFactory
-from common.djangoapps.student.tests.factories import OrgInstructorFactory
-from common.djangoapps.student.tests.factories import OrgStaffFactory
-from common.djangoapps.student.tests.factories import StaffFactory
+from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
+from common.djangoapps.student.roles import CourseInstructorRole
+from common.djangoapps.student.tests.factories import (
+    TEST_PASSWORD,
+    BetaTesterFactory,
+    CourseEnrollmentFactory,
+    GlobalStaffFactory,
+    InstructorFactory,
+    OrgInstructorFactory,
+    OrgStaffFactory,
+    StaffFactory,
+    UserFactory,
+)
+from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.module_render import load_single_xblock
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
@@ -34,7 +41,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_MODERATOR
+    FORUM_ROLE_MODERATOR,
 )
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.djangoapps.util.testing import TestConditionalContent
@@ -44,9 +51,6 @@ from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITIO
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition
 from openedx.features.content_type_gating.services import ContentTypeGatingService
-from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
-from common.djangoapps.student.roles import CourseInstructorRole
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 
 METADATA = {
     'group_access': {
@@ -668,10 +672,6 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
           'group_id': CONTENT_TYPE_GATE_GROUP_IDS['limited_access']}, True),
         ({'user_partition_id': CONTENT_GATING_PARTITION_ID,
           'group_id': CONTENT_TYPE_GATE_GROUP_IDS['full_access']}, False),
-        ({'user_partition_id': ENROLLMENT_TRACK_PARTITION_ID,
-          'group_id': settings.COURSE_ENROLLMENT_MODES['audit']['id']}, True),
-        ({'user_partition_id': ENROLLMENT_TRACK_PARTITION_ID,
-          'group_id': settings.COURSE_ENROLLMENT_MODES['verified']['id']}, False),
         ({'role': 'staff'}, False),
         ({'role': 'student'}, True),
         ({'username': 'audit'}, True),

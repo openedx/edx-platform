@@ -9,7 +9,6 @@ from unittest import TestCase
 from django.utils.timezone import now
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.partitions.partitions import Group
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
@@ -141,7 +140,7 @@ class ExperimentUtilsTests(ModuleStoreTestCase, TestCase):
                                          'pacing_type': 'instructor_paced',
                                          'has_staff_access': False,
                                          'forum_roles': [('Student',)],
-                                         'partition_groups': {'Enrollment Track Groups': Group(id=1, name='Audit')},
+                                         'partition_groups': {},
                                          'has_non_audit_enrollments': False,
                                          'program_key_fields': None,
                                          'email': user.email,

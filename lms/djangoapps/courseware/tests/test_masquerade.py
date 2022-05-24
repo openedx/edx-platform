@@ -209,15 +209,22 @@ class TestMasqueradeLearnerOptions(StaffMasqueradeTestCase):
 
     @ddt.data(True, False)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_MASQUERADE': True})
-    def test_masquerade_options_for_learner(self, partitions_enabled):
+    def test_masquerade_options_for_learner(self, partitions_exist):
         """
         If there are partitions, then the View as Learner should NOT be available
         """
-        with patch.dict('django.conf.settings.FEATURES',
-                        {'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': partitions_enabled}):
-            response = self.get_available_masquerade_identities()
-            is_learner_available = 'Learner' in map(itemgetter('name'), response.json()['available'])
-            assert partitions_enabled != is_learner_available
+        if partitions_exist:
+            user_partition = UserPartition(
+                0, 'Test User Partition', '',
+                [Group(0, 'Cohort Group 1'), Group(1, 'Cohort Group 2')],
+                scheme_id='cohort'
+            )
+            self.course.user_partitions.append(user_partition)
+            modulestore().update_item(self.course, self.test_user.id)
+
+        response = self.get_available_masquerade_identities()
+        is_learner_available = 'Learner' in map(itemgetter('name'), response.json()['available'])
+        assert partitions_exist != is_learner_available
 
 
 @ddt.ddt

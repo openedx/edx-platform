@@ -11,7 +11,6 @@ import ddt
 
 from cms.djangoapps.contentstore.course_group_config import (
     CONTENT_GROUP_CONFIGURATION_NAME,
-    ENROLLMENT_SCHEME,
     GroupConfiguration
 )
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -21,7 +20,7 @@ from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.validation import StudioValidation, StudioValidationMessage  # lint-amnesty, pylint: disable=wrong-import-order
 
 GROUP_CONFIGURATION_JSON = {
@@ -335,13 +334,12 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         self.reload_course()
         self.assertEqual(len(self.course.user_partitions), 0)
 
-    @ddt.data('content_type_gate', 'enrollment_track')
-    def test_cannot_create_restricted_group_configuration(self, scheme_id):
+    def test_cannot_create_restricted_group_configuration(self):
         """
         Test that you cannot create a restricted group configuration.
         """
         group_config = dict(GROUP_CONFIGURATION_JSON)
-        group_config['scheme'] = scheme_id
+        group_config['scheme'] = 'content_type_gate'
         group_config.setdefault('parameters', {})['course_id'] = str(self.course.id)
         response = self.client.ajax_post(
             self._url(),
@@ -652,13 +650,12 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partititons), 2)
         self.assertEqual(user_partititons[0].name, 'Name 0')
 
-    @ddt.data(CONTENT_TYPE_GATING_SCHEME, ENROLLMENT_SCHEME)
-    def test_cannot_create_restricted_group_configuration(self, scheme_id):
+    def test_cannot_create_restricted_group_configuration(self):
         """
         Test that you cannot create a restricted group configuration.
         """
         group_config = dict(GROUP_CONFIGURATION_JSON)
-        group_config['scheme'] = scheme_id
+        group_config['scheme'] = CONTENT_TYPE_GATING_SCHEME
         group_config.setdefault('parameters', {})['course_id'] = str(self.course.id)
         response = self.client.ajax_post(
             self._url(),
@@ -666,20 +663,15 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         )
         self.assertEqual(response.status_code, 400)
 
-    @ddt.data(
-        (CONTENT_TYPE_GATING_SCHEME, CONTENT_GATING_PARTITION_ID),
-        (ENROLLMENT_SCHEME, ENROLLMENT_TRACK_PARTITION_ID),
-    )
-    @ddt.unpack
-    def test_cannot_edit_restricted_group_configuration(self, scheme_id, partition_id):
+    def test_cannot_edit_restricted_group_configuration(self):
         """
         Test that you cannot edit a restricted group configuration.
         """
         group_config = dict(GROUP_CONFIGURATION_JSON)
-        group_config['scheme'] = scheme_id
+        group_config['scheme'] = CONTENT_TYPE_GATING_SCHEME
         group_config.setdefault('parameters', {})['course_id'] = str(self.course.id)
         response = self.client.put(
-            self._url(cid=partition_id),
+            self._url(cid=CONTENT_GATING_PARTITION_ID),
             data=json.dumps(group_config),
             content_type="application/json",
             HTTP_ACCEPT="application/json",

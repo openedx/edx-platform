@@ -109,11 +109,11 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
         discussion_settings = CourseDiscussionSettings.get(self.course.id)
         discussion_settings.update({
             'divided_discussions': ['cohorted_topic'],
-            'division_scheme': CourseDiscussionSettings.ENROLLMENT_TRACK,
+            'division_scheme': CourseDiscussionSettings.COHORT,
             'always_divide_inline_discussions': True,
         })
         discussion_settings = CourseDiscussionSettings.get(self.course.id)
-        assert CourseDiscussionSettings.ENROLLMENT_TRACK == discussion_settings.division_scheme
+        assert CourseDiscussionSettings.COHORT == discussion_settings.division_scheme
         assert ['cohorted_topic'] == discussion_settings.divided_discussions
         assert discussion_settings.always_divide_inline_discussions
 

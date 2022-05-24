@@ -3,19 +3,11 @@ Tests for the Studio authoring XBlock mixin.
 """
 
 
-from django.conf import settings
-from django.test.utils import override_settings
 from xblock.core import XBlock
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import (
-    ENROLLMENT_TRACK_PARTITION_ID,
-    MINIMUM_STATIC_PARTITION_ID,
-    Group,
-    UserPartition
-)
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
 
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.lib.xmodule.xmodule.tests.test_export import PureXBlock
 
 
@@ -25,15 +17,10 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
     """
     MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     GROUP_NO_LONGER_EXISTS = "This group no longer exists"
-    NO_CONTENT_OR_ENROLLMENT_GROUPS = "Access to this component is not restricted"
-    NO_CONTENT_ENROLLMENT_TRACK_ENABLED = "You can restrict access to this component to learners in specific enrollment tracks or content groups"  # lint-amnesty, pylint: disable=line-too-long
-    NO_CONTENT_ENROLLMENT_TRACK_DISABLED = "You can restrict access to this component to learners in specific content groups"  # lint-amnesty, pylint: disable=line-too-long
+    NO_RESTRICTIONS_MSG = "Access to this component is not restricted"
+    NO_CONTENT_GROUP_MSG = "You can restrict access to this component to learners in specific content groups"
     CONTENT_GROUPS_TITLE = "Content Groups"
-    ENROLLMENT_GROUPS_TITLE = "Enrollment Track Groups"
     STAFF_LOCKED = 'The unit that contains this component is hidden from learners'
-
-    FEATURES_WITH_ENROLLMENT_TRACK_DISABLED = settings.FEATURES.copy()
-    FEATURES_WITH_ENROLLMENT_TRACK_DISABLED['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = False
 
     @XBlock.register_temp_plugin(PureXBlock, 'pure')
     def setUp(self):
@@ -123,11 +110,11 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
             self.assertNotIn(string, html)
 
     def test_html_no_partition(self):
-        self.verify_visibility_view_contains(self.video_location, [self.NO_CONTENT_OR_ENROLLMENT_GROUPS])
+        self.verify_visibility_view_contains(self.video_location, [self.NO_CONTENT_GROUP_MSG])
 
     def test_html_empty_partition(self):
         self.create_content_groups([])
-        self.verify_visibility_view_contains(self.video_location, [self.NO_CONTENT_OR_ENROLLMENT_GROUPS])
+        self.verify_visibility_view_contains(self.video_location, [self.NO_CONTENT_GROUP_MSG])
 
     def test_html_populated_partition(self):
         self.create_content_groups(self.pet_groups)
@@ -138,24 +125,24 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
 
         self.verify_visibility_view_does_not_contain(
             self.video_location,
-            [self.NO_CONTENT_OR_ENROLLMENT_GROUPS, self.ENROLLMENT_GROUPS_TITLE]
+            [self.NO_CONTENT_GROUP_MSG]
         )
 
     def test_html_no_partition_staff_locked(self):
         self.set_staff_only(self.vertical_location)
-        self.verify_visibility_view_contains(self.video_location, [self.NO_CONTENT_OR_ENROLLMENT_GROUPS])
+        self.verify_visibility_view_contains(self.video_location, [self.NO_CONTENT_GROUP_MSG])
         self.verify_visibility_view_does_not_contain(
             self.video_location,
-            [self.STAFF_LOCKED, self.CONTENT_GROUPS_TITLE, self.ENROLLMENT_GROUPS_TITLE]
+            [self.STAFF_LOCKED, self.CONTENT_GROUPS_TITLE]
         )
 
     def test_html_empty_partition_staff_locked(self):
         self.create_content_groups([])
         self.set_staff_only(self.vertical_location)
-        self.verify_visibility_view_contains(self.video_location, [self.NO_CONTENT_OR_ENROLLMENT_GROUPS])
+        self.verify_visibility_view_contains(self.video_location, [self.NO_CONTENT_GROUP_MSG])
         self.verify_visibility_view_does_not_contain(
             self.video_location,
-            [self.STAFF_LOCKED, self.CONTENT_GROUPS_TITLE, self.ENROLLMENT_GROUPS_TITLE]
+            [self.STAFF_LOCKED, self.CONTENT_GROUPS_TITLE]
         )
 
     def test_html_populated_partition_staff_locked(self):
@@ -192,81 +179,13 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
             ]
         )
 
-    @override_settings(FEATURES=FEATURES_WITH_ENROLLMENT_TRACK_DISABLED)
-    def test_enrollment_tracks_disabled(self):
+    def test_content_groups_message(self):
         """
-        Test that the "no groups" messages doesn't reference enrollment tracks if
-        they are disabled.
+        Test "no groups" messages.
         """
         self.verify_visibility_view_contains(
             self.video_location,
-            [self.NO_CONTENT_OR_ENROLLMENT_GROUPS, self.NO_CONTENT_ENROLLMENT_TRACK_DISABLED]
-        )
-        self.verify_visibility_view_does_not_contain(self.video_location, [self.NO_CONTENT_ENROLLMENT_TRACK_ENABLED])
-
-    def test_enrollment_track_partitions_only(self):
-        """
-        Test what is displayed with no content groups but 2 enrollment modes registered.
-        In all the cases where no enrollment modes are explicitly added, only the default
-        enrollment mode exists, and we do not show it as an option (unless the course staff
-        member has previously selected it).
-        """
-        CourseModeFactory.create(course_id=self.course.id, mode_slug='audit')
-        CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
-        self.verify_visibility_view_contains(
-            self.video_location,
-            [self.ENROLLMENT_GROUPS_TITLE, 'audit course', 'verified course']
-        )
-        self.verify_visibility_view_does_not_contain(
-            self.video_location,
-            [self.NO_CONTENT_OR_ENROLLMENT_GROUPS, self.CONTENT_GROUPS_TITLE]
-        )
-
-    def test_enrollment_track_partitions_and_content_groups(self):
-        """
-        Test what is displayed with both enrollment groups and content groups.
-        """
-        CourseModeFactory.create(course_id=self.course.id, mode_slug='audit')
-        CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
-        self.create_content_groups(self.pet_groups)
-        self.verify_visibility_view_contains(
-            self.video_location,
-            [
-                self.CONTENT_GROUPS_TITLE, 'Cat Lovers', 'Dog Lovers',
-                self.ENROLLMENT_GROUPS_TITLE, 'audit course', 'verified course'
-            ]
-        )
-        self.verify_visibility_view_does_not_contain(
-            self.video_location,
-            [self.NO_CONTENT_OR_ENROLLMENT_GROUPS]
-        )
-
-    def test_missing_enrollment_mode(self):
-        """
-        Test that an enrollment mode that is no longer registered is displayed as 'deleted',
-        regardless of the number of current enrollment modes in the course.
-        """
-        # Only 1 mode (the default) exists, so nothing initially shows in the visibility view.
-        self.verify_visibility_view_contains(
-            self.video_location,
-            [self.NO_CONTENT_OR_ENROLLMENT_GROUPS, self.NO_CONTENT_ENROLLMENT_TRACK_ENABLED]
-        )
-        self.verify_visibility_view_does_not_contain(
-            self.video_location, [self.ENROLLMENT_GROUPS_TITLE, self.GROUP_NO_LONGER_EXISTS]
-        )
-
-        # Set group_access to reference a missing mode.
-        self.set_group_access(self.video_location, ['10'], ENROLLMENT_TRACK_PARTITION_ID)
-        self.verify_visibility_view_contains(
-            self.video_location, [self.ENROLLMENT_GROUPS_TITLE, self.GROUP_NO_LONGER_EXISTS]
-        )
-
-        # Add 2 explicit enrollment modes.
-        CourseModeFactory.create(course_id=self.course.id, mode_slug='audit')
-        CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
-        self.verify_visibility_view_contains(
-            self.video_location,
-            [self.ENROLLMENT_GROUPS_TITLE, 'audit course', 'verified course', self.GROUP_NO_LONGER_EXISTS]
+            [self.NO_RESTRICTIONS_MSG, self.NO_CONTENT_GROUP_MSG]
         )
 
     def test_pure_xblock_visibility(self):
@@ -278,5 +197,5 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
 
         self.verify_visibility_view_does_not_contain(
             self.pure_location,
-            [self.NO_CONTENT_OR_ENROLLMENT_GROUPS, self.ENROLLMENT_GROUPS_TITLE]
+            [self.NO_CONTENT_GROUP_MSG]
         )

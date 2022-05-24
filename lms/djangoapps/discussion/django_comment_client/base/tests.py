@@ -1524,11 +1524,9 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         ('moderator', 'moderator', 'team_commentable_id', 200, CourseDiscussionSettings.NONE),
         ('moderator', 'student_in_team', 'team_commentable_id', 200, CourseDiscussionSettings.NONE),
         # Group moderator can do operations on commentables within their group if the course is divided
-        ('group_moderator', 'verified', 'course_commentable_id', 200, CourseDiscussionSettings.ENROLLMENT_TRACK),
         ('group_moderator', 'cohorted', 'course_commentable_id', 200, CourseDiscussionSettings.COHORT),
         # Group moderators cannot do operations on commentables outside of their group
         ('group_moderator', 'verified', 'course_commentable_id', 401, CourseDiscussionSettings.COHORT),
-        ('group_moderator', 'cohorted', 'course_commentable_id', 401, CourseDiscussionSettings.ENROLLMENT_TRACK),
         # Group moderators cannot do operations when the course is not divided
         ('group_moderator', 'verified', 'course_commentable_id', 401, CourseDiscussionSettings.NONE),
         ('group_moderator', 'cohorted', 'course_commentable_id', 401, CourseDiscussionSettings.NONE)
@@ -1574,11 +1572,9 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         ('student_in_team', 'moderator', 'team_commentable_id', 401, CourseDiscussionSettings.NONE),
         ('student_not_in_team', 'student_in_team', 'team_commentable_id', 401, CourseDiscussionSettings.NONE),
         # Group moderator can do operations on commentables within their group if the course is divided
-        ('group_moderator', 'verified', 'team_commentable_id', 200, CourseDiscussionSettings.ENROLLMENT_TRACK),
         ('group_moderator', 'cohorted', 'team_commentable_id', 200, CourseDiscussionSettings.COHORT),
         # Group moderators cannot do operations on commentables outside of their group
         ('group_moderator', 'verified', 'team_commentable_id', 401, CourseDiscussionSettings.COHORT),
-        ('group_moderator', 'cohorted', 'team_commentable_id', 401, CourseDiscussionSettings.ENROLLMENT_TRACK),
         # Group moderators cannot do operations when the course is not divided
         ('group_moderator', 'verified', 'team_commentable_id', 401, CourseDiscussionSettings.NONE),
         ('group_moderator', 'cohorted', 'team_commentable_id', 401, CourseDiscussionSettings.NONE)

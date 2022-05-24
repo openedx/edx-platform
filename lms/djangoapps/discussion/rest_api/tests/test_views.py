@@ -2446,13 +2446,10 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
 
-        expected_response['available_division_schemes'] = [CourseDiscussionSettings.ENROLLMENT_TRACK]
         self._assert_current_settings(expected_response)
 
         config_course_cohorts(self.course, is_cohorted=True)
-        expected_response['available_division_schemes'] = [
-            CourseDiscussionSettings.COHORT, CourseDiscussionSettings.ENROLLMENT_TRACK
-        ]
+        expected_response['available_division_schemes'] = [CourseDiscussionSettings.COHORT]
         self._assert_current_settings(expected_response)
 
     def test_empty_body_patch_request(self):

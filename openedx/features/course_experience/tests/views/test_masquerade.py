@@ -11,8 +11,6 @@ from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import add_course_mode
 from .test_course_sock import TEST_VERIFICATION_SOCK_LOCATOR
@@ -39,26 +37,24 @@ class MasqueradeTestBase(SharedModuleStoreTestCase, MasqueradeMixin):
     def setUp(self):
         super().setUp()
         self.course_staff = UserFactory.create()
+        # we will use this users to masquerade
+        self.verified_user = UserFactory.create()
+        self.masters_user = UserFactory.create()
         CourseStaffRole(self.verified_course.id).add_users(self.course_staff)
         CourseStaffRole(self.masters_course.id).add_users(self.course_staff)
 
         # Enroll the user in the two courses
         CourseEnrollmentFactory.create(user=self.course_staff, course_id=self.verified_course.id)
         CourseEnrollmentFactory.create(user=self.course_staff, course_id=self.masters_course.id)
+        CourseEnrollmentFactory.create(
+            user=self.verified_user, course_id=self.verified_course.id, mode='verified'
+        )
+        CourseEnrollmentFactory.create(
+            user=self.masters_user, course_id=self.masters_course.id, mode='masters'
+        )
 
         # Log the staff user in
         self.client.login(username=self.course_staff.username, password=TEST_PASSWORD)
-
-    def get_group_id_by_course_mode_name(self, course_id, mode_name):
-        """
-        Get the needed group_id from the Enrollment_Track partition for the specific masquerading track.
-        """
-        partition_service = PartitionService(course_id)
-        enrollment_track_user_partition = partition_service.get_user_partition(ENROLLMENT_TRACK_PARTITION_ID)
-        for group in enrollment_track_user_partition.groups:
-            if group.name == mode_name:
-                return group.id
-        return None
 
 
 @set_preview_mode(True)
@@ -69,30 +65,28 @@ class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
 
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_masquerade_as_student(self):
-        # Elevate the staff user to be student
-        self.update_masquerade(course=self.verified_course, user_partition_id=ENROLLMENT_TRACK_PARTITION_ID)
+        """
+        Test staff masquerade as audit student.
+        """
+        self.update_masquerade(course=self.verified_course)
         response = self.client.get(reverse('courseware', kwargs={'course_id': str(self.verified_course.id)}))
         self.assertContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
 
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_masquerade_as_verified_student(self):
-        user_group_id = self.get_group_id_by_course_mode_name(
-            self.verified_course.id,
-            'Verified Certificate'
-        )
-        self.update_masquerade(course=self.verified_course, group_id=user_group_id,
-                               user_partition_id=ENROLLMENT_TRACK_PARTITION_ID)
+        """
+        Test staff masquerade as verified student.
+        """
+        self.update_masquerade(course=self.verified_course, username=self.verified_user.username)
         response = self.client.get(reverse('courseware', kwargs={'course_id': str(self.verified_course.id)}))
         self.assertNotContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
 
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_masquerade_as_masters_student(self):
-        user_group_id = self.get_group_id_by_course_mode_name(
-            self.masters_course.id,
-            'Masters'
-        )
-        self.update_masquerade(course=self.masters_course, group_id=user_group_id,
-                               user_partition_id=ENROLLMENT_TRACK_PARTITION_ID)
+        """
+        Test staff masquerade as masters student.
+        """
+        self.update_masquerade(course=self.masters_course, username=self.masters_user.username)
         response = self.client.get(reverse('courseware', kwargs={'course_id': str(self.masters_course.id)}))
 
         self.assertNotContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)

@@ -19,7 +19,6 @@ from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -359,31 +358,6 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         assert len(LastSeenCoursewareTimezone.objects.filter()) == 1
 
     @ddt.data(
-        (1, False),
-        (2, True),
-        (3, True),
-    )
-    @ddt.unpack
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': True})
-    def test_course_staff_masquerade(self, masquerade_group_id, needs_signature):
-        self.user.is_staff = True
-        self.user.save()
-        CourseEnrollment.enroll(self.user, self.course.id, 'audit')
-        masquerade_config = {
-            'role': 'student',
-            'user_partition_id': ENROLLMENT_TRACK_PARTITION_ID,
-            'group_id': masquerade_group_id
-        }
-        self.update_masquerade(**masquerade_config)
-        response = self.client.get(self.url)
-        assert response.status_code == 200
-        courseware_data = response.json()
-        assert 'is_integrity_signature_enabled' in courseware_data
-        assert courseware_data['is_integrity_signature_enabled'] is True
-        assert 'user_needs_integrity_signature' in courseware_data
-        assert courseware_data['user_needs_integrity_signature'] == needs_signature
-
-    @ddt.data(
         ('audit', False),
         ('honor', False),
         ('verified', True),
@@ -397,29 +371,6 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_HONOR_CERTIFICATES': True})
     def test_can_access_proctored_exams(self, mode, result):
         CourseEnrollment.enroll(self.user, self.course.id, mode)
-        response = self.client.get(self.url)
-        assert response.status_code == 200
-        courseware_data = response.json()
-        assert 'can_access_proctored_exams' in courseware_data
-        assert courseware_data['can_access_proctored_exams'] == result
-
-    @ddt.data(
-        (1, False),
-        (2, True),
-        (3, True),
-    )
-    @ddt.unpack
-    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_HONOR_CERTIFICATES': True})
-    def test_can_access_proctored_exams_masquerading(self, masquerade_group_id, result):
-        self.user.is_staff = True
-        self.user.save()
-        CourseEnrollment.enroll(self.user, self.course.id, 'audit')
-        masquerade_config = {
-            'role': 'student',
-            'user_partition_id': ENROLLMENT_TRACK_PARTITION_ID,
-            'group_id': masquerade_group_id
-        }
-        self.update_masquerade(**masquerade_config)
         response = self.client.get(self.url)
         assert response.status_code == 200
         courseware_data = response.json()
