@@ -1,33 +1,10 @@
 {
-  "plugins": [
-    "transform-object-assign",
-    "transform-object-rest-spread"
-  ],
-  "presets": [
-    [
-      "env",
-      {
-        "targets": {
-          "browsers": [
-            "last 2 versions",
-            "IE >= 11"
-          ]
-        },
-        "modules": false
-      }
+    "plugins": [
+      "@babel/transform-object-assign",
+      "@babel/plugin-proposal-object-rest-spread",
     ],
-    "babel-preset-react"
-  ],
-  "env": {
-    "test": {
-      "presets": [
-        [
-          "env",
-          {
-            "modules": "commonjs",
-          }
-        ]
-      ]
-    }
-  },
+    "presets": [
+      "@babel/react",
+      "@babel/preset-env"
+    ]
 }
