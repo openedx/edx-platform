@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n != 1);
-    if (typeof(v) == 'boolean') {
+    const v = (n != 1);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "\n                    Make sure you are on a computer with a webcam, and that you have valid photo identification\n                    such as a driver's license or passport, before you continue.\n                ": "\n                    Prima di continuare, assicurati di essere su un computer con una webcam e di disporre di un documento d'identit\u00e0 valido con foto, come ad esempio la patente di guida o il passaporto. ",
     "\n                    Your verification attempt failed. Please read our guidelines to make\n                    sure you understand the requirements for successfully completing verification,\n                    then try again.\n                ": "\n                    Non hai superato la verifica. Leggi le nostre linee guida per assicurarti di aver compreso i requisiti per completare correttamente la verifica, quindi riprova. ",
     "\n                    Your verification has expired. You must successfully complete a new identity verification\n                    before you can start the proctored exam.\n                ": "\n                    La tua verifica \u00e8 scaduta. Dovrai superare una nuova verifica dell'identit\u00e0 prima di poter iniziare l'esame con supervisione. ",
@@ -1494,7 +1495,6 @@
     "Re-run Course": "Riesegui il corso",
     "Read More": "Per saperne di pi\u00f9",
     "Read more": "Per saperne di pi\u00f9",
-    "Ready To Resume": "Pronto a ripartire",
     "Ready To Start": "Pronto a partire",
     "Ready To Submit": "Pronto per l'invio",
     "Reason": "Motivo ",
@@ -1570,6 +1570,7 @@
     "Return to all posts": "Torna a tutti i post",
     "Return to my dashboard": "Torna alla mia dashboard",
     "Return to team listing": "Torna alla lista del gruppo",
+    "Review Policy Exception": "Verifica Eccezione Policy",
     "Review Rules": "Regole di controllo",
     "Review Your Photos": "Esamina le tue foto ",
     "Review your info": "Verifica le tue informazioni",
@@ -2321,8 +2322,8 @@
     "You have not created any certificates yet.": "Non hai ancora creato alcun certificato.",
     "You have not created any content groups yet.": "Non hai ancora creato alcun gruppo di contenuto.",
     "You have not created any group configurations yet.": "Non hai ancora creato nessuna configurazioni di gruppo.",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Hai selezionato un'azione, e non hai ancora apportato alcuna modifica a campi singoli. Probabilmente stai cercando il pulsante Go, invece di Save.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Hai selezionato un'azione, ma non hai ancora salvato le modifiche apportate a campi singoli. Fai clic su OK per salvare. Poi dovrai ri-eseguire l'azione.",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Hai selezionato un'azione e non hai ancora apportato alcuna modifica ai campi singoli. Probabilmente stai cercando il pulsante Vai, invece di Salva.",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Hai selezionato un'azione, ma non hai ancora salvato le modifiche apportate a campi singoli. Fai clic su OK per salvare. Poi dovrai rieseguire l'azione.",
     "You have selected \u201cDelete my account.\u201d Deletion of your account and personal data is permanent and cannot be undone. {platformName} will not be able to recover your account or the data that is deleted.": "Hai selezionato \u201cElimina il mio account.\u201d L'eliminazione del tuo account e dei tuoi dati personali \u00e8 permanente e non pu\u00f2 essere annullata. {platformName} non sar\u00e0 in grado di recuperare il tuo account o i dati eliminati. ",
     "You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.": "Hai impostato {beta_language} come lingua, che non \u00e8 attualmente completamente tradotta. Puoi aiutarci a tradurre completamente questa lingua unendoti alla comunit\u00e0 Transifex e aggiungendo traduzioni dall'inglese per studenti che parlano {beta_language}.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "Hai correttamente effettuato l'accesso in %(currentProvider)s, ma il tuo account %(currentProvider)s non ha un account %(platformName)s ad esso abbinato. Per collegare i tuoi account accesi utilizzando la password %(platformName)s .",
@@ -2414,6 +2415,18 @@
     "a practice exam": "un esame di prova",
     "a proctored exam": "un esame con supervisione",
     "a timed exam": "un esame a tempo ",
+    "abbrev. month April\u0004Apr": "Apr",
+    "abbrev. month August\u0004Aug": "Ago",
+    "abbrev. month December\u0004Dec": "Dic",
+    "abbrev. month February\u0004Feb": "Feb",
+    "abbrev. month January\u0004Jan": "Gen",
+    "abbrev. month July\u0004Jul": "Lug",
+    "abbrev. month June\u0004Jun": "Giu",
+    "abbrev. month March\u0004Mar": "Mar",
+    "abbrev. month May\u0004May": "Mag",
+    "abbrev. month November\u0004Nov": "Nov",
+    "abbrev. month October\u0004Oct": "Ott",
+    "abbrev. month September\u0004Sep": "Set",
     "about %d hour": [
       "circa %d ora",
       "circa %d ore"
@@ -2623,24 +2636,24 @@
     "{unread_comments_count} new": "{unread_comments_count} nuovo ",
     "\u2026": "..."
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -2650,16 +2663,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -2682,23 +2695,19 @@
       "%d/%m/%Y %H:%M:%S",
       "%d/%m/%Y %H:%M:%S.%f",
       "%d/%m/%Y %H:%M",
-      "%d/%m/%Y",
       "%d/%m/%y %H:%M:%S",
       "%d/%m/%y %H:%M:%S.%f",
       "%d/%m/%y %H:%M",
-      "%d/%m/%y",
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%d-%m-%Y %H:%M:%S",
       "%d-%m-%Y %H:%M:%S.%f",
       "%d-%m-%Y %H:%M",
-      "%d-%m-%Y",
       "%d-%m-%y %H:%M:%S",
       "%d-%m-%y %H:%M:%S.%f",
       "%d-%m-%y %H:%M",
-      "%d-%m-%y"
+      "%Y-%m-%d"
     ],
     "DATE_FORMAT": "d F Y",
     "DATE_INPUT_FORMATS": [
@@ -2726,8 +2735,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -2746,6 +2755,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

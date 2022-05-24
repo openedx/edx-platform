@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n != 1);
-    if (typeof(v) == 'boolean') {
+    const v = (n != 1);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "\n                    Make sure you are on a computer with a webcam, and that you have valid photo identification\n                    such as a driver's license or passport, before you continue.\n                ": "\nStellen Sie sicher, dass Sie sich auf einem Computer mit einer Webcam befinden und dass Sie sich mit einem g\u00fcltigen Lichtbildausweis ausweisen k\u00f6nnen.\n beispielsweise ein F\u00fchrerschein oder ein Personalausweis.",
     "\n                    Your verification attempt failed. Please read our guidelines to make\n                    sure you understand the requirements for successfully completing verification,\n                    then try again.\n                ": "\n                    Ihr Versuch zur Verifikation ist fehlgeschlagen. Bitte Lesen Sie\nunsere Richtlinien um sicher zu gehen, dass Sie die Anforderungen f\u00fcr eine erfolgreiche Durchf\u00fchrung der verifikation verstanden haben.\nBitte versuchen Sie es dann noch einmal.\n                ",
     "\n                    Your verification has expired. You must successfully complete a new identity verification\n                    before you can start the proctored exam.\n                ": "\n                    Ihre Verifikation ist abgelaufen. Sie m\u00fcssen sich erneut erfolgreich verifizieren\n                    bevor Sie die beaufsichtigte Pr\u00fcfung beginnen k\u00f6nnen.\n                ",
@@ -1836,8 +1837,8 @@
     "This includes access to {siteName} from your employer\u2019s or university\u2019s system{additionalSiteSpecificDeletionText}.": "Dazu geh\u00f6rt auch der Zugriff auf {siteName} aus dem System Ihres Arbeitgebers oder Ihrer Universit\u00e4t{additionalSiteSpecificDeletionText}.",
     "This is the Description of the Group Configuration": "Dies ist die Beschreibung des Gruppenaufbaus",
     "This is the Name of the Group Configuration": "Dies ist der Name des Gruppenaufbaus",
-    "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "Dies ist die Liste der verf\u00fcgbaren %s. Einfach im unten stehenden Feld markieren und mithilfe des \"Ausw\u00e4hlen\"-Pfeils ausw\u00e4hlen.",
-    "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "Dies ist die Liste der ausgew\u00e4hlten %s. Einfach im unten stehenden Feld markieren und mithilfe des \"Entfernen\"-Pfeils wieder entfernen.",
+    "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "Dies ist die Liste der verf\u00fcgbaren %s. Einfach im unten stehenden Feld markieren und mithilfe des \u201eAusw\u00e4hlen\u201c-Pfeils ausw\u00e4hlen.",
+    "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "Dies ist die Liste der ausgew\u00e4hlten %s. Einfach im unten stehenden Feld markieren und mithilfe des \u201eEntfernen\u201c-Pfeils wieder entfernen.",
     "This is the name of the group": "Dies ist der Name der Gruppe",
     "This learner is currently sharing a limited profile.": "Dieser Teilnehmer teilt momentan ein eingeschr\u00e4nktes Profil.",
     "This learner will be removed from the team,allowing another learner to take the available spot.": "Dieser Lernende wird aus dem Team entfernt, so dass ein anderer Lernender den verf\u00fcgbaren Platz einnehmen kann. ",
@@ -2194,8 +2195,8 @@
     "You have not created any certificates yet.": "Du hast bislang keine Zertifikate erhalten.",
     "You have not created any content groups yet.": "Sie haben noch keine Inhaltsgruppen definiert.",
     "You have not created any group configurations yet.": "Sie haben noch keine Gruppenkonfigurationen erstellt.",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Sie haben eine Aktion ausgew\u00e4hlt, aber keine \u00c4nderungen an bearbeitbaren Feldern vorgenommen. Sie wollten wahrscheinlich auf \"Ausf\u00fchren\" und nicht auf \"Speichern\" klicken.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Sie haben eine Aktion ausgew\u00e4hlt, aber ihre vorgenommenen \u00c4nderungen nicht gespeichert. Klicken Sie OK, um dennoch zu speichern. Danach m\u00fcssen Sie die Aktion erneut ausf\u00fchren.",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Sie haben eine Aktion ausgew\u00e4hlt, aber keine \u00c4nderungen an bearbeitbaren Feldern vorgenommen. Sie wollten wahrscheinlich auf \u201eAusf\u00fchren\u201c und nicht auf \u201eSpeichern\u201c klicken.",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Sie haben eine Aktion ausgew\u00e4hlt, aber Ihre vorgenommenen \u00c4nderungen nicht gespeichert. Klicken Sie OK, um dennoch zu speichern. Danach m\u00fcssen Sie die Aktion erneut ausf\u00fchren.",
     "You have selected \u201cDelete my account.\u201d Deletion of your account and personal data is permanent and cannot be undone. {platformName} will not be able to recover your account or the data that is deleted.": "Du hast \u201cDelete my account.\u201d gew\u00e4hlt. Die L\u00f6schung Ihres Kontos und Ihrer personenbezogenen Daten ist dauerhaft und kann nicht r\u00fcckg\u00e4ngig gemacht werden. {platformName} kann Ihr Konto oder die gel\u00f6schten Daten nicht wiederherstellen.",
     "You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.": "Sie haben Ihre Sprache auf {beta_language} eingestellt, die derzeit noch nicht vollst\u00e4ndig \u00fcbersetzt ist. Sie k\u00f6nnen uns helfen, diese Sprache vollst\u00e4ndig zu \u00fcbersetzen, indem Sie der Transifex-Community beitreten und \u00dcbersetzungen aus dem Englischen f\u00fcr Lernende hinzuf\u00fcgen, die {beta_language} sprechen.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "Sie haben sich erfolgreich bei %(currentProvider)s angemeldet. Allerdings, %(currentProvider)s Konto ist nicht mit %(platformName)s verbunden. Um ihre Konten zu verbinden, geben Sie %(platformName)s Passwort ein.",
@@ -2492,24 +2493,24 @@
     "{unread_comments_count} new": "{unread_comments_count} neu",
     "\u2026": "..."
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -2519,16 +2520,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -2551,7 +2552,6 @@
       "%d.%m.%Y %H:%M:%S",
       "%d.%m.%Y %H:%M:%S.%f",
       "%d.%m.%Y %H:%M",
-      "%d.%m.%Y",
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
@@ -2580,8 +2580,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -2600,6 +2600,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

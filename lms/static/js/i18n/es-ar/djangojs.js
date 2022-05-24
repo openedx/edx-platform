@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n != 1);
-    if (typeof(v) == 'boolean') {
+    const v = (n != 1);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s de %(cnt)s seleccionado/a",
       "%(sel)s de %(cnt)s seleccionados/as"
@@ -38,7 +39,9 @@
     "Chosen %s": "%s seleccionados/as",
     "Click to choose all %s at once.": "Haga click para seleccionar todos/as los/as %s.",
     "Click to remove all chosen %s at once.": "Haga clic para deselecionar todos/as los/as %s.",
+    "Close": "Cerrar",
     "December": "Diciembre",
+    "Error": "Error",
     "February": "Febrero",
     "Filter": "Filtro",
     "Hide": "Ocultar",
@@ -69,10 +72,24 @@
     "Today": "Hoy",
     "Tomorrow": "Ma\u00f1ana",
     "Type into this box to filter down the list of available %s.": "Escriba en esta caja para filtrar la lista de %s disponibles.",
+    "Verified": "Verificado",
     "Yesterday": "Ayer",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Ha seleccionado una acci\u00f3n pero no ha realizado ninguna modificaci\u00f3n en campos individuales. Es probable que lo que necesite usar en realidad sea el bot\u00f3n Ejecutar y no el bot\u00f3n Guardar.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Ha seleccionado una acci\u00f3n, pero todav\u00eda no ha grabado las modificaciones que ha realizado en campos individuales. Por favor haga click en Aceptar para grabarlas. Necesitar\u00e1 ejecutar la acci\u00f3n nuevamente.",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Ha seleccionado una acci\u00f3n y no ha realizado ninguna modificaci\u00f3n de campos individuales. Es probable que deba usar el bot\u00f3n 'Ir'  y no el bot\u00f3n 'Grabar'.",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Ha seleccionado una acci\u00f3n pero todav\u00eda no ha grabado sus cambios en campos individuales. Por favor haga click en Ok para grabarlos. Luego necesitar\u00e1 re-ejecutar la acci\u00f3n.",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Tiene modificaciones sin guardar en campos modificables individuales. Si ejecuta una acci\u00f3n las mismas se perder\u00e1n.",
+    "abbrev. month April\u0004Apr": "Abr",
+    "abbrev. month August\u0004Aug": "Ago",
+    "abbrev. month December\u0004Dec": "Dic",
+    "abbrev. month February\u0004Feb": "Feb",
+    "abbrev. month January\u0004Jan": "Ene",
+    "abbrev. month July\u0004Jul": "Jul",
+    "abbrev. month June\u0004Jun": "Jun",
+    "abbrev. month March\u0004Mar": "Mar",
+    "abbrev. month May\u0004May": "May",
+    "abbrev. month November\u0004Nov": "Nov",
+    "abbrev. month October\u0004Oct": "Oct",
+    "abbrev. month September\u0004Sep": "Set",
+    "internally reviewed": "revisado internamente",
     "one letter Friday\u0004F": "V",
     "one letter Monday\u0004M": "L",
     "one letter Saturday\u0004S": "S",
@@ -81,24 +98,24 @@
     "one letter Tuesday\u0004T": "M",
     "one letter Wednesday\u0004W": "M"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -108,16 +125,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -171,8 +188,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -191,6 +208,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

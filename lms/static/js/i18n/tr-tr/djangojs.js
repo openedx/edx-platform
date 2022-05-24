@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n > 1);
-    if (typeof(v) == 'boolean') {
+    const v = (n > 1);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "\n                    Your verification attempt failed. Please read our guidelines to make\n                    sure you understand the requirements for successfully completing verification,\n                    then try again.\n                ": "\n                    Do\u011frulama denemeniz ba\u015far\u0131s\u0131z oldu. L\u00fctfen ba\u015far\u0131l\u0131 bir do\u011frulama i\u015flemi i\u00e7in\n                    yerine getirilmesi gerekenleri do\u011frulamak i\u00e7in k\u0131lavuz metinlerimizi yeniden okuyun,\n                    ve ard\u0131ndan tekrar deneyin.\n                ",
     "\n                    Your verification has expired. You must successfully complete a new identity verification\n                    before you can start the proctored exam.\n                ": "\n                    Do\u011frulaman\u0131z ge\u00e7erlili\u011fini kaybetti. G\u00f6zetmenli s\u0131nava ba\u015flamadan \u00f6nce\n                    yeni bir kimlik do\u011frulamas\u0131 yapmal\u0131s\u0131n\u0131z.\n                ",
     "\n                    Your verification is pending. Results should be available 2-3 days after you\n                    submit your verification.\n                ": "\n                    Do\u011frulanman\u0131z beklemede. Do\u011frulaman\u0131z\u0131 g\u00f6nderdikten 2-3 g\u00fcn sonra\n                    sonu\u00e7lar a\u00e7\u0131klanacakt\u0131r.\n                ",
@@ -505,6 +506,7 @@
     "Could not find users associated with the following identifiers:": "Bu \u00f6zelliklere uygun kullan\u0131c\u0131 bulunamad\u0131: ",
     "Could not grade your answer. The submission was aborted.": "Cevab\u0131n\u0131z notland\u0131r\u0131lamad\u0131. G\u00f6nderim iptal edildi.",
     "Could not load teams information.": "Tak\u0131m bilgileri y\u00fcklenemedi.",
+    "Could not override problem score for {user}.": "{user} kullan\u0131c\u0131s\u0131n\u0131n problem puan\u0131 ge\u00e7ersizle\u015ftirilemedi.",
     "Could not retrieve download url.": "\u0130ndirme ba\u011flant\u0131s\u0131na eri\u015filemedi.",
     "Could not retrieve upload url.": "Y\u00fckleme URL'ine eri\u015filemedi.",
     "Could not submit order": "Sipari\u015f teslim edilemedi",
@@ -1387,7 +1389,6 @@
     "Re-run Course": "Dersi Yeniden \u00c7al\u0131\u015ft\u0131r",
     "Read More": "Daha Fazlas\u0131 \u0130\u00e7in",
     "Read more": "Daha fazlas\u0131",
-    "Ready To Resume": "Devam Etmeye Haz\u0131r",
     "Ready To Start": "Ba\u015flamaya Haz\u0131r",
     "Ready To Submit": "G\u00f6ndermeye Haz\u0131r",
     "Reason": "Neden",
@@ -2191,8 +2192,8 @@
     "You have not created any certificates yet.": "Hen\u00fcz bir sertifika olu\u015fturmad\u0131n\u0131z.",
     "You have not created any content groups yet.": "Hen\u00fcz bir i\u00e7erik grubu olu\u015fturmad\u0131n\u0131z.",
     "You have not created any group configurations yet.": "Hen\u00fcz hi\u00e7bir grup ayar\u0131 olu\u015fturmad\u0131n\u0131z.",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Bir eylem se\u00e7tiniz, fakat bireysel alanlar \u00fczerinde hi\u00e7bir de\u011fi\u015fiklik yapmad\u0131n\u0131z. Muhtemelen Kaydet d\u00fc\u011fmesi yerine Git d\u00fc\u011fmesini ar\u0131yorsunuz.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Bir eylem se\u00e7tiniz, fakat hen\u00fcz bireysel alanlara de\u011fi\u015fikliklerinizi kaydetmediniz. Kaydetmek i\u00e7in l\u00fctfen TAMAM d\u00fc\u011fmesine t\u0131klay\u0131n. Eylemi yeniden \u00e7al\u0131\u015ft\u0131rman\u0131z gerekecek.",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Bir eylem se\u00e7tiniz, ancak tek tek alanlarda herhangi bir de\u011fi\u015fiklik yapmad\u0131n\u0131z. Muhtemelen Kaydet d\u00fc\u011fmesi yerine Git d\u00fc\u011fmesini ar\u0131yorsunuz.",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Bir eylem se\u00e7tiniz, ancak de\u011fi\u015fikliklerinizi tek tek alanlara kaydetmediniz. Kaydetmek i\u00e7in l\u00fctfen TAMAM d\u00fc\u011fmesine t\u0131klay\u0131n. Eylemi yeniden \u00e7al\u0131\u015ft\u0131rman\u0131z gerekecek.",
     "You have selected \u201cDelete my account.\u201d Deletion of your account and personal data is permanent and cannot be undone. {platformName} will not be able to recover your account or the data that is deleted.": "\"Hesab\u0131m\u0131 sil\"i se\u00e7tiniz. Hesab\u0131n\u0131z\u0131n ve ki\u015fisel verilerinizin silinmesi kal\u0131c\u0131 olup, sonradan geri d\u00f6nd\u00fcr\u00fclemez. {platformName} platformu silinen hesap ya da verilerinizi hi\u00e7bir \u015fekilde geri getiremez.",
     "You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.": "Dilinizi hen\u00fcz tam anlam\u0131yla desteklenmeyen {beta_language} olarak ayarlad\u0131n\u0131z. Transifex toplulu\u011funa kat\u0131larak {beta_language} aray\u00fcz\u00fcn\u00fcn \u0130ngilizce'den \u00e7evrilmesine yard\u0131mc\u0131 olabilirsin.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "%(currentProvider)s'a ba\u015far\u0131yla kay\u0131t oldunuz ancak %(currentProvider)s hesab\u0131n\u0131z ba\u011fl\u0131 bir %(platformName)s hesab\u0131na sahip de\u011fil. Hesaplar\u0131n\u0131z\u0131 ba\u011flamak i\u00e7in %(platformName)s parolan\u0131z\u0131 kullanarak giri\u015f yap\u0131n.",
@@ -2282,6 +2283,18 @@
     "a day": "bir g\u00fcn",
     "a proctored exam": "bir g\u00f6zetmenli s\u0131nav",
     "a timed exam": "bir s\u00fcreli s\u0131nav",
+    "abbrev. month April\u0004Apr": "Nis",
+    "abbrev. month August\u0004Aug": "A\u011fu",
+    "abbrev. month December\u0004Dec": "Ara",
+    "abbrev. month February\u0004Feb": "\u015eub",
+    "abbrev. month January\u0004Jan": "Oca",
+    "abbrev. month July\u0004Jul": "Tem",
+    "abbrev. month June\u0004Jun": "Haz",
+    "abbrev. month March\u0004Mar": "Mar",
+    "abbrev. month May\u0004May": "May",
+    "abbrev. month November\u0004Nov": "Kas",
+    "abbrev. month October\u0004Oct": "Eki",
+    "abbrev. month September\u0004Sep": "Eyl",
     "about %d hour": [
       "yakla\u015f\u0131k %d saat",
       "yakla\u015f\u0131k %d saat"
@@ -2343,10 +2356,10 @@
     "off": "kapal\u0131",
     "on": "a\u00e7\u0131k",
     "one letter Friday\u0004F": "C",
-    "one letter Monday\u0004M": "P",
-    "one letter Saturday\u0004S": "C",
+    "one letter Monday\u0004M": "Pt",
+    "one letter Saturday\u0004S": "Ct",
     "one letter Sunday\u0004S": "P",
-    "one letter Thursday\u0004T": "P",
+    "one letter Thursday\u0004T": "Pe",
     "one letter Tuesday\u0004T": "S",
     "one letter Wednesday\u0004W": "\u00c7",
     "open slots": "a\u00e7\u0131k yerler",
@@ -2462,24 +2475,24 @@
     "{unread_comments_count} new": "{unread_comments_count} yeni",
     "\u2026": "..."
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -2489,16 +2502,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -2521,7 +2534,6 @@
       "%d/%m/%Y %H:%M:%S",
       "%d/%m/%Y %H:%M:%S.%f",
       "%d/%m/%Y %H:%M",
-      "%d/%m/%Y",
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
@@ -2551,8 +2563,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -2571,6 +2583,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

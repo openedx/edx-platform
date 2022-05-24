@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=0;
-    if (typeof(v) == 'boolean') {
+    const v = 0;
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "\n                    Make sure you are on a computer with a webcam, and that you have valid photo identification\n                    such as a driver's license or passport, before you continue.\n                ": "\n                    \u8bf7\u786e\u4fdd\u60a8\u7684\u7535\u8111\u5e26\u6709\u7f51\u7edc\u6444\u50cf\u5934\uff0c\u5e76\u6709\u6709\u6548\u7684\u5e26\u7167\u7247\u8eab\u4efd\u8bc1\u660e\uff0c\n                    \u4f8b\u5982\u9a7e\u9a76\u8bc1\u6216\u62a4\u7167\u3002\n                ",
     "\n                    Your verification attempt failed. Please read our guidelines to make\n                    sure you understand the requirements for successfully completing verification,\n                    then try again.\n                ": "\n                    \u60a8\u7684\u8eab\u4efd\u8ba4\u8bc1\u5931\u8d25\u4e86\uff0c\u8bf7\u5148\u4ed4\u7ec6\u9605\u8bfb\u8bf4\u660e\uff0c\u786e\u4fdd\u60a8\u7406\u89e3\u6210\u529f\u5b8c\u6210\u8ba4\u8bc1\u7684\u8981\u6c42\uff0c\u7136\u540e\u91cd\u65b0\u8ba4\u8bc1\u3002\n                ",
     "\n                    Your verification has expired. You must successfully complete a new identity verification\n                    before you can start the proctored exam.\n                ": "\n                   \u60a8\u7684\u8eab\u4efd\u8ba4\u8bc1\u5df2\u8fc7\u671f\uff0c\u60a8\u5fc5\u987b\u91cd\u65b0\u6210\u529f\u5b8c\u6210\u8ba4\u8bc1\uff0c\n                    \u7136\u540e\u624d\u80fd\u8fdb\u884c\u76d1\u8003\u8003\u8bd5\u3002\n                ",
@@ -2164,24 +2165,24 @@
     "{type} Progress": "{type}\u8fdb\u5ea6",
     "\u2026": "\u2026"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -2191,16 +2192,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -2223,15 +2224,12 @@
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%m/%d/%Y %H:%M:%S",
       "%m/%d/%Y %H:%M:%S.%f",
       "%m/%d/%Y %H:%M",
-      "%m/%d/%Y",
       "%m/%d/%y %H:%M:%S",
       "%m/%d/%y %H:%M:%S.%f",
-      "%m/%d/%y %H:%M",
-      "%m/%d/%y"
+      "%m/%d/%y %H:%M"
     ],
     "DATE_FORMAT": "N j, Y",
     "DATE_INPUT_FORMATS": [
@@ -2264,8 +2262,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -2284,6 +2282,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

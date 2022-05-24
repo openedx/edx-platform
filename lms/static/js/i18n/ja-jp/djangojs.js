@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=0;
-    if (typeof(v) == 'boolean') {
+    const v = 0;
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "\n      Because the due date has passed, you are no longer able to take this exam.\n    ": "\n\u7de0\u5207\u65e5\u304c\u904e\u304e\u305f\u305f\u3081\u3001\u672c\u8a66\u9a13\u3092\u53d7\u3051\u308b\u3053\u3068\u304c\u3067\u304d\u307e\u305b\u3093\u3002",
     "\n      The due date for this exam has passed\n    ": "\n\u3053\u306e\u8a66\u9a13\u306e\u7de0\u5207\u306f\u65e2\u306b\u904e\u304e\u3066\u3044\u307e\u3059\u3002",
     " ${price} {currency} )": " ${price} {currency} )",
@@ -1380,8 +1381,8 @@
     "You have not created any certificates yet.": "\u307e\u3060\u4fee\u4e86\u8a3c\u3092\u4f5c\u6210\u3057\u3066\u3044\u307e\u305b\u3093\u3002",
     "You have not created any content groups yet.": "\u30b3\u30f3\u30c6\u30f3\u30c4\u30b0\u30eb\u30fc\u30d7\u304c\u307e\u3060\u4f5c\u6210\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002",
     "You have not created any group configurations yet.": "\u30b0\u30eb\u30fc\u30d7\u8a2d\u5b9a\u304c\u4f5c\u6210\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "\u64cd\u4f5c\u3092\u9078\u629e\u3057\u307e\u3057\u305f\u304c\u3001\u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u5909\u66f4\u306f\u3042\u308a\u307e\u305b\u3093\u3067\u3057\u305f\u3002\u3082\u3057\u304b\u3057\u3066\u4fdd\u5b58\u30dc\u30bf\u30f3\u3067\u306f\u306a\u304f\u3066\u5b9f\u884c\u30dc\u30bf\u30f3\u3092\u304a\u63a2\u3057\u3067\u3059\u304b\u3002",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "\u64cd\u4f5c\u3092\u9078\u629e\u3057\u307e\u3057\u305f\u304c\u3001\u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u672a\u4fdd\u5b58\u306e\u5909\u66f4\u304c\u3042\u308a\u307e\u3059\u3002OK\u3092\u30af\u30ea\u30c3\u30af\u3057\u3066\u4fdd\u5b58\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u305d\u306e\u5f8c\u3001\u64cd\u4f5c\u3092\u518d\u5ea6\u5b9f\u884c\u3059\u308b\u5fc5\u8981\u304c\u3042\u308a\u307e\u3059\u3002",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "\u64cd\u4f5c\u3092\u9078\u629e\u3057\u307e\u3057\u305f\u304c\u3001\u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u5909\u66f4\u306f\u3042\u308a\u307e\u305b\u3093\u3067\u3057\u305f\u3002\u3082\u3057\u304b\u3057\u3066\u4fdd\u5b58\u30dc\u30bf\u30f3\u3067\u306f\u306a\u304f\u3066\u5b9f\u884c\u30dc\u30bf\u30f3\u3092\u304a\u63a2\u3057\u3067\u3059\u304b\u3002",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "\u64cd\u4f5c\u3092\u9078\u629e\u3057\u307e\u3057\u305f\u304c\u3001\u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u672a\u4fdd\u5b58\u306e\u5909\u66f4\u304c\u3042\u308a\u307e\u3059\u3002OK\u3092\u30af\u30ea\u30c3\u30af\u3057\u3066\u4fdd\u5b58\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u305d\u306e\u5f8c\u3001\u64cd\u4f5c\u3092\u518d\u5ea6\u5b9f\u884c\u3059\u308b\u5fc5\u8981\u304c\u3042\u308a\u307e\u3059\u3002",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "%(currentProvider)s\u306b\u7121\u4e8b\u30b5\u30a4\u30f3\u30a4\u30f3\u3057\u307e\u3057\u305f\u304c\u3001%(currentProvider)s\u306e\u30a2\u30ab\u30a6\u30f3\u30c8\u306f%(platformName)s\u30a2\u30ab\u30a6\u30f3\u30c8\u3068\u306e\u9023\u643a\u8a2d\u5b9a\u306f\u3057\u3066\u3044\u307e\u305b\u3093\u3002\u30a2\u30ab\u30a6\u30f3\u30c8\u3068\u306e\u9023\u643a\u8a2d\u5b9a\u3092\u3059\u308b\u306b\u306f\u3001%(platformName)s\u306e\u30d1\u30b9\u30ef\u30fc\u30c9\u3067\u30b5\u30a4\u30f3\u30a4\u30f3\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "\u30d5\u30a3\u30fc\u30eb\u30c9\u306b\u672a\u4fdd\u5b58\u306e\u5909\u66f4\u304c\u3042\u308a\u307e\u3059\u3002\u64cd\u4f5c\u3092\u5b9f\u884c\u3059\u308b\u3068\u672a\u4fdd\u5b58\u306e\u5909\u66f4\u306f\u5931\u308f\u308c\u307e\u3059\u3002",
     "You haven't added any assets to this course yet.": "\u3053\u306e\u8b1b\u5ea7\u306b\u306f\u30a2\u30bb\u30c3\u30c8\u304c\u8ffd\u52a0\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002",
@@ -1541,24 +1542,24 @@
     "{type} Progress": "{type} \u306e\u9032\u6357",
     "\u2026": "..."
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -1568,16 +1569,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -1600,15 +1601,12 @@
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%m/%d/%Y %H:%M:%S",
       "%m/%d/%Y %H:%M:%S.%f",
       "%m/%d/%Y %H:%M",
-      "%m/%d/%Y",
       "%m/%d/%y %H:%M:%S",
       "%m/%d/%y %H:%M:%S.%f",
-      "%m/%d/%y %H:%M",
-      "%m/%d/%y"
+      "%m/%d/%y %H:%M"
     ],
     "DATE_FORMAT": "Y\u5e74n\u6708j\u65e5",
     "DATE_INPUT_FORMATS": [
@@ -1641,8 +1639,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -1661,6 +1659,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

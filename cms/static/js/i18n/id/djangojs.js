@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=0;
-    if (typeof(v) == 'boolean') {
+    const v = 0;
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "\n        No, I want to continue working.\n      ": "\nTidak, saya ingin lanjut bekerja.",
     "\n      After you submit your exam, your exam will be graded.\n    ": "\nSetelah Anda mengirimkan jawaban ujian,  jawaban Anda akan dinilai.",
     " ${price} {currency} )": " ${price} {currency} )",
@@ -1616,8 +1617,8 @@
     "You have deleted an option. That option has been removed from its criterion in the sample responses in the Learner Training step. You might have to select a new option for the criterion.": "Anda telah menghapus sebuah opsi. Opsi tersebut telah dihapus dari kriteria pada contoh tanggapan pada langkah Pelatihan Pembelajar. Anda mungkin perlu memilih opsi baru untuk kriteria tersebut.",
     "You have no handouts defined": "Anda tidak memiliki handout yang terdefinisi",
     "You have not bookmarked any courseware pages yet": "Anda belum menandai halaman kursus.",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Anda telah memilih sebuah aksi, tetapi belum mengubah bidang apapun. Kemungkinan Anda mencari tombol Buka dan bukan tombol Simpan.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Anda telah memilih sebuah aksi, tetapi belum menyimpan perubahan ke bidang yang ada. Klik OK untuk menyimpan perubahan ini. Anda akan perlu mengulangi aksi tersebut kembali.",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Anda telah memilih tindakan, dan Anda belum membuat perubahan apa pun di setiap bidang. Anda mungkin mencari tombol Buka daripada tombol Simpan.",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Anda telah memilih tindakan, tetapi Anda belum menyimpan perubahan ke masing-masing bidang. Silakan klik OK untuk menyimpan. Anda harus menjalankan kembali tindakan tersebut.",
     "You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.": "Anda telah menyetel bahasa menjadi {beta_language}, yang belum seluruhnya diterjemahkan. Anda dapat membantu kami menerjemahkan ke bahasa ini seluruhnya dengan bergabung dengan komunitas Transifex dan menambahkan terjemahan dari Bahasa Inggris untuk peserta yang berbicara {beta_language}.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "Anda telah berhasil masuk ke %(currentProvider)s, namun akun %(currentProvider)s Anda tidak memiliki akun %(platformName)s yang terhubung. Untuk menghubungkan akun Anda, masuk sekarang dengan menggunakan kata sandi %(platformName)s Anda.",
     "You have successfully updated your goal.": "Anda telah berhasil memperbarui tujuan Anda",
@@ -1798,24 +1799,24 @@
     "{type} Progress": "Kemajuan {type} ",
     "\u2026": "\u2026"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -1825,16 +1826,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -1857,19 +1858,15 @@
       "%d-%m-%Y %H.%M.%S",
       "%d-%m-%Y %H.%M.%S.%f",
       "%d-%m-%Y %H.%M",
-      "%d-%m-%Y",
       "%d-%m-%y %H.%M.%S",
       "%d-%m-%y %H.%M.%S.%f",
       "%d-%m-%y %H.%M",
-      "%d-%m-%y",
       "%m/%d/%y %H.%M.%S",
       "%m/%d/%y %H.%M.%S.%f",
       "%m/%d/%y %H.%M",
-      "%m/%d/%y",
       "%m/%d/%Y %H.%M.%S",
       "%m/%d/%Y %H.%M.%S.%f",
       "%m/%d/%Y %H.%M",
-      "%m/%d/%Y",
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
@@ -1877,12 +1874,14 @@
     ],
     "DATE_FORMAT": "j N Y",
     "DATE_INPUT_FORMATS": [
-      "%d-%m-%y",
-      "%d/%m/%y",
       "%d-%m-%Y",
       "%d/%m/%Y",
+      "%d-%m-%y",
+      "%d/%m/%y",
       "%d %b %Y",
       "%d %B %Y",
+      "%m/%d/%y",
+      "%m/%d/%Y",
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
@@ -1904,8 +1903,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -1924,6 +1923,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

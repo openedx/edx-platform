@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n != 1);
-    if (typeof(v) == 'boolean') {
+    const v = (n != 1);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     " ${price} {currency} )": " ${price} {currency} ) \u2c60'\u03c3\u044f\u0454\u043c \u03b9\u03c1\u0455\u03c5\u043c \u2202\u03c3\u0142\u03c3\u044f #",
     " Member": [
       " M\u00e9m\u00df\u00e9r \u2c60'\u03c3\u044f\u0454\u043c \u03b9\u03c1\u0455\u03c5\u043c #",
@@ -2356,6 +2357,7 @@
     "follow this post": "f\u00f6ll\u00f6w th\u00efs p\u00f6st \u2c60'\u03c3\u044f\u0454\u043c \u03b9\u03c1\u0455\u03c5\u043c \u2202\u03c3\u0142\u03c3\u044f \u0455\u03b9\u0442 \u03b1\u043c#",
     "for": "f\u00f6r \u2c60'\u03c3\u044f\u0454\u043c#",
     "group configuration": "gr\u00f6\u00fcp \u00e7\u00f6nf\u00efg\u00fcr\u00e4t\u00ef\u00f6n \u2c60'\u03c3\u044f\u0454\u043c \u03b9\u03c1\u0455\u03c5\u043c \u2202\u03c3\u0142\u03c3\u044f \u0455\u03b9\u0442 \u03b1\u043c\u0454\u0442,#",
+    "has ": "h\u00e4s  \u2c60'\u03c3\u044f\u0454\u043c \u03b9#",
     "image omitted": "\u00efm\u00e4g\u00e9 \u00f6m\u00eftt\u00e9d \u2c60'\u03c3\u044f\u0454\u043c \u03b9\u03c1\u0455\u03c5\u043c \u2202\u03c3\u0142\u03c3\u044f \u0455\u03b9#",
     "incorrect": "\u00efn\u00e7\u00f6rr\u00e9\u00e7t \u2c60'\u03c3\u044f\u0454\u043c \u03b9\u03c1\u0455\u03c5\u043c \u2202\u03c3\u0142#",
     "last activity": "l\u00e4st \u00e4\u00e7t\u00efv\u00eft\u00fd \u2c60'\u03c3\u044f\u0454\u043c \u03b9\u03c1\u0455\u03c5\u043c \u2202\u03c3\u0142\u03c3\u044f \u0455\u03b9#",
@@ -2510,24 +2512,24 @@
     "{unread_comments_count} new": "{unread_comments_count} n\u00e9w \u2c60'\u03c3\u044f\u0454\u043c \u03b9\u03c1\u0455\u03c5\u043c #",
     "\u2026": "\u2026 \u2c60#"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -2537,16 +2539,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -2568,28 +2570,27 @@
     "DATETIME_INPUT_FORMATS": [
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%Y.%m.%d %H:%M:%S",
       "%Y.%m.%d %H:%M",
-      "%Y.%m.%d",
       "%d/%m/%Y %H:%M:%S",
       "%d/%m/%Y %H:%M",
-      "%d/%m/%Y",
       "%y-%m-%d %H:%M:%S",
       "%y-%m-%d %H:%M",
-      "%y-%m-%d",
-      "%Y-%m-%d %H:%M:%S.%f"
+      "%Y-%m-%d %H:%M:%S.%f",
+      "%Y-%m-%d"
     ],
     "DATE_FORMAT": "j\\-\\a \\d\\e F Y",
     "DATE_INPUT_FORMATS": [
       "%Y-%m-%d",
       "%y-%m-%d",
       "%Y %m %d",
+      "%Y.%m.%d",
       "%d-a de %b %Y",
       "%d %b %Y",
       "%d-a de %B %Y",
       "%d %B %Y",
-      "%d %m %Y"
+      "%d %m %Y",
+      "%d/%m/%Y"
     ],
     "DECIMAL_SEPARATOR": ",",
     "FIRST_DAY_OF_WEEK": 1,
@@ -2608,8 +2609,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -2628,6 +2629,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

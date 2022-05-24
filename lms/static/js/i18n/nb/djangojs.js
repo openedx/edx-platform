@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n != 1);
-    if (typeof(v) == 'boolean') {
+    const v = (n != 1);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "\n      Are you sure you want to end your proctored exam?\n    ": "\n      Er du sikker p\u00e5 at du vil avslutte din overv\u00e5kete eksamen?\n    ",
     "\n      Error with proctored exam\n    ": "\n      Feil med overv\u00e5ket eksamen\n    ",
     "\n      This exam is proctored\n    ": "\n      Denne eksamenen er overv\u00e5ket\n    ",
@@ -173,12 +174,24 @@
     "You have deleted a criterion. The criterion has been removed from the example responses in the Learner Training step.": "Du har slettet et kriterium. Kriteriet er fjernet fra eksempelresponsene i \"Learner Training\" trinnet.",
     "You have deleted all the options for this criterion. The criterion has been removed from the sample responses in the Learner Training step.": "Du har slettet alle alternativene for dette kriteriet. Kriteriet er fjernet fra eksempelsvarene i \"Learner Training\" trinnet.",
     "You have deleted an option. That option has been removed from its criterion in the sample responses in the Learner Training step. You might have to select a new option for the criterion.": "Du har slettet et alternativ. Dette alternativet er fjernet fra kriteriet i pr\u00f8veresponsene i \"Learner Training\" trinnet. Du m\u00e5 kanskje velge et nytt alternativ for kriteriet.",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Du har valgt en handling, og har ikke gjort noen endringer i individuelle felter. Du ser mest sannsynlig etter G\u00e5-knappen, ikke Lagre-knappen.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Du har valgt en handling, men du har ikke lagret dine endringer i individuelle felter enda. Vennligst trykk OK for \u00e5 lagre. Du m\u00e5 utf\u00f8re handlingen p\u00e5 nytt.",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Du har valgt en handling, og har ikke gjort noen endringer i individuelle felter. Du ser mest sannsynlig etter G\u00e5-knappen, ikke Lagre-knappen.",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Du har valgt en handling, men du har ikke lagret endringene dine i individuelle felter enda. Vennligst trykk OK for \u00e5 lagre. Du m\u00e5 utf\u00f8re handlingen p\u00e5 nytt.",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Du har ulagrede endringer i individuelle felter. Hvis du utf\u00f8rer en handling, vil dine ulagrede endringer g\u00e5 tapt.",
     "You must provide a learner name.": "Du m\u00e5 oppgi et navn p\u00e5 kursdeltager.",
     "You're about to submit your response for this assignment. After you submit this response, you can't change it or submit a new response.": "Du er i ferd med \u00e5 levere ditt svar p\u00e5 denne oppgaven. Etter at du leverer svaret kan du ikke endre det eller levere et nytt svar.",
     "Your file ": "Din fil",
+    "abbrev. month April\u0004Apr": "Apr",
+    "abbrev. month August\u0004Aug": "Aug",
+    "abbrev. month December\u0004Dec": "Des",
+    "abbrev. month February\u0004Feb": "Feb",
+    "abbrev. month January\u0004Jan": "Jan",
+    "abbrev. month July\u0004Jul": "Jul",
+    "abbrev. month June\u0004Jun": "Jun",
+    "abbrev. month March\u0004Mar": "Mar",
+    "abbrev. month May\u0004May": "Mai",
+    "abbrev. month November\u0004Nov": "Nov",
+    "abbrev. month October\u0004Oct": "Okt",
+    "abbrev. month September\u0004Sep": "Sep",
     "active proctored exams": "aktive overv\u00e5kete eksamener",
     "courses with active proctored exams": "kurs med aktive overv\u00e5kete eksamener",
     "internally reviewed": "gjennomg\u00e5tt internt",
@@ -191,24 +204,24 @@
     "one letter Wednesday\u0004W": "O",
     "your course": "ditt kurs"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -218,16 +231,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -250,15 +263,13 @@
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%d.%m.%Y %H:%M:%S",
       "%d.%m.%Y %H:%M:%S.%f",
       "%d.%m.%Y %H:%M",
-      "%d.%m.%Y",
       "%d.%m.%y %H:%M:%S",
       "%d.%m.%y %H:%M:%S.%f",
       "%d.%m.%y %H:%M",
-      "%d.%m.%y"
+      "%Y-%m-%d"
     ],
     "DATE_FORMAT": "j. F Y",
     "DATE_INPUT_FORMATS": [
@@ -283,8 +294,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -303,6 +314,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

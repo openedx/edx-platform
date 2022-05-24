@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n > 1);
-    if (typeof(v) == 'boolean') {
+    const v = (n > 1);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "%(cohort_name)s (%(user_count)s)": "%(cohort_name)s (%(user_count)s)",
     "%(field)s can only contain up to %(count)d characters.": "%(field)s pode conter somente at\u00e9 %(count)d caracteres.",
     "%(field)s must have at least %(count)d characters.": "%(field)s deve ter no m\u00ednimo %(count)d caracteres.",
@@ -952,8 +953,10 @@
     "You have not created any certificates yet.": "Voc\u00ea ainda n\u00e3o criou um certificado.",
     "You have not created any content groups yet.": "Voc\u00ea n\u00e3o criou nenhum grupo de conte\u00fado ainda.",
     "You have not created any group configurations yet.": "Voc\u00ea ainda n\u00e3o criou uma configura\u00e7\u00e3o de grupo.",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Voc\u00ea selecionou uma a\u00e7\u00e3o, e voc\u00ea n\u00e3o fez altera\u00e7\u00f5es em campos individuais. Voc\u00ea provavelmente est\u00e1 procurando o bot\u00e3o Ir ao inv\u00e9s do bot\u00e3o Salvar.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Voc\u00ea selecionou uma a\u00e7\u00e3o, mas voc\u00ea n\u00e3o salvou as altera\u00e7\u00f5es de cada campo ainda. Clique em OK para salvar. Voc\u00ea vai precisar executar novamente a a\u00e7\u00e3o.",
+    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Selecionou uma a\u00e7\u00e3o mas ainda n\u00e3o guardou as mudan\u00e7as dos campos individuais. Provavelmente querer\u00e1 o bot\u00e3o Ir ao inv\u00e9s do bot\u00e3o Guardar.",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Voc\u00ea selecionou uma a\u00e7\u00e3o sem fazer mudan\u00e7as nos campos individuais. Voc\u00ea provavelmente est\u00e1 procurando pelo bot\u00e3o Go ao inv\u00e9s do bot\u00e3o Save.",
+    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Selecionou uma a\u00e7\u00e3o mas ainda n\u00e3o guardou as mudan\u00e7as dos campos individuais. Carregue em OK para gravar. Precisar\u00e1 de correr de novo a a\u00e7\u00e3o.",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Voc\u00ea selecionou uma a\u00e7\u00e3o, mas voc\u00ea ainda n\u00e3o salvou suas altera\u00e7\u00f5es nos campos individuais. Por favor clique OK para salvar. voc\u00ea precisar\u00e1 de rodar novamente a a\u00e7\u00e3o.",
     "You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.": "Voc\u00ea configurou seu idioma para {beta_language}, que atualmente n\u00e3o est\u00e1 todo traduzido. Voc\u00ea pode nos ajudar a traduzir este idioma integralmente se juntando \u00e0 comunidade Transifex e adicionar tradu\u00e7\u00f5es do ingl\u00eas para alunos que falam {beta_language}",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Voc\u00ea tem altera\u00e7\u00f5es n\u00e3o salvas em campos edit\u00e1veis individuais. Se voc\u00ea executar uma a\u00e7\u00e3o suas altera\u00e7\u00f5es n\u00e3o salvas ser\u00e3o perdidas.",
     "You haven't added any assets to this course yet.": "Voc\u00ea n\u00e3o adicionou nenhum ativo a este curso ainda",
@@ -993,6 +996,18 @@
     "Zoom In": "Aumentar a tela",
     "Zoom Out": "Diminuir a tela",
     "[no tags]": "[no tags]",
+    "abbrev. month April\u0004Apr": "Abr",
+    "abbrev. month August\u0004Aug": "Ago",
+    "abbrev. month December\u0004Dec": "Dez",
+    "abbrev. month February\u0004Feb": "Fev",
+    "abbrev. month January\u0004Jan": "Jan",
+    "abbrev. month July\u0004Jul": "Jul",
+    "abbrev. month June\u0004Jun": "Jun",
+    "abbrev. month March\u0004Mar": "Mar",
+    "abbrev. month May\u0004May": "Mai",
+    "abbrev. month November\u0004Nov": "Nov",
+    "abbrev. month October\u0004Oct": "Out",
+    "abbrev. month September\u0004Sep": "Set",
     "and others": "e outros",
     "anonymous": "an\u00f4nimo",
     "bytes": "bytes",
@@ -1040,24 +1055,24 @@
     "{email} is already on the {container} team. Recheck the email address if you want to add a new member.": "{email} j\u00e1 est\u00e1 no grupo {container}. Verifique novamente o endere\u00e7o de email se voc\u00ea quiser adicionar um novo membro.",
     "\u2026": "\u2026"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -1067,16 +1082,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -1099,11 +1114,9 @@
       "%d/%m/%Y %H:%M:%S",
       "%d/%m/%Y %H:%M:%S.%f",
       "%d/%m/%Y %H:%M",
-      "%d/%m/%Y",
       "%d/%m/%y %H:%M:%S",
       "%d/%m/%y %H:%M:%S.%f",
       "%d/%m/%y %H:%M",
-      "%d/%m/%y",
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
@@ -1132,8 +1145,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -1152,6 +1165,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 
