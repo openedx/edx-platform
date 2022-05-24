@@ -4,7 +4,6 @@
 #
 #    make upgrade
 #
-    # via -r requirements/edx-sandbox/py38.in
 cffi==1.15.0
     # via cryptography
 chem==1.2.0
