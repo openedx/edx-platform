@@ -88,14 +88,14 @@ def _get_token_type(request):
     return token_type
 
 
-def _get_jwt_dict_from_opaque_access_token_dict(opaque_token_dict, oauth_adapter):
+def _get_jwt_dict_from_access_token_dict(token_dict, oauth_adapter):
     """
-    Returns a JWT token dict from the provided opaque access token dict.
+    Returns a JWT token dict from the provided original (opaque) access token dict.
 
     Creates the new JWT, and then overrides various values in a copy of the
         token dict with the JWT specific values.
     """
-    jwt_dict = opaque_token_dict.copy()
+    jwt_dict = token_dict.copy()
     # TODO: It would be safer if create_jwt_from_token returned this
     #   dict directly, so it would not be possible for the dict and JWT
     #   to get out of sync, but that is a larger refactor to think through.
@@ -132,12 +132,12 @@ class AccessTokenView(_DispatchingView):
 
     def _get_jwt_content_from_access_token_content(self, request, response):
         """
-        Gets the JWT response content from the opaque token response content.
+        Gets the JWT response content from the original (opaque) token response content.
 
         Includes the JWT token and token type in the response.
         """
         opaque_token_dict = json.loads(response.content.decode('utf-8'))
-        jwt_token_dict = _get_jwt_dict_from_opaque_access_token_dict(
+        jwt_token_dict = _get_jwt_dict_from_access_token_dict(
             opaque_token_dict, self.get_adapter(request)
         )
         return json.dumps(jwt_token_dict)
