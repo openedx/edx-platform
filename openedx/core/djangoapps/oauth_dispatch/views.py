@@ -17,7 +17,7 @@ from ratelimit.decorators import ratelimit
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.dot_overrides import views as dot_overrides_views
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token, get_jwt_access_token_expire_seconds
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_token_dict
 
 
 class _DispatchingView(View):
@@ -88,26 +88,6 @@ def _get_token_type(request):
     return token_type
 
 
-def _get_jwt_dict_from_access_token_dict(token_dict, oauth_adapter):
-    """
-    Returns a JWT token dict from the provided original (opaque) access token dict.
-
-    Creates the new JWT, and then overrides various values in a copy of the
-        token dict with the JWT specific values.
-    """
-    jwt_dict = token_dict.copy()
-    # TODO: It would be safer if create_jwt_from_token returned this
-    #   dict directly, so it would not be possible for the dict and JWT
-    #   to get out of sync, but that is a larger refactor to think through.
-    jwt = create_jwt_from_token(jwt_dict, oauth_adapter)
-    jwt_dict.update({
-        'access_token': jwt,
-        'token_type': 'JWT',
-        'expires_in': get_jwt_access_token_expire_seconds(),
-    })
-    return jwt_dict
-
-
 @method_decorator(
     ratelimit(
         key='openedx.core.djangoapps.util.ratelimit.real_ip', rate=settings.RATELIMIT_RATE,
@@ -137,9 +117,7 @@ class AccessTokenView(_DispatchingView):
         Includes the JWT token and token type in the response.
         """
         opaque_token_dict = json.loads(response.content.decode('utf-8'))
-        jwt_token_dict = _get_jwt_dict_from_access_token_dict(
-            opaque_token_dict, self.get_adapter(request)
-        )
+        jwt_token_dict = create_jwt_token_dict(opaque_token_dict, self.get_adapter(request))
         return json.dumps(jwt_token_dict)
 
 
