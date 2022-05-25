@@ -68,7 +68,7 @@ class SegmentTests(TestCase):
             'user_id': 123,
             'any_other_key': 'abc'
         }
-        fix_user_id(event=event)
+        event = fix_user_id(event=event)
         assert event == {
             'user_id': 123,
             'any_other_key': 'abc'
@@ -86,7 +86,7 @@ class SegmentTests(TestCase):
             'user_id': 123,
             'any_other_key': 'abc'
         }
-        fix_user_id(event=event)
+        event = fix_user_id(event=event)
         assert event == {
             'context': {
                 'user_id': 456,
@@ -105,7 +105,7 @@ class SegmentTests(TestCase):
             'user_id': 123,
             'any_other_key': 'abc'
         }
-        fix_user_id(event=event)
+        event = fix_user_id(event=event)
         assert event == {
             'context': {
                 'user_id': 123,
@@ -125,7 +125,7 @@ class SegmentTests(TestCase):
             # 'user_id' is missing for unknown reason!
             'any_other_key': 'abc'
         }
-        fix_user_id(event=event)
+        event = fix_user_id(event=event)
         assert event == {
             'context': {
                 'user_id': None,
@@ -146,7 +146,7 @@ class SegmentTests(TestCase):
         mock_site_config.get_value.return_value = True
         with patch(EVENTTRACKING_MODULE + '.segment.get_site_config_for_event', return_value=mock_site_config):
             processor = SegmentTopLevelPropertiesProcessor()
-            processor(event)
+            event = processor(event)
 
         assert event == {
             'context': {'user_id': 123},
