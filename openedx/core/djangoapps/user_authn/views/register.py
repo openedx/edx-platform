@@ -795,8 +795,11 @@ class RegistrationValidationView(APIView):
     def name_handler(self, request):
         """ Validates whether fullname is valid """
         name = request.data.get('name')
+        validation_error = get_name_validation_error(name)
+        if validation_error:
+            return validation_error
         self.username_suggestions = generate_username_suggestions(name)
-        return get_name_validation_error(name)
+        return validation_error
 
     def username_handler(self, request):
         """ Validates whether the username is valid. """
