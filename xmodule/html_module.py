@@ -143,7 +143,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
             resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
             resource_string(__name__, 'js/src/html/imageModal.js'),
-            resource_string(__name__, '../js/common_static/js/vendor/draggabilly.js'),
+            resource_string(__name__, 'js/common_static/js/vendor/draggabilly.js'),
         ],
         'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
     }
