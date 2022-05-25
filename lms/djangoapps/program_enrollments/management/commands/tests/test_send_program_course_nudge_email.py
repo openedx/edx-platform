@@ -7,12 +7,14 @@ from unittest.mock import patch
 import ddt
 from django.core.management import call_command
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import timezone
 from testfixtures import LogCapture
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
+from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 
 LOG_PATH = 'lms.djangoapps.program_enrollments.management.commands.send_program_course_nudge_email'
 
@@ -32,6 +34,10 @@ class TestSendProgramCourseNudgeEmailCommand(TestCase):
         super().setUp()
         self.user_1 = UserFactory()
         self.user_2 = UserFactory()
+
+        self.enterprise_customer_user = EnterpriseCustomerUserFactory.create(
+            user_id=self.user_1.id, enterprise_customer__enable_learner_portal=True
+        )
 
         self.enrolled_course_run = CourseRunFactory()
         self.course_run_1 = CourseRunFactory()
@@ -73,6 +79,7 @@ class TestSendProgramCourseNudgeEmailCommand(TestCase):
     )
     @patch('common.djangoapps.student.models.segment.track')
     @patch('lms.djangoapps.program_enrollments.management.commands.send_program_course_nudge_email.get_programs')
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     def test_email_send(self, add_no_commit, get_programs_mock, mock_track):
         """
         Test Segment fired as expected.
