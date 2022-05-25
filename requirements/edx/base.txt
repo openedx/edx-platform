@@ -174,7 +174,6 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   python3-saml
-    #   safe-lxml
     #   social-auth-core
 deprecated==1.2.13
     # via
@@ -650,7 +649,6 @@ lxml==4.8.0
     #   olxcleaner
     #   openedx-calc
     #   ora2
-    #   safe-lxml
     #   xblock
     #   xmlsec
 mailsnake==1.6.4
