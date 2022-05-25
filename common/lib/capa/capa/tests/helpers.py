@@ -73,7 +73,6 @@ def test_capa_system(render_template=None):
         get_python_lib_zip=lambda: None,
         DEBUG=True,
         i18n=gettext.NullTranslations(),
-        node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         render_template=render_template or tst_render_template,
         resources_fs=fs.osfs.OSFS(os.path.join(TEST_DIR, "test_files")),
         seed=0,

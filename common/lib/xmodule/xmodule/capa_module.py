@@ -618,7 +618,6 @@ class ProblemBlock(
             get_python_lib_zip=None,
             DEBUG=None,
             i18n=self.runtime.service(self, "i18n"),
-            node_path=None,
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=None,
@@ -680,7 +679,6 @@ class ProblemBlock(
             get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, self.runtime.course_id)),
             DEBUG=None,
             i18n=self.runtime.service(self, "i18n"),
-            node_path=None,
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=1,
@@ -829,7 +827,6 @@ class ProblemBlock(
             get_python_lib_zip=sandbox_service.get_python_lib_zip,
             DEBUG=self.runtime.DEBUG,
             i18n=self.runtime.service(self, "i18n"),
-            node_path=self.runtime.node_path,
             render_template=self.runtime.service(self, 'mako').render_template,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
