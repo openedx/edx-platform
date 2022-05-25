@@ -12,6 +12,22 @@ from openedx.core.djangoapps.appsembler.eventtracking.exceptions import (
 )
 
 
+def fix_user_id(event):
+    """
+    Adds <user_id> from top level of <event> into <event['context']>
+    :param event:
+    :return:
+    """
+    context = event.get('context')
+    if context is None:
+        return
+
+    if context.get('user_id') is not None:
+        return
+
+    context['user_id'] = event.get('user_id')
+
+
 class SegmentTopLevelPropertiesProcessor(object):
     """
 
@@ -64,7 +80,6 @@ class SegmentTopLevelPropertiesProcessor(object):
 
     Always returns the event for continued processing.
     """
-
     def __call__(self, event):
         """
         Process only if processor is enabled for Site.
@@ -93,4 +108,7 @@ class SegmentTopLevelPropertiesProcessor(object):
                     event[key] = val
         except (KeyError, AttributeError):  # no 'data' or no sub-properties
             pass
+
+        fix_user_id(event=event)
+
         return event
