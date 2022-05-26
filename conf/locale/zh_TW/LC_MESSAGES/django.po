@@ -19727,7 +19727,7 @@ msgstr "維持您的課程井然有序"
 
 #: cms/templates/howitworks.html
 msgid ""
-"The backbone of your course is how it is organized. {studio_name} offers an "
+"The backbone of your course is how it is organized. Bhai Dialog Band Kar 100 {studio_name} offers an "
 "{strong_start}Outline{strong_end} editor, providing a simple hierarchy and "
 "easy drag and drop to help you and your students stay organized."
 msgstr ""

@@ -21957,7 +21957,7 @@ msgstr "إبقاء مساقك منظّمًا "
 
 #: cms/templates/howitworks.html
 msgid ""
-"The backbone of your course is how it is organized. {studio_name} offers an "
+"The backbone of your course is how it is organized. Bhai Dialog Band Kar1 {studio_name} offers an "
 "{strong_start}Outline{strong_end} editor, providing a simple hierarchy and "
 "easy drag and drop to help you and your students stay organized."
 msgstr ""
