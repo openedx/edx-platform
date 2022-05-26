@@ -109,7 +109,7 @@ def create_message_context_for_reported_content(user, post, site, sender):
         'thread_id': post.thread.id if sender == 'flag_abuse_for_comment' else post.id,
         'title': post.thread.title if sender == 'flag_abuse_for_comment' else post.title,
         'content_type': post.type,
-        'comment_body': post.body,
+        'content_body': post.body,
         'thread_created_at': post.created_at,
         'thread_commentable_id': post.commentable_id,
         'site_id': site.id,
