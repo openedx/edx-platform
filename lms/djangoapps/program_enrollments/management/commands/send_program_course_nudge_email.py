@@ -89,7 +89,7 @@ class Command(BaseCommand):
                 for course_run in not_started_course['course_runs']:
                     if self.valid_course_run(course_run) and course_run['key'] != completed_course_id:
                         return program, course_run, not_started_course
-        return None, None
+        return None, None, None
 
     def sort_programs(self, programs):
         """
