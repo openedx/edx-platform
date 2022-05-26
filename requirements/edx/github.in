@@ -72,5 +72,3 @@ git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc32118
 
 git+https://github.com/open-craft/xblock-poll@v1.12.0#egg=xblock-poll==1.12.0
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.5#egg=xblock-drag-and-drop-v2==2.3.5
-
--e git+https://github.com/openedx/codejail-includes.git@5f760fb55f0b5df50daba6b1ecbb02044ccfffb9#egg=codejail-includes
