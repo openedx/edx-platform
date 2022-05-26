@@ -4,6 +4,8 @@
 #
 #    make upgrade
 #
+-e git+https://github.com/openedx/codejail-includes.git@e1d750c28f74e8a81f7ccd12a61e1c3931b1e7c1#egg=codejail-includes
+    # via -r requirements/edx-sandbox/py38.in
 cffi==1.15.0
     # via cryptography
 chem==1.2.0
@@ -80,6 +82,7 @@ scipy==1.7.3
 six==1.16.0
     # via
     #   chem
+    #   codejail-includes
     #   python-dateutil
 sympy==1.10.1
     # via

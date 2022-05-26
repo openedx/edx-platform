@@ -12,8 +12,6 @@
     #   xmodule
 -e git+https://github.com/edx/codejail.git@3.1.3#egg=codejail==3.1.3
     # via -r requirements/edx/testing.txt
--e git+https://github.com/openedx/codejail-includes.git@5f760fb55f0b5df50daba6b1ecbb02044ccfffb9#egg=codejail-includes
-    # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx/django-wiki.git@1.1.0#egg=django-wiki
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
@@ -681,7 +679,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==13.11.1
+faker==13.12.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -921,7 +919,7 @@ multidict==6.0.2
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==0.950
+mypy==0.960
     # via -r requirements/edx/development.in
 mypy-extensions==0.4.3
     # via mypy
@@ -1334,7 +1332,6 @@ six==1.16.0
     #   chem
     #   click-repl
     #   codejail
-    #   codejail-includes
     #   crowdsourcehinter-xblock
     #   edx-ace
     #   edx-auth-backends
