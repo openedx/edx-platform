@@ -23,7 +23,7 @@ LOG_PREFIX = 'Grades: '
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2017-04-11
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14771
-# .. toggle_warnings: This requires the PersistentGradesEnabledFlag to be enabled.
+# .. toggle_warning: This requires the PersistentGradesEnabledFlag to be enabled.
 ASSUME_ZERO_GRADE_IF_ABSENT = WaffleSwitch(f'{WAFFLE_NAMESPACE}.assume_zero_grade_if_absent', __name__)
 # .. toggle_name: grades.disable_regrade_on_policy_change
 # .. toggle_implementation: WaffleSwitch
@@ -69,7 +69,7 @@ ENFORCE_FREEZE_GRADE_AFTER_COURSE_END = CourseWaffleFlag(
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-10-03
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19054
-# .. toggle_warnings: Enabling this requires that the `WRITABLE_GRADEBOOK_URL` setting be properly defined.
+# .. toggle_warning: Enabling this requires that the `WRITABLE_GRADEBOOK_URL` setting be properly defined.
 # TODO: After removing this flag, add a migration to remove waffle flag in a follow-up deployment.
 WRITABLE_GRADEBOOK = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.writable_gradebook', __name__, LOG_PREFIX)
 

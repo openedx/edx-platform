@@ -16,7 +16,7 @@ WAFFLE_FLAG_NAMESPACE = 'verify_student'
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-06-25
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+# .. toggle_warning: This temporary feature toggle does not have a target removal date.
 # .. toggle_tickets: PROD-1639
 USE_NEW_EMAIL_TEMPLATES = WaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.use_new_email_templates', __name__)
 

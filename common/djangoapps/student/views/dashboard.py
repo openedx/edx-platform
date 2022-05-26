@@ -764,17 +764,18 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
 
     show_account_activation_popup = request.COOKIES.get(settings.SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME, None)
 
-    fbe_status_list = []
+    enrollments_fbe_is_on = []
     for enrollment in course_enrollments:
         course_key = CourseKey.from_string(str(enrollment.course_id))
         gated_content = ContentTypeGatingConfig.enabled_for_enrollment(
-            user=request.user,
+            user=user,
             course_key=course_key
         )
-        duration = get_user_course_duration(enrollment.user, enrollment.course)
-        deadline = duration and get_user_course_expiration_date(request.user, enrollment.course)
-        fbe_is_on = bool(deadline and gated_content)
-        fbe_status_list.append(fbe_is_on)
+        duration = get_user_course_duration(user, enrollment.course)
+        deadline = duration and get_user_course_expiration_date(user, enrollment.course)
+        fbe_is_on = deadline and gated_content
+        if fbe_is_on:
+            enrollments_fbe_is_on.append(course_key)
 
     context = {
         'urls': urls,
@@ -822,7 +823,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'display_sidebar_account_activation_message': not(user.is_active or hide_dashboard_courses_until_activated),
         'display_dashboard_courses': (user.is_active or not hide_dashboard_courses_until_activated),
         'empty_dashboard_message': empty_dashboard_message,
-        'fbe_status_list': fbe_status_list,
+        'enrollments_fbe_is_on': enrollments_fbe_is_on,
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
         'show_load_all_courses_link': show_load_all_courses_link(user, course_limit, course_enrollments),

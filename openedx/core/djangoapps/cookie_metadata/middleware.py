@@ -61,7 +61,7 @@ class CookieNameChange:
         # .. toggle_implementation: DjangoSetting
         # .. toggle_default: False
         # .. toggle_description: Used to enable CookieNameChange middleware which changes a cookie name in request.COOKIES
-        # .. toggle_warnings: This should be set at the same time you set COOKIE_NAME_CHANGE_EXPAND_INFO setting
+        # .. toggle_warning: This should be set at the same time you set COOKIE_NAME_CHANGE_EXPAND_INFO setting
         # .. toggle_use_cases: temporary
         # .. toggle_creation_date: 2021-08-04
         # .. toggle_target_removal_date: 2021-10-01
