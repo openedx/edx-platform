@@ -612,13 +612,6 @@ class UserProfile(models.Model):
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
-    is_marketable = models.BooleanField(
-        default=False,
-        help_text=_(
-            "If selected, user will receive edX marketing emails. The marketing email opt-in checkbox on registration "
-            "form maps to this field."
-        ),
-    )
 
     @property
     def has_profile_image(self):
