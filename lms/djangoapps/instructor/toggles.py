@@ -24,7 +24,7 @@ DATA_DOWNLOAD_V2 = WaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.enable_data_download_v2'
 # .. toggle_description: Supports staged rollout to improved is_small_course method.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-07-02
-# .. toggle_warnings: Description mentions staged rollout, but the use case is not set as temporary.
+# .. toggle_warning: Description mentions staged rollout, but the use case is not set as temporary.
 #      This may actually be a temporary toggle.
 # .. toggle_tickets: PROD-1740
 OPTIMISED_IS_SMALL_COURSE = WaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.optimised_is_small_course', __name__)

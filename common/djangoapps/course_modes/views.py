@@ -55,7 +55,7 @@ LOG = logging.getLogger(__name__)
 # .. toggle_creation_date: 2021-8-23
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REV-2133
-# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+# .. toggle_warning: This temporary feature toggle does not have a target removal date.
 VALUE_PROP_TRACK_SELECTION_FLAG = WaffleFlag('course_modes.use_new_track_selection', __name__)
 
 

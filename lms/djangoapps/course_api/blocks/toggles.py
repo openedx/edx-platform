@@ -14,7 +14,7 @@ COURSE_BLOCKS_API_NAMESPACE = 'course_blocks_api'
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2019-09-27
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+# .. toggle_warning: This temporary feature toggle does not have a target removal date.
 HIDE_ACCESS_DENIALS_FLAG = WaffleFlag(
     f'{COURSE_BLOCKS_API_NAMESPACE}.hide_access_denials', __name__
 )
