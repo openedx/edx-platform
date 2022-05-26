@@ -121,7 +121,10 @@ def _request_financial_assistance(method, url, params=None, data=None):
     """
     financial_assistance_configuration = FinancialAssistanceConfiguration.current()
     if financial_assistance_configuration.enabled:
-        oauth_application = Application.objects.get(user=financial_assistance_configuration.get_service_user())
+        oauth_application = Application.objects.get(
+            user=financial_assistance_configuration.get_service_user(),
+            authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS
+        )
         client = OAuthAPIClient(
             settings.LMS_ROOT_URL,
             oauth_application.client_id,
