@@ -294,13 +294,6 @@ class CourseGrade(CourseGradeBase):
         have been attempted by the student.
         """
         return True
-        # TODO - Determine if this should be assumed true and removed
-
-        # for chapter in self.chapter_grades.values():
-        #     for subsection_grade in chapter['sections']:
-        #         if subsection_grade.all_total.first_attempted:
-        #             return True
-        # return False
 
     def _get_subsection_grade(self, subsection, force_update_subsections=False):
         if self.force_update_subsections:

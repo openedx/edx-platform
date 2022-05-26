@@ -1,3 +1,0 @@
-"""
-Defines grading configuration.
-"""

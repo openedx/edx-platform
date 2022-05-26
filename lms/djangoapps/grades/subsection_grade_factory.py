@@ -48,7 +48,6 @@ class SubsectionGradeFactory:
 
         subsection_grade = self._get_bulk_cached_grade(subsection)
         if not subsection_grade:
-            # TODO - determine if anyone ever overrides this
             if not force_calculate:
                 subsection_grade = ZeroSubsectionGrade(subsection, self.course_data)
             else:
