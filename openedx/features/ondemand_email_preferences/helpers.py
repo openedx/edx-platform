@@ -8,6 +8,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from pytz import utc
 
+from common.lib.hubspot_client.client import HubSpotClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.module_render import toc_for_course
 from openedx.features.course_card.helpers import get_course_open_date
@@ -66,3 +68,29 @@ def get_my_account_link(course_id):
     url_target = '{my_account_url}?course_id={course_id}'.format(my_account_url=my_account_url, course_id=course_id)
     base_url = settings.LMS_ROOT_URL
     return base_url + url_target
+
+
+def send_self_paced_course_enrollment_email(user, course_name, course_url, module_list):
+    """
+    Send course enrollment email for self paced course.
+
+    Arguments:
+        user (User): User object.
+        course_name (str): Course name.
+        course_url (str): Course url.
+        module_list (str): Course module details.
+    """
+    context = {
+        'emailId': HubSpotClient.SELF_PACED_COURSE_ENROLLMENT_EMAIL,
+        'message': {
+            'to': user.email
+        },
+        'customProperties': {
+            'course_name': course_name,
+            'course_url': course_url,
+            'module_list': module_list,
+            'first_name': user.first_name,
+        }
+    }
+
+    task_send_hubspot_email.delay(context)

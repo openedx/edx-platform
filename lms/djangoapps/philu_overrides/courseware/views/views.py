@@ -13,6 +13,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from certificates import api as certs_api
 from common.lib.mandrill_client.client import MandrillClient
+from common.lib.hubspot_client.client import HubSpotClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 from lms.djangoapps.certificates.api import get_certificate_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.timed_notification.core import get_course_link
@@ -86,17 +88,22 @@ def generate_user_cert(request, course_id):
         # with a management command.  From the user's perspective,
         # it will appear that the certificate task was submitted successfully.
         base_url = settings.LMS_ROOT_URL
-        MandrillClient().send_mail(
-            MandrillClient.COURSE_COMPLETION_TEMPLATE,
-            student.email,
-            {
+
+        context = {
+            'emailId': HubSpotClient.COURSE_COMPLETION,
+            'message': {
+                'to': student.email
+            },
+            'customProperties': {
                 'course_name': course.display_name,
                 'course_url': get_course_link(course_id=course.id),
                 'full_name': student.first_name + ' ' + student.last_name,
                 'certificate_url': base_url + get_certificate_url(user_id=student.id, course_id=course.id),
-                'course_library_url': base_url + '/courses',
+                'course_library_url': base_url + '/courses'
             }
-        )
+        }
+        task_send_hubspot_email.delay(context)
+
         certs_api.generate_user_certificates(student, course.id, course=course, generation_mode='self')
         _track_successful_certificate_generation(student.id, course.id)
         return HttpResponse()

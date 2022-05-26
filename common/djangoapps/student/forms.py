@@ -19,6 +19,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from edx_ace import ace
 from edx_ace.recipient import Recipient
+from common.lib.hubspot_client.client import HubSpotClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangolib.markup import HTML, Text
@@ -55,10 +57,17 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
         })
     )
 
-    MandrillClient().send_mail(MandrillClient.PASSWORD_RESET_TEMPLATE, user.email, {
-        'first_name': user.first_name,
-        'reset_link': password_reset_link,
-    })
+    context = {
+        'emailId': HubSpotClient.PASSWORD_RESET_EMAIL,
+        'message': {
+            'to': user.email
+        },
+        'customProperties': {
+            'first_name': user.first_name,
+            'reset_link': password_reset_link,
+        }
+    }
+    task_send_hubspot_email.delay(context)
 
 
 def send_account_recovery_email_for_user(user, request, email=None):

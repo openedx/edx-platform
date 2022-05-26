@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from common.lib.mandrill_client.client import MandrillClient
+from common.djangoapps.mailchimp_pipeline.signals.handlers import task_send_account_activation_email
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.onboarding.constants import ORG_PARTNERSHIP_END_DATE_PLACEHOLDER
 from lms.djangoapps.onboarding.models import GranteeOptIn
@@ -45,11 +46,12 @@ def send_account_activation_email(request, registration, user):
         key=registration.activation_key
     )
 
-    context = {
+    data = {
         'first_name': user.first_name,
         'activation_link': activation_link,
+        'user_email': user.email
     }
-    MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, user.email, context)
+    task_send_account_activation_email.delay(data)
 
 
 def reactivation_email_for_user_custom(request, user):

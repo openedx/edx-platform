@@ -10,6 +10,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from common.lib.mandrill_client.client import MandrillClient
+from common.lib.hubspot_client.client import HubSpotClient
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.onboarding.models import EmailPreference, GranteeOptIn, Organization, UserExtendedProfile
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
@@ -26,6 +27,7 @@ log = getLogger(__name__)
 
 
 def update_mailchimp(email, data):
+    return
     try:
         response = ChimpClient().add_update_member_to_list(
             settings.MAILCHIMP_LEARNERS_LIST_ID, email, data)
@@ -217,11 +219,17 @@ def task_send_account_activation_email(data):
         None
     """
     context = {
-        'first_name': data['first_name'],
-        'activation_link': data['activation_link'],
+        'emailId': HubSpotClient.ACCOUNT_ACTIVATION_EMAIL,
+        'message': {
+            'to': data['user_email']
+        },
+        'customProperties': {
+            'first_name': data['first_name'],
+            'activation_link': data['activation_link'],
+        }
     }
 
-    MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, data['user_email'], context)
+    HubSpotClient().send_mail(context)
 
 
 @task()
