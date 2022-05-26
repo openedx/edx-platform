@@ -1,17 +1,13 @@
 <h1><%- gettext('Financial Assistance Application') %></h1>
 
-<div class="intro">
-  <% _.each(header_text, function(copy) { %>
-	<p class="copy"><%- copy %></p>
-  <%  }); %>
-</div>
-
 <% if (applications_status_response) { %>
+  <h1><%- gettext('Submitted Financial Assistance Applications') %></h1>
+
   <div class="financial-assistance-applications-list">
     <table class="financial-assistance-table">
       <thead>
         <tr>
-          <th> - </th>
+          <th><%- gettext('Serial Number') %></th>
           <th><%- gettext('Application Request Date') %></th>
           <th><%- gettext('Status') %></th>
           <th><%- gettext('Coupon Code') %></th>
@@ -44,6 +40,12 @@
 <% } %>
 
 <% if (hide_form == false) { %>
+
+  <div class="intro">
+    <% _.each(header_text, function(copy) { %>
+  	  <p class="copy"><%- copy %></p>
+    <%  }); %>
+  </div>
   <form class="financial-assistance-form" method="POST">
     <div class="js-form-feedback" aria-live="assertive" tabindex="-1">
     </div>

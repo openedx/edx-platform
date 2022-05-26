@@ -2054,15 +2054,14 @@ def financial_assistance_form(request, course_id=None):
         submit_url = 'submit_financial_assistance_request_v2'
         has_already_applied_applications, applications_status_response = \
             get_financial_assistance_application_status(request.user.id, course_id)
-        if not has_already_applied_applications:
-            log.error(applications_status_response)
-            applications_status_response = None
-        else:
+        if has_already_applied_applications:
             has_one_accepted_application = next((
                 application for application in applications_status_response if application.get('status') == 'ACCEPTED'
             ), None)
-            if has_one_accepted_application:
-                hide_form = True
+            hide_form = bool(has_one_accepted_application)
+        else:
+            log.error(applications_status_response)
+            applications_status_response = None
     else:
         submit_url = 'submit_financial_assistance_request'
 
