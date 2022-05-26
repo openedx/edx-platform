@@ -12,7 +12,6 @@ from submissions import api as submissions_api
 
 from common.djangoapps.student.models import anonymous_id_for_user
 from lms.djangoapps.courseware.model_data import ScoresClient
-from lms.djangoapps.grades.config import assume_zero_if_absent, should_persist_grades
 from lms.djangoapps.grades.models import PersistentSubsectionGrade
 from lms.djangoapps.grades.scores import possibly_scored
 from openedx.core.djangoapps.signals.signals import COURSE_ASSESSMENT_GRADE_CHANGED
@@ -41,7 +40,7 @@ class SubsectionGradeFactory:
 
         If read_only is True, doesn't save any updates to the grades.
         force_calculate - If true, will cause this function to return a `CreateSubsectionGrade` object if no cached
-        grade currently exists, even if the assume_zero_if_absent flag is enabled for the course.
+        grade currently exists.
         """
         self._log_event(
             log.debug, f"create, read_only: {read_only}, subsection: {subsection.location}", subsection,
@@ -49,18 +48,18 @@ class SubsectionGradeFactory:
 
         subsection_grade = self._get_bulk_cached_grade(subsection)
         if not subsection_grade:
-            if assume_zero_if_absent(self.course_data.course_key) and not force_calculate:
+            # TODO - determine if anyone ever overrides this
+            if not force_calculate:
                 subsection_grade = ZeroSubsectionGrade(subsection, self.course_data)
             else:
                 subsection_grade = CreateSubsectionGrade(
                     subsection, self.course_data.structure, self._submissions_scores, self._csm_scores,
                 )
-                if should_persist_grades(self.course_data.course_key):
-                    if read_only:
-                        self._unsaved_subsection_grades[subsection_grade.location] = subsection_grade
-                    else:
-                        grade_model = subsection_grade.update_or_create_model(self.student)
-                        self._update_saved_subsection_grade(subsection.location, grade_model)
+                if read_only:
+                    self._unsaved_subsection_grades[subsection_grade.location] = subsection_grade
+                else:
+                    grade_model = subsection_grade.update_or_create_model(self.student)
+                    self._update_saved_subsection_grade(subsection.location, grade_model)
         return subsection_grade
 
     def bulk_create_unsaved(self):
@@ -82,7 +81,7 @@ class SubsectionGradeFactory:
             subsection, self.course_data.structure, self._submissions_scores, self._csm_scores,
         )
 
-        if persist_grade and should_persist_grades(self.course_data.course_key):
+        if persist_grade:
             if only_if_higher:
                 try:
                     grade_model = PersistentSubsectionGrade.read_grade(self.student.id, subsection.location)
@@ -142,11 +141,10 @@ class SubsectionGradeFactory:
         course, for future access of other subsections.
         Returns None if not found.
         """
-        if should_persist_grades(self.course_data.course_key):
-            saved_subsection_grades = self._get_bulk_cached_subsection_grades()
-            grade = saved_subsection_grades.get(subsection.location)
-            if grade:
-                return ReadSubsectionGrade(subsection, grade, self)
+        saved_subsection_grades = self._get_bulk_cached_subsection_grades()
+        grade = saved_subsection_grades.get(subsection.location)
+        if grade:
+            return ReadSubsectionGrade(subsection, grade, self)
 
     def _get_bulk_cached_subsection_grades(self):
         """
