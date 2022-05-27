@@ -1069,7 +1069,6 @@ class ProblemBlock(
             str(err)
         )
 
-        # TODO (vshnayder): another switch on DEBUG.
         if self.debug:
             msg = HTML(
                 '[courseware.capa.capa_module] '

@@ -97,14 +97,6 @@ class RuntimeShim:
         # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
         return False  # Change this if/when we need to support unsafe courses in the new runtime.
 
-    @property
-    def DEBUG(self):
-        """
-        Should DEBUG mode (?) be used? This flag is only read by capa.
-        """
-        # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
-        return False
-
     def get_python_lib_zip(self):
         """
         A function returning a bytestring or None. The bytestring is the
