@@ -767,4 +767,3 @@ class DetermineLabelTestCase(TestCase):
         block_type = "something else"
         result = utils.determine_label(display_name, block_type)
         self.assertTrue(result == display_name)
-        
