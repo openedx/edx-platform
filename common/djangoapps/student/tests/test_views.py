@@ -55,6 +55,12 @@ ONE_WEEK_AGO = now() - timedelta(weeks=1)
 THREE_YEARS_FROM_NOW = now() + timedelta(days=(365 * 3))
 THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
 
+# Name of the method to mock for Content Type Gating.
+GATING_METHOD_NAME = 'openedx.features.content_type_gating.models.ContentTypeGatingConfig.enabled_for_enrollment'
+
+# Name of the method to mock for Course Duration Limits.
+CDL_METHOD_NAME = 'openedx.features.course_duration_limits.models.CourseDurationLimitConfig.enabled_for_enrollment'
+
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -952,6 +958,46 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 self.assertContains(response, html_fragment)
             else:
                 self.assertNotContains(response, html_fragment)
+
+    @ddt.data(
+        # gated_content_on, course_duration_limits_on, upgrade_message
+        (True, True, 'Upgrade to get full access to the course material'),
+        (True, False, 'Upgrade to earn'),
+        (False, True, 'Upgrade to earn'),
+        (False, False, 'Upgrade to earn'),
+    )
+    @ddt.unpack
+    def test_happy_path_upgrade_message(
+        self,
+        gated_content_on,
+        course_duration_limits_on,
+        upgrade_message
+    ):
+        """
+        Upgrade message should be different for a course depending if it's happy or non-happy path.
+        Happy path requirements:
+        - Learner can upgrade (verified_mode)
+        - FBE is on (has an audit_access_deadline and is able to see gated_content)
+        """
+        with patch.object(EcommerceService, 'is_enabled', return_value=True):
+            course = CourseFactory.create()
+            CourseEnrollmentFactory.create(
+                user=self.user,
+                course_id=course.id
+            )
+
+            CourseModeFactory.create(
+                course_id=course.id,
+                mode_slug='verified',
+                mode_display_name='Verified',
+                min_price=149,
+                sku='abcdef',
+            )
+
+            with patch(GATING_METHOD_NAME, return_value=gated_content_on):
+                with patch(CDL_METHOD_NAME, return_value=course_duration_limits_on):
+                    response = self.client.get(reverse('dashboard'))
+                    self.assertContains(response, upgrade_message)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid for the LMS')

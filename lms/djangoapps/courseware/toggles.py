@@ -19,7 +19,7 @@ WAFFLE_FLAG_NAMESPACE = 'courseware'
 # .. toggle_use_cases: open_edx, temporary
 # .. toggle_creation_date: 2020-10-02
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL.
+# .. toggle_warning: Also set settings.LEARNING_MICROFRONTEND_URL.
 # .. toggle_tickets: AA-188
 COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.microfrontend_course_exit_page', __name__
@@ -33,7 +33,7 @@ COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE = CourseWaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-10-07
 # .. toggle_target_removal_date: none
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL.
+# .. toggle_warning: Also set settings.LEARNING_MICROFRONTEND_URL.
 # .. toggle_tickets: AA-371
 COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.mfe_progress_milestones', __name__
@@ -48,7 +48,7 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES = CourseWaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-02-16
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
+# .. toggle_warning: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.
 # .. toggle_tickets: AA-304
 COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION = CourseWaffleFlag(
@@ -59,7 +59,7 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION = CourseWaffleFl
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables an engagement discount incentive message.
-# .. toggle_warnings: This flag depends on the streak celebration feature being enabled
+# .. toggle_warning: This flag depends on the streak celebration feature being enabled
 # .. toggle_use_cases: opt_out, open_edx
 # .. toggle_creation_date: 2021-08-26
 # .. toggle_target_removal_date: None

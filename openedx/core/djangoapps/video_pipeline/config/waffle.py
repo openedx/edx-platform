@@ -29,7 +29,7 @@ DEPRECATE_YOUTUBE = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.deprecate_youtube', __
 #   of enabling this feature toggle are uncertain.]
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-03-12
-# .. toggle_warnings: Enabling this feature requires that the ROLE_ARN, MFA_SERIAL_NUMBER, MFA_TOKEN settings are
+# .. toggle_warning: Enabling this feature requires that the ROLE_ARN, MFA_SERIAL_NUMBER, MFA_TOKEN settings are
 #   properly defined.
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/23375
 ENABLE_DEVSTACK_VIDEO_UPLOADS = WaffleFlag(f'{WAFFLE_NAMESPACE}.enable_devstack_video_uploads', __name__, LOG_PREFIX)

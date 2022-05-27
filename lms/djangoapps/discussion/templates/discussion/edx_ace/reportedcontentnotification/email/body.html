@@ -10,16 +10,16 @@
             <h2>
                 {% filter force_escape %}
                     {% blocktrans trimmed asvar replied_to_text %}
-                        {{ course_name }} {{ course_id }} Reported content awaits review
+                        {{ course_name }}: Reported content awaits review
                     {% endblocktrans %}
                 {% endfilter %}
                 {% interpolate_html replied_to_text start_tag='<b>'|safe end_tag='</b>'|safe %}
             </h2>
 
             <h3> <b> You are receiving this email because the following {{ content_type }} was reported for review </b> </h3>
-            <h3> <b> Title </b> </h3>
-            <br />
-            {{ comment_body }}
+            <h3> <b> {{ title }} </b> </h3>
+
+            {{ content_body }}
 
             {% filter force_escape %}
                 {% blocktrans asvar course_cta_text %}Go to Discussion{% endblocktrans %}
