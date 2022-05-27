@@ -759,7 +759,7 @@ class DetermineLabelTestCase(TestCase):
         result = utils.determine_label(display_name, block_type)
         self.assertEqual(result, display_name)
 
-    def validate_set_titles_not_replaced(self):
+    def validate_non_html_blocks_titles_not_replaced(self):
         """
         Tests that display names for non-"html" xblocks are not repleaced with "Text" when the display name is set.
         """
