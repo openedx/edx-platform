@@ -737,6 +737,7 @@ class ValidateCourseOlxTests(CourseTestCase):
                 allowed_xblocks=allowed_xblocks
             )
 
+
 class DetermineLabelTestCase(TestCase):
     """Tests for xblock Title quirks"""
 
@@ -766,3 +767,4 @@ class DetermineLabelTestCase(TestCase):
         block_type = "something else"
         result = utils.determine_label(display_name, block_type)
         self.assertTrue(result == display_name)
+        
