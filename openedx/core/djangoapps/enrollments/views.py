@@ -44,7 +44,7 @@ from openedx.core.djangoapps.enrollments.errors import (
 )
 from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
 from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination
-from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApiListSerializer ,LiveClassesSerializer #, LiveClassEnrollmentSerializer
+from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApiListSerializer ,LiveClassesSerializer , UserLiveClassDetailsSerializer #LiveClassUserDetailsSerializer ,
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
@@ -619,13 +619,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
              * user: The username of the user.
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        EnrollmentCrossDomainSessionAuth,
-    )
-    permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
-    throttle_classes = (EnrollmentUserThrottle,)
+    # authentication_classes = (
+    #     JwtAuthentication,
+    #     BearerAuthenticationAllowInactiveUser,
+    #     EnrollmentCrossDomainSessionAuth,
+    # )
+    # permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
+    # throttle_classes = (EnrollmentUserThrottle,)
 
     # Since the course about page on the marketing site
     # uses this API to auto-enroll users, we need to support
@@ -954,7 +954,7 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = ()
     throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = CourseEnrollmentsApiListSerializer
     pagination_class = CourseEnrollmentsApiListPagination
@@ -1062,7 +1062,7 @@ class LiveClassesListApiListView(DeveloperErrorViewMixin, ListAPIView):
 
 
     
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = ()
     throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = LiveClassesSerializer
     #ypagination_class = CourseEnrollmentsApiListPagination
@@ -1096,7 +1096,44 @@ class LiveClassesListApiListView(DeveloperErrorViewMixin, ListAPIView):
 
 
 
-# class LiveClassDetailsView(DeveloperErrorViewMixin, ListCreateAPIView):
+class EnrollLiveClassDetailsView(DeveloperErrorViewMixin, ListCreateAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = ()
+    throttle_classes = (EnrollmentUserThrottle,)
+    serializer_class = UserLiveClassDetailsSerializer
+    #pagination_class = LiveClassesSerializer
+    lookup_field = "username"
+
+
+    # lookup_field = "username"
+
+    def get_queryset(self):
+
+        return LiveClassEnrollment.objects.filter(user=self.request.user)
+
+
+
+
+    # def post(self, request, *args, **kwargs):
+    #     """Upload documents"""
+    #     try:
+    #         serializer = self.serializer_class(
+    #             data=request.data,
+    #         )
+    #         serializer.is_valid(raise_exception=True)
+            
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     except Exception as e:
+    #         return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+# class EnrollLiveClassCreateAPIView(DeveloperErrorViewMixin, ListCreateAPIView):
 #     authentication_classes = (
 #         JwtAuthentication,
 #         BearerAuthenticationAllowInactiveUser,
@@ -1108,15 +1145,73 @@ class LiveClassesListApiListView(DeveloperErrorViewMixin, ListAPIView):
 #     #pagination_class = LiveClassesSerializer
 #     lookup_field = "username"
 
+#     def post(self, request, *args, **kwargs):
+#         """Upload documents"""
+#         try:
+#             serializer = self.serializer_class(
+#                 data=request.data,
+#             )
+#             serializer.is_valid(raise_exception=True)
+            
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+# class EnrollLiveClassUserDetailsView(DeveloperErrorViewMixin, ListCreateAPIView):
+#     authentication_classes = (
+#         JwtAuthentication,
+#         BearerAuthenticationAllowInactiveUser,
+#         SessionAuthenticationAllowInactiveUser,
+#     )
+#     permission_classes = (permissions.IsAdminUser,)
+#     throttle_classes = (EnrollmentUserThrottle,)
+#     serializer_class = LiveClassUserDetailsSerializer
+#     # pagination_class = LiveClassesSerializer
+#     lookup_url_kwarg = 'live_class_id'
+
 
 #     # lookup_field = "username"
 
-#     # def get_queryset(self):
-#     #     created_by_id = self.kwargs.get('username')
-
-#     #     return LiveClasses.objects.filter(created_by=created_by_id)
-
 #     def get_queryset(self):
-#         username = self.kwargs.get('user_id')
+    
+#         return LiveClassEnrollment.objects.filter(live_class_id=self.kwargs.get('live_class_id'))
 
-#         return LiveClassEnrollment.objects.filter(user_id=username)
+
+
+
+
+# class EnrollLiveClassUserDetailsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView):
+#     authentication_classes = (
+#         JwtAuthentication,
+#         BearerAuthenticationAllowInactiveUser,
+#         SessionAuthenticationAllowInactiveUser,
+#     )
+#     permission_classes = (permissions.IsAdminUser,)
+#     throttle_classes = (EnrollmentUserThrottle,)
+#     serializer_class = LiveClassEnrollmentSerializer
+#     queryset = LiveClassEnrollment.objects.all()
+#     model = LiveClassEnrollment
+#     lookup_field = "id"
+
+
+
+#     def delete(self, request, *args, **kwargs):
+        
+
+#         try:
+#             enroll_live_class_id = self.model.objects.get(id=self.kwargs.get('id'))
+#             enroll_live_class_id.delete()
+#             return Response("Deleted Successfully", status=status.HTTP_200_OK)
+#         except self.model.DoesNotExist:
+#             return Response("Invalied Id", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+
+
+
+
+

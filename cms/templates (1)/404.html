@@ -1,0 +1,27 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%inherit file="base.html" />
+<%block name="title">${_("Page Not Found")}</%block>
+<%block name="bodyclass">view-util util-404</%block>
+
+
+<%block name="content">
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <header>
+      <h1 class="title title-1">${_("Page not found")}</h1>
+    </header>
+    <article class="content-primary" role="main">
+      <p>
+      ${_('The page that you were looking for was not found.')}
+      ${Text(_('Go back to the {homepage}.')).format(
+        homepage=HTML('<a href="/">homepage</a>'),
+      )}
+      </p>
+    </article>
+  </section>
+</div>
+</%block>

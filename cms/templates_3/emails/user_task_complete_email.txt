@@ -1,0 +1,32 @@
+<%! from django.utils.translation import gettext as _ %>
+% if detail_url:
+
+${_("Your {task_name} task has completed with the status '{task_status}'. Use this URL to view task details or download any files created: {detail_url}").format(task_name=task_name, task_status=task_status, detail_url=detail_url)}
+
+% else:
+
+${_("Your {task_name} task has completed with the status '{task_status}'. Sign in to view the details of your task or download any files created.").format(task_name=task_name, task_status=task_status)}
+
+% endif
+
+% if olx_validation_errors:
+<%
+    warnings = olx_validation_errors.get('warnings')
+    errors = olx_validation_errors.get('errors')
+%>
+${_("Here are some validations we found with your course content.")}
+
+% if errors:
+${_("Errors: ")} (${len(errors)})
+% for index, error in enumerate(errors, start=1):
+  ${index}.  ${error}
+% endfor
+% endif
+
+% if warnings:
+${_("Warnings: ")} (${len(warnings)})
+% for index, warning in enumerate(warnings, start=1):
+  ${index}.  ${warning}
+% endfor
+% endif
+% endif

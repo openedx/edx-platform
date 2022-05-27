@@ -1,0 +1,11 @@
+<form>
+<h3 class="modal-section-title">
+    <%- gettext('Discussion') %>
+</h3>
+<div class="modal-section-content discussion-enabled">
+    <label class="label">
+        <input type="checkbox" id="discussion_enabled" name="discussion_enabled" class="input input-checkbox" />
+        <%- gettext('Enable discussion') %>
+     </label>
+</div>
+</form>

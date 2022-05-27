@@ -1,0 +1,40 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import gettext as _ %>
+<%namespace name='static' file='static_content.html'/>
+
+<div class="wrapper wrapper-component-action-header">
+    <div class="component-header">
+    ${label}
+    </div>
+    <ul class="component-actions">
+      <li class="action-item action-edit">
+        <button class="btn-default edit-button action-button">
+            <span class="icon fa fa-pencil" aria-hidden="true"></span>
+            <span class="action-button-text">${_("Edit")}</span>
+        </button>
+      </li>
+      <li class="action-item action-duplicate">
+        <button data-tooltip="${_("Duplicate")}" class="btn-default duplicate-button action-button">
+            <span class="icon fa fa-copy" aria-hidden="true"></span>
+            <span class="sr">${_("Duplicate this component")}</span>
+        </button>
+      </li>
+      <li class="action-item action-move">
+          <button data-tooltip="${_("Move")}" class="btn-default move-button action-button">
+              <span class="stack-move-icon fa-stack fa-lg">
+                  <span class="fa fa-file-o fa-stack-2x fa-fw" aria-hidden="true"></span>
+                  <span class="fa fa-arrow-right fa-stack-1x fa-fw" aria-hidden="true"></span>
+              </span>
+              <span class="sr">${_("Move")}</span>
+          </button>
+      </li>
+      <li class="action-item action-delete">
+        <button data-tooltip="${_("Delete")}" class="btn-default delete-button action-button">
+            <span class="icon fa fa-trash-o" aria-hidden="true"></span>
+            <span class="sr">${_("Delete this component")}</span>
+        </button>
+      </li>
+    </ul>
+</div>
+<span data-tooltip="${_("Drag to reorder")}" class="drag-handle action"></span>
+${preview | n, decode.utf8}

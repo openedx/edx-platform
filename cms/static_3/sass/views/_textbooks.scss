@@ -1,0 +1,382 @@
+// studio - views - textbooks
+// ====================
+
+.view-textbooks {
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
+  }
+
+  .content-primary {
+    @extend .ui-col-wide;
+
+    .no-textbook-content {
+      @extend %no-content;
+
+      color: $gray-d1;
+    }
+
+    .textbook {
+      @extend %ui-window;
+
+      position: relative;
+
+      .view-textbook {
+        padding: $baseline ($baseline*1.5);
+
+        header {
+          margin-bottom: 0;
+          border-bottom: 0;
+        }
+
+        .textbook-title {
+          @extend %t-title4;
+          @extend %t-strong;
+
+          @include margin-right($baseline*14);
+        }
+
+        .ui-toggle-expansion {
+          @include transition(rotate 0.15s ease-in-out 0.25s);
+
+          @extend %t-action1;
+
+          display: inline-block;
+          width: ($baseline*0.75);
+          vertical-align: text-bottom;
+        }
+
+        &.is-selectable {
+          @extend %ui-fake-link;
+
+          &:hover {
+            color: theme-color("primary");
+
+            .ui-toggle-expansion {
+              color: theme-color("primary");
+            }
+          }
+        }
+
+        .chapters {
+          margin-left: $baseline;
+
+          .chapter {
+            @extend %t-copy-sub2;
+
+            margin-bottom: ($baseline/4);
+            border-bottom: 1px solid $gray-l4;
+
+            .chapter-name {
+              display: inline-block;
+              vertical-align: middle;
+              width: 45%;
+              margin-right: ($baseline/2);
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            }
+
+            .chapter-asset-path {
+              display: inline-block;
+              width: 50%;
+              color: $gray-l1;
+            }
+          }
+        }
+
+        .actions {
+          @include transition(opacity 0.15s 0.25s ease-in-out);
+
+          opacity: 0;
+          position: absolute;
+          top: $baseline;
+
+          @include right($baseline);
+
+          .action {
+            display: inline-block;
+            margin-right: ($baseline/4);
+
+            .view {
+              @include blue-button;
+
+              @extend %t-action4;
+            }
+
+            .edit {
+              @include blue-button;
+
+              @extend %t-action4;
+            }
+
+            .delete {
+              @extend %ui-btn-non;
+            }
+          }
+        }
+      }
+
+      &:hover .actions {
+        opacity: 1;
+      }
+
+      .edit-textbook {
+        box-sizing: border-box;
+        border-radius: 2px;
+        width: 100%;
+        background: $white;
+
+        .wrapper-form {
+          padding: $baseline ($baseline*1.5);
+        }
+
+
+        fieldset {
+          margin-bottom: $baseline;
+        }
+
+        .actions {
+          box-shadow: inset 0 1px 2px $shadow;
+          border-top: 1px solid $gray-l1;
+          padding: ($baseline*0.75) $baseline;
+          background: $gray-l6;
+
+          .action {
+            margin-right: ($baseline/4);
+
+            &:last-child {
+              margin-right: 0;
+            }
+          }
+
+          // add a chapter is below with chapters styling
+
+          .action-primary {
+            @include blue-button;
+            @include transition(all 0.15s);
+
+            @extend %t-action2;
+            @extend %t-strong;
+
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+            text-transform: uppercase;
+          }
+
+          .action-secondary {
+            @include grey-button;
+            @include transition(all 0.15s);
+
+            @extend %t-action2;
+            @extend %t-strong;
+
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+            text-transform: uppercase;
+          }
+        }
+
+        .copy {
+          @extend %t-copy-sub2;
+
+          margin: ($baseline) 0 ($baseline/2) 0;
+          color: $gray;
+
+          strong {
+            @extend %t-strong;
+          }
+        }
+
+        .chapters-fields,
+        .textbook-fields {
+          @extend %cont-no-list;
+
+          .field {
+            margin: 0 0 ($baseline*0.75) 0;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            &.required {
+              label {
+                @extend %t-strong;
+              }
+
+              label::after {
+                margin-left: ($baseline/4);
+                content: "*";
+              }
+            }
+
+            label,
+            input,
+            textarea {
+              display: block;
+            }
+
+            label {
+              @extend %t-copy-sub1;
+
+              @include transition(color, 0.15s, ease-in-out);
+
+              margin: 0 0 ($baseline/4) 0;
+
+              &.is-focused {
+                color: theme-color("primary");
+              }
+            }
+
+            &.add-textbook-name label {
+              @extend %t-title5;
+            }
+
+
+            //this section is borrowed from _account.scss - we should clean up and unify later
+            input,
+            textarea {
+              @extend %t-copy-base;
+
+              height: 100%;
+              width: 100%;
+              padding: ($baseline/2);
+
+              &.long {
+                width: 100%;
+              }
+
+              &.short {
+                width: 25%;
+              }
+
+              ::-webkit-input-placeholder {
+                color: $gray-l4;
+              }
+
+              :-moz-placeholder {
+                color: $gray-l3;
+              }
+
+              ::-moz-placeholder {
+                color: $gray-l3;
+              }
+
+              :-ms-input-placeholder {
+                color: $gray-l3;
+              }
+
+              &:focus {
+                + .tip {
+                  color: $gray-d1;
+                }
+              }
+            }
+
+            textarea.long {
+              height: ($baseline*5);
+            }
+
+            input[type="checkbox"] {
+              display: inline-block;
+              margin-right: ($baseline/4);
+              width: auto;
+              height: auto;
+
+              & + label {
+                display: inline-block;
+              }
+            }
+
+            .tip {
+              @extend %t-copy-sub2;
+
+              @include transition(color, 0.15s, ease-in-out);
+
+              display: block;
+              margin-top: ($baseline/4);
+              color: $gray-d1;
+            }
+
+            &.error {
+              label {
+                color: $red;
+              }
+
+              input {
+                border-color: $red;
+              }
+            }
+          }
+
+          .field-group {
+            @include clearfix();
+
+            margin: 0 0 ($baseline/2) 0;
+
+            .field {
+              display: block;
+              width: 46%;
+              border-bottom: none;
+
+              @include margin(0, ($baseline*0.75), 0, 0);
+
+              padding: ($baseline/4) 0 0 0;
+
+              @include float(left);
+
+              position: relative;
+
+              input,
+              textarea {
+                width: 100%;
+              }
+
+              .action-upload {
+                @extend %ui-btn-flat-outline;
+
+                position: absolute;
+                top: 3px;
+
+                @include right(0);
+              }
+            }
+
+            .action-close {
+              @include transition(color $tmg-f2 ease-in-out);
+
+              @extend %t-action1;
+
+              display: inline-block;
+              float: right;
+              margin-top: ($baseline*2);
+              border: 0;
+              padding: 0;
+              background: transparent;
+              color: $blue-l3;
+
+              &:hover {
+                color: $blue;
+              }
+            }
+          }
+        }
+
+
+        .action-add-chapter {
+          @extend %ui-btn-flat-outline;
+          @extend %t-action1;
+
+          display: block;
+          width: 100%;
+          margin: ($baseline*1.5) 0 0 0;
+          padding: ($baseline/2);
+        }
+      }
+    }
+  }
+
+  .content-supplementary {
+    @extend .ui-col-narrow;
+  }
+}

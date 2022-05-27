@@ -1,0 +1,160 @@
+<%page expression_filter="h"/>
+<%
+  import hashlib
+  from openedx.core.djangolib.js_utils import js_escaped_string
+  from six import text_type
+  hlskey = hashlib.md5(text_type(module.location).encode('utf-8')).hexdigest()
+%>
+
+  <section id="hls-modal-${hlskey}" class="upload-modal modal" style="overflow:scroll; background:#ddd; padding: 10px 0;box-shadow: 0 0 5px 0 #555;" >
+  <a href="#" class="close-button" style="background: #eee; float: right;padding: 5px 10px; margin: 0 10px 0 0; border: 0;"><span class="close-icon"></span></a>
+  <div id="hls-div">
+    <header>
+      <h2>High Level Source Editing</h2>
+    </header>
+
+    <form id="hls-form" enctype="multipart/form-data">
+      <section class="source-edit">
+          <textarea name="" data-metadata-name="source_code" class="source-edit-box hls-data" rows="8" cols="40">${editable_metadata_fields['source_code']['value']}</textarea>
+      </section>
+      <div class="submit">
+        <button type="reset" class="hls-compile">Save &amp; Compile to edX XML</button>
+        <button type="reset" class="hls-save">Save</button>
+        <button type="reset" class="hls-refresh">Refresh</button>
+	<div style="display:none" id="hls-finput"></div>
+        <span id="message"></span>
+        <button type="reset" class="hls-upload" style="float:right">Upload</button>
+      </div>
+    </form>
+
+  </div>
+  </section>
+
+  <script type = "text/javascript">
+require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
+  hlstrig = $('#hls-trig-${hlskey  | n, js_escaped_string}');
+  hlsmodal = $('#hls-modal-${hlskey  | n, js_escaped_string}');
+
+  hlstrig.leanModal({
+      top: 0,
+      overlay: 0.8,
+      closeButton: ".close-button"
+  });
+
+  hlsmodal.data('editor', CodeMirror.fromTextArea(hlsmodal.find('.hls-data')[0], {
+      lineNumbers: true,
+      mode: 'stex'
+  }));
+
+  hlstrig.click(function() {
+
+      // cannot do this with css or it gets overwritten
+      var editorH = $( window ).height() - 100;
+      var editorW = $( window ).innerWidth() - 70;
+      hlsmodal.attr('style', function(i,s) { return s + 'margin: 2% 0 0 10% !important; left:10%; height:' + editorH + 'px;'});
+
+      // setup file input
+      // need to insert this only after hls triggered, because otherwise it
+      // causes other <form> elements to become multipart/form-data,
+      // thus breaking multiple-choice input forms, for example.
+      edx.HtmlUtils.setHtml($('#hls-finput'),edx.HtmlUtils.HTML('<input type="file" name="hlsfile" id="hlsfile" />'));
+      // var el = $('#hls-modal-${hlskey  | n, js_escaped_string}');
+      setup_autoupload(hlsmodal);
+      slow_refresh_hls(hlsmodal);
+  });
+
+  // file upload button
+  hlsmodal.find('.hls-upload').click(function() {
+      hlsmodal.find('#hlsfile').trigger('click');
+  });
+
+  // auto-upload after file is chosen
+  function setup_autoupload(el){
+      el.find('#hlsfile').change(function() {
+          var file = el.find('#hlsfile')[0].files[0];
+
+          var reader = new FileReader();
+          reader.onload = function(event) {
+              var contents = event.target.result;
+	      el.data('editor').setValue(contents);
+	      // trigger compile & save
+	      el.find('.hls-compile').trigger('click');
+          };
+          reader.readAsText(file);
+      });
+  }
+
+  // refresh button
+  hlsmodal.find('.hls-refresh').click(function() {
+      refresh_hls(hlsmodal);
+  });
+
+  function refresh_hls(el) {
+      el.data('editor').refresh();
+      $('#lean_overlay').hide();	      // hide gray overlay
+  }
+
+  function slow_refresh_hls(el) {
+      el.delay(200).queue(function() {
+          refresh_hls(el);
+          $(this).dequeue();
+      });
+      // resize the codemirror box
+      var h = el.height();
+      el.find('.CodeMirror').height(h - 160);
+  }
+
+  // compile & save button
+  hlsmodal.find('.hls-compile').click(function() {
+      compile_hls(hlsmodal);
+      $(hlsmodal).css('display', 'none')
+  });
+
+  // connect to server using POST (requires cross-domain-access)
+
+  function compile_hls(el) {
+      var editor = el.data('editor')
+      var hlsdata = editor.getValue();
+
+      $.ajax({
+          url: "https://studio-input-filter.mitx.mit.edu/latex2edx?raw=1",
+          type: "POST",
+          data: "" + hlsdata,
+          crossDomain: true,
+          processData: false,
+          success: function(data) {
+              xml = data.xml;
+              if (xml.length == 0) {
+                  alert('Conversion failed!  error:' + data.message);
+              } else {
+                  // If a parent CodeMirror editor is open (LaTeX problem being edited), set the text
+                  // there. Otherwise, set the text in the active TinyMCE Editor for the case
+                  // of an HTML component being edited.
+                  var parentCodemirrorEditor = el.closest('.xblock-studio_view').find('.CodeMirror-wrap');
+                  if (parentCodemirrorEditor.length > 0) {
+                      parentCodemirrorEditor[0].CodeMirror.setValue(xml);
+                  }
+                  else if (window.tinyMCE !== undefined && window.tinyMCE.activeEditor !== undefined) {
+                      window.tinyMCE.activeEditor.setContent(xml);
+                  }
+                  save_hls(el);
+              }
+          },
+          error: function() {
+              alert('Error: cannot connect to latex2edx server');
+          }
+      });
+  }
+
+  // save button
+
+  hlsmodal.find('.hls-save').click(function() {
+      save_hls(hlsmodal);
+  });
+
+  function save_hls(el) {
+      el.find('.hls-data').val(el.data('editor').getValue());
+      el.closest('.xblock-studio_view').find('.save-button').click();
+  }
+}); // end require()
+  </script>

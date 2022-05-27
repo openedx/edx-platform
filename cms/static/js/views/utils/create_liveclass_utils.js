@@ -7,9 +7,7 @@
      return function(selectors, classes) {
          var keyLengthViolationMessage = gettext('The combined length of the organization and library code fields' +
            ' cannot be more than <%- limit %> characters.');
-         var keyFieldSelectors = [selectors.org, selectors.number];
-         var nonEmptyCheckFieldSelectors = [selectors.name, selectors.org, selectors.number];
-
+        
          CreateUtilsFactory.call(this, selectors, classes);
        
          this.create = function(liveclassInfo, errorHandler) {
@@ -17,9 +15,10 @@
                  '/live_class/details/',
                  liveclassInfo
              ).done(function(data) {
+                errorHandler(data);
                 // alert(window.location.href)
                 //alert("d"+data)
-                window.location.reload()
+                // window.location.reload()
                  //ViewUtils.redirect(window.location.href);
              }).fail(function(jqXHR, textStatus, errorThrown) {
                  var reason = errorThrown;

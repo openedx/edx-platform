@@ -1,0 +1,73 @@
+<%page expression_filter="h"/>
+<%inherit file="base.html" />
+<%namespace name='static' file='static_content.html'/>
+
+<%!
+  import six
+
+  from django.urls import reverse
+  from django.utils.translation import gettext as _
+%>
+<%block name="title">${_("Export Course to Git")}</%block>
+<%block name="bodyclass">is-signedin course tools view-export-git</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+  <header class="mast has-subtitle">
+    <h1 class="page-header">
+      <small class="subtitle">${_("Tools")}</small>
+      <span class="sr">&gt; </span>${_("Export to Git")}
+    </h1>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+
+      <div class="introduction">
+        <h2 class="title">${_("About Export to Git")}</h2>
+        <div class="copy">
+          <p>${_("Use this to export your course to its git repository.")}</p>
+          <p>${_("This will then trigger an automatic update of the main LMS site and update the contents of your course visible there to students if automatic git imports are configured.")}</p>
+        </div>
+      </div>
+
+      <div class="export-git-controls">
+        <h2 class="title">${_("Export Course to Git:")}</h2>
+
+        % if not context_course.giturl:
+        <p class="error-text">${_("giturl must be defined in your course settings before you can export to git.")}</p>
+        % else:
+        <ul class="list-actions">
+          <li class="item-action">
+            <a class="action action-export-git action-primary" href="${reverse('export_git', kwargs=dict(course_key_string=six.text_type(context_course.id)))}?action=push">
+              <span class="icon fa fa-arrow-circle-o-down" aria-hidden="true"></span>
+              <span class="copy">${_("Export to Git")}</span>
+            </a>
+          </li>
+        </ul>
+        % endif
+      </div>
+      <div class="messages">
+        % if msg:
+          % if failed:
+          <h3 class="error-text">${_('Export Failed')}:</h3>
+          % else:
+          <h3>${_('Export Succeeded')}:</h3>
+          % endif
+        <pre>${msg}</pre>
+        % endif
+      </div>
+    </article>
+    <aside class="content-supplementary" role="complementary">
+      <dl class="export-git-info-block">
+        <dt>${_("Your course:")}</dt>
+        <dd class="course_text">${context_course.id}</dd>
+        <dt>${_("Course git url:")}</dt>
+        <dd class="giturl_text">${context_course.giturl}</dd>
+      </dl>
+    </aside>
+  </section>
+</div>
+</%block>

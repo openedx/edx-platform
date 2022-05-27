@@ -1,0 +1,534 @@
+// studio - elements - navigation
+// ====================
+
+// common
+nav {
+  ol,
+  ul {
+    @extend %cont-no-list;
+  }
+}
+
+// ====================
+
+// tabs
+
+// ====================
+
+// skip navigation
+.nav-skip,
+.transcript-skip {
+  @include font-size(13);
+
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  top: -($baseline*30);
+  overflow: hidden;
+  background: $white;
+  border-bottom: 1px solid $gray-l4;
+  padding: ($baseline*0.75) ($baseline/2);
+
+  &:focus,
+  &:active {
+    position: relative;
+    top: auto;
+    width: auto;
+    height: auto;
+    margin: 0;
+  }
+}
+
+// ====================
+
+// dropdown
+.nav-dd {
+  .title {
+    .label,
+    .fa-caret-down {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .ui-toggle-dd {
+      @include transition(all $tmg-f2 ease-in-out 0s);
+
+      margin-left: $baseline/4;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    // dropped down state
+    &.is-selected {
+      .ui-toggle-dd {
+        @include transform(rotate(-180deg));
+        @include transform-origin(50% 50%);
+      }
+    }
+  }
+
+  .nav-item {
+    position: relative;
+
+    &.nav-course-settings {
+      .wrapper-nav-sub {
+        width: ($baseline*9);
+      }
+    }
+  }
+
+  .wrapper-nav-sub {
+    @include transition(opacity $tmg-f2 ease-in-out 0s);
+
+    position: absolute;
+    top: ($baseline*2.5);
+    opacity: 0;
+    pointer-events: none;
+    width: ($baseline*8);
+    overflow: hidden;
+    height: 0;
+
+
+    // dropped down state
+    &.is-shown {
+      opacity: 1;
+      pointer-events: auto;
+      overflow: visible;
+      height: auto;
+    }
+  }
+
+  .nav-sub {
+    border-radius: 2px;
+    box-sizing: border-box;
+    box-shadow: 0 1px 1px $shadow-l1;
+    position: relative;
+    width: 100%;
+    border: 1px solid $gray-l3;
+    padding: ($baseline/2) ($baseline*0.75);
+    background: $white;
+
+    &::after,
+    &::before {
+      bottom: 100%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    // ui triangle/nub
+    &::after {
+      border-color: rgba(255, 255, 255, 0);
+      border-bottom-color: $white;
+      border-width: 10px;
+    }
+
+    &::before {
+      border-color: rgba(178, 178, 178, 0);
+      border-bottom-color: $gray-l3;
+      border-width: 11px;
+    }
+
+    .nav-item {
+      @extend %t-action3;
+      @extend %t-regular;
+
+      display: block;
+      margin: 0 0 ($baseline/4) 0;
+      border-bottom: 1px solid $gray-l5;
+      padding: 0 0($baseline/4) 0;
+
+      &:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      a {
+        display: block;
+
+        &:hover,
+        &:active {
+          color: theme-color("primary");
+        }
+      }
+    }
+  }
+
+  // CASE: left-hand side arrow/dd
+  &.ui-left {
+    .wrapper-nav-sub {
+      left: 0;
+    }
+
+    .nav-sub {
+      @include text-align(left);
+
+      // ui triangle/nub
+      &::after {
+        left: $baseline;
+        margin-left: -10px;
+      }
+
+      &::before {
+        left: $baseline;
+        margin-left: -11px;
+      }
+    }
+  }
+
+  // CASE: right-hand side arrow/dd
+  &.ui-right {
+    .wrapper-nav-sub {
+      @include left(none);
+      @include right(0);
+    }
+
+    .nav-sub {
+
+      // ui triangle/nub
+      &::after {
+        @include right($baseline);
+
+        margin-right: -10px;
+      }
+
+      &::before {
+        @include right($baseline);
+
+        margin-right: -11px;
+      }
+    }
+  }
+}
+
+.jump-nav {
+  .nav-item {
+    display: inline-block;
+    margin-bottom: 5px;
+
+
+    .title {
+      &:hover,
+      &:active {
+        color: theme-color("primary");
+      }
+    }
+
+    .hyperlink {
+      color: $gray-d2;
+
+      &:hover,
+      &:active {
+        color: theme-color("primary");
+      }
+    }
+
+    .spacer {
+      margin-right: 20px;
+      margin-left: 20px;
+      font-size: 24px;
+    }
+
+    .wrapper-nav-sub {
+      top: 35px;
+      z-index: 100;
+      min-width: 250px;
+    }
+  }
+}
+
+
+// ====================
+$seq-nav-border-color: $border-color !default;
+$seq-nav-hover-color: rgb(245, 245, 245) !default;
+$seq-nav-link-color: $link-color !default;
+$seq-nav-icon-color: rgb(10, 10, 10) !default;
+$seq-nav-icon-color-muted: rgb(90, 90, 90) !default;
+$seq-nav-tooltip-color: rgb(51, 51, 51) !default;
+$seq-nav-height: 40px;
+
+
+#sequence-nav {
+  clear: both;
+}
+
+.sequence-nav {
+  @extend .topbar;
+
+  background-color: #fff;
+  margin: 0 auto;
+  position: relative;
+  border-bottom: none;
+  z-index: 0;
+  height: $seq-nav-height;
+  display: flex;
+  justify-content: center;
+
+  @media print {
+    display: none;
+  }
+
+  .sequence-list-wrapper {
+    @extend %ui-depth2;
+
+    position: relative;
+    height: 100%;
+    flex-grow: 1;
+
+    @include media-breakpoint-down(md) {
+      white-space: nowrap;
+      overflow-x: scroll;
+    }
+  }
+
+  ol {
+    display: flex;
+
+    li {
+      box-sizing: border-box;
+      min-width: 40px;
+      flex-grow: 1;
+      border-color: $seq-nav-border-color;
+      border-width: 1px;
+      border-top-style: solid;
+
+      &:not(:last-child) {
+        @include border-right-style(solid);
+      }
+
+      button {
+        @extend %ui-fake-link;
+        @extend %ui-clear-button;
+
+        width: 100%;
+        height: ($seq-nav-height - 1);
+        position: relative;
+        margin: 0;
+        padding: 0;
+        display: block;
+        text-align: center;
+        border-color: $seq-nav-border-color;
+        border-width: 1px;
+        border-bottom-style: solid;
+        box-sizing: border-box;
+        overflow: visible; // for tooltip - IE11 uses 'hidden' by default if width/height is specified
+
+        .icon {
+          display: inline-block;
+          line-height: 100%; // This matches the height of the <a> its within (the parent) to get vertical centering.
+          font-size: 110%;
+          color: $seq-nav-icon-color-muted;
+        }
+
+        .fa-bookmark {
+          color: $seq-nav-link-color;
+        }
+
+        //video
+        &.seq_video {
+          .icon::before {
+            content: "\f008"; // .fa-film
+          }
+        }
+
+        //other
+        &.seq_other {
+          .icon::before {
+            content: "\f02d"; // .fa-book
+          }
+        }
+
+        //vertical
+        &.seq_vertical {
+          .icon::before {
+            content: "\f00b";  // .fa-tasks
+          }
+        }
+
+        //problems
+        &.seq_problem {
+          .icon::before {
+            content: "\f044";  // .fa-pencil-square-o
+          }
+        }
+
+        .sequence-tooltip {
+          @include text-align(left);
+
+          @extend %ui-depth2;
+
+          margin-top: 12px;
+          background: $seq-nav-tooltip-color;
+          color: $white;
+          font-family: $font-family-sans-serif;
+          line-height: lh();
+          right: 0;  // Should not be RTLed, tooltips do not move in RTL
+          padding: 6px;
+          position: absolute;
+          top: 48px;
+          text-shadow: 0 -1px 0 $black;
+          white-space: pre;
+          pointer-events: none;
+
+          &:empty {
+            background: none;
+
+            &::after {
+              display: none;
+            }
+          }
+
+          &::after {
+            @include transform(rotate(45deg));
+            @include right(18px);
+
+            background: $seq-nav-tooltip-color;
+            content: " ";
+            display: block;
+            height: 10px;
+            right: 18px;  // Not RTLed, positions tooltips relative to seq nav item
+            position: absolute;
+            top: -5px;
+            width: 10px;
+          }
+        }
+      }
+    }
+  }
+
+  body.touch-based-device & ol li button:hover p {
+    display: none;
+  }
+}
+
+.sequence-nav-button {
+  @extend %ui-depth3;
+
+  display: block;
+  top: 0;
+  min-width: 40px;
+  max-width: 40px;
+  height: 100%;
+  text-shadow: none; // overrides default button text-shadow
+  background: none;  // overrides default button gradient
+  background-color: theme-color("inverse");
+  border-color: $seq-nav-border-color;
+  box-shadow: none;
+  font-size: inherit;
+  font-weight: normal;
+  padding: 0;
+  white-space: nowrap;
+  overflow-x: hidden;
+
+  @include media-breakpoint-up(md) {
+    min-width: 120px;
+    max-width: 200px;
+    text-overflow: ellipsis;
+
+    span:not(:last-child) {
+      @include padding-right($baseline / 2);
+    }
+  }
+
+  .sequence-nav-button-label {
+    display: none;
+
+    @include media-breakpoint-up(md) {
+      display: inline;
+    }
+  }
+
+  &.button-previous {
+    order: -999;
+
+    @include media-breakpoint-up(md) {
+      @include left(0);
+      @include border-top-left-radius(3px);
+      @include border-top-right-radius(0);
+      @include border-bottom-right-radius(0);
+      @include border-bottom-left-radius(3px);
+    }
+  }
+
+  &.button-next {
+    order: 999;
+
+    @include media-breakpoint-up(md) {
+      @include right(0);
+      @include border-top-left-radius(0);
+      @include border-top-right-radius(3px);
+      @include border-bottom-right-radius(3px);
+      @include border-bottom-left-radius(0);
+    }
+  }
+
+  &.disabled {
+    cursor: normal;
+  }
+}
+
+.seq_contents {
+  display: none;
+}
+
+#seq_content {
+  &:focus,
+  &:active {
+    outline: none;
+  }
+}
+
+// hover and active states
+.sequence-nav-button,
+.sequence-nav button {
+  &.focused,
+  &:hover,
+  &:active,
+  &.active {
+    padding-top: 2px;
+    background-color: theme-color("primary");
+
+    .icon {
+      color: theme-color("inverse");
+    }
+
+    @include media-breakpoint-up(sm) {
+      border-bottom: 3px solid $seq-nav-link-color;
+      background-color: theme-color("inverse");
+
+      .icon {
+        color: $seq-nav-icon-color;
+      }
+    }
+  }
+
+  // FontAwesome rtl chevron next - Learning Sequence Nav
+  .fa-chevron-next {
+    &::before {
+      @if $bi-app-direction == ltr {
+        content: "\f054"; // .fa-chevron-right
+      }
+
+      @else if $bi-app-direction == rtl {
+        content: "\f053"; // .fa-chevron-left
+      }
+    }
+  }
+
+  // FontAwesome rtl chevron prev - - Learning Sequence Nav
+  .fa-chevron-prev {
+    &::before {
+      @if $bi-app-direction == ltr {
+        content: "\f053"; // .fa-chevron-left
+      }
+
+      @else if $bi-app-direction == rtl {
+        content: "\f054"; // .fa-chevron-right
+      }
+    }
+  }
+}

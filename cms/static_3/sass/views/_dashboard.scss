@@ -1,0 +1,729 @@
+// studio - views - user dashboard
+// ====================
+
+.view-dashboard {
+
+  // temp
+  .content {
+    margin-bottom: ($baseline*5);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // ====================
+
+  // basic layout
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
+  }
+
+  .content-primary {
+    @extend .ui-col-wide;
+  }
+
+  .content-supplementary {
+    @extend .ui-col-narrow;
+  }
+
+  // ====================
+
+  // elements - notices
+  .content .notice-incontext {
+    width: flexgrid(9, 9);
+
+    // CASE: notice has actions {
+    &.has-actions,
+    &.list-notices .notice-item.has-actions {
+      .msg,
+      .list-actions {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .msg {
+        width: flex-grid(6, 9);
+        margin-right: flex-gutter();
+      }
+
+      .list-actions {
+        width: flex-grid(3, 9);
+        text-align: right;
+        margin-top: 0;
+
+        .action-create-course,
+        .action-create-library {
+          @extend %btn-primary-green;
+          @extend %t-action3;
+        }
+      }
+    }
+  }
+
+
+
+  // elements - course creation rights controls
+  .wrapper-creationrights {
+    overflow: hidden;
+
+    .ui-toggle-control {
+      @extend %ui-depth2;
+      @extend %btn-secondary-gray;
+
+      @include clearfix();
+
+      display: block;
+      text-align: left;
+
+      // STATE: hover - syncing up colors with current so transition is smoother
+      &:hover {
+        background: $gray-d1;
+        color: $white;
+      }
+
+      .label {
+        @extend %t-action3;
+
+        float: left;
+        width: flex-grid(8, 9);
+        margin: 3px flex-gutter() 0 0;
+      }
+
+      .fa-times-circle {
+        @extend %t-action1;
+
+        @include transform(rotate(45deg));
+        @include transform-origin(center center);
+        @include transition(all $tmg-f1 linear 0s);
+
+        float: right;
+        text-align: right;
+      }
+    }
+
+    .ui-toggle-target {
+      @extend %ui-depth1;
+
+      @include transition(opacity $tmg-f1 ease-in-out 0s);
+
+      position: relative;
+      top: -2px;
+      display: none;
+      opacity: 0;
+    }
+
+    // CASE: when the content area is shown
+    &.is-shown {
+      .ui-toggle-control {
+        @include border-bottom-radius(0);
+
+        .fa-times-circle {
+          @include transform(rotate(90deg));
+          @include transform-origin(center center);
+        }
+      }
+
+      .ui-toggle-target {
+        display: block;
+        opacity: 1;
+      }
+    }
+  }
+
+  // elements - course creation rights controls
+  .status-creationrights {
+    margin-top: $baseline;
+
+    .title {
+      @extend %t-title7;
+      @extend %t-strong;
+
+      margin-bottom: ($baseline/4);
+      color: $gray-d1;
+    }
+
+    .list-actions,
+    .form-actions {
+      margin-top: ($baseline*0.75);
+
+      .action-primary {
+        @extend %btn-primary-blue;
+        @extend %t-action3;
+      }
+
+      // specific - request button
+      // BT: should we abstract these states out for all buttons like this
+      .action-request {
+        position: relative;
+        overflow: hidden;
+
+        .fa-cog {
+          @include transition(all $tmg-f1 ease-in-out $tmg-f1);
+
+          @extend %t-icon4;
+
+          position: absolute;
+          top: ($baseline/2);
+          left: -($baseline);
+          visibility: hidden;
+          opacity: 0;
+        }
+
+        // state: submitting
+        &.is-submitting {
+          padding-left: ($baseline*2);
+
+          .fa-cog {
+            left: ($baseline*0.75);
+            visibility: visible;
+            opacity: 1;
+          }
+        }
+
+        // state: has an error
+        &.has-error {
+          padding-left: ($baseline*2);
+          background: $red;
+          border-color: $red-d1;
+
+          .fa-cog {
+            left: ($baseline*0.75);
+            visibility: visible;
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    .status-update {
+      .label {
+        @extend %cont-text-sr;
+      }
+
+      .value {
+        border-radius: ($baseline/4);
+        position: relative;
+        overflow: hidden;
+        padding: ($baseline/5) ($baseline/2);
+        background: $gray;
+
+        .status-indicator {
+          position: absolute;
+          top: 0;
+          left: 0;
+          display: block;
+          width: 100%;
+          height: ($baseline/4);
+          opacity: 0.4;
+        }
+      }
+
+      .value-formal,
+      .value-description {
+        border-radius: ($baseline/10);
+        display: inline-block;
+        vertical-align: middle;
+        color: $white;
+      }
+
+      .value-formal {
+        @extend %t-title5;
+        @extend %t-strong;
+
+        margin: ($baseline/2);
+
+        .icon {
+          margin-right: ($baseline/4);
+        }
+      }
+
+      .value-description {
+        @extend %t-copy-sub1;
+
+        position: relative;
+        color: $white;
+        opacity: 0.85;
+      }
+    }
+
+    // CASE: rights are not requested yet
+    &.is-unrequested {
+      .title {
+        @extend %cont-text-sr;
+      }
+    }
+
+    // CASE: status is pending
+    &.is-pending {
+      .status-update {
+        .value {
+          background: $orange;
+        }
+
+        .status-indicator {
+          background: $orange-d1;
+        }
+      }
+    }
+
+
+    // CASE: status is denied
+    &.is-denied {
+      .status-update {
+        .value {
+          background: $red-l1;
+        }
+
+        .status-indicator {
+          background: $red-s1;
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // Course/Library tabs
+  #course-index-tabs {
+    margin: 0;
+    font-size: 1.4rem;
+
+    li {
+      display: inline-block;
+      line-height: $baseline*2;
+      margin: 0 10px;
+
+      &.active {
+        border-bottom: 4px solid theme-color("primary");
+      }
+
+      &.active,
+      &:hover {
+        a {
+          color: $gray-d2;
+        }
+      }
+
+      a {
+        color: theme-color("primary");
+        cursor: pointer;
+        display: inline-block;
+      }
+    }
+  }
+
+  // ELEM: course listings
+  .courses-tab,
+  .archived-courses-tab,
+  .libraries-tab {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+
+  .courses,
+  .libraries,
+  .archived-courses {
+    .title {
+      @extend %t-title6;
+
+      margin-bottom: $baseline;
+      border-bottom: 1px solid $gray-l3;
+      padding-bottom: ($baseline/2);
+      color: $gray-l2;
+    }
+
+    .title {
+      @extend %t-title6;
+
+      margin-bottom: $baseline;
+      border-bottom: 1px solid $gray-l3;
+      padding-bottom: ($baseline/2);
+      color: $gray-l2;
+    }
+  }
+
+  .list-courses {
+    border-radius: 3px;
+    border: 1px solid $gray-l2;
+    background: $white;
+    box-shadow: 0 1px 1px $shadow-l1;
+
+    li:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+
+  // UI: course wrappers (needed for status messages)
+  .wrapper-course {
+
+    // CASE: has status
+    &.has-status {
+      .course-status {
+        box-sizing: border-box;
+        display: inline-block;
+        vertical-align: middle;
+        width: flex-grid(3, 9);
+        padding-right: ($baseline/2);
+        text-align: right;
+
+        .value {
+          .copy,
+          .icon {
+            display: inline-block;
+            vertical-align: middle;
+          }
+
+          .icon {
+            @extend %t-icon4;
+
+            margin-right: ($baseline/2);
+          }
+
+          .copy {
+            @extend %t-copy-sub1;
+          }
+        }
+      }
+
+      .status-message {
+        @extend %t-copy-sub1;
+
+        background-color: $gray-l5;
+        box-shadow: 0 2px 2px 0 $shadow inset;
+        padding: ($baseline*0.75) $baseline;
+
+        &.has-actions {
+          .copy,
+          .status-actions {
+            display: inline-block;
+            vertical-align: middle;
+          }
+
+          .copy {
+            width: 65%;
+            margin: 0 $baseline 0 0;
+          }
+
+          .status-actions {
+            width: 30%;
+            text-align: right;
+
+            .button {
+              @extend %btn-secondary-white;
+
+              padding: ($baseline/4) ($baseline/2);
+            }
+
+            .icon,
+            .button-copy {
+              display: inline-block;
+              vertical-align: middle;
+            }
+
+            .icon {
+              @extend %t-icon4;
+
+              margin-right: ($baseline/4);
+            }
+
+            .button-copy {
+              @extend %t-copy-sub1;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // UI: individual course listings
+  .course-item {
+    box-sizing: border-box;
+    width: flex-grid(9, 9);
+    position: relative;
+    border-bottom: 1px solid $gray-l2;
+    padding: $baseline;
+
+    // STATE: hover/focus
+    &:hover {
+      background: $paleYellow;
+    }
+
+    .course-link,
+    .course-actions {
+      box-sizing: border-box;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    // encompassing course link
+    .course-link {
+      @extend %ui-depth2;
+
+      width: flex-grid(6, 9);
+
+      @include margin-right(flex-gutter());
+    }
+
+    // course title
+    .course-title {
+      @extend %t-title4;
+
+      @include margin(0, ($baseline*2), ($baseline/4), 0);
+
+      font-weight: 300;
+    }
+
+    // course metadata
+    .course-metadata {
+      @extend %t-copy-sub1;
+
+      @include transition(opacity $tmg-f1 ease-in-out 0);
+
+      color: $gray-d2;
+
+      .metadata-item {
+        display: inline-block;
+
+        & + .metadata-item::before {
+          content: "/";
+          margin-left: ($baseline/4);
+          margin-right: ($baseline/4);
+          color: $gray-l4;
+        }
+
+        .label {
+          @extend %cont-text-sr;
+        }
+      }
+
+      .extra-metadata {
+        margin-left: ($baseline/4);
+      }
+    }
+
+    .course-actions {
+      @extend %ui-depth3;
+
+      position: static;
+      width: flex-grid(3, 9);
+
+      @include text-align(right);
+
+      .action {
+        display: inline-block;
+        vertical-align: middle;
+
+        @include margin-right($baseline/2);
+
+        &:last-child {
+          @include margin-right(0);
+        }
+      }
+
+      .button {
+        @extend %t-action3;
+      }
+
+      // view live button
+      .view-button {
+        box-sizing: border-box;
+        padding: ($baseline/2);
+      }
+
+      // course re-run button
+      .action-rerun {
+        margin-right: $baseline;
+      }
+    }
+
+    // CASE: is processing
+    &.is-processing {
+      .course-status .value {
+        color: $gray-l2;
+      }
+    }
+
+    // CASE: has an error
+    &.has-error {
+      .course-status {
+        color: $red; // TODO: abstract this out to an error-based color variable
+      }
+
+      ~ .status-message {
+        background: $red-l1; // TODO: abstract this out to an error-based color variable
+        color: $white;
+      }
+    }
+
+    // CASE: last course in listing
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  // ====================
+
+  // CASE: courses that are being processed
+  .courses-processing {
+    margin-bottom: ($baseline*2);
+    border-bottom: 1px solid $gray-l3;
+    padding-bottom: ($baseline*2);
+
+    // TODO: abstract this case out better with normal course listings
+    .list-courses {
+      border: none;
+      background: none;
+      box-shadow: none;
+    }
+
+    .wrapper-course {
+      @extend %ui-window;
+
+      position: relative;
+    }
+
+    .course-item {
+      border: none;
+
+      // STATE: hover/focus
+      &:hover {
+        background: inherit;
+
+        .course-title {
+          color: inherit;
+        }
+      }
+    }
+
+    // course details (replacement for course-link when a course cannot be linked)
+    .course-details {
+      @extend %ui-depth2;
+
+      display: inline-block;
+      vertical-align: middle;
+      width: flex-grid(6, 9);
+      margin-right: flex-gutter();
+    }
+  }
+
+  .optimization-form {
+    margin-bottom: $baseline;
+
+    label {
+      font-size: 1.4rem;
+    }
+
+    .form-actions {
+      margin-top: ($baseline/2);
+    }
+  }
+
+  // ====================
+
+  // ELEM: new user form
+  .wrapper-create-course {
+
+    // CASE: when form is animating
+    &.animate {
+
+      // STATE: shown
+      &.is-shown {
+        height: ($baseline*26);
+
+        // STATE: errors
+        &.has-errors {
+          height: ($baseline*33);
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // course listings
+
+  .create-course,
+  .create-library {
+    .row {
+      @include clearfix();
+
+      margin-bottom: ($baseline*0.75);
+    }
+
+    .column {
+      float: left;
+      width: 48%;
+    }
+
+    .column:first-child {
+      margin-right: 4%;
+    }
+
+    label {
+      @extend %t-title7;
+      @extend %t-strong;
+
+      display: block;
+    }
+
+    .new-course-org,
+    .new-course-number,
+    .new-course-name,
+    .new-course-run {
+      width: 100%;
+    }
+
+    .course-run-text-direction {
+      direction: ltr;
+      text-align: right;
+    }
+
+    .placeholder-text-direction {
+      direction: rtl;
+    }
+
+    .new-course-name {
+      @extend %t-title5;
+      @extend %t-light;
+    }
+
+    .new-course-save {
+      @include blue-button;
+    }
+
+    .new-course-cancel {
+      @include white-button;
+    }
+
+    .item-details {
+      padding-bottom: 0;
+    }
+
+    .wrap-error {
+      @include transition(all $tmg-f2 ease 0s);
+
+      height: 0;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    .wrap-error.is-shown {
+      height: 65px;
+      opacity: 1;
+    }
+
+    .message-status {
+      @extend %t-strong;
+
+      display: block;
+      margin-bottom: 0;
+      padding: ($baseline*0.5) ($baseline*1.5) 8px ($baseline*1.5);
+    }
+  }
+}

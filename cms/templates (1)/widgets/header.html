@@ -1,0 +1,280 @@
+<%page expression_filter="h" args="online_help_token"/>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+  import six
+  from six.moves.urllib.parse import quote
+  from django.conf import settings
+  from django.urls import reverse
+  from django.utils.translation import gettext as _
+  from cms.djangoapps.contentstore import toggles
+  from cms.djangoapps.contentstore.utils import get_pages_and_resources_url
+  from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
+  from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
+%>
+<div class="wrapper-header wrapper" id="view-top">
+  <header class="primary" role="banner">
+    <div class="wrapper wrapper-l">
+      <h1 class="branding">
+        <a class="brand-link" href="/">
+          <img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
+            % if settings.LOGO_IMAGE_EXTRA_TEXT == 'edge':
+            <span class="font-italic"> <span class="tilted">|</span> EDGE</span>
+            % endif
+        </a>
+      </h1>
+
+      % if context_course:
+      <%
+            course_key = context_course.id
+            url_encoded_course_key = quote(six.text_type(course_key).encode('utf-8'), safe='')
+            index_url = reverse('course_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            course_team_url = reverse('course_team_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            assets_url = reverse('assets_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            textbooks_url = reverse('textbooks_list_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            videos_url = reverse('videos_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            import_url = reverse('import_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            course_info_url = reverse('course_info_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            export_url = reverse('export_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            settings_url = reverse('settings_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            grading_url = reverse('grading_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            advanced_settings_url = reverse('advanced_settings_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            tabs_url = reverse('tabs_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            certificates_url = ''
+            if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
+                certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            checklists_url = reverse('checklists_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            pages_and_resources_mfe_enabled = ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(context_course.id)
+      %>
+      <h2 class="info-course">
+        <span class="sr">${_("Current Course:")}</span>
+        <a class="course-link" href="${index_url}">
+          <span class="course-org">${context_course.display_org_with_default}</span><span class="course-number">${context_course.display_number_with_default}</span>
+          <span class="course-title" title="${context_course.display_name_with_default}">${context_course.display_name_with_default}</span>
+        </a>
+      </h2>
+
+      <nav class="nav-course nav-dd ui-left" aria-label="${_('Course')}">
+        <h2 class="sr">${_("Course Navigation")}</h2>
+        <ol>
+          <li class="nav-item nav-course-courseware">
+            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span></h3>
+
+            <div class="wrapper wrapper-nav-sub">
+              <div class="nav-sub">
+                <ul>
+                  <li class="nav-item nav-course-courseware-outline">
+                    <a href="${index_url}">${_("Outline")}</a>
+                  </li>
+                  <li class="nav-item nav-course-courseware-updates">
+                    <a href="${course_info_url}">${_("Updates")}</a>
+                  </li>
+                  % if not pages_and_resources_mfe_enabled:
+                  <li class="nav-item nav-course-courseware-pages">
+                    <a href="${tabs_url}">${_("Pages")}</a>
+                  </li>
+                  % endif
+                  % if pages_and_resources_mfe_enabled:
+                  <li class="nav-item nav-course-courseware-pages-resources">
+                    <a href="${get_pages_and_resources_url(course_key)}" rel="external">${_("Pages & Resources")}</a>
+                  </li>
+                  % endif
+                  <li class="nav-item nav-course-courseware-uploads">
+                    <a href="${assets_url}">${_("Files & Uploads")}</a>
+                  </li>
+                  % if not pages_and_resources_mfe_enabled:
+                  <li class="nav-item nav-course-courseware-textbooks">
+                    <a href="${textbooks_url}">${_("Textbooks")}</a>
+                  </li>
+                  % endif
+                  % if context_course.video_pipeline_configured:
+                  <li class="nav-item nav-course-courseware-videos">
+                    <a href="${videos_url}">${_("Video Uploads")}</a>
+                  </li>
+                  % endif
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="nav-item nav-course-settings">
+            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Settings")}</span> <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span></h3>
+
+            <div class="wrapper wrapper-nav-sub">
+              <div class="nav-sub">
+                <ul>
+                  <li class="nav-item nav-course-settings-schedule">
+                    <a href="${settings_url}">${_("Schedule & Details")}</a>
+                  </li>
+                  <li class="nav-item nav-course-settings-grading">
+                    <a href="${grading_url}">${_("Grading")}</a>
+                  </li>
+                  <li class="nav-item nav-course-settings-team">
+                    <a href="${course_team_url}">${_("Course Team")}</a>
+                  </li>
+                  <li class="nav-item nav-course-settings-group-configurations">
+                    <a href="${reverse('group_configurations_list_handler', kwargs={'course_key_string': six.text_type(course_key)})}">${_("Group Configurations")}</a>
+                  </li>
+                  % if mfe_proctored_exam_settings_url:
+                  <li class="nav-item nav-course-settings-exams">
+                    <a href="${mfe_proctored_exam_settings_url}">${_("Proctored Exam Settings")}</a>
+                  </li>
+                  % endif
+                  <li class="nav-item nav-course-settings-advanced">
+                    <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
+                  </li>
+                  % if certificates_url:
+                  <li class="nav-item nav-course-settings-certificates">
+                    <a href="${certificates_url}">${_("Certificates")}</a>
+                  </li>
+                  % endif
+                  % if frontend_app_publisher_url:
+                  <li class="nav-item nav-course-courseware-videos">
+                    <a href="${frontend_app_publisher_url}/course-runs/${url_encoded_course_key}">${_("Publisher")}</a>
+                  </li>
+                  % endif
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="nav-item nav-course-tools">
+            <h3 class="title"><span class="label">${_("Tools")}</span> <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span></h3>
+            <div class="wrapper wrapper-nav-sub">
+              <div class="nav-sub">
+                <ul>
+                  <li class="nav-item nav-course-tools-import">
+                    <a href="${import_url}">${_("Import")}</a>
+                  </li>
+                  <li class="nav-item nav-course-tools-export">
+                    <a href="${export_url}">${_("Export")}</a>
+                  </li>
+                  % if toggles.EXPORT_GIT.is_enabled() and context_course.giturl:
+                  <li class="nav-item nav-course-tools-export-git">
+                    <a href="${reverse('export_git', kwargs=dict(course_key_string=six.text_type(course_key)))}">${_("Export to Git")}</a>
+                  </li>
+                  % endif
+                  <li class="nav-item nav-course-tools-checklists">
+                    <a href="${checklists_url}">${_("Checklists")}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </nav>
+      % elif context_library:
+       <%
+            library_key = context_library.location.course_key
+            index_url = reverse('library_handler', kwargs={'library_key_string': six.text_type(library_key)})
+            import_url = reverse('import_handler', kwargs={'course_key_string': six.text_type(library_key)})
+            lib_users_url = reverse('manage_library_users', kwargs={'library_key_string': six.text_type(library_key)})
+            export_url = reverse('export_handler', kwargs={'course_key_string': six.text_type(library_key)})
+      %>
+      <h2 class="info-course">
+        <span class="sr">${_("Current Library:")}</span>
+        <a class="course-link" href="${index_url}">
+          <span class="course-org">${context_library.display_org_with_default}</span><span class="course-number">${context_library.display_number_with_default}</span>
+          <span class="course-title" title="${context_library.display_name_with_default}">${context_library.display_name_with_default}</span>
+        </a>
+      </h2>
+
+      <nav class="nav-course nav-dd ui-left" aria-label="${_('Course')}">
+        <h2 class="sr">${_("Course Navigation")}</h2>
+        <ol>
+
+          <li class="nav-item nav-library-settings">
+            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Library")} </span>${_("Settings")}</span> <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span></h3>
+            <div class="wrapper wrapper-nav-sub">
+              <div class="nav-sub">
+                <ul>
+                  <li class="nav-item nav-library-settings-team">
+                    <a href="${lib_users_url}">${_("User Access")}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item nav-course-tools">
+            <h3 class="title"><span class="label">${_("Tools")}</span> <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span></h3>
+
+            <div class="wrapper wrapper-nav-sub">
+              <div class="nav-sub">
+                <ul>
+                  <li class="nav-item nav-course-tools-import">
+                    <a href="${import_url}">${_("Import")}</a>
+                  </li>
+                  <li class="nav-item nav-course-tools-export">
+                    <a href="${export_url}">${_("Export")}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </nav>
+      % endif
+    </div>
+
+    <div class="wrapper wrapper-r">
+      % if header_language_selector_is_enabled():
+        <% languages = released_languages() %>
+        % if len(languages) > 1:
+        <nav class="user-language-selector" aria-label="${_('Language preference')}">
+          <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
+              <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+              % if user.is_authenticated:
+              <input title="preference api" type="hidden" id="preference-api-url" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
+              % else:
+              <input title="session update url" type="hidden" id="update-session-url" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
+              % endif
+              <label><span class="sr">${_("Choose Language")}</span>
+              <select class="input select language-selector" id="settings-language-value" name="language">
+              % for language in languages:
+                % if language[0] == LANGUAGE_CODE:
+                 <option value="${language[0]}" selected="selected">${language[1]}</option>
+                % else:
+                 <option value="${language[0]}" >${language[1]}</option>
+                % endif
+              % endfor
+              </select>
+              </label>
+          </form>
+        </nav>
+      % endif
+      % endif
+      % if user.is_authenticated:
+      <nav class="nav-account nav-is-signedin nav-dd ui-right" aria-label="${_('Account')}">
+        <h2 class="sr-only">${_("Account Navigation")}</h2>
+        <ol>
+          % if settings.FEATURES.get('ENABLE_HELP_LINK'):
+            <li class="nav-item nav-account-help">
+              <h3 class="title"><span class="label"><a href="${get_online_help_info(online_help_token)['doc_url']}" title="${_('Contextual Online Help')}" rel="noopener" target="_blank">${_("Help")}</a></span></h3>
+            </li>
+          % endif
+          <li class="nav-item nav-account-user">
+            <%include file="user_dropdown.html" args="online_help_token=online_help_token" />
+          </li>
+        </ol>
+      </nav>
+
+    % else:
+      <nav class="nav-not-signedin nav-pitch" aria-label="${_('Account')}">
+        <h2 class="sr-only">${_("Account Navigation")}</h2>
+        <ol>
+          <li class="nav-item nav-not-signedin-help">
+            <a href="${get_online_help_info(online_help_token)['doc_url']}" title="${_('Contextual Online Help')}" rel="noopener" target="_blank">${_("Help")}</a>
+          </li>
+          % if static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
+              <li class="nav-item nav-not-signedin-signup">
+                <a class="action action-signup" href="${settings.FRONTEND_REGISTER_URL}?next=${current_url}">${_("Sign Up")}</a>
+              </li>
+          % endif
+          <li class="nav-item nav-not-signedin-signin">
+            <a class="action action-signin" href="${settings.LOGIN_URL}?next=${current_url}">${_("Sign In")}</a>
+          </li>
+        </ol>
+      </nav>
+    % endif
+    </div>
+  </header>
+</div>

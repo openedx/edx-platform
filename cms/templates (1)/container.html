@@ -1,0 +1,234 @@
+<%page expression_filter="h"/>
+<%inherit file="base.html" />
+<%def name="online_help_token()">
+<%
+if is_unit_page:
+    return "unit"
+else:
+    return "container"
+%>
+</%def>
+<%!
+from django.utils.translation import gettext as _
+
+from cms.djangoapps.contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%block name="title">${xblock.display_name_with_default} ${xblock_type_display_name(xblock)}</%block>
+<%block name="bodyclass">is-signedin course container view-container</%block>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+% for template_name in templates:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+<script type="text/template" id="image-modal-tpl">
+    <%static:include path="common/templates/image-modal.underscore" />
+</script>
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+% if not settings.STUDIO_FRONTEND_CONTAINER_URL:
+    <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/common.min.css')}" />
+    <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/editImageModal.min.css')}" />
+% endif
+</%block>
+
+<%block name="page_bundle">
+    <%static:webpack entry="js/factories/container">
+        ContainerFactory(
+            ${component_templates | n, dump_js_escaped_json},
+            ${xblock_info | n, dump_js_escaped_json},
+            "${action | n, js_escaped_string}",
+            {
+                isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
+                canEdit: true,
+                outlineURL: "${outline_url | n, js_escaped_string}"
+            }
+        );
+        require(["js/models/xblock_info", "js/views/xblock", "js/views/utils/xblock_utils", "common/js/components/utils/view_utils"], function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils) {
+            var model = new XBlockInfo({
+                id: '${subsection.location|n, decode.utf8}'
+            });
+            var xblockView = new XBlockView({
+                model: model,
+                el: $('#sequence-nav'),
+                view: 'author_view?position=${position|n, decode.utf8}&next_url=${next_url|n, decode.utf8}&prev_url=${prev_url|n, decode.utf8}'
+            });
+            xblockView.xblockReady = function() {
+                $('.seq_new_button').click(function(evt) {
+                    evt.preventDefault();
+                    XBlockUtils.addXBlock($(evt.target)).done(function(locator) {
+                        ViewUtils.redirect('/container/' + locator + '?action=new');
+                        return false;
+                    });
+                    return false;
+                });
+
+            };
+            xblockView.render();
+        });
+    </%static:webpack>
+</%block>
+
+<%block name="content">
+
+<script type="text/javascript">
+    window.STUDIO_FRONTEND_IN_CONTEXT_IMAGE_SELECTION = true;
+</script>
+
+
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-navigation has-subtitle">
+        <div class="jump-nav">
+            <nav class="nav-dd title ui-left">
+                <ol>
+                % for block in ancestor_xblocks:
+                    <li class="nav-item">
+                        <span class="title label">${block['title']}
+                            <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span>
+                        </span>
+                        % if not block['is_last']:
+                        <span class="spacer"> &rsaquo;</span>
+                        % endif
+                        <div class="wrapper wrapper-nav-sub">
+                            <div class="nav-sub">
+                                <ul>
+                                % for child in block['children']:
+                                    <%
+                                        # Not all xblock has their own studio page
+                                        # Check if siblings has any url to their own studio
+                                        # page, otherwise avoid including them in dropdown.
+                                        url = xblock_studio_url(child)
+                                    %>
+                                    % if url:
+                                        <li class="nav-item">
+                                            <a href="${url}">${child.display_name_with_default}</a>
+                                        </li>
+                                    % endif
+                                % endfor
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                % endfor
+                </ol>
+            </nav>
+
+              <div class="wrapper-xblock-field incontext-editor is-editable"
+                 data-field="display_name" data-field-display-name="${_("Display Name")}">
+                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default}</span></h1>
+            </div>
+            <div class="container-access">
+            </div>
+        </div>
+
+        <nav class="nav-actions" aria-label="${_('Page Actions')}">
+            <h3 class="sr">${_("Page Actions")}</h3>
+            <ul>
+                ## Hide the sequence navigation when we've browsed into a child of the unit, e.g. showing the child blocks of a problem-builder xblock
+                % if is_unit_page:
+                    <li class="action-item action-view nav-item">
+                        <a href="${published_preview_link}" class="button button-view action-button is-disabled" aria-disabled="true" rel="external" title="${_('Open the courseware in the LMS')}">
+                            <span class="action-button-text">${_("View Live Version")}</span>
+                        </a>
+                    </li>
+                    <li class="action-item action-preview nav-item">
+                        <a href="${draft_preview_link}" class="button button-preview action-button" rel="external" title="${_('Preview the courseware in the LMS')}">
+                            <span class="action-button-text">${_("Preview")}</span>
+                        </a>
+                    </li>
+                % else:
+                    <li class="action-item action-edit nav-item">
+                        <a href="#" class="button button-edit action-button edit-button">
+                            <span class="icon fa fa-pencil" aria-hidden="true"></span>
+                            <span class="action-button-text">${_("Edit")}</span>
+                        </a>
+                    </li>
+                % endif
+            </ul>
+        </nav>
+    % if is_unit_page:
+    <div id="sequence-nav"></div>
+    % endif
+    </header>
+</div>
+
+<div class="wrapper-content wrapper">
+    <div class="inner-wrapper">
+        <section class="content-area">
+
+            <article class="content-primary">
+                <div class="container-message wrapper-message"></div>
+                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
+                </section>
+                <div class="ui-loading">
+                    <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
+                </div>
+            </article>
+            <aside class="content-supplementary" role="complementary">
+                % if xblock.category == 'split_test':
+                    <div class="bit">
+                        <h3 class="title-3">${_("Adding components")}</h3>
+                        <p>${Text(_("Select a component type under {strong_start}Add New Component{strong_end}. Then select a template.")).format(
+                                    strong_start=HTML('<strong>'),
+                                    strong_end=HTML("</strong>"),
+                            )}</p>
+                        <p>${_("The new component is added at the bottom of the page or group. You can then edit and move the component.")}</p>
+                        <h3 class="title-3">${_("Editing components")}</h3>
+                        <p>${Text(_("Click the {strong_start}Edit{strong_end} icon in a component to edit its content.")).format(
+                                    strong_start=HTML('<strong>'),
+                                    strong_end=HTML("</strong>"),
+                            )}</p>
+                        <h3 class="title-3">${_("Reorganizing components")}</h3>
+                        <p>${_("Drag components to new locations within this component.")}</p>
+                        <p>${_("For content experiments, you can drag components to other groups.")}</p>
+                        <h3 class="title-3">${_("Working with content experiments")}</h3>
+                        <p>${_("Confirm that you have properly configured content in each of your experiment groups.")}</p>
+                    </div>
+                    <div class="bit external-help">
+                        <a href="${get_online_help_info(online_help_token())['doc_url']}" rel="noopener" target="_blank" class="button external-help-button">${_("Learn more about component containers")}</a>
+                    </div>
+                % elif is_unit_page:
+                    <div id="publish-unit"></div>
+                    <div id="publish-history" class="unit-publish-history"></div>
+                    <div class="unit-location is-hidden">
+                        <h4 class="bar-mod-title">${_("Unit Location")}</h4>
+                        <div class="wrapper-unit-id bar-mod-content">
+                            <h5 class="title">${_("Location ID")}</h5>
+                            <p class="unit-id">
+                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.block_id}</span>
+                                <span class="tip"><span class="sr">Tip: </span>${Text(_('To create a link to this unit from an HTML component in this course, enter "/jump_to_id/<location ID>" as the URL value.'))}</span>
+                            </p>
+                        </div>
+                     </div>
+                % endif
+            </aside>
+        </section>
+        <div id="edit-image-modal">
+        <%static:studiofrontend entry="editImageModal">
+            {
+            "course": {
+                "id": "${context_course.id | n, js_escaped_string}",
+                "name": "${context_course.display_name_with_default | n, js_escaped_string}",
+                "url_name": "${context_course.location.name | n, js_escaped_string}",
+                "org": "${context_course.location.org | n, js_escaped_string}",
+                "num": "${context_course.location.course | n, js_escaped_string}",
+                "display_course_number": "${context_course.display_coursenumber | n, js_escaped_string}",
+                "revision": "${context_course.location.revision | n, js_escaped_string}"
+            },
+            "help_tokens": {
+                "image_accessibility": "${get_online_help_info('image_accessibility')['doc_url'] | n, js_escaped_string}"
+            },
+            "lang": "${language_code | n, js_escaped_string}"
+            }
+        </%static:studiofrontend>
+        </div>
+    </div>
+</div>
+</%block>

@@ -1,0 +1,3 @@
+<%! from django.utils.translation import gettext as _ %>
+
+${_("Your request for course creation rights to {studio_name} have been denied. If you believe this was in error, please contact {email}").format(studio_name=settings.STUDIO_NAME, email=studio_request_email)}

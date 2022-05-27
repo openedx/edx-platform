@@ -1,0 +1,299 @@
+// studio - views - course import
+// ====================
+
+.view-import {
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
+  }
+
+  .content-primary {
+    @extend .ui-col-wide;
+  }
+
+  .content-supplementary {
+    @extend .ui-col-narrow;
+  }
+
+  // UI: export controls
+  .export-controls {
+    @extend %ui-window;
+
+    @include clearfix();
+
+    padding: ($baseline*1.5) ($baseline*2);
+  }
+
+  // UI: import form
+  .import-form {
+    box-sizing: border-box;
+
+    @extend %ui-window;
+
+    padding: $baseline ($baseline*1.5) ($baseline*1.5) ($baseline*1.5);
+
+    > .title {
+      @extend %t-title4;
+    }
+
+    .file-name-block,
+    .error-block {
+      display: none;
+      margin-bottom: $baseline;
+    }
+
+    .error-block {
+      color: $error-red;
+    }
+
+    .file-input {
+      display: none;
+    }
+  }
+
+  // ====================
+
+  // UI: default
+  .action-choose-file {
+    @extend %btn-primary-green;
+    @extend %t-action1;
+
+    display: block;
+    margin: $baseline 0;
+    padding: ($baseline*0.75) $baseline;
+
+    .icon {
+      @extend %t-icon2;
+
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: ($baseline/4);
+    }
+
+    .copy {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  // ====================
+
+  // UI: elem - file selection
+  .wrapper-file-name {
+    @extend %ui-well;
+
+    margin: $baseline 0;
+    padding: $baseline ($baseline*1.5);
+    background-color: $gray-l4;
+
+    .title {
+      @extend %t-copy-lead1;
+
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0;
+
+      .label {
+        margin-right: ($baseline/2);
+      }
+
+      .file-name {
+        @extend %t-strong;
+      }
+    }
+
+    // artifact styling needed for current page behavior logic
+    .submit-button {
+      @extend %btn-primary-green;
+      @extend %t-action1;
+
+      display: none;
+      margin-top: ($baseline*0.75);
+      width: 100%;
+      padding: ($baseline*0.75) $baseline;
+    }
+  }
+
+  // ====================
+
+  // UI: upload progress
+  .wrapper-status {
+    @include transition(opacity $tmg-f2 ease-in-out 0);
+
+    opacity: 1;
+
+    // STATE: hidden
+    &.is-hidden {
+      opacity: 0;
+      display: none;
+    }
+
+    > .title {
+      @extend %t-title4;
+
+      margin-bottom: $baseline;
+      border-bottom: 1px solid $gray-l3;
+      padding-bottom: ($baseline/2);
+    }
+    // elem - progress list
+    .list-progress {
+      width: flex-grid(9, 9);
+
+      .status-visual {
+        position: relative;
+        float: left;
+        width: flex-grid(1, 9);
+
+        .icon {
+          @include transition(opacity $tmg-f1 ease-in-out 0);
+
+          @extend %t-icon4;
+
+          position: absolute;
+          top: ($baseline/2);
+          left: $baseline;
+        }
+      }
+
+      .status-detail {
+        float: left;
+        width: flex-grid(8, 9);
+        margin-left: ($baseline*3);
+
+        .title {
+          @extend %t-title5;
+          @extend %t-strong;
+        }
+
+        .copy {
+          @extend %t-copy-base;
+
+          color: $gray-l2;
+        }
+      }
+
+      .item-progresspoint {
+        @include clearfix();
+        @include transition(opacity $tmg-f1 ease-in-out 0);
+
+        margin-bottom: $baseline;
+        border-bottom: 1px solid $gray-l4;
+        padding-bottom: $baseline;
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        // CASE: has actions
+        &.has-actions {
+          .list-actions {
+            display: none;
+
+            .action-primary {
+              @extend %btn-primary-blue;
+            }
+          }
+        }
+
+        // TYPE: success
+        &.item-progresspoint-success {
+          .item-progresspoint-success-date {
+            @include margin-left($baseline/4);
+
+            display: none;
+          }
+
+          &.is-complete {
+            .item-progresspoint-success-date {
+              display: inline;
+            }
+          }
+        }
+
+
+        // STATE: not started
+        &.is-not-started {
+          opacity: 0.5;
+
+          .fa-warning {
+            visibility: hidden;
+            opacity: 0;
+          }
+
+          .fa-cog {
+            visibility: visible;
+            opacity: 1;
+          }
+
+          .fa-check {
+            opacity: 0.3;
+          }
+        }
+
+        // STATE: started
+        &.is-started {
+          .fa-warning {
+            visibility: hidden;
+            opacity: 0;
+          }
+
+          .fa-cog {
+            @include animation(fa-spin 2s infinite linear);
+
+            visibility: visible;
+            opacity: 1;
+          }
+        }
+
+        // STATE: completed
+        &.is-complete {
+          .fa-cog {
+            visibility: visible;
+            opacity: 1;
+          }
+
+          .fa-warning {
+            visibility: hidden;
+            opacity: 0;
+          }
+
+          .icon {
+            color: $green;
+          }
+
+          .status-detail .title {
+            color: $green;
+          }
+
+          .list-actions {
+            display: block;
+          }
+        }
+
+        // STATE: error
+        &.has-error {
+          .fa-cog {
+            visibility: hidden;
+            opacity: 0;
+          }
+
+          .fa-warning {
+            visibility: visible;
+            opacity: 1;
+          }
+
+          .icon {
+            color: $red;
+          }
+
+          .status-detail .title,
+          .status-detail .copy {
+            color: $red;
+          }
+        }
+      }
+    }
+  }
+}

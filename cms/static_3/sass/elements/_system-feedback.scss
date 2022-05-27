@@ -1,0 +1,1055 @@
+// studio - elements - system feedback
+// ====================
+
+// messages
+.message {
+  @extend %t-copy-sub1;
+
+  display: block;
+}
+
+.message-status {
+  @include border-top-radius(2px);
+
+  box-sizing: border-box;
+
+  @extend %t-strong;
+
+  display: none;
+  border-bottom: 2px solid $yellow-d2;
+  margin: 0 0 $baseline 0;
+  padding: ($baseline/2) $baseline;
+  background: $yellow-d1;
+  color: $white;
+
+  .feedback-symbol {
+    @extend %t-icon5;
+
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    margin-right: ($baseline/2);
+  }
+
+  .text {
+    display: inline-block;
+  }
+
+  &.error {
+    border-color: $red-d3;
+    background: $red-l1;
+  }
+
+  &.is-shown {
+    display: block;
+  }
+}
+
+
+// alerts, notifications, prompts, and status communication
+// ====================
+
+// shared
+.wrapper-notification,
+.wrapper-alert,
+.prompt {
+  box-sizing: border-box;
+
+  .copy {
+    @extend %t-copy-sub1;
+  }
+}
+
+.wrapper-notification,
+.wrapper-alert,
+.prompt {
+  background: $gray-d3;
+
+  .copy {
+    color: $gray-l2;
+
+    .title {
+      color: $white;
+    }
+
+    .nav-actions {
+      .action-primary {
+        color: $gray-d4;
+      }
+    }
+  }
+}
+
+.page-banner {
+  max-width: $fg-max-width;
+  margin: 0 auto;
+
+  .user-messages {
+    padding-top: $baseline;
+
+    // Hack: force override the global important rule
+    // that courseware links don't have an underline.
+    a:hover {
+      color: $link-color;
+      text-decoration: underline !important;
+    }
+  }
+
+  .alert {
+    margin-bottom: $baseline !important;
+    padding: $baseline;
+    border: 1px solid;
+
+    .icon-alert {
+      margin-right: $baseline / 4;
+    }
+
+    &.alert-info {
+      color: $state-info-text;
+      background-color: $state-info-bg;
+      border-color: $state-info-border;
+      box-shadow: none;
+    }
+
+    &.alert-success {
+      color: $state-success-text;
+      background-color: $state-success-bg;
+      border-color: $state-success-border;
+      box-shadow: none;
+    }
+
+    &.alert-warning {
+      color: $state-warning-text;
+      background-color: $state-warning-bg;
+      border-color: $state-warning-border;
+      box-shadow: none;
+    }
+
+    &.alert-danger {
+      color: $state-danger-text;
+      background-color: $state-danger-bg;
+      border-color: $state-danger-border;
+      box-shadow: none;
+    }
+  }
+}
+
+.alert,
+.notification,
+.prompt {
+
+  // types - confirm
+  &.confirm {
+    .nav-actions .action-primary {
+      @include blue-button();
+
+      @extend %t-action4;
+
+      border-color: $blue-d2;
+    }
+
+    button {
+      @extend %btn-no-style;
+
+      color: $blue;
+
+      &:hover {
+        color: $blue-s2;
+      }
+    }
+  }
+
+  // types - warning
+  &.warning {
+    .nav-actions .action-primary {
+      @include orange-button();
+
+      @extend %t-action4;
+
+      border-color: $orange-d2;
+      color: $gray-d4;
+    }
+
+    button {
+      @extend %btn-no-style;
+
+      color: $orange;
+
+      &:hover {
+        color: $orange-s2;
+      }
+    }
+  }
+
+  // types - error
+  &.error {
+    .nav-actions .action-primary {
+      @include red-button();
+
+      @extend %t-action4;
+
+      border-color: $red-d2;
+    }
+
+    button {
+      @extend %btn-no-style;
+
+      color: $red-l1;
+
+      &:hover {
+        color: $red;
+      }
+    }
+  }
+
+  // types - announcement
+  &.announcement {
+    .nav-actions .action-primary {
+      @include blue-button();
+
+      @extend %t-action4;
+
+      border-color: $blue-d2;
+    }
+
+    button {
+      @extend %btn-no-style;
+
+      color: $blue;
+
+      &:hover {
+        color: $blue-s2;
+      }
+    }
+  }
+
+  // types - confirmation
+  &.confirmation {
+    .nav-actions .action-primary {
+      @include green-button();
+
+      @extend %t-action4;
+
+      border-color: $green-d2;
+    }
+
+    button {
+      @extend %btn-no-style;
+
+      color: $green;
+
+      &:hover {
+        color: $green-s2;
+      }
+    }
+  }
+
+  // types - step required
+  &.step-required {
+    .nav-actions .action-primary {
+      @include pink-button();
+
+      @extend %t-action4;
+
+      border-color: $pink-d2;
+    }
+
+    button {
+      @extend %btn-no-style;
+
+      color: $pink;
+
+      &:hover {
+        color: $pink-s1;
+      }
+    }
+  }
+}
+
+// prompts
+.wrapper-prompt {
+  @extend %ui-depth5;
+
+  @include transition(all $tmg-f3 ease-in-out  0s);
+
+  position: fixed;
+  top: 0;
+  background: $black-t1;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    margin-right: -0.25em; /* Adjusts for spacing */
+  }
+
+  .prompt {
+    border-radius: ($baseline/5);
+    box-shadow: 0 0 3px $shadow-d1;
+    display: inline-block;
+    vertical-align: middle;
+    width: $baseline*17.5;
+    border: 4px solid $black;
+
+    @include text-align(left);
+
+    .copy {
+      border-top: 4px solid $blue;
+      padding: $baseline;
+    }
+
+    .nav-actions {
+      box-shadow: inset 0 1px 2px $shadow-d1;
+      border-top: 1px solid $black-t1;
+      padding: ($baseline*0.75) $baseline;
+      background: $gray-d4;
+
+      .nav-item {
+        display: inline-block;
+
+        @include margin-right($baseline*0.75);
+
+        &:last-child {
+          @include margin-right(0);
+        }
+      }
+
+      .action-primary {
+        @extend %t-action4;
+        @extend %t-strong;
+      }
+
+      .action-secondary {
+        @extend %t-action4;
+      }
+    }
+  }
+
+  // types of prompts - error
+  .prompt.error {
+    .feedback-symbol {
+      color: $red-l1;
+    }
+
+    .copy {
+      border-top-color: $red-l1;
+    }
+  }
+
+  // types of prompts - confirmation
+  .prompt.confirmation {
+    .feedback-symbol {
+      color: $green;
+    }
+
+    .copy {
+      border-top-color: $green;
+    }
+  }
+
+  // types of prompts - error
+  .prompt.warning {
+    .feedback-symbol {
+      color: $orange;
+    }
+
+    .copy {
+      border-top-color: $orange;
+    }
+  }
+}
+
+// ====================
+
+// notifications
+.wrapper-notification {
+  @extend %ui-depth5;
+
+  @include clearfix();
+
+  box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $blue;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: $baseline ($baseline*2);
+
+  &.wrapper-notification-warning {
+    box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $orange;
+
+    .feedback-symbol {
+      color: $orange;
+    }
+  }
+
+  &.wrapper-notification-error {
+    box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $red-l1;
+
+    .feedback-symbol {
+      color: $red-l1;
+    }
+  }
+
+  &.wrapper-notification-confirmation {
+    box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $green;
+
+    .feedback-symbol {
+      color: $green;
+    }
+  }
+
+  &.wrapper-notification-mini {
+    box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $pink;
+  }
+
+  // shorter/status notifications
+  &.wrapper-notification-status {
+    @include border-top-radius(3px);
+
+    right: ($baseline);
+    width: auto;
+    border: 4px solid $black;
+    border-bottom: none;
+    padding: ($baseline/2) $baseline;
+
+    .notification {
+      box-sizing: border-box;
+
+      @include clearfix();
+
+      width: 100%;
+      max-width: none;
+
+      .feedback-symbol,
+      .copy {
+        float: none;
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .feedback-symbol {
+        width: $baseline;
+        height: ($baseline*1.25);
+        margin-right: ($baseline/4);
+        line-height: 3rem;
+      }
+    }
+  }
+
+  // help notifications
+  &.wrapper-notification-help {
+    @include border-top-radius(3px);
+
+    width: ($baseline*14);
+    right: ($baseline);
+    border: 4px solid $black;
+    border-bottom: none;
+    padding: $baseline;
+
+    .notification {
+      box-sizing: border-box;
+
+      @include clearfix();
+
+      width: 100%;
+      max-width: none;
+      min-width: none;
+
+      .feedback-symbol {
+        width: $baseline;
+        margin-right: ($baseline*0.75);
+      }
+
+      .action-notification-close {
+        right: 0;
+      }
+
+      .copy {
+        width: ($baseline*10);
+      }
+    }
+  }
+}
+
+.notification {
+  box-sizing: border-box;
+
+  @include clearfix();
+
+  margin: 0 auto;
+  width: flex-grid(12);
+  max-width: $fg-max-width;
+
+  strong {
+    @extend %t-strong;
+  }
+
+  .feedback-symbol,
+  .copy {
+    float: left;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .feedback-symbol {
+    @include transition (color $tmg-f1 ease-in-out 0s);
+
+    @extend %t-icon3;
+
+    width: flex-grid(1, 12);
+    height: ($baseline*1.25);
+    margin-top: ($baseline/4);
+    margin-right: flex-gutter();
+    text-align: right;
+    color: $white;
+  }
+
+  .copy {
+    @extend %t-copy-sub1;
+
+    width: flex-grid(10, 12);
+    color: $gray-l2;
+
+    .title {
+      @extend %t-title7;
+
+      margin-bottom: 0;
+      color: $white;
+    }
+  }
+
+  // with actions
+  &.has-actions {
+    .feedback-symbol {
+      width: flex-grid(1, 12);
+    }
+
+    .copy {
+      width: flex-grid(7, 12);
+
+      @include margin-right(flex-gutter());
+    }
+
+    .nav-actions {
+      width: flex-grid(4, 12);
+
+      @include float(left);
+
+      margin-top: ($baseline/4);
+      text-align: right;
+
+      .nav-item {
+        display: inline-block;
+        vertical-align: middle;
+
+        @include margin-right($baseline/2);
+
+        &:last-child {
+          @include margin-right(0);
+        }
+      }
+    }
+
+    .action-primary {
+      @include blue-button();
+
+      @extend %t-strong;
+
+      border-color: $blue-d2;
+    }
+
+    .action-secondary {
+      @extend %t-action4;
+    }
+  }
+
+  &.confirmation {
+    .copy {
+      margin-top: ($baseline/5);
+    }
+  }
+
+  &.mini {
+    width: auto;
+    max-width: none;
+    min-width: 0;
+
+    .feedback-symbol {
+      @include animation(rotateCW $tmg-s3 linear infinite);
+
+      width: 25px;
+      margin: -4px 10px 0 0;
+
+      @include transform-origin(52% 60%);
+    }
+
+    .copy {
+      width: auto;
+    }
+
+    .title {
+      @extend %cont-truncated;
+    }
+
+    .copy p {
+      @extend %cont-text-sr;
+    }
+  }
+}
+
+// ====================
+
+// alerts
+.wrapper-alert {
+  @extend %ui-depth2;
+
+  box-sizing: border-box;
+  box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  border-top: 1px solid $black;
+  padding: $baseline ($baseline*2) ($baseline*1.5) ($baseline*2);
+  background: $gray-d3;
+
+  // needed since page load is very slow
+  display: none;
+
+  // needed since page load is very slow
+  &.is-shown {
+    display: block;
+  }
+
+  &.wrapper-alert-warning {
+    box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $orange;
+
+    .feedback-symbol {
+      color: $orange;
+    }
+  }
+
+  &.wrapper-alert-error {
+    box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $red-l1;
+
+    .feedback-symbol {
+      color: $red-l1;
+    }
+  }
+
+  &.wrapper-alert-confirmation {
+    box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $green;
+
+    .feedback-symbol {
+      color: $green;
+    }
+  }
+
+  &.wrapper-alert-announcement {
+    box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
+
+    .feedback-symbol {
+      color: $blue;
+    }
+  }
+
+  &.wrapper-alert-step-required {
+    box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $pink;
+
+    .feedback-symbol {
+      color: $pink;
+    }
+  }
+}
+
+// adopted alerts
+.alert {
+  box-sizing: border-box;
+
+  @include clearfix();
+
+  margin: 0 auto;
+  width: flex-grid(12);
+  max-width: $fg-max-width;
+  min-width: $fg-min-width;
+  color: $white;
+
+  strong {
+    @extend %t-strong;
+  }
+
+  .feedback-symbol,
+  .copy {
+    float: left;
+  }
+
+  .feedback-symbol {
+    @include transition (color $tmg-f1 ease-in-out 0s);
+
+    @extend %t-icon3;
+
+    width: flex-grid(1, 12);
+    margin: ($baseline/4) flex-gutter() 0 0;
+    text-align: right;
+  }
+
+  .copy {
+    width: flex-grid(10, 12);
+    margin-top: ($baseline/2);
+    color: $gray-l2;
+
+    .title {
+      @extend %t-title7;
+
+      margin-bottom: 0;
+      color: $white;
+    }
+  }
+
+  // with actions
+  &.has-actions {
+    .feedback-symbol {
+      width: flex-grid(1, 12);
+    }
+
+    .copy {
+      width: flex-grid(7, 12);
+
+      @include margin-right(flex-gutter());
+    }
+
+    .nav-actions {
+      width: flex-grid(4, 12);
+
+      @include float(left);
+
+      margin-top: ($baseline/2);
+      text-align: right;
+
+      .nav-item {
+        display: inline-block;
+        vertical-align: middle;
+
+        @include margin-right($baseline/2);
+
+        &:last-child {
+          @include margin-right(0);
+        }
+
+        .action-primary {
+          @extend %t-action4;
+          @extend %t-strong;
+        }
+
+        .action-secondary {
+          @extend %t-action4;
+        }
+      }
+    }
+  }
+
+  // with cancel
+  .action-alert-close {
+    @include border-bottom-radius(($baseline/5));
+
+    position: absolute;
+    top: -($baseline/10);
+    right: $baseline;
+    padding: ($baseline/4) ($baseline/2) 0 ($baseline/2);
+    background: $gray-d4;
+    text-align: center;
+
+    .label {
+      @extend %cont-text-sr;
+    }
+
+    .icon {
+      @extend %t-icon6;
+
+      color: $white;
+      width: auto;
+      margin: 0;
+      padding: 2px;
+    }
+
+    &:hover {
+      background: $gray-d1;
+    }
+  }
+
+  // with dismiss (to sunset action-alert-clos)
+  .action-dismiss {
+    .button {
+      @extend %btn-secondary-white;
+
+      padding: ($baseline/4) ($baseline/2);
+    }
+
+    .icon,
+    .button-copy {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .icon {
+      @extend %t-icon4;
+
+      margin-right: ($baseline/4);
+    }
+
+    .button-copy {
+      @extend %t-copy-sub1;
+    }
+  }
+}
+
+// ====================
+
+// js enabled
+.js {
+
+  // prompt set-up
+  .wrapper-prompt {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  // prompt showing
+  &.prompt-is-shown {
+    .wrapper-prompt.is-shown {
+      visibility: visible;
+      pointer-events: auto;
+
+      .prompt {
+        @include animation(bounceIn $tmg-f1 ease-in-out 1);
+      }
+    }
+  }
+
+  // prompt hiding
+  &.prompt-is-hiding {
+    .wrapper-prompt {
+      .prompt {
+        @include animation(bounceOut $tmg-f1 ease-in-out 1);
+      }
+    }
+  }
+
+  // notification showing/hiding
+  .wrapper-notification {
+    bottom: -($ui-notification-height);
+
+    // varying animations
+    &.is-shown {
+      @include animation(notificationSlideUp $tmg-s1 ease-in-out 1);
+      @include animation-fill-mode(forwards);
+    }
+
+    &.is-hiding {
+      @include animation(notificationSlideDown $tmg-s1 ease-in-out 1);
+      @include animation-fill-mode(forwards);
+    }
+  }
+}
+
+// ====================
+
+// block-level messages and validation
+.wrapper-message {
+  .message {
+    @extend %t-copy-sub1;
+
+    background-color: $gray-d2;
+    padding: ($baseline/2) ($baseline*0.75);
+    color: $white;
+
+    .icon {
+      font-style: normal;
+    }
+
+    &.information {
+      @extend %t-copy-sub1;
+
+      background-color: $gray-l5;
+      color: $gray-d2;
+    }
+
+    &.validation {
+      background-color: $gray-d2;
+      color: $white;
+
+      a {
+        color: $blue-l2;
+      }
+    }
+
+    &.has-warnings {
+      border-bottom: 3px solid $orange;
+
+      .fa-warning {
+        margin-right: ($baseline/2);
+        color: $orange;
+      }
+    }
+
+    &.has-errors {
+      border-bottom: 3px solid $red-l2;
+
+      .fa-exclamation-circle {
+        margin-right: ($baseline/2);
+        color: $red-l2;
+      }
+    }
+  }
+
+  .message-list {
+    margin-bottom: 0;
+  }
+
+  .message-actions {
+    padding: ($baseline/2) $baseline;
+    background-color: $gray-d1;
+
+    .actions-list {
+      @extend %actions-list;
+    }
+  }
+}
+
+
+// ====================
+
+// temporary
+body.uxdesign.alerts {
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
+    float: left;
+  }
+
+  .content-primary {
+    @extend %ui-window;
+
+    width: flex-grid(12, 12);
+
+    @include margin-right(flex-gutter());
+
+    padding: $baseline ($baseline*1.5);
+
+    > section {
+      margin-bottom: ($baseline*2);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    ul {
+      li {
+        @include clearfix();
+
+        width: flex-grid(12, 12);
+        margin-bottom: ($baseline/4);
+        border-bottom: 1px solid $gray-l4;
+        padding-bottom: ($baseline/4);
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        a {
+          @include float(left);
+
+          width: flex-grid(5, 12);
+
+          @include margin-right(flex-gutter());
+        }
+      }
+    }
+  }
+}
+
+// ====================
+
+// artifact styles
+.main-wrapper {
+  .alert {
+    @extend %t-copy-sub1;
+
+    padding: 15px 20px;
+    margin-bottom: ($baseline*1.5);
+    border-radius: 3px;
+    border: 1px solid #edbd3c;
+    background: #fbf6e1;
+    // background: #edbd3c;
+    @include clearfix();
+
+    .alert-message {
+      @include float(left);
+
+      margin: 4px 0 0;
+      color: $gray-d3;
+    }
+
+    strong {
+      @extend %t-strong;
+    }
+
+    .alert-action {
+      @include float(left);
+
+      &.secondary {
+        @include orange-button;
+      }
+    }
+  }
+}
+
+body.error {
+  background: $gray-d4;
+  color: $gray-d3;
+
+  .primary-header {
+    display: none;
+  }
+
+  .error-prompt {
+    width: 700px;
+    margin: 150px auto;
+    padding: 60px 50px 90px;
+    border-radius: 3px;
+    background: $white;
+    text-align: center;
+  }
+
+  h1 {
+    @extend %t-title1;
+    @extend %t-light;
+
+    float: none;
+    margin: 0;
+    color: $gray-d3;
+  }
+
+  .description {
+    @extend %t-copy-lead2;
+
+    margin-bottom: 50px;
+  }
+
+  .back-button {
+    @include blue-button();
+
+    @extend %t-action1;
+
+    padding: 14px 40px 18px;
+  }
+}
+
+.advance-modules-remove-text {
+  margin-top: ($baseline/2);
+}

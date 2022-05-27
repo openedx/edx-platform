@@ -1,0 +1,33 @@
+<div class="xblock-render" class="studio-xblock-wrapper">
+    <div class="wrapper">
+        % for tag in tags:
+        <div class="wrapper-content left">
+            <div><label for="tags_${tag['key']}_${block_location}">${tag['title']}</label>:</div>
+            <div>
+            <select id="tags_${tag['key']}_${block_location}" name="${tag['key']}" multiple="multiple">
+                % for v in tag['values']:
+                    <%
+                        selected = ''
+                        if v in tag['current_values']:
+                            selected = 'selected'
+                    %>
+                    <option value="${v}" ${selected}>${v}</option>
+                % endfor
+            </select>
+            </div>
+        </div>
+        % endfor
+
+        % if tags_count > 0:
+        <div class="wrapper-content left">
+            <div class="outline-content">
+                <div class="add-item">
+                    <a href="javascript: void(0);" class="button button-new save_tags" title="Save tags">
+                        <span class="action-button-text">Save tags</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        % endif
+    </div>
+</div>

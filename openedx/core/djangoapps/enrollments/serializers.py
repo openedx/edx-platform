@@ -3,17 +3,20 @@ Serializers for all Course Enrollment related return objects.
 """
 
 
+from asyncore import read
 import logging
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from lms.djangoapps.courseware.courses import (
     get_course_with_access,get_permission_for_course_about,)
+from django.db import transaction
 
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode , get_course_prices ,format_course_price ,get_cosmetic_display_price
 from common.djangoapps.student.models import CourseEnrollment , LiveClassEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import LiveClasses, CourseOverview
+from django.contrib.auth.models import User 
 import datetime
 
 log = logging.getLogger(__name__)
@@ -206,27 +209,88 @@ class ModeSerializer(serializers.Serializer):  # pylint: disable=abstract-method
 
 
 
-# class LiveClassEnrollmentSerializer(serializers.ModelSerializer):
-
-
-#     live_class =LiveClassesSerializer()
-#     #user= serializers.SerializerMethodField()
-#     user_id = serializers.CharField(source="user", read_only=True)
-
-
-#     #user = serializers.SerializerMethodField('get_username')
-
-
-
-
-#     # def get_username(self, model):
-#     #     """Retrieves the username from the associated model."""
-#     #     return model.username
-
-
-
-#     class Meta:
-#         model = LiveClassEnrollment
-#         fields = ('id' , 'user_id', 'live_class')
+class UserListSerializer(serializers.ModelSerializer):
     
+
+    class Meta:
+        model = User
+        fields = ('id' , 'username', 'email' , 'is_active', 'is_staff' ,'is_superuser')
+
+
+
+
+
+
+
+
+class LiveClassEnrollmentSerializer(serializers.ModelSerializer):
+
+    #live_class =LiveClassesSerializer(read_only=True)
+    # user =UserListSerializer( read_only=True)
+
+
+    class Meta:
+        model = LiveClassEnrollment
+        fields = ( 'id','user', 'live_class')
+
+
+
+
+
+    # def create(self, validated_data):
+    #     pass
+
+        #return super().create(validated_data)
+        #read_only_fields = ('id',)
+
+
+    # def to_internal_value(self, data):
+    #     username = data.get('username')
+    #     user = User.objects.get(username=username)
+
+    #     data['user_id']=user.id
+    #     return data
+        
+    # def create(self, validated_data):
+    #     return super(LiveClassEnrollmentSerializer, self).create(validated_data)
+        
+    #     #return LiveClassEnrollment.objects.create(**validated_data)
+
+
+
+    # @transaction.atomic
+    # def create(self, validated_data):
+    #     username = validated_data.get('username')
+    #     users = User.objects.get(username=username)
+    #     validated_data['user']= users.id        
+    #     # live_classes = LiveClassEnrollment.objects.create(**validated_data,user_id=instance.id)
+    #     # live_classes.save()
+
+
+
+class LiveClassUserDetailsSerializer(serializers.ModelSerializer):
+
+    #live_class =LiveClassesSerializer(read_only=True)
+    user =UserListSerializer( read_only=True)
+
+
+    class Meta:
+        model = LiveClassEnrollment
+        fields = ( 'id','user', 'live_class')
+        #read_only_fields = ('id',)
+
+class UserLiveClassDetailsSerializer(serializers.ModelSerializer):
+
+    live_class =LiveClassesSerializer(read_only=True)
+    # user =UserListSerializer( read_only=True)
+
+
+    class Meta:
+        model = LiveClassEnrollment
+        fields = ( 'id','user', 'live_class')
+
+
+
+
+
 

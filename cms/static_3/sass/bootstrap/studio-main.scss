@@ -1,0 +1,24 @@
+// -----------------------------
+// Studio main styles for Bootstrap
+// -----------------------------
+
+// Studio theme variables
+@import 'cms/theme/variables';
+
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// Legacy support
+@import 'legacy';
+
+// Variables
+@import 'mixins';
+@import 'variables';
+@import 'base';
+
+// Elements
+@import 'header';
+@import 'footer';
+@import 'navigation';
+@import 'layouts';
+@import 'components';

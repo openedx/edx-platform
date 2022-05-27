@@ -1,0 +1,11 @@
+<%! from django.utils.translation import gettext as _ %>
+${_("User '{user}' with e-mail {email} has requested {studio_name} course creator privileges on edge.").format(
+    user=user_name, email=user_email, studio_name=settings.STUDIO_SHORT_NAME,
+)}
+${_("To grant or deny this request, use the course creator admin table.")}
+
+% if is_secure:
+  https://${ site }/admin/course_creators/coursecreator/
+% else:
+  http://${ site }/admin/course_creators/coursecreator/
+% endif

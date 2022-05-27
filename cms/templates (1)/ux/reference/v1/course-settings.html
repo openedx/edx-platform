@@ -1,0 +1,11 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%inherit file="/base.html" />
+<%block name="title">Studio Test Page</%block>
+<%block name="bodyclass">view-settings</%block>
+
+<%block name="content">
+<%include file="../fragments/course-settings.html"/>
+</%block>

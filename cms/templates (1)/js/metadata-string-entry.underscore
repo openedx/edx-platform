@@ -1,0 +1,8 @@
+<div class="wrapper-comp-setting">
+	<label class="label setting-label" for="<%- uniqueId %>"><%- model.get('display_name') %></label>
+	<input class="input setting-input" type="text" id="<%- uniqueId %>" value='<%- model.get("value") %>'/>
+	<button class="action setting-clear inactive" type="button" name="setting-clear" value="<%- gettext("Clear") %>" data-tooltip="<%- gettext("Clear") %>">
+        <span class="icon fa fa-undo" aria-hidden="true"></span><span class="sr">"<%- gettext("Clear Value") %>"</span>
+    </button>
+</div>
+<span class="tip setting-help"><%- model.get('help') %></span>

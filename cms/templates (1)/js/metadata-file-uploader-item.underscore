@@ -1,0 +1,3 @@
+<a href="#" class="upload-action upload-setting"><%- model.get('value') ? gettext('Replace') : gettext('Upload') %>
+</a><% if (model.get('value')) { %><a href="<%- model.get("value") %>" rel="noopener" target="_blank" class="download-action download-setting"><%- gettext("Download") %>
+</a><% } %>

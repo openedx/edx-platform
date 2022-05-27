@@ -1,0 +1,1032 @@
+// studio - elements - xblock rendering
+// ==========================
+
+// Table of Contents
+// * +Layout - Xblocks
+// * +Licensing - Xblocks
+// * +Pagination - Xblocks
+// * +Messaging - Xblocks
+// * +Case: Page Level
+// * +Case: Nesting Level
+// * +Case: Element / Component Level
+// * +Case: Experiment Groups - Edited
+// * +Editing - Xblocks
+// * +Case - Special Xblock Type Overrides
+
+@import 'edx-pattern-library-shims/base/variables';
+
+
+// +Layout - Xblocks
+// ====================
+// styling for xblocks at various levels of nesting: page level,
+.wrapper-xblock {
+  margin: ($baseline/2);
+  border: 1px solid $gray-l4;
+  border-radius: ($baseline/5);
+  background: $white;
+  box-shadow: 0 1px 1px $shadow-l1;
+
+  // STATE: hover/focus
+  &:hover,
+  &:focus {
+    box-shadow: 0 0 1px $shadow;
+  }
+
+  // UI: xblock header primary for main title and xblock actions
+  .xblock-header-primary {
+    box-sizing: border-box;
+    border-bottom: 1px solid $gray-l4;
+    border-radius: ($baseline/5) ($baseline/5) 0 0;
+    min-height: ($baseline*2.5);
+    background-color: $gray-l6;
+    padding: ($baseline/2) ($baseline/2) ($baseline/2) ($baseline);
+    display: flex;
+    align-items: center;
+
+    .header-details {
+      @extend %cont-truncated;
+
+      width: 50%;
+      vertical-align: middle;
+
+      .xblock-display-name {
+        @extend %t-copy-lead1;
+
+        font-weight: font-weight(semi-bold);
+      }
+
+      .xblock-group-visibility-label {
+        @extend %t-copy-sub1;
+
+        white-space: normal;
+        font-weight: font-weight(semi-bold);
+        color: $gray;
+      }
+    }
+
+    .header-actions {
+      width: 49%;
+
+      @include text-align(right);
+    }
+  }
+
+  // UI: secondary header for meta-information and associated actions
+  .xblock-header-secondary {
+    overflow: hidden;
+    border-top: 1px solid $gray-l3;
+    background-color: $gray-l5;
+    padding: ($baseline/2) $baseline;
+
+    .meta-info {
+      display: inline-block;
+      vertical-align: middle;
+      width: 65%;
+      font-style: italic;
+      color: $gray;
+    }
+
+    .actions-list {
+      width: 34%;
+      display: inline-block;
+      vertical-align: middle;
+      text-align: right;
+
+      .action-item {
+        display: inline-block;
+
+        .action-button {
+          @include transition(all $tmg-f3 linear 0s);
+
+          display: block;
+          width: auto;
+          height: ($baseline*1.5);
+          border-radius: 3px;
+          padding: 3px ($baseline/2) 0 ($baseline/2);
+          color: $gray-l1;
+
+          &:hover {
+            background-color: $blue;
+            color: $gray-l6;
+          }
+
+          .action-button-text {
+            display: inline-block;
+            vertical-align: middle;
+            padding: 0 1px;
+            text-transform: uppercase;
+          }
+
+          &.delete-button:hover {
+            background-color: $gray-l1;
+          }
+        }
+
+        .icon {
+          display: inline-block;
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+
+  // +Licensing - Xblocks
+  // ====================
+  .xblock-license,
+  .xmodule_display.xmodule_HtmlModule .xblock-license,
+  .xmodule_VideoModule .xblock-license {
+    @include text-align(right);
+
+    @extend %t-title7;
+
+    display: block;
+    width: auto;
+    border-top: 1px solid $gray-l3;
+    padding: ($baseline/4) 0;
+    color: $gray;
+    text-align: $bi-app-right;
+
+    .license-label,
+    .license-value,
+    .license-actions {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 0;
+    }
+
+    a {
+      color: $gray;
+
+      &:hover {
+        color: $ui-link-color;
+      }
+    }
+
+    i {
+      font-style: normal;
+    }
+  }
+
+  // CASE: xblocks video
+  .xmodule_VideoModule .xblock-license {
+    border: 0;
+  }
+
+
+  // +Pagination - Xblocks
+  .container-paging-header {
+    .meta-wrap {
+      margin: $baseline ($baseline/2);
+    }
+
+    .meta {
+      @extend %t-copy-sub2;
+
+      display: inline-block;
+      vertical-align: top;
+      width: flex-grid(9, 12);
+      color: $gray-d1;
+
+      .count-current-shown,
+      .count-total,
+      .sort-order {
+        @extend %t-strong;
+      }
+    }
+
+    .pagination {
+      @extend %pagination;
+    }
+  }
+
+  .container-paging-footer {
+    .pagination {
+      @extend %pagination;
+    }
+  }
+
+  //UI: default internal xblock content styles
+  // ====================
+  // TO-DO: clean-up / remove this reset
+  // internal headings for problems and video components
+  h2 {
+    @extend %t-title5;
+
+    margin: ($baseline*1.5) ($baseline*2) ($baseline*1.5) 0;
+    color: $gray;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+
+  // ====================
+
+  .wrapper-xblock {
+
+    // UI: xblocks - calls-to-action
+    .header-actions .actions-list {
+      @extend %actions-list;
+    }
+
+    // CASE: xblock is collapsible
+    &.is-collapsible,
+    &.xblock-type-container {
+      .icon {
+        font-style: normal;
+      }
+
+      .expand-collapse {
+        @extend %expand-collapse;
+
+        margin: 0 ($baseline/4);
+        height: ($baseline*1.25);
+        width: $baseline;
+
+        &:focus {
+          outline: 0;
+        }
+      }
+
+      .action-view {
+        .action-button {
+          transition: none;
+        }
+
+        .action-button-text {
+          padding-right: ($baseline/5);
+          padding-left: 0;
+        }
+      }
+    }
+  }
+
+  // +Messaging - Xblocks
+  // ====================
+  // xblock message area, for general information as well as validation
+  .wrapper-xblock-message {
+    .xblock-message {
+      @extend %t-copy-sub1;
+
+      background-color: $gray-d2;
+      padding: ($baseline*0.75);
+      color: $white;
+
+      .icon {
+        font-style: normal;
+      }
+
+      &.information {
+        @extend %t-copy-sub1;
+
+        background-color: $gray-l5;
+        color: $gray-d2;
+      }
+
+      &.validation {
+        background-color: $gray-d2;
+        color: $white;
+
+        a {
+          color: $blue-l2;
+        }
+
+        &.has-warnings {
+          border-top: 3px solid $orange;
+
+          .fa-exclamation-triangle {
+            margin-right: ($baseline/2);
+            color: $orange;
+          }
+        }
+
+        &.has-errors {
+          border-top: 3px solid $red-l2;
+
+          .fa-exclamation-circle {
+            margin-right: ($baseline/2);
+            color: $red-l2;
+          }
+        }
+      }
+    }
+
+    .xblock-message-list {
+      margin-bottom: 0;
+    }
+
+    .xblock-message-actions {
+      padding: ($baseline/2) $baseline;
+      background-color: $gray-d1;
+
+      .actions-list {
+        @extend %actions-list;
+      }
+    }
+  }
+
+  // +Case: Page Level
+  // ====================
+  &.level-page {
+    margin: 0;
+    box-shadow: none;
+    border: 0;
+
+    .xblock-header {
+      display: none;
+    }
+
+    .xblock-message {
+      &.validation {
+        padding-top: ($baseline*0.75);
+      }
+
+      .xblock-message-list {
+        margin: 0 ($baseline*2.25);
+        list-style-type: disc;
+        color: $gray-l3;
+      }
+
+      .xblock-message-item {
+        padding-bottom: ($baseline/4);
+      }
+
+      &.information {
+        padding: ($baseline/2) 0;
+        background-color: $gray-l5;
+        color: $gray-d1;
+      }
+    }
+
+    .no-container-content {
+      .xblock-message-list {
+        margin: 0;
+        list-style-type: none;
+        color: $gray-d2;
+      }
+    }
+  }
+
+  // +Case: Nesting Level
+  // ====================
+  // element wrapper level
+  &.level-nesting {
+    @include transition(all $tmg-f2 linear 0s);
+
+    border: 1px solid $gray-l3;
+    padding-bottom: $baseline;
+
+    // min-height to allow drop when empty
+    .reorderable-container {
+      min-height: $baseline;
+    }
+
+    .xblock-header {
+      display: block;
+    }
+
+    .xblock-header-primary {
+      @include ui-flexbox();
+
+      margin-bottom: 0;
+      border-bottom: none;
+      background: none;
+    }
+
+    .xblock-render {
+      margin: ($baseline/2);
+    }
+
+    // STATE: nesting level xblock is collapsed
+    &.collapsed {
+      padding-bottom: 0;
+      background-color: $gray-l7;
+      box-shadow: 0 0 1px $shadow-d2 inset;
+    }
+  }
+
+  // +Case: Element / Component Level
+  // ====================
+  &.level-element {
+    @include transition(all $tmg-f2 linear 0s);
+
+    box-shadow: none;
+
+    &:hover {
+      border-color: $blue;
+    }
+
+    .xblock-header {
+      display: block;
+    }
+
+    .xblock-header-primary {
+      @extend %t-light;
+
+      display: flex;
+      margin-bottom: 0;
+      border-bottom: 1px solid $gray-l4;
+      background-color: $gray-l6;
+
+      &.is-collapsed {
+        border-bottom: 0;
+        border-radius: 3px;
+      }
+    }
+
+    .xblock-render {
+      margin: ($baseline/2);
+      padding: ($baseline/2);
+      overflow: hidden;
+
+      code::before,
+      code::after {
+        @include display-left-to-right();
+      }
+    }
+
+    // STATE: container/component with children - abbreviated preview
+    &.xblock-type-container {
+      .xblock-header-primary {
+        margin-bottom: 0;
+        border-bottom: 0;
+        border-radius: ($baseline/5);
+      }
+
+      .xblock-render {
+        display: none;
+      }
+    }
+
+    .wrapper-xblock-message {
+      .xblock-message {
+        &.information {
+          @extend %t-copy-sub2;
+
+          padding: 0 $baseline ($baseline*0.75) $baseline;
+          color: $gray-l1;
+        }
+      }
+    }
+  }
+
+  // +Case: Experiment Groups - Edited
+  // ====================
+  // edited experiment groups: active and inactive
+  .wrapper-groups {
+    .title {
+      @extend %t-title7;
+
+      margin-left: ($baseline/2);
+      color: $gray-l1;
+    }
+
+    &.is-active {
+
+      // don't show delete buttons on active groups
+      .wrapper-xblock.level-nesting > .xblock-header .action-delete {
+        display: none;
+      }
+    }
+
+    &.is-inactive {
+      margin: ($baseline*1.5) 0 0 0;
+      border-top: 2px dotted $gray-l2;
+      padding: ($baseline*0.75) 0;
+      background-color: $gray-l4;
+
+      .wrapper-xblock.level-nesting {
+        @include transition(all $tmg-f2 linear 0s);
+
+        opacity: 0.7;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      // don't show add new content to inactive groups
+      .new-component-item {
+        display: none;
+      }
+    }
+  }
+}
+
+// +Editing - Xblocks
+// ====================
+
+// xblock Editor tab wrapper
+.wrapper-comp-editor {
+  display: block;
+
+  // Because the editor may be a CodeMirror editor (which must be visible at the time it is created
+  // in order for it to properly initialize), we must toggle "is-inactive" instead of the more common "is-active"
+  &.is-inactive {
+    display: none;
+  }
+}
+
+// xblock Settings tab wrapper
+.wrapper-comp-settings {
+  display: none;
+
+  &.is-active {
+    display: block;
+  }
+
+  .file-uploader {
+    .upload-setting {
+      @extend %ui-btn-flat-outline;
+      @extend %t-action3;
+      @extend %t-strong;
+
+      box-sizing: border-box;
+      display: inline-block;
+      padding: ($baseline/2);
+      width: 49%;
+      margin-right: 2%;
+    }
+
+    .download-setting {
+      @extend %ui-btn-non;
+      @extend %t-action4;
+      @extend %t-strong;
+
+      box-sizing: border-box;
+      display: inline-block;
+      padding: ($baseline/2);
+      width: 49%;
+      text-align: center;
+      color: $blue;
+
+      &:hover {
+        background-color: $blue;
+      }
+    }
+
+    .wrapper-uploader-actions {
+      width: 45%;
+      display: inline-block;
+      min-width: ($baseline*5);
+    }
+  }
+
+  //settings-list
+  .list-input.settings-list {
+    @extend %cont-no-list;
+
+    overflow: auto;
+    max-height: 400px;
+
+    //chrome scrollbar visibility correction
+    &::-webkit-scrollbar {
+      -webkit-appearance: none;
+      width: 11px;
+      height: 11px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 8px;
+      border: 2px solid $gray-l2;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    //component-setting-entry
+    .field.comp-setting-entry {
+      opacity: 0.7;
+      margin: 0 $baseline;
+      border-top: 1px solid $gray-l4;
+      background-color: $white;
+      padding: $baseline ($baseline/2);
+
+      &:first-child {
+        border-top: 0;
+      }
+
+
+
+      // STATE: hover & focus
+      &:hover,
+      &:focus {
+        opacity: 1;
+      }
+
+      &.is-set {
+        opacity: 1;
+        background-color: $white;
+
+        .setting-input {
+          color: $blue-l1;
+        }
+      }
+    }
+
+    .wrapper-comp-setting,
+    .wrapper-comp-setting-text {
+      min-width: 300px;
+      top: 0;
+      vertical-align: top;
+      margin-bottom: 5px;
+      position: relative;
+    }
+
+    .setting-label {
+      @include transition(color $tmg-f2 ease-in-out 0s);
+
+      @extend %t-copy-sub1;
+      @extend %t-strong;
+
+      vertical-align: middle;
+      display: inline-block;
+      position: relative;
+      left: 0;
+      width: 25%;
+      min-width: 100px;
+      margin-right: ($baseline/2);
+
+      &.is-focused {
+        color: $blue;
+      }
+    }
+
+    input,
+    select,
+    input[type="number"] {
+      @include placeholder($gray-l4);
+      @include size(100%, 100%);
+
+      @extend %t-copy-base;
+
+      width: 45%;
+      min-width: 100px;
+      padding: ($baseline/2);
+      border-radius: 3px;
+      border: 1px solid $gray-l2;
+      text-overflow: ellipsis;
+    }
+
+    //Allows users to copy full value of disabled inputs.
+    input.is-disabled {
+      text-overflow: clip;
+      opacity: 0.5;
+    }
+
+    input[type="number"] {
+      width: 42%;
+      box-shadow: 0 1px 2px $shadow-l1 inset;
+      //For webkit browsers which render number fields differently, make input wider.
+      -moz-column-width: {
+        width: 32%;
+      }
+
+      &:active {
+        background-color: #fffcf1;
+      }
+    }
+
+    select {
+      &:focus {
+        box-shadow: 0 0 1px $shadow;
+
+        @include transition(opacity $tmg-f2 ease-in-out 0s);
+
+        background-color: $yellow;
+      }
+
+      &:active {
+        background-color: $yellow;
+      }
+    }
+
+    .action.setting-clear {
+      @extend %t-action4;
+
+      color: $gray;
+      width: 25px;
+      height: 25px;
+      vertical-align: middle;
+      padding: ($baseline/4);
+      border-radius: 50%;
+      margin: 0 ($baseline/2);
+      box-shadow: none;
+      text-shadow: none;
+      border: 1px solid $gray-l1;
+      background-color: $gray-l4;
+
+      &:hover {
+        box-shadow: 0 1px 1px $shadow;
+
+        @include transition(opacity $tmg-f2 ease-in-out 0s);
+
+        background-color: $blue-s3;
+        border: 1px solid $blue-s3;
+        color: $white;
+      }
+
+      &.inactive {
+        visibility: hidden;
+      }
+    }
+
+    .setting-help {
+      @extend %t-copy-sub2;
+
+      display: inline-block;
+      min-width: ($baseline*10);
+      vertical-align: top;
+    }
+
+    .setting-text {
+      display: inline;
+      white-space: nowrap;
+    }
+
+
+
+    // TYPE: enumerated lists of metadata sets
+    .metadata-list-enum {
+      * {
+        box-sizing: border-box;
+      }
+
+      // label
+      .setting-label {
+        vertical-align: top;
+        margin-top: ($baseline/2);
+      }
+
+      // inputs and labels
+      .wrapper-list-settings {
+        @include size(45%, 100%);
+
+        display: inline-block;
+        min-width: ($baseline*5);
+
+        // enumerated fields
+        .list-settings {
+          margin: 0;
+
+          .list-settings-item {
+            margin-bottom: ($baseline/2);
+          }
+
+          // inputs
+          .input {
+            width: 80%;
+            margin-right: ($baseline/2);
+            vertical-align: middle;
+          }
+        }
+      }
+
+      .setting-clear {
+        vertical-align: top;
+        margin-top: ($baseline/4);
+      }
+
+      .create-setting {
+        @extend %ui-btn-flat-outline;
+        @extend %t-action3;
+        @extend %t-strong;
+
+        display: block;
+        width: 100%;
+        padding: ($baseline/2);
+
+        .icon {
+          margin-right: ($baseline/4);
+        }
+      }
+
+      .remove-setting {
+        @include transition(color $tmg-f2 ease-in-out);
+
+        @extend %t-action1;
+
+        display: inline-block;
+        background: transparent;
+        color: $blue-l3;
+
+        &:hover {
+          color: $blue;
+        }
+      }
+    }
+
+    // TYPE: Dict
+    .metadata-dict {
+      * {
+        box-sizing: border-box;
+      }
+
+      // label
+      .setting-label {
+        vertical-align: top;
+        margin-top: ($baseline*0.75);
+      }
+
+      // inputs and labels
+      .wrapper-dict-settings {
+        width: 55%;
+        display: inline-block;
+        min-width: 240px;
+
+        // enumerated fields
+        .list-settings {
+          margin: ($baseline/2) 0 0;
+
+          .list-settings-item {
+            margin-bottom: ($baseline/2);
+          }
+
+          // inputs
+          .input {
+            width: 43%;
+            margin-right: ($baseline/4);
+            vertical-align: middle;
+            display: inline-block;
+
+            &.input-value {
+              margin-right: ($baseline/2);
+            }
+          }
+        }
+      }
+
+      .setting-clear {
+        vertical-align: top;
+        margin: ($baseline*0.75) 0 0 0;
+      }
+
+      .create-setting {
+        @extend %ui-btn-flat-outline;
+        @extend %t-action3;
+        @extend %t-strong;
+
+        display: block;
+        width: 88%;
+        padding: ($baseline/2);
+
+        .icon {
+          margin-right: ($baseline/4);
+        }
+      }
+
+      .remove-setting {
+        @include transition(color $tmg-f2 ease-in-out);
+
+        @extend %t-action1;
+
+        display: inline-block;
+        background: transparent;
+        color: $blue-l3;
+
+        &:hover {
+          color: $blue;
+        }
+      }
+    }
+  }
+}
+
+.wrapper-comp-plugins {
+  display: none;
+
+  &.is-active {
+    display: block;
+  }
+}
+
+
+// +Case - Special Xblock Type Overrides
+// ====================
+// TO-DO - remove this reset styling from base _xblocks.scss file
+
+// Latex Compiler
+// make room for the launch compiler button
+.wrapper-comp-editor.latex-problem {
+  margin-top: ($baseline*2.5);
+}
+
+// sadly this button is outside the wrapper for the latex-problem so we can't get more specific with the class rule - ugh
+.launch-latex-compiler {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  background-color: $white;
+  padding: $baseline/2 0 $baseline/2 $baseline;
+  border-bottom: 1px solid $gray-l2;
+}
+
+//  hides latex compiler button if settings mode is-active - double ugh
+div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
+  display: none;
+}
+
+
+.wrapper-xblock {
+  .discussion-preview {
+    color: $gray-l1;
+    font-style: italic;
+  }
+}
+
+// CASE: xblock license settings
+.wrapper-license {
+  .license-types {
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+
+    .license-type {
+      display: inline-block;
+    }
+
+    .action.license-button {
+      @include grey-button;
+
+      @extend %t-action2;
+
+      display: inline-block;
+      text-align: center;
+      width: 220px;
+      height: 40px;
+      cursor: pointer;
+
+      &.is-selected {
+        @include blue-button;
+      }
+    }
+
+    .tip {
+      @extend %t-copy-sub2;
+    }
+  }
+
+  .wrapper-license-options {
+    margin-bottom: ($baseline/2);
+
+    .tip {
+      @extend %t-copy-sub2;
+    }
+
+    .license-options {
+      padding-bottom: ($baseline/2);
+
+      .license-option {
+        line-height: 1.5;
+        border-bottom: 1px solid $gray-l4;
+        padding: ($baseline/2) 0 ($baseline*0.4);
+
+        &.is-clickable {
+          cursor: pointer;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        input[type=checkbox] {
+          vertical-align: top;
+          width: auto;
+          min-width: auto;
+          height: auto;
+          border: 0;
+          margin: ($baseline*0.15) 15px 0;
+        }
+
+        .option-name {
+          @extend %t-action3;
+          @extend %t-strong;
+
+          display: inline-block;
+          width: 15%;
+          vertical-align: top;
+          cursor: pointer;
+        }
+
+        .explanation {
+          @extend %t-action4;
+
+          display: inline-block;
+          width: 75%;
+          vertical-align: top;
+          color: $gray;
+        }
+      }
+    }
+  }
+
+  .license-preview a {
+    color: $gray;
+
+    &:hover {
+      color: $ui-link-color;
+    }
+  }
+
+  .list-input.settings-list ul.license-options li {
+    // to make sure the padding is correctly overridden
+    padding: ($baseline / 2) 0 ($baseline * 0.4);
+  }
+}

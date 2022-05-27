@@ -1,0 +1,56 @@
+<form>
+    <% if (xblockInfo.get('prereqs').length > 0) { %>
+        <h3 class="modal-section-title"><%- gettext('Limit Access') %></h3>
+        <div class="modal-section-content gating-prereq">
+            <ul class="list-fields list-input">
+                <p class="field-message">
+                    <%- gettext('Select a prerequisite subsection and enter a minimum score percentage and minimum completion percentage to limit access to this subsection. Allowed values are 0-100') %>
+                </p>
+                <li class="field field-select">
+                    <label class="label">
+                        <%- gettext('Prerequisite:') %>
+                        <select id="prereq" class="input">
+                            <option value=""><%- gettext('No prerequisite') %></option>
+                            <% _.each(xblockInfo.get('prereqs'), function(prereq){ %>
+                                <option value="<%- prereq.block_usage_key %>"><%- prereq.block_display_name %></option>
+                            <% }); %>
+                        </select>
+                    </label>
+                </li>
+                <li id="prereq_min_score_input" class="field field-input input-cosmetic">
+                    <label for="prereq_min_score">
+                        <%- gettext('Minimum Score:') %>
+                    </label>
+                    <input type="number" id="prereq_min_score" aria-describedby="msp" class="input input-text percentage" min="0" max="100" />
+                    <span id="msp">%</span>
+                </li>
+                <li id="prereq_min_completion_input" class="field field-input input-cosmetic">
+                    <label for="prereq_min_completion">
+                        <%- gettext('Minimum Completion:') %>
+                    </label>
+                    <input type="number" id="prereq_min_completion" aria-describedby="mcp" class="input input-text percentage" min="0" max="100" />
+                    <span id="mcp">%</span>
+                </li>
+                <li id="prereq_min_score_error" class="message-status error">
+                    <%- gettext('The minimum score percentage must be a whole number between 0 and 100.') %>
+                </li>
+                <li id="prereq_min_completion_error" class="message-status error">
+                    <%- gettext('The minimum completion percentage must be a whole number between 0 and 100.') %>
+                </li>
+            </ul>
+        </div>
+    <% } %>
+    <h3 class="modal-section-title"><%- gettext('Use as a Prerequisite') %></h3>
+    <div class="modal-section-content gating-is-prereq">
+        <div class="list-fields list-input">
+            <div class="field-checkbox checkbox-cosmetic">
+                <input type="checkbox" id="is_prereq" name="is_prereq" class="input input-checkbox" />
+                <label for="is_prereq" class="label">
+                    <span class="icon fa fa-check-square-o input-checkbox-checked" aria-hidden="true"></span>
+                    <span class="icon fa fa-square-o input-checkbox-unchecked" aria-hidden="true"></span>
+                    <%- gettext('Make this subsection available as a prerequisite to other content') %>
+                </label>
+            </div>
+        </div>
+    </div>
+</form>

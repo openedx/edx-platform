@@ -1,0 +1,14 @@
+## mako
+
+<%page expression_filter="h"/>
+
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/studio-main.css" %>
+
+<%inherit file="/base.html" />
+<%block name="title">Bootstrap Test Page</%block>
+<%block name="bodyclass">bootstrap-test</%block>
+
+<%block name="content">
+<%include file="../fragments/course-settings.html"/>
+</%block>

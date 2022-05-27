@@ -1,0 +1,34 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+  from django.conf import settings
+  from django.urls import reverse
+  from django.utils.translation import gettext as _
+  from edx_django_utils.monitoring import set_custom_attribute
+  from common.djangoapps.student.roles import GlobalStaff
+%>
+
+<h3 class="title">
+  <span class="label">
+    <span class="label-prefix sr-only">${_("Currently signed in as:")}</span>
+    <span class="account-username" title="${ user.username }">${ user.username }</span>
+  </span>
+  <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span>
+</h3>
+<div class="wrapper wrapper-nav-sub">
+  <div class="nav-sub">
+    <ul>
+      <li class="nav-item nav-account-dashboard">
+        <a href="/">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
+      </li>
+      % if GlobalStaff().has_user(user):
+      <li class="nav-item">
+        <a href="${reverse('maintenance:maintenance_index')}">${_("Maintenance")}</a>
+      </li>
+      % endif
+      <li class="nav-item nav-account-signout">
+        <a class="action action-signout" href="${settings.FRONTEND_LOGOUT_URL}">${_("Sign Out")}</a>
+      </li>
+    </ul>
+  </div>
+</div>

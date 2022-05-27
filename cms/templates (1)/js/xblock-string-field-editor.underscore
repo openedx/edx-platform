@@ -1,0 +1,16 @@
+<div class="incontext-editor-action-wrapper">
+    <button class="action-edit action-inline xblock-field-value-edit incontext-editor-open-action">
+        <span class="icon fa fa-pencil" aria-hidden="true"></span><span class="sr"> <%- gettext('Edit') %></span>
+    </button>
+</div>
+
+<div class="xblock-string-field-editor incontext-editor-form">
+  <form>
+    <% var formLabel = gettext("Edit %(display_name)s (required)"); %>
+    <label><span class="sr"><%= interpolate(formLabel, {display_name: fieldDisplayName}, true) %></span> <% // xss-lint: disable=underscore-not-escaped %>
+      <input type="text" value="<%= value %>" class="xblock-field-input incontext-editor-input" data-metadata-name="<%- fieldName %>"> <% // xss-lint: disable=underscore-not-escaped %>
+    </label>
+    <button class="sr action action-primary" name="submit" type="submit"><%- gettext("Save") %></button>
+    <button class="sr action action-secondary" name="cancel" type="button"><%- gettext("Cancel") %></button>
+  </form>
+</div>

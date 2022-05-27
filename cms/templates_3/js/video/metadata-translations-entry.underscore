@@ -1,0 +1,11 @@
+<div class="wrapper-comp-setting metadata-video-translations">
+  <label class="label setting-label"><%- model.get('display_name')%></label>
+  <input class="upload-transcript-input is-hidden" type="file" name="file" accept=".srt"/>
+  <div class="wrapper-translations-settings">
+    <ol class="list-settings"></ol>
+    <a href="#" class="create-action create-setting">
+      <span class="icon fa fa-plus" aria-hidden="true"></span><%- gettext("Add") %> <span class="sr"><%- model.get('display_name')%></span>
+    </a>
+  </div>
+</div>
+<span class="tip setting-help"><%- model.get('help') %></span>

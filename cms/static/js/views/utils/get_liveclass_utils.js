@@ -20,7 +20,7 @@
                 var elem = document.getElementById("output");
                 elem.innerHTML = '';
                 var output = document.getElementById('output');
-                output.style.display='block'
+                output.style.display='block';
                 var response = JSON.parse(JSON.stringify(response))
                 
                 for(let i=0;i<response.results.length;i++)
@@ -39,6 +39,11 @@
                     ele1.setAttribute("target",'_black');
                     ele1.innerHTML='Start';
                     parent.appendChild(ele1);
+                    // var ele2= document.createElement("div");
+                    // ele2.setAttribute("id",response.results[i]['id']);
+                    // ele2.setAttribute("class","view-users");
+                    // ele2.innerHTML='View Users';
+                    // parent.appendChild(ele2);
                     output.appendChild(parent);  
                           
                   }
@@ -56,5 +61,72 @@
                  errorHandler(reason);
              });
          };
+
+         this.getUser = function(liveclassInfo, errorHandler) {
+            $.getJSON(
+                '/accounts/details?page=2',
+                liveclassInfo
+            ).done(function(response) {
+                errorHandler(response)
+            //    var elem = document.getElementById("output");
+            //    elem.innerHTML = '';
+            //    var output = document.getElementById('output');
+            //    output.style.display='block';
+            //    var response = JSON.parse(JSON.stringify(response))
+               
+            //    for(let i=0;i<response.results.length;i++)
+            //      {
+            //        var parent = document.createElement("div");
+            //        var ele = document.createElement("div");
+            //        ele.setAttribute("id","timedrpact"+i);
+            //        ele.setAttribute("class","inner");
+            //        ele.innerHTML=response.results[i]["topic_name"];
+            //        parent.appendChild(ele);
+            //        var ele1= document.createElement("a");
+            //        ele1.setAttribute("id","timedrpact1"+i);
+            //        ele1.setAttribute("class","button inner-link");
+            //        ele1.setAttribute("href",response.results[i]["meeting_link"]);
+            //        ele1.setAttribute("target",'_black');
+            //        ele1.innerHTML='Start';
+            //        parent.appendChild(ele1);
+            //        output.appendChild(parent);  
+                         
+            //      }
+               
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                var reason = errorThrown;
+                if (jqXHR.responseText) {
+                    try {
+                        var detailedReason = $.parseJSON(jqXHR.responseText).ErrMsg;
+                        if (detailedReason) {
+                            reason = detailedReason;
+                        }
+                    } catch (e) {}
+                }
+                errorHandler(reason);
+            });
+        };
+
+
+        this.assignUser = function(liveclassInfo, errorHandler) {
+            $.postJSON(
+                '/live_class/user/enrollment',
+                liveclassInfo
+            ).done(function(response) {
+                errorHandler(response)
+               
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                var reason = errorThrown;
+                if (jqXHR.responseText) {
+                    try {
+                        var detailedReason = $.parseJSON(jqXHR.responseText).ErrMsg;
+                        if (detailedReason) {
+                            reason = detailedReason;
+                        }
+                    } catch (e) {}
+                }
+                errorHandler(reason);
+            });
+        };
      };
  });

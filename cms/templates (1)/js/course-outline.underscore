@@ -1,0 +1,382 @@
+<%
+var releasedToStudents = xblockInfo.get('released_to_students');
+var visibilityState = xblockInfo.get('visibility_state');
+var published = xblockInfo.get('published');
+var prereq = xblockInfo.get('prereq');
+var hasPartitionGroups = xblockInfo.get('has_partition_group_components');
+var userPartitionInfo = xblockInfo.get('user_partition_info');
+var selectedGroupsLabel = userPartitionInfo['selected_groups_label'];
+var selectedPartitionIndex = userPartitionInfo['selected_partition_index'];
+
+var statusMessages = [];
+var messageType;
+var messageText;
+var statusType = null;
+var addStatusMessage = function (statusType, message) {
+    var statusIconClass = '';
+    if (statusType === 'warning') {
+        statusIconClass = 'fa-file-o';
+    } else if (statusType === 'error') {
+        statusIconClass = 'fa-warning';
+    } else if (statusType === 'staff-only' || statusType === 'gated') {
+        statusIconClass = 'fa-lock';
+    } else if (statusType === 'partition-groups') {
+        statusIconClass = 'fa-eye';
+    }
+
+    statusMessages.push({iconClass: statusIconClass, text: message});
+};
+
+if (prereq) {
+    var prereqDisplayName = '';
+    _.each(xblockInfo.get('prereqs'), function (p) {
+        if (p.block_usage_key == prereq) {
+            prereqDisplayName = p.block_display_name;
+            return false;
+        }
+    });
+    messageType = 'gated';
+    messageText = interpolate(
+        gettext('Prerequisite: %(prereq_display_name)s'),
+        {prereq_display_name: prereqDisplayName},
+        true
+    );
+    addStatusMessage(messageType, messageText);
+}
+if (staffOnlyMessage) {
+    messageType = 'staff-only';
+    messageText = gettext('Contains staff only content');
+    addStatusMessage(messageType, messageText);
+} else {
+    if (visibilityState === 'needs_attention' && xblockInfo.isVertical()) {
+        messageType = 'warning';
+        if (published && releasedToStudents) {
+            messageText = gettext('Unpublished changes to live content');
+        } else if (!published) {
+            messageText = gettext('Unpublished units will not be released');
+        } else {
+            messageText = gettext('Unpublished changes to content that will release in the future');
+        }
+        addStatusMessage(messageType, messageText);
+    }
+
+    if (selectedPartitionIndex !== -1 && !isNaN(selectedPartitionIndex) && xblockInfo.isVertical()) {
+        messageType = 'partition-groups';
+        messageText = edx.StringUtils.interpolate(
+                gettext('Access to this unit is restricted to: {selectedGroupsLabel}'),
+                {
+                    selectedGroupsLabel: selectedGroupsLabel
+                }
+        )
+        addStatusMessage(messageType, messageText);
+    } else if (hasPartitionGroups && xblockInfo.isVertical()) {
+        addStatusMessage(
+            'partition-groups',
+            gettext('Access to some content in this unit is restricted to specific groups of learners')
+        );
+    }
+}
+
+var gradingType = gettext('Ungraded');
+if (xblockInfo.get('graded')) {
+    gradingType = xblockInfo.get('format')
+}
+
+var is_proctored_exam = xblockInfo.get('is_proctored_exam');
+var is_practice_exam = xblockInfo.get('is_practice_exam');
+var is_onboarding_exam = xblockInfo.get('is_onboarding_exam');
+var exam_value;
+if (is_proctored_exam) {
+    if (is_onboarding_exam) {
+        exam_value = gettext('Onboarding Exam');
+    } else if (is_practice_exam) {
+        exam_value = gettext('Practice proctored Exam');
+    } else {
+        exam_value = gettext('Proctored Exam');
+    }
+
+} else {
+    exam_value = gettext('Timed Exam');
+}
+%>
+<% if (parentInfo) { %>
+<li class="outline-item outline-<%- xblockType %> <%- visibilityClass %> is-draggable <%- includesChildren ? 'is-collapsible' : '' %> <%- isCollapsed ? 'is-collapsed' : '' %>"
+    data-parent="<%- parentInfo.get('id') %>" data-locator="<%- xblockInfo.get('id') %>" id="<%- xblockInfo.get('id') %>">
+
+    <span class="draggable-drop-indicator draggable-drop-indicator-before"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+    <% if (xblockInfo.isHeaderVisible()) { %>
+    <div class="<%- xblockType %>-header">
+        <% if (includesChildren) { %>
+            <h3 class="<%- xblockType %>-header-details expand-collapse <%- isCollapsed ? 'expand' : 'collapse' %> ui-toggle-expansion"
+                title="<%- interpolate(
+                      gettext('Collapse/Expand this %(xblock_type)s'), { xblock_type: xblockTypeDisplayName }, true
+                ) %>"
+            >
+                <span class="icon fa fa-caret-down" aria-hidden="true"></span>
+        <% } else { %>
+            <h3 class="<%- xblockType %>-header-details">
+        <% } %>
+                <% if (xblockInfo.isVertical()) { %>
+                    <span class="unit-title item-title">
+                    <span class="wrapper-<%- xblockType %>-title wrapper-xblock-field incontext-editor is-editable" data-field="display_name" data-field-display-name="<%- gettext("Display Name") %>">
+                        <a class="<%- xblockType %>-title item-title xblock-field-value incontext-editor-value" href="<%- xblockInfo.get('studio_url') %>"><%- xblockInfo.get('display_name') %></a>
+                    </span>
+                    </span>
+                <% } else { %>
+                    <span class="wrapper-<%- xblockType %>-title wrapper-xblock-field incontext-editor is-editable" data-field="display_name" data-field-display-name="<%- gettext("Display Name") %>">
+                        <span class="<%- xblockType %>-title item-title xblock-field-value incontext-editor-value"><%- xblockInfo.get('display_name') %></span>
+                    </span>
+                <% } %>
+            </h3>
+        <div class="<%- xblockType %>-header-actions">
+            <ul class="actions-list">
+                <% if (xblockInfo.isSequential() && xblockInfo.get('proctoring_exam_configuration_link')) { %>
+                <li class="action-item">
+                    <a href="<%- xblockInfo.get('proctoring_exam_configuration_link') %>" data-tooltip="<%- gettext('Proctoring Settings') %>" class="proctoring-configuration-button" rel="noopener" target="_blank">
+                        <span class="action-button-text"><%- gettext('Proctoring Settings') %></span>
+                    </a>
+                </li>
+                <% } %>
+                <% if (xblockInfo.isPublishable()) { %>
+                    <li class="action-item action-publish">
+                        <a href="#" data-tooltip="<%- gettext('Publish') %>" class="publish-button action-button">
+                            <span class="icon fa fa-upload" aria-hidden="true"></span>
+                            <span class="sr action-button-text"><%- gettext('Publish') %></span>
+                        </a>
+                    </li>
+                <% } %>
+                <% if (xblockInfo.isEditableOnCourseOutline()) { %>
+                    <li class="action-item action-configure">
+                        <a href="#" data-tooltip="<%- gettext('Configure') %>" class="configure-button action-button">
+                            <span class="icon fa fa-gear" aria-hidden="true"></span>
+                            <span class="sr action-button-text"><%- gettext('Configure') %></span>
+                        </a>
+                    </li>
+                <% } %>
+                <% if (xblockInfo.isDuplicable()) { %>
+                    <li class="action-item action-duplicate">
+                        <a href="#" data-tooltip="<%- gettext('Duplicate') %>" class="duplicate-button action-button">
+                            <span class="icon fa fa-copy" aria-hidden="true"></span>
+                            <span class="sr action-button-text"><%- gettext('Duplicate') %></span>
+                        </a>
+                    </li>
+                <% } %>
+                <% if (xblockInfo.isDeletable()) { %>
+                    <li class="action-item action-delete">
+                        <a href="#" data-tooltip="<%- gettext('Delete') %>" class="delete-button action-button">
+                            <span class="icon fa fa-trash-o" aria-hidden="true"></span>
+                            <span class="sr action-button-text"><%- gettext('Delete') %></span>
+                        </a>
+                    </li>
+                <% } %>
+                <% if (xblockInfo.isDraggable()) { %>
+                <li class="action-item action-drag">
+                    <span data-tooltip="<%- gettext('Drag to reorder') %>"
+                          class="drag-handle <%- xblockType %>-drag-handle action">
+                        <span class="sr"><%- gettext('Drag to reorder') %></span>
+                    </span>
+                </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+    <div class="<%- xblockType %>-status">
+        <% if (!xblockInfo.isVertical()) { %>
+            <% if (xblockInfo.get('explanatory_message') !=null) { %>
+                <div class="explanatory-message">
+                    <span>
+                        <%- xblockInfo.get('explanatory_message') %>
+                    </span>
+                </div>
+            <% } else { %>
+              <div class="status-release">
+                <p>
+                    <span class="sr status-release-label"><%- gettext('Release Status:') %></span>
+                    <span class="status-release-value">
+                        <% if (!course.get('self_paced')) { %>
+                            <% if (xblockInfo.get('released_to_students')) { %>
+                                <span class="icon fa fa-check" aria-hidden="true"></span>
+                                <%- gettext('Released:') %>
+                            <% } else if (xblockInfo.get('release_date')) { %>
+                                <span class="icon fa fa-clock-o" aria-hidden="true"></span>
+                                <%- gettext('Scheduled:') %>
+                            <% } else { %>
+                                <span class="icon fa fa-clock-o" aria-hidden="true"></span>
+                                <%- gettext('Unscheduled') %>
+                            <% } %>
+                            <% if (xblockInfo.get('release_date')) { %>
+                                <%- xblockInfo.get('release_date') %>
+                            <% } %>
+                        <% } %>
+                    </span>
+                </p>
+              </div>
+            <% } %>
+            <% if (xblockInfo.isChapter()) { %>
+                <div class="block-highlights">
+                    <% var number_of_highlights = (xblockInfo.get('highlights') || []).length; %>
+                        <button class="block-highlights-value highlights-button action-button">
+                            <span class="number-highlights"><%- number_of_highlights %></span>
+                            <%- gettext('Section Highlights') %>
+                        </button>
+                </div>
+            <% } %>
+            <% if (xblockInfo.get('is_time_limited')) { %>
+                <div class="status-timed-proctored-exam">
+                    <p>
+                        <span class="sr status-grading-label"> <%- gettext('Graded as:') %> </span>
+                        <span class="icon fa fa-check" aria-hidden="true"></span>
+                        <span class="status-grading-value"> <%- gradingType %> </span>
+                         -
+                        <span class="sr status-proctored-exam-label"> <%- exam_value %> </span>
+                        <span class="status-proctored-exam-value"> <%- exam_value %> </span>
+                        <% if (xblockInfo.get('due_date') && !course.get('self_paced')) { %>
+                            <span class="status-grading-date"> <%- gettext('Due:') %> <%- xblockInfo.get('due_date') %> </span>
+                        <% } %>
+                    </p>
+                </div>
+                <% if (course.get('self_paced') && course.get('is_custom_relative_dates_active') && xblockInfo.get('relative_weeks_due')) { %>
+                    <div class="status-grading">
+                        <p>
+                            <span class="icon fa fa-calendar" aria-hidden="true"></span>
+                            <span class="status-custom-grading-date">
+                                <%- edx.StringUtils.interpolate(
+                                        ngettext(
+                                            'Custom due date: {relativeWeeks} week from enrollment',
+                                            'Custom due date: {relativeWeeks} weeks from enrollment',
+                                            xblockInfo.get('relative_weeks_due')),
+                                        {
+                                            relativeWeeks: xblockInfo.get('relative_weeks_due')
+                                        }
+                                    )
+                                %>
+                            </span>
+                        <p>
+                    </div>
+                <% } %>
+            <% } else if ((xblockInfo.get('due_date') && !course.get('self_paced')) || xblockInfo.get('graded')) { %>
+                <div class="status-grading">
+                    <p>
+                        <span class="sr status-grading-label"> <%- gettext('Graded as:') %> </span>
+                        <span class="icon fa fa-check" aria-hidden="true"></span>
+                        <span class="status-grading-value"> <%- gradingType %> </span>
+                        <% if (xblockInfo.get('due_date') && !course.get('self_paced')) { %>
+                            <span class="status-grading-date"> <%- gettext('Due:') %> <%- xblockInfo.get('due_date') %> </span>
+                        <% } %>
+                    </p>
+                </div>
+                <% if (course.get('self_paced') && course.get('is_custom_relative_dates_active') && xblockInfo.get('relative_weeks_due')) { %>
+                    <div class="status-grading">
+                        <p>
+                            <span class="icon fa fa-calendar" aria-hidden="true"></span>
+                            <span class="status-custom-grading-date">
+                                <%- edx.StringUtils.interpolate(
+                                        ngettext(
+                                            'Custom due date: {relativeWeeks} week from enrollment',
+                                            'Custom due date: {relativeWeeks} weeks from enrollment',
+                                            xblockInfo.get('relative_weeks_due')),
+                                        {
+                                            relativeWeeks: xblockInfo.get('relative_weeks_due')
+                                        }
+                                    )
+                                %>
+                            </span>
+                        <p>
+                    </div>
+                <% } %>
+            <% } else if (course.get('self_paced') && course.get('is_custom_relative_dates_active') && xblockInfo.get('relative_weeks_due')) { %>
+                <div class="status-grading">
+                    <p>
+                        <span class="sr status-grading-label"> <%- gettext('Graded as:') %> </span>
+                        <span class="icon fa fa-check" aria-hidden="true"></span>
+                        <span class="status-grading-value"> <%- gradingType %> </span>
+                    </p>
+                </div>
+                <div class="status-grading">
+                    <p>
+                        <span class="icon fa fa-calendar" aria-hidden="true"></span>
+                        <span class="status-custom-grading-date">
+                            <%- edx.StringUtils.interpolate(
+                                    ngettext(
+                                        'Custom due date: {relativeWeeks} week from enrollment',
+                                        'Custom due date: {relativeWeeks} weeks from enrollment',
+                                        xblockInfo.get('relative_weeks_due')),
+                                    {
+                                        relativeWeeks: xblockInfo.get('relative_weeks_due')
+                                    }
+                                )
+                            %>
+                        </span>
+                    <p>
+                </div>
+            <% } %>
+            <div class="status-hide-after-due">
+                <p>
+                    <% if (xblockInfo.get('hide_after_due')) { %>
+                        <span class="icon fa fa-eye-slash" aria-hidden="true"></span>
+                        <span class="status-hide-after-due-value">
+                        <% if (course.get('self_paced')) { %>
+                            <%- gettext("Subsection is hidden after course end date") %> </span>
+                        <% } else { %>
+                            <%- gettext("Subsection is hidden after due date") %> </span>
+                        <% } %>
+                    <% } %>
+                </p>
+            </div>
+        <% } %>
+        <% if (statusMessages.length > 0) { %>
+            <div class="status-messages">
+            <% for (var i=0; i<statusMessages.length; i++) { %>
+                <div class="status-message">
+                    <span class="icon fa <%- statusMessages[i].iconClass %>" aria-hidden="true"></span>
+                    <p class="status-message-copy"><%- statusMessages[i].text %></p>
+                </div>
+            <% } %>
+            </div>
+        <% } %>
+    </div>
+    <% } %>
+<% } %>
+
+    <% if (!parentInfo && xblockInfo.get('child_info') && xblockInfo.get('child_info').children.length === 0) { %>
+        <div class="no-content add-section">
+            <p><%- gettext("You haven't added any content to this course yet.") %>
+                <a href="#" class="button button-new" data-category="<%- childCategory %>"
+                   data-parent="<%- xblockInfo.get('id') %>" data-default-name="<%- defaultNewChildName %>"
+                   title="<%- interpolate(
+                         gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true
+                   ) %>"
+                >
+                    <span class="icon fa fa-plus" aria-hidden="true"></span><%- addChildLabel %>
+                </a>
+            </p>
+        </div>
+    <% } else if (!xblockInfo.isVertical()) { %>
+        <div class="outline-content <%- xblockType %>-content">
+            <ol class="<%- typeListClass %> is-sortable">
+                <li class="ui-splint ui-splint-indicator">
+                    <span class="draggable-drop-indicator draggable-drop-indicator-initial"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+                </li>
+            </ol>
+
+            <% if (childType) { %>
+            <% if (xblockInfo.isChildAddable()) { %>
+                <div class="add-<%- childType %> add-item">
+                    <a href="#" class="button button-new" data-category="<%- childCategory %>"
+                       data-parent="<%- xblockInfo.get('id') %>" data-default-name="<%- defaultNewChildName %>"
+                       title="<%- interpolate(
+                             gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true
+                       ) %>"
+                    >
+                        <span class="icon fa fa-plus" aria-hidden="true"></span><%- addChildLabel %>
+                    </a>
+                </div>
+                <% } %>
+            <% } %>
+        </div>
+    <% } %>
+
+<% if (parentInfo) { %>
+    <span class="draggable-drop-indicator draggable-drop-indicator-after"><span class="icon fa fa-caret-right" aria-hidden="true"></span></span>
+</li>
+<% } %>

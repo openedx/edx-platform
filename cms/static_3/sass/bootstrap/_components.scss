@@ -1,0 +1,199 @@
+// Open edX: components
+// ====================
+
+// Skip nav
+.nav-skip,
+.transcript-skip {
+  font-size: $font-size-base;
+  line-height: 14px;
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  top: -($baseline*30);
+  overflow: hidden;
+  background: $white;
+  border-bottom: 1px solid $gray-500;
+  padding: ($baseline*0.75) ($baseline/2);
+
+  &:focus,
+  &:active {
+    position: relative;
+    top: auto;
+    width: auto;
+    height: auto;
+    margin: 0;
+  }
+}
+
+// Page banner
+.page-banner {
+  max-width: $studio-max-width;
+  margin: 0 auto;
+
+  .user-messages {
+    margin-top: $baseline;
+  }
+}
+
+// Alerts
+.alert {
+  .icon-alert {
+    margin-right: $baseline / 4;
+  }
+}
+
+// Sock
+.wrapper-sock {
+  @include clearfix();
+
+  position: relative;
+  margin: ($baseline*2) 0 0 0;
+  border-top: 1px solid $gray-500;
+  width: 100%;
+
+  .wrapper-inner {
+    display: none;
+    width: 100% !important;
+    border-bottom: 1px solid $white;
+    padding: 0 $baseline !important;
+  }
+
+  // sock - actions
+  .list-cta {
+    @extend %ui-depth1;
+
+    position: absolute;
+    top: -($baseline*0.75);
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    list-style: none;
+
+    .cta-show-sock {
+      @extend %ui-btn-pill;
+      @extend %t-action4;
+
+      background: theme-color("light");
+      padding: ($baseline/2) $baseline;
+      color: theme-color("dark");
+
+      .icon {
+        margin-right: $baseline/4;
+      }
+
+      &:hover {
+        background: theme-color("primary");
+        color: theme-color("inverse");
+      }
+    }
+  }
+
+  // sock - additional help
+  .sock {
+    @include clearfix();
+
+    @extend %t-copy-sub2;
+
+    max-width: $studio-max-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+    padding: ($baseline*2) 0;
+    color: $gray-500;
+
+    // support body
+    header {
+      .title {
+        @extend %t-title4;
+      }
+    }
+
+    .list-actions {
+      list-style: none;
+    }
+
+    // shared elements
+    .support,
+    .feedback {
+      .title {
+        @extend %t-title6;
+
+        color: $white;
+        margin-bottom: ($baseline/2);
+      }
+
+      .copy {
+        @extend %t-copy-sub2;
+
+        margin: 0 0 $baseline 0;
+      }
+
+      .list-actions {
+        @include clearfix();
+
+        .action-item {
+          float: left;
+          margin-right: $baseline/2;
+          margin-bottom: ($baseline/2);
+
+          &:last-child {
+            margin-right: 0;
+          }
+
+          .action {
+            @extend %t-action4;
+
+            display: block;
+
+            .icon {
+              @extend %t-icon4;
+
+              vertical-align: middle;
+              margin-right: $baseline/4;
+            }
+          }
+
+          .tip {
+            @extend %cont-text-sr;
+          }
+        }
+
+        .action-primary {
+          @extend %btn-primary-blue;
+          @extend %t-action3;
+        }
+      }
+    }
+
+    // studio support content
+    .support {
+      width: flex-grid(8, 12);
+      float: left;
+      margin-right: flex-gutter();
+
+      .action-item {
+        width: flexgrid(4, 8);
+      }
+    }
+
+    // studio feedback content
+    .feedback {
+      width: flex-grid(4, 12);
+      float: left;
+
+      .action-item {
+        width: flexgrid(4, 4);
+      }
+    }
+  }
+
+  // case: sock content is shown
+  &.is-shown {
+    border-color: theme-color("primary");
+
+    .list-cta .cta-show-sock {
+      background: theme-color("primary");
+      border-color: theme-color("primary");
+      color: $white;
+    }
+  }
+}

@@ -1,0 +1,145 @@
+<%page expression_filter="h"/>
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "pages" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%!
+  from django.utils.translation import gettext as _
+  from django.urls import reverse
+  from xmodule.tabs import StaticTab
+  from openedx.core.djangolib.js_utils import js_escaped_string
+  from cms.djangoapps.contentstore.utils import get_pages_and_resources_url
+%>
+<%block name="title">${_("Custom pages")}</%block>
+<%block name="bodyclass">is-signedin course view-static-pages</%block>
+
+<%block name="header_extras">
+% for template_name in ["basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+<%block name="page_bundle">
+    <%static:webpack entry="js/factories/edit_tabs">
+        EditTabsFactory("${context_course.location | n, js_escaped_string}", "${reverse('tabs_handler', kwargs={'course_key_string': context_course.id}) | n, js_escaped_string}");
+    </%static:webpack>
+</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+  % if context_course:
+    <%
+      pages_and_resources_mfe_url = get_pages_and_resources_url(context_course.id)
+      pages_and_resources_mfe_enabled = bool(pages_and_resources_mfe_url)
+    %>
+  % endif
+
+  % if pages_and_resources_mfe_enabled:
+  <header class="mast has-actions">
+    <div class="jump-nav">
+      <nav class="nav-dd title ui-left">
+        <ol>
+            <li class="nav-item">
+                <span class="label">${_("Content")}</span>
+                <span class="spacer"> &rsaquo;</span>
+            </li>
+            <li class="nav-item">
+              <a class="title" href="${pages_and_resources_mfe_url}" rel="external">${_("Pages & Resources")}</a>
+              <span class="spacer"> &rsaquo;</span>
+            </li>
+        </ol>
+      </nav>
+    </div>
+    <h1 class="page-header">
+      <span class="sr">&gt; </span>${_("Custom pages")}
+    </h1>
+  % else:
+  <header class="mast has-actions has-subtitle">
+    <h1 class="page-header">
+      <small class="subtitle">${_("Content")}</small>
+      ## Translators: Custom Pages refer to the tabs that appear in the top navigation of each course.
+      <span class="sr"> > </span>${_("Custom pages")}
+    </h1>
+  % endif
+
+    <nav class="nav-actions" aria-label="${_('Page Actions')}">
+      <h3 class="sr">${_("Page Actions")}</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="button new-button new-tab"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("New Page")}</a>
+        </li>
+        <li class="nav-item">
+          <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+
+      <div class="notice-incontext">
+        <p class="copy">${_("Note: Pages are publicly visible. If users know the URL of a page, they can view the page even if they are not registered for or logged in to your course.")}</p>
+      </div>
+
+
+      <div class="inner-wrapper">
+        <article class="unit-body">
+
+          <div class="tab-list">
+            <ol class="course-nav-list course components">
+
+              % for tab in tabs_to_render:
+                <%
+                  css_class = "course-tab"
+                  if tab.is_movable:
+                    css_class = css_class + " is-movable"
+                  elif (not tab.is_movable) and (not tab.is_hideable):
+                    css_class = css_class + " is-fixed"
+                %>
+
+                <li class="component ${css_class}" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
+
+              % endfor
+
+              <li class="new-component-item"></li>
+            </ol>
+          </div>
+
+          <div class="add-pages">
+              <p>${_("You can add additional custom pages to your course.")} <a href="#" class="button new-button new-tab"><span class="icon fa fa-plus" aria-hidden="true"></span>${_("Add a New Page")}</a></p>
+          </div>
+        </article>
+      </div>
+    </article>
+
+    <aside class="content-supplementary" role="complementary">
+      <div class="bit">
+        <h3 class="title-3">${_("What are custom pages?")}</h3>
+        <p>${_("You can create and edit custom pages to provide students with additional course content. For example, you can create pages for the grading policy, course syllabus, and a course calendar. ")} </p>
+      </div>
+      <div class="bit">
+        <h3 class="title-3">${_("How do custom pages look to students in my course?")}</h3>
+        <p>${_("Custom pages are listed horizontally at the top of your course after default pages.")} <br /> <a rel="modal" href="#preview-lms-staticpages">${_("See an example")}</a></p>
+      </div>
+    </aside>
+
+  </section>
+</div>
+
+<div class="content-modal" id="preview-lms-staticpages">
+  <h3 class="title">${_("Custom pages in your course")}</h3>
+  <figure>
+    <img src="${static.url("images/preview-lms-staticpage.png")}" alt="${_('Preview of Pages in your course')}" />
+    <figcaption class="description">${_("Custom pages are listed horizontally at the top of your course after default pages and textbooks. In the above example, custom pages for \"Course Schedule\" and \"Supplements\" have been added to a course.")}</figcaption>
+  </figure>
+
+  <a href="#" rel="view" class="action action-modal-close">
+    <span class="icon fa fa-times-circle" aria-hidden="true"></span>
+    <span class="label">${_("close modal")}</span>
+  </a>
+</div>
+</%block>

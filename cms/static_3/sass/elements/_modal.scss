@@ -1,0 +1,85 @@
+// studio - elements - modal windows
+// ====================
+
+.modal-cover {
+  @extend %ui-depth3;
+
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.modal {
+  @extend %ui-depth4;
+
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  width: 930px;
+  height: 540px;
+  margin-left: -465px;
+  background: $white;
+
+  .modal-body {
+    height: 400px;
+    padding: 40px;
+    overflow-y: scroll;
+  }
+
+  .modal-actions {
+    height: 60px;
+
+    @include linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+
+    background-color: #d1dae3;
+  }
+
+  h2 {
+    @extend %t-title5;
+    @extend %t-light;
+
+    margin: 0 ($baseline/2) ($baseline*1.5);
+    color: #646464;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  p {
+    margin: $baseline;
+  }
+
+  .revert-button {
+    @include blue-button;
+
+    margin: 13px 6px 0 13px;
+  }
+
+  .close-button {
+    @include white-button;
+
+    margin-top: 13px;
+  }
+}
+
+// lean modal alternative
+#lean_overlay {
+  @extend %ui-depth4;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: none;
+  height: 100%;
+  width: 100%;
+  background: $black;
+}
+
+// Mimic Bootstrap functionality which makes the background body unscrollable while the modal is open.
+body.modal-open {
+  overflow: hidden;
+}

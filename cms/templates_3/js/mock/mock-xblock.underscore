@@ -1,0 +1,24 @@
+<li class="studio-xblock-wrapper is-draggable">
+    <header class="xblock-header">
+        <div class="header-details">
+            <span class="xblock-display-name">Mock XBlock</span>
+        </div>
+        <div class="header-actions">
+            <ul class="actions-list">
+                <li class="action-item action-drag">
+                    <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
+                </li>
+            </ul>
+            <a href="#" class="button action-button notification-action-button" data-notification-action="add-missing-groups">
+                <span class="action-button-text">Add Missing Groups</span>
+            </a>
+        </div>
+    </header>
+    <article class="xblock-render">
+        <div class="xblock xblock-student_view xmodule_display xmodule_VerticalModule"
+             data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1"
+             data-type="None">
+            <p>Mock XBlock</p>
+        </div>
+    </article>
+</li>

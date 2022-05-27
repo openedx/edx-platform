@@ -16,9 +16,11 @@ from typing import Dict
 
 
 
-from openedx.core.djangoapps.enrollments.serializers import  LiveClassesSerializer
+from openedx.core.djangoapps.enrollments.serializers import  LiveClassesSerializer , UserListSerializer ,LiveClassEnrollmentSerializer ,LiveClassUserDetailsSerializer ,UserLiveClassDetailsSerializer
+from common.djangoapps.student.models import LiveClassEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import LiveClasses 
-from rest_framework.generics import ListAPIView , ListCreateAPIView , RetrieveDestroyAPIView ,RetrieveUpdateDestroyAPIView # lint-amnesty, pylint: disable=wrong-import-order
+from django.contrib.auth.models import User 
+from rest_framework.generics import ListAPIView , ListCreateAPIView ,CreateAPIView , RetrieveDestroyAPIView ,RetrieveUpdateDestroyAPIView # lint-amnesty, pylint: disable=wrong-import-order
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -588,12 +590,12 @@ def course_listing(request):
         'liveclass_enabled': True,
         'liveclass_enabled_list': False,
         'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
-        'liveclass_authoring_mfe_url': '#',
         'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
+        'liveclass_authoring_mfe_url': '#',
         'libraries': [_format_library_for_view(lib, request) for lib in libraries],
         'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
+        'show_new_liveclass_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
         'user': user,
-          'show_new_liveclass_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(user),
         'rerun_creator_status': GlobalStaff().has_user(user),
@@ -617,9 +619,9 @@ def library_listing(request):
         'libraries_enabled': LIBRARIES_ENABLED,
         'libraries': [_format_library_for_view(lib, request) for lib in libraries],
         'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
-          'show_new_liveclass_button': LIBRARIES_ENABLED and request.user.is_active,
         'user': request.user,
         'request_course_creator_url': reverse('request_course_creator'),
+        'show_new_liveclass_button': LIBRARIES_ENABLED and request.user.is_active,
         'course_creator_status': _get_course_creator_status(request.user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'archived_courses': True,
@@ -1952,21 +1954,19 @@ class LiveClassesApiListView(DeveloperErrorViewMixin, ListCreateAPIView):
     #pagination_class = LiveClassesSerializer
     lookup_field = "username"
 
+    # def get_queryset(self):
+    #     created_by_id = self.kwargs.get('username')
+
+    #     return LiveClasses.objects.filter(created_by=created_by_id)
+
+
     def get_queryset(self):
-        queryset = LiveClasses.objects.all()
-        usernames =self.kwargs.get('username')
-
-        if usernames:
-            queryset = queryset.filter(user__username__in=usernames)
-
-
-        return queryset
+        return LiveClasses.objects.filter(created_by=self.request.user)
 
 
 
 
-        # validated_data['created_by_id']= self.context['user'].id
-        # return LiveClasses.objects.filter(created_by=validated_data)
+        
 
 
     def post(self, request, *args, **kwargs):
@@ -2017,6 +2017,115 @@ class LiveClassesDeleteApiView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPI
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response("Updated Successfully", status=status.HTTP_200_OK)
+        except self.model.DoesNotExist:
+            return Response("Invalied Id", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+
+
+class UserDetailsListApiView(DeveloperErrorViewMixin, ListAPIView):
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    #pagination_class = False
+    serializer_class = UserListSerializer
+    queryset = User.objects.all()
+
+
+    # def get_queryset(self):
+    #     is_active = self.kwargs.get('is_active')
+
+    #     return User.objects.filter(is_active=is_active)
+
+
+
+    def get_serializer_class(self):
+        """Get Serializer"""
+        if self.request.method == 'GET':
+            return UserListSerializer
+
+
+
+
+class EnrollLiveClassCreateView(DeveloperErrorViewMixin, CreateAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    #throttle_classes = (EnrollmentUserThrottle,)
+    serializer_class = LiveClassEnrollmentSerializer
+    #queryset = LiveClassEnrollment.objects.all()
+
+    #pagination_class = LiveClassesSerializer
+    
+
+    def post(self, request, *args, **kwargs):
+        """Upload documents"""
+        try:
+            serializer = self.serializer_class(
+                data=request.data,
+            )
+            serializer.is_valid(raise_exception=True)
+            
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+class EnrollLiveClassUserDetailsView(DeveloperErrorViewMixin, ListCreateAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    #throttle_classes = (EnrollmentUserThrottle,)
+    serializer_class = LiveClassUserDetailsSerializer
+    # pagination_class = LiveClassesSerializer
+    lookup_url_kwarg = 'live_class_id'
+
+
+    # lookup_field = "username"
+
+    def get_queryset(self):
+    
+        return LiveClassEnrollment.objects.filter(live_class_id=self.kwargs.get('live_class_id'))
+
+
+
+
+
+class EnrollLiveClassUserDeleteApiView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    #throttle_classes = (EnrollmentUserThrottle,)
+    serializer_class = UserLiveClassDetailsSerializer
+    queryset = LiveClassEnrollment.objects.all()
+    model = LiveClassEnrollment
+    lookup_field = "id"
+
+
+
+    def delete(self, request, *args, **kwargs):
+        
+
+        try:
+            enroll_live_class_id = self.model.objects.get(id=self.kwargs.get('id'))
+            enroll_live_class_id.delete()
+            return Response("Deleted Successfully", status=status.HTTP_200_OK)
         except self.model.DoesNotExist:
             return Response("Invalied Id", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 

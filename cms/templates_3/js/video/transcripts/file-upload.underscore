@@ -1,0 +1,9 @@
+<div class="progress-bar is-invisible">
+  <div class="progress-fill"></div>
+</div>
+<form class="file-chooser" action="/transcripts/upload"
+                          method="post" enctype="multipart/form-data">
+  <input type="file" class="file-input" name="transcript-file"
+    accept="<%- _.map(ext, function(val){ return '.' + val; }).join(', ') %>">
+  <input type="hidden" name="locator" value="<%- component_locator %>">
+</form>

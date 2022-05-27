@@ -17,7 +17,9 @@ from .views import (
     #LiveClassesApiListView,
     LiveClassesListApiListView ,
     #LiveClassesDeleteApiView,
-    #LiveClassDetailsView,
+    EnrollLiveClassDetailsView,
+    # EnrollLiveClassUserDetailsView,
+    # EnrollLiveClassUserDetailsView,
 )
 
 urlpatterns = [
@@ -50,5 +52,9 @@ urlpatterns = [
 
     re_path(r'^enrollments/live_class/?$', LiveClassesListApiListView.as_view(), name='live_class_list'),
 
-    #path('enrollment/live_class/details/<user_id>', LiveClassDetailsView.as_view(), name='user_live_class_details' ),
+    path('enrollment/live_class/enroll', EnrollLiveClassDetailsView.as_view(), name='user_live_class_details' ),
+
+    # path('enrollment/live_class/enroll/detail/<live_class_id>', EnrollLiveClassUserDetailsView.as_view(), name='user_live_class_details' ),
+
+    # path('enrollment/live_class/enroll/live_class/detail/<id>', EnrollLiveClassUserDetailsView.as_view(), name='user_live_class_details' ),
 ]

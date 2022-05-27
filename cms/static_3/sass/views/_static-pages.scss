@@ -1,0 +1,418 @@
+// studio - views - course pages
+// ====================
+
+.view-static-pages {
+
+  // page structure
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
+    float: left;
+  }
+
+  .content-primary {
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
+
+    .add-pages {
+      @extend %no-content;
+
+      margin: ($baseline*1.5) 0;
+      color: $gray-d1;
+    }
+
+    .notice-incontext {
+      padding: 0;
+      box-shadow: none;
+
+      .copy {
+        @extend %t-copy-base;
+
+        opacity: 1;
+      }
+    }
+  }
+
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
+
+  .wrapper-actions-list {
+    top: 6px;
+
+    .actions-list {
+      .action-item {
+        position: relative;
+        display: inline-block;
+        min-width: ($baseline*1.5);
+        margin: 0;
+        text-align: center;
+
+        .action-button,
+        .toggle-actions-view {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+
+          display: inline-block;
+          border: 0;
+          background: none;
+          color: $gray-l3;
+
+          &:hover {
+            background-color: $blue;
+            color: $gray-l6;
+          }
+        }
+
+        &.action-visible {
+          position: relative;
+        }
+
+        &.action-visible label {
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 30px;
+          width: 30px;
+
+          &:hover {
+            background-color: $blue;
+          }
+        }
+
+        &.action-visible .toggle-checkbox {
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 30px;
+          width: 30px;
+          opacity: 0;
+        }
+
+        &.action-visible .toggle-checkbox:hover ~ .action-button,
+        &.action-visible .toggle-checkbox:checked:hover ~ .action-button {
+          background-color: $blue;
+          color: $gray-l6;
+        }
+
+        &.action-visible .toggle-checkbox ~ .action-button {
+          .fa-eye {
+            display: inline-block;
+            pointer-events: none;
+          }
+
+          .fa-eye-slash {
+            display: none;
+          }
+        }
+
+        &.action-visible .toggle-checkbox:checked ~ .action-button {
+          background-color: $gray;
+          color: $white;
+
+          .fa-eye {
+            display: none;
+          }
+
+          .fa-eye-slash {
+            display: inline-block;
+            pointer-events: none;
+          }
+        }
+      }
+    }
+  }
+
+
+  .unit-body {
+    padding: 0;
+
+    .details {
+      display: block !important;
+
+      h2 {
+        margin: 0 0 5px;
+      }
+    }
+
+    .wrapper-component-editor {
+      @extend %ui-depth4;
+
+      position: relative;
+      background: $lightBluishGrey2;
+    }
+
+    .component-editor {
+      @include edit-box;
+
+      box-shadow: none;
+      display: none;
+      padding: 0;
+      border-radius: 2px 2px 0 0;
+
+      //Overrides general edit-box mixin
+      .row {
+        margin-bottom: 0;
+      }
+
+      // This duplicates the styling from Unit page editing
+      .module-actions {
+        box-shadow: inset 0 1px 1px $shadow;
+        padding: 0 0 10px 10px;
+        background-color: $gray-l6;
+
+        .save-button {
+          margin: ($baseline/2) 8px 0 0;
+        }
+      }
+    }
+  }
+
+  .component-editor {
+    border: none;
+    border-radius: 0;
+  }
+
+  .components > li {
+    margin: 0;
+    border-radius: 0;
+
+    &.new-component-item {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+  }
+
+  .component,
+  .course-nav-item {
+    position: relative;
+    border: 1px solid $mediumGrey;
+    border-top: none;
+
+    &:first-child {
+      border-top: 1px solid $mediumGrey;
+    }
+
+    &:hover {
+      border: 1px solid $mediumGrey;
+      border-top: none;
+
+      &:first-child {
+        border-top: 1px solid $mediumGrey;
+      }
+
+      .drag-handle {
+        background: url('#{$static-path}/images/drag-handles.png') center no-repeat #fff;
+      }
+    }
+
+    .drag-handle {
+      @extend %ui-depth1;
+
+      @include right(0);
+
+      position: absolute;
+      display: block;
+      top: 0;
+      width: 35px;
+      height: 100%;
+      border: none;
+      background: url('#{$static-path}/images/drag-handles.png') center no-repeat #fff;
+
+      &:hover {
+        background: url('#{$static-path}/images/drag-handles.png') center no-repeat #fff;
+      }
+
+      &.is-fixed {
+        cursor: default;
+        width: ($baseline*1.5);
+        background: $gray-l4 none;
+      }
+    }
+
+    // uses similar styling as assets.scss, unit.scss
+    .wrapper-component-action-header {
+      box-sizing: border-box;
+      position: absolute;
+      width: 100%;
+      padding: $baseline/4 $baseline/2;
+      top: 0;
+      left: 0;
+    }
+
+    .component-header {
+      display: none;
+    }
+
+    .component-actions,
+    .course-nav-item-actions {
+      display: inline-block;
+
+      @include float(right);
+      @include margin-right($baseline*2);
+
+      padding: 8px 0;
+      vertical-align: middle;
+      text-align: center;
+
+      .action-item {
+        display: inline-block;
+        margin: ($baseline/4) 0 ($baseline/4) ($baseline/2);
+
+        .action-button {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+
+          display: block;
+          padding: 0 $baseline/2;
+          width: auto;
+          height: ($baseline*1.5);
+          border-radius: 3px;
+          color: $gray-d1;
+          text-transform: uppercase;
+
+          &:hover {
+            background-color: $blue;
+            color: $gray-l6;
+          }
+
+          .action-button-text {
+            padding-left: 1px;
+            vertical-align: bottom;
+            line-height: 17px;
+          }
+
+          &.delete-button:hover {
+            background-color: $gray-l1;
+          }
+        }
+
+        .icon {
+          display: inline-block;
+          vertical-align: bottom;
+        }
+
+        &.action-duplicate,
+        &.action-move {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // basic course nav items - overrides from above
+  .course-nav-item {
+    padding: ($baseline*0.75) ($baseline/4) ($baseline*0.75) $baseline;
+    background: $white;
+
+    &.is-fixed {
+      @extend %ui-disabled;
+
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+
+      opacity: 0.5;
+    }
+
+    .course-nav-item-header {
+      display: inline-block;
+      width: 80%;
+
+      .title {
+        @extend %t-title4;
+      }
+
+      .title-sub {
+        @extend %t-title7;
+
+        color: $gray-l2;
+      }
+    }
+
+    .course-nav-item-actions {
+      display: inline-block;
+      padding: ($baseline/10);
+    }
+  }
+
+  .component.editing {
+    border-left: 1px solid $mediumGrey;
+    border-right: 1px solid $mediumGrey;
+
+    .xblock-student_view {
+      display: none;
+    }
+  }
+
+  .new .xblock-student_view {
+    background: $yellow;
+  }
+
+  .xblock-student_view {
+    @include transition(background-color $tmg-s3 linear 0s);
+
+    @extend %t-title4;
+
+    padding: 20px 20px 22px;
+    background: $white;
+  }
+
+  .static-page-item {
+    position: relative;
+    margin: ($baseline/2) 0;
+    padding: 22px 20px;
+    border: 1px solid $darkGrey;
+    border-radius: 3px;
+    background: $white;
+    box-shadow: 0 1px 2px $shadow-l1;
+
+    .page-name {
+      @extend %t-title5;
+      @extend %t-strong;
+    }
+
+    .item-actions {
+      margin-top: 19px;
+      margin-right: 12px;
+    }
+  }
+}
+
+.edit-static-page {
+  .main-wrapper {
+    margin-top: ($baseline*2);
+  }
+
+  .static-page-details {
+    @extend %ui-window;
+
+    padding: 32px 40px;
+
+    .row {
+      border: none;
+    }
+  }
+
+  .page-display-name-input {
+    @extend %t-copy-lead1;
+
+    width: 100%;
+  }
+
+  .page-contents {
+    box-sizing: border-box;
+
+    @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
+
+    @extend %t-copy-sub1;
+
+    width: 100%;
+    height: 360px;
+    padding: 15px;
+    border: 1px solid #b0b6c2;
+    border-radius: 2px;
+    background-color: #edf1f5;
+    box-shadow: 0 1px 2px $shadow-l1 inset;
+    font-family: Monaco, monospace;
+    color: #3c3c3c;
+    outline: 0;
+  }
+}

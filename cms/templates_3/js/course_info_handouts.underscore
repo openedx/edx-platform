@@ -1,0 +1,22 @@
+<a href="#" class="edit-button"><span class="edit-icon"></span><%- gettext("Edit") %></a>
+
+<h2 class="title"><%- gettext("Course Handouts") %></h2>
+<%if (model.get('data') != null) { %>
+  <div class="handouts-content">
+
+  </div>
+<% } else {%>
+  <p><%- gettext("You have no handouts defined") %></p>
+<% } %>
+<form class="edit-handouts-form" style="display: block;">
+  <div class="message message-status error" name="handout_html_error" id="handout_error">
+    <%- gettext("There is invalid code in your content. Please check to make sure it is valid HTML.") %>
+  </div>
+  <div class="row">
+    <textarea class="handouts-content-editor text-editor"></textarea>
+  </div>
+  <div class="row">
+    <a href="#" class="save-button"><%- gettext("Save") %></a>
+    <a href="#" class="cancel-button"><%- gettext("Cancel") %></a>
+  </div>
+</form>

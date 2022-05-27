@@ -1,0 +1,71 @@
+<%! from django.utils.translation import gettext as _ %>
+<%namespace name='static' file='../../static_content.html'/>
+<%page args="tabName" expression_filter="h"/>
+
+<%
+import json
+%>
+
+## include js templates:
+
+% for template_name in ["metadata-videolist-entry", "file-upload"]:
+    <script type="text/template" id="${template_name}">
+        <%static:include path="js/video/transcripts/${template_name}.underscore" />
+    </script>
+% endfor
+
+% for template_name in ["transcripts-found", "transcripts-uploaded", "transcripts-use-existing", "transcripts-not-found", "transcripts-replace", "transcripts-import", "transcripts-choose"]:
+    <script type="text/template" id="${template_name}">
+        <%static:include path="js/video/transcripts/messages/${template_name}.underscore" />
+    </script>
+% endfor
+% for template_name in ["metadata-translations-entry", "metadata-translations-item"]:
+    <script id="${template_name}" type="text/template">
+        <%static:include path="js/video/${template_name}.underscore" />
+    </script>
+% endfor
+
+<div class="wrapper-comp-settings basic_metadata_edit" data-metadata='${json.dumps(transcripts_basic_tab_metadata)}'></div>
+
+<script type="text/javascript">
+    require(
+        [
+            "domReady!",
+            "jquery",
+            "js/views/video/transcripts/editor"
+        ],
+
+        function(doc, $, Editor) {
+            var transcripts = new Editor({
+                    el: $('#editor-tab-${html_id|n, decode.utf8}').find('.basic_metadata_edit')
+                }),
+                storage = TabsEditingDescriptor.getStorage();
+
+            TabsEditingDescriptor.Model.addModelUpdate(
+                '${html_id|n, decode.utf8}',
+                '${tabName|n, decode.utf8}',
+                function () {
+                    // Advanced, Save
+                    metadataEditor = storage.MetadataEditor;
+
+                    if (metadataEditor) {
+                        transcripts.syncAdvancedTab(metadataEditor.collection, metadataEditor);
+                    }
+                }
+            );
+
+            TabsEditingDescriptor.Model.addOnSwitch(
+                '${html_id|n, decode.utf8}',
+                '${tabName|n, decode.utf8}',
+                function () {
+                    // Basic
+                    metadataEditor = storage.MetadataEditor;
+
+                    if (metadataEditor) {
+                        transcripts.syncBasicTab(metadataEditor.collection, metadataEditor);
+                    }
+                }
+            );
+        }
+    );
+</script>

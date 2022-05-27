@@ -1,0 +1,100 @@
+// Open edX: Studio footer
+// =======================
+//
+// Note: these styles replicate the Studio styles directly
+// rather than benefiting from any Bootstrap classes. Ideally
+// the header should be reimagined using Bootstrap and then
+// these styles will no longer be necessary.
+
+.wrapper-footer {
+  position: relative;
+  width: 100%;
+  margin: 0 0 $baseline 0;
+  padding: $baseline;
+
+  footer.primary {
+    @extend %t-copy-sub2;
+
+    @include clearfix();
+
+    max-width: $studio-max-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+    color: $gray-500;
+
+    .footer-content-primary {
+      @include clearfix();
+    }
+
+    .colophon {
+      width: flex-grid(4, 12);
+      float: left;
+      margin-right: flex-gutter(2);
+    }
+
+    .nav-peripheral {
+      width: flex-grid(6, 12);
+      float: right;
+      text-align: right;
+
+      .nav-item {
+        display: inline-block;
+        margin-right: $baseline/4;
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        a {
+          border-radius: 2px;
+          padding: ($baseline/2) ($baseline/2);
+          background: transparent;
+
+          .icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: $baseline/4;
+          }
+        }
+      }
+    }
+
+    .footer-content-secondary {
+      @include clearfix();
+
+      margin-top: $baseline;
+    }
+
+    .footer-about-copyright,
+    .footer-about-openedx {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    // platform trademarks
+    .footer-about-copyright {
+      width: flex-grid(4, 12);
+      float: left;
+      margin-right: flex-gutter(2);
+    }
+
+    // platform Open edX logo and link
+    .footer-about-openedx {
+      float: right;
+      text-align: right;
+
+      a {
+        display: inline-block;
+
+        img {
+          display: block;
+          width: ($baseline* 6);
+        }
+
+        &:hover {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}

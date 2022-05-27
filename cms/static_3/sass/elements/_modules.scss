@@ -1,0 +1,804 @@
+// studio - elements - content modules
+// ====================
+// Patterns for pieces of content - modules - used throughout the app
+
+// basic gray module with a strong top border and title, with related content box attached
+// --------------------
+%bar-module {
+  margin-bottom: $baseline;
+  border-top: 5px solid $gray-l1;
+  background-color: $white;
+
+  .bar-mod-title {
+    @extend %t-title6;
+    @extend %t-strong;
+
+    display: block;
+    padding: ($baseline/2) ($baseline*0.75);
+    background-color: $gray-l4;
+  }
+
+  .bar-mod-content {
+    @extend %t-copy-sub1;
+
+    border-bottom: 1px solid $gray-l4;
+    padding: ($baseline*0.75) ($baseline*0.75) $baseline ($baseline*0.75);
+
+    .title {
+      @extend %t-title8;
+      @extend %t-strong;
+
+      margin-bottom: ($baseline/4);
+      color: $gray-d2;
+      text-transform: uppercase;
+    }
+
+    .meta {
+      @extend %t-copy-sub2;
+
+      color: $gray-d2;
+    }
+  }
+}
+
+// blue bar and title bg version
+// --------------------
+%bar-module-blue {
+  @extend %bar-module;
+
+  border-top: 5px solid $blue;
+
+  .bar-mod-title {
+    background-color: $blue-t0;
+  }
+}
+
+// green bar and title bg version
+// --------------------
+%bar-module-green {
+  @extend %bar-module;
+
+  border-top: 5px solid $green;
+
+  .bar-mod-title {
+    background-color: $green-l5;
+  }
+}
+
+// yellow bar and title bg version
+// --------------------
+%bar-module-yellow {
+  @extend %bar-module;
+
+  border-top: 5px solid $orange-l2;
+
+  .bar-mod-title {
+    background-color: $orange-l5;
+  }
+}
+
+// red bar and title bg version
+// --------------------
+%bar-module-red {
+  @extend %bar-module;
+
+  border-top: 5px solid $red-l2;
+
+  .bar-mod-title {
+    background-color: $red-l5;
+  }
+}
+
+// black bar and title bg version
+%bar-module-black {
+  @extend %bar-module;
+
+  border-top: 5px solid $black;
+
+  .bar-mod-title {
+    background-color: $gray-l4;
+  }
+}
+
+// Add new component menu with big green buttons
+// outermost wrapper for add a new component menu
+// --------------------
+.add-xblock-component {
+  margin: $baseline ($baseline/2);
+  border: 1px solid $gray-l3;
+  border-radius: ($baseline/4);
+  box-shadow: 0 1px 3px $shadow inset;
+  background-color: $gray-l5;
+  padding: ($baseline/2);
+
+  // add component menu inner wrapper
+  .new-component {
+    text-align: center;
+
+    h5 {
+      @extend %t-title5;
+      @extend %t-strong;
+
+      margin-bottom: ($baseline*0.75);
+      color: $uxpl-green-base;
+    }
+
+    // add component - list of green buttons
+    .new-component-type {
+      @include clearfix();
+
+      li {
+        display: inline-block;
+      }
+
+      // green button
+      .add-xblock-component-button {
+        @extend %t-action3;
+
+        @include margin-right($baseline*0.75);
+
+        position: relative;
+        display: inline-block;
+        width: ($baseline*6.25);
+        height: ($baseline*5);
+        margin-bottom: ($baseline/2);
+        box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+        border-radius: ($baseline/4);
+        padding: 0;
+        text-align: center;
+
+        @extend %btn-primary-green;
+
+        .name {
+          box-sizing: border-box;
+          display: block;
+          color: $white;
+        }
+      }
+    }
+  }
+
+  // outer most wrapper div for scroll up component picker menus
+  // swaps in when a green button is clicked
+  // --------------------
+  .new-component-templates {
+    @include clearfix();
+
+    display: none;
+    margin: $baseline ($baseline*2);
+    border-radius: 3px;
+    border: 1px solid $mediumGrey;
+    background-color: $white;
+    box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+
+    .cancel-button {
+      @include white-button;
+      @include margin($baseline, 0, ($baseline/2), ($baseline/2));
+    }
+
+    .problem-type-tabs {
+      display: none;
+    }
+
+    // specific menu types
+    &.new-component-problem {
+      .problem-type-tabs {
+        display: inline-block;
+      }
+    }
+
+    .support-documentation {
+      float: right;
+
+      @include margin($baseline, 0, ($baseline/2), ($baseline/2));
+      @include font-size(14);
+
+      .support-documentation-level {
+        padding-right: ($baseline/2);
+      }
+
+      .support-documentation-link {
+        // Override JQuery ui-widget-content link color (black) with our usual link color and hover action.
+        color: theme-color("primary");
+        text-decoration: none;
+        padding-right: ($baseline/2);
+
+        &:hover {
+          color: $uxpl-blue-hover-active;
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .support-level {
+      padding-right: ($baseline/2);
+    }
+
+    .icon {
+      color: $uxpl-primary-accent;
+    }
+  }
+
+  // individual menus
+  // --------------------
+  .new-component-template {
+    @include clearfix();
+
+    margin-bottom: 0;
+
+    li {
+      border: none;
+      border-bottom: 1px dashed $lightGrey;
+
+      &:first-child {
+        border-radius: 3px 3px 0 0;
+      }
+    }
+
+    .button-component {
+      @include clearfix();
+      @include transition(none);
+
+      @extend %t-demi-strong;
+
+      display: block;
+      width: 100%;
+      border: 0;
+      padding: 7px $baseline;
+      background: $white;
+      color: $gray-d3;
+      text-align: left;
+      font-family: $f-sans-serif;
+
+      &:hover {
+        @include transition(background-color $tmg-f2 linear 0s);
+
+        background: tint($green, 30%);
+        color: $white;
+
+        .icon {
+          color: $white;
+        }
+      }
+    }
+  }
+
+  // basic and advanced problem tabs - also handled by jquery-ui tabs
+  // --------------------
+  .problem-type-tabs {
+    @include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+
+    list-style-type: none;
+    width: 100%;
+    border-radius: 0;
+    background-color: $lightBluishGrey;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 $shadow inset;
+
+    li:first-child {
+      @include margin-left($baseline);
+    }
+
+    li {
+      @include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+
+      opacity: 0.8;
+
+      @include float(left);
+
+      display: inline-block;
+      width: auto;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 $shadow inset;
+      background-color: tint($lightBluishGrey, 10%);
+      text-align: center;
+
+      &:hover {
+        opacity: 0.9;
+        background-color: tint($lightBluishGrey, 20%);
+      }
+
+      &.ui-state-active {
+        @include active;
+
+        border: 0;
+        opacity: 1;
+      }
+
+      // reset to remove jquery-ui float
+      a.link-tab {
+        float: none;
+      }
+    }
+
+    a {
+      @extend %t-action3;
+
+      display: block;
+      padding: ($baseline*0.75) ($baseline*1.25);
+      text-align: center;
+      color: $gray-d3;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+// outline UI
+// --------------------
+// outline: utilities
+$outline-indent-width: $baseline;
+
+// UI: general outline
+.outline-content {
+  margin-top: ($baseline/4);
+
+  .unit-content {
+    margin-top: 0;
+  }
+
+  // add/new items
+  .add-item {
+    margin-top: ($baseline*0.75);
+
+    .button-new {
+      @extend %ui-btn-flat-outline;
+
+      padding: ($baseline/2) $baseline;
+      display: block;
+
+      .icon {
+        display: inline-block;
+        vertical-align: middle;
+
+        @include margin-right($baseline/2);
+      }
+    }
+  }
+}
+
+
+%outline-item-status {
+  @extend %t-copy-sub2;
+  @extend %t-strong;
+
+  color: $gray-d1;
+
+  .icon {
+    @extend %t-icon5;
+
+    @include margin-right($baseline/4);
+  }
+}
+
+// outline UI - complex
+// --------------------
+%outline-complex-item {
+
+  // UI: item title
+  .item-title {
+    @include transition(color $tmg-f2 ease-in-out 0s);
+  }
+
+  // CASE: last-child in UI
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  // CASE: has staff-only content
+  &.is-staff-only {
+
+    // needed to make sure direct children only
+    > .section-status,
+    > .subsection-status,
+    > .unit-status {
+      .status-message .icon {
+        color: $color-staff-only;
+      }
+    }
+  }
+
+  // CASE: has gated content
+  &.is-gated {
+
+    // needed to make sure direct children only
+    > .section-status,
+    > .subsection-status,
+    > .unit-status {
+      .status-message .icon {
+        color: $color-gated;
+      }
+    }
+  }
+
+  // CASE: has unpublished content
+  &.has-warnings {
+
+    // needed to make sure direct children only
+    > .section-status .status-message,
+    > .subsection-status .status-message,
+    > .unit-status .status-message {
+      .icon {
+        color: $color-warning;
+      }
+    }
+  }
+
+  // CASE: has errors
+  &.has-errors {
+
+    // needed to make sure direct children only
+    > .section-status .status-message,
+    > .subsection-status .status-message,
+    > .unit-status .status-message,
+    > .section-status .status-message-copy,
+    > .subsection-status .status-message-copy,
+    > .unit-status .status-message-copy {
+      color: $color-error;
+    }
+  }
+}
+
+
+// outline UI - simple
+// --------------------
+%outline-simple-item {
+  border: 1px solid $gray-l4;
+
+  // CASE: last-child in UI
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .item-title a {
+    color: $color-heading-base;
+
+    &:hover {
+      color: $blue;
+    }
+  }
+}
+
+
+// CASE: complex outline
+.outline-complex {
+
+  // outline: sections
+  .outline-section {
+    @include transition(border-left-width $tmg-f2 linear 0s, border-left-color $tmg-f2 linear 0s, padding-left $tmg-f2 linear 0s);
+
+    @extend %ui-window;
+    @extend %outline-complex-item;
+
+    border-left: 1px solid $color-draft;
+    margin-bottom: $baseline;
+    padding: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
+
+    // STATE: is-collapsed
+    &.is-collapsed {
+      border-left-width: ($baseline/4);
+      padding-left: $baseline;
+
+      // CASE: is ready to be live
+      &.is-ready {
+        border-left-color: $color-ready;
+      }
+
+      // CASE: is live
+      &.is-live {
+        border-left-color: $color-live;
+      }
+
+      // CASE: has staff-only content
+      &.is-staff-only {
+        border-left-color: $color-staff-only;
+      }
+
+      // CASE: has gated content
+      &.is-gated {
+        border-left-color: $color-gated;
+      }
+
+      // CASE: has unpublished content
+      &.has-warnings {
+        border-left-color: $color-warning;
+      }
+
+      // CASE: has errors
+      &.has-errors {
+        border-left-color: $color-error;
+      }
+    }
+
+    // header - title
+    .section-title {
+      @extend %t-title5;
+      @extend %t-strong;
+
+      color: $color-heading-base;
+    }
+
+    // status
+    .section-status {
+      @extend %outline-item-status;
+    }
+
+    // status - release
+    .status-release,
+    .explanatory-message {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+
+      opacity: 0.65;
+    }
+
+    // status - message
+    .status-messages {
+      margin-top: ($baseline/2);
+      border-top: 1px solid $gray-l4;
+      padding-top: ($baseline/4);
+
+      .icon {
+        @include margin-right($baseline/4);
+      }
+    }
+
+    .status-message-copy {
+      display: inline-block;
+      color: $color-heading-base;
+    }
+
+    // STATE: hover/active
+    &:hover,
+    &:active {
+
+      // status - release
+      > .section-status .status-release,
+      .section-status,
+      .explanatory-message {
+        opacity: 1;
+      }
+    }
+  }
+
+  // outline: subsections
+  .outline-subsection {
+    @include transition(border-left-color $tmg-f2 linear 0s);
+
+    @extend %outline-complex-item;
+
+    margin-bottom: ($baseline/2);
+    border: 1px solid $gray-l4;
+    border-left: ($baseline/4) solid $color-draft;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: ($baseline*0.75);
+
+
+    // CASE: is ready to be live
+    &.is-ready {
+      border-left-color: $color-ready;
+    }
+
+    // CASE: is live
+    &.is-live {
+      border-left-color: $color-live;
+    }
+
+    // CASE: is presented for staff only
+    &.is-staff-only {
+      border-left-color: $color-staff-only;
+    }
+
+    // CASE: is presented for gated
+    &.is-gated {
+      border-left-color: $color-gated;
+    }
+
+    // CASE: has unpublished content
+    &.has-warnings {
+      border-left-color: $color-warning;
+    }
+
+    // CASE: has errors
+    &.has-errors {
+      border-left-color: $color-error;
+    }
+
+    // STATE: hover/active
+    &:hover,
+    &:active {
+      box-shadow: 0 1px 1px $shadow-l2;
+    }
+
+    // header - title
+    .subsection-title {
+      @extend %t-title6;
+
+      color: $color-heading-base;
+    }
+
+    // status
+    .subsection-status {
+      @extend %outline-item-status;
+    }
+
+    // STATE: hover/active
+    &:hover,
+    &:active {
+
+      // status - release
+      > .subsection-status .status-release {
+        opacity: 1;
+      }
+
+      // status - grading
+      > .subsection-status .status-grading {
+        opacity: 1;
+      }
+
+      > .subsection-status .status-timed-proctored-exam {
+        opacity: 1;
+      }
+
+      > .subsection-status .status-hide-after-due {
+        opacity: 1;
+      }
+    }
+
+    // status - grading
+    .status-grading,
+    .status-timed-proctored-exam,
+    .status-hide-after-due {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+
+      opacity: 0.75;
+    }
+
+    .status-grading-value,
+    .status-proctored-exam-value,
+    .status-custom-grading-date {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .status-grading-date,
+    .status-due-date {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: ($baseline/4);
+    }
+  }
+
+  // outline: units
+  .outline-unit {
+    @extend %outline-complex-item;
+
+    margin-bottom: ($baseline/2);
+    border: 1px solid $gray-l4;
+    padding: ($baseline/4) ($baseline/2);
+
+    // header - title
+    .unit-title {
+      @extend %t-title7;
+
+      color: $color-heading-base;
+    }
+
+    .unit-status {
+      @extend %outline-item-status;
+    }
+
+    // STATE: hover/active
+    &:hover,
+    &:active {
+      box-shadow: 0 1px 1px $shadow-l2;
+
+      // status - release
+      .unit-status .status-release {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+// CASE: simple outline
+.outline-simple {
+
+  // outline: sections
+  .outline-section {
+    @extend %outline-simple-item;
+
+    margin-bottom: $baseline;
+    padding: ($baseline/2);
+
+    // header - title
+    .section-title {
+      @extend %t-title5;
+      @extend %t-strong;
+
+      color: $color-heading-base;
+    }
+
+    // status
+    .section-status {
+      @extend %outline-item-status;
+    }
+
+    // status - release
+    .status-release {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+
+      opacity: 0.65;
+    }
+
+    // status - grading
+    .status-grading {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+
+      opacity: 0.65;
+    }
+
+    .status-grading-value {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .status-grading-date {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: ($baseline/4);
+    }
+
+    // status - message
+    .status-message {
+      margin-top: ($baseline/2);
+      border-top: 1px solid $gray-l4;
+      padding-top: ($baseline/4);
+
+      .icon {
+        margin-right: ($baseline/4);
+      }
+    }
+
+    .status-message-copy {
+      display: inline-block;
+      color: $color-heading-base;
+    }
+  }
+
+  // outline: subsections
+  .outline-subsection {
+    @extend %outline-simple-item;
+
+    margin-bottom: ($baseline/2);
+    padding: ($baseline/2);
+
+    // header - title
+    .subsection-title {
+      @extend %t-title6;
+
+      color: $color-heading-base;
+    }
+
+    // status
+    .subsection-status {
+      @extend %outline-item-status;
+    }
+  }
+
+  // outline: units
+  .outline-unit {
+    @extend %outline-simple-item;
+
+    margin-bottom: ($baseline/4);
+    padding: ($baseline/4) ($baseline/2);
+
+    // header - title
+    .unit-title {
+      @extend %t-title7;
+
+      color: $color-heading-base;
+    }
+
+    .unit-status {
+      @extend %outline-item-status;
+    }
+  }
+}

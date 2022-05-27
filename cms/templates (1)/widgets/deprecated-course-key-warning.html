@@ -1,0 +1,49 @@
+<%page args="course=None" expression_filter="h" />
+<%!
+from datetime import datetime
+from datetime import date
+
+from django.conf import settings
+from django.utils.translation import gettext as _
+
+from openedx.core.djangolib.translation_utils import translate_date
+
+DEFAULT_LANGUAGE = getattr(settings, 'LANGUAGE_CODE', 'en')
+IS_ENABLED = settings.FEATURES.get('DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO', True)
+%>
+<%
+is_visible = IS_ENABLED and course and course.id.deprecated
+if is_visible:
+    try:
+        expiration_date = datetime.strptime(IS_ENABLED, "%Y-%m-%d")
+    except TypeError as error:
+        expiration_message = _('Support will be removed in an upcoming release.')
+    else:
+        language = getattr(course, 'language', None) or DEFAULT_LANGUAGE
+        expiration_date = date(expiration_date.year, expiration_date.month, expiration_date.day)
+        expiration_date = translate_date(expiration_date, language=language)
+        expiration_message = _("Support will be removed on {expiration_date}.").format(
+            expiration_date=expiration_date,
+        )
+    is_visible = True
+%>
+% if is_visible:
+  <div class="wrapper wrapper-alert wrapper-alert-warning is-shown">
+    <div class="alert announcement">
+      <span class="feedback-symbol fa fa-warning" aria-hidden="true"></span>
+      <span class="sr">${_("Warning")}</span>
+      <div class="copy">
+        <h2 class="title title-3 warning-heading-text">
+          ${_("This course uses a legacy storage format.")}
+        </h2>
+        <p>
+          ${expiration_message}
+          ${_(
+            "Please reach out to your support team contact, "
+            "if you have any additional questions or concerns."
+          )}
+        </p>
+      </div>
+    </div>
+  </div>
+% endif

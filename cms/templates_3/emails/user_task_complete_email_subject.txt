@@ -1,0 +1,2 @@
+<%! from django.utils.translation import gettext as _ %>
+${_("{platform_name} {studio_name}: Task Status Update").format(platform_name=settings.PLATFORM_NAME, studio_name=settings.STUDIO_NAME)}

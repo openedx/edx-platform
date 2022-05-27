@@ -1,0 +1,38 @@
+<%page expression_filter="h" args="online_help_token" />
+<%!
+from django.conf import settings
+from django.utils.translation import gettext as _
+%>
+<%namespace file="sock_links.html" import="get_sock_links" />
+
+<div class="wrapper-sock wrapper">
+  <ul class="list-actions list-cta">
+    <li class="action-item">
+      <a href="#sock" class="cta cta-show-sock"><span class="icon fa fa-question-circle" aria-hidden="true"></span>
+        <span class="copy-show is-shown">${_("Looking for help with {studio_name}?").format(studio_name=settings.STUDIO_SHORT_NAME)}</span>
+        <span class="copy-hide is-hidden">${_("Hide {studio_name} Help").format(studio_name=settings.STUDIO_SHORT_NAME)}</span>
+      </a>
+    </li>
+  </ul>
+
+  <div class="wrapper-inner wrapper">
+    <section class="sock" id="sock" aria-labelledby="sock-heading">
+      <h2 id="sock-heading" class="title sr-only">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
+      <%
+        links = get_sock_links()
+      %>
+      <div class="support">
+        <ul class="list-actions">
+          % for link in links:
+            % if link['condition']:
+              <li class="action-item">
+                <a href="${link['href']}" title="${link['sr_mouseover_text']}" rel="external" class="action action-primary">${link['text']}</a>
+                <span class="tip">${link['sr_mouseover_text']}</span>
+              </li>
+            %endif
+          % endfor
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>

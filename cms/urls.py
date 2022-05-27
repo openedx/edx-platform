@@ -18,8 +18,9 @@ import openedx.core.djangoapps.lang_pref.views
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import views as contentstore_views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
+from cms.djangoapps.contentstore.views.course import LiveClassesApiListView , LiveClassesDeleteApiView , UserDetailsListApiView ,EnrollLiveClassCreateView,EnrollLiveClassUserDetailsView ,EnrollLiveClassUserDeleteApiView
+
 from openedx.core.apidocs import api_info
-from cms.djangoapps.contentstore.views.course import LiveClassesApiListView , LiveClassesDeleteApiView
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
@@ -91,11 +92,19 @@ urlpatterns = oauth2_urlpatterns + [
     # restful api
     path('', contentstore_views.howitworks, name='homepage'),
     path('howitworks', contentstore_views.howitworks, name='howitworks'),
-    path('signin_redirect_to_lms', contentstore_views.login_redirect_to_lms, name='login_redirect_to_lms'),
-    path('request_course_creator', contentstore_views.request_course_creator, name='request_course_creator'),
+    
     path('live_class/details/', LiveClassesApiListView.as_view(), name='user_live_class' ),
     path('live_class/<id>', LiveClassesDeleteApiView.as_view(), name='live_class_delete' ),
+    path('accounts/details', UserDetailsListApiView.as_view(), name='live_class_delete' ),
+    path('live_class/user/enrollment', EnrollLiveClassCreateView.as_view(), name='user_live_class_enroll' ),
 
+    path('live_class/enroll/detail/<live_class_id>', EnrollLiveClassUserDetailsView.as_view(), name='user_live_class_details' ),
+
+    path('live_class/enroll/live_class/detail/<id>', EnrollLiveClassUserDeleteApiView.as_view(), name='user_live_class_details' ),
+    
+    
+    path('signin_redirect_to_lms', contentstore_views.login_redirect_to_lms, name='login_redirect_to_lms'),
+    path('request_course_creator', contentstore_views.request_course_creator, name='request_course_creator'),
     re_path(fr'^course_team/{COURSELIKE_KEY_PATTERN}(?:/(?P<email>.+))?$',
             contentstore_views.course_team_handler, name='course_team_handler'),
     re_path(fr'^course_info/{settings.COURSE_KEY_PATTERN}$', contentstore_views.course_info_handler,
@@ -274,8 +283,6 @@ if settings.DEBUG:
         urlpatterns += dev_urlpatterns
     except ImportError:
         pass
-
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     urlpatterns += static(
         settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['base_url'],
