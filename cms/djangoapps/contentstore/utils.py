@@ -707,11 +707,10 @@ def determine_label(display_name, block_type):
     Returns the name of the xblock to display in studio.
     Please see TNL-9838.
     """
-    if display_name:
-        return display_name
+    label = display_name
     if block_type == 'html':
-        return 'Text'
-    return block_type
+        label = _("Text")
+    return label
 
 
 @contextmanager
