@@ -73,7 +73,9 @@ def send_course_notification_email(course, template_name, context, to_list=None)
                 email
             )
             log.info("Just before sending email")
-            MandrillClient().send_mail(template_name, email, context)
+
+            # TODO: FIX MANDRILL EMAILS
+            # MandrillClient().send_mail(template_name, email, context)
             log.info("After sending email")
 
             recipients_info[email] += 1

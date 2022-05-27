@@ -120,6 +120,8 @@ class Command(BaseCommand):
         return users_set
 
     def handle(self, *args, **options):
+        return
+
         batch_size = 500
         cursor = connection.cursor()
         cursor.execute('SET TRANSACTION ISOLATION LEVEL READ COMMITTED')

@@ -23,6 +23,8 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
+        return
+
         client = ChimpClient()
 
         users = User.objects.all()

@@ -70,6 +70,7 @@ from student.helpers import (
     DISABLE_UNENROLL_CERT_STATES,
     cert_info,
     generate_activation_email_context,
+    send_password_reset_complete_email
 )
 from student.message_types import EmailChange, PasswordReset
 from student.models import (
@@ -941,14 +942,7 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
                 response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
                 return response
         elif response.status_code == 302:
-            MandrillClient().send_mail(
-                MandrillClient.PASSWORD_RESET_COMPLETE,
-                user.email,
-                {
-                    'first_name': user.first_name,
-                    'signin_link': settings.LMS_ROOT_URL + '/login'
-                }
-            )
+            send_password_reset_complete_email(user)
 
         # get the updated user
         updated_user = User.objects.get(id=uid_int)
@@ -1182,7 +1176,8 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
     context = {
         "verify_email_link": message_context['confirm_link']
     }
-    MandrillClient().send_mail(MandrillClient.VERIFY_CHANGE_USER_EMAIL, message_context['new_email'], context)
+    # TODO: FIX MANDRILL EMAILS
+    # MandrillClient().send_mail(MandrillClient.VERIFY_CHANGE_USER_EMAIL, message_context['new_email'], context)
 
     if not secondary_email_change_request:
         # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.

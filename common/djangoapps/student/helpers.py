@@ -20,6 +20,8 @@ from pytz import UTC
 from six import iteritems, text_type
 import third_party_auth
 from course_modes.models import CourseMode
+from common.lib.hubspot_client.client import HubSpotClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 from lms.djangoapps.certificates.api import (
     get_certificate_url,
     has_html_certificates_enabled
@@ -675,3 +677,23 @@ def do_create_account(form, custom_form=None):
     set_opt_in_and_affiliate_user_organization(user, form)
 
     return user, profile, registration
+
+
+def send_password_reset_complete_email(user):
+    """
+    Send Password Reset Completed Email.
+
+    Arguments:
+        user (User): User object
+    """
+    context = {
+        'emailId': HubSpotClient.PASSWORD_RESET_COMPLETE,
+        'message': {
+            'to': user.email
+        },
+        'customProperties': {
+            'first_name': user.first_name,
+            'signin_link': settings.LMS_ROOT_URL + '/login'
+        }
+    }
+    task_send_hubspot_email.delay(context)

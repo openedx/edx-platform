@@ -6,7 +6,8 @@ import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from common.lib.mandrill_client.client import MandrillClient
+from common.lib.hubspot_client.client import HubSpotClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.features.student_certificates.models import CertificateVerificationKey
 from openedx.features.student_certificates.signals import USER_CERTIFICATE_DOWNLOADABLE
@@ -44,14 +45,15 @@ def send_email_user_certificate_downloadable(
     Returns:
         None
     """
-    template = MandrillClient.DOWNLOAD_CERTIFICATE
-
-    context = dict(first_name=first_name, course_name=display_name,
-                   certificate_url=certificate_reverse_url)
-    try:
-        MandrillClient().send_mail(template, user_email, context)
-    except Exception as e:  # pylint: disable=broad-except
-        # Mandrill errors are thrown as exceptions
-        log.error(
-            'Unable to send email for USER_CERTIFICATE_DOWNLOADABLE signal: {class_name} - {exception_object}'.format(
-                class_name=e.__class__, exception_object=e))
+    context = {
+        'emailId': HubSpotClient.CERTIFICATE_READY_TO_DOWNLOAD,
+        'message': {
+            'to': user_email
+        },
+        'customProperties': {
+            'course_name': display_name,
+            'certificate_url': certificate_reverse_url,
+            'first_name': first_name
+        }
+    }
+    task_send_hubspot_email.delay(context)

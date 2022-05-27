@@ -31,6 +31,8 @@ def update_org_details_at_mailchimp(org_label, org_type, work_area, org_id, list
     Returns:
         None
     """
+    return
+
     log.info("Task to send organization details to MailChimp")
     log.info(org_label)
 
@@ -55,6 +57,8 @@ def update_org_details_at_mailchimp(org_label, org_type, work_area, org_id, list
 @task()
 def update_enrollments_completions_at_mailchimp(list_id):
     """Task to send user enrollments & course completions details to MailChimp"""
+    return
+
     log.info("starting enrollments & completions sync")
 
     cursor = connection.cursor()
