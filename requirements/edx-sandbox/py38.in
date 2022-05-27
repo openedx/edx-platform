@@ -17,8 +17,5 @@ codejail-includes                   # CodeJail manages execution of untrusted co
 # The issue will be investigated and fixed in https://openedx.atlassian.net/browse/BOM-2841.
 numpy>=1.16.0,<1.17.0
 
-# Install these packages from the edx-platform working tree
-# NOTE: if you change code in these packages, you MUST change the version
-# number in its setup.py or the code WILL NOT be installed during deploy.
 
 
