@@ -179,11 +179,12 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
                 'email_address': student_email,
             }
 
-            MandrillClient().send_mail(
-                MandrillClient.COURSE_INVITATION_ONLY_REGISTER_TEMPLATE,
-                student_email,
-                email_context
-            )
+            # TODO: FIX MANDRILL EMAILS
+            # MandrillClient().send_mail(
+            #     MandrillClient.COURSE_INVITATION_ONLY_REGISTER_TEMPLATE,
+            #     student_email,
+            #     email_context
+            # )
 
     after_state = EmailEnrollmentState(course_id, student_email)
 

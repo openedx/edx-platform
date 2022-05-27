@@ -1176,7 +1176,8 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
     context = {
         "verify_email_link": message_context['confirm_link']
     }
-    MandrillClient().send_mail(MandrillClient.VERIFY_CHANGE_USER_EMAIL, message_context['new_email'], context)
+    # TODO: FIX MANDRILL EMAILS
+    # MandrillClient().send_mail(MandrillClient.VERIFY_CHANGE_USER_EMAIL, message_context['new_email'], context)
 
     if not secondary_email_change_request:
         # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.

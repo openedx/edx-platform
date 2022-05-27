@@ -24,6 +24,8 @@ def task_user_badge_notify(user, course_id, badge_name):
     context = {
         'my_badge_url': my_badge_url,
     }
-    MandrillClient().send_mail(MandrillClient.USER_BADGE_EMAIL_TEMPLATE, user.email, context)
+
+    # TODO: FIX MANDRILL EMAILS
+    # MandrillClient().send_mail(MandrillClient.USER_BADGE_EMAIL_TEMPLATE, user.email, context)
 
     send_user_badge_notification(user, my_badge_url, badge_name)

@@ -8126,8 +8126,10 @@ def update_user_email(user, old_email, new_email):
         'old_email': old_email,
         'new_email': new_email
     }
-    MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, old_email, context)
-    MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, new_email, context)
+
+    # TODO: FIX MANDRILL EMAILS
+    # MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, old_email, context)
+    # MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, new_email, context)
 
 
 def affiliated_unattended_surveys(user_extended_profile):

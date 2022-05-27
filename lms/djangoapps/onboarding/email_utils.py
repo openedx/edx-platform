@@ -35,7 +35,8 @@ def send_admin_activation_email(first_name, org_id, org_name, claimed_by_name, c
 
     while max_retries > 0:
         try:
-            MandrillClient().send_mail(MandrillClient.ORG_ADMIN_ACTIVATION_TEMPLATE, dest_addr, message_context)
+            # TODO: FIX MANDRILL EMAILS
+            # MandrillClient().send_mail(MandrillClient.ORG_ADMIN_ACTIVATION_TEMPLATE, dest_addr, message_context)
             max_retries = 0
         except:
             max_retries -= 1
@@ -61,7 +62,8 @@ def send_admin_update_email(org_id, org_name, dest_addr, org_admin_name, hash_ke
         "admin_activation_link": admin_activation_link
     }
 
-    MandrillClient().send_mail(MandrillClient.ORG_ADMIN_CHANGE_TEMPLATE, dest_addr, message_context)
+    # TODO: FIX MANDRILL EMAILS
+    # MandrillClient().send_mail(MandrillClient.ORG_ADMIN_CHANGE_TEMPLATE, dest_addr, message_context)
 
 
 def send_admin_update_confirmation_email(org_name, current_admin, new_admin, confirm):
@@ -74,6 +76,9 @@ def send_admin_update_confirmation_email(org_name, current_admin, new_admin, con
     new_admin -- the new admin of the organization
     confirm -- 1 if the current_admin has confirmed resignation else 0
     """
+    return
+
+    # TODO: FIX MANDRILL EMAILS
     if confirm == 1:
         MandrillClient().send_mail(MandrillClient.ORG_ADMIN_CLAIM_CONFIRMATION, current_admin.email, {
             "first_name": current_admin.first_name,

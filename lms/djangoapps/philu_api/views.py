@@ -272,7 +272,9 @@ def send_alquity_fake_confirmation_email(request):
             "full_name": request.user.get_full_name(),
             "course_name": request.META.get('HTTP_COURSE_NAME', '')
         }
-        MandrillClient().send_mail(MandrillClient.ALQUITY_FAKE_SUBMIT_CONFIRMATION_TEMPLATE, request.user.email, ctx)
+
+        # TODO: FIX MANDRILL EMAILS
+        # MandrillClient().send_mail(MandrillClient.ALQUITY_FAKE_SUBMIT_CONFIRMATION_TEMPLATE, request.user.email, ctx)
     except Exception as ex:  # pylint: disable=broad-except
         logging.exception(ex)
         success = False
