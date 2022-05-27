@@ -748,7 +748,7 @@ class DetermineLabelTestCase(TestCase):
         display_name = None
         block_type = "html"
         result = utils.determine_label(display_name, block_type)
-        self.assertTrue(result == "Text")
+        self.assertEqual(result, display_name)
 
     def validate_set_titles_not_replaced(self):
         """
@@ -757,7 +757,7 @@ class DetermineLabelTestCase(TestCase):
         display_name = "Something"
         block_type = "html"
         result = utils.determine_label(display_name, block_type)
-        self.assertTrue(result == display_name)
+        self.assertEqual(result, display_name)
 
     def validate_set_titles_not_replaced(self):
         """
@@ -766,4 +766,4 @@ class DetermineLabelTestCase(TestCase):
         display_name = None
         block_type = "something else"
         result = utils.determine_label(display_name, block_type)
-        self.assertTrue(result == display_name)
+        self.assertEqual(result, display_name)
