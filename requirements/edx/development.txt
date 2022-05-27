@@ -951,7 +951,7 @@ openedx-calc==3.0.1
     # via -r requirements/edx/testing.txt
 openedx-events==0.9.1
     # via -r requirements/edx/testing.txt
-openedx-filters==0.6.2
+openedx-filters==0.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
@@ -1305,7 +1305,7 @@ selenium==3.141.0
     # via
     #   -r requirements/edx/testing.txt
     #   bok-choy
-semantic-version==2.9.0
+semantic-version==2.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-drf-extensions
