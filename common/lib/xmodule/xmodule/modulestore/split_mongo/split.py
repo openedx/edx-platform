@@ -104,6 +104,7 @@ from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
 from xmodule.modulestore.split_mongo.mongo_connection import DuplicateKeyError, DjangoFlexPersistenceBackend
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.partitions.partitions_service import PartitionService
+from xmodule.util.misc import get_library_or_course_attribute
 
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
@@ -214,7 +215,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if not isinstance(course_key, (CourseLocator, LibraryLocator)):
             raise TypeError(f'{course_key!r} is not a CourseLocator or LibraryLocator')
         # handle version_guid based retrieval locally
-        if course_key.org is None or course_key.course is None or course_key.run is None:
+        if course_key.org is None or get_library_or_course_attribute(course_key) is None or course_key.run is None:
             return self._active_bulk_ops.records[
                 course_key.replace(org=None, course=None, run=None, branch=None)
             ]
@@ -231,7 +232,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if not isinstance(course_key, (CourseLocator, LibraryLocator)):
             raise TypeError(f'{course_key!r} is not a CourseLocator or LibraryLocator')
 
-        if course_key.org and course_key.course and course_key.run:
+        if course_key.org and get_library_or_course_attribute(course_key) and course_key.run:
             del self._active_bulk_ops.records[course_key.replace(branch=None, version_guid=None)]
         else:
             del self._active_bulk_ops.records[
@@ -821,7 +822,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         if not course_key.version_guid:
             head_validation = True
-        if head_validation and course_key.org and course_key.course and course_key.run:
+        if head_validation and course_key.org and get_library_or_course_attribute(course_key) and course_key.run:
             if course_key.branch is None:
                 raise InsufficientSpecificationError(course_key)
 
@@ -1897,7 +1898,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             index_entry = {
                 '_id': ObjectId(),
                 'org': locator.org,
-                'course': locator.course,
+                'course': get_library_or_course_attribute(locator),
                 'run': locator.run,
                 'edited_by': user_id,
                 'edited_on': datetime.datetime.now(UTC),
@@ -2923,7 +2924,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :param force: if false, raises VersionConflictError if the current head of the course != the one identified
         by course_key
         """
-        if course_key.org is None or course_key.course is None or course_key.run is None or course_key.branch is None:
+        if course_key.org is None or get_library_or_course_attribute(course_key) is None or course_key.run is None or course_key.branch is None:
             return None
         else:
             index_entry = self.get_course_index(course_key)
