@@ -83,3 +83,13 @@ def get_idp_form_url(request, initial_form_mode, next_url):
         return get_idp_register_url(next_url=next_url)
     else:
         return get_idp_login_url(next_url=next_url)
+
+
+def store_idp_metadata_in_user_profile(user, metadata):
+    """
+    Store data from IdP into the User profile for later use.
+    """
+    meta = user.profile.get_meta()
+    meta["tahoe_idp_metadata"] = metadata
+    user.profile.set_meta(meta)
+    user.profile.save()

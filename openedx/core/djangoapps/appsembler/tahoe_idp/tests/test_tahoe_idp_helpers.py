@@ -7,6 +7,8 @@ import pytest
 
 from site_config_client.openedx.test_helpers import override_site_config
 
+from student.tests.factories import UserFactory
+
 from openedx.core.djangoapps.appsembler.tahoe_idp import helpers
 
 
@@ -90,3 +92,13 @@ def test_get_idp_form_url_for_register_with_pipeline(settings):
     with override_site_config('admin', ENABLE_TAHOE_IDP=True):
         url = helpers.get_idp_form_url(None, 'register', '/home')
     assert not url, 'Return no URL when there is a running pipeline'
+
+
+@pytest.mark.django_db
+def test_store_idp_metadata_in_user_profile():
+    """
+    Ensure store_idp_metadata_in_user_profile saves metadata in User.profile.
+    """
+    learner = UserFactory()
+    helpers.store_idp_metadata_in_user_profile(learner, {'custom_field': 'some value'})
+    assert learner.profile.get_meta() == {'tahoe_idp_metadata': {'custom_field': 'some value'}}
