@@ -5,9 +5,7 @@ Tests for ErrorBlock and NonStaffErrorBlock
 
 import unittest
 
-import pytest
 from opaque_keys.edx.locator import CourseLocator
-from xblock.test.tools import unabc
 
 from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
 from xmodule.modulestore.xml import CourseLocationManager

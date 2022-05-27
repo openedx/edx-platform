@@ -955,7 +955,7 @@ class VideoBlock(
 
         course_id = getattr(id_generator, 'target_course_id', None)
         # Update the handout location with current course_id
-        if 'handout' in list(field_data.keys()) and course_id:
+        if 'handout' in field_data and course_id:
             handout_location = StaticContent.get_location_from_path(field_data['handout'])
             if isinstance(handout_location, AssetLocator):
                 handout_new_location = StaticContent.compute_location(course_id, handout_location.path)

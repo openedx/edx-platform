@@ -2924,7 +2924,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :param force: if false, raises VersionConflictError if the current head of the course != the one identified
         by course_key
         """
-        if course_key.org is None or get_library_or_course_attribute(course_key) is None or course_key.run is None or course_key.branch is None:
+        if (course_key.org is None or
+                get_library_or_course_attribute(course_key) is None or
+                course_key.run is None or course_key.branch is None):
             return None
         else:
             index_entry = self.get_course_index(course_key)

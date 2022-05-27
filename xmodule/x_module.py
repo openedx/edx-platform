@@ -2,7 +2,6 @@
 
 import logging
 import os
-import sys
 import time
 import warnings
 from collections import namedtuple
@@ -35,8 +34,6 @@ from xblock.fields import (
 from xblock.runtime import IdGenerator, IdReader, Runtime
 
 from xmodule import block_metadata_utils
-from xmodule.errortracker import exc_info_to_str
-from xmodule.exceptions import UndefinedContext
 from xmodule.fields import RelativeTime
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.xmodule_django import add_webpack_to_fragment
@@ -1015,10 +1012,9 @@ class MetricsMixin:
 
     def render(self, block, view_name, context=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         start_time = time.time()
+        status = "success"
         try:
-            status = "success"
             return super().render(block, view_name, context=context)
-
         except:
             status = "failure"
             raise
@@ -1045,10 +1041,9 @@ class MetricsMixin:
 
     def handle(self, block, handler_name, request, suffix=''):  # lint-amnesty, pylint: disable=missing-function-docstring
         start_time = time.time()
+        status = "success"
         try:
-            status = "success"
             return super().handle(block, handler_name, request, suffix=suffix)
-
         except:
             status = "failure"
             raise

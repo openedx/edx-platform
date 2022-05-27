@@ -1080,7 +1080,7 @@ class CourseBlock(
         self._grading_policy = {}
         self.set_grading_policy(self.grading_policy)
 
-        if self.discussion_topics == {}:
+        if not self.discussion_topics:
             self.discussion_topics = {_('General'): {'id': self.location.html_id()}}
 
         try:

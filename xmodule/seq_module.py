@@ -9,8 +9,8 @@ import collections
 import json
 import logging
 from datetime import datetime
-from django.conf import settings
 from functools import reduce
+from django.conf import settings
 
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
@@ -613,7 +613,8 @@ class SequenceBlock(
         params = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, view, fragment)  # lint-amnesty, pylint: disable=line-too-long
         if SHOW_PROGRESS_BAR.is_enabled() and getattr(settings, 'COMPLETION_AGGREGATOR_URL', ''):
             parent_block_id = self.get_parent().scope_ids.usage_id.block_id
-            params['chapter_completion_aggregator_url'] = '/'.join([settings.COMPLETION_AGGREGATOR_URL, str(self.course_id), parent_block_id]) + '/'
+            params['chapter_completion_aggregator_url'] = '/'.join(
+                [settings.COMPLETION_AGGREGATOR_URL, str(self.course_id), parent_block_id]) + '/'
         fragment.add_content(self.runtime.service(self, 'mako').render_template("seq_module.html", params))
 
         self._capture_full_seq_item_metrics(display_items)

@@ -17,9 +17,9 @@ from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
 
 from lxml import etree
-from openedx.core.djangolib.markup import Text, HTML
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, List, Scope, String  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangolib.markup import Text, HTML
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.stringify import stringify_children
 from xmodule.util.xmodule_django import add_webpack_to_fragment
@@ -31,6 +31,7 @@ from xmodule.x_module import (
     XModuleToXBlockMixin,
 )
 from xmodule.xml_module import XmlMixin
+
 
 log = logging.getLogger(__name__)
 _ = lambda text: text

@@ -27,11 +27,11 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
-import xmodule
 from capa import responsetypes
 from capa.correctmap import CorrectMap
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from capa.xqueue_interface import XQueueInterface
+import xmodule
 from xmodule.capa_module import ComplexEncoder, ProblemBlock
 from xmodule.tests import DATA_DIR
 

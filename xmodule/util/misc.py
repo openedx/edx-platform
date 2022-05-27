@@ -5,11 +5,11 @@ Miscellaneous utility functions.
 
 import re
 
-from xmodule.annotator_mixin import html_to_text
 from opaque_keys.edx.locator import (
     CourseLocator,
     LibraryLocator,
 )
+from xmodule.annotator_mixin import html_to_text
 
 
 def escape_invalid_characters(name, invalid_char_list, replace_with='_'):

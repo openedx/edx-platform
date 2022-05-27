@@ -743,7 +743,7 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):  # lint-a
         courses = self.draft_store.get_courses()
         course = courses[0]
         # Confirm that no specified asset collection name means empty asset metadata.
-        assert self.draft_store.get_all_asset_metadata(course.id, 'asset') == []
+        assert not self.draft_store.get_all_asset_metadata(course.id, 'asset')
 
     def test_no_asset_invalid_key(self):
         course_key = CourseLocator(org="edx3", course="test_course", run=None, deprecated=True)

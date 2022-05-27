@@ -84,7 +84,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     @property
     def resources_fs(self):
-        return Mock(name='TestModuleSystem.resources_fs', root_path='.'),
+        return Mock(name='TestModuleSystem.resources_fs', root_path='.')
 
     def __repr__(self):
         """

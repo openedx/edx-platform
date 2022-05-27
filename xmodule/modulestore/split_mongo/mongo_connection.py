@@ -20,6 +20,7 @@ import pytz
 from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+from edx_django_utils.cache import RequestCache
 
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 from xmodule.exceptions import HeartbeatFailure
@@ -27,7 +28,6 @@ from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 from openedx.core.lib.cache_utils import request_cached
-from edx_django_utils.cache import RequestCache
 
 log = logging.getLogger(__name__)
 

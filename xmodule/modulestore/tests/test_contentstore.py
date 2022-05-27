@@ -165,7 +165,7 @@ class TestContentstore(unittest.TestCase):
         fake_course = CourseLocator('test', 'fake', 'non')
         course_assets, count = self.contentstore.get_all_content_for_course(fake_course)
         assert count == 0
-        assert course_assets == []
+        assert not course_assets
 
     @ddt.data(True, False)
     def test_attrs(self, deprecated):
