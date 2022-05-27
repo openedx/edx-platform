@@ -502,6 +502,8 @@ class CohortHandler(DeveloperErrorViewMixin, APIPermissions):
             * user_partition_id: The integer identified of the UserPartition.
             * group_id: The integer identified of the specific group in the partition.
     """
+    queryset = []
+
     def get(self, request, course_key_string, cohort_id=None):
         """
         Endpoint to get either one or all cohorts.

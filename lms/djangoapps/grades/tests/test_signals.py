@@ -11,21 +11,25 @@ import ddt
 import pytest
 import pytz
 from django.test import TestCase
-from submissions.models import score_reset, score_set
 from opaque_keys.edx.locator import CourseLocator
+from submissions.models import score_reset, score_set
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from common.djangoapps.util.date_utils import to_timestamp
+from lms.djangoapps.grades.models import PersistentCourseGrade
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 from ..constants import ScoreDatabaseTableEnum
 from ..signals.handlers import (
     disconnect_submissions_signal_receiver,
+    listen_for_course_grade_passed_first_time,
+    listen_for_failing_grade,
+    listen_for_passing_grade,
     problem_raw_score_changed_handler,
     submissions_score_reset_handler,
-    submissions_score_set_handler,
-    listen_for_course_grade_passed_first_time,
-    listen_for_passing_grade,
-    listen_for_failing_grade
+    submissions_score_set_handler
 )
 from ..signals.signals import PROBLEM_RAW_SCORE_CHANGED
 
@@ -266,7 +270,7 @@ class ScoreChangedSignalRelayTest(TestCase):
                 pass
 
 
-class CourseEventsSignalsTest(TestCase):
+class CourseEventsSignalsTest(ModuleStoreTestCase):
     """
     Tests to ensure that the courseware module correctly catches
     course grades passed/failed signal and emit course related event
@@ -281,10 +285,6 @@ class CourseEventsSignalsTest(TestCase):
         Configure mocks for all the dependencies of the render method
         """
         super().setUp()
-        self.signal_mock = self.setup_patch(
-            'lms.djangoapps.grades.signals.signals.COURSE_GRADE_PASSED_FIRST_TIME.send',
-            None,
-        )
         self.user_mock = MagicMock()
         self.user_mock.id = 42
         self.get_user_mock = self.setup_patch(
@@ -296,6 +296,8 @@ class CourseEventsSignalsTest(TestCase):
             course='some_course',
             run='some_run'
         )
+        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
+        self.client.login(username=self.user.username, password="edx")
 
     def setup_patch(self, function_name, return_value):
         """
@@ -383,5 +385,45 @@ class CourseEventsSignalsTest(TestCase):
                 'course_id': str(course_id),
                 'event_transaction_id': str(get_event_transaction_id()),
                 'event_transaction_type': str(get_event_transaction_type()),
+            }
+        )
+
+    @patch('lms.djangoapps.grades.events.segment.track')
+    def test_segment_event_on_course_grade_passed_first_time(self, segment_track_mock):
+        course = CourseOverviewFactory()
+        __ = CourseEnrollmentFactory(
+            is_active=True,
+            mode='verified',
+            course=course,
+            user=self.user
+        )
+        params = {
+            "user_id": self.user.id,
+            "course_id": course.id,
+            "course_version": "JoeMcEwing",
+            "course_edited_timestamp": datetime(
+                year=2016,
+                month=8,
+                day=1,
+                hour=18,
+                minute=53,
+                second=24,
+                microsecond=354741,
+                tzinfo=pytz.UTC,
+            ),
+            "percent_grade": 77.7,
+            "letter_grade": "Great job",
+            "passed": True,
+        }
+        __ = PersistentCourseGrade.update_or_create(**params)
+        segment_track_mock.assert_called_with(
+            self.user.id,
+            'edx.course.learner.passed.first_time',
+            {
+                'LMS_USER_ID': self.user.id,
+                'COURSERUN_KEY': str(course.id),
+                'COURSE_TITLE': course.display_name,
+                'COURSE_ORG_NAME': course.org,
+                'PASSED': 1,
             }
         )

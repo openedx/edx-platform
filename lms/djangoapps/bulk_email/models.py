@@ -270,36 +270,16 @@ class CourseEmail(Email):
         """
         Create an instance of CourseEmail.
         """
+        # deferred import to prevent a circular import issue
+        from lms.djangoapps.bulk_email.api import determine_targets_for_course_email
+
         # automatically generate the stripped version of the text from the HTML markup:
         if text_message is None:
             text_message = html_to_text(html_message)
 
-        new_targets = []
-        for target in targets:
-            # split target, to handle cohort:cohort_name and track:mode_slug
-            target_split = target.split(':', 1)
-            # Ensure our desired target exists
-            if target_split[0] not in EMAIL_TARGETS:  # lint-amnesty, pylint: disable=no-else-raise
-                fmt = 'Course email being sent to unrecognized target: "{target}" for "{course}", subject "{subject}"'
-                msg = fmt.format(target=target, course=course_id, subject=subject).encode('utf8')
-                raise ValueError(msg)
-            elif target_split[0] == SEND_TO_COHORT:
-                # target_split[1] will contain the cohort name
-                cohort = CohortTarget.ensure_valid_cohort(target_split[1], course_id)
-                new_target, _ = CohortTarget.objects.get_or_create(target_type=target_split[0], cohort=cohort)
-            elif target_split[0] == SEND_TO_TRACK:
-                # target_split[1] contains the desired mode slug
-                CourseModeTarget.ensure_valid_mode(target_split[1], course_id)
+        new_targets = determine_targets_for_course_email(course_id, subject, targets)
 
-                # There could exist multiple CourseModes that match this query, due to differing currency types.
-                # The currencies do not affect user lookup though, so we can just use the first result.
-                mode = CourseMode.objects.filter(course_id=course_id, mode_slug=target_split[1])[0]
-                new_target, _ = CourseModeTarget.objects.get_or_create(target_type=target_split[0], track=mode)
-            else:
-                new_target, _ = Target.objects.get_or_create(target_type=target_split[0])
-            new_targets.append(new_target)
-
-        # create the task, then save it immediately:
+        # create the course email instance, then save it immediately:
         course_email = cls(
             course_id=course_id,
             sender=sender,

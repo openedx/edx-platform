@@ -79,7 +79,7 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
-edx-django-utils>=4.7.0            # Utilities for cache, monitoring, and plugins
+edx-django-utils>=5.0.0            # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
 edx-enterprise
 edx-milestones

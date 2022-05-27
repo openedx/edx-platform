@@ -114,7 +114,7 @@ REGISTER_USER = Signal()
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2020-04-30
 # .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+# .. toggle_warning: This temporary feature toggle does not have a target removal date.
 REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag('registration.enable_failure_logging', __name__)
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 
@@ -360,7 +360,8 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'education': profile.level_of_education_display,
             'address': profile.mailing_address,
             'gender': profile.gender_display,
-            'country': str(profile.country)
+            'country': str(profile.country),
+            'is_marketable': params.get('marketing_emails_opt_in') == 'true'
         }
         if settings.MARKETING_EMAILS_OPT_IN and params.get('marketing_emails_opt_in'):
             email_subscribe = 'subscribed' if params.get('marketing_emails_opt_in') == 'true' else 'unsubscribed'

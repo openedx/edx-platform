@@ -7,6 +7,7 @@ import json
 from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 
+import dateutil
 import pytest
 import pytz
 import ddt
@@ -21,12 +22,13 @@ from lms.djangoapps.bulk_email.data import BulkEmailTargetChoices
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api import (
+    convert_schedule_to_utc_from_local,
     SpecificStudentIdMissingError,
     generate_anonymous_ids,
     generate_certificates_for_students,
     get_instructor_task_history,
     get_running_instructor_tasks,
-    process_scheduled_tasks,
+    process_scheduled_instructor_tasks,
     regenerate_certificates,
     submit_bulk_course_email,
     submit_calculate_may_enroll_csv,
@@ -46,6 +48,7 @@ from lms.djangoapps.instructor_task.api import (
     submit_reset_problem_attempts_in_entrance_exam,
 )
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
+from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import PROGRESS, SCHEDULED, InstructorTask
 from lms.djangoapps.instructor_task.tasks import (
     export_ora2_data,
@@ -60,6 +63,7 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskTestCase,
     TestReportMixin
 )
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, delete_user_preference
 
 LOG_PATH = 'lms.djangoapps.instructor_task.api'
 
@@ -93,7 +97,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
                     in get_instructor_task_history(
                         TEST_COURSE_KEY,
                         usage_key=self.problem_url,
-                        task_type='rescore_problem'
+                        task_type=InstructorTaskTypes.RESCORE_PROBLEM
                     )]
         assert set(task_ids) == set(expected_ids)
         # make the same call using a non-existent task_type:
@@ -142,29 +146,45 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             submit_rescore_problem_for_all_students(request, problem_url)
 
     @ddt.data(
-        (normalize_repr(submit_rescore_problem_for_all_students), 'rescore_problem'),
+        (normalize_repr(submit_rescore_problem_for_all_students), InstructorTaskTypes.RESCORE_PROBLEM),
         (
             normalize_repr(submit_rescore_problem_for_all_students),
-            'rescore_problem_if_higher',
+            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
             {'only_if_higher': True}
         ),
-        (normalize_repr(submit_rescore_problem_for_student), 'rescore_problem', {'student': True}),
+        (normalize_repr(submit_rescore_problem_for_student), InstructorTaskTypes.RESCORE_PROBLEM, {'student': True}),
         (
             normalize_repr(submit_rescore_problem_for_student),
-            'rescore_problem_if_higher',
+            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
             {'student': True, 'only_if_higher': True}
         ),
-        (normalize_repr(submit_reset_problem_attempts_for_all_students), 'reset_problem_attempts'),
-        (normalize_repr(submit_delete_problem_state_for_all_students), 'delete_problem_state'),
-        (normalize_repr(submit_rescore_entrance_exam_for_student), 'rescore_problem', {'student': True}),
+        (normalize_repr(submit_reset_problem_attempts_for_all_students), InstructorTaskTypes.RESET_PROBLEM_ATTEMPTS),
+        (normalize_repr(submit_delete_problem_state_for_all_students), InstructorTaskTypes.DELETE_PROBLEM_STATE),
         (
             normalize_repr(submit_rescore_entrance_exam_for_student),
-            'rescore_problem_if_higher',
-            {'student': True, 'only_if_higher': True},
+            InstructorTaskTypes.RESCORE_PROBLEM,
+            {'student': True}
         ),
-        (normalize_repr(submit_reset_problem_attempts_in_entrance_exam), 'reset_problem_attempts', {'student': True}),
-        (normalize_repr(submit_delete_entrance_exam_state_for_student), 'delete_problem_state', {'student': True}),
-        (normalize_repr(submit_override_score), 'override_problem_score', {'student': True, 'score': 0})
+        (
+            normalize_repr(submit_rescore_entrance_exam_for_student),
+            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
+            {'student': True, 'only_if_higher': True}
+        ),
+        (
+            normalize_repr(submit_reset_problem_attempts_in_entrance_exam),
+            InstructorTaskTypes.RESET_PROBLEM_ATTEMPTS,
+            {'student': True}
+        ),
+        (
+            normalize_repr(submit_delete_entrance_exam_state_for_student),
+            InstructorTaskTypes.DELETE_PROBLEM_STATE,
+            {'student': True}
+        ),
+        (
+            normalize_repr(submit_override_score),
+            InstructorTaskTypes.OVERRIDE_PROBLEM_SCORE,
+            {'student': True, 'score': 0}
+        )
     )
     @ddt.unpack
     def test_submit_task(self, task_function, expected_task_type, params=None):
@@ -249,7 +269,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
     def _generate_scheduled_task(self, task_state=None):
         return InstructorTaskFactory.create(
-            task_type="bulk_course_email",
+            task_type=InstructorTaskTypes.BULK_COURSE_EMAIL,
             course_id=self.course.id,
             task_input="{'email_id': 1, 'to_option': ['myself']}",
             task_key="3416a75f4cea9109507cacd8e2f2aefc",
@@ -337,7 +357,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             submit_export_ora2_data(request, self.course.id)
 
             mock_submit_task.assert_called_once_with(
-                request, 'export_ora2_data', export_ora2_data, self.course.id, {}, '')
+                request, InstructorTaskTypes.EXPORT_ORA2_DATA, export_ora2_data, self.course.id, {}, '')
 
     def test_submit_export_ora2_submission_files(self):
         request = self.create_task_request(self.instructor)
@@ -348,7 +368,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
             mock_submit_task.assert_called_once_with(
                 request,
-                'export_ora2_submission_files',
+                InstructorTaskTypes.EXPORT_ORA2_SUBMISSION_FILES,
                 export_ora2_submission_files,
                 self.course.id,
                 {},
@@ -434,7 +454,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
             mock_submit_task.assert_called_once_with(
                 request,
-                'generate_anonymous_ids_for_course',
+                InstructorTaskTypes.GENERATE_ANONYMOUS_IDS_FOR_COURSE,
                 generate_anonymous_ids_for_course,
                 self.course.id,
                 {},
@@ -488,7 +508,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         ]
 
         with LogCapture() as log:
-            process_scheduled_tasks()
+            process_scheduled_instructor_tasks()
 
         mock_submit_scheduled_task.assert_called_once_with(due_instructor_task_schedule)
         log.check_present((LOG_PATH, "INFO", expected_messages[0]),)
@@ -508,6 +528,80 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         ]
 
         with LogCapture() as log:
-            process_scheduled_tasks()
+            process_scheduled_instructor_tasks()
 
         log.check_present((LOG_PATH, "ERROR", expected_messages[0]),)
+
+
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+class ScheduledInstructorTaskTests(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests API methods that support scheduled instructor tasks
+    """
+    def setUp(self):
+        super().setUp()
+        self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
+
+    def tearDown(self):
+        super().tearDown()
+        delete_user_preference(self.instructor, 'time_zone', self.instructor.username)
+
+    def _get_expected_schedule(self, schedule, timezone):
+        local_tz = dateutil.tz.gettz(timezone)
+        local_dt = dateutil.parser.parse(schedule).replace(tzinfo=local_tz)
+        return local_dt.astimezone(pytz.utc)
+
+    def test_convert_schedule_to_utc_from_local_no_user_preference(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies that we use
+        the browser provided timezone data if there is no preferred timezone set by the user in their account settings.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        browser_timezone = "America/New_York"
+        expected_schedule = self._get_expected_schedule(schedule, browser_timezone)
+
+        schedule_utc = convert_schedule_to_utc_from_local(schedule, browser_timezone, self.instructor)
+
+        assert schedule_utc == expected_schedule
+
+    def test_convert_schedule_to_utc_from_local_with_preferred_timezone(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies that we use the
+        preferred timezone if a user has set one in their account settings.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        preferred_timezone = "America/Anchorage"
+        set_user_preference(self.instructor, 'time_zone', preferred_timezone)
+        expected_schedule = self._get_expected_schedule(schedule, preferred_timezone)
+
+        schedule_utc = convert_schedule_to_utc_from_local(schedule, "", self.instructor)
+
+        assert schedule_utc == expected_schedule
+
+    def test_convert_schedule_to_utc_from_local_with_preferred_and_browser_timezone(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies that we use
+        the preferred timezone over the browser timezone when provided both values.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        browser_timezone = "America/New_York"
+        preferred_timezone = "America/Anchorage"
+        set_user_preference(self.instructor, 'time_zone', preferred_timezone)
+        expected_schedule = self._get_expected_schedule(schedule, preferred_timezone)
+
+        schedule_utc = convert_schedule_to_utc_from_local(schedule, browser_timezone, self.instructor)
+
+        assert schedule_utc == expected_schedule
+
+    def test_convert_schedule_to_utc_from_local_with_invalid_timezone(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies an error
+        condition if the application cannot determine a timezone to use for conversion.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        expected_error_message = "Unable to determine the time zone to use to convert the schedule to UTC"
+
+        with self.assertRaises(ValueError) as value_err:
+            convert_schedule_to_utc_from_local(schedule, "Flim/Flam", self.instructor)
+
+        assert str(value_err.exception) == expected_error_message

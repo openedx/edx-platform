@@ -526,7 +526,7 @@ def submit_scheduled_task(schedule):
             # turn this into the format Celery expects
             task_args = [schedule.task.id, task_arguments]
             # submit the task
-            log.info(f"Submitting scheduled task {schedule.task.id} for processing")
+            log.info(f"Submitting scheduled task '{schedule.task.id}' for processing")
             task_class.apply_async(task_args, task_id=schedule.task.task_id)
         except Exception as error:  # pylint: disable=broad-except
             # broad except here to make sure we cast a wide net for tasks with issues that can't be processed

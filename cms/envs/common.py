@@ -404,7 +404,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_ALL_FILE_URLS': False,
 
     # .. toggle_name: FEATURES['ENABLE_ORA_USER_STATE_UPLOAD_DATA']
@@ -416,7 +416,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
 
     # .. toggle_name: FEATURES['DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO']
@@ -430,7 +430,7 @@ FEATURES = {
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-06-12
     # .. toggle_target_removal_date: 2021-04-01
-    # .. toggle_warnings: This can be removed once support is removed for deprecated
+    # .. toggle_warning: This can be removed once support is removed for deprecated
     #   course keys.
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
     'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
@@ -443,7 +443,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-06-20
     # .. toggle_target_removal_date: 2020-12-31
     # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
-    # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
+    # .. toggle_warning: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
     #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
     'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
 
@@ -456,7 +456,7 @@ FEATURES = {
     #   otherwise the course creation functionality will work as it should.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-12-02
-    # .. toggle_warnings: Another toggle DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
+    # .. toggle_warning: Another toggle DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
     'DISABLE_COURSE_CREATION': False,
 
     # Can be turned off to disable the help link in the navbar
@@ -501,7 +501,7 @@ FEATURES = {
     # .. toggle_creation_date: 2022-03-22
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/28268
-    # .. toggle_warnings: For consistency in user-experience, keep the value in sync with the setting of the same name
+    # .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
     #   in the LMS and CMS.
     'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': False,
 
@@ -512,7 +512,7 @@ FEATURES = {
     #   This also hides the "Unenroll" button on the Learner Dashboard.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-10-11
-    # .. toggle_warnings: For consistency in user experience, keep the value in sync with the setting of the same name
+    # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
     #   in the LMS and CMS.
     # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
     'DISABLE_UNENROLLMENT': False,
@@ -584,6 +584,17 @@ HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-667
 ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
 HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
+
+# .. toggle_name: ENABLE_DYNAMIC_REGISTRATION_FIELDS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle adds fields configured in
+# REGISTRATION_EXTRA_FIELDS to Authn MFE
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2022-04-21
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
+ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
@@ -2567,7 +2578,7 @@ EDXAPP_PARSE_KEYS = {}
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-12-02
 # .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
+# .. toggle_warning: This url can be removed once it no longer has any real traffic.
 # .. toggle_tickets: ARCH-1253
 DISABLE_DEPRECATED_SIGNIN_URL = False
 
@@ -2578,7 +2589,7 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-12-02
 # .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
+# .. toggle_warning: This url can be removed once it no longer has any real traffic.
 # .. toggle_tickets: ARCH-1253
 DISABLE_DEPRECATED_SIGNUP_URL = False
 
