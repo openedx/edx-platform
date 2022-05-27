@@ -3,8 +3,6 @@ Test cases for tabs.
 """
 
 from unittest.mock import MagicMock, Mock, patch
-
-import ddt
 import pytest
 from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser
@@ -24,7 +22,6 @@ from lms.djangoapps.courseware.tabs import (
 )
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
@@ -38,7 +35,6 @@ from common.djangoapps.util.milestones_helpers import (
     add_milestone,
     get_milestone_relationship_types
 )
-from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from xmodule import tabs as xmodule_tabs  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     TEST_DATA_MIXED_MODULESTORE,
@@ -76,7 +72,7 @@ class TabTestCase(SharedModuleStoreTestCase):
         """
         Returns true if the specified tab is enabled.
         """
-        return tab is not None and tab.is_enabled(course, user=user)
+        return tab.is_enabled(course, user=user)
 
     def set_up_books(self, num_books):
         """Initializes the textbooks in the course and adds the given number of books to each textbook"""
@@ -777,7 +773,6 @@ class CourseInfoTabTestCase(TabTestCase):
                 assert tab.type == 'course_info'
 
 
-@ddt.ddt
 class DiscussionLinkTestCase(TabTestCase):
     """Test cases for discussion link tab."""
 
@@ -839,19 +834,11 @@ class DiscussionLinkTestCase(TabTestCase):
             )
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    @ddt.data(Provider.OPEN_EDX, Provider.LEGACY)
-    def test_tabs_with_discussion(self, provider):
+    def test_tabs_with_discussion(self):
         """Test a course with a discussion tab configured"""
-        config = DiscussionsConfiguration.get(self.course.id)
-        config.provider_type = provider
-        config.save()
-        if provider == Provider.OPEN_EDX:
-            expected_link = get_learning_mfe_home_url(course_key=self.course.id, url_fragment="discussion")
-        else:
-            expected_link = "default_discussion_link"
         self.check_discussion(
             tab_list=self.tabs_with_discussion,
-            expected_discussion_link=expected_link,
+            expected_discussion_link="default_discussion_link",
             expected_can_display_value=True,
         )
 
@@ -865,19 +852,11 @@ class DiscussionLinkTestCase(TabTestCase):
         )
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    @ddt.data(Provider.OPEN_EDX, Provider.LEGACY)
-    def test_tabs_enrolled_or_staff(self, provider):
-        config = DiscussionsConfiguration.get(self.course.id)
-        config.provider_type = provider
-        config.save()
+    def test_tabs_enrolled_or_staff(self):
         for is_enrolled, is_staff in [(True, False), (False, True)]:
-            if provider == Provider.OPEN_EDX:
-                expected_link = get_learning_mfe_home_url(course_key=self.course.id, url_fragment="discussion")
-            else:
-                expected_link = "default_discussion_link"
             self.check_discussion(
                 tab_list=self.tabs_with_discussion,
-                expected_discussion_link=expected_link,
+                expected_discussion_link="default_discussion_link",
                 expected_can_display_value=True,
                 is_enrolled=is_enrolled,
                 is_staff=is_staff
