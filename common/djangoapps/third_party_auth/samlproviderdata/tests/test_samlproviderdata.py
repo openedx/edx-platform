@@ -93,6 +93,19 @@ class SAMLProviderDataTests(APITestCase):
         assert len(results) == 1
         assert results[0]['sso_url'] == SINGLE_PROVIDER_DATA['sso_url']
 
+    def test_get_one_provider_data_with_pk_success(self):
+        # GET auth/saml/v0/providerdata/<provider data ID>/?enterprise_customer_uuid=id
+        url_base = reverse('saml_provider_data-list')
+        query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
+        url = f'{url_base}{self.saml_provider_data.id}/?{urlencode(query_kwargs)}'
+
+        response = self.client.get(url, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data.get('id') == self.saml_provider_data.id
+        assert response.data.get('entity_id') == self.saml_provider_data.entity_id
+        assert response.data.get('sso_url') == self.saml_provider_data.sso_url
+        assert response.data.get('public_key') == self.saml_provider_data.public_key
+
     def test_create_one_provider_data_success(self):
         # POST auth/saml/v0/providerdata/ -d data
         url = reverse('saml_provider_data-list')
