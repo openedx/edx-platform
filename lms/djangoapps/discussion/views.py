@@ -29,6 +29,7 @@ from xmodule.modulestore.django import modulestore
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
@@ -44,7 +45,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     get_group_id_for_comments_service,
     get_group_id_for_user,
     is_commentable_divided,
-    strip_none,
+    strip_none
 )
 from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserException
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE
@@ -55,21 +56,19 @@ from openedx.core.djangoapps.discussions.utils import (
     available_division_schemes,
     get_discussion_categories_ids,
     get_divided_discussions,
-    get_group_names_by_id,
+    get_group_names_by_id
 )
-from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
-from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
-from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.features.course_duration_limits.access import generate_course_expired_fragment
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
-
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR,
+    CourseDiscussionSettings,
     Role
 )
+from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
+from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 
 User = get_user_model()
 log = logging.getLogger("edx.discussions")
@@ -762,13 +761,18 @@ def is_course_staff(course_key: CourseKey, user: User):
 
 
 def is_privileged_user(course_key: CourseKey, user: User):
+    """
+    Returns True if user has one of following course role
+    Administrator, Moderator, Group Moderator, Community TA
+    """
     forum_roles = [
         FORUM_ROLE_COMMUNITY_TA,
         FORUM_ROLE_GROUP_MODERATOR,
         FORUM_ROLE_MODERATOR,
         FORUM_ROLE_ADMINISTRATOR
     ]
-    return Role.user_has_role_for_course(user, course_key, forum_roles)
+    has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
+    return GlobalStaff().has_user(request.user) or is_course_staff(course_key, users) or has_course_role
 
 
 class DiscussionBoardFragmentView(EdxFragmentView):
