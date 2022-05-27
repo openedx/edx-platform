@@ -772,7 +772,7 @@ def is_privileged_user(course_key: CourseKey, user: User):
         FORUM_ROLE_ADMINISTRATOR
     ]
     has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
-    return GlobalStaff().has_user(request.user) or is_course_staff(course_key, users) or has_course_role
+    return GlobalStaff().has_user(user) or is_course_staff(course_key, user) or has_course_role
 
 
 class DiscussionBoardFragmentView(EdxFragmentView):
