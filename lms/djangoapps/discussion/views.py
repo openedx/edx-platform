@@ -63,6 +63,14 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR,
+    Role
+)
+
 User = get_user_model()
 log = logging.getLogger("edx.discussions")
 
@@ -707,7 +715,8 @@ def followed_threads(request, course_key, user_id):
 def _discussions_mfe_context(query_params: Dict,
                              course_key: CourseKey,
                              is_educator_or_staff=False,
-                             legacy_only_view=False) -> Optional[Dict]:
+                             legacy_only_view=False,
+                             is_privileged=False) -> Optional[Dict]:
     """
     Returns the context for rendering the MFE banner and MFE.
 
@@ -740,7 +749,7 @@ def _discussions_mfe_context(query_params: Dict,
         "mfe_url": f"{forum_url}?discussions_experience=new",
         "share_feedback_url": settings.DISCUSSIONS_MFE_FEEDBACK_URL,
         "course_key": course_key,
-        "show_banner": enable_mfe,
+        "show_banner": enable_mfe and is_privileged,
         "discussions_mfe_url": mfe_url,
     }
 
@@ -750,6 +759,16 @@ def is_course_staff(course_key: CourseKey, user: User):
     Check if user has course instructor or course staff role.
     """
     return CourseInstructorRole(course_key).has_user(user) or CourseStaffRole(course_key).has_user(user)
+
+
+def is_privileged_user(course_key: CourseKey, user: User):
+    forum_roles = [
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_GROUP_MODERATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_ADMINISTRATOR
+    ]
+    return Role.user_has_role_for_course(user, course_key, forum_roles)
 
 
 class DiscussionBoardFragmentView(EdxFragmentView):
@@ -782,7 +801,9 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         # Force using the legacy view if a user profile is requested or the URL contains a specific topic or thread
         force_legacy_view = (profile_page_context or thread_id or discussion_id)
         is_educator_or_staff = is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user)
-        mfe_context = _discussions_mfe_context(request.GET, course_key, is_educator_or_staff, force_legacy_view)
+        is_privileged = is_privileged_user(course_key, request.user)
+        mfe_context = _discussions_mfe_context(request.GET, course_key, is_educator_or_staff, force_legacy_view,
+                                               is_privileged)
         if mfe_context["show_mfe"]:
             fragment = Fragment(render_to_string('discussion/discussion_mfe_embed.html', mfe_context))
             fragment.add_css(
