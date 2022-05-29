@@ -6,6 +6,7 @@
 # Translators:
 # Adam Banasiak <adam@cku.elblag.pl>, 2015
 # Aleks Ada, 2022
+# Aleksandra Iksińska, 2022
 # Andrzej Batorski <bator54@gmail.com>, 2014
 # ecz1992, 2014
 # escapeplan4 <escapeplan4@gmail.com>, 2017
@@ -61,6 +62,7 @@
 # Translators:
 # Adam Banasiak <adam@cku.elblag.pl>, 2015
 # rodzajowo <a.dubrawska@gmail.com>, 2014
+# Aleks Ada, 2022
 # Bartłomiej Kuszel <bartlomiej.kuszel@gmail.com>, 2015
 # Maciej Kolankowski <maciej@eduprojekt.org>, 2015-2018
 # Maciej Kolankowski <maciej@eduprojekt.org>, 2014
@@ -144,7 +146,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-15 20:43+0000\n"
+"POT-Creation-Date: 2022-05-22 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Marcin Miłek, 2022\n"
 "Language-Team: Polish (https://www.transifex.com/open-edx/teams/6205/pl/)\n"
@@ -5600,6 +5602,7 @@ msgstr "Polityka Dostępności"
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
@@ -7242,10 +7245,13 @@ msgid "Team"
 msgstr "Zespół"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field
+#. which allows the user to input the city in which they live.
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -11060,6 +11066,14 @@ msgid "Enter your full name."
 msgstr "Podaj swoje imię i nazwisko."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your first name."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your last name."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "The email addresses do not match."
 msgstr "Adresy e-mail nie są zgodne."
 
@@ -11082,6 +11096,10 @@ msgstr "Podaj swój zawód"
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your specialty."
 msgstr "Podaj swoją specjalność"
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your state."
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your city."
@@ -11124,24 +11142,34 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr "Pola '{field_name}' nie można edytować."
 
+#. Translators: This label appears above a field which allows the
+#. user to input the First Name
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "First Name"
 msgstr "Imię"
 
+#. Translators: This label appears above a field which allows the
+#. user to input the Last Name
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Last Name"
 msgstr "Nazwisko"
 
+#. Translators: This label appears above a field
+#. which allows the user to input the State/Province/Region in which they
+#. live.
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "State/Province/Region"
 msgstr "Województwo"
@@ -11179,9 +11207,12 @@ msgid "Job Title"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field
+#. meant to hold the user's mailing address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's mailing address.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html
 msgid "Mailing address"
@@ -16579,6 +16610,12 @@ msgid ""
 "access to the course material, unlock both graded and non-graded "
 "assignments, and earn a {link_start}verified certificate{link_end} to "
 "showcase on your resumé."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"{start_bold}Get the most out of your course!{end_bold} Upgrade to earn a "
+"{link_start}verified certificate{link_end} to showcase on your resumé."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html

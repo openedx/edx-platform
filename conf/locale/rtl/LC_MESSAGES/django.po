@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-22 20:42+0000\n"
-"PO-Revision-Date: 2022-05-22 20:42:06.061268\n"
+"POT-Creation-Date: 2022-05-29 20:42+0000\n"
+"PO-Revision-Date: 2022-05-29 20:42:17.222392\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6900,8 +6900,8 @@ msgstr "Ǥøød"
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 #, python-format
-msgid "%(course_name)s %(course_id)s Reported content awaits review"
-msgstr "%(course_name)s %(course_id)s Ɍǝdøɹʇǝd ɔønʇǝnʇ ɐʍɐᴉʇs ɹǝʌᴉǝʍ"
+msgid "%(course_name)s: Reported content awaits review"
+msgstr "%(course_name)s: Ɍǝdøɹʇǝd ɔønʇǝnʇ ɐʍɐᴉʇs ɹǝʌᴉǝʍ"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt

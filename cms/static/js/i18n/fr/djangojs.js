@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = (n > 1);
+    const v = (n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -142,6 +142,7 @@
     " From this point in time, you must follow the <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online proctoring rules</a> to pass the proctoring review for your exam. ": " A ce stade vous devez suivre les <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">r\u00e9gles de surveillance</a> pour satisfaire les revues de votre examen surveill\u00e9. ",
     " Member": [
       "Membre",
+      "Membres",
       "Membres"
     ],
     " Your Proctoring Session Has Started ": "Votre session d'examen surveill\u00e9 a d\u00e9marr\u00e9",
@@ -169,6 +170,7 @@
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)scommentaires (%(unread_comments_count)s commentaires non lus)%(span_close)s",
     "%(errorCount)s error found in form.": [
       "%(errorCount)s erreur trouv\u00e9e dans le formulaire.",
+      "%(errorCount)s erreurs trouv\u00e9es dans le formulaire.",
       "%(errorCount)s erreurs trouv\u00e9es dans le formulaire."
     ],
     "%(field)s can only contain up to %(count)d characters.": "Les %(field)s ne peuvent pas d\u00e9passer %(count)d caract\u00e8res.",
@@ -177,35 +179,43 @@
     "%(programName)s Home Page.": "Page d'accueil %(programName)s.",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s sur %(cnt)s s\u00e9lectionn\u00e9",
-      "%(sel)s sur %(cnt)s s\u00e9lectionn\u00e9s"
+      "%(sel)s sur %(cnt)s s\u00e9lectionn\u00e9s",
+      ""
     ],
     "%(type)s Component Template Menu": "%(type)s Menu Mod\u00e8le de Composant",
     "%(value)s hour": [
       "%(value)s heure",
+      "%(value)s heures",
       "%(value)s heures"
     ],
     "%(value)s minute": [
       "%(value)s minute",
+      "%(value)s minutes",
       "%(value)s minutes"
     ],
     "%(value)s second": [
       "%(value)s seconde",
+      "%(value)s secondes",
       "%(value)s secondes"
     ],
     "%d day": [
       "%d jour",
+      "%d jours",
       "%d jours"
     ],
     "%d minute": [
       "%d minute",
+      "%d minutes",
       "%d minutes"
     ],
     "%d month": [
+      "%d mois",
       "%d mois",
       "%d mois"
     ],
     "%d year": [
       "%d an",
+      "%d ans",
       "%d ans"
     ],
     "%s ago": "il y a %s ",
@@ -223,6 +233,7 @@
     "(Staff)": "(\u00c9quipe p\u00e9dagogique)",
     "(contains %(student_count)s student)": [
       "(contient %(student_count)s \u00e9tudiant)",
+      "(contient %(student_count)s \u00e9tudiants)",
       "(contient %(student_count)s \u00e9tudiants)"
     ],
     "(optional)": "(optionnel)",
@@ -587,6 +598,7 @@
     "Contains staff only content": "Contient du contenu r\u00e9serv\u00e9 aux membres de l'\u00e9quipe enseignante",
     "Contains {count} group": [
       "Contient {count} groupe",
+      "Contient {count} groupes",
       "Contient {count} groupes"
     ],
     "Content Group ID": "ID du groupe de contenu",
@@ -621,6 +633,7 @@
     "Country of residence": "Pays de r\u00e9sidence",
     "Country or Region of Residence": "Pays ou r\u00e9gion de r\u00e9sidence",
     "Course": [
+      "Cours",
       "Cours",
       "Cours"
     ],
@@ -1191,6 +1204,7 @@
     "Load next {numResponses} responses": "Charger les {numResponses} r\u00e9ponses suivantes",
     "Load next {num_items} result": [
       "Charger {num_items} resultat, le prochain",
+      "Charger les {num_items} prochains resultats",
       "Charger les {num_items} prochains resultats"
     ],
     "Loading": "Chargement",
@@ -1320,11 +1334,13 @@
     "Note: Learners can be in only one cohort. Adding learners to this group overrides any previous group assignment.": "Remarque: Les \u00e9tudiants peuvent \u00eatre dans une seule cohorte. L'ajout d'\u00e9tudiants \u00e0 ce groupe pr\u00e9vaut sur toute affectation pr\u00e9c\u00e9dente \u00e0 d'autres groupes.",
     "Note: You are %s hour ahead of server time.": [
       "Note\u00a0: l'heure du serveur pr\u00e9c\u00e8de votre heure de %s heure.",
-      "Note\u00a0: l'heure du serveur pr\u00e9c\u00e8de votre heure de %s heures."
+      "Note\u00a0: l'heure du serveur pr\u00e9c\u00e8de votre heure de %s heures.",
+      ""
     ],
     "Note: You are %s hour behind server time.": [
       "Note\u00a0: votre heure pr\u00e9c\u00e8de l'heure du serveur de %s heure.",
-      "Note\u00a0: votre heure pr\u00e9c\u00e8de l'heure du serveur de %s heures."
+      "Note\u00a0: votre heure pr\u00e9c\u00e8de l'heure du serveur de %s heures.",
+      ""
     ],
     "Noted in:": "Not\u00e9 dans :",
     "Notes": "Notes",
@@ -1691,6 +1707,7 @@
     "Show Annotations": "Afficher les annotations",
     "Show Comment (%(num_comments)s)": [
       "Afficher (%(num_comments)s) Commentaires",
+      "Afficher (%(num_comments)s) Commentaires",
       "Afficher (%(num_comments)s) Commentaires"
     ],
     "Show Deprecated Settings": "Afficher les param\u00e8tres obsol\u00e8tes",
@@ -1710,6 +1727,7 @@
     "Showing all responses": "Afficher toutes les r\u00e9ponses",
     "Showing first response": [
       "Affiche la premi\u00e8re r\u00e9ponse",
+      "Affiche les {numResponses} premi\u00e8res r\u00e9ponses",
       "Affiche les {numResponses} premi\u00e8res r\u00e9ponses"
     ],
     "Showing results for \"{searchString}\"": "Affichage des r\u00e9sultats pour \"{searchString}\"",
@@ -1960,6 +1978,7 @@
     "There was an error retrieving preview results for this catalog. Please check that your query is correct and try again.": "Il y a eu une erreur lors de la r\u00e9cup\u00e9ration de l'aper\u00e7u des r\u00e9sultats pour ce catalogue. Veuillez v\u00e9rifier que votre requ\u00eate est correcte et essayer de nouveau.",
     "There was an error when trying to add learners:": [
       "Il y a eu une erreur lors de la tentative d'ajout d'\u00e9tudiants",
+      "{numErrors} \u00e9tudiants n'ont pas pu \u00eatre ajout\u00e9s \u00e0 cette cohorte :",
       "{numErrors} \u00e9tudiants n'ont pas pu \u00eatre ajout\u00e9s \u00e0 cette cohorte :"
     ],
     "There was an error while importing the new course to our database.": "Une erreur est survenue pendant l'importation du nouveau cours dans notre base de donn\u00e9es.",
@@ -2207,6 +2226,7 @@
     "Used": "Utilis\u00e9",
     "Used in {count} location": [
       "Utilis\u00e9 dans {count} emplacement",
+      "Utilis\u00e9 dans {count} emplacements",
       "Utilis\u00e9 dans {count} emplacements"
     ],
     "User Email": "Email de l'utilisateur",
@@ -2259,6 +2279,7 @@
     "View my exam": "Voir mon examen",
     "View {span_start} {team_name} {span_end}": "Voir {span_start} {team_name} {span_end}",
     "Viewing %s course": [
+      "Voir %s cours",
       "Voir %s cours",
       "Voir %s cours"
     ],
@@ -2475,6 +2496,7 @@
     "abbrev. month September\u0004Sep": "sep",
     "about %d hour": [
       "environ %d heure",
+      "environ %d heures",
       "environ %d heures"
     ],
     "about a minute": "environ une minute",
@@ -2568,6 +2590,7 @@
     "the more quickly and helpfully we can respond!": "le plus rapidement et efficacement que nous pouvons r\u00e9pondre !",
     "there is currently {numVotes} vote": [
       "il y a actuellement {numVotes} vote",
+      "il y a actuellement {numVotes} votes",
       "il y a actuellement {numVotes} votes"
     ],
     "title_word_{uniqueId}": "title_word_{uniqueId}",
@@ -2596,10 +2619,12 @@
     "{download_link_start}Download this image (right-click or option-click, save as){link_end} and then {upload_link_start}upload{link_end} it to your backpack.": "{download_link_start}T\u00e9l\u00e9chargez cette image (clic droit ou option-clic, enregistrer sous){link_end} puis {upload_link_start}upload{link_end} dans votre sac \u00e0 dos.",
     "{earned}/{possible} point (graded)": [
       "{earned}/{possible} point (not\u00e9)",
+      "{earned}/{possible} points (not\u00e9)",
       "{earned}/{possible} points (not\u00e9)"
     ],
     "{earned}/{possible} point (ungraded)": [
       "{earned}/{possible} point (pas not\u00e9)",
+      "{earned}/{possible} points (pas not\u00e9)",
       "{earned}/{possible} points (pas not\u00e9)"
     ],
     "{email}": "{email}",
@@ -2613,30 +2638,37 @@
     "{minutes} {unit}": "{minutes} {unit}",
     "{numMoved} learner was moved from {prevCohort}": [
       "{numMoved} a \u00e9t\u00e9 enlev\u00e9 de {prevCohort}",
+      "{numMoved} \u00e9tudiants ont \u00e9t\u00e9 enlev\u00e9s de {prevCohort}",
       "{numMoved} \u00e9tudiants ont \u00e9t\u00e9 enlev\u00e9s de {prevCohort}"
     ],
     "{numPreassigned} learner was pre-assigned for this cohort. This learner will automatically be added to the cohort when they enroll in the course.": [
       "{numPreassigned} \u00e9tudiant \u00e9tait affect\u00e9 d'avance dans cette cohorte. Cet \u00e9tudiant sera automatiquement ajout\u00e9 \u00e0 la cohorte quand il s'inscrira \u00e0 ce cours.",
+      "{numPreassigned} \u00e9tudiants \u00e9taient affect\u00e9s d'avance dans cette cohorte. Ces \u00e9tudiants seront automatiquement ajout\u00e9s \u00e0 la cohorte quand ils s'inscriront \u00e0 ce cours.",
       "{numPreassigned} \u00e9tudiants \u00e9taient affect\u00e9s d'avance dans cette cohorte. Ces \u00e9tudiants seront automatiquement ajout\u00e9s \u00e0 la cohorte quand ils s'inscriront \u00e0 ce cours."
     ],
     "{numPresent} learner was already in the cohort": [
       "{numPresent} \u00e9tudiant \u00e9tait d\u00e9j\u00e0 dans la cohorte",
+      "{numPresent} \u00e9tudiants \u00e9taient d\u00e9j\u00e0 dans la cohorte",
       "{numPresent} \u00e9tudiants \u00e9taient d\u00e9j\u00e0 dans la cohorte"
     ],
     "{numResponses} other response": [
       "{numResponses} autre r\u00e9ponse",
+      "{numResponses} autres r\u00e9ponses",
       "{numResponses} autres r\u00e9ponses"
     ],
     "{numResponses} response": [
       "{numResponses} r\u00e9ponse",
+      "{numResponses} r\u00e9ponses",
       "{numResponses} r\u00e9ponses"
     ],
     "{numUsersAdded} learner has been added to this cohort. ": [
       "{numUsersAdded} \u00e9tudiant a \u00e9t\u00e9 ajout\u00e9 \u00e0 cette cohorte.",
+      "{numUsersAdded} \u00e9tudiants ont \u00e9t\u00e9 ajout\u00e9s \u00e0 cette cohorte.",
       "{numUsersAdded} \u00e9tudiants ont \u00e9t\u00e9 ajout\u00e9s \u00e0 cette cohorte."
     ],
     "{numVotes} Vote": [
       "{numVotes} Vote",
+      "{numVotes} Votes",
       "{numVotes} Votes"
     ],
     "{num_of_hours} hour": "{num_of_hours} heure",
@@ -2645,18 +2677,22 @@
     "{num_of_minutes} minutes": "{num_of_minutes} minutes",
     "{num_points} point possible (graded)": [
       "{num_points} point possible (graded)",
+      "{num_points} points possibles (graded)",
       "{num_points} points possibles (graded)"
     ],
     "{num_points} point possible (graded, results hidden)": [
       "{num_points} point possible (not\u00e9, r\u00e9sultats cach\u00e9s)",
+      "{num_points} points possibles (not\u00e9, r\u00e9sultats cach\u00e9s)",
       "{num_points} points possibles (not\u00e9, r\u00e9sultats cach\u00e9s)"
     ],
     "{num_points} point possible (ungraded)": [
       "{num_points} point possible (pas not\u00e9)",
+      "{num_points} points possibles (pas not\u00e9)",
       "{num_points} points possibles (pas not\u00e9)"
     ],
     "{num_points} point possible (ungraded, results hidden)": [
       "{num_points} point possible (non not\u00e9, r\u00e9sultats cach\u00e9s)",
+      "{num_points} points possibles (non not\u00e9, r\u00e9sultats cach\u00e9s)",
       "{num_points} points possibles (non not\u00e9, r\u00e9sultats cach\u00e9s)"
     ],
     "{organization}\\'s logo": "logo {organization}",
@@ -2674,11 +2710,13 @@
     "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on {platformName}.{strongEnd}": "{strongStart}Avertissement : la suppression du compte est permanente. {strongEnd}Veuillez lire attentivement les informations ci-dessus avant de poursuivre. Ceci est une action irr\u00e9versible et {strongStart}vous ne pourrez plus utiliser la m\u00eame adresse courriel sur {platformName}.{strongEnd}",
     "{team_count} Team": [
       "{team_count} \u00c9quipe",
+      "{team_count} \u00c9quipes",
       "{team_count} \u00c9quipes"
     ],
     "{totalItems} total": "total de {totalItems}",
     "{total_results} result found for \"{search_term}\"": [
       "{total_results} r\u00e9sultat trouv\u00e9 pour le \"{search_term}\"",
+      "{total_results} r\u00e9sultats trouv\u00e9s pour le \"{search_term}\"",
       "{total_results} r\u00e9sultats trouv\u00e9s pour le \"{search_term}\""
     ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",
