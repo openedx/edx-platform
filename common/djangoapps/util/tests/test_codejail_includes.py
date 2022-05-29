@@ -9,7 +9,7 @@ import loncapa
 from verifiers import draganddrop
 
 
-class Test_CodeJail_Includes(unittest.TestCase):
+class TestCodeJailIncludes(unittest.TestCase):
     """ tests for  codejail includes"""
 
     def test_loncapa(self):
