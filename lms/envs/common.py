@@ -1398,10 +1398,12 @@ WIKI_ENABLED = True
 ###
 
 COURSE_MODE_DEFAULTS = {
+    'android_sku': None,
     'bulk_sku': None,
     'currency': 'usd',
     'description': None,
     'expiration_datetime': None,
+    'ios_sku': None,
     'min_price': 0,
     'name': _('Audit'),
     'sku': None,
