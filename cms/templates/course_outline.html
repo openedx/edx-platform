@@ -191,10 +191,10 @@ from django.urls import reverse
                     <a href="${lms_link}" rel="external" class="button view-button view-live-button"
                        title="${_('Click to open the courseware in the LMS in a new tab')}">${_("View Live")}</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                   <a id="myBtn" rel="external" class="button view-button view-live-button"
                      title="${_('Click to add/view meeting link')}">${_("Live Class")}</a>
-              </li>
+              </li> -->
               <li class="nav-item">
                 <a id="enroll_users_btn" rel="external" class="button view-button view-live-button"
                    title="${_('Click to add/view meeting link')}">${_("Enroll Students")}</a>
@@ -260,7 +260,39 @@ from django.urls import reverse
   </div>
 
 </div>
+<div id="myModal1" class="modal-meeting1">
+  <div class="modal-content-meeting">
+  <div class="modal-header">
+    <span class="close1">&times;</span>
+    <h2>Enroll Students</h2>
+  </div>
+  <div class="modal-body">
+    <table style="text-align: center;width: 100%;">
+      <tr>
+        <td style="width:70%">  
+          <!-- <p for="enroll-student">Name</p> -->
+          <input  style="width: 100%;" type="text" id="enroll-student" name="meeting-topic" placeholder="Enter student username...">
+        </td>
+        <td style="width:30%">  
+          <div style="margin-top:10px;text-align:center;width: 100%;">
+            <button id="add-student" class="button" style="background-color: #005800;;color: #fff;border-radius: 6px;border-color: #fff;
+                padding: 5px;">Add Student</button>
+          </div>
+        </td>
+      </tr>
+      </table>
+      <div style="margin-top:10px">
+        Enrolled Students
+      </div>
+      <div style="margin-top:10px">
+      <div id="output-students" class="out-student">
+    
+      </div>
+    </div>
+    </div>
+  </div>
 
+</div>
 <div class="wrapper-content wrapper">
     <section class="content">
         <article class="content-primary" role="main">
@@ -350,136 +382,299 @@ from django.urls import reverse
     </section>
 </div>
 <script>
-  // Get the modal
   var modal = document.getElementById("myModal");
-  
-  // Get the button that opens the modal
-  var btn = document.getElementById("myBtn");
-  
-  // Get the <span> element that closes the modal
-  var span = document.getElementsByClassName("close")[0];
-  
-  // When the user clicks the button, open the modal 
-  btn.onclick = function() {
-    modal.style.display = "block";
+  // var btn = document.getElementById("liveclass_btn");
+  var modal1 = document.getElementById("myModal1");
+  var btn1 = document.getElementById("enroll_users_btn");
+  // var span = document.getElementsByClassName("close")[0];
+  var span1 = document.getElementsByClassName("close1")[0];
+  var token = '';
+  csrftoken()
+ 
+  // btn.onclick = function() {
+  //   modal.style.display = "block";
+  //   getRooms();
+  //   modal1.style.display = "none";
+  // }
+  btn1.onclick = function() {
+    modal1.style.display = "block";
+    getStudents();
+    // modal.style.display = "none";
+    
+   
+  }
+
+
+  // span.onclick = function() {
+  //   modal.style.display = "none";
+  //   //modal1.style.display = "none";
+  // }
+  span1.onclick = function() {
+   // modal.style.display = "none"
+    modal1.style.display = "none";
   }
   
-  // When the user clicks on <span> (x), close the modal
-  span.onclick = function() {
-    modal.style.display = "none";
-  }
-  
-  // When the user clicks anywhere outside of the modal, close it
   window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
+    // if (event.target == modal) {
+    //   modal.style.display = "none";
+    //  // modal1.style.display = "none";
+    // }
+    if (event.target == modal1) {
+      //modal.style.display = "none";
+      modal1.style.display = "none";
     }
   }
-  function reply_click()
+function reply_click()
+{
+    removeElement();
+    createRoom();
+}
+function enroll_click()
+{
+  student = document.getElementById('enroll-student').value
+  if(student!="")
   {
-    
-      removeElement();
-      createRoom();
-     
+  removeElementStudents()
+  enroll_student()
   }
-  document.getElementById('generate').onclick = reply_click;
-  //document.getElementById('myBtn').onclick = reply_click;
-   getRooms();
-  function removeElement() {
+  else
+  {
+    alert("Enter username")
+  }
+}
+function enroll_student()
+{
+  url=window.location.href;  
+  str_data = url.split('/')
+  student = document.getElementById('enroll-student').value
+   student_data = {
+    "user":student,
+    "course_details":{
+        "course_id":str_data[str_data.length-1]
+    }
+}
+  fetch("http://localhost:18000/api/enrollment/v1/enrollment", {
+      method: "POST",
+      headers: {
+      'Content-Type': 'application/json',
+      'authorization':'Basic ZWR4OmVkeA==',
+      'X-CSRFToken':token
+    
+    }, 
+      body: JSON.stringify(student_data)
+    }).then(function(res){ return res.json(); })
+    .then(function(data){ 
+    if(data.message==undefined)  
+    {
+     
+    }
+    else
+    {
+      alert(data.message)
+    }
+    getStudents()
+      
+    })
+    
+}
+document.getElementById('generate').onclick = reply_click;
+document.getElementById('add-student').onclick = enroll_click;
+//getRooms();
+function removeElement() {
     var elem = document.getElementById("output");
     elem.innerHTML = '';
 }
+function removeElementStudents() {
+    var elem = document.getElementById("output-students");
+    elem.innerHTML = '';
+}
+function login()
+{
+ 
+          let formData = new FormData();
+formData.append("email","edx@example.com");
+formData.append( "password","edx123456");
+  fetch('http://localhost:18000/api/user/v1/account/login_session/', {
+    body: formData,
+           method: "POST"
+          
+          
+})
+    .then( res => res.json() )
+    .then(response => {
+    //  alert(JSON.stringify(response))
+      csrftoken()
+    })
+}
+function csrftoken()
+{
+  fetch('http://localhost:18000/csrf/api/v1/token', {headers: {
+          'Content-Type': 'application/json',
+        }},)
+    .then( res => res.json() )
+    .then(response => {
+       token = response.csrfToken;
+       getStudents()
+    })
+}
+
+function getStudents()
+{
+  url=window.location.href;  
+  str_data = url.split('/')
+  
+  fetch("http://localhost:18000/api/enrollment/v1/enrollments?course_id="+encodeURIComponent(str_data[str_data.length-1]), 
+       )
+    .then( res => res.json() )
+    .then(response => {
+     
+
+     // alert(JSON.stringify(response))
+     var output = document.getElementById('output-students');
+      for(let i=0;i<response.results.length;i++)
+      {
+        var parent = document.createElement("div");
+        if(!document.getElementById('timedrpact'+i))
+        {
+          var ele = document.createElement("div");
+          ele.setAttribute("id","timedrpact"+i);
+          ele.setAttribute("class","inner-student");
+          ele.innerHTML=response.results[i]['user']
+          parent.appendChild(ele);
+          output.appendChild(parent);  
+        }
+      } 
+    
+    
+    })
+    .catch(error => console.error('Error:', error));
+
+}
+
 function createRoom()
 {
-url=window.location.href;  
-str_data = url.split('+')
-data_length = str_data.length-1
-topic = str_data[1]+'0f0f'+document.getElementById('meeting-topic').value
-date = document.getElementById('meeting-date').value
-var unix = Math.round(+new Date()/1000);
-start_time = document.getElementById('meeting-start-time').value
-end_time = document.getElementById('meeting-end-time').value
-let data = {"properties":{"room_name":topic}}
-var datetime_start = new Date(date+' '+start_time);
-var datetime_end= new Date(date+' '+end_time);
-const start_unix = Math.floor(datetime_start.getTime() / 1000);
-const end_unix = Math.floor(datetime_end.getTime() / 1000);
-// fetch("https://api.daily.co/v1/meeting-tokens", {
-//   method: "POST",
-//   headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10'}, 
-//   body: JSON.stringify(data)
-// }).then(function(res){ return res.json(); })
-// .then(function(data){ 
-let crt_room = {"name": topic,
-"privacy": "public",
-"properties" : {
-   "start_audio_off":true,
-   "start_video_off":true,
-  //  nbf:start_unix,
-  //  exp:end_unix
-  }}
-  fetch("https://api.daily.co/v1/rooms/", {
-  method: "POST",
-  headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10'}, 
-  body: JSON.stringify(crt_room)
-}).then(function(res){ return res.json(); })
-.then(function(data){ 
-
-  getRooms()
- // alert(JSON.stringify(data))
-  
+    url=window.location.href;  
+    str_data = url.split('+')
+    data_length = str_data.length-1
+    topic = str_data[1]+'0f0f'+document.getElementById('meeting-topic').value
+    date = document.getElementById('meeting-date').value
+    var unix = Math.round(+new Date()/1000);
+    start_time = document.getElementById('meeting-start-time').value
+    end_time = document.getElementById('meeting-end-time').value
+    let data = {"properties":{"room_name":topic}}
+    var datetime_start = new Date(date+' '+start_time);
+    var datetime_end= new Date(date+' '+end_time);
+    const start_unix = Math.floor(datetime_start.getTime() / 1000);
+    const end_unix = Math.floor(datetime_end.getTime() / 1000);
+    let crt_room = {"name": topic,
+    "privacy": "public",
+    "properties" : {
+      "start_audio_off":true,
+      "start_video_off":true,
+      //  nbf:start_unix,
+      //  exp:end_unix
+      }}
+      fetch("https://api.daily.co/v1/rooms/", {
+      method: "POST",
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10'}, 
+      body: JSON.stringify(crt_room)
+    }).then(function(res){ return res.json(); })
+    .then(function(data){ 
+      getRooms()  
+      updateLiveClass(data)
+    
+    
 })
-
-    //
-
-//  })
-
-
-
 }
-  function getRooms(){
-  fetch('https://api.daily.co/v1/rooms?limit=10', {headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10',
-    }},)
-.then( res => res.json() )
-.then(response => {
+function updateLiveClass(meetingResponse)
+{
+  
   url=window.location.href;  
   str_data = url.split('+')
-  topic = str_data[1]
-  //alert(JSON.stringify(response))
-  var output = document.getElementById('output');
-  for(let i=0;i<response.data.length;i++)
-    {
-       let tmp_name = response.data[i]["name"];
-       let conv_name = tmp_name.split('0f0f');
-       var parent = document.createElement("div");
-        if(!document.getElementById('timedrpact'+i) && conv_name[0]==topic)
-        {
-            var ele = document.createElement("div");
-            ele.setAttribute("id","timedrpact"+i);
-            ele.setAttribute("class","inner");
-            ele.innerHTML=conv_name[1];
-            parent.appendChild(ele);
-            var ele1= document.createElement("a");
-            ele1.setAttribute("id","timedrpact1"+i);
-            ele1.setAttribute("class","button inner-link");
-            ele1.setAttribute("href",response.data[i]["url"]);
-            ele1.setAttribute("target",'_black');
-            ele1.innerHTML='Start';
-            parent.appendChild(ele1);
-            output.appendChild(parent);  
-            
-        }   
-        
-          
+  str_data1= url.split('/')
+  data_length = str_data.length-1
+    topic = str_data[1]+'0f0f'+document.getElementById('meeting-topic').value
+    date = document.getElementById('meeting-date').value
+  var datetime_start = new Date(date+' '+start_time);
+    var datetime_end= new Date(date+' '+end_time);
+    var unix = Math.round(+new Date()/1000);
+    start_time = document.getElementById('meeting-start-time').value
+    end_time = document.getElementById('meeting-end-time').value
+    const start_unix = Math.floor(datetime_start.getTime() / 1000);
+    const end_unix = Math.floor(datetime_end.getTime() / 1000);
+  data = {
+    course_id:str_data1[str_data1.length-1],
+    room_id:meetingResponse.id,
+    room_name:meetingResponse.name,
+    topic_name:topic,
+    meeting_date:date,
+    meeting_start_time:start_time,
+    meeting_end_time:end_time,
+    client_token:"xydsdjxkksdasdsadkhas1223msd",
+    meeting_link:meetingResponse.url
 
-    }
-}) 
-.catch(error => console.error('Error:', error));
+
+  };
+  //alert(JSON.stringify(data))
+  post_url = "http://localhost:18000/api/enrollment/v1/enrollment/"+encodeURIComponent(str_data1[str_data1.length-1])+"/live_classes";
+  
+  fetch(post_url, {
+      method: "POST",
+      headers: {'Content-Type': 'application/json'}, 
+      body: JSON.stringify(data)
+    }).then(function(res){ return res.json(); })
+    .then(function(data){ 
+})
+  
+}
+function getRooms(){
+    fetch('https://api.daily.co/v1/rooms?limit=50', {headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10',
+        }},)
+    .then( res => res.json() )
+    .then(response => {
+      url=window.location.href;  
+      str_data = url.split('+')
+      topic = str_data[1]
+      //alert(JSON.stringify(response))
+      var output = document.getElementById('output');
+      for(let i=0;i<response.data.length;i++)
+        {
+          let tmp_name = response.data[i]["name"];
+          let conv_name = tmp_name.split('0f0f');
+          var parent = document.createElement("div");
+            if(conv_name[0]==topic)
+            {
+              //alert(conv_name)
+                var ele = document.createElement("div");
+                ele.setAttribute("id","timedrpact"+i);
+                ele.setAttribute("class","inner");
+                ele.innerHTML=conv_name[1];
+                parent.appendChild(ele);
+                var ele1= document.createElement("a");
+                ele1.setAttribute("id","timedrpact1"+i);
+                ele1.setAttribute("class","button inner-link");
+                ele1.setAttribute("href",response.data[i]["url"]);
+                ele1.setAttribute("target",'_black');
+                ele1.innerHTML='Start';
+                parent.appendChild(ele1);
+                // var ele2 = document.createElement("div");
+                // ele2.setAttribute("id",'inner-link-delete'+i);
+                // ele2.setAttribute("class","btn inner-link-delete");
+                // ele2.innerHTML='Delete';
+                // parent.appendChild(ele2);
+                output.appendChild(parent);  
+                
+            }   
+            
+              
+
+        }
+    }) 
+    .catch(error => console.error('Error:', error));
 }
   </script>
-  
 </%block>
 
 
