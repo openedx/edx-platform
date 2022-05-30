@@ -181,6 +181,7 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
+    pagination_class = None
     throttle_classes = (EnrollmentUserThrottle,)
 
     # Since the course about page on the marketing site uses this API to auto-enroll users,
@@ -1103,6 +1104,7 @@ class EnrollLiveClassDetailsView(DeveloperErrorViewMixin, ListCreateAPIView):
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = ()
+    pagination_class = None
     throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = UserLiveClassDetailsSerializer
     #pagination_class = LiveClassesSerializer

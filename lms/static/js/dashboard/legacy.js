@@ -54,9 +54,9 @@
                         output.style.display='block';
                         var response = JSON.parse(JSON.stringify(response))
                         
-                        for(let i=0;i<response.results.length;i++)
+                        for(let i=0;i<response.length;i++)
                           {
-                              if(response.results[i]['live_class']!=undefined && response.results[i]['live_class']!=null )
+                              if(response[i]['live_class']!=undefined && response[i]['live_class']!=null )
                               {
                                 var parent = document.createElement("div");
                                 parent.classList.add('d-flex', 'justify-content-between', 'align-items-center',)
@@ -70,14 +70,14 @@
                                 ele.setAttribute("class","inner");
                                 ele.appendChild(image);
                                 const span = document.createElement("span");
-                                span.innerText = response.results[i]['live_class']["topic_name"];
+                                span.innerText = response[i]['live_class']["topic_name"];
                                 span.style.marginLeft = '40px';
                                 ele.appendChild(span);
                                 parent.appendChild(ele);
                                 var ele1= document.createElement("a");
                                 ele1.setAttribute("id","timedrpact1"+i);
                                 ele1.setAttribute("class","button inner-link");
-                                ele1.setAttribute("href",response.results[i]['live_class']["meeting_link"]);
+                                ele1.setAttribute("href",response[i]['live_class']["meeting_link"]);
                                 ele1.setAttribute("target",'_black');
                                 ele1.setAttribute(
                                   "style", "font-size: 18px; margin-right: 20px; box-shadow: 0px 5px 0px #ee6100; border: none; color:#fff; background: #ff7f27; border-radius: 12px; padding: 12px 20px; background-image: none; text-shadow: 0 0");

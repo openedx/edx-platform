@@ -281,14 +281,15 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
  }
 
  var assignUsers= function(tab) {
+  
  if(localStorage.getItem('liveclass_id')!=undefined)
  {
  let id = localStorage.getItem('liveclass_id');
  var username = document.getElementById('new-liveclass-username').value;
  GetLiveClassUtils.getUser({}, function(errorMessage) {
- 
- var res = errorMessage.results;
-//  alert(JSON.stringify(res)) 
+   
+ var res = errorMessage;
+
  let data = res.filter((data)=>data['email']==username);
  
  if(data.length>0)

@@ -1949,6 +1949,7 @@ class LiveClassesApiListView(DeveloperErrorViewMixin, ListCreateAPIView):
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
     serializer_class = LiveClassesSerializer
     #pagination_class = LiveClassesSerializer
     lookup_field = "username"
@@ -2030,7 +2031,7 @@ class UserDetailsListApiView(DeveloperErrorViewMixin, ListAPIView):
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAdminUser,)
-    #pagination_class = False
+    pagination_class = None
     serializer_class = UserListSerializer
     queryset = User.objects.all()
 
@@ -2087,6 +2088,7 @@ class EnrollLiveClassUserDetailsView(DeveloperErrorViewMixin, ListCreateAPIView)
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
     #throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = LiveClassUserDetailsSerializer
     # pagination_class = LiveClassesSerializer
