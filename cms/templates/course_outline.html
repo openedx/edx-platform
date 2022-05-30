@@ -453,7 +453,7 @@ function enroll_student()
         "course_id":str_data[str_data.length-1]
     }
 }
-  fetch("http://localhost:18000/api/enrollment/v1/enrollment", {
+  fetch("http://student.launchpadlearning.ca/api/enrollment/v1/enrollment", {
       method: "POST",
       headers: {
       'Content-Type': 'application/json',
@@ -494,7 +494,7 @@ function login()
           let formData = new FormData();
 formData.append("email","edx@example.com");
 formData.append( "password","edx123456");
-  fetch('http://localhost:18000/api/user/v1/account/login_session/', {
+  fetch('http://student.launchpadlearning.ca/api/user/v1/account/login_session/', {
     body: formData,
            method: "POST"
           
@@ -508,7 +508,7 @@ formData.append( "password","edx123456");
 }
 function csrftoken()
 {
-  fetch('http://localhost:18000/csrf/api/v1/token', {headers: {
+  fetch('http://student.launchpadlearning.ca/csrf/api/v1/token', {headers: {
           'Content-Type': 'application/json',
         }},)
     .then( res => res.json() )
@@ -523,7 +523,7 @@ function getStudents()
   url=window.location.href;  
   str_data = url.split('/')
   
-  fetch("http://localhost:18000/api/enrollment/v1/enrollments?course_id="+encodeURIComponent(str_data[str_data.length-1]), 
+  fetch("http://student.launchpadlearning.ca/api/enrollment/v1/enrollments?course_id="+encodeURIComponent(str_data[str_data.length-1]), 
        )
     .then( res => res.json() )
     .then(response => {
@@ -616,7 +616,7 @@ function updateLiveClass(meetingResponse)
 
   };
   //alert(JSON.stringify(data))
-  post_url = "http://localhost:18000/api/enrollment/v1/enrollment/"+encodeURIComponent(str_data1[str_data1.length-1])+"/live_classes";
+  post_url = "http://student.launchpadlearning.ca/api/enrollment/v1/enrollment/"+encodeURIComponent(str_data1[str_data1.length-1])+"/live_classes";
   
   fetch(post_url, {
       method: "POST",
