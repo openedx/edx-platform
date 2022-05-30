@@ -33,7 +33,7 @@
 
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="find-courses">
-      <section class="courses-container" style="padding: 40px 72px">
+      <section class="courses-container">
         % if course_discovery_enabled:
         <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
           <div id="discovery-message" class="search-status-label"></div>
@@ -55,14 +55,12 @@
         <div id="filter-bar" class="filters hide-phone is-collapsed">
         </div>
         % endif
-        <div style="display: flex;">
-          <div 
-          style="flex-basis: 75%; padding-top: 0;"
-          class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
-          <h3 style="font-weight: 900; font-size: 20px;">Free Courses</h3>
-            <ul class="courses-listing courses-list" style="display: flex; flex-direction: column;">
+
+        <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
+          <h3 style="font-weight: 900; margin-bottom: 24px; font-size: 24px;">Welcome to Launchpad learning</h3>
+          <ul class="courses-listing courses-list" style="display: flex; flex-direction: column;">
             %for course in courses:
-            <li class="courses-listing-item" style="width: 100%; margin-bottom: 10px;">
+            <li class="courses-listing-item" style=" width: 100%">
               <%include file="../course.html" args="course=course" />
             </li>
             %endfor

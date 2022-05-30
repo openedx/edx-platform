@@ -166,7 +166,7 @@ from common.djangoapps.student.models import CourseEnrollment
                 )
             %>
            
-            <div class="live_class"> 
+            <div class="live_class">
               <h3 style="font-size: 24px; font-weight: 900; margin-bottom: 24px">Live Classes</h3>
               <div id="output" class="out" style="position: relative;display: none;"></div>
             </div>
@@ -280,7 +280,7 @@ from common.djangoapps.student.models import CourseEnrollment
             
           <h3 style="font-size: 24px; font-weight: 500; margin-bottom: 28px;">Learning Path</h3>
           <div style="background-color: #fff; border-radius: 12px;">
-            <!-- <section class="ftco-section" style="padding: 0">
+            <section class="ftco-section" style="padding: 0">
               <div class="">
                 <div class="">
                   <div class="">
@@ -302,7 +302,7 @@ from common.djangoapps.student.models import CourseEnrollment
                   </div>
                 </div>
               </div>
-            </section> -->
+            </section>
               <div class="livecalss" style="padding: 24px">
                   <h3 style="font-size: 24px; font-weight: 500; margin-bottom: 24px; margin-top: 0">Live Class</h3>
                   <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap:20px; padding:12px">
@@ -486,7 +486,7 @@ from common.djangoapps.student.models import CourseEnrollment
 
 
 <script>
-  //loadData()
+  loadData()
   function loadData()
   {
     fetch("http://localhost:18000/api/enrollment/v1/enrollments/live_class", 
