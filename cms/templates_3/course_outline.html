@@ -564,6 +564,7 @@ function createRoom()
       body: JSON.stringify(crt_room)
     }).then(function(res){ return res.json(); })
     .then(function(data){ 
+      //alert(JSON.stringify(data))
       getRooms()  
       updateLiveClass(data)
     
@@ -600,7 +601,7 @@ function updateLiveClass(meetingResponse)
 
   };
   //alert(JSON.stringify(data))
-  post_url = "http://localhost:18000/api/enrollment/v1/enrollment/"+encodeURIComponent(str_data1[str_data1.length-1])+"/live_classes";
+  post_url = "http://student.launchpadlearning.ca/api/enrollment/v1/enrollment/"+encodeURIComponent(str_data1[str_data1.length-1])+"/live_classes";
   
   fetch(post_url, {
       method: "POST",
