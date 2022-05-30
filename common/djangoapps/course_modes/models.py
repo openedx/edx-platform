@@ -35,6 +35,8 @@ Mode = namedtuple('Mode',
                       'expiration_datetime',
                       'description',
                       'sku',
+                      'android_sku',
+                      'ios_sku',
                       'bulk_sku',
                   ])
 
@@ -114,6 +116,30 @@ class CourseMode(models.Model):
         )
     )
 
+    # Optional Android SKU for integration with mobile and the ecommerce service
+    android_sku = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="Android SKU",
+        help_text=_(
+            "OPTIONAL: This is the Android SKU registered on play store for this mode of the course. "
+            "Leave this blank if the course has not yet been migrated to the ecommerce service."
+        )
+    )
+
+    # Optional SKU for integration with mobile and the ecommerce service
+    ios_sku = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name="IOS SKU",
+        help_text=_(
+            "OPTIONAL: This is the IOS SKU registered on app store for this mode of the course.  "
+            "Leave this blank if the course has not yet been migrated to the ecommerce service."
+        )
+    )
+
     # Optional bulk order SKU for integration with the ecommerce service
     bulk_sku = models.CharField(
         max_length=255,
@@ -150,6 +176,8 @@ class CourseMode(models.Model):
         settings.COURSE_MODE_DEFAULTS['expiration_datetime'],
         settings.COURSE_MODE_DEFAULTS['description'],
         settings.COURSE_MODE_DEFAULTS['sku'],
+        settings.COURSE_MODE_DEFAULTS['android_sku'],
+        settings.COURSE_MODE_DEFAULTS['ios_sku'],
         settings.COURSE_MODE_DEFAULTS['bulk_sku'],
     )
     DEFAULT_MODE_SLUG = settings.COURSE_MODE_DEFAULTS['slug']
@@ -814,6 +842,8 @@ class CourseMode(models.Model):
             self.expiration_datetime,
             self.description,
             self.sku,
+            self.android_sku,
+            self.ios_sku,
             self.bulk_sku
         )
 
