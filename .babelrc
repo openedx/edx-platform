@@ -19,6 +19,12 @@
     "babel-preset-react"
   ],
   "env": {
+    "development":{
+      "compact": false
+    },
+    "production":{
+      "compact": false
+    },
     "test": {
       "presets": [
         [
