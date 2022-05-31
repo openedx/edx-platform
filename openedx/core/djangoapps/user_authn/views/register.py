@@ -101,7 +101,7 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
-MARKETING_EMAILS_OPT_IN = 'marketing_emails_opt_in'
+MARKETING_EMAILS_OPT_IN = 'is_marketable'
 # used to announce a registration
 # providing_args=["user", "registration"]
 REGISTER_USER = Signal()
