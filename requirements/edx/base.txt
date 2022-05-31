@@ -774,9 +774,7 @@ psutil==5.9.1
     #   -r requirements/edx/paver.txt
     #   edx-django-utils
 py2neo==2021.2.3
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.in
+    # via -r requirements/edx/base.in
 pyblake2==1.1.2
     # via blockstore
 pycountry==22.3.5

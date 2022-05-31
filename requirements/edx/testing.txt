@@ -984,9 +984,7 @@ py==1.11.0
     #   pytest-forked
     #   tox
 py2neo==2021.2.3
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
+    # via -r requirements/edx/base.txt
 pyblake2==1.1.2
     # via
     #   -r requirements/edx/base.txt
