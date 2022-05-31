@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = (n != 1);
+    const v = (n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -89,6 +89,7 @@
     " From this point in time, you must follow the <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online proctoring rules</a> to pass the proctoring review for your exam. ": " A partir deste momento, deve seguir o <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">regras de supervisi\u00e3o online</a> para passar na revis\u00e3o de supervis\u00e3o para o seu exame.   ",
     " Member": [
       " Membro",
+      " Membros",
       " Membros"
     ],
     " Your Proctoring Session Has Started ": "A Sua Sess\u00e3o De Supervis\u00e3o J\u00e1 Come\u00e7ou",
@@ -116,6 +117,7 @@
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)s coment\u00e1rios (%(unread_comments_count)s coment\u00e1rios por ler) %(span_close)s",
     "%(errorCount)s error found in form.": [
       "%(errorCount)s erro encontrado no formul\u00e1rio.",
+      "%(errorCount)s erros encontrados no formul\u00e1rio.",
       "%(errorCount)s erros encontrados no formul\u00e1rio."
     ],
     "%(field)s can only contain up to %(count)d characters.": "%(field)s pode conter apenas at\u00e9%(count)d caracteres.",
@@ -124,35 +126,43 @@
     "%(programName)s Home Page.": "%(programName)s - P\u00e1gina Inicial.",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s de %(cnt)s selecionado",
-      "%(sel)s de %(cnt)s selecionados"
+      "%(sel)s de %(cnt)s selecionados",
+      ""
     ],
     "%(type)s Component Template Menu": "%(type)s Menu de Modelo de Componente",
     "%(value)s hour": [
       "%(value)s hora",
+      "%(value)s horas",
       "%(value)s horas"
     ],
     "%(value)s minute": [
       "%(value)s minuto",
+      "%(value)s minutos",
       "%(value)s minutos"
     ],
     "%(value)s second": [
       "%(value)s segundo",
+      "%(value)s segundos",
       "%(value)s segundos"
     ],
     "%d day": [
       "%d dia",
+      "%d dias",
       "%d dias"
     ],
     "%d minute": [
       "%d minuto",
+      "%d minutos",
       "%d minutos"
     ],
     "%d month": [
       "%d m\u00eas",
+      "%d meses",
       "%d meses"
     ],
     "%d year": [
       "%d ano",
+      "%d anos",
       "%d anos"
     ],
     "%s ago": "%s atr\u00e1s",
@@ -170,6 +180,7 @@
     "(Staff)": "(Equipa)",
     "(contains %(student_count)s student)": [
       "(cont\u00e9m %(student_count)s estudante)",
+      "(cont\u00e9m %(student_count)s estudantes)",
       "(cont\u00e9m %(student_count)s estudantes)"
     ],
     "(optional)": "(opcional)",
@@ -529,6 +540,7 @@
     "Contains staff only content": "Cont\u00e9m apenas conte\u00fado da equipa",
     "Contains {count} group": [
       "Cont\u00e9m {count} grupo",
+      "Cont\u00e9m {count} grupos.",
       "Cont\u00e9m {count} grupos."
     ],
     "Content Group ID": "ID do Grupo de Conte\u00fado",
@@ -562,6 +574,7 @@
     "Country or Region of Residence": "Pa\u00eds ou Regi\u00e3o de Resid\u00eancia",
     "Course": [
       "Curso",
+      "Cursos",
       "Cursos"
     ],
     "Course Content": "Conte\u00fado do Curso",
@@ -1120,6 +1133,7 @@
     "Load next {numResponses} responses": "Carregar pr\u00f3ximas {numResponses} respostas",
     "Load next {num_items} result": [
       "Carregar o pr\u00f3ximo {num_items} resultado",
+      "Carregar os pr\u00f3ximos {num_items} resultados",
       "Carregar os pr\u00f3ximos {num_items} resultados"
     ],
     "Loading": "Carregando",
@@ -1242,11 +1256,13 @@
     "Note: Learners can be in only one cohort. Adding learners to this group overrides any previous group assignment.": "Nota: os estudantes apenas podem pertencer a um grupo. Adicionar alunos a este grupo sobrep\u00f5e-se a qualquer atribui\u00e7\u00e3o de grupo anterior.",
     "Note: You are %s hour ahead of server time.": [
       "Nota: O seu fuso hor\u00e1rio est\u00e1 %s hora adiantado em rela\u00e7\u00e3o ao servidor.",
-      "Nota: O seu fuso hor\u00e1rio est\u00e1 %s horas adiantado em rela\u00e7\u00e3o ao servidor."
+      "Nota: O seu fuso hor\u00e1rio est\u00e1 %s horas adiantado em rela\u00e7\u00e3o ao servidor.",
+      ""
     ],
     "Note: You are %s hour behind server time.": [
       "Nota: O use fuso hor\u00e1rio est\u00e1 %s hora atrasado em rela\u00e7\u00e3o ao servidor.",
-      "Nota: O use fuso hor\u00e1rio est\u00e1 %s horas atrasado em rela\u00e7\u00e3o ao servidor."
+      "Nota: O use fuso hor\u00e1rio est\u00e1 %s horas atrasado em rela\u00e7\u00e3o ao servidor.",
+      ""
     ],
     "Noted in:": "Anotado em:",
     "Notes": "Notas",
@@ -1602,6 +1618,7 @@
     "Show Annotations": "Mostrar Anota\u00e7\u00f5es",
     "Show Comment (%(num_comments)s)": [
       "Mostrar coment\u00e1rio (%(num_comments)s)",
+      "Mostrar Coment\u00e1rios (%(num_comments)s)",
       "Mostrar Coment\u00e1rios (%(num_comments)s)"
     ],
     "Show Deprecated Settings": "Mostrar Defini\u00e7\u00f5es Descontinuadas",
@@ -1621,6 +1638,7 @@
     "Showing all responses": "Mostrar todas as respostas",
     "Showing first response": [
       "A apresentar a primeira resposta",
+      "A mostar as primeiras {numResponses} respostas",
       "A mostar as primeiras {numResponses} respostas"
     ],
     "Showing results for \"{searchString}\"": "Mostrar resultados para \"{searchString}\"",
@@ -1863,6 +1881,7 @@
     "There was an error retrieving preview results for this catalog. Please check that your query is correct and try again.": "Ocorreu um erro ao tentar recuperar os resultados de visualiza\u00e7\u00e3o deste cat\u00e1logo. Por favor, verifique se a sua pesquisa est\u00e1 correta e tente novamente.",
     "There was an error when trying to add learners:": [
       "Ocorreu um erro na tentativa de adicionar estudantes:",
+      "{numErrors} estudantes n\u00e3o puderam ser adicionados a este grupo:",
       "{numErrors} estudantes n\u00e3o puderam ser adicionados a este grupo:"
     ],
     "There was an error while importing the new course to our database.": "Ocorreu um erro durante a importa\u00e7\u00e3o do novo curso para a nossa base de dados.",
@@ -2106,6 +2125,7 @@
     "Used": "Utilizado",
     "Used in {count} location": [
       "Usado em {count} local",
+      "Utilizado em {count} locais",
       "Utilizado em {count} locais"
     ],
     "User Email": "Email do Utilizador",
@@ -2158,6 +2178,7 @@
     "View {span_start} {team_name} {span_end}": "Ver {span_start} {team_name} {span_end}",
     "Viewing %s course": [
       "A visualizar %s curso",
+      "A visualizar %s cursos",
       "A visualizar %s cursos"
     ],
     "Visibility": "Visibilidade",
@@ -2357,6 +2378,7 @@
     "a timed exam": "um exame cronometrado",
     "about %d hour": [
       "cerca de %d hora",
+      "cerca de %d horas",
       "cerca de %d horas"
     ],
     "about a minute": "cerca de um minuto",
@@ -2448,6 +2470,7 @@
     "the more quickly and helpfully we can respond!": "O mais r\u00e1pido e \u00fatil que conseguimos responder!",
     "there is currently {numVotes} vote": [
       "existe atualmente {numVotes} voto",
+      "existem atualmente {numVotes} votos",
       "existem atualmente {numVotes} votos"
     ],
     "title_word_{uniqueId}": "t\u00edtulo_palavra_{uniqueId}",
@@ -2474,10 +2497,12 @@
     "{download_link_start}Download this image (right-click or option-click, save as){link_end} and then {upload_link_start}upload{link_end} it to your backpack.": "{download_link_start} Transfira esta imagem (clique com o bot\u00e3o direito do rato, ou bot\u00e3o de op\u00e7\u00f5es, e use op\u00e7\u00e3o salvar como){link_end} e, em seguida, {upload_link_start}carregue-a{link_end}- para a sua mochila.",
     "{earned}/{possible} point (graded)": [
       "{earned}/{possible} ponto (classificado)",
+      "{earned}/{possible} pontos (classificado)",
       "{earned}/{possible} pontos (classificado)"
     ],
     "{earned}/{possible} point (ungraded)": [
       "{earned}/{possible} ponto (n\u00e3o classificado)",
+      "{earned}/{possible} pontos (n\u00e3o classificado)",
       "{earned}/{possible} pontos (n\u00e3o classificado)"
     ],
     "{email}": "{email}",
@@ -2491,30 +2516,37 @@
     "{minutes} {unit}": "{minutes} {unit}",
     "{numMoved} learner was moved from {prevCohort}": [
       "{numMoved} estudante foi movido de {prevCohort}",
+      "{numMoved} estudantes foram transferidos de {prevCohort}",
       "{numMoved} estudantes foram transferidos de {prevCohort}"
     ],
     "{numPreassigned} learner was pre-assigned for this cohort. This learner will automatically be added to the cohort when they enroll in the course.": [
       "{numPreassigned} estudante foi previamente designado para esta coorte. Este estudante ser\u00e1 automaticamente adicionado na coorte quando ingressar no curso.",
+      "{numPreassigned} estudantes foram previamente designados para este grupo. Estes estudantes ser\u00e3o automaticamente adicionados ao grupo quando ingressarem no curso.",
       "{numPreassigned} estudantes foram previamente designados para este grupo. Estes estudantes ser\u00e3o automaticamente adicionados ao grupo quando ingressarem no curso."
     ],
     "{numPresent} learner was already in the cohort": [
       "{numPresent} estudante j\u00e1 estava na coorte",
+      "estudantes{numPresent} estudantes j\u00e1 fazem parte do grupo",
       "estudantes{numPresent} estudantes j\u00e1 fazem parte do grupo"
     ],
     "{numResponses} other response": [
       "{numResponses} outra resposta",
+      "{numResponses} outras respostas",
       "{numResponses} outras respostas"
     ],
     "{numResponses} response": [
       "{numResponses} resposta",
+      "{numResponses} respostas",
       "{numResponses} respostas"
     ],
     "{numUsersAdded} learner has been added to this cohort. ": [
       "{numUsersAdded} estudante foi adicionado a esta coorte. ",
+      "{numUsersAdded} estudantes foram adicionados a este grupo.",
       "{numUsersAdded} estudantes foram adicionados a este grupo."
     ],
     "{numVotes} Vote": [
       "{numVotes} Voto",
+      "{numVotes} Votos",
       "{numVotes} Votos"
     ],
     "{num_of_hours} hour": "{num_of_hours} hora",
@@ -2523,18 +2555,22 @@
     "{num_of_minutes} minutes": "{num_of_minutes} minutos",
     "{num_points} point possible (graded)": [
       "{num_points} ponto poss\u00edvel (classificado)",
+      "{num_points} pontos poss\u00edveis (classificado)",
       "{num_points} pontos poss\u00edveis (classificado)"
     ],
     "{num_points} point possible (graded, results hidden)": [
       "{num_points} ponto poss\u00edvel (classificado, resultados ocultos)",
+      "{num_points} pontos poss\u00edveis (classificado, resultados ocultados)",
       "{num_points} pontos poss\u00edveis (classificado, resultados ocultados)"
     ],
     "{num_points} point possible (ungraded)": [
       "{num_points} ponto poss\u00edvel (n\u00e3o classificado)",
+      "{num_points} pontos poss\u00edveis (n\u00e3o classificado)",
       "{num_points} pontos poss\u00edveis (n\u00e3o classificado)"
     ],
     "{num_points} point possible (ungraded, results hidden)": [
       "{num_points} ponto poss\u00edvel (n\u00e3o classificado, resultados ocultos)",
+      "{num_points} pontos poss\u00edveis (n\u00e3o classificado, resultados ocultos)",
       "{num_points} pontos poss\u00edveis (n\u00e3o classificado, resultados ocultos)"
     ],
     "{organization}\\'s logo": "Logo da {organization}",
@@ -2552,11 +2588,13 @@
     "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on {platformName}.{strongEnd}": "{strongStart} Aviso: O apagar da conta \u00e9 permanente. {strongEnd} Leia atentamente o texto antes de prosseguir. Esta \u00e9 uma a\u00e7\u00e3o irrevers\u00edvel, e {strongStart} n\u00e3o poder\u00e1 voltar a usar o mesmo e-mail em {platformName}. {strongEnd}",
     "{team_count} Team": [
       "{team_count} Equipa",
+      "{team_count} Equipas",
       "{team_count} Equipas"
     ],
     "{totalItems} total": " total {totalItems}",
     "{total_results} result found for \"{search_term}\"": [
       "{total_results} resultado encontrado para \"{search_term}\"",
+      "{total_results} resultados encontrados para \"{search_term}\"",
       "{total_results} resultados encontrados para \"{search_term}\""
     ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",

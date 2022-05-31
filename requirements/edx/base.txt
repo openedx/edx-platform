@@ -92,7 +92,7 @@ botocore==1.8.17
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/base.in
-celery==5.2.6
+celery==5.2.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in

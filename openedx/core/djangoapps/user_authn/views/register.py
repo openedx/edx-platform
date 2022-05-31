@@ -360,7 +360,8 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'education': profile.level_of_education_display,
             'address': profile.mailing_address,
             'gender': profile.gender_display,
-            'country': str(profile.country)
+            'country': str(profile.country),
+            'is_marketable': params.get('marketing_emails_opt_in') == 'true'
         }
         if settings.MARKETING_EMAILS_OPT_IN and params.get('marketing_emails_opt_in'):
             email_subscribe = 'subscribed' if params.get('marketing_emails_opt_in') == 'true' else 'unsubscribed'

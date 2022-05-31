@@ -6,6 +6,10 @@ Miscellaneous utility functions.
 import re
 
 from xmodule.annotator_mixin import html_to_text
+from opaque_keys.edx.locator import (
+    CourseLocator,
+    LibraryLocator,
+)
 
 
 def escape_invalid_characters(name, invalid_char_list, replace_with='_'):
@@ -110,3 +114,13 @@ def is_xblock_an_assignment(xblock):
     weight = getattr(xblock, 'weight', 1)
     scored = has_score and (weight is None or weight > 0)
     return graded and scored
+
+
+def get_library_or_course_attribute(locator):
+    """
+    Returns respective attribute to distinguish betweeen LibraryLocator and CourseLocator objects.
+    """
+    if isinstance(locator, CourseLocator):
+        return locator.course
+    if isinstance(locator, LibraryLocator):
+        return locator.library

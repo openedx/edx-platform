@@ -125,7 +125,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-15 20:43+0000\n"
+"POT-Creation-Date: 2022-05-22 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2021\n"
 "Language-Team: Italian (Italy) (https://www.transifex.com/open-edx/teams/6205/it_IT/)\n"
@@ -133,7 +133,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 "Generated-By: Babel 2.8.0\n"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -464,6 +464,7 @@ msgid "%(count)d student account was unlocked."
 msgid_plural "%(count)d student accounts were unlocked."
 msgstr[0] "%(count)d account studente è stato sbloccato."
 msgstr[1] "%(count)d account studente sono stati sbloccati."
+msgstr[2] "%(count)d account studente sono stati sbloccati."
 
 #: common/djangoapps/student/admin.py
 #, python-brace-format
@@ -1383,6 +1384,8 @@ msgid_plural ""
 msgstr[0] "Il file deve terminare con l'estensione '{file_types}'."
 msgstr[1] ""
 "Il file deve terminare con una delle seguenti estensioni: '{file_types}'."
+msgstr[2] ""
+"Il file deve terminare con una delle seguenti estensioni: '{file_types}'."
 
 #: common/djangoapps/util/file.py
 #, python-brace-format
@@ -1422,6 +1425,7 @@ msgid "at least %(min_length)d character"
 msgid_plural "at least %(min_length)d characters"
 msgstr[0] "almeno %(min_length)d carattere"
 msgstr[1] "almeno %(min_length)d caratteri"
+msgstr[2] "almeno %(min_length)d caratteri"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1437,6 +1441,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Questa password è troppo lunga. Non deve contenere più di %(max_length)d "
 "caratteri."
+msgstr[2] ""
+"Questa password è troppo lunga. Non deve contenere più di %(max_length)d "
+"caratteri."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1447,6 +1454,8 @@ msgstr[0] ""
 "La password utilizzata non deve contenere più di %(max_length)d carattere."
 msgstr[1] ""
 "La password utilizzata non deve contenere più di %(max_length)d caratteri."
+msgstr[2] ""
+"La password utilizzata non deve contenere più di %(max_length)d caratteri."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1454,6 +1463,7 @@ msgid "This password must contain at least %(min_alphabetic)d letter."
 msgid_plural "This password must contain at least %(min_alphabetic)d letters."
 msgstr[0] "Questa password deve contenere almeno %(min_alphabetic)d lettera."
 msgstr[1] "Questa password deve contenere almeno %(min_alphabetic)d lettere."
+msgstr[2] "Questa password deve contenere almeno %(min_alphabetic)d lettere."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1463,6 +1473,8 @@ msgstr[0] ""
 "La password utilizzata deve contenere almeno %(min_alphabetic)d lettera."
 msgstr[1] ""
 "La password utilizzata deve contenere almeno %(min_alphabetic)d lettere."
+msgstr[2] ""
+"La password utilizzata deve contenere almeno %(min_alphabetic)d lettere."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1470,6 +1482,7 @@ msgid "%(num)d letter"
 msgid_plural "%(num)d letters"
 msgstr[0] "%(num)d lettera"
 msgstr[1] "%(num)d lettere"
+msgstr[2] "%(num)d lettere"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1477,6 +1490,7 @@ msgid "This password must contain at least %(min_numeric)d number."
 msgid_plural "This password must contain at least %(min_numeric)d numbers."
 msgstr[0] "Questa password deve contenere almeno %(min_numeric)d numero."
 msgstr[1] "Questa password deve contenere almeno %(min_numeric)d numeri."
+msgstr[2] "Questa password deve contenere almeno %(min_numeric)d numeri."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1486,6 +1500,8 @@ msgstr[0] ""
 "La password utilizzata deve contenere almeno %(min_numeric)d numero."
 msgstr[1] ""
 "La password utilizzata deve contenere almeno %(min_numeric)d numeri."
+msgstr[2] ""
+"La password utilizzata deve contenere almeno %(min_numeric)d numeri."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1493,6 +1509,7 @@ msgid "%(num)d number"
 msgid_plural "%(num)d numbers"
 msgstr[0] "%(num)d numero"
 msgstr[1] "%(num)d numeri"
+msgstr[2] "%(num)d numeri"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1502,6 +1519,8 @@ msgid_plural ""
 msgstr[0] ""
 "Questa password deve contenere almeno %(min_upper)d lettera maiuscola."
 msgstr[1] ""
+"Questa password deve contenere almeno %(min_upper)d lettere maiuscole."
+msgstr[2] ""
 "Questa password deve contenere almeno %(min_upper)d lettere maiuscole."
 
 #: common/djangoapps/util/password_policy_validators.py
@@ -1515,6 +1534,9 @@ msgstr[0] ""
 msgstr[1] ""
 "La password utilizzata deve contenere almeno %(min_upper)d lettere "
 "maiuscole."
+msgstr[2] ""
+"La password utilizzata deve contenere almeno %(min_upper)d lettere "
+"maiuscole."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1522,6 +1544,7 @@ msgid "%(num)d uppercase letter"
 msgid_plural "%(num)d uppercase letters"
 msgstr[0] "%(num)d lettera maiuscola"
 msgstr[1] "%(num)d lettere maiuscole"
+msgstr[2] "%(num)d lettere maiuscole"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1531,6 +1554,8 @@ msgid_plural ""
 msgstr[0] ""
 "Questa password deve contenere almeno %(min_lower)d lettera minuscola."
 msgstr[1] ""
+"Questa password deve contenere almeno %(min_lower)d lettere minuscole."
+msgstr[2] ""
 "Questa password deve contenere almeno %(min_lower)d lettere minuscole."
 
 #: common/djangoapps/util/password_policy_validators.py
@@ -1544,6 +1569,9 @@ msgstr[0] ""
 msgstr[1] ""
 "La password utilizzata deve contenere almeno %(min_lower)d lettere "
 "minuscole."
+msgstr[2] ""
+"La password utilizzata deve contenere almeno %(min_lower)d lettere "
+"minuscole."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1551,6 +1579,7 @@ msgid "%(num)d lowercase letter"
 msgid_plural "%(num)d lowercase letters"
 msgstr[0] "%(num)d lettera minuscola"
 msgstr[1] "%(num)d lettere minuscole"
+msgstr[2] "%(num)d lettere minuscole"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1562,6 +1591,9 @@ msgstr[0] ""
 "Questa password deve contenere almeno %(min_punctuation)d segno di "
 "punteggiatura."
 msgstr[1] ""
+"Questa password deve contenere almeno %(min_punctuation)d segni di "
+"punteggiatura."
+msgstr[2] ""
 "Questa password deve contenere almeno %(min_punctuation)d segni di "
 "punteggiatura."
 
@@ -1577,6 +1609,9 @@ msgstr[0] ""
 msgstr[1] ""
 "La password utilizzata deve contenere almeno %(min_punctuation)d segni di "
 "punteggiatura."
+msgstr[2] ""
+"La password utilizzata deve contenere almeno %(min_punctuation)d segni di "
+"punteggiatura."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1584,6 +1619,7 @@ msgid "%(num)d punctuation mark"
 msgid_plural "%(num)d punctuation marks"
 msgstr[0] "%(num)d segno di punteggiatura"
 msgstr[1] "%(num)d segni di punteggiatura"
+msgstr[2] "%(num)d segni di punteggiatura"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1591,6 +1627,7 @@ msgid "This password must contain at least %(min_symbol)d symbol."
 msgid_plural "This password must contain at least %(min_symbol)d symbols."
 msgstr[0] "Questa password deve contenere almeno %(min_symbol)d simbolo."
 msgstr[1] "Questa password deve contenere almeno %(min_symbol)d simboli."
+msgstr[2] "Questa password deve contenere almeno %(min_symbol)d simboli."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1600,6 +1637,8 @@ msgstr[0] ""
 "La password utilizzata deve contenere almeno %(min_symbol)d simbolo."
 msgstr[1] ""
 "La password utilizzata deve contenere almeno %(min_symbol)d simboli."
+msgstr[2] ""
+"La password utilizzata deve contenere almeno %(min_symbol)d simboli."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1607,6 +1646,7 @@ msgid "%(num)d symbol"
 msgid_plural "%(num)d symbols"
 msgstr[0] "%(num)d simbolo"
 msgstr[1] "%(num)d simboli"
+msgstr[2] "%(num)d simboli"
 
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
@@ -2510,6 +2550,7 @@ msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
 msgstr[0] "Non corretto ({progress} punto)"
 msgstr[1] "Non corretto ({progress} punti)"
+msgstr[2] "Non corretto ({progress} punti)"
 
 #: common/lib/xmodule/xmodule/capa_module.py
 #, python-brace-format
@@ -2517,6 +2558,7 @@ msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
 msgstr[0] "Corretto ({progress} punto)"
 msgstr[1] "Corretto ({progress} punti)"
+msgstr[2] "Corretto ({progress} punti)"
 
 #: common/lib/xmodule/xmodule/capa_module.py
 #, python-brace-format
@@ -2524,6 +2566,7 @@ msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
 msgstr[0] "Parzialmente corretto ({progress} punto)"
 msgstr[1] "Parzialmente corretto ({progress} punti)"
+msgstr[2] "Parzialmente corretto ({progress} punti)"
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid "Partially Correct"
@@ -2565,6 +2608,7 @@ msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
 msgstr[0] "{num_hour} ora"
 msgstr[1] "{num_hour} ore"
+msgstr[2] "{num_hour} ore"
 
 #: common/lib/xmodule/xmodule/capa_module.py
 #, python-brace-format
@@ -2572,6 +2616,7 @@ msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
 msgstr[0] "{num_minute} minuto"
 msgstr[1] "{num_minute} minuti"
+msgstr[2] "{num_minute} minuti"
 
 #: common/lib/xmodule/xmodule/capa_module.py
 #, python-brace-format
@@ -2579,6 +2624,7 @@ msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
 msgstr[0] "{num_second} secondo"
 msgstr[1] "{num_second} secondi"
+msgstr[2] "{num_second} secondi"
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid "Problem needs to be reset prior to save."
@@ -3943,6 +3989,8 @@ msgstr[0] ""
 "La libreria specificata è configurata per recuperare {count} problema, "
 msgstr[1] ""
 "La libreria specificata è configurata per recuperare {count} problemi, "
+msgstr[2] ""
+"La libreria specificata è configurata per recuperare {count} problemi, "
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 #, python-brace-format
@@ -3950,6 +3998,7 @@ msgid "but there is only {actual} matching problem."
 msgid_plural "but there are only {actual} matching problems."
 msgstr[0] "ma c'è solo {actual} problema corrispondente."
 msgstr[1] "ma ci sono solo {actual} problemi corrispondenti."
+msgstr[2] "ma ci sono solo {actual} problemi corrispondenti."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Edit the library configuration."
@@ -4843,6 +4892,7 @@ msgid_plural ""
 msgstr[0] ""
 "Non esiste alcun file di trascrizione associato alla lingua {lang}."
 msgstr[1] "Non vi sono file di trascrizione associati alle lingue {lang}."
+msgstr[2] "Non vi sono file di trascrizione associati alle lingue {lang}."
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
@@ -5822,6 +5872,7 @@ msgstr "Politica di accessibilità"
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
@@ -6404,6 +6455,7 @@ msgid_plural ""
 "                        "
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -6495,6 +6547,7 @@ msgid "({number} Question)"
 msgid_plural "({number} Questions)"
 msgstr[0] "({number} Question)"
 msgstr[1] "({number} Questions)"
+msgstr[2] "({number} Questions)"
 
 #: lms/djangoapps/course_home_api/outline/views.py
 #, python-brace-format
@@ -7514,10 +7567,13 @@ msgid "Team"
 msgstr "Team"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field
+#. which allows the user to input the city in which they live.
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -8014,6 +8070,7 @@ msgid "{num_emails} sent"
 msgid_plural "{num_emails} sent"
 msgstr[0] "{num_emails} inviata"
 msgstr[1] "{num_emails} inviate"
+msgstr[2] "{num_emails} inviate"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 #, python-brace-format
@@ -8021,6 +8078,7 @@ msgid "{num_emails} failed"
 msgid_plural "{num_emails} failed"
 msgstr[0] "{num_emails} non riuscita"
 msgstr[1] "{num_emails} non riuscite"
+msgstr[2] "{num_emails} non riuscite"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Complete"
@@ -11584,6 +11642,14 @@ msgid "Enter your full name."
 msgstr "Inserire il proprio nome completo."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your first name."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your last name."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "The email addresses do not match."
 msgstr "Gli indirizzi email non corrispondono."
 
@@ -11606,6 +11672,10 @@ msgstr "Inserire la propria professione."
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your specialty."
 msgstr "Inserire la propria specializzazione."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your state."
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your city."
@@ -11648,24 +11718,34 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr "Impossibile modificare il campo '{field_name}'."
 
+#. Translators: This label appears above a field which allows the
+#. user to input the First Name
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "First Name"
 msgstr "Nome"
 
+#. Translators: This label appears above a field which allows the
+#. user to input the Last Name
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Last Name"
 msgstr "Cognome"
 
+#. Translators: This label appears above a field
+#. which allows the user to input the State/Province/Region in which they
+#. live.
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "State/Province/Region"
 msgstr "Stato/Provincia/Regione"
@@ -11703,9 +11783,12 @@ msgid "Job Title"
 msgstr "Qualifica"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field
+#. meant to hold the user's mailing address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's mailing address.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html
 msgid "Mailing address"
@@ -12786,6 +12869,7 @@ msgid "Try again ({attempts} attempt remaining)"
 msgid_plural "Try again ({attempts} attempts remaining)"
 msgstr[0] "Prova di nuovo ({attempts} tentativo rimanente)"
 msgstr[1] "Prova di nuovo ({attempts} tentativi rimanenti)"
+msgstr[2] "Prova di nuovo ({attempts} tentativi rimanenti)"
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
 #, python-brace-format
@@ -14027,6 +14111,7 @@ msgid "%s discussion started"
 msgid_plural "%s discussions started"
 msgstr[0] "%s discussione avviata "
 msgstr[1] "%s discussioni avviate"
+msgstr[2] "%s discussioni avviate"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
@@ -14035,6 +14120,7 @@ msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s commento"
 msgstr[1] "%s commenti"
+msgstr[2] "%s commenti"
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
 msgid "Discussion unavailable"
@@ -14387,6 +14473,10 @@ msgstr[1] ""
 "Visualizzazione di tutto il contenuto corrispondente idoneo per essere "
 "aggiunto a {display_name}. A ciascuno studente verranno assegnati "
 "{max_count} componenti estratti casualmente da questo elenco. "
+msgstr[2] ""
+"Visualizzazione di tutto il contenuto corrispondente idoneo per essere "
+"aggiunto a {display_name}. A ciascuno studente verranno assegnati "
+"{max_count} componenti estratti casualmente da questo elenco. "
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -14558,6 +14648,7 @@ msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
 msgstr[0] "Hai utilizzato {num_used} di {num_total} tentativo "
 msgstr[1] "Hai utilizzato {num_used} di {num_total} tentativi "
+msgstr[2] "Hai utilizzato {num_used} di {num_total} tentativi "
 
 #: lms/templates/problem.html
 msgid ""
@@ -17588,6 +17679,12 @@ msgid ""
 "access to the course material, unlock both graded and non-graded "
 "assignments, and earn a {link_start}verified certificate{link_end} to "
 "showcase on your resumé."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"{start_bold}Get the most out of your course!{end_bold} Upgrade to earn a "
+"{link_start}verified certificate{link_end} to showcase on your resumé."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
