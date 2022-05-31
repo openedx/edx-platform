@@ -59,12 +59,6 @@ django-webpack-loader==0.7.0
 # requirements of edx-platform. Pinning temporarily until this is resolved in edx-val.
 edxval<2.1
 
-# At the time of writing this comment, we do not know whether py2neo>=2022
-# will support our currently-deployed Neo4j version (3.5).
-# Feel free to loosen this constraint if/when it is confirmed that a later
-# version of py2neo will work with Neo4j 3.5.
-py2neo<2022
-
 # Sphinx requires docutils<0.18. This pin can be removed once https://github.com/sphinx-doc/sphinx/issues/9777 is closed.
 docutils<0.18
 
