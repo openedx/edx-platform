@@ -8,15 +8,29 @@ import tahoe_sites.api
 
 from openedx.core.djangoapps.appsembler.auth import course_roles
 
+try:
+    from tahoe_idp import api as tahoe_idp_api
+except ImportError:
+    # Ignore import error until `tahoe-idp` installed in appsembler.txt for production.
+    pass
+
+from .helpers import store_idp_metadata_in_user_profile
+
 from .constants import TAHOE_IDP_BACKEND_NAME
 
 log = logging.getLogger(__name__)
 
 
-@beeline.traced(name='tpa_pipeline.set_roles_from_tahoe_idp_roles')
-def set_roles_from_tahoe_idp_roles(auth_entry, strategy, details, user=None, *args, **kwargs):
+@beeline.traced(name='tpa_pipeline.tahoe_idp_user_updates')
+def tahoe_idp_user_updates(auth_entry, strategy, details, user=None, *args, **kwargs):
     """
-    Update the user `is_admin` status and OrgStaffRole when using the `tahoe-idp` backend.
+    Update the user after login via the Tahoe IdP backend.
+
+    Performs the following updates:
+     - Update the user `is_admin` status
+     - Set OrgStaffRole for eligible users
+     - Share Tahoe User.id with the `tahoe-idp` provider
+     - Store the user metadate from the `tahoe-idp` into the `User.profile.meta`
 
     This pipeline step links both `tahoe-idp` and `tahoe-sites` packages.
     Although unlikely, updates to either modules may break this step.
@@ -45,3 +59,8 @@ def set_roles_from_tahoe_idp_roles(auth_entry, strategy, details, user=None, *ar
             organization_short_name=organization_short_name,
             set_as_organization_staff=set_as_organization_staff,
         )
+
+        store_idp_metadata_in_user_profile(user, details['tahoe_idp_metadata'])
+
+        # TODO: Directly call `tahoe_idp.api` function may not be a good idea, find a better signal or hook instead.
+        tahoe_idp_api.update_tahoe_user_id(user)
