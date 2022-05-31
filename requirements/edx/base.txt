@@ -12,6 +12,8 @@
     #   xmodule
 -e git+https://github.com/edx/django-wiki.git@1.1.0#egg=django-wiki
     # via -r requirements/edx/github.in
+-e git+https://github.com/edx/codejail.git@1f1e87b87fe255243b4d746558896383774c7c85#egg=edx-codejail
+    # via -r requirements/edx/github.in
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
     # via -r requirements/edx/github.in
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
@@ -432,8 +434,6 @@ edx-celeryutils==1.2.1
     #   -r requirements/edx/base.in
     #   edx-name-affirmation
     #   super-csv
-edx-codejail==3.2.0
-    # via -r requirements/edx/base.in
 edx-completion==4.2.0
     # via -r requirements/edx/base.in
 edx-django-release-util==1.2.0
