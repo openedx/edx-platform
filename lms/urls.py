@@ -676,6 +676,10 @@ urlpatterns += [
         r'^u/',
         include('openedx.features.learner_profile.urls'),
     ),
+
+    # GenZ custom features urls
+    url(r'^genz/', include(('openedx.features.genz_features.urls', 'openedx.features.genz_features'),
+                            namespace='genz_features')),
 ]
 
 if settings.FEATURES.get('ENABLE_TEAMS'):

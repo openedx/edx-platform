@@ -180,6 +180,9 @@ urlpatterns = [
     url(r'^api/val/v0/', include('edxval.urls')),
     url(r'^api/tasks/v0/', include('user_tasks.urls')),
     url(r'^accessibility$', contentstore_views.accessibility, name='accessibility'),
+    # GenZ custom features urls
+    url(r'^genz/', include(('openedx.features.genz_features.urls', 'openedx.features.genz_features'),
+                            namespace='genz_features')),
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:
