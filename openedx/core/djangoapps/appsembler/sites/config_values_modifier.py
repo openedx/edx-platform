@@ -59,8 +59,7 @@ class TahoeConfigurationValueModifier:
         return self.get_domain()
 
     def get_css_overrides_file(self):
-        domain_without_port_number = self.get_domain().split(':')[0]
-        return '{}.css'.format(domain_without_port_number)
+        return self.site_config_instance.get_css_overrides_file()
 
     def get_lms_root_url(self):
         """
