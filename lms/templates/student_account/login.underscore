@@ -2,7 +2,7 @@
 </div>
 
 <div class="inlinestyle" style="border-radius: 20px; width: 500px; box-shadow: 1px 1px 10px rgba(0,0,0,.2)">
-    <div style="text-align: center; margin-bottom: 20px; padding:20px 0 10px; border-bottom: 2px solid #efefef"><img src="../../static/images/logo.svg" width="250px"/></div>
+    <div style="text-align: center; margin-bottom: 20px; padding:20px 0 10px; border-bottom: 2px solid #efefef"><img src="https://launchpadedx.s3.us-west-1.amazonaws.com/logo.svg" width="250px"/></div>
 <% // Hide SSO related messages if we are not in the SSO pipeline.  %>
 <% if (context.enterpriseName && context.currentProvider) { %>
     <% if (context.pipelineUserDetails && context.pipelineUserDetails.email) { %>
