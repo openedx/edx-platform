@@ -125,7 +125,7 @@ botocore==1.8.17
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/base.txt
-celery==5.2.6
+celery==5.2.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -908,7 +908,7 @@ openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
 openedx-events==0.9.1
     # via -r requirements/edx/base.txt
-openedx-filters==0.6.2
+openedx-filters==0.7.0
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
@@ -1238,7 +1238,7 @@ selenium==3.141.0
     # via
     #   -r requirements/edx/testing.in
     #   bok-choy
-semantic-version==2.9.0
+semantic-version==2.10.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-drf-extensions

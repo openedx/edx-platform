@@ -94,7 +94,7 @@ botocore==1.8.17
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/base.in
-celery==5.2.6
+celery==5.2.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -728,7 +728,7 @@ openedx-calc==3.0.1
     # via -r requirements/edx/base.in
 openedx-events==0.9.1
     # via -r requirements/edx/base.in
-openedx-filters==0.6.2
+openedx-filters==0.7.0
     # via
     #   -r requirements/edx/base.in
     #   lti-consumer-xblock
@@ -943,7 +943,7 @@ scipy==1.7.3
     #   -c requirements/edx/../constraints.txt
     #   chem
     #   openedx-calc
-semantic-version==2.9.0
+semantic-version==2.10.0
     # via edx-drf-extensions
 shapely==1.8.2
     # via -r requirements/edx/base.in
