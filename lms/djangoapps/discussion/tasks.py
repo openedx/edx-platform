@@ -155,9 +155,9 @@ def _should_send_message(context):
 
 
 def _is_content_still_reported(context):
-    if context.get('thread_id'):
-        return len(cc.Thread.find(context['thread_id']).abuse_flaggers) > 0
-    return len(cc.Comment.find(context['comment_id']).abuse_flaggers) > 0
+    if context.get('comment_id') is not None:
+        return len(cc.Comment.find(context['comment_id']).abuse_flaggers) > 0
+    return len(cc.Thread.find(context['thread_id']).abuse_flaggers) > 0
 
 
 def _is_not_subcomment(comment_id):
