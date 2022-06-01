@@ -94,3 +94,52 @@ def send_self_paced_course_enrollment_email(user, course_name, course_url, modul
     }
 
     task_send_hubspot_email.delay(context)
+
+
+def send_instructor_paced_course_enrollment_email(user, course_name, course_url):
+    """
+    Send course enrollment email for Instructor paced course.
+
+    Arguments:
+        user (User): User object.
+        course_name (str): Course name.
+        course_url (str): Course url.
+    """
+    context = {
+        'emailId': HubSpotClient.INSTRUCTOR_PACED_COURSE_ENROLLMENT_EMAIL,
+        'message': {
+            'to': user.email
+        },
+        'customProperties': {
+            'course_name': course_name,
+            'course_url': course_url,
+            'full_name': user.get_full_name(),
+            'signin_url': settings.LMS_ROOT_URL + '/login',
+        }
+    }
+
+    task_send_hubspot_email.delay(context)
+
+
+def send_mini_course_enrollment_email(user, course_name, course_url):
+    """
+    Send course enrollment email for Mini lesson.
+
+    Arguments:
+        user (User): User object.
+        course_name (str): Course name.
+        course_url (str): Course url.
+    """
+    context = {
+        'emailId': HubSpotClient.MINI_COURSE_ENROLMENT,
+        'message': {
+            'to': user.email
+        },
+        'customProperties': {
+            'course_name': course_name,
+            'course_url': course_url,
+            'full_name': user.get_full_name(),
+        }
+    }
+
+    task_send_hubspot_email.delay(context)
