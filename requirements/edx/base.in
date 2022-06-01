@@ -36,7 +36,6 @@ botocore==1.8.17                    # via boto3, s3transfer
 bridgekeeper                        # Used for determining permissions for courseware.
 celery                              # Asynchronous task execution library
 chem                                # A helper library for chemistry calculations
-codejail-includes                   # CodeJail manages execution of untrusted code in secure sandboxes.
 contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
 crowdsourcehinter-xblock
 cryptography                        # Implementations of assorted cryptography algorithms
