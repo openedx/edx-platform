@@ -736,3 +736,34 @@ class ValidateCourseOlxTests(CourseTestCase):
                 ignore=ignore,
                 allowed_xblocks=allowed_xblocks
             )
+
+
+class DetermineLabelTestCase(TestCase):
+    """Tests for xblock Title quirks"""
+
+    def validate_html_replaced_with_text(self):
+        """
+        Tests that display names for "html" xblocks are repleaced with "Text" when the display name is otherwise unset.
+        """
+        display_name = None
+        block_type = "html"
+        result = utils.determine_label(display_name, block_type)
+        self.assertEqual(result, display_name)
+
+    def validate_set_titles_not_replaced(self):
+        """
+        Tests that display names for "html" xblocks are not repleaced with "Text" when the display name is set.
+        """
+        display_name = "Something"
+        block_type = "html"
+        result = utils.determine_label(display_name, block_type)
+        self.assertEqual(result, display_name)
+
+    def validate_non_html_blocks_titles_not_replaced(self):
+        """
+        Tests that display names for non-"html" xblocks are not repleaced with "Text" when the display name is set.
+        """
+        display_name = None
+        block_type = "something else"
+        result = utils.determine_label(display_name, block_type)
+        self.assertEqual(result, display_name)
