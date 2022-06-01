@@ -80,16 +80,31 @@ def send_admin_update_confirmation_email(org_name, current_admin, new_admin, con
     confirm -- 1 if the current_admin has confirmed resignation else 0
     """
     if confirm == 1:
-        MandrillClient().send_mail(MandrillClient.ORG_ADMIN_CLAIM_CONFIRMATION, current_admin.email, {
-            "first_name": current_admin.first_name,
-            "org_name": org_name,
-            "claimed_by_name": new_admin.email,
-        })
-        MandrillClient().send_mail(MandrillClient.NEW_ADMIN_CLAIM_CONFIRMATION, new_admin.email, {
-            "first_name": new_admin.first_name,
-            "org_name": org_name,
-            "confirm": confirm,
-        })
+        org_admin_claim_confirmation_email_context = {
+            'emailId': HubSpotClient.ORG_ADMIN_CLAIM_CONFIRMATION,
+            'message': {
+                'to': current_admin.email
+            },
+            'customProperties': {
+                'first_name': current_admin.first_name,
+                'org_name': org_name,
+                'claimed_by_name': new_admin.email,
+            }
+        }
+        task_send_hubspot_email.delay(org_admin_claim_confirmation_email_context)
+
+        org_new_admin_claim_confirmation_email_context = {
+            'emailId': HubSpotClient.ORG_NEW_ADMIN_CLAIM_CONFIRMATION,
+            'message': {
+                'to': new_admin.email
+            },
+            'customProperties': {
+                'first_name': new_admin.first_name,
+                'org_name': org_name,
+                'confirm': confirm,
+            }
+        }
+        task_send_hubspot_email.delay(org_new_admin_claim_confirmation_email_context)
     else:
         org_admin_get_in_touch_email_context = {
             'emailId': HubSpotClient.ORG_ADMIN_GET_IN_TOUCH,
