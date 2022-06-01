@@ -343,9 +343,9 @@ def upload_ora2_data(
     )
     task_progress.update_task_state(extra_meta=curr_step)
 
-    upload_csv_to_report_store(rows, 'ORA_data', course_id, start_date)
+    report_name = upload_csv_to_report_store(rows, 'ORA_data', course_id, start_date)
 
-    curr_step = {'step': 'Finalizing ORA data report'}
+    curr_step = {'step': 'Finalizing ORA data report','report_name': report_name}
     task_progress.update_task_state(extra_meta=curr_step)
     TASK_LOG.info(u'%s, Task type: %s, Upload complete.', task_info_string, action_name)
 
