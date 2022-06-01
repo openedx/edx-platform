@@ -46,23 +46,27 @@ def send_admin_update_email(org_id, org_name, dest_addr, org_admin_name, hash_ke
     Send an email to the admin, that this user claims himself to be the admin
     """
     request = get_current_request()
-
     admin_activation_link = '{protocol}://{site}/onboarding/admin_activate/{claimed_by_key}'.format(
         protocol='https' if request.is_secure() else 'http',
         site=safe_get_host(request),
         claimed_by_key=hash_key.activation_hash
     )
 
-    message_context = {
-        "org_name": org_name,
-        "first_name": org_admin_name,
-        "claimed_by_name": claimed_by_name,
-        "claimed_by_email": claimed_by_email,
-        "admin_activation_link": admin_activation_link
+    context = {
+        'emailId': HubSpotClient.ORG_ADMIN_CHANGE,
+        'message': {
+            'to': dest_addr
+        },
+        'customProperties': {
+            'first_name': org_admin_name,
+            'org_name': org_name,
+            'claimed_by_name': claimed_by_name,
+            'claimed_by_email': claimed_by_email,
+            'admin_activation_link': admin_activation_link
+        }
     }
 
-    # TODO: FIX MANDRILL EMAILS
-    # MandrillClient().send_mail(MandrillClient.ORG_ADMIN_CHANGE_TEMPLATE, dest_addr, message_context)
+    task_send_hubspot_email.delay(context)
 
 
 def send_admin_update_confirmation_email(org_name, current_admin, new_admin, confirm):
