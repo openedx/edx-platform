@@ -25,7 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.49.5
+edx-enterprise==3.49.6
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
