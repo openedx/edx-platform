@@ -89,6 +89,9 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
     task_progress.update_task_state(extra_meta=current_step)
 
     # Perform the upload
-    upload_csv_to_report_store(rows, 'student_profile_info', course_id, start_date)
-
+    report_name = upload_csv_to_report_store(rows, 'student_profile_info', course_id, start_date)
+    current_step = {
+        'step': 'CSV uploaded',
+        'report_name': report_name,
+    }
     return task_progress.update_task_state(extra_meta=current_step)
