@@ -2,7 +2,6 @@ import base64
 
 from crum import get_current_request
 from openedx.core.lib.request_utils import safe_get_host
-from common.lib.mandrill_client.client import MandrillClient
 from common.lib.hubspot_client.client import HubSpotClient
 from common.lib.hubspot_client.tasks import task_send_hubspot_email
 
