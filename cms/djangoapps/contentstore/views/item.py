@@ -427,16 +427,13 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
             # Note that the container view recursively adds headers into the preview fragment,
             # so only the "Pages" view requires that this extra wrapper be included.
-            display_label = xblock.display_name or xblock.scope_ids.block_type
-            if not xblock.display_name and xblock.scope_ids.block_type == 'html':
-                display_label = _("Text")
             if is_pages_view:
                 fragment.content = render_to_string('component.html', {
                     'xblock_context': context,
                     'xblock': xblock,
                     'locator': usage_key,
                     'preview': fragment.content,
-                    'label': display_label,
+                    'label': xblock.display_name or xblock.scope_ids.block_type,
                 })
         else:
             raise Http404
