@@ -3506,8 +3506,8 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         schedule = "Blub Glub"
         self.full_test_message['schedule'] = "Blub Glub"
         expected_message = (
-            f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: unknown "
-            "string format"
+            f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: Unknown "
+            "string format: Blub Glub"
         )
 
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
