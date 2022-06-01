@@ -22,8 +22,6 @@
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx/RateXBlock.git@2.0.1#egg=rate-xblock
     # via -r requirements/edx/testing.txt
--e common/lib/sandbox-packages
-    # via -r requirements/edx/testing.txt
 -e openedx/core/lib/xblock_builtin/xblock_discussion
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
@@ -203,6 +201,8 @@ code-annotations==1.3.0
     #   edx-enterprise
     #   edx-lint
     #   edx-toggles
+codejail-includes==1.0.0
+    # via -r requirements/edx/testing.txt
 contextlib2==21.6.0
     # via -r requirements/edx/testing.txt
 coreapi==2.3.3
@@ -1334,6 +1334,7 @@ six==1.16.0
     #   chem
     #   click-repl
     #   codejail
+    #   codejail-includes
     #   crowdsourcehinter-xblock
     #   edx-ace
     #   edx-auth-backends
