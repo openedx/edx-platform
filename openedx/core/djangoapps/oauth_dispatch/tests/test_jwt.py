@@ -6,6 +6,7 @@ import ddt
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
+from oauth2_provider import models as dot_models
 
 from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
