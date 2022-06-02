@@ -135,7 +135,7 @@ setup(
             'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',
         ],
         'openedx.dynamic_partition_generator': [
-            'enrollment_track = common.lib.xmodule.xmodule.partitions.enrollment_track_partition_generator:create_enrollment_track_partition',  # lint-amnesty, pylint: disable=line-too-long
+            'enrollment_track = xmodule.partitions.enrollment_track_partition_generator:create_enrollment_track_partition',  # lint-amnesty, pylint: disable=line-too-long
             'content_type_gating = openedx.features.content_type_gating.partitions:create_content_gating_partition'
         ],
     }
