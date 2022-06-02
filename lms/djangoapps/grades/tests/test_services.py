@@ -17,7 +17,6 @@ from lms.djangoapps.grades.services import GradesService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
-from ..config.waffle import REJECTED_EXAM_OVERRIDES_GRADE
 from ..constants import ScoreDatabaseTableEnum
 
 
@@ -68,11 +67,10 @@ class GradesServiceTests(ModuleStoreTestCase):
         self.mock_create_id.return_value = 1
         self.type_patcher = patch('lms.djangoapps.grades.api.set_event_transaction_type')
         self.mock_set_type = self.type_patcher.start()
-        self.flag_patcher = patch('lms.djangoapps.grades.config.waffle.waffle_flags')
-        self.mock_waffle_flags = self.flag_patcher.start()
-        self.mock_waffle_flags.return_value = {
-            REJECTED_EXAM_OVERRIDES_GRADE: MockWaffleFlag(True)
-        }
+        self.waffle_flag_patch = patch(
+            'lms.djangoapps.grades.config.waffle.REJECTED_EXAM_OVERRIDES_GRADE', MockWaffleFlag(True)
+        )
+        self.waffle_flag_patch.start()
 
     def tearDown(self):
         super().tearDown()
@@ -80,7 +78,7 @@ class GradesServiceTests(ModuleStoreTestCase):
         self.signal_patcher.stop()
         self.id_patcher.stop()
         self.type_patcher.stop()
-        self.flag_patcher.stop()
+        self.waffle_flag_patch.stop()
 
     def subsection_grade_to_dict(self, grade):
         return {
@@ -304,7 +302,5 @@ class GradesServiceTests(ModuleStoreTestCase):
 
     def test_should_override_grade_on_rejected_exam(self):
         assert self.service.should_override_grade_on_rejected_exam('course-v1:edX+DemoX+Demo_Course')
-        self.mock_waffle_flags.return_value = {
-            REJECTED_EXAM_OVERRIDES_GRADE: MockWaffleFlag(False)
-        }
-        assert not self.service.should_override_grade_on_rejected_exam('course-v1:edX+DemoX+Demo_Course')
+        with patch('lms.djangoapps.grades.config.waffle.REJECTED_EXAM_OVERRIDES_GRADE', MockWaffleFlag(False)):
+            assert not self.service.should_override_grade_on_rejected_exam('course-v1:edX+DemoX+Demo_Course')

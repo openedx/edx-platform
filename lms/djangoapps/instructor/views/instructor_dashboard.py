@@ -60,7 +60,6 @@ from openedx.core.djangoapps.discussions.utils import available_division_schemes
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from openedx.core.djangoapps.plugins.constants import ProjectType
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.url_utils import quote_slashes
@@ -119,7 +118,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         log.error("Unable to find course with course key %s while loading the Instructor Dashboard.", course_id)
         return HttpResponseServerError()
 
-    course = get_course_by_id(course_key, depth=0)
+    course = get_course_by_id(course_key, depth=None)
 
     access = {
         'admin': request.user.is_staff,
@@ -508,9 +507,6 @@ def _section_cohort_management(course, access):
         ),
         'cohorts_url': reverse('cohorts', kwargs={'course_key_string': str(course_key)}),
         'upload_cohorts_csv_url': reverse('add_users_to_cohorts', kwargs={'course_id': str(course_key)}),
-        'verified_track_cohorting_url': reverse(
-            'verified_track_cohorting', kwargs={'course_key_string': str(course_key)}
-        ),
     }
     return section_data
 
@@ -679,9 +675,7 @@ def _section_send_email(course, access):
     cohorts = []
     if is_course_cohorted(course_key):
         cohorts = get_course_cohorts(course)
-    course_modes = []
-    if not VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(course_key):
-        course_modes = CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False)
+    course_modes = CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',

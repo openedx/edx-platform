@@ -16,15 +16,17 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import normalize_repr
-from lms.djangoapps.bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
+from lms.djangoapps.bulk_email.api import create_course_email
+from lms.djangoapps.bulk_email.data import BulkEmailTargetChoices
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
+    generate_anonymous_ids,
     generate_certificates_for_students,
     get_instructor_task_history,
     get_running_instructor_tasks,
-    process_scheduled_tasks,
+    process_scheduled_instructor_tasks,
     regenerate_certificates,
     submit_bulk_course_email,
     submit_calculate_may_enroll_csv,
@@ -42,9 +44,9 @@ from lms.djangoapps.instructor_task.api import (
     submit_rescore_problem_for_student,
     submit_reset_problem_attempts_for_all_students,
     submit_reset_problem_attempts_in_entrance_exam,
-    generate_anonymous_ids
 )
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
+from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import PROGRESS, SCHEDULED, InstructorTask
 from lms.djangoapps.instructor_task.tasks import (
     export_ora2_data,
@@ -92,7 +94,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
                     in get_instructor_task_history(
                         TEST_COURSE_KEY,
                         usage_key=self.problem_url,
-                        task_type='rescore_problem'
+                        task_type=InstructorTaskTypes.RESCORE_PROBLEM
                     )]
         assert set(task_ids) == set(expected_ids)
         # make the same call using a non-existent task_type:
@@ -141,29 +143,45 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             submit_rescore_problem_for_all_students(request, problem_url)
 
     @ddt.data(
-        (normalize_repr(submit_rescore_problem_for_all_students), 'rescore_problem'),
+        (normalize_repr(submit_rescore_problem_for_all_students), InstructorTaskTypes.RESCORE_PROBLEM),
         (
             normalize_repr(submit_rescore_problem_for_all_students),
-            'rescore_problem_if_higher',
+            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
             {'only_if_higher': True}
         ),
-        (normalize_repr(submit_rescore_problem_for_student), 'rescore_problem', {'student': True}),
+        (normalize_repr(submit_rescore_problem_for_student), InstructorTaskTypes.RESCORE_PROBLEM, {'student': True}),
         (
             normalize_repr(submit_rescore_problem_for_student),
-            'rescore_problem_if_higher',
+            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
             {'student': True, 'only_if_higher': True}
         ),
-        (normalize_repr(submit_reset_problem_attempts_for_all_students), 'reset_problem_attempts'),
-        (normalize_repr(submit_delete_problem_state_for_all_students), 'delete_problem_state'),
-        (normalize_repr(submit_rescore_entrance_exam_for_student), 'rescore_problem', {'student': True}),
+        (normalize_repr(submit_reset_problem_attempts_for_all_students), InstructorTaskTypes.RESET_PROBLEM_ATTEMPTS),
+        (normalize_repr(submit_delete_problem_state_for_all_students), InstructorTaskTypes.DELETE_PROBLEM_STATE),
         (
             normalize_repr(submit_rescore_entrance_exam_for_student),
-            'rescore_problem_if_higher',
-            {'student': True, 'only_if_higher': True},
+            InstructorTaskTypes.RESCORE_PROBLEM,
+            {'student': True}
         ),
-        (normalize_repr(submit_reset_problem_attempts_in_entrance_exam), 'reset_problem_attempts', {'student': True}),
-        (normalize_repr(submit_delete_entrance_exam_state_for_student), 'delete_problem_state', {'student': True}),
-        (normalize_repr(submit_override_score), 'override_problem_score', {'student': True, 'score': 0})
+        (
+            normalize_repr(submit_rescore_entrance_exam_for_student),
+            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
+            {'student': True, 'only_if_higher': True}
+        ),
+        (
+            normalize_repr(submit_reset_problem_attempts_in_entrance_exam),
+            InstructorTaskTypes.RESET_PROBLEM_ATTEMPTS,
+            {'student': True}
+        ),
+        (
+            normalize_repr(submit_delete_entrance_exam_state_for_student),
+            InstructorTaskTypes.DELETE_PROBLEM_STATE,
+            {'student': True}
+        ),
+        (
+            normalize_repr(submit_override_score),
+            InstructorTaskTypes.OVERRIDE_PROBLEM_SCORE,
+            {'student': True, 'score': 0}
+        )
     )
     @ddt.unpack
     def test_submit_task(self, task_function, expected_task_type, params=None):
@@ -217,12 +235,15 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
     def _define_course_email(self):
         """Create CourseEmail object for testing."""
-        # TODO: convert to use bulk_email app's `create_course_email` API function and remove direct import and use of
-        # bulk_email model
-        course_email = CourseEmail.create(
+        email_recipient_groups = [
+            BulkEmailTargetChoices.SEND_TO_MYSELF,
+            BulkEmailTargetChoices.SEND_TO_STAFF,
+            BulkEmailTargetChoices.SEND_TO_LEARNERS
+        ]
+        course_email = create_course_email(
             self.course.id,
             self.instructor,
-            [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS],
+            email_recipient_groups,
             "Test Subject",
             "<p>This is a test message</p>"
         )
@@ -245,7 +266,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
     def _generate_scheduled_task(self, task_state=None):
         return InstructorTaskFactory.create(
-            task_type="bulk_course_email",
+            task_type=InstructorTaskTypes.BULK_COURSE_EMAIL,
             course_id=self.course.id,
             task_input="{'email_id': 1, 'to_option': ['myself']}",
             task_key="3416a75f4cea9109507cacd8e2f2aefc",
@@ -333,7 +354,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             submit_export_ora2_data(request, self.course.id)
 
             mock_submit_task.assert_called_once_with(
-                request, 'export_ora2_data', export_ora2_data, self.course.id, {}, '')
+                request, InstructorTaskTypes.EXPORT_ORA2_DATA, export_ora2_data, self.course.id, {}, '')
 
     def test_submit_export_ora2_submission_files(self):
         request = self.create_task_request(self.instructor)
@@ -344,7 +365,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
             mock_submit_task.assert_called_once_with(
                 request,
-                'export_ora2_submission_files',
+                InstructorTaskTypes.EXPORT_ORA2_SUBMISSION_FILES,
                 export_ora2_submission_files,
                 self.course.id,
                 {},
@@ -430,7 +451,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
             mock_submit_task.assert_called_once_with(
                 request,
-                'generate_anonymous_ids_for_course',
+                InstructorTaskTypes.GENERATE_ANONYMOUS_IDS_FOR_COURSE,
                 generate_anonymous_ids_for_course,
                 self.course.id,
                 {},
@@ -484,7 +505,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         ]
 
         with LogCapture() as log:
-            process_scheduled_tasks()
+            process_scheduled_instructor_tasks()
 
         mock_submit_scheduled_task.assert_called_once_with(due_instructor_task_schedule)
         log.check_present((LOG_PATH, "INFO", expected_messages[0]),)
@@ -504,6 +525,6 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         ]
 
         with LogCapture() as log:
-            process_scheduled_tasks()
+            process_scheduled_instructor_tasks()
 
         log.check_present((LOG_PATH, "ERROR", expected_messages[0]),)

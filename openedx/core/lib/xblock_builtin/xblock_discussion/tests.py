@@ -14,7 +14,7 @@ from xblock.fields import NO_CACHE_VALUE, UNIQUE_ID, ScopeIds
 from xblock.runtime import Runtime
 
 from openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion import DiscussionXBlock
-from safe_lxml import etree  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.lib.safe_lxml import etree
 
 
 def attribute_pair_repr(self):

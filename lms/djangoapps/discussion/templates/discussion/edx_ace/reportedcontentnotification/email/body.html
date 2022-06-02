@@ -1,0 +1,34 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load django_markup %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h2 style="font-weight: normal">
+                {% filter force_escape %}
+                    {% blocktrans %}
+                        {{ course_name }}: Reported content awaits review
+                    {% endblocktrans %}
+                {% endfilter %}
+            </h2>
+
+            <h4> <b> You are receiving this email because the following {{ content_type }} was reported for review </b> </h4>
+            <h3> <b> Post Title: {{ title }} </b> </h3>
+
+            {{ content_body }}
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Go to Discussion{% endblocktrans %}
+            {% endfilter %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=post_link%}
+
+            {% block google_analytics_pixel %}
+                <img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" style="display: block;"/>
+            {% endblock %}
+        </td>
+    </tr>
+</table>
+{% endblock %}

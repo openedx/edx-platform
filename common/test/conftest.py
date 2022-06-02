@@ -1,4 +1,6 @@
 """Code run by pylint before running any tests."""
-from safe_lxml import defuse_xml_libs
+
+# Patch the xml libs before anything else.
+from openedx.core.lib.safe_lxml import defuse_xml_libs
 
 defuse_xml_libs()

@@ -11,13 +11,14 @@ from uuid import uuid4
 import pytz
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.utils import translation
 from django.utils.encoding import smart_str
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from openedx_filters.learning.filters import CertificateRenderStarted
 from organizations import api as organizations_api
 from edx_django_utils.plugins import pluggable_override
 
@@ -84,7 +85,7 @@ def get_certificate_description(mode, certificate_type, platform_name, course_ke
                                          "{platform_name} and has completed all of the required tasks for this course "
                                          "under its guidelines. ").format(cert_type=certificate_type,
                                                                           platform_name=platform_name)
-        if not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'):
+        if settings.FEATURES.get('ENABLE_CERTIFICATES_IDV_REQUIREMENT'):
             certificate_type_description += _("A {cert_type} certificate also indicates that the "
                                               "identity of the learner has been checked and "
                                               "is valid.").format(cert_type=certificate_type)
@@ -252,7 +253,7 @@ def _update_course_context(request, context, course, platform_name):
     context['accomplishment_copy_course_name'] = accomplishment_copy_course_name
     course_number = course.display_coursenumber if course.display_coursenumber else course.number
     context['course_number'] = course_number
-    context['is_integrity_signature_enabled_for_course'] = settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE')
+    context['idv_enabled_for_certificates'] = settings.FEATURES.get('ENABLE_CERTIFICATES_IDV_REQUIREMENT')
     if context['organization_long_name']:
         # Translators:  This text represents the description of course
         context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_short_name}, '
@@ -511,7 +512,7 @@ def render_cert_by_uuid(request, certificate_uuid):
     test_func=lambda request: request.GET.get('preview', None)
 )
 @pluggable_override('OVERRIDE_RENDER_CERTIFICATE_VIEW')
-def render_html_view(request, course_id, certificate=None):
+def render_html_view(request, course_id, certificate=None):  # pylint: disable=too-many-statements
     """
     This public view generates an HTML representation of the specified user and course
     If a certificate is not available, we display a "Sorry!" screen instead
@@ -642,8 +643,30 @@ def render_html_view(request, course_id, certificate=None):
         # Track certificate view events
         _track_certificate_events(request, course, user, user_certificate)
 
+        try:
+            # .. filter_implemented_name: CertificateRenderStarted
+            # .. filter_type: org.openedx.learning.certificate.render.started.v1
+            context, custom_template = CertificateRenderStarted.run_filter(
+                context=context,
+                custom_template=custom_template,
+            )
+        except CertificateRenderStarted.RenderAlternativeInvalidCertificate as exc:
+            response = _render_invalid_certificate(
+                request,
+                course_id,
+                platform_name,
+                configuration,
+                cert_path=exc.template_name or INVALID_CERTIFICATE_TEMPLATE_PATH,
+            )
+        except CertificateRenderStarted.RedirectToPage as exc:
+            response = HttpResponseRedirect(exc.redirect_to)
+        except CertificateRenderStarted.RenderCustomResponse as exc:
+            response = exc.response
+        else:
+            response = _render_valid_certificate(request, context, custom_template)
+
         # Render the certificate
-        return _render_valid_certificate(request, context, custom_template)
+        return response
 
 
 def _get_catalog_data_for_course(course_key):

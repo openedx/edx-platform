@@ -76,7 +76,6 @@ from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
-from lms.djangoapps.grades.config.waffle import waffle_switch as grades_waffle_switch
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -355,7 +354,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.user_password)
         CourseEnrollment.enroll(self.user, course.id)
 
-        with self.assertNumQueries(203, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
+        with self.assertNumQueries(202, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(3):
                 url = reverse(
                     'courseware_section',
@@ -844,6 +843,17 @@ class ViewsTestCase(BaseViewsTestCase):
         assert response.status_code == 200
         self.assertContains(response, 'Financial Assistance Application')
 
+    @patch('lms.djangoapps.courseware.views.views._use_new_financial_assistance_flow', return_value=True)
+    @patch('lms.djangoapps.courseware.views.views.is_eligible_for_financial_aid', return_value=(False, 'error reason'))
+    def test_new_financial_assistance_page_course_ineligible(self, *args):
+        """
+        Test to verify the financial_assistance view against an ineligible course returns an error page.
+        """
+        url = reverse('financial_assistance_v2', args=['course-v1:test+TestX+Test_Course'])
+        response = self.client.get(url)
+        assert response.status_code == 200
+        self.assertContains(response, 'This course is not eligible for Financial Assistance for the following reason:')
+
     @ddt.data(([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, True, YESTERDAY),
               ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, True, None),
               ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, False, None),
@@ -903,10 +913,11 @@ class ViewsTestCase(BaseViewsTestCase):
 
         self.assertContains(response, str(course))
 
-    def _submit_financial_assistance_form(self, data, submit_url='submit_financial_assistance_request'):
+    def _submit_financial_assistance_form(self, data, submit_url='submit_financial_assistance_request',
+                                          referrer_url=None):
         """Submit a financial assistance request."""
         url = reverse(submit_url)
-        return self.client.post(url, json.dumps(data), content_type='application/json')
+        return self.client.post(url, json.dumps(data), content_type='application/json', HTTP_REFERER=referrer_url)
 
     @patch.object(views, 'create_zendesk_ticket', return_value=200)
     def test_submit_financial_assistance_request(self, mock_create_zendesk_ticket):
@@ -969,7 +980,12 @@ class ViewsTestCase(BaseViewsTestCase):
     @patch.object(
         views, 'create_financial_assistance_application', return_value=HttpResponse(status=status.HTTP_204_NO_CONTENT)
     )
-    def test_submit_financial_assistance_request_v2(self, create_application_mock):
+    @ddt.data(
+        ('/financial-assistance/course-v1:test+TestX+Test_Course/apply/', status.HTTP_204_NO_CONTENT),
+        ('/financial-assistance/course-v1:invalid+ErrorX+Invalid_Course/apply/', status.HTTP_400_BAD_REQUEST)
+    )
+    @ddt.unpack
+    def test_submit_financial_assistance_request_v2(self, referrer_url, expected_status, *args):
         form_data = {
             'username': self.user.username,
             'course': 'course-v1:test+TestX+Test_Course',
@@ -980,9 +996,11 @@ class ViewsTestCase(BaseViewsTestCase):
             'mktg-permission': False
         }
         response = self._submit_financial_assistance_form(
-            form_data, submit_url='submit_financial_assistance_request_v2'
+            form_data,
+            submit_url='submit_financial_assistance_request_v2',
+            referrer_url=referrer_url
         )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.status_code == expected_status
 
     @ddt.data(
         ({}, 400),
@@ -1503,8 +1521,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "Download Your Certificate")
 
     @ddt.data(
-        (True, 53),
-        (False, 53),
+        (True, 52),
+        (False, 52),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1517,14 +1535,14 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 61, 43),
-        (True, 53, 37)
+        (False, 60, 42),
+        (True, 52, 36)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
-        with override_waffle_switch(grades_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT), active=enable_waffle):
+        with override_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
             with self.assertNumQueries(
                 initial, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
             ), check_mongo_calls(2):
@@ -1537,6 +1555,7 @@ class ProgressPageTests(ProgressPageBaseTests):
                 ), check_mongo_calls(2):
                     self._get_progress_page()
 
+    @patch.dict(settings.FEATURES, {'ENABLE_CERTIFICATES_IDV_REQUIREMENT': True})
     @ddt.data(
         *itertools.product(
             (
@@ -1848,7 +1867,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         assert response.title == 'Your certificate will be available soon!'
 
     @ddt.data(True, False)
-    def test_no_certs_generated_and_not_verified(self, enable_integrity_signature):
+    def test_no_certs_generated_and_not_verified(self, enable_cert_idv_requirement):
         """
         Verify if the learner is not ID Verified, and the certs are not yet generated,
         but the learner is eligible, the get_cert_data would return cert status Unverified
@@ -1857,14 +1876,14 @@ class ProgressPageTests(ProgressPageBaseTests):
         CertificateGenerationCourseSetting(
             course_key=self.course.id, self_generation_enabled=True
         ).save()
-        with patch.dict(settings.FEATURES, ENABLE_INTEGRITY_SIGNATURE=enable_integrity_signature):
+        with patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_cert_idv_requirement):
             with patch(
                 'lms.djangoapps.certificates.api.certificate_downloadable_status',
                 return_value=self.mock_certificate_downloadable_status()
             ):
                 response = views.get_cert_data(self.user, self.course, CourseMode.VERIFIED, MagicMock(passed=True))
 
-        if enable_integrity_signature:
+        if not enable_cert_idv_requirement:
             assert response.cert_status == 'requesting'
             assert response.title == 'Congratulations, you qualified for a certificate!'
         else:

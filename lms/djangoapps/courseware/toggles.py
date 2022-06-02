@@ -2,12 +2,12 @@
 Toggles for courseware in-course experience.
 """
 
-from edx_toggles.toggles import LegacyWaffleFlagNamespace, SettingToggle
+from edx_toggles.toggles import SettingToggle, WaffleSwitch
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace for courseware waffle flags.
-WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
+WAFFLE_FLAG_NAMESPACE = 'courseware'
 
 
 # Waffle flag to enable the course exit page in the learning MFE.
@@ -19,10 +19,10 @@ WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
 # .. toggle_use_cases: open_edx, temporary
 # .. toggle_creation_date: 2020-10-02
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL.
+# .. toggle_warning: Also set settings.LEARNING_MICROFRONTEND_URL.
 # .. toggle_tickets: AA-188
 COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'microfrontend_course_exit_page', __name__
+    f'{WAFFLE_FLAG_NAMESPACE}.microfrontend_course_exit_page', __name__
 )
 
 # .. toggle_name: courseware.mfe_progress_milestones
@@ -33,10 +33,10 @@ COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE = CourseWaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-10-07
 # .. toggle_target_removal_date: none
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL.
+# .. toggle_warning: Also set settings.LEARNING_MICROFRONTEND_URL.
 # .. toggle_tickets: AA-371
 COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'mfe_progress_milestones', __name__
+    f'{WAFFLE_FLAG_NAMESPACE}.mfe_progress_milestones', __name__
 )
 
 # .. toggle_name: courseware.mfe_progress_milestones_streak_celebration
@@ -48,25 +48,24 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES = CourseWaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-02-16
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
+# .. toggle_warning: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.
 # .. toggle_tickets: AA-304
 COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'mfe_progress_milestones_streak_celebration', __name__
+    f'{WAFFLE_FLAG_NAMESPACE}.mfe_progress_milestones_streak_celebration', __name__
 )
 
 # .. toggle_name: courseware.mfe_progress_milestones_streak_discount_enabled
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables an engagement discount incentive message.
-# .. toggle_warnings: This flag depends on the streak celebration feature being enabled
+# .. toggle_warning: This flag depends on the streak celebration feature being enabled
 # .. toggle_use_cases: opt_out, open_edx
 # .. toggle_creation_date: 2021-08-26
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-950
 COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'streak_discount_enabled',
-    __name__,
+    f'{WAFFLE_FLAG_NAMESPACE}.streak_discount_enabled', __name__
 )
 
 
@@ -81,7 +80,7 @@ COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT = CourseWaffleFlag(
 # .. toggle_creation_date: 2021-02-09
 # .. toggle_target_removal_date: 2021-05-01
 COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'optimized_render_xblock', __name__
+    f'{WAFFLE_FLAG_NAMESPACE}.optimized_render_xblock', __name__
 )
 
 # .. toggle_name: COURSES_INVITE_ONLY
@@ -97,12 +96,17 @@ COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
 # .. toggle_status: unsupported
 COURSES_INVITE_ONLY = SettingToggle('COURSES_INVITE_ONLY', default=False)
 
+ENABLE_OPTIMIZELY_IN_COURSEWARE = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
+    'RET.enable_optimizely_in_courseware', __name__
+)
+
 
 def courseware_mfe_is_active() -> bool:
     """
     Should we serve the Learning MFE as the canonical courseware experience?
     """
     from lms.djangoapps.courseware.access_utils import in_preview_mode  # avoid a circular import
+
     # We only use legacy views for the Studio "preview mode" feature these days, while everyone else gets the MFE
     return not in_preview_mode()
 

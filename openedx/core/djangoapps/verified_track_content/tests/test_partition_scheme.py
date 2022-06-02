@@ -14,7 +14,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # 
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, UserPartition, ReadOnlyUserPartitionError  # lint-amnesty, pylint: disable=wrong-import-order
 
-from ..models import VerifiedTrackCohortedCourse
 from ..partition_scheme import ENROLLMENT_GROUP_IDS, EnrollmentTrackPartitionScheme, EnrollmentTrackUserPartition
 
 
@@ -33,11 +32,6 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
         groups = partition.groups
         assert 1 == len(groups)
         assert 'Audit' == groups[0].name
-
-    def test_using_verified_track_cohort(self):
-        VerifiedTrackCohortedCourse.objects.create(course_key=self.course.id, enabled=True).save()
-        partition = create_enrollment_track_partition(self.course)
-        assert 0 == len(partition.groups)
 
     def test_multiple_groups(self):
         create_mode(self.course, CourseMode.AUDIT, "Audit Enrollment Track", min_price=0)
@@ -162,11 +156,6 @@ class EnrollmentTrackPartitionSchemeTest(SharedModuleStoreTestCase):
             expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=-1)
         )
         assert 'Verified Enrollment Track' == self._get_user_group().name
-
-    def test_using_verified_track_cohort(self):
-        VerifiedTrackCohortedCourse.objects.create(course_key=self.course.id, enabled=True).save()
-        CourseEnrollment.enroll(self.student, self.course.id)
-        assert self._get_user_group() is None
 
     def _get_user_group(self):
         """

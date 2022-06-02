@@ -18,7 +18,7 @@ from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
-from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle_switch
+from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from ..course_grade import CourseGrade, ZeroCourseGrade
 from ..course_grade_factory import CourseGradeFactory
 from ..subsection_grade import ReadSubsectionGrade, ZeroSubsectionGrade
@@ -130,7 +130,7 @@ class TestCourseGradeFactory(GradeTestBase):
         with self.assertNumQueries(4), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-        num_queries = 41
+        num_queries = 42
         with self.assertNumQueries(num_queries), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
@@ -162,7 +162,7 @@ class TestCourseGradeFactory(GradeTestBase):
     @ddt.data(*itertools.product((True, False), (True, False)))
     @ddt.unpack
     def test_read_zero(self, assume_zero_enabled, create_if_needed):
-        with override_waffle_switch(waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT), active=assume_zero_enabled):
+        with override_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
             grade_factory = CourseGradeFactory()
             course_grade = grade_factory.read(self.request.user, self.course, create_if_needed=create_if_needed)
             if create_if_needed or assume_zero_enabled:

@@ -1,21 +1,24 @@
 """
 Logistration API View Tests
 """
+import socket
 from unittest.mock import patch
 from urllib.parse import urlencode
-import socket
+
 import ddt
 from django.conf import settings
+from django.test.utils import override_settings
 from django.urls import reverse
+from rest_framework import status
 from rest_framework.test import APITestCase
 
 from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
+from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @skip_unless_lms
@@ -87,16 +90,19 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         Returns the MFE context
         """
         return {
-            'currentProvider': current_provider,
-            'platformName': settings.PLATFORM_NAME,
-            'providers': self.get_provider_data(params) if params else [],
-            'secondaryProviders': [],
-            'finishAuthUrl': pipeline.get_complete_url(backend_name) if backend_name else None,
-            'errorMessage': None,
-            'registerFormSubmitButtonText': 'Create Account',
-            'syncLearnerProfileData': False,
-            'pipeline_user_details': {'email': 'test@test.com'} if add_user_details else {},
-            'countryCode': self.country_code
+            'context_data': {
+                'currentProvider': current_provider,
+                'platformName': settings.PLATFORM_NAME,
+                'providers': self.get_provider_data(params) if params else [],
+                'secondaryProviders': [],
+                'finishAuthUrl': pipeline.get_complete_url(backend_name) if backend_name else None,
+                'errorMessage': None,
+                'registerFormSubmitButtonText': 'Create Account',
+                'syncLearnerProfileData': False,
+                'pipeline_user_details': {'email': 'test@test.com'} if add_user_details else {},
+                'countryCode': self.country_code
+            },
+            'registration_fields': {},
         }
 
     @patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_AUTH': False})
@@ -168,7 +174,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         })
 
         response = self.client.get(self.url, self.query_params)
-        assert response.data['providers'] == provider_data
+        assert response.data['context_data']['providers'] == provider_data
 
     def test_user_country_code(self):
         """
@@ -177,7 +183,33 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         response = self.client.get(self.url, self.query_params)
 
         assert response.status_code == 200
-        assert response.data['countryCode'] == self.country_code
+        assert response.data['context_data']['countryCode'] == self.country_code
+
+    @override_settings(
+        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
+        REGISTRATION_EXTRA_FIELDS={"first_name": "optional", "city": "optional"}
+    )
+    def test_required_fields_not_configured(self):
+        """
+        Test that when no required fields are configured in REGISTRATION_EXTRA_FIELDS
+        settings, then API returns proper response.
+        """
+        response = self.client.get(self.url)
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['registration_fields']['fields'] == {}
+
+    @override_settings(
+        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
+        REGISTRATION_EXTRA_FIELDS={'state': 'required', 'last_name': 'required', 'first_name': 'required'},
+        REGISTRATION_FIELD_ORDER=['first_name', 'last_name', 'state'],
+    )
+    def test_field_order(self):
+        """
+        Test that order of fields
+        """
+        response = self.client.get(self.url)
+        assert response.status_code == status.HTTP_200_OK
+        assert list(response.data['registration_fields']['fields'].keys()) == ['first_name', 'last_name', 'state']
 
 
 @skip_unless_lms

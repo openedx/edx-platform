@@ -7,12 +7,14 @@ import datetime
 
 import pytz
 from django.conf import settings
-from django.utils.translation import gettext as _
 from django.urls import reverse
+from django.utils.translation import gettext as _
+
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.features.course_experience.course_tools import CourseTool
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.courseware.utils import _use_new_financial_assistance_flow
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.course_experience.course_tools import CourseTool
 
 
 class FinancialAssistanceTool(CourseTool):
@@ -86,4 +88,6 @@ class FinancialAssistanceTool(CourseTool):
         """
         Returns the URL for this tool for the specified course key.
         """
+        if _use_new_financial_assistance_flow(str(course_key)):
+            return reverse('financial_assistance_v2', args=[course_key])
         return reverse('financial_assistance')

@@ -33,7 +33,6 @@ from lms.djangoapps.courseware.access_response import (
 from lms.djangoapps.courseware.access_utils import (
     ACCESS_DENIED,
     ACCESS_GRANTED,
-    adjust_start_date,
     check_course_open_for_learner,
     check_start_date,
     debug,
@@ -67,7 +66,6 @@ from common.djangoapps.util.milestones_helpers import (
 from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import XModule  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -151,9 +149,6 @@ def has_access(user, action, obj, course_key=None):
 
     if isinstance(obj, ErrorBlock):
         return _has_access_error_desc(user, action, obj, course_key)
-
-    if isinstance(obj, XModule):
-        return _has_access_xmodule(user, action, obj, course_key)
 
     # NOTE: any descriptor access checkers need to go above this
     if isinstance(obj, XBlock):
@@ -698,29 +693,6 @@ def _dispatch(table, action, user, obj):
 
     raise ValueError("Unknown action for object type '{}': '{}'".format(
         type(obj), action))
-
-
-def _adjust_start_date_for_beta_testers(user, descriptor, course_key):
-    """
-    If user is in a beta test group, adjust the start date by the appropriate number of
-    days.
-
-    Arguments:
-       user: A django user.  May be anonymous.
-       descriptor: the XModuleDescriptor the user is trying to get access to, with a
-       non-None start date.
-
-    Returns:
-        A datetime.  Either the same as start, or earlier for beta testers.
-
-    NOTE: number of days to adjust should be cached to avoid looking it up thousands of
-    times per query.
-
-    NOTE: For now, this function assumes that the descriptor's location is in the course
-    the user is looking at.  Once we have proper usages and definitions per the XBlock
-    design, this should use the course the usage is in.
-    """
-    return adjust_start_date(user, descriptor.days_early_for_beta, descriptor.start, course_key)
 
 
 def _has_instructor_access_to_location(user, location, course_key=None):

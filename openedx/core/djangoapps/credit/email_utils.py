@@ -10,6 +10,7 @@ import urllib
 import uuid
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -19,14 +20,14 @@ from django.core.mail import EmailMessage, SafeMIMEText
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from eventtracking import tracker
+from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.edxmako.template import Template
-from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -225,7 +226,10 @@ def get_credit_provider_attribute_values(course_key, attribute_name):
 
     try:
         user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
-        response = ecommerce_api_client(user).courses(course_id).get(include_products=1)
+        api_url = urljoin(f"{get_ecommerce_api_base_url()}/", f"courses/{course_id}/")
+        response = get_ecommerce_api_client(user).get(api_url, params={"include_products": 1})
+        response.raise_for_status()
+        response = response.json() if response.content else None
     except Exception:  # pylint: disable=broad-except
         log.exception("Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
         return attribute_values

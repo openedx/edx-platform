@@ -12,11 +12,13 @@ import ddt
 import httpretty
 import pytest
 import pytz
+import requests
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
 from django.test import TestCase, override_settings
-from edx_rest_api_client import exceptions
-from edx_rest_api_client.client import EdxRestApiClient
+from edx_rest_api_client.auth import SuppliedJwtAuth
+from requests.exceptions import HTTPError
+from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import UserFactory
@@ -28,7 +30,6 @@ from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFa
 from openedx.core.djangoapps.programs import tasks
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -81,15 +82,17 @@ class AwardProgramCertificateTestCase(TestCase):
     """
     Test the award_program_certificate function
     """
-
     @httpretty.activate
-    def test_award_program_certificate(self):
+    @mock.patch('openedx.core.djangoapps.programs.tasks.get_credentials_api_base_url')
+    def test_award_program_certificate(self, mock_get_api_base_url):
         """
         Ensure the correct API call gets made
         """
+        mock_get_api_base_url.return_value = 'http://test-server/'
         student = UserFactory(username='test-username', email='test-email@email.com')
 
-        test_client = EdxRestApiClient('http://test-server', jwt='test-token')
+        test_client = requests.Session()
+        test_client.auth = SuppliedJwtAuth('test-token')
 
         httpretty.register_uri(
             httpretty.POST,
@@ -401,7 +404,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         Verify that a 429 error causes the task to fail and then retry.
         """
-        exception = exceptions.HttpClientError()
+        exception = HTTPError()
         exception.response = mock.Mock(status_code=429)
         mock_get_completed_programs.return_value = {1: 1, 2: 2}
         mock_award_program_certificate.side_effect = self._make_side_effect(
@@ -421,7 +424,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         Verify that a 404 error causes the task to fail but there is no retry.
         """
-        exception = exceptions.HttpNotFoundError()
+        exception = HTTPError()
         exception.response = mock.Mock(status_code=404)
         mock_get_completed_programs.return_value = {1: 1, 2: 2}
         mock_award_program_certificate.side_effect = self._make_side_effect(
@@ -441,7 +444,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         Verify that other 4XX errors cause task to fail but there is no retry.
         """
-        exception = exceptions.HttpClientError()
+        exception = HTTPError()
         exception.response = mock.Mock(status_code=418)
         mock_get_completed_programs.return_value = {1: 1, 2: 2}
         mock_award_program_certificate.side_effect = self._make_side_effect(
@@ -472,11 +475,14 @@ class PostCourseCertificateTestCase(TestCase):
         )
 
     @httpretty.activate
-    def test_post_course_certificate(self):
+    @mock.patch('openedx.core.djangoapps.programs.tasks.get_credentials_api_base_url')
+    def test_post_course_certificate(self, mock_get_api_base_url):
         """
         Ensure the correct API call gets made
         """
-        test_client = EdxRestApiClient('http://test-server', jwt='test-token')
+        mock_get_api_base_url.return_value = 'http://test-server/'
+        test_client = requests.Session()
+        test_client.auth = SuppliedJwtAuth('test-token')
 
         httpretty.register_uri(
             httpretty.POST,
@@ -651,12 +657,15 @@ class RevokeProgramCertificateTestCase(TestCase):
     """
 
     @httpretty.activate
-    def test_revoke_program_certificate(self):
+    @mock.patch('openedx.core.djangoapps.programs.tasks.get_credentials_api_base_url')
+    def test_revoke_program_certificate(self, mock_get_api_base_url):
         """
         Ensure the correct API call gets made
         """
+        mock_get_api_base_url.return_value = 'http://test-server/'
         test_username = 'test-username'
-        test_client = EdxRestApiClient('http://test-server', jwt='test-token')
+        test_client = requests.Session()
+        test_client.auth = SuppliedJwtAuth('test-token')
 
         httpretty.register_uri(
             httpretty.POST,
@@ -863,7 +872,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         """
         Verify that a 429 error causes the task to fail and then retry.
         """
-        exception = exceptions.HttpClientError()
+        exception = HTTPError()
         exception.response = mock.Mock(status_code=429)
         mock_get_inverted_programs.return_value = self.inverted_programs
         mock_get_certified_programs.return_value = [1, 2]
@@ -884,7 +893,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         """
         Verify that a 404 error causes the task to fail but there is no retry.
         """
-        exception = exceptions.HttpNotFoundError()
+        exception = HTTPError()
         exception.response = mock.Mock(status_code=404)
         mock_get_inverted_programs.return_value = self.inverted_programs
         mock_get_certified_programs.return_value = [1, 2]
@@ -905,7 +914,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         """
         Verify that other 4XX errors cause task to fail but there is no retry.
         """
-        exception = exceptions.HttpClientError()
+        exception = HTTPError()
         exception.response = mock.Mock(status_code=418)
         mock_get_inverted_programs.return_value = self.inverted_programs
         mock_get_certified_programs.return_value = [1, 2]
@@ -994,11 +1003,14 @@ class PostCourseCertificateConfigurationTestCase(TestCase):
         }
 
     @httpretty.activate
-    def test_post_course_certificate_configuration(self):
+    @mock.patch('openedx.core.djangoapps.programs.tasks.get_credentials_api_base_url')
+    def test_post_course_certificate_configuration(self, mock_get_api_base_url):
         """
         Ensure the correct API call gets made
         """
-        test_client = EdxRestApiClient('http://test-server', jwt='test-token')
+        mock_get_api_base_url.return_value = 'http://test-server/'
+        test_client = requests.Session()
+        test_client.auth = SuppliedJwtAuth('test-token')
 
         httpretty.register_uri(
             httpretty.POST,

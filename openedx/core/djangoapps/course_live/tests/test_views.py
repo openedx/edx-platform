@@ -71,7 +71,19 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         response = self._get()
         self.assertEqual(response.status_code, 200)
-        expected_data = {'pii_sharing_allowed': False, 'message': 'PII sharing is not allowed on this course'}
+        expected_data = {
+            'course_key': None,
+            'provider_type': '',
+            'enabled': True,
+            'lti_configuration': {
+                'lti_1p1_client_key': '',
+                'lti_1p1_client_secret': '',
+                'lti_1p1_launch_url': '',
+                'version': 'lti_1p1',
+                'lti_config': {}
+            },
+            'pii_sharing_allowed': False
+        }
         self.assertEqual(response.data, expected_data)
 
     def test_pii_sharing_is_allowed(self):
@@ -113,8 +125,8 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         self.assertEqual(lti_config['lti_1p1_client_secret'], lti_configuration.lti_1p1_client_secret)
         self.assertEqual(lti_config['lti_1p1_launch_url'], lti_configuration.lti_1p1_launch_url)
         self.assertEqual({
-            'pii_share_username': True,
-            'pii_share_email': True,
+            'pii_share_username': False,
+            'pii_share_email': False,
             'additional_parameters': {'custom_instructor_email': 'email@example.com'}
         }, lti_configuration.lti_config)
 
@@ -136,8 +148,8 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
                 'lti_1p1_launch_url': 'example.com',
                 'version': 'lti_1p1',
                 'lti_config': {
-                    'pii_share_email': True,
-                    'pii_share_username': True,
+                    'pii_share_email': False,
+                    'pii_share_username': False,
                     'additional_parameters': {
                         'custom_instructor_email': 'email@example.com'
                     },
@@ -180,8 +192,8 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
                 'lti_1p1_launch_url': 'example01.com',
                 'version': 'lti_1p1',
                 'lti_config': {
-                    'pii_share_username': True,
-                    'pii_share_email': True,
+                    'pii_share_username': False,
+                    'pii_share_email': False,
                     'additional_parameters': {
                         'custom_instructor_email':
                             'new_email@example.com'

@@ -21,7 +21,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseFinanceAdminRole  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
@@ -30,7 +29,7 @@ from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
+from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK
 from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
@@ -335,8 +334,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Test that, when the writable gradebook feature is enabled and
         deployed in another domain, a staff member can see it.
         """
-        waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
-        with override_waffle_flag(waffle_flag, active=True):
+        with override_waffle_flag(WRITABLE_GRADEBOOK, active=True):
             response = self.client.get(self.url)
 
         expected_gradebook_url = f'http://gradebook.local.edx.org/{self.course.id}'
@@ -357,8 +355,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Test that, when the writable gradebook feature is enabled and
         deployed in a subdirectory, a staff member can see it.
         """
-        waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
-        with override_waffle_flag(waffle_flag, active=True):
+        with override_waffle_flag(WRITABLE_GRADEBOOK, active=True):
             response = self.client.get(self.url)
 
         expected_gradebook_url = f'{settings.WRITABLE_GRADEBOOK_URL}/{self.course.id}'
@@ -393,8 +390,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         a message that the feature is only available for courses with small
         numbers of learners.
         """
-        waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
-        with override_waffle_flag(waffle_flag, active=True):
+        with override_waffle_flag(WRITABLE_GRADEBOOK, active=True):
             response = self.client.get(self.url)
         assert TestInstructorDashboard.GRADEBOOK_LEARNER_COUNT_MESSAGE not in response.content.decode('utf-8')
         self.assertContains(response, 'View Gradebook')

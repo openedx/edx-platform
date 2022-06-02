@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -79,7 +79,7 @@
 # d6910e756eb8532754192e6021dc9f83, 2014-2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -135,9 +135,9 @@
 # d6910e756eb8532754192e6021dc9f83, 2015
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from French (https://www.transifex.com/open-edx/teams/6205/fr/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2022.
 #
 # Translators:
 # laurentFUN <laurent.at.fun@gmail.com>, 2019
@@ -147,7 +147,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
-# Copyright (C) 2021 edX
+# Copyright (C) 2022 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -182,7 +182,7 @@
 # willyedoo <willyedoo@gmail.com>, 2019
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
-# Copyright (C) 2021 edX
+# Copyright (C) 2022 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -195,7 +195,7 @@
 # Eric Fortin, 2016
 # eric maginot <eric_maginot@hotmail.fr>, 2017
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
-# iderr <ibrahim@derraz.fr>, 2021
+# iderr <ibrahim@derraz.fr>, 2021-2022
 # INARES <contact@inares.org>, 2015
 # John Burke <johnb@matinee.co.uk>, 2018
 # Laetitia Pfaender <l.pfaender@learning-tribes.com>, 2016
@@ -216,15 +216,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-19 20:42+0000\n"
-"PO-Revision-Date: 2021-11-08 15:37+0000\n"
-"Last-Translator: iderr <ibrahim@derraz.fr>\n"
+"POT-Creation-Date: 2022-05-22 20:43+0000\n"
+"PO-Revision-Date: 2014-06-11 15:18+0000\n"
+"Last-Translator: iderr <ibrahim@derraz.fr>, 2021-2022\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
@@ -538,6 +538,7 @@ msgid "{num_points} point possible (graded, results hidden)"
 msgid_plural "{num_points} points possible (graded, results hidden)"
 msgstr[0] "{num_points} point possible (noté, résultats cachés)"
 msgstr[1] "{num_points} points possibles (noté, résultats cachés)"
+msgstr[2] "{num_points} points possibles (noté, résultats cachés)"
 
 #. Translators: {num_points} is the number of points possible (examples: 1, 3,
 #. 10).;
@@ -546,6 +547,7 @@ msgid "{num_points} point possible (ungraded, results hidden)"
 msgid_plural "{num_points} points possible (ungraded, results hidden)"
 msgstr[0] "{num_points} point possible (non noté, résultats cachés)"
 msgstr[1] "{num_points} points possibles (non noté, résultats cachés)"
+msgstr[2] "{num_points} points possibles (non noté, résultats cachés)"
 
 #. Translators: {num_points} is the number of points possible (examples: 1, 3,
 #. 10).;
@@ -554,6 +556,7 @@ msgid "{num_points} point possible (graded)"
 msgid_plural "{num_points} points possible (graded)"
 msgstr[0] "{num_points} point possible (graded)"
 msgstr[1] "{num_points} points possibles (graded)"
+msgstr[2] "{num_points} points possibles (graded)"
 
 #. Translators: {num_points} is the number of points possible (examples: 1, 3,
 #. 10).;
@@ -562,6 +565,7 @@ msgid "{num_points} point possible (ungraded)"
 msgid_plural "{num_points} points possible (ungraded)"
 msgstr[0] "{num_points} point possible (pas noté)"
 msgstr[1] "{num_points} points possibles (pas noté)"
+msgstr[2] "{num_points} points possibles (pas noté)"
 
 #. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -572,6 +576,7 @@ msgid "{earned}/{possible} point (graded)"
 msgid_plural "{earned}/{possible} points (graded)"
 msgstr[0] "{earned}/{possible} point (noté)"
 msgstr[1] "{earned}/{possible} points (noté)"
+msgstr[2] "{earned}/{possible} points (noté)"
 
 #. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -582,6 +587,7 @@ msgid "{earned}/{possible} point (ungraded)"
 msgid_plural "{earned}/{possible} points (ungraded)"
 msgstr[0] "{earned}/{possible} point (pas noté)"
 msgstr[1] "{earned}/{possible} points (pas noté)"
+msgstr[2] "{earned}/{possible} points (pas noté)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -2072,18 +2078,21 @@ msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
 msgstr[0] "%(value)s heure"
 msgstr[1] "%(value)s heures"
+msgstr[2] "%(value)s heures"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
 msgstr[0] "%(value)s minute"
 msgstr[1] "%(value)s minutes"
+msgstr[2] "%(value)s minutes"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s seconde"
 msgstr[1] "%(value)s secondes"
+msgstr[2] "%(value)s secondes"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid ""
@@ -2267,12 +2276,14 @@ msgid "there is currently {numVotes} vote"
 msgid_plural "there are currently {numVotes} votes"
 msgstr[0] "il y a actuellement {numVotes} vote"
 msgstr[1] "il y a actuellement {numVotes} votes"
+msgstr[2] "il y a actuellement {numVotes} votes"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
 msgstr[0] "{numVotes} Vote"
 msgstr[1] "{numVotes} Votes"
+msgstr[2] "{numVotes} Votes"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
@@ -2437,12 +2448,14 @@ msgid "{numResponses} other response"
 msgid_plural "{numResponses} other responses"
 msgstr[0] "{numResponses} autre réponse"
 msgstr[1] "{numResponses} autres réponses"
+msgstr[2] "{numResponses} autres réponses"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} response"
 msgid_plural "{numResponses} responses"
 msgstr[0] "{numResponses} réponse"
 msgstr[1] "{numResponses} réponses"
+msgstr[2] "{numResponses} réponses"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
@@ -2453,6 +2466,7 @@ msgid "Showing first response"
 msgid_plural "Showing first {numResponses} responses"
 msgstr[0] "Affiche la première réponse"
 msgstr[1] "Affiche les {numResponses} premières réponses"
+msgstr[2] "Affiche les {numResponses} premières réponses"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
@@ -2550,6 +2564,7 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minute"
 msgstr[1] "%d minutes"
+msgstr[2] "%d minutes"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
@@ -2561,6 +2576,7 @@ msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] "environ %d heure"
 msgstr[1] "environ %d heures"
+msgstr[2] "environ %d heures"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
@@ -2572,6 +2588,7 @@ msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d jour"
 msgstr[1] "%d jours"
+msgstr[2] "%d jours"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
@@ -2583,6 +2600,7 @@ msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d mois"
 msgstr[1] "%d mois"
+msgstr[2] "%d mois"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
@@ -2594,6 +2612,7 @@ msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d an"
 msgstr[1] "%d ans"
+msgstr[2] "%d ans"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Select a section or problem"
@@ -3071,6 +3090,7 @@ msgid " Member"
 msgid_plural " Members"
 msgstr[0] "Membre"
 msgstr[1] "Membres"
+msgstr[2] "Membres"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -3203,6 +3223,7 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] "{team_count} Équipe"
 msgstr[1] "{team_count} Équipes"
+msgstr[2] "{team_count} Équipes"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
@@ -3305,6 +3326,7 @@ msgid "Markdown Editing Help"
 msgstr "Aide de saisie Markdown"
 
 #: lms/static/js/Markdown.Editor.js cms/templates/js/asset-library.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 msgid "URL"
 msgstr "URL"
 
@@ -3318,6 +3340,7 @@ msgid "%(errorCount)s error found in form."
 msgid_plural "%(errorCount)s errors found in form."
 msgstr[0] "%(errorCount)s erreur trouvée dans le formulaire."
 msgstr[1] "%(errorCount)s erreurs trouvées dans le formulaire."
+msgstr[2] "%(errorCount)s erreurs trouvées dans le formulaire."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
@@ -3810,6 +3833,7 @@ msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "Voir %s cours"
 msgstr[1] "Voir %s cours"
+msgstr[2] "Voir %s cours"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -4007,18 +4031,21 @@ msgid "{numUsersAdded} learner has been added to this cohort. "
 msgid_plural "{numUsersAdded} learners have been added to this cohort. "
 msgstr[0] "{numUsersAdded} étudiant a été ajouté à cette cohorte."
 msgstr[1] "{numUsersAdded} étudiants ont été ajoutés à cette cohorte."
+msgstr[2] "{numUsersAdded} étudiants ont été ajoutés à cette cohorte."
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numMoved} learner was moved from {prevCohort}"
 msgid_plural "{numMoved} learners were moved from {prevCohort}"
 msgstr[0] "{numMoved} a été enlevé de {prevCohort}"
 msgstr[1] "{numMoved} étudiants ont été enlevés de {prevCohort}"
+msgstr[2] "{numMoved} étudiants ont été enlevés de {prevCohort}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numPresent} learner was already in the cohort"
 msgid_plural "{numPresent} learners were already in the cohort"
 msgstr[0] "{numPresent} étudiant était déjà dans la cohorte"
 msgstr[1] "{numPresent} étudiants étaient déjà dans la cohorte"
+msgstr[2] "{numPresent} étudiants étaient déjà dans la cohorte"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{email}"
@@ -4039,6 +4066,10 @@ msgstr[1] ""
 "{numPreassigned} étudiants étaient affectés d'avance dans cette cohorte. Ces"
 " étudiants seront automatiquement ajoutés à la cohorte quand ils "
 "s'inscriront à ce cours."
+msgstr[2] ""
+"{numPreassigned} étudiants étaient affectés d'avance dans cette cohorte. Ces"
+" étudiants seront automatiquement ajoutés à la cohorte quand ils "
+"s'inscriront à ce cours."
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Unknown username: {user}"
@@ -4053,6 +4084,7 @@ msgid "There was an error when trying to add learners:"
 msgid_plural "{numErrors} learners could not be added to this cohort:"
 msgstr[0] "Il y a eu une erreur lors de la tentative d'ajout d'étudiants"
 msgstr[1] "{numErrors} étudiants n'ont pas pu être ajoutés à cette cohorte :"
+msgstr[2] "{numErrors} étudiants n'ont pas pu être ajoutés à cette cohorte :"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "View all errors"
@@ -4125,39 +4157,6 @@ msgstr "Cohortes activées"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Cohortes désactivées"
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-"Ce cours utilise des cohortes automatiques pour les apprenants vérifiés. "
-"Vous ne pouvez pas désactiver les cohortes, et vous ne pouvez pas renommer "
-"la cohorte manuelle nommée'{verifiedCohortName}'. Pour changer la "
-"configuration des cohortes vérifiées,contacter votre gestionnaire de "
-"partenariat edX."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-"Ce cours a les cohortes automatiques activées pour les apprenants vérifiés, "
-"mais la cohorte requise n'existe pas. Vous devez créer manuellement une "
-"cohorte nommée '{verifiedCohortName}' pour que cette fonctionnalité "
-"fonctionne."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
-msgstr ""
-"Ce cours a les cohortes automatiques activées pour les apprenants vérifiés, "
-"mais les cohortes sont désactivées. Vous devez activer les cohortes pour que"
-" cette fonctionnalité fonctionne."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -5908,43 +5907,12 @@ msgstr "Score total"
 msgid "Bookmark this page"
 msgstr "Ajouter cette page aux favoris"
 
-#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
-msgid "Thank you for setting your course goal to {goal}!"
-msgstr "Merci d'avoir défini {goal} comme étant votre objectif de cours ! "
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr "Votre objectif a été mis à jour avec succès."
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr "Il y a eu une erreur lors de la mise à jour de votre objectif."
-
-#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "Tout déplier"
-
-#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "Tout replier"
-
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr "Montrer plus"
-
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr "Montrer moins"
-
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result found for \"{search_term}\""
 msgid_plural "{total_results} results found for \"{search_term}\""
 msgstr[0] "{total_results} résultat trouvé pour le \"{search_term}\""
 msgstr[1] "{total_results} résultats trouvés pour le \"{search_term}\""
+msgstr[2] "{total_results} résultats trouvés pour le \"{search_term}\""
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
@@ -6710,6 +6678,7 @@ msgid "Contains {count} group"
 msgid_plural "Contains {count} groups"
 msgstr[0] "Contient {count} groupe"
 msgstr[1] "Contient {count} groupes"
+msgstr[2] "Contient {count} groupes"
 
 #: cms/static/js/views/group_configuration_details.js
 #: cms/static/js/views/partition_group_details.js
@@ -6726,6 +6695,7 @@ msgid "Used in {count} location"
 msgid_plural "Used in {count} locations"
 msgstr[0] "Utilisé dans {count} emplacement"
 msgstr[1] "Utilisé dans {count} emplacements"
+msgstr[2] "Utilisé dans {count} emplacements"
 
 #. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
@@ -7630,6 +7600,11 @@ msgstr "Actions"
 msgid "Unscheduled"
 msgstr "Non programmé"
 
+#: cms/templates/js/discussion-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Discussion"
+msgstr "Discussion"
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -7759,6 +7734,7 @@ msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
 msgstr[0] "Afficher (%(num_comments)s) Commentaires"
 msgstr[1] "Afficher (%(num_comments)s) Commentaires"
+msgstr[2] "Afficher (%(num_comments)s) Commentaires"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a comment"
@@ -7869,10 +7845,6 @@ msgid "follow this post"
 msgstr "Suivre ce message"
 
 #: common/static/common/templates/discussion/templates.underscore
-msgid "post anonymously"
-msgstr "Écrire anonymement"
-
-#: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously to classmates"
 msgstr "Écrire anonymement aux autres participants"
 
@@ -7940,10 +7912,6 @@ msgstr ""
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"
 msgstr "Question"
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Discussion"
-msgstr "Discussion"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Endorse"
@@ -8337,6 +8305,14 @@ msgid "This catalog's courses:"
 msgstr "Les cours de ce catalogue : "
 
 #: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "Tout déplier"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "Tout replier"
+
+#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Date de début"
 
@@ -8420,6 +8396,14 @@ msgid ""
 msgstr ""
 "Pour recevoir des crédits pour votre problème, cliquez sur « Soumettre » "
 "pour chaque exercice avant de sélectionner « Terminer mon examen »."
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "Montrer plus"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "Montrer moins"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -8805,6 +8789,7 @@ msgid "(contains %(student_count)s student)"
 msgid_plural "(contains %(student_count)s students)"
 msgstr[0] "(contient %(student_count)s étudiant)"
 msgstr[1] "(contient %(student_count)s étudiants)"
+msgstr[2] "(contient %(student_count)s étudiants)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid ""
@@ -9014,6 +8999,7 @@ msgid "Course"
 msgid_plural "Courses"
 msgstr[0] "Cours"
 msgstr[1] "Cours"
+msgstr[2] "Cours"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "Completed"
@@ -9083,15 +9069,6 @@ msgstr "Félicitations !"
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr "Votre Parcours d'apprentissage"
-
-#: lms/templates/learner_dashboard/program_details_tab_view.underscore
-#: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"To complete the program, you must earn a verified certificate for each "
-"course."
-msgstr ""
-"Afin de compléter ce programme, vous devez obtenir un certificat vérifié "
-"pour chacun de ces cours."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -10026,6 +10003,7 @@ msgid "Load next {num_items} result"
 msgid_plural "Load next {num_items} results"
 msgstr[0] "Charger {num_items} resultat, le prochain"
 msgstr[1] "Charger les {num_items} prochains resultats"
+msgstr[2] "Charger les {num_items} prochains resultats"
 
 #: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
@@ -10844,6 +10822,10 @@ msgstr "Date"
 msgid "Post"
 msgstr "Poster"
 
+#: cms/templates/js/discussion-editor.underscore
+msgid "Enable discussion"
+msgstr "Activer la discussion"
+
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
 msgstr "Date de rendu :"
@@ -11077,6 +11059,7 @@ msgstr "Nouveau %(item_type)s"
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear"
 msgstr "Effacer"
@@ -11086,6 +11069,7 @@ msgstr "Effacer"
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Effacer la valeur"
@@ -11340,24 +11324,6 @@ msgstr ""
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
 "Learners do not see whether their answers to assessments were correct or "
-"incorrect, nor the score received, until after the course end date has "
-"passed."
-msgstr ""
-"Les étudiants ne peuvent voir ni si leurs réponses aux évaluations étaient "
-"justes ou fausses ni la note reçue, avant que la date de fin du cours ne "
-"soit passée. "
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"If the course does not have an end date, learners always see their scores "
-"when they submit answers to assessments."
-msgstr ""
-"Si le cours ne comporte aucune date de fin, les étudiants pourront toujours "
-"voir les notes obtenues après évaluation."
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"Learners do not see whether their answers to assessments were correct or "
 "incorrect, nor the score received, until after the due date for the "
 "subsection has passed."
 msgstr ""
@@ -11518,25 +11484,27 @@ msgstr "Types d'examen"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This subsection was released to learners as a special exam, but was reverted"
-" back to a basic exam. You may not configure it as a special exam now. "
-"Contact edX Support for assistance."
+"This subsection was released to learners as a proctored exam, but was "
+"reverted back to a basic or timed exam. You may not configure it as a "
+"proctored exam now. Contact edX Support for assistance."
 msgstr ""
-"Cette sous-section a été diffusée aux apprenants au titre d'examen spécial, "
-"mais a été requalifiée en examen de base. Vous ne pouvez plus la configurer "
-"désormais en examen spécial. Contactez le Support edX pour une aide."
+"Cette sous-section a été communiquée aux apprenants en tant qu&#39;examen "
+"surveillé, mais est redevenue un examen de base ou chronométré. Vous ne "
+"pouvez pas le configurer en tant qu&#39;examen surveillé maintenant. "
+"Contactez le support edX pour obtenir de l&#39;aide."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This special exam has been released to learners. You may not convert it to "
-"another type of special exam. You may revert this subsection back to being a"
-" basic exam by selecting 'None', but you will NOT be able to configure it as"
-" a special exam in the future."
+"This proctored exam has been released to learners. You may not convert it to"
+" another type of special exam. You may revert this subsection back to being "
+"a basic exam by selecting 'None', or a timed exam, but you will NOT be able "
+"to configure it as a proctored exam in the future."
 msgstr ""
-"Cet examen spécial a été diffusé aux apprenants. Vous ne pouvez pas le "
-"transformer en un autre type d'examen spécial. Vous pouvez repasser cette "
-"sous-section en examen de base en sélectionnant 'Aucun', mais vous ne "
-"pourrez PAS la requalifier plus tard en examen spécial."
+"Cet examen surveillé a été mis à la disposition des apprenants. Vous ne "
+"pouvez pas le convertir en un autre type d&#39;examen spécial. Vous pouvez "
+"redonner à cette sous-section un examen de base en sélectionnant "
+"&quot;Aucun&quot; ou un examen chronométré, mais vous ne pourrez PAS le "
+"configurer en tant qu&#39;examen surveillé à l&#39;avenir."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"

@@ -25,7 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.44.4
+edx-enterprise==3.49.7
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
@@ -50,10 +50,6 @@ pymongo<3.11
 
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
-
-# transifex-client==0.14.2(latest) requires python-slugify<5.0.0 for Python 2.0 support.
-# This can be removed once transifex-client drops support for Python 2.0 and removes the required constraint.
-python-slugify<5.0.0
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
@@ -84,7 +80,3 @@ scipy<1.8.0
 # See issue: https://github.com/sphinx-contrib/openapi/issues/123
 mistune<2.0.0
 
-# django-celery-results==2.3.0 requires psycopg2 as dependency but hasn't explicitly added in package requirements.
-# The PR https://github.com/celery/django-celery-results/pull/292 fixing this issue has been merged but
-# new version hasn't been released yet with the fix so pinning the version until django-celery-results>2.3.0 is out.
-django-celery-results<2.3.0

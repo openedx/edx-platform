@@ -2244,8 +2244,17 @@ class CreateCommentTest(
             parent_id=parent_id
         )
         data = self.minimal_data.copy()
+        editable_fields = [
+            "abuse_flagged",
+            "anonymous",
+            "edit_reason_code",
+            "raw_body",
+            "voted",
+        ]
         if parent_id:
             data["parent_id"] = parent_id
+        else:
+            editable_fields.insert(3, "endorsed")
 
         _set_course_discussion_blackout(course=self.course, user_id=self.user.id)
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_MODERATOR)
@@ -2271,14 +2280,7 @@ class CreateCommentTest(
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": [
-                "abuse_flagged",
-                "anonymous",
-                "edit_reason_code",
-                "endorsed",
-                "raw_body",
-                "voted",
-            ],
+            "editable_fields": editable_fields,
             "child_count": 0,
             "can_delete": True,
             "anonymous": False,

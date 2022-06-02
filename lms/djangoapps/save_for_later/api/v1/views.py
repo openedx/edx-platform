@@ -86,15 +86,17 @@ class CourseSaveForLaterApiView(APIView):
             return Response({'error_code': 'course-not-found'}, status=404)
 
         SavedCourse.objects.update_or_create(
-            user_id=user.id,
             email=email,
             course_id=course_id,
-            org_img_url=org_img_url,
-            marketing_url=marketing_url,
-            weeks_to_complete=weeks_to_complete,
-            min_effort=min_effort,
-            max_effort=max_effort,
-            reminder_email_sent=False,
+            defaults={
+                'user_id': user.id,
+                'org_img_url': org_img_url,
+                'marketing_url': marketing_url,
+                'weeks_to_complete': weeks_to_complete,
+                'min_effort': min_effort,
+                'max_effort': max_effort,
+                'reminder_email_sent': False,
+            }
         )
         course_data = {
             'course': course,
@@ -160,9 +162,12 @@ class ProgramSaveForLaterApiView(APIView):
 
         program = get_programs(uuid=program_uuid)
         SavedProgram.objects.update_or_create(
-            user_id=user.id,
             email=email,
             program_uuid=program_uuid,
+            defaults={
+                'user_id': user.id,
+                'reminder_email_sent': False,
+            }
         )
         if program:
             program_data = {
