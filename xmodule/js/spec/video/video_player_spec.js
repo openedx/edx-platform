@@ -4,7 +4,7 @@
     'use strict';
 
     require(
-['video/03_video_player.js', 'hls', 'underscore'],
+['../../src/video/03_video_player.js', 'hls', 'underscore'],
 function(VideoPlayer, HLS, _) {
     describe('VideoPlayer', function() {
         var STATUS = window.STATUS,

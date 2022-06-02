@@ -9,7 +9,7 @@
 // to the server.
 
 import BookmarkButton from 'course_bookmarks/js/views/bookmark_button';
-import {markBlocksCompletedOnViewIfNeeded} from '../../../../../../../../lms/static/completion/js/CompletionOnViewService.js';
+import {markBlocksCompletedOnViewIfNeeded} from '../../../../../lms/static/completion/js/CompletionOnViewService.js';
 
 var SEEN_COMPLETABLES = new Set();
 

@@ -2,7 +2,7 @@
     'use strict';
 
     require(
-['video/01_initialize.js'],
+['../../src/video/01_initialize.js'],
 function(Initialize) {
     describe('Initialize', function() {
         var state = {};
