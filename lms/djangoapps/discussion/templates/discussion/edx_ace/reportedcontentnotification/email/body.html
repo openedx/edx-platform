@@ -18,7 +18,7 @@
             <h4> <b> You are receiving this email because the following {{ content_type }} was reported for review </b> </h4>
             <h3> <b> Post Title: {{ title }} </b> </h3>
 
-            {{ comment_body }}
+            {{ content_body }}
 
             {% filter force_escape %}
                 {% blocktrans asvar course_cta_text %}Go to Discussion{% endblocktrans %}
