@@ -4,7 +4,7 @@ import EditHelpers from 'js/spec_helpers/edit_helpers';
 import ContainerView from 'js/views/container';
 import XBlockInfo from 'js/models/xblock_info';
 import 'jquery.simulate';
-import 'xmodule/js/src/xmodule';
+import '../../xmodule/js/src/xmodule';
 import 'cms/js/main';
 import 'xblock/cms.runtime.v1';
 

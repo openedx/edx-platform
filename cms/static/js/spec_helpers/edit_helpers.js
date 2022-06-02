@@ -8,7 +8,7 @@ import TemplateHelpers from 'common/js/spec_helpers/template_helpers';
 import modal_helpers from 'js/spec_helpers/modal_helpers';
 import EditXBlockModal from 'js/views/modals/edit_xblock';
 import ComponentTemplates from 'js/collections/component_template';
-import XModule from 'xmodule/js/src/xmodule';
+import XModule from '../../xmodule/js/src/xmodule';
 import 'cms/js/main';
 import 'xblock/cms.runtime.v1';
 

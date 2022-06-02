@@ -4,7 +4,7 @@ import ViewUtils from 'common/js/components/utils/view_utils';
 import edit_helpers from 'js/spec_helpers/edit_helpers';
 import ModuleEdit from 'js/views/module_edit';
 import ModuleModel from 'js/models/module_info';
-import 'xmodule/js/src/xmodule';
+import '../../xmodule/js/src/xmodule';
 
 describe('ModuleEdit', function() {
     beforeEach(function() {
