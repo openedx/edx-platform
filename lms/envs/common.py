@@ -4921,15 +4921,10 @@ HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 
 ############### Settings for the ace_common plugin #################
-ACE_ENABLED_CHANNELS = ['django_email']
-ACE_ENABLED_POLICIES = ['bulk_email_optout']
-ACE_CHANNEL_SAILTHRU_DEBUG = True
-ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = None
-ACE_ROUTING_KEY = 'edx.lms.core.default'
-ACE_CHANNEL_DEFAULT_EMAIL = 'django_email'
-ACE_CHANNEL_TRANSACTIONAL_EMAIL = 'django_email'
-ACE_CHANNEL_SAILTHRU_API_KEY = ""
-ACE_CHANNEL_SAILTHRU_API_SECRET = ""
+# Note that all settings are actually defined by the plugin
+# pylint: disable=wrong-import-position
+from openedx.core.djangoapps.ace_common.settings import common as ace_common_settings
+ACE_ROUTING_KEY = ace_common_settings.ACE_ROUTING_KEY
 
 ############### Settings swift #####################################
 SWIFT_USERNAME = None
