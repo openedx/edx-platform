@@ -7,7 +7,8 @@ from logging import getLogger
 from django.core.management.base import BaseCommand
 from submissions.models import Submission
 
-from common.lib.mandrill_client.client import MandrillClient
+from common.lib.hubspot_client.client import HubSpotClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 from lms.djangoapps.onboarding.helpers import get_email_pref_on_demand_course, get_user_anonymous_id
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.ondemand_email_preferences.helpers import get_my_account_link
@@ -228,24 +229,28 @@ def check_for_last_module_submission(oras_list, anonymous_user):
 
 def send_reminder_email(user, course, course_deadline):
     """
-        Send weekly emails for completed module
+    Send weekly emails for completed module
 
-        Parameters:
-        user: user, whom we are sending emails.
-        course: Course for which we want to send email.
-        course_deadline: Suggested deadline by which user must complete course.
-
-        """
-    template = MandrillClient.ON_DEMAND_REMINDER_EMAIL_TEMPLATE
+    Parameters:
+    user: user, whom we are sending emails.
+    course: Course for which we want to send email.
+    course_deadline: Suggested deadline by which user must complete course.
+    """
     next_chapter_url = get_nth_chapter_link(course, chapter_index=0)
     context = {
-        'first_name': user.first_name,
-        'course_name': course.display_name,
-        'deadline_date': str(course_deadline),
-        'course_url': next_chapter_url,
-        'email_address': user.email,
-        'unsubscribe_link': get_my_account_link(course.id)
+        'emailId': HubSpotClient.ON_DEMAND_REMINDER_EMAIL_TEMPLATE,
+        'message': {
+            'to': user.email
+        },
+        'customProperties': {
+            'first_name': user.first_name,
+            'course_name': course.display_name,
+            'deadline_date': str(course_deadline),
+            'course_url': next_chapter_url,
+            'email_address': user.email,
+            'unsubscribe_link': get_my_account_link(course.id)
+        }
     }
 
-    MandrillClient().send_mail(template, user.email, context)
+    task_send_hubspot_email.delay(context)
     log.info("Emailing to %s Task Completed for course reminder", user.email)
