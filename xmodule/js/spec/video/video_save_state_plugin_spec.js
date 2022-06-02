@@ -1,4 +1,4 @@
-import * as Time from 'time.js';
+import * as Time from '../../src/time.js';
 
 (function(undefined) {
     'use strict';

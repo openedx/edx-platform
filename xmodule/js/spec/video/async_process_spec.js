@@ -1,6 +1,6 @@
 (function(require) {
     require(
-['video/00_async_process.js'],
+['../../../src/video/00_async_process.js'],
 function(AsyncProcess) {
     var getArrayNthLength = function(n, multiplier) {
             var result = [],
