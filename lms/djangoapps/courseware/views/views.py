@@ -199,18 +199,6 @@ REQUESTING_CERT_DATA = CertData(
     certificate_available_date=None
 )
 
-UNVERIFIED_CERT_DATA = CertData(
-    CertificateStatuses.unverified,
-    _('Certificate unavailable'),
-    _(
-        'You have not received a certificate because you do not have a current {platform_name} '
-        'verified identity.'
-    ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
-    download_url=None,
-    cert_web_view_url=None,
-    certificate_available_date=None
-)
-
 
 def _earned_but_not_available_cert_data(cert_downloadable_status):
     return CertData(
@@ -230,6 +218,23 @@ def _downloadable_cert_data(download_url=None, cert_web_view_url=None):
         _("You've earned a certificate for this course."),
         download_url=download_url,
         cert_web_view_url=cert_web_view_url,
+        certificate_available_date=None
+    )
+
+
+def _unverified_cert_data():
+    """
+        platform_name is dynamically updated in multi-tenant installations
+    """
+    return CertData(
+        CertificateStatuses.unverified,
+        _('Certificate unavailable'),
+        _(
+            'You have not received a certificate because you do not have a current {platform_name} '
+            'verified identity.'
+        ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
+        download_url=None,
+        cert_web_view_url=None,
         certificate_available_date=None
     )
 
@@ -1176,14 +1181,11 @@ def _certificate_message(student, course, enrollment_mode):  # lint-amnesty, pyl
     if cert_downloadable_status['is_generating']:
         return GENERATING_CERT_DATA
 
-    if cert_downloadable_status['is_unverified']:
-        return UNVERIFIED_CERT_DATA
+    if cert_downloadable_status['is_unverified'] or _missing_required_verification(student, enrollment_mode):
+        return _unverified_cert_data()
 
     if cert_downloadable_status['is_downloadable']:
         return _downloadable_certificate_message(course, cert_downloadable_status)
-
-    if _missing_required_verification(student, enrollment_mode):
-        return UNVERIFIED_CERT_DATA
 
     return REQUESTING_CERT_DATA
 
