@@ -1089,8 +1089,9 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/testing.txt
     #   olxcleaner
-pylint==2.14.0
+pylint==2.13.9
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-lint
     #   pylint-celery
@@ -1469,10 +1470,6 @@ tomli==2.0.1
     #   pep517
     #   pylint
     #   pytest
-tomlkit==0.11.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   pylint
 tox==3.25.0
     # via
     #   -r requirements/edx/testing.txt
