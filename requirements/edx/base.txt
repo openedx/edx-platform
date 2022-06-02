@@ -639,9 +639,9 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==4.1.0
+lti-consumer-xblock==4.1.1
     # via -r requirements/edx/base.in
-lxml==4.8.0
+lxml==4.9.0
     # via
     #   -r requirements/edx/base.in
     #   edxval
@@ -897,7 +897,7 @@ random2==1.0.1
     # via -r requirements/edx/base.in
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
-redis==4.3.1
+redis==4.3.3
     # via -r requirements/edx/base.in
 regex==2022.4.24
     # via nltk
