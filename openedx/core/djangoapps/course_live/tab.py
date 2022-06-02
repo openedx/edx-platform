@@ -4,8 +4,8 @@ Configurations to render Course Live Tab
 from django.utils.translation import gettext_lazy
 from lti_consumer.models import LtiConfiguration
 
-from common.lib.xmodule.xmodule.course_module import CourseBlock
-from common.lib.xmodule.xmodule.tabs import TabFragmentViewMixin
+from xmodule.course_module import CourseBlock
+from xmodule.tabs import TabFragmentViewMixin
 from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.course_live.config.waffle import ENABLE_COURSE_LIVE
 from openedx.core.djangoapps.course_live.models import CourseLiveConfiguration
