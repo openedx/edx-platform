@@ -1,4 +1,4 @@
-12. Added grant type in JWT payload
+13. Added grant type in JWT payload
 -----------------------------------------
 
 Status
