@@ -54,7 +54,8 @@ from track.event_transaction_utils import (
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from openedx.features.course_card.helpers import get_related_card_id
-from common.lib.mandrill_client.client import MandrillClient
+from common.lib.hubspot_client.client import HubSpotClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 
 log = logging.getLogger(__name__)
 
@@ -173,18 +174,18 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
             email_params['email_address'] = student_email
 
             email_context = {
-                'course_name': email_params['display_name'],
-                'site_name': email_params['site_name'],
-                'registration_url': email_params['registration_url'],
-                'email_address': student_email,
+                'emailId': HubSpotClient.COURSE_INVITATION_NON_REGISTERED_USERS,
+                'message': {
+                    'to': student_email
+                },
+                'customProperties': {
+                    'course_name': email_params['display_name'],
+                    'site_name': email_params['site_name'],
+                    'registration_url': email_params['registration_url'],
+                    'email_address': student_email,
+                }
             }
-
-            # TODO: FIX MANDRILL EMAILS
-            # MandrillClient().send_mail(
-            #     MandrillClient.COURSE_INVITATION_ONLY_REGISTER_TEMPLATE,
-            #     student_email,
-            #     email_context
-            # )
+            task_send_hubspot_email.delay(email_context)
 
     after_state = EmailEnrollmentState(course_id, student_email)
 

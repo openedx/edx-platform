@@ -13,7 +13,7 @@ from boto.ses.exceptions import (
     SESLocalAddressCharacterError,
     SESIllegalAddressError,
 )
-from common.lib.mandrill_client.client import MandrillClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 from lms.djangoapps.courseware.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 
@@ -29,14 +29,14 @@ SINGLE_EMAIL_FAILURE_ERRORS = (
 )
 
 
-def send_course_notification_email(course, template_name, context, to_list=None):
+def send_course_notification_email(course, template_id, context, to_list=None):
 
     """
     Sends an email to a list of recipients.
 
     Inputs are:
       * `course`: notification about this course.
-      * `template_name`: slug of the Mandrill template which is to be used.
+      * `template_id`: Id of the HubSpot template which is to be used.
       * `context`: context for template
       * `to_list`: list of recipients, if list is not provided then the email will be send to all enrolled students.
 
@@ -73,9 +73,15 @@ def send_course_notification_email(course, template_name, context, to_list=None)
                 email
             )
             log.info("Just before sending email")
+            email_context = {
+                'emailId': template_id,
+                'message': {
+                    'to': email
+                },
+                'customProperties': context
+            }
 
-            # TODO: FIX MANDRILL EMAILS
-            # MandrillClient().send_mail(template_name, email, context)
+            task_send_hubspot_email.delay(email_context)
             log.info("After sending email")
 
             recipients_info[email] += 1

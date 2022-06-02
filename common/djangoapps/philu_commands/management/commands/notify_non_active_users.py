@@ -7,7 +7,8 @@ from logging import getLogger
 from django.core.management.base import BaseCommand
 from pytz import utc
 
-from common.lib.mandrill_client.client import MandrillClient
+from common.lib.hubspot_client.client import HubSpotClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 from courseware.models import StudentModule
 from lms.djangoapps.branding import get_visible_courses
 from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
@@ -76,12 +77,17 @@ class Command(BaseCommand):
                     course_name = course.display_name
                     course_url = get_course_first_chapter_link(course=course)
 
-                    template = MandrillClient.COURSE_ACTIVATION_REMINDER_TEMPLATE
                     context = {
-                        'first_name': first_name,
-                        'course_name': course_name,
-                        'course_url': course_url
+                        'emailId': HubSpotClient.COURSE_ACTIVATION_REMINDER_NON_ACTIVE_USERS,
+                        'message': {
+                            'to': non_active_user.email
+                        },
+                        'customProperties': {
+                            'first_name': first_name,
+                            'course_name': course_name,
+                            'course_url': course_url
+                        }
                     }
 
-                    MandrillClient().send_mail(template, non_active_user.email, context)
+                    task_send_hubspot_email.delay(context)
                     log.info("Emailing to %s Task Completed", non_active_user.email)
