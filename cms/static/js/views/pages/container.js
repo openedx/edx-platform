@@ -326,10 +326,11 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 useNewVideoEditor = this.$('.xblock-header-primary').attr("use-new-editor-video"),
                 useNewProblemEditor = this.$('.xblock-header-primary').attr("use-new-editor-problem");
 
-                //find the block type in the locator
-                var matchBlockTypeFromLocator = /\@(.*?)\+/;
-                var blockType = data.locator.match(matchBlockTypeFromLocator);
-
+                //find the block type in the locator if availible
+                if(data.hasOwnProperty('locator')){
+                    var matchBlockTypeFromLocator = /\@(.*?)\+/;
+                    var blockType = data.locator.match(matchBlockTypeFromLocator);
+                }
                 if((useNewTextEditor === "True" && blockType.includes("html")) ||
                     (useNewVideoEditor === "True" && blockType.includes("video"))||
                     (useNewProblemEditor === "True" && blockType.includes("problem"))
