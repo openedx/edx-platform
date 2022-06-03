@@ -3081,9 +3081,6 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
 
-    # GenZ Custom Features
-    'openedx.features.genz_features',
-
     'lms.djangoapps.experiments',
 
     # DRF filters
@@ -3133,6 +3130,21 @@ INSTALLED_APPS = [
     # permissions needs to be listed as an LMS app or the script will fail.
     'user_tasks',
 ]
+
+######################### GENPLUS APPS #################################
+
+GENPLUS_INSTALLED_APPS = [
+    # genplus core app
+    'openedx.features.genplus_features.genplus',
+
+    # genplus learning app
+    'openedx.features.genplus_features.genplus_learning',
+
+    # genplus teach app
+    'openedx.features.genplus_features.genplus_teach',
+]
+
+INSTALLED_APPS.extend(GENPLUS_INSTALLED_APPS)
 
 ######################### CSRF #########################################
 
