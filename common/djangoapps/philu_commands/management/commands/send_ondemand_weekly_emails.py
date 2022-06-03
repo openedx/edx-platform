@@ -7,7 +7,8 @@ from logging import getLogger
 from django.core.management.base import BaseCommand
 from submissions.models import Submission
 
-from common.lib.mandrill_client.client import MandrillClient
+from common.lib.hubspot_client.client import HubSpotClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 from lms.djangoapps.onboarding.helpers import get_email_pref_on_demand_course, get_user_anonymous_id
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.ondemand_email_preferences.helpers import get_my_account_link
@@ -32,7 +33,7 @@ class Command(BaseCommand):
     help = """
     Send weekly emails to those users who have completed graded module in last 24 hours. This email will not be
     sent for those modules which don't have at-least one graded sub-section. If user has completed last module and
-    skipped some graded modules then skip module email will be send.
+    skipped some graded modules then skip module email will be sent.
     """
 
     def handle(self, *args, **options):  # pylint: disable=too-many-statements
@@ -161,20 +162,23 @@ def send_weekly_email(user, course, chapter_block, all_course_blocks, next_chapt
 
         """
     current_chapter_name = all_course_blocks[chapter_block]['display_name']
-    template = MandrillClient.ON_DEMAND_WEEKLY_MODULE_COMPLETE_TEMPLATE
     next_chapter_url = get_nth_chapter_link(course, chapter_index=next_chapter_index)
     context = {
-        'first_name': user.first_name,
-        'course_name': course.display_name,
-        'module_title': current_chapter_name,
-        'next_module_url': next_chapter_url,
-        'email_address': user.email,
-        'unsubscribe_link': get_my_account_link(course.id)
+        'emailId': HubSpotClient.ON_DEMAND_COURSE_WEEKLY_MODULE_COMPLETE,
+        'message': {
+            'to': user.email
+        },
+        'customProperties': {
+            'first_name': user.first_name,
+            'course_name': course.display_name,
+            'module_title': current_chapter_name,
+            'next_module_url': next_chapter_url,
+            'email_address': user.email,
+            'unsubscribe_link': get_my_account_link(course.id)
+        }
     }
 
-    subject = EMAIL_SUBJECT_LINE.format(course_name=course.display_name)
-
-    MandrillClient().send_mail(template, user.email, context, subject=subject)
+    task_send_hubspot_email.delay(context)
     log.info("Emailing to %s Task Completed for module completion", user.email)
 
 
@@ -188,17 +192,22 @@ def send_module_skip_email(user, course, chapters_skipped):
         chapters_skipped: dict that are storing skipped chapter.
 
     """
-    template = MandrillClient.ON_DEMAND_WEEKLY_MODULE_SKIP_TEMPLATE
     skip_module_url = get_nth_chapter_link(course, chapter_index=chapters_skipped.keys()[0])
     context = {
-        'first_name': user.first_name,
-        'course_name': course.display_name,
-        'module_list': get_module_list(chapters_skipped.values()),
-        'email_address': user.email,
-        'course_url': skip_module_url
+        'emailId': HubSpotClient.ON_DEMAND_WEEKLY_MODULE_SKIPPED_TEMPLATE,
+        'message': {
+            'to': user.email
+        },
+        'customProperties': {
+            'first_name': user.first_name,
+            'course_name': course.display_name,
+            'module_list': get_module_list(chapters_skipped.values()),
+            'email_address': user.email,
+            'course_url': skip_module_url
+        }
     }
 
-    MandrillClient().send_mail(template, user.email, context)
+    task_send_hubspot_email.delay(context)
     log.info("Emailing to %s Task Completed for skip module", user.email)
 
 
