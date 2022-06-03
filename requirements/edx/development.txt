@@ -232,7 +232,7 @@ cssselect==1.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   pyquery
-cssutils==2.4.0
+cssutils==2.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   pynliner
@@ -842,7 +842,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==4.1.0
+lti-consumer-xblock==4.1.1
     # via -r requirements/edx/testing.txt
 lxml==4.9.0
     # via
@@ -1089,7 +1089,7 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/testing.txt
     #   olxcleaner
-pylint==2.14.0
+pylint==2.13.9
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -1246,9 +1246,9 @@ random2==1.0.1
     # via -r requirements/edx/testing.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/testing.txt
-redis==4.3.2
+redis==4.3.3
     # via -r requirements/edx/testing.txt
-regex==2022.4.24
+regex==2022.6.2
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
@@ -1392,7 +1392,7 @@ soupsieve==2.3.2.post1
     # via
     #   -r requirements/edx/testing.txt
     #   beautifulsoup4
-sphinx==5.0.0
+sphinx==5.0.1
     # via
     #   edx-sphinx-theme
     #   sphinxcontrib-httpdomain
@@ -1470,10 +1470,6 @@ tomli==2.0.1
     #   pep517
     #   pylint
     #   pytest
-tomlkit==0.11.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   pylint
 tox==3.25.0
     # via
     #   -r requirements/edx/testing.txt
