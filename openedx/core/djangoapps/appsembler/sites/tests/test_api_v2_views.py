@@ -73,7 +73,7 @@ def test_compile_sass_view(client, site_with_uuid, superuser_with_token):
     site, site_uuid = site_with_uuid
     site_configuration = SiteConfigurationFactory.build(
         site=site,
-        site_values={'css_overrides_file': 'site.css'}
+        site_values={},
     )
     site_configuration.save()
 
@@ -164,8 +164,7 @@ def test_compile_sass_file(caplog, site_with_uuid):
     site, _ = site_with_uuid
     site_config = SiteConfigurationFactory.build(
         site=site,
-        site_values={'css_overrides_file': 'site.css',
-                     'THEME_VERSION': 'tahoe-v2'},
+        site_values={'THEME_VERSION': 'tahoe-v2'},
     )
     site_config.save()
 
@@ -174,5 +173,7 @@ def test_compile_sass_file(caplog, site_with_uuid):
     sass_status = site_config.compile_microsite_sass()
     assert sass_status['successful_sass_compile']
     assert 'Sass compile finished successfully' in sass_status['sass_compile_message']
-    assert '_main-v2.scss' in sass_status['scss_file_used'], 'Use `_main-v2.scss` due to THEME_VERSION`'
-    assert 'main.scss' not in sass_status['scss_file_used']
+    assert sass_status['scss_file_used'] == '_main-v2.scss', 'Use `_main-v2.scss` due to THEME_VERSION`'
+    assert sass_status['site_css_file'] == 'fake-site.css'
+    assert sass_status['theme_version'] == 'tahoe-v2'
+    assert sass_status['configuration_source'] == 'openedx_site_configuration_model'

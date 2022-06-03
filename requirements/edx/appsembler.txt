@@ -23,4 +23,4 @@ django-tiers==0.2.4
 fusionauth-client==1.36.0
 tahoe-sites==0.1.6
 tahoe-lti==0.3.0
-site-configuration-client==0.1.7
+site-configuration-client==0.1.8
