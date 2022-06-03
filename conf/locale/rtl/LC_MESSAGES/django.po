@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-29 20:42+0000\n"
-"PO-Revision-Date: 2022-05-29 20:42:17.222392\n"
+"POT-Creation-Date: 2022-06-03 17:28+0000\n"
+"PO-Revision-Date: 2022-06-03 17:28:01.509197\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6714,19 +6714,6 @@ msgid "You've earned a certificate for this course."
 msgstr "Ɏøn'ʌǝ ǝɐɹnǝd ɐ ɔǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ ʇɥᴉs ɔønɹsǝ."
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Certificate unavailable"
-msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝ nnɐʌɐᴉlɐblǝ"
-
-#: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
-msgid ""
-"You have not received a certificate because you do not have a current "
-"{platform_name} verified identity."
-msgstr ""
-"Ɏøn ɥɐʌǝ nøʇ ɹǝɔǝᴉʌǝd ɐ ɔǝɹʇᴉɟᴉɔɐʇǝ bǝɔɐnsǝ ʎøn dø nøʇ ɥɐʌǝ ɐ ɔnɹɹǝnʇ "
-"{platform_name} ʌǝɹᴉɟᴉǝd ᴉdǝnʇᴉʇʎ."
-
-#: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate will be available soon!"
 msgstr "Ɏønɹ ɔǝɹʇᴉɟᴉɔɐʇǝ ʍᴉll bǝ ɐʌɐᴉlɐblǝ søøn!"
 
@@ -6741,6 +6728,19 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate is available"
 msgstr "Ɏønɹ ɔǝɹʇᴉɟᴉɔɐʇǝ ᴉs ɐʌɐᴉlɐblǝ"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Certificate unavailable"
+msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝ nnɐʌɐᴉlɐblǝ"
+
+#: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity."
+msgstr ""
+"Ɏøn ɥɐʌǝ nøʇ ɹǝɔǝᴉʌǝd ɐ ɔǝɹʇᴉɟᴉɔɐʇǝ bǝɔɐnsǝ ʎøn dø nøʇ ɥɐʌǝ ɐ ɔnɹɹǝnʇ "
+"{platform_name} ʌǝɹᴉɟᴉǝd ᴉdǝnʇᴉʇʎ."
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
@@ -6898,15 +6898,25 @@ msgid "Good"
 msgstr "Ǥøød"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 #, python-format
-msgid "%(course_name)s: Reported content awaits review"
-msgstr "%(course_name)s: Ɍǝdøɹʇǝd ɔønʇǝnʇ ɐʍɐᴉʇs ɹǝʌᴉǝʍ"
+msgid ""
+"\n"
+"                        %(course_name)s: Reported content awaits review\n"
+"                    "
+msgstr ""
+"\n"
+"                        %(course_name)s: Ɍǝdøɹʇǝd ɔønʇǝnʇ ɐʍɐᴉʇs ɹǝʌᴉǝʍ\n"
+"                    "
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 msgid "Go to Discussion"
 msgstr "Ǥø ʇø Đᴉsɔnssᴉøn"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
+#, python-format
+msgid "%(course_name)s: Reported content awaits review"
+msgstr "%(course_name)s: Ɍǝdøɹʇǝd ɔønʇǝnʇ ɐʍɐᴉʇs ɹǝʌᴉǝʍ"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/subject.txt
 #, python-format
@@ -11361,6 +11371,11 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr "Ŧɥǝ '{field_name}' ɟᴉǝld ɔɐnnøʇ bǝ ǝdᴉʇǝd."
 
+#: openedx/core/djangoapps/user_api/accounts/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Enter a valid name"
+msgstr "Ɇnʇǝɹ ɐ ʌɐlᴉd nɐɯǝ"
+
 #. Translators: This label appears above a field which allows the
 #. user to input the First Name
 #. Translators: This label appears above a field on the registration form
@@ -11859,10 +11874,6 @@ msgstr "Ŧɥǝ dɹøʌᴉdǝd ɐɔɔǝss_ʇøʞǝn ᴉs nøʇ ʌɐlᴉd."
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Full Name cannot contain the following characters: < >"
 msgstr "Fnll Nɐɯǝ ɔɐnnøʇ ɔønʇɐᴉn ʇɥǝ ɟølløʍᴉnƃ ɔɥɐɹɐɔʇǝɹs: < >"
-
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "Enter a valid name"
-msgstr "Ɇnʇǝɹ ɐ ʌɐlᴉd nɐɯǝ"
 
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "A properly formatted e-mail is required"
@@ -16490,8 +16501,8 @@ msgid "Share with friends and family!"
 msgstr "Sɥɐɹǝ ʍᴉʇɥ ɟɹᴉǝnds ɐnd ɟɐɯᴉlʎ!"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
-msgid "I just enrolled in {number} {title} through {account}: {url}"
-msgstr "Ɨ ɾnsʇ ǝnɹøllǝd ᴉn {number} {title} ʇɥɹønƃɥ {account}: {url}"
+msgid "I just enrolled in {number} {title} through {account} {url}"
+msgstr "Ɨ ɾnsʇ ǝnɹøllǝd ᴉn {number} {title} ʇɥɹønƃɥ {account} {url}"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {platform} {url}"
