@@ -47,7 +47,8 @@ from edx_ace.recipient import Recipient
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 
-from common.lib.mandrill_client.client import MandrillClient
+from common.lib.hubspot_client.client import HubSpotClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -1172,12 +1173,17 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
         ),
     })
 
-    # We need to send emails by Mandrill rather than edx-ace so we are making a core change here for that.
+    # We need to send emails by HubSpot rather than edx-ace, so we are making a core change here for that.
     context = {
-        "verify_email_link": message_context['confirm_link']
+        'emailId': HubSpotClient.VERIFY_CHANGE_USER_EMAIL,
+        'message': {
+            'to': message_context['new_email']
+        },
+        'customProperties': {
+            'verify_email_link': message_context['confirm_link']
+        }
     }
-    # TODO: FIX MANDRILL EMAILS
-    # MandrillClient().send_mail(MandrillClient.VERIFY_CHANGE_USER_EMAIL, message_context['new_email'], context)
+    task_send_hubspot_email.delay(context)
 
     if not secondary_email_change_request:
         # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.

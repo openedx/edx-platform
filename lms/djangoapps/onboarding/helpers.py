@@ -9,7 +9,8 @@ from difflib import SequenceMatcher
 from django.conf import settings
 from django.core import serializers
 
-from common.lib.mandrill_client.client import MandrillClient
+from common.lib.hubspot_client.client import HubSpotClient
+from common.lib.hubspot_client.tasks import task_send_hubspot_email
 from mailchimp_pipeline.signals.handlers import update_user_email_in_mailchimp
 from nodebb.tasks import task_update_user_profile_on_nodebb
 from oef.models import OrganizationOefUpdatePrompt
@@ -8123,13 +8124,19 @@ def update_user_email(user, old_email, new_email):
 
     # send email to new and old account
     context = {
-        'old_email': old_email,
-        'new_email': new_email
+        'emailId': HubSpotClient.VERIFY_CHANGE_USER_EMAIL,
+        'customProperties': {
+            'old_email': old_email,
+            'new_email': new_email
+        }
     }
+    old_email_context = context
+    old_email_context['message']['to'] = old_email
+    task_send_hubspot_email.delay(old_email_context)
 
-    # TODO: FIX MANDRILL EMAILS
-    # MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, old_email, context)
-    # MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, new_email, context)
+    new_email_context = context
+    new_email_context['message']['to'] = new_email
+    task_send_hubspot_email.delay(new_email_context)
 
 
 def affiliated_unattended_surveys(user_extended_profile):
