@@ -202,7 +202,15 @@ def create_account_with_params(request, params):
         do_third_party_auth=False,
         tos_required=tos_required,
     )
-    custom_form = get_registration_extension_form(data=params)
+
+    custom_data = params
+    running_pipeline = pipeline.get(request)
+    if running_pipeline:
+        current_provider = provider.Registry.get_from_pipeline(running_pipeline)
+        if current_provider:
+            custom_data = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
+
+    custom_form = get_registration_extension_form(data=custom_data)
 
     # Perform operations within a transaction that are critical to account creation
     with outer_atomic(read_committed=True):

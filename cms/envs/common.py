@@ -1592,9 +1592,6 @@ INSTALLED_APPS = [
     'openedx.features.effort_estimation',
     'lms.djangoapps.experiments',
 
-    # GenZ Custom Features
-    'openedx.features.genz_features',
-
     'openedx.core.djangoapps.external_user_ids',
     # so sample_task is available to celery workers
     'openedx.core.djangoapps.heartbeat',
@@ -1615,6 +1612,20 @@ INSTALLED_APPS = [
     'organizations',
 ]
 
+######################### GENPLUS APPS #################################
+
+GENPLUS_INSTALLED_APPS = [
+    # genplus core app
+    'openedx.features.genplus_features.genplus',
+
+    # genplus learning app
+    'openedx.features.genplus_features.genplus_learning',
+
+    # genplus teach app
+    'openedx.features.genplus_features.genplus_teach',
+]
+
+INSTALLED_APPS.extend(GENPLUS_INSTALLED_APPS)
 
 ################# EDX MARKETING SITE ##################################
 

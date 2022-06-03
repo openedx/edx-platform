@@ -20,6 +20,7 @@ from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
+from openedx.features.genplus_features.urls import genplus_url_patterns
 
 
 django_autodiscover()
@@ -180,10 +181,9 @@ urlpatterns = [
     url(r'^api/val/v0/', include('edxval.urls')),
     url(r'^api/tasks/v0/', include('user_tasks.urls')),
     url(r'^accessibility$', contentstore_views.accessibility, name='accessibility'),
-    # GenZ custom features urls
-    url(r'^genz/', include(('openedx.features.genz_features.urls', 'openedx.features.genz_features'),
-                            namespace='genz_features')),
 ]
+
+urlpatterns += genplus_url_patterns
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:
     # TODO: Remove deprecated signin url when traffic proves it is no longer in use
