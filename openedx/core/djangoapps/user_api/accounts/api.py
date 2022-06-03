@@ -5,6 +5,7 @@ Programmatic integration point for User API Accounts sub-application
 
 
 import datetime
+import re
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -403,7 +404,11 @@ def get_name_validation_error(name):
     :return: Validation error message.
 
     """
-    return '' if name else accounts.REQUIRED_FIELD_NAME_MSG
+    if name:
+        regex = re.findall(r'https|http?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', name)
+        return _('Enter a valid name') if bool(regex) else ''
+    else:
+        return accounts.REQUIRED_FIELD_NAME_MSG
 
 
 def get_username_validation_error(username):
