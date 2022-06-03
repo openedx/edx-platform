@@ -327,14 +327,14 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 useNewProblemEditor = this.$('.xblock-header-primary').attr("use-new-editor-problem");
 
                 //find the block type in the locator
-                var matchBlockTypeFromLocator = /(?<=\@)(.*?)(?=\+)/g;
+                var matchBlockTypeFromLocator = /\@(.*?)\+/;
                 var blockType = data.locator.match(matchBlockTypeFromLocator);
 
                 if((useNewTextEditor === "True" && blockType.includes("html")) ||
                     (useNewVideoEditor === "True" && blockType.includes("video"))||
                     (useNewProblemEditor === "True" && blockType.includes("problem"))
                     ){
-                        var destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType + '/' + encodeURI(data.locator);
+                        var destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
                         window.location.href = destinationUrl;
                         return;
                 }
