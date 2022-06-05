@@ -2,7 +2,7 @@
     'use strict';
 
     require(
-['../../src/video/00_iterator.js'],
+['video/00_iterator.js'],
 function(Iterator) {
     describe('Iterator', function() {
         var list = ['a', 'b', 'c', 'd', 'e'],

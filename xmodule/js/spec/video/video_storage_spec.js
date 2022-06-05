@@ -1,6 +1,6 @@
 (function(require, define, undefined) {
     require(
-['../../src/video/00_video_storage.js'],
+['video/00_video_storage.js'],
 function(VideoStorage) {
     describe('VideoStorage', function() {
         var namespace = 'test_storage',

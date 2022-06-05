@@ -2,7 +2,7 @@
 Setup script for the Open edX package.
 """
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 XBLOCKS = [
     "about = xmodule.html_module:AboutBlock",
@@ -55,7 +55,11 @@ setup(
         "cms",
         "lms",
         "openedx",
+        "xmodule",
     ],
+    package_data={
+        'xmodule': ['js/module/*'],
+    },
     entry_points={
         "openedx.course_tab": [
             "ccx = lms.djangoapps.ccx.plugins:CcxCourseTab",

@@ -116,7 +116,7 @@ case "${TEST_SUITE}" in
                 mv reports/${TEST_SUITE}.coverage reports/.coverage.commonlib
                 ;;
             [1-2])
-                paver test_lib -l common/lib/xmodule --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> common-tests.${SHARD}.log
+                paver test_lib -l ./xmodule --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> common-tests.${SHARD}.log
                 mv reports/${TEST_SUITE}.coverage reports/.coverage.commonlib.${SHARD}
                 ;;
             3|"noshard")

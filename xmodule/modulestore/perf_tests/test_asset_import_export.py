@@ -46,7 +46,7 @@ COURSE_DATA_DIR = TEST_DATA_ROOT / COURSE_NAME
 ASSET_XML_PATH = COURSE_DATA_DIR / AssetMetadata.EXPORTED_ASSET_DIR / AssetMetadata.EXPORTED_ASSET_FILENAME
 
 # Path where asset XML schema definition file is located.
-ASSET_XSD_PATH = PLATFORM_ROOT / "common" / "lib" / "xmodule" / "xmodule" / "assetstore" / "tests" / ASSET_XSD_FILE
+ASSET_XSD_PATH = PLATFORM_ROOT / "xmodule" / "assetstore" / "tests" / ASSET_XSD_FILE
 
 
 @ddt.ddt

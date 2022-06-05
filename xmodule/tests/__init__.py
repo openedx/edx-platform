@@ -3,7 +3,7 @@ unittests for xmodule
 
 Run like this:
 
-    paver test_lib -l common/lib/xmodule
+    paver test_lib -l ./xmodule
 
 """
 
@@ -43,8 +43,8 @@ from openedx.core.lib.cache_utils import CacheService
 
 MODULE_DIR = path(__file__).dirname()
 # Location of common test DATA directory
-# '../../../../edx-platform/common/test/data/'
-DATA_DIR = MODULE_DIR.parent.parent.parent.parent / "test" / "data"
+# '../../common/test/data/'
+DATA_DIR = MODULE_DIR.parent.parent / "common" / "test" / "data"
 
 
 class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method

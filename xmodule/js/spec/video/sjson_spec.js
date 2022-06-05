@@ -1,6 +1,6 @@
 (function(require) {
     require(
-['../../src/video/00_sjson.js'],
+['video/00_sjson.js'],
 function(Sjson) {
     describe('Sjson', function() {
         var data = jasmine.stubbedCaption,
