@@ -6,8 +6,8 @@ from opaque_keys.edx.locator import CourseLocator
 from unittest.mock import patch, Mock
 
 from django.test import override_settings
-from organizations.models import UserOrganizationMapping
 from organizations.tests.factories import OrganizationFactory
+from tahoe_sites.tests.utils import create_organization_mapping
 
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.appsembler.sites.tasks import (
@@ -45,10 +45,10 @@ class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
         self.m_store = modulestore()
         self.user = UserFactory.create()
         self.organization = OrganizationFactory.create(short_name=self.organization_name)
-        UserOrganizationMapping.objects.create(
+        create_organization_mapping(
             user=self.user,
             organization=self.organization,
-            is_amc_admin=True,
+            is_admin=True,
         )
 
     def get_course_id(self, use_new_format=False):

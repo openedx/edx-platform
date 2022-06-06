@@ -106,8 +106,8 @@ class TestEnrollmentChangeBase(six.with_metaclass(ABCMeta, CacheIsolationTestCas
         self.assertEqual(after, after_ideal)
 
 
-@patch('lms.djangoapps.instructor.enrollment.get_organization_for_site', Mock(return_value=object()))
-@patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
+@patch('lms.djangoapps.instructor.enrollment.get_organization_by_site', Mock(return_value=object()))
+@patch('lms.djangoapps.instructor.enrollment.is_exist_organization_user_by_email', Mock(return_value=False))
 class TestInstructorEnrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.enroll_email """
     @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Could not fix the test')

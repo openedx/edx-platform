@@ -18,8 +18,8 @@ from django.utils.translation import ugettext as _
 from django.views import View
 from django.views.decorators.clickjacking import xframe_options_deny
 from django.views.decorators.csrf import csrf_protect
+from tahoe_sites.api import deprecated_get_admin_users_queryset_by_email
 
-from organizations.models import UserOrganizationMapping
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole
@@ -88,20 +88,6 @@ def find_global_admin_users(email):
     )
 
 
-def find_amc_admin_users(email):
-    """Returns users matching the email who have AMC admin rights
-
-    Check for matches in the user model for the given email address who have
-    `UserOrganizationMapping.is_amc_admin` rights
-
-    Returns a User model queryset with zero or more records
-    """
-    return get_user_model().objects.filter(
-        id__in=UserOrganizationMapping.objects.filter(
-            user__email=email,
-            is_amc_admin=True).values('user_id'))
-
-
 def find_course_access_role_users(email):
     """Returns users matching the email who have specific course access roles
 
@@ -133,7 +119,7 @@ def find_studio_authorized_users(email):
 
     Returns a User model queryset with zero or more records
     """
-    amc_admins = find_amc_admin_users(email)
+    amc_admins = deprecated_get_admin_users_queryset_by_email(email)
     car_users = find_course_access_role_users(email)
     return (amc_admins | car_users).distinct()
 
