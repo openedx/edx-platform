@@ -26,8 +26,7 @@ While the preference should always be to develop outside the edx-platform reposi
 * The application requires multiple imports from edx-platform
 
   * Note: There are strategies for plugging apps into core LMS and CMS behaviors without directly importing edx-platform code, notably the `Hooks Extension Framework`_.
-  * If it is truly necessary to import from edx-platform code directly, in addition to noting this in the ADR, the authors of the new application should add the libraries or applications it imports to the
-`Libraries we KNOW we want to move out of the monolith`_ Confluence page.
+  * If it is truly necessary to import from edx-platform code directly, in addition to noting this in the ADR, the authors of the new application should add the libraries or applications it imports to the `Libraries we KNOW we want to move out of the monolith`_ Confluence page.
 
 
 .. _Hooks Extension Framework: https://open-edx-proposals.readthedocs.io/en/latest/architectural-decisions/oep-0050-hooks-extension-framework.html
