@@ -57,9 +57,23 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
     Tests for allowlisted student auto-certificate generation
     """
 
+    def setup_patch(self, function_name, return_value):
+        """
+        Patch a function with a given return value, and return the mock
+        """
+        magic_mock = mock.MagicMock(return_value=return_value)
+        new_patch = mock.patch(function_name, new=magic_mock)
+        new_patch.start()
+        self.addCleanup(new_patch.stop)
+        return magic_mock
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
+        self.mock_pathways_with_course = self.setup_patch(
+            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
+            None,
+        )
         # Instructor paced course
         self.ip_course = CourseFactory.create(self_paced=False)
         CourseEnrollmentFactory(
@@ -105,10 +119,28 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
     Tests for certificate generation task firing on passing grade receipt
     """
 
+    def setup_patch(self, function_name, return_value):
+        """
+        Patch a function with a given return value, and return the mock
+        """
+        magic_mock = mock.MagicMock(return_value=return_value)
+        new_patch = mock.patch(function_name, new=magic_mock)
+        new_patch.start()
+        self.addCleanup(new_patch.stop)
+        return magic_mock
+
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(
             self_paced=True,
+        )
+        self.mock_pathways_with_course = self.setup_patch(
+            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
+            None,
+        )
+        self.signal_mock_course_passed_pathway_progress = self.setup_patch(
+            'learner_pathway_progress.signals.update_learner_pathway_progress',
+            None,
         )
         self.course_key = self.course.id
         self.user = UserFactory.create()
@@ -222,12 +254,26 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
     status
     """
 
+    def setup_patch(self, function_name, return_value):
+        """
+        Patch a function with a given return value, and return the mock
+        """
+        magic_mock = mock.MagicMock(return_value=return_value)
+        new_patch = mock.patch(function_name, new=magic_mock)
+        new_patch.start()
+        self.addCleanup(new_patch.stop)
+        return magic_mock
+
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(
             self_paced=True,
         )
         self.user = UserFactory.create()
+        self.mock_pathways_with_course = self.setup_patch(
+            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
+            None,
+        )
         self.enrollment = CourseEnrollmentFactory(
             user=self.user,
             course_id=self.course.id,
@@ -304,10 +350,28 @@ class LearnerIdVerificationTest(ModuleStoreTestCase):
     Tests for certificate generation task firing on learner id verification
     """
 
+    def setup_patch(self, function_name, return_value):
+        """
+        Patch a function with a given return value, and return the mock
+        """
+        magic_mock = mock.MagicMock(return_value=return_value)
+        new_patch = mock.patch(function_name, new=magic_mock)
+        new_patch.start()
+        self.addCleanup(new_patch.stop)
+        return magic_mock
+
     def setUp(self):
         super().setUp()
         self.course_one = CourseFactory.create(self_paced=True)
         self.user_one = UserFactory.create()
+        self.mock_pathways_with_course = self.setup_patch(
+            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
+            None,
+        )
+        self.signal_mock_course_passed_pathway_progress = self.setup_patch(
+            'learner_pathway_progress.signals.update_learner_pathway_progress',
+            None,
+        )
         self.enrollment_one = CourseEnrollmentFactory(
             user=self.user_one,
             course_id=self.course_one.id,
@@ -386,11 +450,30 @@ class EnrollmentModeChangeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing when the user's enrollment mode changes
     """
+
+    def setup_patch(self, function_name, return_value):
+        """
+        Patch a function with a given return value, and return the mock
+        """
+        magic_mock = mock.MagicMock(return_value=return_value)
+        new_patch = mock.patch(function_name, new=magic_mock)
+        new_patch.start()
+        self.addCleanup(new_patch.stop)
+        return magic_mock
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
         self.verified_course = CourseFactory.create(
             self_paced=True,
+        )
+        self.mock_update_pathway_progress = self.setup_patch(
+            'learner_pathway_progress.signals.update_learner_pathway_progress',
+            None,
+        )
+        self.signal_mock_course_passed_pathway_progress = self.setup_patch(
+            'learner_pathway_progress.signals.listen_for_course_grade_upgrade_in_learner_pathway',
+            None,
         )
         self.verified_course_key = self.verified_course.id  # pylint: disable=no-member
         self.verified_enrollment = CourseEnrollmentFactory(

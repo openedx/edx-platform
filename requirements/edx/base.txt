@@ -634,6 +634,10 @@ lazy==1.4
     #   acid-xblock
     #   lti-consumer-xblock
     #   ora2
+learner-pathway-progress==1.2
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.in
 libsass==0.10.0
     # via
     #   -r requirements/edx/paver.txt

@@ -447,10 +447,14 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         if not is_enterprise_enabled:
             assert get_enterprise_course_enrollments(self.user) == []
         else:
-            ece = EnterpriseCourseEnrollmentFactory(enterprise_customer_user=enterprise_customer_user)
-            enterprise_course_enrollments = get_enterprise_course_enrollments(self.user)
-            assert len(enterprise_course_enrollments) == 1
-            assert enterprise_course_enrollments[0].id == ece.id
+            with mock.patch(
+                'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
+                return_value=None
+            ):
+                ece = EnterpriseCourseEnrollmentFactory(enterprise_customer_user=enterprise_customer_user)
+                enterprise_course_enrollments = get_enterprise_course_enrollments(self.user)
+                assert len(enterprise_course_enrollments) == 1
+                assert enterprise_course_enrollments[0].id == ece.id
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')

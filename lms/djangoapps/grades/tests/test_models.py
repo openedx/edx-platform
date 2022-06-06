@@ -8,7 +8,7 @@ from base64 import b64encode
 from collections import OrderedDict
 from datetime import datetime
 from hashlib import sha1
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import ddt
 import pytest
@@ -373,6 +373,20 @@ class PersistentCourseGradesTest(GradesModelTestCase):
             "letter_grade": "Great job",
             "passed": True,
         }
+        self.signal_mock_pathway_progress = self.setup_patch(
+            'lms.djangoapps.grades.signals.signals.COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send',
+            None,
+        )
+
+    def setup_patch(self, function_name, return_value):
+        """
+        Patch a function with a given return value, and return the mock
+        """
+        mock = MagicMock(return_value=return_value)
+        new_patch = patch(function_name, new=mock)
+        new_patch.start()
+        self.addCleanup(new_patch.stop)
+        return mock
 
     def test_update(self):
         created_grade = PersistentCourseGrade.update_or_create(**self.params)
@@ -425,12 +439,14 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         assert grade.letter_grade == ''
         assert grade.passed_timestamp == passed_timestamp
 
+    @patch('lms.djangoapps.grades.signals.signals.COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send')
     @patch('lms.djangoapps.grades.signals.signals.COURSE_GRADE_PASSED_FIRST_TIME.send')
-    def test_passed_timestamp_is_now(self, mock):
+    def test_passed_timestamp_is_now(self, mock, mock_grade_update_in_learner_pathway):
         with freeze_time(now()):
             grade = PersistentCourseGrade.update_or_create(**self.params)
             assert now() == grade.passed_timestamp
             self.assertEqual(mock.call_count, 1)
+            self.assertEqual(mock_grade_update_in_learner_pathway.call_count, 1)
 
     def test_create_and_read_grade(self):
         created_grade = PersistentCourseGrade.update_or_create(**self.params)
