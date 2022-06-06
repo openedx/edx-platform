@@ -68,9 +68,10 @@ class UserIndexSerializer(serializers.ModelSerializer):
     username = serializers.CharField(read_only=True)
     fullname = serializers.CharField(
         source='profile.name', default=None, read_only=True)
+    date_joined = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = get_user_model()
         fields = (
-            'id', 'username', 'fullname', 'email',
+            'id', 'username', 'fullname', 'email', 'date_joined',
         )

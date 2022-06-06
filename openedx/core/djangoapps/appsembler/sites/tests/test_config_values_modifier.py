@@ -2,7 +2,7 @@
 Tests for TahoeConfigurationValueModifier.
 """
 import pytest
-
+from django.contrib.sites.models import Site
 from unittest.mock import Mock
 
 from openedx.core.djangoapps.appsembler.sites.config_values_modifier import TahoeConfigurationValueModifier
@@ -61,7 +61,6 @@ def test_domain_name():
     ['ACTIVATION_EMAIL_SUPPORT_LINK', 'https://mysite.com/help', 'Should fix RED-2385.'],
     ['PASSWORD_RESET_SUPPORT_LINK', 'https://mysite.com/help', 'Should fix RED-2471.'],
     ['PASSWORD_RESET_SUPPORT_LINK', 'https://mysite.com/help', 'Should fix RED-2471.'],
-    ['css_overrides_file', 'mysite.com.css', 'Should configure the path for css_override_file'],
 ])
 def test_modifier_urls(settings, config_name, expected_value, message):
     settings.LMS_ROOT_URL = 'https://hello-world.com'
@@ -73,9 +72,12 @@ def test_modifier_urls(settings, config_name, expected_value, message):
     assert overriding_value == expected_value, message
 
 
+@pytest.mark.django_db
 def test_css_override_file_with_port_number():
-    modifier = TahoeConfigurationValueModifier(site_config_instance=Mock())
-    modifier.site_config_instance.site.domain = 'test.localhost:18000'
+    with ENABLE_CONFIG_VALUES_MODIFIER.override(True):
+        site_config = SiteConfiguration()
+        site_config.site = Site(domain='test.localhost:18000')
+    modifier = site_config.tahoe_config_modifier
     assert modifier.get_css_overrides_file() == 'test.localhost.css', 'Should not include port number in css file name'
 
 

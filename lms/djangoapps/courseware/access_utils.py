@@ -28,6 +28,8 @@ from student.roles import CourseBetaTesterRole
 from xmodule.util.xmodule_django import get_current_request_hostname
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
+from openedx.core.djangoapps.appsembler.preview import helpers as preview_helpers
+
 DEBUG_ACCESS = False
 log = getLogger(__name__)
 
@@ -98,6 +100,11 @@ def in_preview_mode():
     """
     Returns whether the user is in preview mode or not.
     """
+    if preview_helpers.is_preview_mode():
+        # Tahoe: Support `?preview=true` parameter in URL to avoid needing
+        #        a specific domain for course content preview
+        return True
+
     hostname = get_current_request_hostname()
     preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE', None)
     return bool(preview_lms_base and hostname and hostname.split(':')[0] == preview_lms_base.split(':')[0])

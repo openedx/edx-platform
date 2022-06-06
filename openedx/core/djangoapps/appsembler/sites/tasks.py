@@ -25,11 +25,18 @@ from organizations.models import Organization, OrganizationCourse
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, SignalHandler
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 LOGGER = get_task_logger(__name__)
+
+
+def current_year():
+    """
+    A helper to get current year.
+    """
+    return datetime.datetime.now().year
 
 
 def import_course_on_site_creation_after_transaction(organization):
@@ -91,7 +98,7 @@ def import_course_on_site_creation(organization_id):
             'course-v1:{}+{}+{}'.format(
                 organization.short_name,
                 course_name,
-                datetime.datetime.now().year,
+                current_year(),
             )
         )
 
@@ -132,7 +139,7 @@ def import_course_on_site_creation(organization_id):
                 create_if_not_present=True,
             )
 
-            # TODO: Remove this line once we implement OrgStaffRole in Tahoe.
+            # TODO: Remove this once we roll out Tahoe 2.0 sites, because OrgStaffRole is implemented there.
             # Add the new registered user as admin in the course
             CourseAccessRole.objects.get_or_create(
                 # TODO: Ensure only an admin get this course (`is_amc_admin`).
@@ -146,6 +153,14 @@ def import_course_on_site_creation(organization_id):
                 organization=organization,
                 course_id=str(course_target_id),
                 active=True
+            )
+
+            SignalHandler.course_published.send(
+                sender=__name__,
+                course_key=course_target_id,
+            )
+            emit_course_published_signal_in_cms.delay(
+                str(course_target_id),
             )
 
     # catch all exceptions so we can update the state and properly cleanup the course.
@@ -176,3 +191,19 @@ def import_course_on_site_creation(organization_id):
     except Exception as exc:
         logging.exception('Error enrolling the user in default course')
         return 'exception: ' + str(exc)
+
+
+@task(routing_key=settings.CMS_UPDATE_SEARCH_INDEX_JOB_QUEUE)
+def emit_course_published_signal_in_cms(course_key):
+    """
+    An LMS-scheduled task to update CMS course search index and other tasks.
+
+    This is a "routing" task to schedule the `update_search_index` task from _LMS_ and run it in the _CMS_ queue among
+    other tasks. This is to work around the `cms.djangoapps.contentstore` module cannot be imported from LMS code.
+    """
+    from cms.djangoapps.contentstore.signals import handlers  # Local import that run only in CMS.
+
+    handlers.listen_for_course_publish(
+        sender=__name__,
+        course_key=CourseKey.from_string(course_key),
+    )

@@ -46,12 +46,12 @@ from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
 from util.request_rate_limiter import PasswordResetEmailRateLimiter
 
-from openedx.core.djangoapps.site_configuration import tahoe_auth0_helpers
+from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
 
 from organizations.models import UserOrganizationMapping
 
 try:
-    from tahoe_auth0 import api as tahoe_auth0_api  # Tahoe: optional dependency
+    from tahoe_idp import api as tahoe_idp_api  # Tahoe: optional dependency
 except ImportError:
     pass
 
@@ -120,8 +120,8 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
     """
     site = get_current_site()
 
-    if tahoe_auth0_helpers.is_tahoe_auth0_enabled():
-        return tahoe_auth0_api.request_password_reset(user.email)
+    if tahoe_idp_helpers.is_tahoe_idp_enabled():
+        return tahoe_idp_api.request_password_reset(user.email)
 
     message_context = get_base_template_context(site)
     message_context.update({
@@ -130,7 +130,7 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'reset_link': '{protocol}://{site}{link}?track=pwreset'.format(
             protocol='https' if request.is_secure() else 'http',
-            site=site.domain,
+            site=site.domain if site else settings.SITE_NAME,
             link=reverse('password_reset_confirm', kwargs={
                 'uidb36': int_to_base36(user.id),
                 'token': default_token_generator.make_token(user),

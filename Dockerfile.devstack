@@ -10,10 +10,23 @@ FROM edxops/edxapp:juniper.master
 #   2. Use the https://github.com/appsembler/edxapp-envs environment files
 #
 
-RUN cd /edx/app/edxapp \
-    && git clone https://github.com/appsembler/edx-platform.git --branch main --single-branch --depth 1 \
-    && bash -c 'cd edx-platform && source ../edxapp_env && paver install_prereqs' \
-    && rm -rf edx-platform \
+# Build this docker image with the following command:
+#
+#  $ make devstack-docker-build
+#
+#  To push to dockerhub:
+#
+#  $ make devstack-docker-push
+#
+
+RUN rm -rf /edx/app/edxapp/edx-platform
+COPY . /edx/app/edxapp/edx-platform
+
+RUN cd /edx/app/edxapp/edx-platform \
+    && . ../edxapp_env \
+    && paver install_prereqs \
+    && pip install -r requirements/edx/appsembler.txt \
+    && rm -rf /edx/app/edxapp/edx-platform \
     && rm -f /edx/etc/lms.yml /edx/etc/studio.yml \
     && ln -s /edx/src/edxapp-envs/lms.yml /edx/etc/ \
     && ln -s /edx/src/edxapp-envs/studio.yml /edx/etc/

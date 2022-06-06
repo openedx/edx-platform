@@ -157,7 +157,7 @@ class RegistrationViewSet(RegistrationViewSetV1):
             assert NON_FIELD_ERRORS not in err.message_dict
             # Only return first error for each field
             # TODO: Let's give a clue as to which are the error causing fields
-            msg = 'Invalid parameters on user creation'
+            msg = err
             return Response(dict(user_message=msg), status=status.HTTP_400_BAD_REQUEST)
         except AccountValidationError as err:
             log.error('AccountValidationError. err={}'.format(err))

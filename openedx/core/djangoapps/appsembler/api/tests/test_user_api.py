@@ -1,8 +1,10 @@
 
 import unittest
+from datetime import datetime
 
 from django.contrib.sites.models import Site
 from django.urls import resolve, reverse
+from django.utils.timezone import utc
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 
@@ -34,7 +36,15 @@ class UserIndexViewSetTest(TestCase):
     # Fixtures to be used for filtering
     JANE_DUE_USERNAME = 'jane.due'
     JANE_DUE_EMAIL = '{username}@user.api.example.com'.format(username=JANE_DUE_USERNAME)
+    JANE_DUE_DATE_JOINED = datetime.strptime('2021-02-10T12:13:14',
+                                             '%Y-%m-%dT%H:%M:%S').replace(tzinfo=utc)
     NON_USER_EMAIL = 'not.for.a.user@user.api.example.com'
+    OTHER_DATE_JOINED = [
+        datetime.strptime('2021-06-07T12:13:14',
+                          '%Y-%m-%dT%H:%M:%S').replace(tzinfo=utc),
+        datetime.strptime('2021-10-10T12:13:14',
+                          '%Y-%m-%dT%H:%M:%S').replace(tzinfo=utc)
+    ]
 
     def setUp(self):
         """
@@ -56,9 +66,11 @@ class UserIndexViewSetTest(TestCase):
 
         # Set up users and enrollments for 'my site'
         self.my_site_users = [
-            UserFactory.create(email=self.JANE_DUE_EMAIL, username=self.JANE_DUE_USERNAME),
-            UserFactory.create(),
-            UserFactory.create(),
+            UserFactory.create(email=self.JANE_DUE_EMAIL,
+                               username=self.JANE_DUE_USERNAME,
+                               date_joined=self.JANE_DUE_DATE_JOINED),
+            UserFactory.create(date_joined=self.OTHER_DATE_JOINED[0]),
+            UserFactory.create(date_joined=self.OTHER_DATE_JOINED[1]),
         ]
 
         for user in self.my_site_users:
@@ -81,6 +93,7 @@ class UserIndexViewSetTest(TestCase):
         assert data['username'] == user.username
         assert data['fullname'] == user.profile.name
         assert data['email'] == user.email
+        assert data['date_joined'] == user.date_joined.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def test_get_all_users_for_site(self):
         url = reverse('tahoe-api:v1:users-list')
@@ -131,6 +144,26 @@ class UserIndexViewSetTest(TestCase):
         if expected_count:
             # Ignore the email case
             assert results[0]['email'].lower() == email.lower(), msg
+
+    def test_filter_by_date_joined(self):
+        """Test the date_joined filters matching.
+        """
+        expected_date_joined = self.my_site_users[0].date_joined.strftime('%Y-%m-%dT%H:%M:%SZ')
+        expected_count = 1
+        msg = 'Should find Jane in the users'
+        date_joined_filter = self.my_site_users[0].date_joined.date()
+        url = reverse('tahoe-api:v1:users-list')
+        request = APIRequestFactory().get(url, {'date_joined': date_joined_filter})
+        request.META['HTTP_HOST'] = self.my_site.domain
+        force_authenticate(request, user=self.caller)
+
+        view = resolve(url).func
+        response = view(request)
+        response.render()
+        results = response.data['results']
+
+        assert len(results) == expected_count, msg
+        assert results[0]['date_joined'] == expected_date_joined, msg
 
     @unittest.expectedFailure
     def test_get_all_enrolled_learners_for_site(self):

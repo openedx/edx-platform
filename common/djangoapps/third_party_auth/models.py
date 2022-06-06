@@ -332,30 +332,30 @@ class ProviderConfig(ConfigurationModel):
         """
         Determines if the provider is able to be used with the current site.
 
-        Appsembler: We will skip same verification if the backend is Auth0.
-                    Auth0 will handle this for us.
+        Appsembler: We will skip same verification if the backend is Tahoe IdP.
+                    Tahoe IdP will handle this for us.
         """
-        if self.is_tahoe_auth0_backend():
+        if self.is_tahoe_idp_backend():
             # Tahoe: Share one backend between all Tahoe sites.
-            return self.is_auth0_enabled()
+            return self.is_tahoe_idp_enabled()
 
         # Tahoe: Normal upstream-logic for other backends.
         return self.enabled and self.site_id == Site.objects.get_current(get_current_request()).id
 
-    def is_tahoe_auth0_backend(self):
+    def is_tahoe_idp_backend(self):
         """
-        Check if `tahoe-auth0` backend in use to enable spacial handling.
+        Check if `tahoe-idp` backend in use to enable spacial handling.
         """
-        return self.backend_name == "tahoe-auth0"
+        return self.backend_name == "tahoe-idp"
 
-    def is_auth0_enabled(self):
-        is_auth0_enabled = False
-        if self.is_tahoe_auth0_backend():
+    def is_tahoe_idp_enabled(self):
+        is_tahoe_idp_enabled = False
+        if self.is_tahoe_idp_backend():
             # Tahoe: Local imports to avoid circular import errors.
-            from openedx.core.djangoapps.site_configuration import tahoe_auth0_helpers
-            is_auth0_enabled = tahoe_auth0_helpers.is_tahoe_auth0_enabled()
+            from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
+            is_tahoe_idp_enabled = tahoe_idp_helpers.is_tahoe_idp_enabled()
 
-        return is_auth0_enabled
+        return is_tahoe_idp_enabled
 
 
 class OAuth2ProviderConfig(ProviderConfig):

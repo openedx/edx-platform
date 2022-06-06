@@ -71,6 +71,19 @@ shell: ## launch a bash shell in a Docker container with all edx-platform depend
 	-v edxapp_node_modules:/edx/app/edxapp/edx-platform/node_modules \
 	edxops/edxapp:latest /edx/app/edxapp/devstack.sh open
 
+
+DATE := $(shell date --iso-8601)
+devstack-docker-build:
+	docker build --no-cache -f Dockerfile.devstack \
+          -t appsembler/edxapp:juniper.master \
+          -t appsembler/edxapp:juniper.manual-$(DATE) .
+
+
+devstack-docker-push:
+	docker push appsembler/edxapp:juniper.master
+	docker push appsembler/edxapp:juniper.manual-$(DATE)
+
+
 # Order is very important in this list: files must appear after everything they include!
 REQ_FILES = \
 	requirements/edx/pip-tools \

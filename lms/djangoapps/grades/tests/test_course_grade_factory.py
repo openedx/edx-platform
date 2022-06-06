@@ -4,20 +4,18 @@ Tests for the CourseGradeFactory class.
 
 
 import itertools
-import datetime
 
 import ddt
 from django.conf import settings
 from mock import patch
 from six import text_type
 
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle
 from ..course_grade import CourseGrade, ZeroCourseGrade
@@ -32,35 +30,6 @@ class TestCourseGradeFactory(GradeTestBase):
     """
     Test that CourseGrades are calculated properly
     """
-    @classmethod
-    def setUpClass(cls):
-        super(TestCourseGradeFactory, cls).setUpClass()
-        # We add a new graded subsection, with a due date 10 days in the
-        # fugture and show_correcteness (AKA visibility) past_due. In
-        # test_course_grade_factory we will make sure the grade is 0,
-        # because the grade show not be displayed until the due date
-        # is completed.
-        with cls.store.bulk_operations(cls.course.id):
-            cls.sequence3 = ItemFactory.create(
-                parent=cls.chapter,
-                category='sequential',
-                display_name="Test Sequential B",
-                graded=True,
-                format="FinalExam",
-                metadata={'show_correctness': 'past_due', 'due': datetime.datetime.now() + datetime.timedelta(days=10)}
-            )
-            problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
-                question_text='The correct answer is Choice 3',
-                choices=[False, False, True, False],
-                choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-            )
-            cls.problem3 = ItemFactory.create(
-                parent=cls.sequence3,
-                category="problem",
-                display_name="Test Problem",
-                data=problem_xml
-            )
-
     def _assert_zero_grade(self, course_grade, expected_grade_class):
         """
         Asserts whether the given course_grade is as expected with
@@ -125,14 +94,14 @@ class TestCourseGradeFactory(GradeTestBase):
             sections = course_grade.chapter_grades[self.chapter.location]['sections']
             self.assertEqual(
                 [section.display_name for section in sections],
-                [self.sequence.display_name, self.sequence2.display_name, self.sequence3.display_name]
+                [self.sequence.display_name, self.sequence2.display_name]
             )
 
         with self.assertNumQueries(3), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-        num_queries = 52
-        with self.assertNumQueries(num_queries), mock_get_score(2, 2):
+        num_queries = 44
+        with self.assertNumQueries(num_queries), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
         with self.assertNumQueries(3):
@@ -145,14 +114,14 @@ class TestCourseGradeFactory(GradeTestBase):
         with self.assertNumQueries(3):
             _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
 
-        num_queries = 28
+        num_queries = 23
         with self.assertNumQueries(num_queries), mock_get_score(2, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
         with self.assertNumQueries(3):
-            _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of 1.0
+            _assert_read(expected_pass=True, expected_percent=1.0)  # updated to grade of 1.0
 
-        num_queries = 34
+        num_queries = 29
         with self.assertNumQueries(num_queries), mock_get_score(0, 0):  # the subsection now is worth zero
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
@@ -182,7 +151,7 @@ class TestCourseGradeFactory(GradeTestBase):
         with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mocked_course_blocks:
             with patch('lms.djangoapps.grades.subsection_grade.get_score') as mocked_get_score:
                 course_grade = grade_factory.read(self.request.user, self.course)
-                self.assertEqual(course_grade.percent, 0.25)  # make sure it's not a zero-valued course grade
+                self.assertEqual(course_grade.percent, 0.5)  # make sure it's not a zero-valued course grade
                 self.assertFalse(mocked_get_score.called)  # no calls to CSM/submissions tables
                 self.assertFalse(mocked_course_blocks.called)  # no user-specific transformer calculation
 
@@ -196,7 +165,7 @@ class TestCourseGradeFactory(GradeTestBase):
 
     def test_subsection_type_graders(self):
         graders = CourseGrade.get_subsection_type_graders(self.course)
-        self.assertEqual(len(graders), 3)
+        self.assertEqual(len(graders), 2)
         self.assertEqual(graders["Homework"].type, "Homework")
         self.assertEqual(graders["NoCredit"].min_count, 0)
 
@@ -219,10 +188,8 @@ class TestCourseGradeFactory(GradeTestBase):
         self.assertEqual(mock_update.called, force_update)
 
     def test_course_grade_summary(self):
-        with mock_get_score(2, 2):
+        with mock_get_score(1, 2):
             self.subsection_grade_factory.update(self.course_structure[self.sequence.location])
-        with mock_get_score(1, 1):
-            self.subsection_grade_factory.update(self.course_structure[self.sequence3.location])
         course_grade = CourseGradeFactory().update(self.request.user, self.course)
 
         actual_summary = course_grade.summary
@@ -235,12 +202,7 @@ class TestCourseGradeFactory(GradeTestBase):
                 'Homework': {
                     'category': 'Homework',
                     'percent': 0.25,
-                    'detail': 'Homework = 25.00% of a possible 50.00%',
-                },
-                'FinalExam': {
-                    'category': 'FinalExam',
-                    'percent': 0.0,
-                    'detail': 'FinalExam = 0.00% of a possible 50.00%',
+                    'detail': 'Homework = 25.00% of a possible 100.00%',
                 },
                 'NoCredit': {
                     'category': 'NoCredit',
@@ -252,9 +214,9 @@ class TestCourseGradeFactory(GradeTestBase):
             'section_breakdown': [
                 {
                     'category': 'Homework',
-                    'detail': u'Homework 1 - Test Sequential X - 100% (2/2)',
+                    'detail': u'Homework 1 - Test Sequential X - 50% (1/2)',
                     'label': u'HW 01',
-                    'percent': 1.0
+                    'percent': 0.5
                 },
                 {
                     'category': 'Homework',
@@ -264,22 +226,10 @@ class TestCourseGradeFactory(GradeTestBase):
                 },
                 {
                     'category': 'Homework',
-                    'detail': u'Homework Average = 50%',
+                    'detail': u'Homework Average = 25%',
                     'label': u'HW Avg',
-                    'percent': 0.5,
+                    'percent': 0.25,
                     'prominent': True
-                },
-                # We want to make sure this grade is 0.0 and 0% since we
-                # competed the problem above, but the subsection has a due
-                # date and the visibiity of it is set to be shown after the
-                # due date is pass. So the grade is added and calculated but
-                # not displayed in the summary until the due date has pass.
-                {
-                    'category': 'FinalExam',
-                    'percent': 0.0,
-                    'prominent': True,
-                    'label': 'FE',
-                    'detail': 'FinalExam = 0%'
                 },
                 {
                     'category': 'NoCredit',
