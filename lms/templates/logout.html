@@ -10,9 +10,9 @@
 
         <p style="text-align: center; margin-bottom: 20px;">
             {% blocktrans trimmed asvar sso_signout_msg %}
-              {start_anchor}Click here{end_anchor} to delete your single signed on (SSO) session.
+              {start_anchor}{{ tpa_logout_url }}{middle_anchor}Click here{end_anchor} to delete your single signed on (SSO) session.
             {% endblocktrans %}
-            {% interpolate_html sso_signout_msg start_anchor='<a href="'|add:tpa_logout_url|add:'">'|safe end_anchor='</a>'|safe %}
+            {% interpolate_html sso_signout_msg start_anchor='<a href="' middle_anchor='">'|safe end_anchor='</a>'|safe %}
         </p>
 
     {% else %}
@@ -36,9 +36,9 @@
 
             <p style="text-align: center; margin-bottom: 20px;">
                 {% blocktrans trimmed asvar signout_msg1 %}
-                  If you are not redirected within 5 seconds, {start_anchor}click here to go to the home page{end_anchor}.
+                  If you are not redirected within 5 seconds, {start_anchor}{{ target }}{middle_anchor}click here to go to the home page{end_anchor}.
                 {% endblocktrans %}
-                {% interpolate_html signout_msg1 start_anchor='<a href="'|add:target|add:'">'|safe end_anchor='</a>'|safe %}
+                {% interpolate_html signout_msg1 start_anchor='<a href="'|safe middle_anchor='">'|safe end_anchor='</a>'|safe %}
             </p>
         {% endif %}
 
