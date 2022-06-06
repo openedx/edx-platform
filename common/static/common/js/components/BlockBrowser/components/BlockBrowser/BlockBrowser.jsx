@@ -6,14 +6,14 @@ import React from 'react';
 
 const RightIcon = (
   <Icon
-    className={['fa', 'fa-arrow-right']}
+    className="fa fa-arrow-right"
     screenReaderText={gettext('View child items')}
   />
 );
 
 const UpIcon = (
   <Icon
-    className={['fa', 'fa-arrow-up']}
+    className="fa fa-arrow-up"
     screenReaderText={gettext('Navigate up')}
   />
 );
@@ -41,7 +41,7 @@ export const BlockList = ({ blocks, selectedBlock, onSelectBlock, onChangeRoot }
         className={classNames(`block-type-${block.type}`, { selected: block.id === selectedBlock })}
       >
         <Button
-          className={['block-name']}
+          className="block-name"
           onClick={() => onSelectBlock(block.id)}
           label={block.display_name}
         />

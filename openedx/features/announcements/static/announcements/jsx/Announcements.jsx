@@ -93,7 +93,7 @@ class AnnouncementList extends React.Component {
       var prev_button = (
         <div>
           <Button
-            className={["announcement-button", "prev"]}
+            className="announcement-button prev"
             onClick={() => this.renderPrevPage()}
             label="← previous"
           />
@@ -106,7 +106,7 @@ class AnnouncementList extends React.Component {
       var next_button = (
         <div>
           <Button
-            className={["announcement-button", "next"]}
+            className="announcement-button next"
             onClick={() => this.renderNextPage()}
             label="next →"
           />

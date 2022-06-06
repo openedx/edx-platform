@@ -36,7 +36,7 @@ export const LinkProgramEnrollmentsSupportPage = props => (
       value={props.text}
       placeholder="external_student_key,lms_username"
     />
-    <Button label="Submit" type="submit" className={['btn', 'btn-primary']} />
+    <Button label="Submit" type="submit" className="btn btn-primary" />
   </form>
 );
 

@@ -106,12 +106,12 @@ class EntitlementForm extends React.Component {
         />
         <div>
           <Button
-            className={['btn', 'btn-secondary']}
+            className="btn btn-secondary"
             label="Close"
             onClick={this.onClose}
           />
           <Button
-            className={['btn', 'btn-primary']}
+            className="btn btn-primary"
             label="Submit"
             onClick={this.submitForm}
           />

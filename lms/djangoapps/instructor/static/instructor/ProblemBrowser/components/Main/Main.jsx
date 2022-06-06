@@ -41,12 +41,12 @@ export default class Main extends React.Component {
           // eslint-disable-next-line jsx-a11y/no-static-element-interactions
         (<span
           onClick={this.handleToggleDropdown}
-          className={['problem-selector']}
+          className="problem-selector"
         >
           <span>{selectedBlock || 'Select a section or problem'}</span>
-          <span className={['pull-right']}>
+          <span className="pull-right">
             <Icon
-              className={['fa', 'fa-sort']}
+              className="fa fa-sort"
             />
           </span>
         </span>);

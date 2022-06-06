@@ -8,7 +8,7 @@ const ReportStatus = ({ error, succeeded, inProgress, reportPath }) => {
   const progressMessage = (
     <div className="msg progress">
       {gettext('Your report is being generated...')}
-      <Icon hidden className={['fa', 'fa-refresh', 'fa-spin', 'fa-fw']} />
+      <Icon hidden className="fa fa-refresh fa-spin fa-fw" />
     </div>
   );
 
@@ -17,7 +17,7 @@ const ReportStatus = ({ error, succeeded, inProgress, reportPath }) => {
       {gettext('Your report has been successfully generated.')}
       {reportPath &&
       <a href={reportPath}>
-        <Icon hidden className={['fa', 'fa-link']} />
+        <Icon hidden className="fa fa-link" />
         {gettext('View Report')}
       </a>}
     </div>

@@ -4,7 +4,7 @@ import 'whatwg-fetch';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, StatusAlert } from '@edx/paragon/static';
+import { Button, StatusAlert } from '@edx/paragon';
 
 import PasswordResetInput from './PasswordResetInput';
 
@@ -12,7 +12,7 @@ import PasswordResetInput from './PasswordResetInput';
 // conflict with some standard LMS ones ('alert' at least). This means that you need to do
 // something like the following on any templates that use this class:
 //
-// <link type='text/css' rel='stylesheet' href='${STATIC_URL}paragon/static/paragon.min.css'>
+// <link type='text/css' rel='stylesheet' href='${STATIC_URL}paragon/dist/paragon.css'>
 //
 
 class PasswordResetConfirmation extends React.Component {
@@ -120,9 +120,8 @@ class PasswordResetConfirmation extends React.Component {
 
             <Button
               type="submit"
-              className={['action', 'action-primary', 'action-update', 'js-reset']}
-              label={this.props.primaryActionButtonLabel}
-            />
+              className="action action-primary action-update js-reset"
+            >{this.props.primaryActionButtonLabel}</Button>
           </form>
         </div>
       </section>

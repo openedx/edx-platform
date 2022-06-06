@@ -2,7 +2,7 @@
 /* eslint-disable react/no-danger, import/prefer-default-export */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Icon, StatusAlert } from '@edx/paragon/static';
+import { Button, Icon, StatusAlert } from '@edx/paragon';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import StudentAccountDeletionModal from './StudentAccountDeletionModal';
 
@@ -127,20 +127,19 @@ export class StudentAccountDeletion extends React.Component {
         />
         <Button
           id="delete-account-btn"
-          className={['btn-outline-primary']}
+          className="btn-outline-primary"
           disabled={showError}
-          label={gettext('Delete My Account')}
           inputRef={(input) => { this.modalTrigger = input; }}
           onClick={this.loadDeletionModal}
-        />
+        >{gettext('Delete My Account')}</Button>
         {showError &&
           <StatusAlert
             dialog={(
               <div className="modal-alert">
                 <div className="icon-wrapper">
-                  <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
+                  <Icon id="delete-confirmation-body-error-icon" className="fa fa-exclamation-circle" />
                 </div>
-                <div className="alert-content">
+                <div className="alert-content flex-column">
                   {socialAuthConnected && isActive &&
                     <p dangerouslySetInnerHTML={{ __html: socialAuthError }} />
                   }

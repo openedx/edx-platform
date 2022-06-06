@@ -181,7 +181,7 @@ export const ProgramEnrollmentsInspectorPage = props => (
         id="search_button"
         label="Search"
         type="submit"
-        className={['btn', 'btn-primary']}
+        className="btn btn-primary"
         inputRef={(input) => { self.button = input; }}
       />
     </form>

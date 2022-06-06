@@ -45,7 +45,7 @@ module.exports = _.values(Merge.smart(commonConfig, {
                         {
                             loader: 'sass-loader',
                             options: {
-                                data: '$base-rem-size: 0.625; @import "paragon-reset";',
+                                data: '@import "bootstrap-variables";',
                                 includePaths: [
                                     path.join(__dirname, './node_modules/@edx/paragon/src/utils'),
                                     path.join(__dirname, './node_modules/')

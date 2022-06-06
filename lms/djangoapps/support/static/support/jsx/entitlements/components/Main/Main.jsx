@@ -37,7 +37,7 @@ const MainContent = (props) => {
       <div className="actions">
         <SearchContainer />
         <Button
-          className={['btn', 'btn-primary']}
+          className="btn btn-primary"
           label="Create New Entitlement"
           onClick={props.openCreationForm}
         />

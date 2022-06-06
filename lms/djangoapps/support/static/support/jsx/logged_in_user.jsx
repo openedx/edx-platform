@@ -58,7 +58,7 @@ function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarn
       <div className="row">
         <div className="col-sm-12">
           <Button
-            className={['btn', 'btn-primary', 'btn-submit']}
+            className="btn btn-primary btn-submit"
             onClick={reDirectUser}
             label={gettext('Course Discussion Forum')}
           />
@@ -74,7 +74,7 @@ function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarn
             <div className="form-group">
               <StatusAlert
                 alertType="info"
-                className={['in', 'pattern-library-shim']}
+                className="in pattern-library-shim"
                 dismissible={false}
                 dialog={
                   gettext('While our support team is happy to assist with the edX platform, the course staff has the expertise for specific assignment questions, grading or the proper procedures in each course. Please post all course related questions within the Discussion Forum where the Course Staff can directly respond.')
@@ -102,7 +102,7 @@ function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarn
         <div className="row">
           <div className="col-sm-12">
             <Button
-              className={['btn', 'btn-primary', 'btn-submit']}
+              className="btn btn-primary btn-submit"
               type="button"
               onClick={handleClick}
               label={gettext('Create Support Ticket')}

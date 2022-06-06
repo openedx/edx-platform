@@ -162,7 +162,7 @@ class LibrarySourcedBlockPicker extends React.Component {
         </div>
         <div style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
           <div className={styles.column}>
-            <input type="text" className={[styles.search]} aria-label="Search for library" placeholder="Search for library" label="Search for library" name="librarySearch" onChange={this.onLibrarySearchInput}/>
+            <input type="text" className={styles.search} aria-label="Search for library" placeholder="Search for library" label="Search for library" name="librarySearch" onChange={this.onLibrarySearchInput}/>
             <div className={styles.elementList} onChange={this.onLibrarySelected}>
               {
                 this.state.libraries.map(lib => (
@@ -176,7 +176,7 @@ class LibrarySourcedBlockPicker extends React.Component {
             </div>
           </div>
           <div className={styles.column}>
-            <input type="text" className={[styles.search]} aria-label="Search for XBlocks" placeholder="Search for XBlocks" name="xblockSearch" onChange={this.onXBlockSearchInput} disabled={!this.state.selectedLibrary || this.state.libraryLoading}/>
+            <input type="text" className={styles.search} aria-label="Search for XBlocks" placeholder="Search for XBlocks" name="xblockSearch" onChange={this.onXBlockSearchInput} disabled={!this.state.selectedLibrary || this.state.libraryLoading}/>
             <div className={styles.elementList} onChange={this.onXblockSelected}>
               {
                 this.state.xblocks.map(block => (
@@ -198,7 +198,7 @@ class LibrarySourcedBlockPicker extends React.Component {
                     <label className={styles.elementItem}>
                       {block}
                     </label>
-                    <button className={[styles.remove]} data-value={block} onClick={this.onDeleteClick} aria-label="Remove block">
+                    <button className={styles.remove} data-value={block} onClick={this.onDeleteClick} aria-label="Remove block">
                       <span aria-hidden="true" className="icon fa fa-times"></span>
                     </button>
                   </li>

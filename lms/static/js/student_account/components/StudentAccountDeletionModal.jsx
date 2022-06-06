@@ -2,7 +2,7 @@
 /* eslint-disable react/no-danger */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal, Icon, InputText, StatusAlert } from '@edx/paragon/static';
+import { Button, Modal, Icon, InputText, StatusAlert } from '@edx/paragon';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 import { deactivate } from '../AccountsClient';
@@ -139,9 +139,9 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                   dialog={(
                     <div className="modal-alert">
                       <div className="icon-wrapper">
-                        <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
+                        <Icon id="delete-confirmation-body-error-icon" className="fa fa-exclamation-circle" />
                       </div>
-                      <div className="alert-content">
+                      <div className="alert-content flex-column">
                         <h3 className="alert-title">{ validationMessage }</h3>
                         <p>{ validationErrorDetails }</p>
                       </div>
@@ -157,9 +157,9 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                 dialog={(
                   <div className="modal-alert">
                     <div className="icon-wrapper">
-                      <Icon id="delete-confirmation-body-warning-icon" className={['fa', 'fa-exclamation-triangle']} />
+                      <Icon id="delete-confirmation-body-warning-icon" className="fa fa-exclamation-triangle" />
                     </div>
-                    <div className="alert-content">
+                    <div className="alert-content flex-column">
                       <h3 className="alert-title">{noteDeletion}</h3>
                       <p>
                         <span>{bodyDeletion} </span>
@@ -177,7 +177,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                 name="confirm-password"
                 label="Password"
                 type="password"
-                className={['confirm-password-input']}
+                className="confirm-password-input"
                 onBlur={this.passwordFieldValidation}
                 isValid={passwordValid}
                 validationMessage={validationMessage}
@@ -190,10 +190,9 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
           closeText={gettext('Cancel')}
           buttons={[
             <Button
-              label={gettext('Yes, Delete')}
               onClick={this.deleteAccount}
               disabled={password.length === 0 || passwordSubmitted}
-            />,
+            >{gettext('Yes, Delete')}</Button>,
           ]}
         />
       </div>
