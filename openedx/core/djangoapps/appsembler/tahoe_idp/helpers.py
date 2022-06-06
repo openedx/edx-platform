@@ -12,11 +12,13 @@ from django.utils.http import urlencode
 
 from site_config_client.openedx import api as config_client_api
 
+from tahoe_sites.api import is_active_admin_on_organization, get_organization_for_user
 import third_party_auth
 from third_party_auth.pipeline import running as pipeline_running
 
 
 from .constants import TAHOE_IDP_BACKEND_NAME
+from student.roles import OrgInstructorRole, OrgStaffRole
 
 
 def is_tahoe_idp_enabled():
@@ -93,3 +95,31 @@ def store_idp_metadata_in_user_profile(user, metadata):
     meta["tahoe_idp_metadata"] = metadata
     user.profile.set_meta(meta)
     user.profile.save()
+
+
+def is_studio_allowed_for_user(user, organization=None):
+    """
+    Check whether the given user is permitted to log into studio or not
+
+    Permission rules:
+       The user is superuser
+    OR the user is staff user
+    OR the user is an admin on the organization
+    OR the user has (OrgStaffRole) or (OrgInstructorRole) role
+
+    :param user: the user in question
+    :param organization: the user's organization. If the user is not super admin or staff, this value will be used
+        to question the rest of the rules. It'll also be fetched internally if not provided
+    :return: <True> if permitted. <False> otherwise
+    """
+    if user.is_superuser or user.is_staff:
+        return True
+
+    if organization is None:
+        organization = get_organization_for_user(user)
+
+    if is_active_admin_on_organization(user=user, organization=organization):
+        return True
+
+    short_name = organization.short_name
+    return OrgStaffRole(short_name).has_user(user) or OrgInstructorRole(short_name).has_user(user)
