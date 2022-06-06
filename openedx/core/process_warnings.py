@@ -12,6 +12,7 @@ import re
 from collections import Counter
 from xml.sax.saxutils import escape
 
+import pandas as pd
 from write_to_html import HtmlOutlineWriter  # noqa pylint: disable=import-error,useless-suppression
 
 columns = [
@@ -270,6 +271,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("--dir-path", default="test_root/log")
     parser.add_argument("--html-path", default="test_html.html")
+    parser.add_argument('--json-report-path', default="test_json.json")
     args = parser.parse_args()
     data_output = process_warnings_json(args.dir_path)
+    data_dataframe = pd.DataFrame(data=data_output, columns=columns)
+    data = data_dataframe.to_json(args.json_report_path, orient='index')
     write_html_report(data_output, args.html_path)
