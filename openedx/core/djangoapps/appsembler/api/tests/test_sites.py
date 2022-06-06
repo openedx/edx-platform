@@ -8,16 +8,18 @@ TODO: Make this module tests more robust
    This may be a bit "belt and suspenders", but given the importance, is worthwhile
 
 """
+import ddt
 import mock
 import pytest
 
 from django.test import RequestFactory, TestCase
-
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
+from django.db.models.query import QuerySet
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
-import organizations
+from organizations.models import Organization
 
 from openedx.core.djangoapps.site_configuration.tests.factories import (
     SiteConfigurationFactory,
@@ -42,6 +44,7 @@ def create_org_users(org, new_user_count):
         organization=org).user for i in range(new_user_count)]
 
 
+@ddt.ddt
 class SitesModuleTests(TestCase):
     def setUp(self):
         """
@@ -49,8 +52,8 @@ class SitesModuleTests(TestCase):
         """
         self.other_site = Site.objects.get(domain='example.com')
         self.my_site = SiteFactory(domain='foo.test')
-        self.other_site_org = OrganizationFactory(sites=[self.other_site])
-        self.my_site_org = OrganizationFactory(sites=[self.my_site])
+        self.other_site_org = OrganizationFactory(linked_site=self.other_site)
+        self.my_site_org = OrganizationFactory(linked_site=self.my_site)
         self.my_course_overviews = [
             CourseOverviewFactory(),
             CourseOverviewFactory()
@@ -68,6 +71,14 @@ class SitesModuleTests(TestCase):
         course_keys = aapi_sites.get_course_keys_for_site(self.my_site)
         expected_ids = [str(co.id) for co in self.my_course_overviews]
         self.assertEqual(set([str(key) for key in course_keys]), set(expected_ids))
+
+    @ddt.data(Organization.DoesNotExist, Organization.MultipleObjectsReturned)
+    def test_get_course_keys_for_site_with_handled_exception(self, side_effect):
+        with mock.patch(
+            'openedx.core.djangoapps.appsembler.api.sites.get_organization_by_site',
+            side_effect=side_effect
+        ):
+            self.assertEqual(aapi_sites.get_course_keys_for_site(mock.Mock()), [])
 
     def test_get_courses_for_site(self):
         courses = aapi_sites.get_courses_for_site(self.my_site)
@@ -116,3 +127,12 @@ class SitesModuleTests(TestCase):
         retrieved_users = aapi_sites.get_users_for_site(self.my_site)
         assert set(retrieved_users) == set(my_users)
         assert set(retrieved_users).isdisjoint(set(other_users))
+
+    def test_get_users_for_site_with_handled_exceptions(self):
+        with mock.patch(
+            'openedx.core.djangoapps.appsembler.api.sites.get_organization_by_site',
+            mock.Mock(side_effect=Organization.DoesNotExist)
+        ):
+            result = aapi_sites.get_users_for_site(mock.Mock())
+            assert isinstance(result, QuerySet)
+            assert result.count() == 0

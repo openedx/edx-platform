@@ -10,6 +10,7 @@ from unittest import skipUnless
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from organizations.models import Organization, UserOrganizationMapping
+from tahoe_sites.api import create_tahoe_site_by_link
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 from student.tests.factories import UserFactory
@@ -41,7 +42,7 @@ def with_organization_context(site_color, configs=None):
                 name=site_color,
                 short_name=site_color,
             )
-            org.sites.add(site)
+            create_tahoe_site_by_link(organization=org, site=site)
 
         with patch('openedx.core.djangoapps.appsembler.sites.utils._get_current_organization', return_value=org):
             # Avoids having `get_current_organization` freak out due to missing request.

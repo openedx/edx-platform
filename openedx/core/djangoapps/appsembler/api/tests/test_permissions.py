@@ -12,6 +12,7 @@ from inspect import isclass
 
 import ddt
 import mock
+from organizations.models import Organization
 
 from student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import (
@@ -74,9 +75,7 @@ class SiteAdminPermissionsTest(TestCase):
         patch = mock.patch(SITE_CONFIGURATION_CLASS + '.compile_microsite_sass')
         self.mock_site_config_method = patch.start()
         self.site = SiteFactory()
-        self.organization = OrganizationFactory(
-            sites=[self.site],
-        )
+        self.organization = OrganizationFactory(linked_site=self.site)
         self.site_configuration = SiteConfigurationFactory(
             site=self.site,
             sass_variables={},
@@ -110,3 +109,12 @@ class SiteAdminPermissionsTest(TestCase):
         request.user = get_user_model().objects.get(username=username)
         permission = IsSiteAdminUser().has_permission(request, None)
         self.assertEqual(permission, has_permission)
+
+    @mock.patch('django.contrib.sites.shortcuts.get_current_site', mock.Mock())
+    @ddt.data(Organization.DoesNotExist, Organization.MultipleObjectsReturned)
+    def test_is_site_admin_user_with_handled_exceptions(self, side_effect):
+        with mock.patch(
+            'openedx.core.djangoapps.appsembler.api.permissions.get_organization_by_site',
+            side_effect=side_effect
+        ):
+            self.assertEqual(IsSiteAdminUser().has_permission(mock.Mock(), None), False)

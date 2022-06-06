@@ -16,6 +16,7 @@ from openedx.core.djangoapps.site_configuration.tests.factories import (
 )
 
 import organizations
+from tahoe_sites.api import create_tahoe_site_by_link
 
 from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
 
@@ -78,12 +79,11 @@ class OrganizationFactory(factory.DjangoModelFactory):
     active = True
 
     @factory.post_generation
-    def sites(self, create, extracted, **kwargs):
+    def linked_site(self, create, extracted, **kwargs):
         if not create:
             return
         if extracted:
-            for site in extracted:
-                self.sites.add(site)
+            create_tahoe_site_by_link(organization=self, site=extracted)
 
 
 class UserOrganizationMappingFactory(factory.DjangoModelFactory):

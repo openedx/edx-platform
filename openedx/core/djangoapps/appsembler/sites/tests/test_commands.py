@@ -9,6 +9,7 @@ from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import override_settings, TestCase
+from tahoe_sites.api import create_tahoe_site_by_link
 
 from openedx.core.djangoapps.appsembler.sites.management.commands.create_devstack_site import Command
 from openedx.core.djangoapps.appsembler.sites.management.commands.offboard import Command as OffboardSiteCommand
@@ -201,6 +202,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
         self.site_domain = '{}.localhost:18000'.format(self.site_name)
 
         self.site = Site.objects.create(domain=self.site_domain, name=self.site_name)
+        create_tahoe_site_by_link(site=self.site, organization=OrganizationFactory())
         SiteConfigurationFactory.create(site=self.site)
 
         self.command = OffboardSiteCommand()
@@ -278,7 +280,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
         data = self.command.generate_objects(self.site)
         assert data == {
             'site': 'process_site',
-            'organizations': [],
+            'organizations': [[]],
             'courses': [],
             'configurations': {},
             'configurations_history': [],
@@ -649,7 +651,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
         query_set = OrganizationCourse.objects.filter(organization__in=[organization])
         assert query_set.count() == courses_count
 
-        data = self.command.process_courses([organization])
+        data = self.command.process_courses(organization)
         assert data == [{
             'course_id': course.course_id,
             'active': course.active,

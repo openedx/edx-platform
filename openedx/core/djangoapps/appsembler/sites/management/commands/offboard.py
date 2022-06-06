@@ -11,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import ForeignKey
+from tahoe_sites.api import get_organization_by_site
 
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -113,14 +114,13 @@ class Command(BaseCommand):
         Takes care of generating site objects.
         """
         self.debug_message('Generating site:%s objects...' % site.name)
-
-        organizations = Organization.objects.filter(sites__id=site.id)
+        organization = get_organization_by_site(site=site)
         objects = {
             'site': self.process_site(site),
             'organizations': [
-                self.process_organization(org) for org in organizations
+                self.process_organization(org) for org in [organization]
             ],
-            'courses': self.process_courses(organizations),
+            'courses': self.process_courses(organization),
             'configurations': self.process_site_configurations(site),
             'configurations_history': self.process_site_configurations_history(site),
             'users': self.process_users(site),
@@ -128,11 +128,11 @@ class Command(BaseCommand):
 
         return objects
 
-    def process_courses(self, organizations):
+    def process_courses(self, organization):
         """
         Processes site courses.
         """
-        query_set = OrganizationCourse.objects.filter(organization__in=organizations)
+        query_set = OrganizationCourse.objects.filter(organization=organization)
         self.debug_message('Processing organizations courses (%d total)...' % query_set.count())
 
         courses = []

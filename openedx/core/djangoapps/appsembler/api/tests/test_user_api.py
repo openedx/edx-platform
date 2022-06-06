@@ -61,8 +61,8 @@ class UserIndexViewSetTest(TestCase):
         super(UserIndexViewSetTest, self).setUp()
         self.my_site = Site.objects.get(domain='example.com')
         self.other_site = SiteFactory(domain='other-site.test')
-        self.other_site_org = OrganizationFactory(sites=[self.other_site])
-        self.my_site_org = OrganizationFactory(sites=[self.my_site])
+        self.other_site_org = OrganizationFactory(linked_site=self.other_site)
+        self.my_site_org = OrganizationFactory(linked_site=self.my_site)
 
         # Set up users and enrollments for 'my site'
         self.my_site_users = [

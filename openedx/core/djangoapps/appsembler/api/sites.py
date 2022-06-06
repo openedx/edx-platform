@@ -1,11 +1,9 @@
 import beeline
+import logging
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from organizations.models import (
-    Organization,
-    OrganizationCourse,
-    UserOrganizationMapping,
-)
+from organizations.models import Organization, OrganizationCourse
+from tahoe_sites.api import get_organization_by_site, get_users_of_organization
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -13,15 +11,26 @@ from student.models import CourseEnrollment
 
 from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
 
+log = logging.getLogger(__name__)
+
 
 @beeline.traced(name="api.sites.get_course_keys_for_site")
 def get_course_keys_for_site(site):
-    orgs = Organization.objects.filter(sites__in=[site])
-    org_courses = OrganizationCourse.objects.filter(
-        organization__in=orgs)
-    course_ids = org_courses.values_list('course_id', flat=True)
-
-    return [as_course_key(cid) for cid in course_ids]
+    try:
+        organization = get_organization_by_site(site=site)
+    except Organization.DoesNotExist:
+        result = []
+    except Organization.MultipleObjectsReturned:
+        log.warning(
+            'get_course_keys_for_site: This module expects a one:one relationship between organization and site. '
+            'Raised by site (%s)', site.id
+        )
+        result = []
+    else:
+        org_courses = OrganizationCourse.objects.filter(organization=organization)
+        course_ids = org_courses.values_list('course_id', flat=True)
+        result = [as_course_key(cid) for cid in course_ids]
+    return result
 
 
 @beeline.traced(name="api.sites.get_courses_for_site")
@@ -81,5 +90,11 @@ def get_enrollments_for_site(site):
 
 @beeline.traced(name="api.sites.get_users_for_site")
 def get_users_for_site(site):
-    org = Organization.objects.filter(sites__in=[site]).first()
-    return org.users.all()
+    try:
+        organization = get_organization_by_site(site=site)
+    except Organization.DoesNotExist:
+        result = get_user_model().objects.none()
+    else:
+        result = get_users_of_organization(organization=organization)
+
+    return result

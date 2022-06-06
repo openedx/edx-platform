@@ -37,8 +37,8 @@ class ActiveSitesTestCase(TestCase):
         super(ActiveSitesTestCase, self).setUp()
         self.siteFoo = SiteFactory.create(domain='foo.dev', name='foo.dev')
         self.siteBar = SiteFactory.create(domain='bar.dev', name='bar.dev')
-        self.organizationA = OrganizationFactory(sites=[self.siteFoo])
-        self.organizationB = OrganizationFactory(sites=[self.siteBar])
+        self.organizationA = OrganizationFactory(linked_site=self.siteFoo)
+        self.organizationB = OrganizationFactory(linked_site=self.siteBar)
 
     def test_get_active_sites(self):
         """
@@ -76,9 +76,9 @@ class OrganizationByRequestTestCase(TestCase):
         self.siteFoo = SiteFactory.create(domain='foo.dev', name='foo.dev')
         self.siteBar = SiteFactory.create(domain='bar.dev', name='bar.dev')
         self.siteBaz = SiteFactory.create(domain='baz.dev', name='baz.dev')
-        self.organizationA = OrganizationFactory(sites=[self.siteFoo])
-        self.organizationB = OrganizationFactory(sites=[self.siteFoo])
-        self.organizationC = OrganizationFactory(sites=[self.siteBar])
+        self.organizationA = OrganizationFactory(linked_site=self.siteFoo)
+        self.organizationB = OrganizationFactory(linked_site=self.siteFoo)
+        self.organizationC = OrganizationFactory(linked_site=self.siteBar)
         self.request = RequestFactory().post('dummy_url')
         self.request.session = {}
         for patch_req in (
