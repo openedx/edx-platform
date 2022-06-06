@@ -26,6 +26,9 @@ lms/djangoapps/edxnotes
 # Analytics
 common/djangoapps/track/                   @edx/edx-data-engineering
 
+# App Backends
+lms/djangoapps/learner_home                @openedx/content-aurora
+
 # Credentials
 lms/djangoapps/certificates/               @edx/platform-credentials
 

@@ -1031,3 +1031,8 @@ urlpatterns += [
 urlpatterns += [
     path('api/instructor_task/', include('lms.djangoapps.instructor_task.rest_api.urls')),
 ]
+
+# Learner Dashboard (Learner Home)
+urlpatterns += [
+    path('api/learner_home/', include('lms.djangoapps.learner_home.urls', 'learner-home'))
+]
