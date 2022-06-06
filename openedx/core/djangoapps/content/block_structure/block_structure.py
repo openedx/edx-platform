@@ -558,8 +558,7 @@ class BlockStructureBlockData(BlockStructure):
             transformer_data = self.get_transformer_block_data(usage_key, transformer)
         except KeyError:
             return default
-        field = getattr(transformer_data, key, default)
-        return self._make_datetime_field_compatible(field)
+        return getattr(transformer_data, key, default)
 
     def set_transformer_block_field(self, usage_key, transformer, key, value):
         """
