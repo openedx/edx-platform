@@ -101,18 +101,24 @@ def parse_metadata_xml(xml, entity_id):
 
     # Now we just need to get the public_key and sso_url
     # We want the use='signing' cert, not the 'encryption' one
-    public_key = sso_desc.findtext("./{}[@use='signing']//{}".format(
+    # There may be multiple signing certs returned by the server so create one record per signing cert found.
+    certs = sso_desc.findall("./{}[@use='signing']//{}".format(
         etree.QName(SAML_XML_NS, "KeyDescriptor"), "{http://www.w3.org/2000/09/xmldsig#}X509Certificate"
     ))
-    if not public_key:
+
+    if not certs:
         # it's possible that there is just one keyDescription with no use attribute
         # that is a shortcut for both signing and encryption combined. So we can use that as fallback.
-        public_key = sso_desc.findtext("./{}//{}".format(
+        certs = sso_desc.findall("./{}//{}".format(
             etree.QName(SAML_XML_NS, "KeyDescriptor"), "{http://www.w3.org/2000/09/xmldsig#}X509Certificate"
         ))
-        if not public_key:
+        if not certs:
             raise MetadataParseError("Public Key missing. Expected an <X509Certificate>")
-    public_key = public_key.replace(" ", "")
+
+    public_keys = []
+    for key in certs:
+        public_keys.append(key.text.replace(" ", ""))
+
     binding_elements = sso_desc.iterfind("./{}".format(etree.QName(SAML_XML_NS, "SingleSignOnService")))
     sso_bindings = {element.get('Binding'): element.get('Location') for element in binding_elements}
     try:
@@ -120,7 +126,7 @@ def parse_metadata_xml(xml, entity_id):
         sso_url = sso_bindings['urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']
     except KeyError:
         raise MetadataParseError("Unable to find SSO URL with HTTP-Redirect binding.")  # lint-amnesty, pylint: disable=raise-missing-from
-    return public_key, sso_url, expires_at
+    return public_keys, sso_url, expires_at
 
 
 def user_exists(details):
@@ -164,29 +170,22 @@ def get_user_from_email(details):
     return None
 
 
-def create_or_update_saml_provider_data(entity_id, public_key, sso_url, expires_at):
+def create_or_update_bulk_saml_provider_data(entity_id, public_keys, sso_url, expires_at):
     """
-    Update/Create the SAMLProviderData for the given entity ID.
-    Return value:
-        False if nothing has changed and existing data's "fetched at" timestamp is just updated.
-        True if a new record was created. (Either this is a new provider or something changed.)
+    Placeholder
     """
-    data_obj = SAMLProviderData.current(entity_id)
     fetched_at = now()
-    if data_obj and (data_obj.public_key == public_key and data_obj.sso_url == sso_url):
-        data_obj.expires_at = expires_at
-        data_obj.fetched_at = fetched_at
-        data_obj.save()
-        return False
-    else:
-        SAMLProviderData.objects.create(
-            entity_id=entity_id,
-            fetched_at=fetched_at,
-            expires_at=expires_at,
-            sso_url=sso_url,
-            public_key=public_key,
+    new_records_created = False
+    # Create a data record for each of the public keys provided
+    for key in public_keys:
+        _, created = SAMLProviderData.objects.update_or_create(
+            public_key=key, entity_id=entity_id,
+            defaults={'sso_url': sso_url, 'expires_at': expires_at, 'fetched_at': fetched_at},
         )
-        return True
+        if created:
+            new_records_created = True
+
+    return new_records_created
 
 
 def convert_saml_slug_provider_id(provider):  # lint-amnesty, pylint: disable=redefined-outer-name
