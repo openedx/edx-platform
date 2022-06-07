@@ -56,12 +56,12 @@ def test_idp_login_url_with_next_url():
 
 def test_get_idp_register_url():
     url = helpers.get_idp_register_url()
-    assert url == '/register-use-fa-form'
+    assert url == '/auth/login/tahoe-idp/?auth_entry=register'
 
 
 def test_get_idp_register_url_with_next():
     url = helpers.get_idp_register_url(next_url='/courses?per_page=10')
-    assert url == '/register-use-fa-form?next=%2Fcourses%3Fper_page%3D10', 'should add encoded `next`'
+    assert url == '/auth/login/tahoe-idp/?auth_entry=register&next=%2Fcourses%3Fper_page%3D10', 'should add encoded `next`'
 
 
 def test_get_idp_form_url_with_tahoe_idp_disabled(settings):
@@ -93,7 +93,9 @@ def test_get_idp_form_url_for_register_without_pipeline(settings):
     with override_site_config('admin', ENABLE_TAHOE_IDP=True):
         url = helpers.get_idp_form_url(None, 'register', '/home')
 
-    assert url == '/register-use-fa-form?next=%2Fhome', 'Return a URL when there is no running pipeline'
+    assert url == '/auth/login/tahoe-idp/?auth_entry=register&next=%2Fhome', (
+        'Return a URL when there is no running pipeline'
+    )
 
 
 @patch('openedx.core.djangoapps.appsembler.tahoe_idp.helpers.pipeline_running', Mock(return_value=True))
