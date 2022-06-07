@@ -111,3 +111,12 @@ def is_studio_allowed_for_user(user, organization=None):
 
     short_name = organization.short_name
     return OrgStaffRole(short_name).has_user(user) or OrgInstructorRole(short_name).has_user(user)
+
+
+def is_studio_login_form_overridden():
+    """
+    Return the value of TAHOE_IDP_STUDIO_LOGIN_FORM_OVERRIDE. Default is <False>
+    """
+    if settings.FEATURES.get('TAHOE_IDP_STUDIO_LOGIN_FORM_OVERRIDE', None):
+        return True
+    return False
