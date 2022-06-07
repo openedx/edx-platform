@@ -214,7 +214,7 @@ coreschema==0.0.4
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==6.4
+coverage[toml]==6.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-cov
@@ -232,7 +232,7 @@ cssselect==1.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   pyquery
-cssutils==2.4.0
+cssutils==2.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   pynliner
@@ -249,6 +249,7 @@ defusedxml==0.7.1
     #   python3-openid
     #   python3-saml
     #   social-auth-core
+    #   tableauserverclient
 deprecated==1.2.13
     # via
     #   -r requirements/edx/testing.txt
@@ -348,7 +349,7 @@ django-config-models==2.3.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==3.12.0
+django-cors-headers==3.13.0
     # via -r requirements/edx/testing.txt
 django-countries==7.3.2
     # via
@@ -417,7 +418,7 @@ django-multi-email-field==0.6.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-django-mysql==4.6.0
+django-mysql==4.7.0
     # via -r requirements/edx/testing.txt
 django-oauth-toolkit==1.3.2
     # via
@@ -439,7 +440,7 @@ django-sekizai==3.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   django-wiki
-django-ses==3.0.1
+django-ses==3.1.0
     # via -r requirements/edx/testing.txt
 django-simple-history==3.0.0
     # via
@@ -461,7 +462,7 @@ django-storages==1.8
     #   edxval
 django-user-tasks==3.0.0
     # via -r requirements/edx/testing.txt
-django-waffle==2.4.1
+django-waffle==2.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
@@ -681,7 +682,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==13.12.0
+faker==13.12.1
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -693,7 +694,7 @@ fastavro==1.4.12
     # via
     #   -r requirements/edx/testing.txt
     #   openedx-events
-filelock==3.7.0
+filelock==3.7.1
     # via
     #   -r requirements/edx/testing.txt
     #   tox
@@ -813,7 +814,7 @@ jsonfield==3.1.0
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
-jsonschema==4.5.1
+jsonschema==4.6.0
     # via sphinxcontrib-openapi
 jwcrypto==1.3.1
     # via
@@ -844,9 +845,9 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==4.1.0
+lti-consumer-xblock==4.1.1
     # via -r requirements/edx/testing.txt
-lxml==4.8.0
+lxml==4.9.0
     # via
     #   -r requirements/edx/testing.txt
     #   edxval
@@ -921,7 +922,7 @@ multidict==6.0.2
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==0.960
+mypy==0.961
     # via -r requirements/edx/development.in
 mypy-extensions==0.4.3
     # via mypy
@@ -1091,7 +1092,7 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/testing.txt
     #   olxcleaner
-pylint==2.13.9
+pylint==2.14.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-lint
@@ -1248,9 +1249,9 @@ random2==1.0.1
     # via -r requirements/edx/testing.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/testing.txt
-redis==4.3.1
+redis==4.3.3
     # via -r requirements/edx/testing.txt
-regex==2022.4.24
+regex==2022.6.2
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
@@ -1395,7 +1396,7 @@ soupsieve==2.3.2.post1
     # via
     #   -r requirements/edx/testing.txt
     #   beautifulsoup4
-sphinx==5.0.0
+sphinx==5.0.1
     # via
     #   edx-sphinx-theme
     #   sphinxcontrib-httpdomain
@@ -1443,7 +1444,7 @@ sympy==1.10.1
     # via
     #   -r requirements/edx/testing.txt
     #   openedx-calc
-tableauserverclient==0.18.0
+tableauserverclient==0.19.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -1473,6 +1474,10 @@ tomli==2.0.1
     #   pep517
     #   pylint
     #   pytest
+tomlkit==0.11.0
+    # via
+    #   -r requirements/edx/testing.txt
+    #   pylint
 tox==3.25.0
     # via
     #   -r requirements/edx/testing.txt
