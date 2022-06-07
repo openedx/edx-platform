@@ -36,6 +36,10 @@ class AccountCreationFormCustom(AccountCreationForm):
         required=False
     )
 
+    is_organization_registered = forms.CharField(
+        required=False
+    )
+
     # field to check if organization is selected from dropdown or not
     is_org_selected = forms.BooleanField(
         required=False
@@ -110,6 +114,7 @@ class AccountCreationFormCustom(AccountCreationForm):
         cleaned_org_name = self.cleaned_data.get('organization_name')
         cleaned_org_size = self.cleaned_data.get('organization_size')
         cleaned_org_type = self.cleaned_data.get('organization_type')
+        cleaned_is_organization_registered = self.cleaned_data.get('is_organization_registered')
 
         valid_org_type = OrgSector.objects.filter(code=cleaned_org_type).exists()
         valid_org_size = TotalEmployee.objects.filter(code=cleaned_org_size).exists()
@@ -119,6 +124,12 @@ class AccountCreationFormCustom(AccountCreationForm):
 
         if cleaned_org_size and not valid_org_size:
             self.errors.update({'organization_size': [_('Invalid organization size option provided'), ]})
+
+        if (
+            cleaned_is_organization_registered and
+            cleaned_is_organization_registered not in ['No', 'Yes', 'I don\'t Know']
+        ):
+            self.errors.update({'is_organization_registered': [_('Invalid option provided'), ]})
 
         # User is affiliated with some organization
         if cleaned_org_name:
@@ -150,6 +161,10 @@ class AccountCreationFormCustom(AccountCreationForm):
                 if not cleaned_org_type:
                     self.errors.update(
                         {'organization_type': [_('Organization type not provided for new organization'), ]}
+                    )
+                if not cleaned_is_organization_registered:
+                    self.errors.update(
+                        {'is_organization_registered': ['Organization registration not provided for new organization', ]}
                     )
 
         return self.cleaned_data

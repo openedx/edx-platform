@@ -136,10 +136,12 @@ def set_opt_in_and_affiliate_user_organization(user, form):
     if org_name:
         user_organization, org_created = Organization.objects.get_or_create(label=org_name)
         org_size = form.cleaned_data.get('organization_size')
+        is_organization_registered = form.cleaned_data.get('is_organization_registered')
 
         if org_created:
             user_organization.total_employees = org_size
             user_organization.org_type = org_type
+            user_organization.is_organization_registered = is_organization_registered
             user_organization.save()
             is_first_learner = True
         else:
@@ -148,6 +150,9 @@ def set_opt_in_and_affiliate_user_organization(user, form):
 
             if org_type:
                 user_organization.org_type = org_type
+
+            if is_organization_registered:
+                user_organization.is_organization_registered = is_organization_registered
 
             user_organization.save()
             is_first_learner = user_organization.can_join_as_first_learner(exclude_user=user)
