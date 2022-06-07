@@ -5,7 +5,6 @@ Helper module for Tahoe Identity Provider package.
 """
 
 from collections import OrderedDict
-
 from django.conf import settings
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -29,12 +28,12 @@ def is_tahoe_idp_enabled():
     return config_client_api.get_admin_value('ENABLE_TAHOE_IDP', default=global_flag)
 
 
-def get_idp_login_url(next_url=None):
+def get_idp_login_url(next_url=None, auth_entry='login'):
     """
     Get Tahoe IdP login URL which uses `social_auth`.
     """
     params = OrderedDict()
-    params['auth_entry'] = 'login'
+    params['auth_entry'] = auth_entry
     if next_url:
         params['next'] = next_url
 
@@ -49,19 +48,7 @@ def get_idp_register_url(next_url=None):
     """
     Get Tahoe IdP register URL using `tahoe-idp` package.
     """
-    base = '/register-use-fa-form'
-
-    if not next_url:
-        return base
-
-    params = {
-        'next': next_url,
-    }
-
-    return '{base}?{query}'.format(
-        base=base,
-        query=urlencode(params),
-    )
+    return get_idp_login_url(next_url=next_url, auth_entry='register')
 
 
 def get_idp_form_url(request, initial_form_mode, next_url):
@@ -76,15 +63,16 @@ def get_idp_form_url(request, initial_form_mode, next_url):
     if not third_party_auth.is_enabled():
         return None
 
+    auth_entry = 'login'
     if initial_form_mode == "register":
+        auth_entry = 'register'
+
         if pipeline_running(request):
             # Upon registration, Open edX  auto-submits the frontend hidden registration form.
             # Returning, None to avoid breaking an otherwise needed form submit.
             return None
 
-        return get_idp_register_url(next_url=next_url)
-    else:
-        return get_idp_login_url(next_url=next_url)
+    return get_idp_login_url(next_url=next_url, auth_entry=auth_entry)
 
 
 def store_idp_metadata_in_user_profile(user, metadata):
