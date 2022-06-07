@@ -214,7 +214,7 @@ coreschema==0.0.4
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==6.4.1
+coverage[toml]==6.4
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-cov
@@ -232,7 +232,7 @@ cssselect==1.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   pyquery
-cssutils==2.4.1
+cssutils==2.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   pynliner
@@ -693,13 +693,15 @@ fastavro==1.4.12
     # via
     #   -r requirements/edx/testing.txt
     #   openedx-events
-filelock==3.7.1
+filelock==3.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox
     #   virtualenv
-freezegun==1.2.1
-    # via -r requirements/edx/testing.txt
+freezegun==0.3.12
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/testing.txt
 frozenlist==1.3.0
     # via
     #   -r requirements/edx/testing.txt
@@ -811,7 +813,7 @@ jsonfield==3.1.0
     #   edx-submissions
     #   lti-consumer-xblock
     #   ora2
-jsonschema==4.6.0
+jsonschema==4.5.1
     # via sphinxcontrib-openapi
 jwcrypto==1.3.1
     # via
@@ -842,9 +844,9 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==4.1.1
+lti-consumer-xblock==4.1.0
     # via -r requirements/edx/testing.txt
-lxml==4.9.0
+lxml==4.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   edxval
@@ -1091,7 +1093,6 @@ pylatexenc==2.10
     #   olxcleaner
 pylint==2.13.9
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-lint
     #   pylint-celery
@@ -1175,8 +1176,9 @@ pytest-randomly==3.12.0
     # via -r requirements/edx/testing.txt
 pytest-xdist[psutil]==2.5.0
     # via -r requirements/edx/testing.txt
-python-dateutil==2.8.2
+python-dateutil==2.4.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   analytics-python
     #   botocore
@@ -1246,9 +1248,9 @@ random2==1.0.1
     # via -r requirements/edx/testing.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/testing.txt
-redis==4.3.3
+redis==4.3.1
     # via -r requirements/edx/testing.txt
-regex==2022.6.2
+regex==2022.4.24
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
@@ -1344,6 +1346,7 @@ six==1.16.0
     #   edx-rbac
     #   edx-sphinx-theme
     #   event-tracking
+    #   freezegun
     #   fs
     #   fs-s3fs
     #   html5lib
@@ -1392,7 +1395,7 @@ soupsieve==2.3.2.post1
     # via
     #   -r requirements/edx/testing.txt
     #   beautifulsoup4
-sphinx==5.0.1
+sphinx==5.0.0
     # via
     #   edx-sphinx-theme
     #   sphinxcontrib-httpdomain
