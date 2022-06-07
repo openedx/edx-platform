@@ -75,7 +75,8 @@ def get_grade_book_page(request, course, course_key):
     current_offset = request.GET.get('offset', 0)
     enrolled_students = User.objects.filter(
         courseenrollment__course_id=course_key,
-        courseenrollment__is_active=1
+        courseenrollment__is_active=1,
+        courseenrollment__mode='honor'
     ).order_by('username').select_related("profile")
 
     total_students = enrolled_students.count()
