@@ -206,7 +206,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==6.4
+coverage[toml]==6.4.1
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -224,7 +224,7 @@ cssselect==1.1.0
     # via
     #   -r requirements/edx/testing.in
     #   pyquery
-cssutils==2.4.0
+cssutils==2.4.1
     # via
     #   -r requirements/edx/base.txt
     #   pynliner
@@ -669,14 +669,12 @@ fastavro==1.4.12
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
-filelock==3.7.0
+filelock==3.7.1
     # via
     #   tox
     #   virtualenv
-freezegun==0.3.12
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.in
+freezegun==1.2.1
+    # via -r requirements/edx/testing.in
 frozenlist==1.3.0
     # via
     #   -r requirements/edx/base.txt
@@ -806,9 +804,9 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==4.1.0
+lti-consumer-xblock==4.1.1
     # via -r requirements/edx/base.txt
-lxml==4.8.0
+lxml==4.9.0
     # via
     #   -r requirements/edx/base.txt
     #   edxval
@@ -1034,6 +1032,7 @@ pylatexenc==2.10
     #   olxcleaner
 pylint==2.13.9
     # via
+    #   -c requirements/edx/../constraints.txt
     #   edx-lint
     #   pylint-celery
     #   pylint-django
@@ -1107,9 +1106,8 @@ pytest-randomly==3.12.0
     # via -r requirements/edx/testing.in
 pytest-xdist[psutil]==2.5.0
     # via -r requirements/edx/testing.in
-python-dateutil==2.4.0
+python-dateutil==2.8.2
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   analytics-python
     #   botocore
@@ -1176,9 +1174,9 @@ random2==1.0.1
     # via -r requirements/edx/base.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
-redis==4.3.1
+redis==4.3.3
     # via -r requirements/edx/base.txt
-regex==2022.4.24
+regex==2022.6.2
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1272,7 +1270,6 @@ six==1.16.0
     #   edx-milestones
     #   edx-rbac
     #   event-tracking
-    #   freezegun
     #   fs
     #   fs-s3fs
     #   html5lib
