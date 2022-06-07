@@ -8124,7 +8124,10 @@ def update_user_email(user, old_email, new_email):
 
     # send email to new and old account
     context = {
-        'emailId': HubSpotClient.VERIFY_CHANGE_USER_EMAIL,
+        'emailId': HubSpotClient.CHANGE_USER_EMAIL_ALERT,
+        'message': {
+            'to': None,
+        },
         'customProperties': {
             'old_email': old_email,
             'new_email': new_email
