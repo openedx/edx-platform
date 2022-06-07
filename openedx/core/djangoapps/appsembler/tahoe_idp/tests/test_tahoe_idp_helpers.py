@@ -3,6 +3,7 @@ Tests for `tahoe_idp.helpers`.
 """
 from unittest.mock import patch, Mock
 
+from django.conf import settings
 import pytest
 
 from organizations.tests.factories import OrganizationFactory
@@ -188,3 +189,22 @@ def test_is_studio_allowed_for_user_learner_no_organization(user_with_org):
     """
     learner, _ = user_with_org
     assert not helpers.is_studio_allowed_for_user(learner)
+
+
+def test_is_studio_login_form_overridden_flag_not_available():
+    """
+    Verify that the default for not having the flag is to return <False>
+    """
+    assert 'TAHOE_IDP_STUDIO_LOGIN_FORM_OVERRIDE' not in settings.FEATURES
+    assert not helpers.is_studio_login_form_overridden()
+
+
+@pytest.mark.parametrize('flag_value,expected_result', [
+    (None, False), (False, False), (True, True), ('something', True)
+])
+def test_is_studio_login_form_overridden_flag_available(flag_value, expected_result):
+    """
+    Verify that is_studio_login_form_overridden returns the value of the helper
+    """
+    with patch.dict('django.conf.settings.FEATURES', {'TAHOE_IDP_STUDIO_LOGIN_FORM_OVERRIDE': flag_value}):
+        assert helpers.is_studio_login_form_overridden() is expected_result
