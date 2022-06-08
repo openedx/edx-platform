@@ -565,25 +565,28 @@ def course_listing(request):
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
 
     return render_to_response('index.html', {
-        'courses': active_courses,
-        'split_studio_home': split_library_view_on_dashboard(),
-        'archived_courses': archived_courses,
-        'in_process_course_actions': in_process_course_actions,
-        'libraries_enabled': LIBRARIES_ENABLED,
-        'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
-        'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
-        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
-        'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
-        'user': user,
-        'request_course_creator_url': reverse('request_course_creator'),
-        'course_creator_status': _get_course_creator_status(user),
-        'rerun_creator_status': GlobalStaff().has_user(user),
-        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
-        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
-        'optimization_enabled': optimization_enabled,
-        'active_tab': 'courses'
+    'courses': active_courses,
+    'split_studio_home': split_library_view_on_dashboard(),
+    'archived_courses': archived_courses,
+    'in_process_course_actions': in_process_course_actions,
+    'libraries_enabled': LIBRARIES_ENABLED,
+    'liveclass_enabled': True,
+    'liveclass_enabled_list': False,
+    'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
+    'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
+    'liveclass_authoring_mfe_url': '#',
+    'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+    'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
+    'show_new_liveclass_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
+    'user': user,
+    'request_course_creator_url': reverse('request_course_creator'),
+    'course_creator_status': _get_course_creator_status(user),
+    'rerun_creator_status': GlobalStaff().has_user(user),
+    'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+    'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+    'optimization_enabled': optimization_enabled,
+    'active_tab': 'courses'
     })
-
 
 @login_required
 @ensure_csrf_cookie
@@ -600,6 +603,7 @@ def library_listing(request):
         'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
         'user': request.user,
         'request_course_creator_url': reverse('request_course_creator'),
+        'show_new_liveclass_button': LIBRARIES_ENABLED and request.user.is_active,
         'course_creator_status': _get_course_creator_status(request.user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'archived_courses': True,

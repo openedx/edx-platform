@@ -5,10 +5,13 @@ Declaration of CourseOverview model
 
 import json
 import logging
+#from msilib.schema import SelfReg
 from urllib.parse import urlparse, urlunparse
 
 from ccx_keys.locator import CCXLocator
 from config_models.models import ConfigurationModel
+from collections import  namedtuple
+
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
@@ -21,6 +24,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from simple_history.models import HistoricalRecords
 
+from django.contrib.auth.models import User
 from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
@@ -38,6 +42,9 @@ log = logging.getLogger(__name__)
 
 class CourseOverviewCaseMismatchException(Exception):
     pass
+
+
+
 
 
 class CourseOverview(TimeStampedModel):
@@ -66,6 +73,7 @@ class CourseOverview(TimeStampedModel):
 
     # Cache entry versioning.
     version = models.IntegerField()
+    
 
     # Course identification
     id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
@@ -918,6 +926,108 @@ class CourseOverviewTab(models.Model):
 
     def __str__(self):
         return self.tab_id
+
+
+
+# live_class = namedtuple('live_class',
+#                   [
+#                       'start_time',
+#                       'end_time',
+#                       'is_recurrence_meeting',
+#                       'room_key',
+#                       'room_name',
+#                       'topic_name',
+#                       'start_date',
+#                       'end_date',
+#                       'client_token',
+#                       'meeting_link',
+#                       'created_date',
+#                       'created_by',
+#                       'meeting_notes',
+#                   ])
+
+
+class LiveClasses(models.Model):
+
+    start_time = models.TimeField(null=True)
+    end_time = models.TimeField(null=True)
+    room_key = models.CharField(max_length=60, null=True)
+    room_name = models.CharField(max_length=60, null=True)
+    topic_name = models.CharField(max_length=60, null=True)
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
+    client_token = models.CharField(max_length=60, null=True)
+    meeting_link = models.CharField(max_length=60, null=True)
+    created_date = models.DateTimeField(null=True)
+    created_by = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE ,null=True )
+    is_recurrence_meeting =  models.BooleanField(max_length=60, null=False)
+    meeting_notes = models.CharField(max_length=60, null=True)
+    course = models.ForeignKey(CourseOverview, db_index=True, on_delete=models.CASCADE ,null=True )
+
+
+#     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
+
+            
+    
+
+
+    
+    # @classmethod
+    # def live_class_for_user(
+    #     cls, user_id=None,  username=None,
+    # ):
+
+    #     if user_id is None and username is None:
+    #         raise ValueError("One of user_id or user must not be None.")
+
+    #     if username is not None and not isinstance(username, User):
+    #         # CourseBlocks don't have the data needed to pull related modes,
+    #         # so we'll fall back on course_id-based lookup instead
+    #         user_id = user_id
+    #         username = None
+
+    #     if username is not None:
+    #         found_user_live_class = username.live_classes.all()
+    #     else:
+    #         found_user_live_class = cls.objects.filter(user_id=user_id)
+
+
+    #     live_classes = ([live_class.to_tuple() for live_class in found_user_live_class])
+
+    #     return live_classes
+
+
+
+    # def to_tuple(self):
+    #     """
+    #     Takes a mode model and turns it into a model named tuple.
+
+    #     Returns:
+    #         A 'Mode' namedtuple with all the same attributes as the model.
+
+    #     """
+    #     return live_class(
+
+    #         self.start_time ,
+    #         self.end_time,
+    #         self.is_recurrence_meeting,
+    #         self.room_key,
+    #         self.room_name,
+    #         self.topic_name,
+    #         self.start_date,
+    #         self.end_date,
+    #         self.client_token,
+    #         self.meeting_link,
+    #         self.created_date,
+    #         self.created_by,
+    #         self.meeting_notes,
+           
+    #     )
+
+
+
+    
+
 
 
 class CourseOverviewImageSet(TimeStampedModel):

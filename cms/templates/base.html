@@ -78,6 +78,139 @@ from openedx.core.release import RELEASE_LINE
     <%include file="widgets/segment-io.html" />
 
     <%block name="header_extras"></%block>
+    <style>
+  
+      /* The Modal (background) */
+      .modal-meeting {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1001; /* Sit on top */
+       
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        -webkit-animation-name: fadeIn; /* Fade in the background */
+        -webkit-animation-duration: 0.4s;
+        animation-name: fadeIn;
+        animation-duration: 0.4s
+      }
+      .modal-meeting1 {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1001; /* Sit on top */
+       
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        -webkit-animation-name: fadeIn; /* Fade in the background */
+        -webkit-animation-duration: 0.4s;
+        animation-name: fadeIn;
+        animation-duration: 0.4s
+      }
+      
+      /* Modal Content */
+      .modal-content-meeting{
+        position: fixed;
+        height:100%;
+        background-color: #fefefe;
+        
+        -webkit-animation-name: slideIn;
+        -webkit-animation-duration: 0.4s;
+        animation-name: slideIn;
+        animation-duration: 0.4s;
+        width: 30%;
+left: 70%;
+      }
+      
+      /* The Close Button */
+      .close {
+        color: white;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .close1 {
+        color: white;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      
+      .close1:hover,
+      .close1:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      
+      
+      .modal-header {
+        padding: 2px 16px;
+        background-color: #0075b4;
+        color: white;
+      }
+      
+      .modal-body {padding: 2px 16px;height: 95%;}
+      
+      .modal-footer {
+        padding: 2px 16px;
+        background-color: #0075b4;;
+        color: white;
+      }
+      
+      /* Add Animation */
+      @-webkit-keyframes slideIn {
+        from {right: -300px; opacity: 0} 
+        to {rigt: 0; opacity: 1}
+      }
+      
+      @keyframes slideIn {
+        from {right: -300px; opacity: 0}
+        to {right: 0; opacity: 1}
+      }
+      
+      @-webkit-keyframes fadeIn {
+        from {right: 0} 
+        to {right: 1}
+      }
+      
+      @keyframes fadeIn {
+        from {opacity: 0} 
+        to {opacity: 1}
+      }
+      *{box-sizing:border-box;}
+.out{width:100%;height:auto;position:absolute;
+  border:1px #c0c0c0 solid;}
+  .out-student{width:100%;height:auto;position:absolute;
+  }
+  .inner-student{width:100%;height:auto;padding:4px;font-size:2rem;font-family:arial;float: left;border: 1px solid rgb(211, 203, 203);box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;margin:5px;padding: 1.5rem;}
+.inner{width: 50%;
+height: auto;
+padding: 4px;
+font-size: 2rem;
+font-family: arial;
+float: left;
+border: 1px solid #e3e1e1;
+background: #fff;}
+.inner-link{width:50%;height:auto;padding:4px;font-size:2rem;font-family:arial;float: left;border: 1px solid #e3e1e1;background:#fff;text-align: center;}
+.inner-link-delete{width:25%;height:auto;padding:4px;font-size:2rem;font-family:arial;float: left;border: 1px solid gray;text-align: center;}
+.view-users{width:50%;height:auto;padding:4px;font-size:2rem;font-family:arial;float: left;border: 1px solid #e3e1e1;background:#fff;text-align: center;cursor: pointer;}
+      </style>
+    
   </head>
 
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">

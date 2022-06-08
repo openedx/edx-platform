@@ -77,7 +77,7 @@ from lms.djangoapps.courseware.models import (
 )
 from lms.djangoapps.courseware.toggles import streak_celebration_is_active
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview,LiveClasses
 from openedx.core.djangoapps.enrollments.api import (
     _default_course_mode,
     get_enrollment_attributes,
@@ -169,7 +169,7 @@ def anonymous_id_for_user(user, course_id):
 
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
-
+    
     if user.is_anonymous:
         return None
 
@@ -612,7 +612,8 @@ class UserProfile(models.Model):
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
-
+    #attendance = models.CharField(max_length=250, null=True, db_index=True)
+    #user_attendance = models.CharField(max_length=250, null=True, db_index=True)
     @property
     def has_profile_image(self):
         """
@@ -1208,6 +1209,9 @@ class CourseEnrollmentManager(models.Manager):
 # is used to cache the state in the request cache.
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
 
+class LiveClassEnrollment(models.Model):
+    live_class = models.ForeignKey(LiveClasses, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class CourseEnrollment(models.Model):
     """

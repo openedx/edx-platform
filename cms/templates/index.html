@@ -41,6 +41,10 @@ from openedx.core.djangolib.js_utils import (
             <a href="#" class="button new-button new-library-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
             ${_("New Library")}</a>
           % endif
+          % if show_new_liveclass_button:
+          <a href="#" class="button new-button new-liveclass-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
+          ${_("New Live Class")}</a>
+        % endif
         </li>
       </ul>
     </nav>
@@ -187,6 +191,183 @@ from openedx.core.djangolib.js_utils import (
       </div>
       % endif
 
+     
+      %if liveclass_enabled and show_new_liveclass_button:
+      <div class="wrapper-create-element wrapper-create-liveclass">
+        <form class="form-create create-liveclass liveclass-info" id="create-liveclass-form" name="create-liveclass-form">
+          <div class="wrap-error">
+            <div id="liveclasscreation_error" name="liveclass_creation_error" class="message message-status message-status error" role="alert">
+            <p>${_("Please correct the highlighted fields below.")}</p>
+            </div>
+          </div>
+
+          <div class="wrapper-form">
+            <h3 class="title">${_("Create a New Live Class")}</h3>
+
+            <fieldset>
+              <legend class="sr">${_("Required Information to Create a New Live Class")}</legend>
+              <ol class="list-input">
+                <li class="field text required" id="field-liveclass-name">
+                  <label for="new-liveclass-name">${_("Live Class Name")}</label>
+                  ## Translators: This is an example name for a new content live class, seen when
+                  ## filling out the form to create a new live class.
+                  ## (A live class is a collection of content or problems.)
+                  <input class="new-liveclass-name" id="new-liveclass-name" type="text" name="new-liveclass-name" required placeholder="${_('e.g. Python - Variables')}" aria-describedby="tip-new-liveclass-name tip-error-new-liveclass-name" />
+                  <!-- <span class="tip" id="tip-new-liveclass-name">${_("The public display name for your liveclass.")}</span> -->
+                  <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-name"></span>
+                </li>
+                <li class="field text required" id="field-liveclass-notes">
+                  <label for="new-liveclass-notes">${_("Meeting Notes")}</label>
+                  
+                  <textarea  class="new-liveclass-notes" id="new-liveclass-notes" name="new-liveclass-notes" required placeholder="${_('e.g. Notes')}" aria-describedby="tip-new-liveclass-notes tip-error-new-liveclass-notes"></textarea>
+                  <!-- <span class="tip" id="tip-new-liveclass-notes">${_("The public notes for your liveclass.")}</span> -->
+                  <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-notes"></span>
+                  
+                </li>
+                <li class="field text required" id="field-liveclass-recurrence">
+                  <!-- <label for="new-liveclass-notes">${_("Meeting Notes")}</label> -->
+                  
+                  <input type="checkbox" class="new-liveclass-recurrence" id="new-liveclass-recurrence" name="new-liveclass-recurrence" required aria-describedby="tip-new-liveclass-recurrence tip-error-new-liveclass-recurrence"/> Recurrence Meeting
+                  <!-- <span class="tip" id="tip-new-liveclass-notes">${_("The public notes for your liveclass.")}</span> -->
+                  <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-recurrence"></span>
+                  
+                </li>
+                <li class="field text required" id="field-liveclass-date">
+                  <table>
+                    <tr>
+                      <td style="vertical-align: middle;padding:10px;padding-left: 0;">
+                        <!-- <label for="new-liveclass-startdate">${_("Start Date")}</label> -->
+                        <input type="date" class="new-liveclass-startdate" id="new-liveclass-startdate" name="new-liveclass-startdate" required placeholder="${_('e.g. startdate')}" aria-describedby="tip-new-liveclass-startdate tip-error-new-liveclass-startdate"/>
+                        <!-- <span class="tip" id="tip-new-liveclass-startdate">${_("The public startdate for your liveclass.")}</span> -->
+                        <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-startdate"></span>
+                      </td>
+                      <td style="vertical-align: middle;padding:10px">
+                        <!-- <label for="new-liveclass-starttime">${_("Start Time")}</label> -->
+                  <input type="time" class="new-liveclass-starttime" id="new-liveclass-starttime" name="new-liveclass-starttime" required placeholder="${_('e.g. starttime')}" aria-describedby="tip-new-liveclass-starttime tip-error-new-liveclass-starttime"/>
+                  <!-- <span class="tip" id="tip-new-liveclass-starttime">${_("The public starttime for your liveclass.")}</span> -->
+                  <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-starttime"></span>
+                      </td>
+                      <td style="vertical-align: middle;padding:10px">
+                        to
+                      </td>
+                      <td style="vertical-align: middle;padding:10px">
+                        <!-- <label for="new-liveclass-startdate">${_("Start Date")}</label> -->
+                        <input type="date" class="new-liveclass-enddate" id="new-liveclass-enddate" name="new-liveclass-enddate" required placeholder="${_('e.g. enddate')}" aria-describedby="tip-new-liveclass-enddate tip-error-new-liveclass-enddate"/>
+                        <!-- <span class="tip" id="tip-new-liveclass-enddate">${_("The public enddate for your liveclass.")}</span> -->
+                        <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-enddate"></span>
+                      </td>
+                      <td style="vertical-align: middle;padding:10px">
+                        <!-- <label for="new-liveclass-starttime">${_("Start Time")}</label> -->
+                  <input type="time" class="new-liveclass-endtime" id="new-liveclass-endtime" name="new-liveclass-endtime" required placeholder="${_('e.g. endtime')}" aria-describedby="tip-new-liveclass-endtime tip-error-new-liveclass-endtime"/>
+                  <!-- <span class="tip" id="tip-new-liveclass-endtime">${_("The public endtime for your liveclass.")}</span> -->
+                  <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-endtime"></span>
+                      </td>
+                    </tr>
+                  </table>
+                  <!-- <div style="width: 100%;">
+                  <div style="width:20%">
+                  <label for="new-liveclass-startdate">${_("Start Date")}</label>
+                  <input type="date" class="new-liveclass-startdate" id="new-liveclass-startdate" name="new-liveclass-startdate" required placeholder="${_('e.g. startdate')}" aria-describedby="tip-new-liveclass-startdate tip-error-new-liveclass-startdate"/>
+                  <span class="tip" id="tip-new-liveclass-startdate">${_("The public startdate for your liveclass.")}</span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-startdate"></span>
+                  </div>
+                  <div style="width:20%">
+                    <label for="new-liveclass-startdate">${_("Start Date")}</label>
+                    <input type="date" class="new-liveclass-startdate" id="new-liveclass-startdate" name="new-liveclass-startdate" required placeholder="${_('e.g. startdate')}" aria-describedby="tip-new-liveclass-startdate tip-error-new-liveclass-startdate"/>
+                    <span class="tip" id="tip-new-liveclass-startdate">${_("The public startdate for your liveclass.")}</span>
+                    <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-startdate"></span>
+                    </div>
+                  </div> -->
+                </li>
+                <li class="field text required" id="field-liveclass-repeatcriteria"  style="display: none;">
+                                          <label for="new-liveclass-repeattype">${_("Recurrence Criterias")}</label>
+
+                  <table>
+                    <tr>
+                      <td style="vertical-align: middle;padding:10px;padding-left: 0;">
+                        <!-- <label for="new-liveclass-repeattype">${_("Repeat Type")}</label> -->
+
+                        <select name="new-liveclass-repeattype" id="new-liveclass-repeattype" style="height: 4.5rem;width: 15rem;">
+                          <!-- <option value="week">Day</option> -->
+                          <option value="week">Week</option>
+                          <!-- <option value="month">Month</option>
+                          <option value="year">Year</option> -->
+                        </select> 
+                        <span class="tip" id="tip-new-liveclass-enddate">${_("repeat type")}</span>
+
+                        <!-- ><label for="new-liveclass-repeatendson">${_("Repeat Type")}</label>
+                        <input type="date" class="new-liveclass-repeatendson" id="new-liveclass-repeatendson" name="new-liveclass-repeatendson"  placeholder="${_('e.g. repeatendson')}" aria-describedby="tip-new-liveclass-repeatendson tip-error-new-liveclass-repeatendson"/>
+                        <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-repeatendson"></span -->
+                            </td>
+                            <td style="vertical-align: middle;padding: 30px;" id="week">
+                              <input type="checkbox" class="new-liveclass-s" id="new-liveclass-s" name="new-liveclass-s" required aria-describedby="tip-new-liveclass-s tip-error-new-liveclass-s"/> S
+                              <input type="checkbox" class="new-liveclass-m" id="new-liveclass-m" name="new-liveclass-m" required aria-describedby="tip-new-liveclass-m tip-error-new-liveclass-m"/> M
+                              <input type="checkbox" class="new-liveclass-t" id="new-liveclass-t" name="new-liveclass-t" required aria-describedby="tip-new-liveclass-t tip-error-new-liveclass-t"/> T
+                              <input type="checkbox" class="new-liveclass-w" id="new-liveclass-w" name="new-liveclass-w" required aria-describedby="tip-new-liveclass-w tip-error-new-liveclass-w"/> W
+                              <input type="checkbox" class="new-liveclass-t" id="new-liveclass-t" name="new-liveclass-t" required aria-describedby="tip-new-liveclass-t tip-error-new-liveclass-t"/> T
+                              <input type="checkbox" class="new-liveclass-f" id="new-liveclass-f" name="new-liveclass-f" required aria-describedby="tip-new-liveclass-f tip-error-new-liveclass-f"/> F
+                              <input type="checkbox" class="new-liveclass-sa" id="new-liveclass-sa" name="new-liveclass-sa" required aria-describedby="tip-new-liveclass-sa tip-error-new-liveclass-sa"/> SA
+
+                            </td>
+                    <td style="vertical-align: middle;padding:10px;padding-left: 0;">
+                  <!-- <label for="new-liveclass-repeatendson">${_("Repeat Ends On")}</label> -->
+                  <input type="date" class="new-liveclass-repeatendson" id="new-liveclass-repeatendson" name="new-liveclass-repeatendson"  placeholder="${_('e.g. repeatendson')}" aria-describedby="tip-new-liveclass-repeatendson tip-error-new-liveclass-repeatendson"/>
+                  <span class="tip" id="tip-new-liveclass-enddate">${_("repeat ends on")}</span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-repeatendson"></span>
+                      </td>
+                    </tr>
+                  </table>
+                </li>
+                </ol>
+<!-- 
+              <ol class="list-input">
+                <li class="field text required" id="field-library-name">
+                  <label for="new-library-name">${_("Library Name")}</label>
+                  ## Translators: This is an example name for a new content library, seen when
+                  ## filling out the form to create a new library.
+                  ## (A library is a collection of content or problems.)
+                  <input class="new-library-name" id="new-library-name" type="text" name="new-library-name" required placeholder="${_('e.g. Computer Science Problems')}" aria-describedby="tip-new-library-name tip-error-new-library-name" />
+                  <span class="tip" id="tip-new-library-name">${_("The public display name for your library.")}</span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-library-name"></span>
+                </li>
+                <li class="field text required">
+                  <label for="new-library-org">${_("Organization")}</label>
+                  <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-library-org tip-error-new-library-org" />
+                  <span class="tip" id="tip-new-library-org">${_("The public organization name for your library.")} ${_("This cannot be changed.")}</span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-library-org"></span>
+                </li>
+
+                <li class="field text required" id="field-library-number">
+                  <label for="new-library-number">${_("Library Code")}</label>
+                  ## Translators: This is an example for the "code" used to identify a library,
+                  ## seen when filling out the form to create a new library. This example is short
+                  ## for "Computer Science Problems". The example number may contain letters
+                  ## but must not contain spaces.
+                  <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" required placeholder="${_('e.g. CSPROB')}" aria-describedby="tip-new-library-number tip-error-new-library-number" />
+                  <span class="tip" id="tip-new-library-number">${Text(_("The unique code that identifies this library. {strong_start}Note: This is part of your library URL, so no spaces or special characters are allowed.{strong_end} This cannot be changed.")).format(
+                      strong_start=HTML('<strong>'),
+                      strong_end=HTML('</strong>'),
+                  )}</span>
+                  <span class="tip tip-error is-hiding" id="tip-error-new-library-number"></span>
+                </li>
+              </ol> -->
+
+            </fieldset>
+          </div>
+
+          <div class="actions">
+            <input type="hidden" value="${allow_unicode_course_id}" class="allow-unicode-course-id" />
+            <input type="submit" value="${_('Create')}" class="action action-primary new-liveclass-save" />
+            <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-liveclass-cancel" />
+             </br></br>
+             <input class="new-liveclass-username" id="new-liveclass-username" type="text" name="new-liveclass-username" required placeholder="${_('Enter Email')}" aria-describedby="tip-new-liveclass-username tip-error-new-liveclass-username" />
+            <input type="button" value="${_('Assign User')}" class="action action-primary new-liveclass-user" />
+          </div>
+        </form>
+      </div>
+      % endif
+
+  
       %if optimization_enabled:
       <div class="optimization-form">
         <h2 class="title title-3">${_("Organization and Library Settings")}</h2>
@@ -344,6 +525,18 @@ from openedx.core.djangolib.js_utils import (
              </li>
             % endif
         % endif
+
+        % if liveclass_enabled_list:
+        <li><a href="${liveclass_authoring_mfe_url}">${_("LiveClass")}</a></li>
+        %else:
+         <li class="liveclass-tab ${ 'active' if active_tab == 'liveclass' else ''}">
+            % if split_studio_home:
+              <a href="${reverse('home_liveclass')}">${_("LiveClass")}</a>
+            % else:
+              <a href="#" >${_("Live Class")}</a>
+            % endif
+         </li>
+    % endif
       </ul>
       % endif
 
@@ -535,7 +728,15 @@ from openedx.core.djangolib.js_utils import (
         % endif
       </div>
       %endif
-
+      %if len(libraries) > 0 or optimization_enabled:
+      <div class="liveclass react-liveclass-listing liveclass-tab ${ 'active' if active_tab == 'liveclass' else ''}">
+        <div id="output" class="out" style="position: relative;display: none;">
+   
+        </div>
+      </div>
+      %else:
+      <div></div>
+      %endif
     </article>
     <aside class="content-supplementary" role="complementary">
       <div class="bit">
@@ -611,4 +812,13 @@ from openedx.core.djangolib.js_utils import (
 
   %endif
 </div>
+<script>
+  // var element = document.getElementsByClassName('view-users')
+  // element.onclick = function(e){
+  //   alert('data')
+  //  }
+
+</script>
 </%block>
+
+

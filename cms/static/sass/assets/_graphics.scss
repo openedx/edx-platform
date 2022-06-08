@@ -1,5 +1,3 @@
-// studio - assets - graphics
-// ====================
 
 .drag-handle {
   display: inline-block;
@@ -51,4 +49,11 @@
   width: ($baseline*3);
   height: ($baseline*3);
   background: url('#{$static-path}/images/large-openassessment-icon.png') center no-repeat;
+}
+
+.large-pdf-icon {
+  display: inline-block;
+  width: ($baseline*3);
+  height: ($baseline*3);
+  background: url('#{$static-path}/images/large-pdf-icon.png') center no-repeat;
 }
