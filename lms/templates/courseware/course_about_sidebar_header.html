@@ -20,33 +20,27 @@ from six import text_type
         site_domain = static.get_value('site_domain', settings.SITE_NAME)
         site_protocol = 'https' if settings.HTTPS == 'on' else 'http'
         platform_name = static.get_platform_name()
+        course_path = reverse('about_course', args=[text_type(course.id)])
+        course_url = f"{site_protocol}://{site_domain}{course_path}"
 
         ## Translators: This text will be automatically posted to the student's
         ## Twitter account. {url} should appear at the end of the text.
-        tweet_text = _("I just enrolled in {number} {title} through {account}: {url}").format(
+        tweet_text = _("I just enrolled in {number} {title} through {account} {url}").format(
             number=course.number,
             title=course.display_name_with_default,
             account=static.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
-            url=u"{protocol}://{domain}{path}".format(
-                protocol=site_protocol,
-                domain=site_domain,
-                path=reverse('about_course', args=[text_type(course.id)])
-            )
+            url=course_url
         )
 
         tweet_action = u"https://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=six.moves.urllib.parse.quote(tweet_text))
 
-        facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
+        facebook_link = f"https://www.facebook.com/sharer/sharer.php?u={six.moves.urllib.parse.quote(course_url)}"
 
         email_body = _("I just enrolled in {number} {title} through {platform} {url}").format(
                 number=course.number,
                 title=course.display_name_with_default,
                 platform=platform_name,
-                url=u"{protocol}://{domain}{path}".format(
-                    protocol=site_protocol,
-                    domain=site_domain,
-                    path=reverse('about_course', args=[text_type(course.id)]),
-                )
+                url=course_url
         )
 
         email_subject = _("Take a course with {platform} online").format(platform=platform_name)
@@ -59,7 +53,7 @@ from six import text_type
         <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
       </a>
       <a href="${facebook_link}" class="share">
-        <span class="icon fa fa-thumbs-up" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
+        <span class="icon fa fa-facebook" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
       </a>
       <a href="${email_link}" class="share">
         <span class="icon fa fa-envelope" aria-hidden="true"></span><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
