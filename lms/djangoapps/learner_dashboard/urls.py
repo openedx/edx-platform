@@ -6,7 +6,7 @@ from lms.djangoapps.learner_dashboard import courses_views, programs, program_vi
 
 # Learner Dashboard Routing
 urlpatterns = [
-    path('courses/', courses_views.course_listing, name='course_listing_view')
+    path('learner/', courses_views.course_listing, name='course_listing_view')
 ]
 
 # Program Dashboard Routing
