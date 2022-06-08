@@ -681,10 +681,8 @@ filelock==3.6.0
     # via
     #   tox
     #   virtualenv
-freezegun==0.3.12
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.in
+freezegun==1.2.1
+    # via -r requirements/edx/testing.in
 frozenlist==1.3.0
     # via
     #   -r requirements/edx/base.txt
@@ -1126,7 +1124,7 @@ pytest-randomly==3.11.0
     # via -r requirements/edx/testing.in
 pytest-xdist[psutil]==2.5.0
     # via -r requirements/edx/testing.in
-python-dateutil==2.4.0
+python-dateutil==2.8.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt

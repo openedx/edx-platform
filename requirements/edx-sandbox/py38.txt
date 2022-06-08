@@ -39,10 +39,8 @@ matplotlib==3.3.4
     #   -r requirements/edx-sandbox/py38.in
 mpmath==1.2.1
     # via sympy
-networkx==2.5.1
-    # via
-    #   -c requirements/edx-sandbox/../constraints.txt
-    #   -r requirements/edx-sandbox/py38.in
+networkx==2.8.2
+    # via -r requirements/edx-sandbox/py38.in
 nltk==3.7
     # via
     #   -r requirements/edx-sandbox/py38.in
@@ -66,10 +64,8 @@ pyparsing==3.0.7
     #   chem
     #   matplotlib
     #   openedx-calc
-python-dateutil==2.4.0
-    # via
-    #   -c requirements/edx-sandbox/../constraints.txt
-    #   matplotlib
+python-dateutil==2.8.2
+    # via matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
 regex==2022.3.15
