@@ -1637,7 +1637,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
     def __init__(
             self, static_url, track_function, get_module,
-            descriptor_runtime, debug=False, hostname="", publish=None,
+            descriptor_runtime, hostname="", publish=None,
             course_id=None, error_descriptor_class=None,
             field_data=None, rebind_noauth_module_to_user=None,
             **kwargs):
@@ -1678,7 +1678,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         self.STATIC_URL = static_url
         self.track_function = track_function
         self.get_module = get_module
-        self.DEBUG = self.debug = debug
         self.HOSTNAME = self.hostname = hostname
         self.course_id = course_id
 

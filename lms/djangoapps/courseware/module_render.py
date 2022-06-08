@@ -729,7 +729,6 @@ def get_module_system_for_user(
         static_url=settings.STATIC_URL,
         get_module=inner_get_module,
         user=user,
-        debug=settings.DEBUG,
         hostname=settings.SITE_NAME,
         publish=publish,
         course_id=course_id,

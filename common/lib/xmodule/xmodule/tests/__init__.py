@@ -153,7 +153,6 @@ def get_test_system(
         static_url='/static',
         track_function=Mock(name='get_test_system.track_function'),
         get_module=get_module,
-        debug=True,
         hostname="edx.org",
         services={
             'user': user_service,

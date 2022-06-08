@@ -12,6 +12,7 @@ import re
 from unittest import mock
 from urllib import parse
 
+from django.conf import settings
 from oauthlib.oauth1 import Client
 from webob import Response
 from xblock.core import XBlock
@@ -63,7 +64,7 @@ class LTI20BlockMixin:
         Returns:
             webob.response:  response to this request.  See above for details.
         """
-        if self.system.debug:
+        if settings.DEBUG:
             self._log_correct_authorization_header(request)
 
         if not self.accept_grades_past_due and self.is_past_due():
