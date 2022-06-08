@@ -23,6 +23,7 @@ from xblock.runtime import KvsFieldData, MemoryIdManager, Runtime
 from xmodule.errortracker import make_error_tracker
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import ModuleI18nService
+from xmodule.services import RebindUserService
 from xmodule.util.sandboxing import SandboxService
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.static_replace.services import ReplaceURLService
@@ -30,6 +31,7 @@ from common.djangoapps.track import contexts as track_contexts
 from common.djangoapps.track import views as track_views
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
+from lms.djangoapps.courseware import module_render
 from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreChildrenData, BlockstoreFieldData
@@ -37,7 +39,7 @@ from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import Ephemera
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
 from openedx.core.lib.cache_utils import CacheService
-from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url
+from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url, request_token
 
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
@@ -217,6 +219,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         # TODO: Do these declarations actually help with anything? Maybe this check should
         # be removed from here and from XBlock.runtime
         declaration = block.service_declaration(service_name)
+        context_key = block.scope_ids.usage_id.context_key
         if declaration is None:
             raise NoSuchServiceError(f"Service {service_name!r} was not requested.")
         # Most common service is field-data so check that first:
@@ -230,7 +233,6 @@ class XBlockRuntime(RuntimeShim, Runtime):
                     raise
             return self.block_field_datas[block.scope_ids]
         elif service_name == "completion":
-            context_key = block.scope_ids.usage_id.context_key
             return CompletionService(user=self.user, context_key=context_key)
         elif service_name == "user":
             return DjangoXBlockUserService(
@@ -253,6 +255,17 @@ class XBlockRuntime(RuntimeShim, Runtime):
             return CacheService(cache)
         elif service_name == 'replace_urls':
             return ReplaceURLService(xblock=block, lookup_asset_url=self._lookup_asset_url)
+        elif service_name == 'rebind_user':
+            # this service should ideally be initialized with all the arguments of get_module_system_for_user
+            # but only the positional arguments are passed here as the other arguments are too
+            # specific to the lms.module_render module
+            return RebindUserService(
+                self.user,
+                context_key,
+                module_render.get_module_system_for_user,
+                track_function=make_track_function(),
+                request_token=request_token(crum.get_current_request()),
+            )
 
         # Check if the XBlockRuntimeSystem wants to handle this:
         service = self.system.get_service(block, service_name)

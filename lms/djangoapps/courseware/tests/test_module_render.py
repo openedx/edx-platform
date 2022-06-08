@@ -55,6 +55,7 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.services import RebindUserServiceError
 from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW, CombinedSystem  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps import static_replace
@@ -2175,10 +2176,10 @@ class TestRebindModule(TestSubmittingProblems):
         user2 = UserFactory()
         user2.id = 2
         with self.assertRaisesRegex(
-            render.LmsModuleRenderError,
+            RebindUserServiceError,
             "rebind_noauth_module_to_user can only be called from a module bound to an anonymous user"
         ):
-            assert module.system.rebind_noauth_module_to_user(module, user2)
+            assert module.runtime.service(module, 'rebind_user').rebind_noauth_module_to_user(module, user2)
 
     def test_rebind_noauth_module_to_user_anonymous(self):
         """
@@ -2188,7 +2189,7 @@ class TestRebindModule(TestSubmittingProblems):
         module = self.get_module_for_user(self.anon_user)
         user2 = UserFactory()
         user2.id = 2
-        module.system.rebind_noauth_module_to_user(module, user2)
+        module.runtime.service(module, 'rebind_user').rebind_noauth_module_to_user(module, user2)
         assert module
         assert module.system.anonymous_student_id == anonymous_id_for_user(user2, self.course.id)
         assert module.scope_ids.user_id == user2.id

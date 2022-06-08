@@ -275,6 +275,7 @@ class LTIFields:
 @XBlock.needs("i18n")
 @XBlock.needs("mako")
 @XBlock.needs("user")
+@XBlock.needs("rebind_user")
 class LTIBlock(
     LTIFields,
     LTI20BlockMixin,
