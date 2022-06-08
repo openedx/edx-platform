@@ -287,10 +287,15 @@ class SiteConfigAPIClientTests(TestCase):
         "course_about_show_social_links": False,
     }
 
-    sass_variables = [
+    sass_variables_v1 = [
         ["$brand-primary-color", ["#0090C1", "#0090C1"]],
         ["$brand-accent-color", ["#7f8c8d", "#7f8c8d"]],
     ]
+
+    sass_variables_v2 = {
+        'primary_brand_color': '#0090c1',
+        'buttons_accents_color': '#0040f6',
+    }
 
     backend_configs = {
         'configuration': {
@@ -299,11 +304,11 @@ class SiteConfigAPIClientTests(TestCase):
                     'title': 'About page from site configuration service',
                 }
             },
-            'css': {
-                '$brand-primary-color': '#0090C1',
-                '$brand-accent-color': '#7f8c8d',
+            'css': sass_variables_v2,
+            'setting': {
+                'THEME_VERSION': 'tahoe-v2',
+                **test_config,
             },
-            'setting': test_config,
             'secret': {
                 'SEGMENT_KEY': 'test-secret-from-service',
             },
@@ -335,16 +340,51 @@ class SiteConfigAPIClientTests(TestCase):
         site_configuration.save()
         assert site_configuration.get_value('platform_name') == 'API Adapter Platform'
 
-    def test_formatted_sass_variables_with_adapter(self):
+    def test_theme_v1_variables_overrides_without_adapter(self):
         """
-        Ensure api_adapter is used for `_formatted_sass_variables()`.
+        Ensure `_get_theme_v1_variables_overrides()` works without the adapter.
         """
         site_configuration = SiteConfigurationFactory.create(
             site=self.site,
             site_values={},
+            sass_variables=self.sass_variables_v1,
+        )
+        assert site_configuration._get_theme_v1_variables_overrides()
+
+    def test_theme_v2_variables_overrides_without_adapter_old_variables(self):
+        """
+        Ensure `_get_theme_v2_variables_overrides()` checks of a v2 type CSS variables.
+        """
+        site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+            site_values={},
+            sass_variables=self.sass_variables_v1,
+        )
+        with pytest.raises(Exception, match='expects a theme v2 dictionary of css variables'):
+            assert site_configuration._get_theme_v2_variables_overrides()
+
+    def test_theme_v2_variables_overrides_without_adapter_new_variables(self):
+        """
+        Ensure `_get_theme_v2_variables_overrides()` works with v2 type CSS variables.
+        """
+        site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+            site_values={},
+            sass_variables=self.sass_variables_v2,
+        )
+        assert site_configuration._get_theme_v2_variables_overrides()
+
+    def test_theme_v2_variables_overrides_with_adapter(self):
+        """
+        Ensure `_get_theme_v2_variables_overrides()` works with the adapter.
+        """
+        site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+            site_values={},
+            sass_variables={},
         )
         site_configuration.api_adapter = self.api_adapter
-        assert site_configuration._formatted_sass_variables()
+        assert site_configuration._get_theme_v2_variables_overrides()
 
     def test_page_content_without_adapter(self):
         """
