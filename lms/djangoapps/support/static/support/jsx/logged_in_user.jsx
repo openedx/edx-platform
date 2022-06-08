@@ -60,8 +60,7 @@ function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarn
           <Button
             className="btn btn-primary btn-submit"
             onClick={reDirectUser}
-            label={gettext('Course Discussion Forum')}
-          />
+          >{gettext('Course Discussion Forum')}</Button>
         </div>
       </div>
     );
@@ -105,8 +104,7 @@ function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarn
               className="btn btn-primary btn-submit"
               type="button"
               onClick={handleClick}
-              label={gettext('Create Support Ticket')}
-            />
+            >{gettext('Create Support Ticket')}</Button>
           </div>
         </div>
       </div>

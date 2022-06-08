@@ -32,7 +32,7 @@ class Search extends React.Component {
           value={this.state.username}
           onChange={this.handleUsernameChange}
           inputGroupAppend={
-            <Button className="btn btn-primary ml-2 search-button" label="Search" type="submit" />
+            <Button className="btn btn-primary ml-2 search-button" type="submit">Search</Button>
           }
         />
       </form>

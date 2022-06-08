@@ -35,7 +35,7 @@ export default class Main extends React.Component {
 
   render() {
     const { selectedBlock, onSelectBlock } = this.props;
-    let selectorType = <Button onClick={this.handleToggleDropdown} label={gettext('Select a section or problem')} />;
+      let selectorType = <Button onClick={this.handleToggleDropdown}>{gettext('Select a section or problem')}</Button>;
     if (this.props.showBtnUi === 'false') {
       selectorType =
           // eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -74,8 +74,7 @@ export default class Main extends React.Component {
           <Button
             onClick={this.initiateReportGeneration}
             name="list-problem-responses-csv"
-            label={gettext('Create a report of problem responses')}
-          />
+          >{gettext('Create a report of problem responses')}</Button>
           <ReportStatusContainer />
         </div>
 

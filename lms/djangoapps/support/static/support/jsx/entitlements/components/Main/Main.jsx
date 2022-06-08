@@ -38,9 +38,8 @@ const MainContent = (props) => {
         <SearchContainer />
         <Button
           className="btn btn-primary"
-          label="Create New Entitlement"
           onClick={props.openCreationForm}
-        />
+        >Create New Entitlement</Button>
       </div>
       {
           props.entitlements.length > 0 ?
