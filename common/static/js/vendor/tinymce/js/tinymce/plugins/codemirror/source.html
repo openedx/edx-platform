@@ -12,12 +12,37 @@
  */
 
 // Global vars:
-var tinymce,     // Reference to TinyMCE
-	editor,      // Reference to TinyMCE editor
-	codemirror,  // CodeMirror instance
+var codemirror,  // CodeMirror instance
 	chr = 0,     // Unused utf-8 character, placeholder for cursor
 	isMac = /macintosh|mac os/i.test(navigator.userAgent),
-	CMsettings;  // CodeMirror settings
+	CMsettings,  // CodeMirror settings
+    messageHandler,
+    parentOrigin,
+    postToParent;
+
+// EDX: Add message handler for listening to events from TinyMCE
+messageHandler = function(event) {
+    var cleanup = function () {
+        window.removeEventListener("message", messageHandler);
+        postToParent({type: "closeWindow"});
+    };
+    if (event.data.type === "init") {
+        start(event.data.content);
+    }
+    else if (event.data.type == "save") {
+        submit();
+        cleanup();
+    }
+    else if (event.data.type == "cancel") {
+        cleanup();
+    }
+};
+window.addEventListener("message", messageHandler);
+
+// EDX: Function to post messages to the TinyMCE instance.
+postToParent = function(data) {
+    parent.postMessage(data, parentOrigin);
+}
 
 function inArray(key, arr)
 {
@@ -30,13 +55,24 @@ function inArray(key, arr)
 {// Initialise (before load)
 	"use strict";
 
-	tinymce = parent.tinymce;
-	editor = tinymce.activeEditor;
-    var i, userSettings = editor.settings.codemirror ? editor.settings.codemirror : {};
+    var i;
+    var getParamByName = function (name) {
+        var match = new RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    };
+
+
+    // Getting this as a query parameter is very ugly, but the JS and CSS needs
+    // to be added to the head as the page is being rendered. Therefore it isn't possible
+    // to use postMessage APIs to get the setting value. And we can't hardcode the value in here
+    // because we need the baseURL, which is only added to server-side templated files.
+    var codemirrorPath = getParamByName("CodeMirrorPath"),
+        parentOrigin = getParamByName("ParentOrigin");
+
     CMsettings = {
-		path: userSettings.path || 'codemirror-4.8',
-    indentOnInit: userSettings.indentOnInit || false,
-    disableFilesMerge: userSettings.disableFilesMerge || false,
+	    path: codemirrorPath,
+        indentOnInit: false,
+        disableFilesMerge: false,
 		config: {// Default config
 			mode: 'htmlmixed',
 			theme: 'default',
@@ -46,68 +82,28 @@ function inArray(key, arr)
 			tabSize: 2,
 			indentWithTabs: true,
 			matchBrackets: true,
-      saveCursorPosition: true,
+            saveCursorPosition: true,
 			styleActiveLine: true
 		},
+        // EDX: File paths are updated based on the directory structure of the JS
+        // files from common/static/js/vendor/CodeMirror/
 		jsFiles: [// Default JS files
-			'lib/codemirror.js',
-			'addon/edit/matchbrackets.js',
-			'mode/xml/xml.js',
-			'mode/javascript/javascript.js',
-			'mode/css/css.js',
-			'mode/htmlmixed/htmlmixed.js',
-			'addon/dialog/dialog.js',
-			'addon/search/searchcursor.js',
-			'addon/search/search.js',
-			'addon/selection/active-line.js'
+			'CodeMirror/codemirror.js',
+			'CodeMirror/addons/match-highlighter.js',
+			'CodeMirror/addons/xml.js',
+			'CodeMirror/addons/javascript.js',
+			'CodeMirror/addons/css.js',
+			'CodeMirror/addons/htmlmixed.js',
+			'CodeMirror/addons/dialog/dialog.js',
+			'CodeMirror/addons/searchcursor.js',
+			'CodeMirror/addons/search.js',
+			'CodeMirror/addons/edx_markdown.js'
 		],
 		cssFiles: [// Default CSS files
-			'lib/codemirror.css',
-			'addon/dialog/dialog.css'
+			'CodeMirror/codemirror.css',
+			'CodeMirror/addons/dialog/dialog.css'
 		]
 	};
-
-	if (userSettings.fullscreen) {
-		CMsettings.jsFiles.push('addon/display/fullscreen.js');
-		CMsettings.cssFiles.push('addon/display/fullscreen.css');
-	}
-
-  if (CMsettings.disableFilesMerge) {
-    if (
-      Array.isArray(userSettings.jsFiles) &&
-      Array.isArray(userSettings.cssFiles) &&
-      (userSettings.jsFiles.length > 0) &&
-      (userSettings.cssFiles.length > 0)
-    ) {
-      CMsettings.jsFiles = []
-      CMsettings.cssFiles = []
-    } else {
-      if (console) {
-        console.error('Codemirror plugin: jsFiles and cssFiles must be specified if disableFilesMerge is set to true')
-        console.warn('Codemirror plugin: ignoring disableFilesMerge')
-      }
-    }
-  }
-
-  // Merge config
-  for (i in userSettings.config) {
-    CMsettings.config[i] = userSettings.config[i];
-  }
-
-
-	// Merge jsFiles
-	for (i in userSettings.jsFiles) {
-		if (!inArray(userSettings.jsFiles[i], CMsettings.jsFiles)) {
-			CMsettings.jsFiles.push(userSettings.jsFiles[i]);
-		}
-	}
-
-	// Merge cssFiles
-	for (i in userSettings.cssFiles) {
-		if (!inArray(userSettings.cssFiles[i], CMsettings.cssFiles)) {
-			CMsettings.cssFiles.push(userSettings.cssFiles[i]);
-		}
-	}
 
 	// Add trailing slash to path
 	if (!/\/$/.test(CMsettings.path)) {
@@ -131,10 +127,17 @@ function inArray(key, arr)
     	document.documentElement.className += CMsettings.config.theme.replace(/(^|\s)\s*/g, " cm-s-");
     }
 
-	window.onload = start;
+	// window.onload = postToParent({type: "init"});
+    // Window Onload seems to fire as soon as the source.html is loaded and doesn't wait for
+    // the injected JS Files are loaded and until the CodeMirror object becomes available.
+    document.addEventListener('readystatechange', function() {
+        if (document.readyState == "complete") {
+            postToParent({type: "init"});
+        }
+    });
 }());
 
-function start()
+function start(html)
 {// Initialise (on load)
 	"use strict";
 
@@ -155,17 +158,17 @@ function start()
 	// head.appendChild(div);
 
 	// Set CodeMirror cursor and bookmark to same position as cursor was in TinyMCE:
-	var html = editor.getContent({source_view: true});
+	// var html = editor.getContent({source_view: true});
 
     // [FIX] #6 z-index issue with table panel and source code dialog
     //	editor.selection.getBookmark();
 
 	html = html.replace(/<span\s+style="display: none;"\s+class="CmCaReT"([^>]*)>([^<]*)<\/span>/gm, String.fromCharCode(chr));
-	editor.dom.remove(editor.dom.select('.CmCaReT'));
+	// editor.dom.remove(editor.dom.select('.CmCaReT'));
 
     // Hide TinyMCE toolbar panels, [FIX] #6 z-index issue with table panel and source code dialog
     // https://github.com/christiaan/tinymce-codemirror/issues/6
-    tinymce.each(editor.contextToolbars, function(toolbar) { if (toolbar.panel) { toolbar.panel.hide(); } });
+    // tinymce.each(editor.contextToolbars, function(toolbar) { if (toolbar.panel) { toolbar.panel.hide(); } });
 
 	CodeMirror.defineInitHook(function(inst)
 	{
@@ -178,7 +181,7 @@ function start()
 		}
 
 		// Indent all code, if so requested:
-		if (editor.settings.codemirror.indentOnInit) {
+		if (CMsettings.indentOnInit) {
 			var last = inst.lineCount();
 			inst.operation(function() {
 				for (var i = 0; i < last; ++i) {
@@ -229,7 +232,7 @@ function submit()
 	doc.replaceSelection(cc);
 
 	var pos = codemirror.getCursor(),
-  curLineHTML = doc.getLine(pos.line);
+        curLineHTML = doc.getLine(pos.line);
 
 	if (findDepth(curLineHTML, cc) !== 0) {
 		// Cursor is inside a <tag>, don't set cursor:
@@ -255,25 +258,18 @@ function submit()
     code.search(ccLocationCheck) !== -1
   )
   {
-    editor.setContent(code.replace(cc, ''));
+    code = code.replace(cc, '');
   }
   else
   {
-      editor.setContent(code.replace(cc, '<span id="CmCaReT"></span>'));
+    code = code.replace(cc, '<span id="CmCaReT"></span>');
   }
 
-	editor.isNotDirty = !isDirty;
-	if (isDirty) {
-		editor.nodeChanged();
-	}
-
-	// Set cursor:
-	var el = editor.dom.select('span#CmCaReT')[0];
-	if (el) {
-		editor.selection.scrollIntoView(el);
-		editor.selection.setCursorLocation(el,0);
-		editor.dom.remove(el);
-	}
+  postToParent({
+    type: "setText",
+    text: code,
+    isDirty: isDirty
+  });
 }
 
 document.onkeydown = function (evt)
