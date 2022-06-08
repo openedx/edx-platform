@@ -3,6 +3,7 @@ Viewset for auth/saml/v0/samlproviderconfig
 """
 
 from django.shortcuts import get_list_or_404
+from django.db.utils import IntegrityError
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import permissions, viewsets, status
@@ -59,7 +60,10 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
             enterprise_customer__uuid=self.requested_enterprise_uuid
         )
         slug_list = [idp.provider_id for idp in enterprise_customer_idps]
-        return [config for config in SAMLProviderConfig.objects.current_set() if config.provider_id in slug_list]
+        saml_config_ids = [
+            config.id for config in SAMLProviderConfig.objects.current_set() if config.provider_id in slug_list
+        ]
+        return SAMLProviderConfig.objects.filter(id__in=saml_config_ids)
 
     def destroy(self, request, *args, **kwargs):
         saml_provider_config = self.get_object()
@@ -116,9 +120,12 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
             raise ValidationError(f'Enterprise customer not found at uuid: {customer_uuid}')  # lint-amnesty, pylint: disable=raise-missing-from
 
         # Create the samlproviderconfig model first
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+        except IntegrityError as exc:
+            return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
 
         # Associate the enterprise customer with the provider
         association_obj = EnterpriseCustomerIdentityProvider(

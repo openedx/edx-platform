@@ -14,6 +14,14 @@ class SAMLProviderConfigSerializer(serializers.ModelSerializer):  # lint-amnesty
         model = SAMLProviderConfig
         fields = '__all__'
 
+    def validate(self, data):
+        """
+        Validate that no provider config exists with a different slug and same entity ID
+        """
+        if SAMLProviderConfig.objects.filter(entity_id=data['entity_id']).exclude(slug=data['slug']):
+            raise serializers.ValidationError(f"Entity ID: {data['entity_id']} already taken")
+        return data
+
     def create(self, validated_data):
         """
         Overwriting create in order to get a SAMLConfiguration object from id.
@@ -27,7 +35,6 @@ class SAMLProviderConfigSerializer(serializers.ModelSerializer):  # lint-amnesty
         return SAMLProviderConfig.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-
         if 'saml_config_id' in validated_data:
             saml_configuration = SAMLConfiguration.objects.current_set().get(id=validated_data['saml_config_id'])
             del validated_data['saml_config_id']
