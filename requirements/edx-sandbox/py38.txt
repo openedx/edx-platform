@@ -18,8 +18,6 @@ cryptography==36.0.2
     # via -r requirements/edx-sandbox/py38.in
 cycler==0.11.0
     # via matplotlib
-decorator==4.4.2
-    # via networkx
 joblib==1.1.0
     # via nltk
 kiwisolver==1.4.2
@@ -64,7 +62,7 @@ pyparsing==3.0.7
     #   chem
     #   matplotlib
     #   openedx-calc
-python-dateutil==2.8.2
+python-dateutil==2.4.0
     # via matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in

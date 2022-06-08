@@ -211,6 +211,7 @@ django==3.2.13
     #   django-wiki
     #   djangorestframework
     #   drf-jwt
+    #   drf-nested-routers
     #   drf-yasg
     #   edx-ace
     #   edx-api-doc-tools
@@ -349,6 +350,7 @@ django-ses==3.0.1
     # via -r requirements/edx/base.in
 django-simple-history==3.0.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edx-name-affirmation
@@ -386,8 +388,8 @@ djangorestframework==3.12.4
     #   blockstore
     #   django-config-models
     #   django-user-tasks
-    #   djangorestframework-expander
     #   drf-jwt
+    #   drf-nested-routers
     #   drf-yasg
     #   edx-api-doc-tools
     #   edx-completion
@@ -399,8 +401,6 @@ djangorestframework==3.12.4
     #   edx-submissions
     #   ora2
     #   super-csv
-djangorestframework-expander==0.2.3
-    # via blockstore
 djangorestframework-xml==2.0.0
     # via edx-enterprise
 docopt==0.6.2
@@ -414,7 +414,9 @@ done-xblock==2.0.4
 drf-jwt==1.19.2
     # via edx-drf-extensions
 drf-nested-routers==0.93.4
-    # via blockstore
+    # via
+    #   -r requirements/edx/base.in
+    #   blockstore
 drf-yasg==1.20.0
     # via edx-api-doc-tools
 edx-ace==1.5.0
@@ -424,7 +426,9 @@ edx-api-doc-tools==1.6.0
     #   -r requirements/edx/base.in
     #   blockstore
 edx-auth-backends==4.1.0
-    # via -r requirements/edx/base.in
+    # via
+    #   -r requirements/edx/base.in
+    #   blockstore
 edx-braze-client==0.1.3
     # via -r requirements/edx/base.in
 edx-bulk-grades==1.0.0
@@ -448,6 +452,7 @@ edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.in
 edx-django-utils==4.6.0
     # via
+    #   -r requirements/edx/base.in
     #   -r requirements/edx/github.in
     #   blockstore
     #   django-config-models
@@ -704,11 +709,12 @@ multidict==6.0.2
     #   aiohttp
     #   yarl
 mysqlclient==2.1.0
-    # via -r requirements/edx/base.in
-newrelic==7.10.0.175
     # via
     #   -r requirements/edx/base.in
     #   blockstore
+newrelic==7.10.0.175
+    # via
+    #   -r requirements/edx/base.in
     #   edx-django-utils
 nltk==3.7
     # via
@@ -840,7 +846,6 @@ pysrt==1.1.2
     #   edxval
 python-dateutil==2.8.2
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   analytics-python
     #   botocore

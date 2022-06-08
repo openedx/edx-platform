@@ -777,8 +777,6 @@ class BlockStructureBlockData(BlockStructure):
         """
         if isinstance(field, datetime):
             if isinstance(field.tzinfo, tzlocal) and not hasattr(field.tzinfo, '_hasdst'):
-                # Todo: This log statement is added for temporary use only
-                logger.info('Python-dateutil logs: Making datetime field compatible to python-dateutil package')
                 return datetime(
                     year=field.year, month=field.month, day=field.day,
                     hour=field.hour, minute=field.minute, second=field.second,

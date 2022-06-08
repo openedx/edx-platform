@@ -298,6 +298,7 @@ django==3.2.13
     #   django-wiki
     #   djangorestframework
     #   drf-jwt
+    #   drf-nested-routers
     #   drf-yasg
     #   edx-ace
     #   edx-api-doc-tools
@@ -373,7 +374,9 @@ django-crum==0.7.9
 django-debug-toolbar==3.2.4
     # via -r requirements/edx/development.in
 django-environ==0.8.1
-    # via blockstore
+    # via
+    #   -r requirements/edx/testing.txt
+    #   blockstore
 django-fernet-fields==0.6
     # via
     #   -r requirements/edx/testing.txt
@@ -448,6 +451,7 @@ django-ses==3.0.1
     # via -r requirements/edx/testing.txt
 django-simple-history==3.0.0
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-name-affirmation
@@ -485,8 +489,8 @@ djangorestframework==3.12.4
     #   blockstore
     #   django-config-models
     #   django-user-tasks
-    #   djangorestframework-expander
     #   drf-jwt
+    #   drf-nested-routers
     #   drf-yasg
     #   edx-api-doc-tools
     #   edx-completion
@@ -498,8 +502,6 @@ djangorestframework==3.12.4
     #   edx-submissions
     #   ora2
     #   super-csv
-djangorestframework-expander==0.2.3
-    # via blockstore
 djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/testing.txt
@@ -536,11 +538,11 @@ edx-api-doc-tools==1.6.0
     #   -r requirements/edx/testing.txt
     #   blockstore
 edx-auth-backends==4.1.0
-    # via -r requirements/edx/testing.txt
-edx-braze-client==0.1.3
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
+edx-braze-client==0.1.3
+    # via -r requirements/edx/testing.txt
 edx-bulk-grades==1.0.0
     # via
     #   -r requirements/edx/testing.txt
@@ -703,7 +705,7 @@ filelock==3.6.0
     #   -r requirements/edx/testing.txt
     #   tox
     #   virtualenv
-freezegun==1.2.1
+freezegun==0.3.12
     # via -r requirements/edx/testing.txt
 frozenlist==1.3.0
     # via
@@ -948,11 +950,12 @@ mypy==0.942
 mypy-extensions==0.4.3
     # via mypy
 mysqlclient==2.1.0
-    # via -r requirements/edx/testing.txt
-newrelic==7.10.0.175
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
+newrelic==7.10.0.175
+    # via
+    #   -r requirements/edx/testing.txt
     #   edx-django-utils
 nltk==3.7
     # via
@@ -1065,7 +1068,9 @@ py2neo==2021.2.3
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
 pyblake2==1.1.2
-    # via blockstore
+    # via
+    #   -r requirements/edx/testing.txt
+    #   blockstore
 pycodestyle==2.8.0
     # via -r requirements/edx/testing.txt
 pycountry==22.3.5
@@ -1194,7 +1199,6 @@ pytest-xdist[psutil]==2.5.0
     # via -r requirements/edx/testing.txt
 python-dateutil==2.8.2
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   analytics-python
     #   botocore
