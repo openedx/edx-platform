@@ -18,8 +18,6 @@ cryptography==36.0.2
     # via -r requirements/edx-sandbox/py38.in
 cycler==0.11.0
     # via matplotlib
-decorator==4.4.2
-    # via networkx
 joblib==1.1.0
     # via nltk
 kiwisolver==1.4.2
@@ -39,10 +37,8 @@ matplotlib==3.3.4
     #   -r requirements/edx-sandbox/py38.in
 mpmath==1.2.1
     # via sympy
-networkx==2.5.1
-    # via
-    #   -c requirements/edx-sandbox/../constraints.txt
-    #   -r requirements/edx-sandbox/py38.in
+networkx==2.8.2
+    # via -r requirements/edx-sandbox/py38.in
 nltk==3.7
     # via
     #   -r requirements/edx-sandbox/py38.in
@@ -67,9 +63,7 @@ pyparsing==3.0.7
     #   matplotlib
     #   openedx-calc
 python-dateutil==2.4.0
-    # via
-    #   -c requirements/edx-sandbox/../constraints.txt
-    #   matplotlib
+    # via matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
 regex==2022.3.15
