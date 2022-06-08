@@ -1087,16 +1087,6 @@ NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
 
-# For Node.js
-
-system_node_path = os.environ.get("NODE_PATH", NODE_MODULES_ROOT)
-
-node_paths = [
-    COMMON_ROOT / "static/js/vendor",
-    system_node_path,
-]
-NODE_PATH = ':'.join(node_paths)
-
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
 # Where to look for a status message
