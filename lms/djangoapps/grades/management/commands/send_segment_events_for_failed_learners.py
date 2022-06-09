@@ -53,7 +53,10 @@ class Command(BaseCommand):
         but we are adding grace period of 1 day to mitigate any edge cases due to last minute grade override.
         """
         thirty_one_days_ago = timezone.now().date() - timedelta(days=31)
-        return CourseOverview.objects.exclude(end__isnull=True).filter(end__date=thirty_one_days_ago)
+        courses = CourseOverview.objects.exclude(end__isnull=True).filter(end__date=thirty_one_days_ago)
+        thirty_one_days_ago_ended_course_keys = [str(course) for course in courses.values_list('id', flat=True)]
+        log.info(f"Found {thirty_one_days_ago_ended_course_keys} courses that were ended on [{thirty_one_days_ago}]")
+        return courses
 
     def get_course_failed_user_ids(self, course):
         """
