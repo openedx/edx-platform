@@ -84,7 +84,6 @@
     "eslint-config-edx-es5": "2.0.0",
     "eslint-import-resolver-webpack": "0.8.4",
     "jasmine-core": "2.6.4",
-    "jasmine-jquery": "git+https://github.com/velesin/jasmine-jquery.git#ebad463d592d3fea00c69f26ea18a930e09c7b58",
     "jest": "26.0.0",
     "jest-enzyme": "6.0.2",
     "karma": "0.13.22",
