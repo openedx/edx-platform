@@ -198,7 +198,10 @@ class MasqueradeView(View):
             group_id=group_id,
             user_name=found_user_name,
         )
-        request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
+        if role == 'staff':
+            del request.session[MASQUERADE_SETTINGS_KEY]
+        else:
+            request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
         return JsonResponse({'success': True})
 
 
