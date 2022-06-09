@@ -20,10 +20,29 @@
 
 # Instructions for creating js/tinymce.full.min.js
 
-1. Follow the README file of the downloaded tinymce’s codebase and install all the requirements.
+The following uses the version 5.5.1 as a reference. Change your filenames depending the version you have downloaded.
+
+1. Unzip the zip file downloaded from Github.
+    ```
+    unzip tinymce-5.5.1.zip
+    ```
 2. Open terminal and change directory to the newly downloaded tinymce.
-3. Run the build command: “yarn build”, this will create multiple zip files in the build directory.
-4. Unzip the tinymce_<version>.zip file in common/static/vendor/js/
-5. Unzip vendor_extra/tinymce/JakePackage.zip in  common/static/vendor/js/tinymce/.
-6. Run the following command in the tinymce directory: npx jake minify bundle[themes:silver,plugins:*]
-7. Cleanup by deleting the unversioned files that were created from unzipping jake_package.zip.
+    ```
+    cd tinymce-5.5.1
+    ```
+3. Build TinyMCE using Yarn. this will create multiple zip files in the `dist` directory.
+    ```
+    yarn && yarn build
+    ```
+4. Unzip the dev bundle to the edx-platform's vendor directory.
+    ```
+    unzip dist/tinymce_5.5.1_dev.zip -d /path/to/edx-platform/common/static/js/vendor/
+    ```
+5. Remove the unnecessary files in `/path/to/edx-platform/common/static/js/vendor/tinymce` like `package.json`, `yarn.lock`...etc.,
+6. Generate a bundled version of the TinyMCE with all the plugins using the following command
+    ```
+    cd common/static/js/vendor/tinymce/js/tinymce
+    find . -name "*.min.js" -not -name "jquery*" -not -name "tinymce.full.min.js" | sort -r | xargs cat > tinymce.full.min.js
+    ```
+    This `find`s all the min.js files in the tinymce folders, sorts them reverse (local file first, folders next), and combines their content into a single file.
+
