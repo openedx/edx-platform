@@ -88,16 +88,20 @@ function inArray(key, arr)
         // EDX: File paths are updated based on the directory structure of the JS
         // files from common/static/js/vendor/CodeMirror/
 		jsFiles: [// Default JS files
-			'CodeMirror/codemirror.js',
-			'CodeMirror/addons/match-highlighter.js',
-			'CodeMirror/addons/xml.js',
-			'CodeMirror/addons/javascript.js',
-			'CodeMirror/addons/css.js',
-			'CodeMirror/addons/htmlmixed.js',
-			'CodeMirror/addons/dialog/dialog.js',
-			'CodeMirror/addons/searchcursor.js',
-			'CodeMirror/addons/search.js',
-			'CodeMirror/addons/edx_markdown.js'
+			// 'CodeMirror/codemirror.js',
+			// 'CodeMirror/addons/match-highlighter.js',
+			// 'CodeMirror/addons/xml.js',
+			// 'CodeMirror/addons/javascript.js',
+			// 'CodeMirror/addons/css.js',
+			// 'CodeMirror/addons/htmlmixed.js',
+			// 'CodeMirror/addons/dialog/dialog.js',
+			// 'CodeMirror/addons/searchcursor.js',
+			// 'CodeMirror/addons/search.js',
+			// 'CodeMirror/addons/edx_markdown.js'
+
+            // EDX: Use the codemirror-compressed.js and load everything in a single
+            // request instead of using multiple requests for multiple files
+            'codemirror-compressed.js'
 		],
 		cssFiles: [// Default CSS files
 			'CodeMirror/codemirror.css',
