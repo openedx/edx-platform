@@ -51,6 +51,10 @@ def get_customer_themes_storage():
     return storage_class(**settings.CUSTOMER_THEMES_BACKEND_OPTIONS)
 
 
+THEME_AMC_V1 = 'amc-v1'
+THEME_TAHOE_V2 = 'tahoe-v2'
+
+
 @python_2_unicode_compatible
 class SiteConfiguration(models.Model):
     """
@@ -308,6 +312,9 @@ class SiteConfiguration(models.Model):
             domain=domain_without_port_number,
         )
 
+    def get_theme_version(self):
+        return self.get_value('THEME_VERSION', THEME_AMC_V1)
+
     def compile_microsite_sass(self):
         """
         Compiles the microsite sass and save it into the storage bucket.
@@ -334,8 +341,8 @@ class SiteConfiguration(models.Model):
 
         storage = get_customer_themes_storage()
         css_file_name = self.get_css_overrides_file()
-        theme_version = self.get_value('THEME_VERSION', 'amc-v1')
-        if theme_version == 'tahoe-v2':
+        theme_version = self.get_theme_version()
+        if theme_version == THEME_TAHOE_V2:
             scss_file = '_main-v2.scss'
         else:
             # TODO: Deprecated. Remove once all sites are migrated to Tahoe 2.0 structure.
@@ -406,20 +413,44 @@ class SiteConfiguration(models.Model):
             except Exception:  # pylint: disable=broad-except  # noqa
                 logger.warning("Can't delete CSS file {}".format(css_file))
 
-    @beeline.traced('site_config._formatted_sass_variables')
-    def _formatted_sass_variables(self):
+    @beeline.traced('site_config._get_theme_v1_variables_overrides')
+    def _get_theme_v1_variables_overrides(self):
+        """
+        Get the amc-v1 theme variable overrides.
+
+        TODO: Remove once AMC is shut down.
+        """
+        beeline.add_context_field('value_source', 'django_model')
+        sass_variables = self.sass_variables
+        return " ".join(["{}: {};".format(var, val[0]) for var, val in sass_variables])
+
+    @beeline.traced('site_config._get_theme_v2_variables_overrides')
+    def _get_theme_v2_variables_overrides(self):
+        """
+        Get tahoe-v2 variable names.
+        """
+        beeline.add_context_field('value_source', 'site_config_service')
+
         if self.api_adapter:
             # Tahoe: Use `SiteConfigAdapter` if available.
             beeline.add_context_field('value_source', 'site_config_service')
-            sass_variables = self.api_adapter.get_amc_v1_theme_css_variables()
+            css_variables_dict = self.api_adapter.get_css_variables_dict()
         else:
             beeline.add_context_field('value_source', 'django_model')
-            sass_variables = self.sass_variables
-        return " ".join(["{}: {};".format(var, val[0]) for var, val in sass_variables])
+            # Assume a sass variables dict, this is useful for devstack and testing purposes.
+            css_variables_dict = self.sass_variables
+
+        if not isinstance(css_variables_dict, dict):
+            raise Exception('_get_theme_v2_variables_overrides expects a theme v2 dictionary of css variables')
+
+        return " ".join(["${}: {};".format(var, val) for var, val in css_variables_dict.items()])
 
     def _sass_var_override(self, path):
         if 'branding-basics' in path:
-            return [(path, self._formatted_sass_variables())]
+            # TODO: Remove once AMC is shut down.
+            return [(path, self._get_theme_v1_variables_overrides())]
+        if 'tahoe-v2-variables-overrides' in path:
+            return [(path, self._get_theme_v2_variables_overrides())]
         if 'customer-sass-input' in path:
             return [(path, self.get_value('customer_sass_input', ''))]
         return None
