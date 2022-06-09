@@ -1,13 +1,8 @@
 <div class="js-form-feedback" aria-live="assertive" tabindex="-1">
 </div>
 
-<% if ( context.createAccountOption !== false && !context.syncLearnerProfileData && !(context.enterpriseName && context.currentProvider) ) { %>
-<div class="toggle-form">
-    <span class="text"><%- gettext("First time here?") %></span>
-    <a href="#login" class="form-toggle" data-type="register"><%- gettext("Create an Account.") %></a>
-</div>
-<% } %>
-
+<div class="inlinestyle" style="border-radius: 20px; width: 500px; box-shadow: 1px 1px 10px rgba(0,0,0,.2)">
+    <div style="text-align: center; margin-bottom: 20px; padding:20px 0 10px; border-bottom: 2px solid #efefef"><img src="https://launchpadedx.s3.us-west-1.amazonaws.com/logo.svg" width="250px"/></div>
 <% // Hide SSO related messages if we are not in the SSO pipeline.  %>
 <% if (context.enterpriseName && context.currentProvider) { %>
     <% if (context.pipelineUserDetails && context.pipelineUserDetails.email) { %>
@@ -24,10 +19,11 @@
     </p>
     <p><%- gettext("To continue learning with this account, sign in below.") %></p>
 <% } else if (!context.is_require_third_party_auth_enabled) { %>
-    <h1 class="section-title"><%- gettext("Sign In") %></h1>
+    <h1 style="font-size:24px; font-weight:900; margin:0; text-align: center; color: #111" class="section-title"><%- gettext("Login") %></h1>
+    <p style="color: #333;text-align:center; margin-bottom: 40px; font-weight: 600; margin-top: 5px; font-size: 14px">To get access to your files</p>
 <% } %>
 
-<form id="login" class="login-form" tabindex="-1" method="POST">
+<form id="login" style="padding: 0px 60px 40px;" class="login-form" tabindex="-1" method="POST">
 
     <p class="sr">
         <% if ( context.providers.length > 0 && !context.currentProvider || context.hasSecondaryProviders ) { %>
@@ -53,7 +49,7 @@
     <% if (!context.is_require_third_party_auth_enabled) { %>
         <%= HtmlUtils.HTML(context.fields) %>
 
-        <button type="submit" class="action action-primary action-update js-login login-button"><%- gettext("Sign in") %></button>
+        <button type="submit" style="background: #ff7f27; border-radius: 8px; width: 100%; box-shadow:0 0; border: none; font-weight:700" class="action action-primary action-update js-login login-button"><%- gettext("Log in") %></button>
     <% } %>
 
     <% if ( context.providers.length > 0 && !context.currentProvider) { %>
@@ -79,5 +75,12 @@
         }); %>
     </div>
     <% } %>
+    <% if ( context.createAccountOption !== false && !context.syncLearnerProfileData && !(context.enterpriseName && context.currentProvider) ) { %>
+        <div class="toggle-form" style="font-weight: 600; font-size: 14px; text-align: center; margin-top: 20px">
+            <span class="text"><%- gettext("Dont have an account?") %></span>
+            <a href="#login" style="color: #ff7f27" class="form-toggle" data-type="register"><%- gettext("Register") %></a>
+        </div>
+        <% } %>
 </form>
+</div>
 

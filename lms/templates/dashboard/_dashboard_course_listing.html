@@ -57,12 +57,12 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 %>
 
 <%namespace name='static' file='../static_content.html'/>
-
-<li class="course-item">
+<li class="course-item" style="background: #fff; box-shadow: 0 2px 7px 0 rgba(0,0,0,.08); padding-bottom:0; margin-bottom: 36px; overflow: hidden; border-radius: 8px; flex: 1 1 100%; display: flex; justify-content: space-between;">
   % if display_course_modes_on_dashboard:
     <%
         course_verified_certs = enrollment_mode_display(
             enrollment.mode,
+            verification_status.get('status'),
             course_overview.id
         )
     %>
@@ -74,11 +74,12 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
   % else:
     <% mode_class = '' %>
   % endif
-      <div class="course-container"
+      <div class="" style="width: 100%; overflow: hidden;"
         % if getattr(course_overview, 'language'):
           lang="${course_overview.language}"
         % endif
       >
+      
 <article class="course${mode_class}" aria-labelledby="course-title-${enrollment.course_id}" id="course-card-${course_card_index}">
   <% course_target = course_home_url(course_overview.id) %>
   <section class="details" aria-labelledby="details-heading-${enrollment.course_id}">
@@ -87,7 +88,8 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
       % if show_courseware_link and not is_unfulfilled_entitlement:
         % if not is_course_expired:
             <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover course-target-link" tabindex="-1">
-              <img src="${course_overview.image_urls['small']}" class="course-image" alt="${_('{course_number} {course_name} Home Page').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
+              <img           
+              style=" border-radius: 12px 0 0 12px" src="${course_overview.image_urls['small']}" class="course-image" alt="${_('{course_number} {course_name} Home Page').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
             </a>
         % else:
             <a class="fade-cover">
@@ -113,9 +115,9 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
         <h3 class="course-title" id="course-title-${enrollment.course_id}">
           % if show_courseware_link and not is_unfulfilled_entitlement:
             % if not is_course_expired:
-              <a data-course-key="${enrollment.course_id}" href="${course_target}" class="course-target-link">${course_overview.display_name_with_default}</a>
+            <a data-course-key="${enrollment.course_id}" href="${course_target}" class="course-target-link" style=" font-weight:600 ; color:#000; font-family: Roboto">${course_overview.display_name_with_default}</a>
             % else:
-              <a class="disable-look" data-course-key="${enrollment.course_id}">${course_overview.display_name_with_default}</a>
+              <a class="disable-look" data-course-key="${enrollment.course_id}" >${course_overview.display_name_with_default}</a>
             % endif
           % else:
             <span>${course_overview.display_name_with_default}</span>
@@ -124,8 +126,8 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
         <div class="wrapper-course-info-actions">
           <div class="wrapper-course-info-row">
             <div class="course-info">
-              <span class="info-university">${course_overview.display_org_with_default} - </span>
-              <span class="info-course-id">${course_overview.display_number_with_default}</span>
+              <!-- <span class="info-university">${course_overview.display_org_with_default} - </span> -->
+              <!-- <span class="info-course-id">${course_overview.display_number_with_default}</span> -->
               <%
                 enrollment_date = course_overview.self_paced and enrollment and enrollment.created
                 if course_overview.start_date_is_still_default:
@@ -259,8 +261,8 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 ## as these are the only actions currently available
                 % if entitlement and (can_refund_entitlement or show_email_settings):
                     <%include file='_dashboard_entitlement_actions.html' args='course_overview=course_overview,entitlement=entitlement,dashboard_index=dashboard_index, can_refund_entitlement=can_refund_entitlement, show_email_settings=show_email_settings'/>
-                % elif not entitlement and (can_unenroll or partner_managed_enrollment or show_email_settings):
-                    <div class="wrapper-action-more" data-course-key="${enrollment.course_id}">
+                % elif not entitlement:
+                  <div class="wrapper-action-more" data-course-key="${enrollment.course_id}">
                       <button type="button" class="action action-more" id="actions-dropdown-link-${dashboard_index}" aria-haspopup="true" aria-expanded="false" aria-controls="actions-dropdown-${dashboard_index}" data-course-number="${course_overview.number}" data-course-name="${course_overview.display_name_with_default}" data-dashboard-index="${dashboard_index}">
                         <span class="sr">${_('Course options for')}</span>
                         <span class="sr">&nbsp;

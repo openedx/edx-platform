@@ -233,6 +233,9 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
  $('.new-liveclass-button').addClass('is-disabled').attr('aria-disabled', true);
  $('.new-liveclass-save').addClass('is-disabled').attr('aria-disabled', true);
  var $newLiveClass = $('.wrapper-create-liveclass').addClass('is-shown');
+ GetLiveClassUtils.getCourse({}, function(res,errorMessage) {
+    //alert(res)
+    });
  var $cancelButton = $newLiveClass.find('.new-liveclass-cancel');
  $('.new-liveclass-save').on('click', saveNewLiveClass);
  
@@ -281,7 +284,6 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
  }
 
  var assignUsers= function(tab) {
-  
  if(localStorage.getItem('liveclass_id')!=undefined)
  {
  let id = localStorage.getItem('liveclass_id');

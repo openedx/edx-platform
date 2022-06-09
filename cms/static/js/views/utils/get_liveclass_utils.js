@@ -63,6 +63,16 @@
              });
          };
 
+         this.getCourse = function(object, errorHandler) {
+             alert("data")
+            $.getJSON(
+                'course/v1/courses',
+                object
+            ).done(function(response) {
+                alert(JSON.stringify(response))
+            });
+         }
+
          this.getUser = function(liveclassInfo, errorHandler) {
             $.getJSON(
                 '/accounts/details',
@@ -129,5 +139,7 @@
                 errorHandler(reason);
             });
         };
+
+
      };
  });

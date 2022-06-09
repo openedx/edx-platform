@@ -100,7 +100,7 @@ urlpatterns = oauth2_urlpatterns + [
 
     path('live_class/enroll/detail/<live_class_id>', EnrollLiveClassUserDetailsView.as_view(), name='live_class_user_details' ),
 
-    path('live_class/enroll/course/detail/<course_id>', EnrollCourseUserDetailsView.as_view(), name='course_user_details' ),
+    path('course/enroll/course/detail/<course_id>', EnrollCourseUserDetailsView.as_view(), name='course_user_details' ),
     
     path('staff/course/detail/<edited_by_id>', LoginStaffCourseDetailsList.as_view(), name='live_class_user_details' ),
 

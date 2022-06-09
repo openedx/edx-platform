@@ -243,8 +243,12 @@ class LiveClassEnrollmentSerializer(serializers.ModelSerializer):
         fields = ( 'id','user', 'live_class')
 
 
-
-
+    def create(self, validated_data):
+        instance=LiveClassEnrollment.objects.create(live_class=validated_data.get('live_class'), user=validated_data.get('user'))
+        instance.save()
+        CourseEnrollment.objects.create(course=instance.live_class.course, user=instance.user)
+        
+        return instance 
 
     # def create(self, validated_data):
     #     pass
