@@ -753,6 +753,7 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     url_params = {
         'enterprise_customer_uuid': enterprise_customer_uuid_for_request(request),
         'course_id': course_id,
+        'source': 'lms-courseware',
         'next': request.build_absolute_uri(return_path),
         'failure_url': request.build_absolute_uri(
             reverse('dashboard') + '?' + urlencode(
