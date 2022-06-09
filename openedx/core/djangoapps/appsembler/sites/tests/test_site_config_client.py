@@ -3,6 +3,7 @@ Tests for site_config_client_helpers and SiteConfigAdapter.
 """
 from unittest.mock import patch
 import pytest
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.test import RequestFactory
 from mock import Mock
@@ -12,6 +13,8 @@ from lms.djangoapps.courseware.access_utils import in_preview_mode
 from openedx.core.djangoapps.appsembler.sites import (
     site_config_client_helpers as client_helpers,
 )
+
+User = get_user_model()
 
 
 @pytest.fixture
@@ -85,6 +88,7 @@ def test_get_configuration_adapter_status_default():
 def test_get_configuration_adapter_status_draft():
     """Ensure status can be set to `draft`."""
     request = RequestFactory().get('/', data={'preview': 'true'})
+    request.user = User()
     status = client_helpers.get_configuration_adapter_status(request)
     assert status == 'draft'
 
@@ -106,6 +110,8 @@ def test_courseware_in_preview_mode(settings):
         assert not in_preview_mode(), 'Sanity check: example.com is not the preview domain'
 
         request = RequestFactory().get('/', data={'preview': 'true'})
+        request.user = User()
+
         with patch('crum.get_current_request', return_value=request):
             assert in_preview_mode(), (
                 'New feature: example.com/?preview=true should be considered as a preview request'
