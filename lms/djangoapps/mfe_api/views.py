@@ -21,11 +21,21 @@ class MFEConfigView(APIView):
     def get(self, request):
         """
         GET /api/mfe/v1/config
+        or
+        GET /api/mfe/v1/config?mfe=name_of_mfe
 
         **GET Response Values**
         ```
         {
-            "LOGO_URL": "https://example.com/logo.png",
+            "BASE_URL": "https://name_of_mfe.example.com",
+            "LANGUAGE_PREFERENCE_COOKIE_NAME": "example-language-preference",
+            "CREDENTIALS_BASE_URL": "https://credentials.example.com",
+            "DOSCOVERY_API_BASE_URL": "https://discovery.example.com",
+            "LMS_BASE_URL": "https://courses.example.com",
+            "LOGIN_URL": "https://courses.example.com/login",
+            "LOGOUT_URL": "https://courses.example.com/logout",
+            "STUDIO_BASE_URL": "https://studio.example.com",
+            "LOGO_URL": "https://courses.example.com/logo.png"
         }
         ```
         """
@@ -34,9 +44,9 @@ class MFEConfigView(APIView):
             msg = 'MFE API not found. Try setting FEATURES["ENABLE_MFE_API"] to true.'
             return JsonResponse({'message': msg}, status=status.HTTP_404_NOT_FOUND)
 
-        mfe_config = {'MFE_CONFIG': configuration_helpers.get_value('MFE_CONFIG', {})}
+        mfe_config = configuration_helpers.get_value('MFE_CONFIG', {})
         if request.query_params.get('mfe'):
             mfe = str(request.query_params.get('mfe')).upper()
-            mfe_config[f'MFE_CONFIG_{mfe}']= configuration_helpers.get_value(f'MFE_CONFIG_{mfe}',{})
+            mfe_config.update(configuration_helpers.get_value(f'MFE_CONFIG_{mfe}', {}))
 
         return JsonResponse(mfe_config, status=status.HTTP_200_OK)
