@@ -24,7 +24,13 @@ from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    get_group_id_for_comments_service,
+    is_user_community_ta,
+    prepare_content,
+)
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
@@ -548,6 +554,58 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         """
         delete_thread(request, thread_id)
         return Response(status=204)
+
+
+class LearnerThreadView(APIView):
+    """
+    **Use Cases**
+
+        Fetch user's active threads
+
+    **Example Requests**:
+
+        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015/learner/?page=1&page_size=10
+
+    **GET Thread List Parameters**:
+
+        * page: The (1-indexed) page to retrieve (default is 1)
+
+        * page_size: The number of items per page (default is 10)
+    """
+
+    def get(self, request, course_id=None):
+        """
+        Implements the GET method as described in the class docstring.
+        """
+        course_key = CourseKey.from_string(course_id)
+        page_num = request.GET.get('page', 1)
+        threads_per_page = request.GET.get('page_size', 10)
+        discussion_id = None
+        user_id = request.user.id
+        group_id = None
+        try:
+            group_id = get_group_id_for_comments_service(request, course_key, discussion_id)
+        except ValueError:
+            pass
+
+        query_params = {
+            "page": page_num,
+            "per_page": threads_per_page,
+            "course_id": str(course_key),
+            "user_id": user_id,
+        }
+
+        if group_id is not None:
+            query_params['group_id'] = group_id
+            profiled_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
+        else:
+            profiled_user = comment_client.User(id=user_id, course_id=course_key)
+        threads, page, num_pages = profiled_user.active_threads(query_params)
+
+        is_staff = has_permission(request.user, 'openclose_thread', course_key)
+        is_community_ta = is_user_community_ta(request.user, course_key)
+        threads = [prepare_content(thread, course_key, is_staff, is_community_ta) for thread in threads]
+        return Response(threads)
 
 
 @view_auth_classes()
