@@ -702,6 +702,7 @@ def get_sibling_urls(subsection, unit_location):    # pylint: disable=too-many-s
         next_url = reverse_usage_url('container_handler', next_loc)
     return prev_url, next_url
 
+
 def determine_label(display_name, block_type):
     """
     Returns the name of the xblock to display in studio.
