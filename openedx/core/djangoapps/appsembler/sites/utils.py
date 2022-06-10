@@ -1,7 +1,10 @@
+from uuid import UUID
+
+import logging
+
 from datetime import timedelta
 
 import beeline
-import json
 
 from urllib.parse import urlparse
 
@@ -32,6 +35,11 @@ from openedx.core.lib.log_utils import audit_log
 from openedx.core.djangoapps.theming.helpers import get_current_request, get_current_site
 from openedx.core.djangoapps.theming.models import SiteTheme
 
+from site_config_client.exceptions import SiteConfigurationError
+
+
+log = logging.getLogger(__name__)
+
 
 @beeline.traced(name="get_lms_link_from_course_key")
 def get_lms_link_from_course_key(base_lms_url, course_key):
@@ -50,12 +58,14 @@ def get_lms_link_from_course_key(base_lms_url, course_key):
     return base_lms_url
 
 
-def _get_active_tiers_uuids():
+def get_active_tiers_uuids_from_amc_postgres():
     """
-    Get active Tier organiation UUIDs from the Tiers (AMC Postgres) database.
+    Get active Tier organization UUIDs from the Tiers (AMC Postgres) database.
 
     Note: This mostly a hack that's needed for improving the performance of
           batch operations by excluding dead sites.
+
+    Return a list of UUID objects.
 
     TODO: This helper should live in a future Tahoe Sites package.
     """
@@ -67,7 +77,39 @@ def _get_active_tiers_uuids():
     ).annotate(
         organization_edx_uuid=F('organization__edx_uuid')
     ).values_list('organization_edx_uuid', flat=True)
-    return active_tiers_uuids
+    return list(active_tiers_uuids)
+
+
+def get_active_site_uuids_from_site_config_service():
+    """
+    Get active Tier organization UUIDs via the client of the Site Configuration service.
+
+    Return a list of UUID objects.
+    TODO: Move this helper into another package.
+    """
+    client = getattr(settings, 'SITE_CONFIG_CLIENT', None)
+    if client:
+        try:
+            active_sites_response = client.list_active_sites()
+            active_sites = active_sites_response['results']
+            site_uuids = [UUID(site['uuid']) for site in active_sites]
+            return site_uuids
+        except SiteConfigurationError:
+            log.exception('An error occurred while fetching site config active sites, returning an empty list.')
+
+    return []
+
+
+def get_active_organizations_uuids():
+    """
+    Get active organization UUIDs from both AMC Postgres and Site Config service.
+
+    Return a list of UUID objects.
+    """
+    amc_uuids = get_active_tiers_uuids_from_amc_postgres()
+    site_config_uuids = get_active_site_uuids_from_site_config_service()
+    all_uuids_unique = set(amc_uuids + site_config_uuids)  # Combine results and remove duplicates
+    return list(all_uuids_unique)  # Covert to list for convenience.
 
 
 def get_active_organizations():
@@ -79,7 +121,7 @@ def get_active_organizations():
 
     TODO: This helper should live in a future Tahoe Sites package.
     """
-    active_tiers_uuids = _get_active_tiers_uuids()
+    active_tiers_uuids = get_active_organizations_uuids()
 
     # Now back to the LMS MySQL database
     return Organization.objects.filter(
