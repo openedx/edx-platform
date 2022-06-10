@@ -9,7 +9,7 @@
            ' cannot be more than <%- limit %> characters.');
         
          CreateUtilsFactory.call(this, selectors, classes);
-       
+     
          this.create = function(liveclassInfo, errorHandler) {
              $.postJSON(
                  '/live_class/details/',

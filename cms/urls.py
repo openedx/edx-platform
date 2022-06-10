@@ -18,7 +18,7 @@ import openedx.core.djangoapps.lang_pref.views
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import views as contentstore_views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
-from cms.djangoapps.contentstore.views.live_class import LiveClassesApiListView , LiveClassesDeleteUpdateApiView , UserDetailsListApiView ,EnrollLiveClassCreateView,EnrollLiveClassUserDetailsView ,EnrollLiveClassUserDeleteApiView , UserCourseEnrollment ,EnrollCourseUserDetailsView , LoginStaffCourseDetailsList
+from cms.djangoapps.contentstore.views.live_class import LiveClassesApiListView ,CourseListView,UserCourseUnEnrollment, LiveClassesDeleteUpdateApiView , UserDetailsListApiView ,EnrollLiveClassCreateView,EnrollLiveClassUserDetailsView ,EnrollLiveClassUserDeleteApiView , UserCourseEnrollment ,EnrollCourseUserDetailsView , LoginStaffCourseDetailsList
 
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
@@ -104,11 +104,14 @@ urlpatterns = oauth2_urlpatterns + [
     
     path('staff/course/detail/<edited_by_id>', LoginStaffCourseDetailsList.as_view(), name='live_class_user_details' ),
 
+ path('home/courses/all/courses', CourseListView.as_view(), name="course-list"),
+
 
 
     path('live_class/enroll/live_class/detail/<id>', EnrollLiveClassUserDeleteApiView.as_view(), name='enroll_user_live_class_delete' ),
 
     path('user/enrollment', UserCourseEnrollment.as_view() , name='user_course_enrollment'),
+    path('user/course/unenrollment/<id>', UserCourseUnEnrollment.as_view() , name='user_course_enrollment'),
     
     
     path('signin_redirect_to_lms', contentstore_views.login_redirect_to_lms, name='login_redirect_to_lms'),

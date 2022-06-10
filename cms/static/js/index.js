@@ -181,13 +181,13 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
  var saveNewLiveClass= function(e) {
  e.preventDefault();
 
- 
+
  
  var $newLiveClassForm = $(this).closest('#create-liveclass-form');
  
  var display_name = $newLiveClassForm.find('.new-liveclass-name').val();
- 
- 
+ var course_id = $('#category :selected').attr('id');
+
  let crt_room = {"name": display_name,
  "privacy": "public",
  "properties" : {
@@ -205,11 +205,13 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
  var lib_info = {
  'topic_name':display_name,
  'is_recurrence_meeting':false,
- 'meeting_link':data.url
+ 'meeting_link':data.url,
+ 'course_id':course_id
  };
  analytics.track('Created a LiveClass', lib_info);
 
  CreateLiveClassUtils.create(lib_info, function(errorMessage) {
+   
  if(errorMessage.id==undefined)
  {
  var msg = edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML('<p>'), errorMessage, edx.HtmlUtils.HTML('</p>'));

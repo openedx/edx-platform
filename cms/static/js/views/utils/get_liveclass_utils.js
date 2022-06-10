@@ -64,12 +64,19 @@
          };
 
          this.getCourse = function(object, errorHandler) {
-             alert("data")
+    
             $.getJSON(
-                'course/v1/courses',
+                'courses/all/courses ',
                 object
             ).done(function(response) {
-                alert(JSON.stringify(response))
+                
+                    var catOptions = "";
+                    for (let i=0;i<response.length;i++) {
+                        
+                        catOptions += '<option id='+response[i]['id']+'>' + response[i]['name'] + "</option>";
+                    
+                      document.getElementById("category").innerHTML = catOptions;
+        }
             });
          }
 

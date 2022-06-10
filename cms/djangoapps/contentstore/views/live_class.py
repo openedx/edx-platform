@@ -1,6 +1,5 @@
 import logging
-
-from openedx.core.djangoapps.enrollments.serializers import  LiveClassesSerializer , UserListSerializer ,LiveClassEnrollmentSerializer ,LiveClassUserDetailsSerializer ,UserLiveClassDetailsSerializer, CourseEnrolledUserDetailsSerializer ,LoginStaffCourseDetailsSerializer
+from openedx.core.djangoapps.enrollments.serializers import  LiveClassesSerializer , UserListSerializer ,CourseEnrollmentSerializer ,LiveClassEnrollmentSerializer ,LiveClassUserDetailsSerializer ,UserLiveClassDetailsSerializer, CourseEnrolledUserDetailsSerializer ,LoginStaffCourseDetailsSerializer
 from common.djangoapps.student.models import LiveClassEnrollment
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.lib.log_utils import audit_log
@@ -9,7 +8,11 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 
 
+from lms.djangoapps.course_api.serializers import CourseSerializer
+from lms.djangoapps.course_api.forms import  CourseListGetForm
+from lms.djangoapps.course_api.api import  list_courses ,course_detail, list_course_keys, _filter_by_search
 
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
@@ -47,7 +50,7 @@ from rest_framework.generics import ListAPIView , ListCreateAPIView ,CreateAPIVi
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-from openedx.core.djangoapps.content.course_overviews.models import LiveClasses 
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, LiveClasses 
 from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_rest_framework_extensions.auth.jwt.authentication import \
@@ -624,3 +627,136 @@ class UserCourseEnrollment(CreateAPIView , ApiKeyPermissionMixIn):
                     actual_activation=current_enrollment['is_active'] if current_enrollment else None,
                     user_id=user.id
                 )
+
+
+class UserCourseUnEnrollment(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    #throttle_classes = (EnrollmentUserThrottle,)
+    serializer_class = CourseEnrollmentSerializer
+    queryset = CourseEnrollment.objects.all()
+    model = CourseEnrollment
+    lookup_field = "id"
+
+
+
+    def delete(self, request, *args, **kwargs):
+        
+
+        try:
+            enroll_course_id = self.model.objects.get(id=self.kwargs.get('id'))
+            enroll_course_id.delete()
+            return Response("Deleted Successfully", status=status.HTTP_200_OK)
+        except self.model.DoesNotExist:
+            return Response("Invalied Id", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+
+
+@view_auth_classes(is_authenticated=False)
+class CourseListView(DeveloperErrorViewMixin, ListAPIView):
+    """
+    **Use Cases**
+
+        Request information on all courses visible to the specified user.
+
+    **Example Requests**
+
+        GET /api/courses/v1/courses/
+
+    **Response Values**
+
+        Body comprises a list of objects as returned by `CourseDetailView`.
+
+    **Parameters**
+
+        search_term (optional):
+            Search term to filter courses (used by ElasticSearch).
+
+        username (optional):
+            The username of the specified user whose visible courses we
+            want to see. The username is not required only if the API is
+            requested by an Anonymous user.
+
+        org (optional):
+            If specified, visible `CourseOverview` objects are filtered
+            such that only those belonging to the organization with the
+            provided org code (e.g., "HarvardX") are returned.
+            Case-insensitive.
+
+        permissions (optional):
+            If specified, it filters visible `CourseOverview` objects by
+            checking if each permission specified is granted for the username.
+            Notice that Staff users are always granted permission to list any
+            course.
+
+    **Returns**
+
+        * 200 on success, with a list of course discovery objects as returned
+          by `CourseDetailView`.
+        * 400 if an invalid parameter was sent or the username was not provided
+          for an authenticated request.
+        * 403 if a user who does not have permission to masquerade as
+          another user specifies a username other than their own.
+        * 404 if the specified user does not exist, or the requesting user does
+          not have permission to view their courses.
+
+        Example response:
+
+            [
+              {
+                "blocks_url": "/api/courses/v1/blocks/?course_id=edX%2Fexample%2F2012_Fall",
+                "media": {
+                  "course_image": {
+                    "uri": "/c4x/edX/example/asset/just_a_test.jpg",
+                    "name": "Course Image"
+                  }
+                },
+                "description": "An example course.",
+                "end": "2015-09-19T18:00:00Z",
+                "enrollment_end": "2015-07-15T00:00:00Z",
+                "enrollment_start": "2015-06-15T00:00:00Z",
+                "course_id": "edX/example/2012_Fall",
+                "name": "Example Course",
+                "number": "example",
+                "org": "edX",
+                "start": "2015-07-17T12:00:00Z",
+                "start_display": "July 17, 2015",
+                "start_type": "timestamp"
+              }
+            ]
+    """
+
+    pagination_class = None
+    serializer_class = CourseSerializer
+
+    
+
+    def get_queryset(self):
+        """
+        Yield courses visible to the user.
+        """
+        form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
+        if not form.is_valid():
+        
+            raise ValidationError(form.errors)
+        return list_courses(
+            self.request,
+            form.cleaned_data['username'],
+            org=form.cleaned_data['org'],
+            filter_=form.cleaned_data['filter_'],
+            search_term=form.cleaned_data['search_term'],
+            permissions=form.cleaned_data['permissions']
+            
+        )
+
+
+    # queryset = CourseOverview.objects.all()
+    # def get_serializer_class(self):
+    #     """Get Serializer"""
+    #     if self.request.method == 'GET':
+    #         return CourseSerializer                
