@@ -1,35 +1,22 @@
 """
-This is the common settings file, intended to set sane defaults.
+This is the common settings file, intended to set sane defaults. If you have a
+piece of configuration that's dependent on a set of feature flags being set,
+then create a function that returns the calculated value based on the value of
+FEATURES[...]. Modules that extend this one can change the feature
+configuration in an environment specific config file and re-calculate those
+values.
 
-If you wish to override some of the settings set here without needing to specify
-everything, you should create a new settings file that imports the content of this
-one and then overrides anything you wish to make overridable.
+We should make a method that calls all these config methods so that you just
+make one call at the end of your site-specific dev file to reset all the
+dependent variables (like INSTALLED_APPS) for you.
 
-Some known files that extend this one:
-
-- `production.py` - This file loads overrides from a yaml settings file and uses that
-    to override the settings set in this file.
-
-
-Conventions
------------
-
-1. Extending a List Setting
-
-    Sometimes settings take the form of a list and rather than replacing the
-    whole list, we want to add items to the list. eg. CELERY_IMPORTS.
-
-    In this case, it is recommended that a new variable created in your extended
-    file that contains the word `EXTRA` and enough of the base variable to easily
-    let people map between the two items.
-
-    Examples:
-        - CELERY_EXTRA_IMPORTS  (preferred format)
-        - EXTRA_MIDDLEWARE_CLASSES
-        - XBLOCK_EXTRA_MIXINS  (preferred format)
-
-    The preferred format for the name of the new setting (e.g. `CELERY_EXTRA_IMPORTS`) is to use
-    the same prefix (e.g. `CELERY`) of the setting that is being appended (e.g. `CELERY_IMPORTS`).
+Longer TODO:
+1. Right now our treatment of static content in general and in particular
+   course-specific static content is haphazard.
+2. We should have a more disciplined approach to feature flagging, even if it
+   just means that we stick them in a dict called FEATURES.
+3. We need to handle configuration for multiple courses. This could be as
+   multiple sites, but we do need a way to map their data assets.
 """
 
 # We intentionally define lots of variables that aren't used
@@ -58,7 +45,7 @@ from enterprise.constants import (
     ENTERPRISE_OPERATOR_ROLE
 )
 
-from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
+from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN ,LIVE_CLASS_ID_PATTERN
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
@@ -107,7 +94,7 @@ FEATURES = {
     # .. toggle_description: This displays histograms in the Staff Debug Info panel to course staff.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-02-13
-    # .. toggle_warning: Generating histograms requires scanning the courseware_studentmodule table on each view. This
+    # .. toggle_warnings: Generating histograms requires scanning the courseware_studentmodule table on each view. This
     #   can make staff access to courseware very slow on large courses.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2425
     'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
@@ -121,7 +108,7 @@ FEATURES = {
     #   date.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2012-07-24
-    # .. toggle_warning: This will cause ALL courses to be immediately visible.
+    # .. toggle_warnings: This will cause ALL courses to be immediately visible.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/17913
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
@@ -134,7 +121,7 @@ FEATURES = {
     #   to False will not contain inline discussion components and discussion tab in any courses.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2012-08-14
-    # .. toggle_warning: If the discussion panel is present in the course and the value for this flag is False then,
+    # .. toggle_warnings: If the discussion panel is present in the course and the value for this flag is False then,
     #   attempting to expand those components will cause errors. So, this should only be set to False with an LMS that
     #   is running courses that do not contain discussion components.
     #   For consistency in user-experience, keep the value in sync with the setting of the same name in the CMS.
@@ -146,7 +133,7 @@ FEATURES = {
     # .. toggle_description: Add PDF and HTML textbook tabs to the courseware.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-27
-    # .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
+    # .. toggle_warnings: For consistency in user-experience, keep the value in sync with the setting of the same name
     #   in the CMS.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/3064
     'ENABLE_TEXTBOOK': True,
@@ -158,7 +145,7 @@ FEATURES = {
     #   on/off setting for discussion digest emails.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-07-30
-    # .. toggle_warning: This should remain off in production until digest notifications are online.
+    # .. toggle_warnings: This should remain off in production until digest notifications are online.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/520
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
@@ -171,7 +158,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-08-19
     # .. toggle_target_removal_date: None
-    # .. toggle_warning: It is not recommended to enable this feature if ENABLE_DISCUSSION_HOME_PANEL is not enabled,
+    # .. toggle_warnings: It is not recommended to enable this feature if ENABLE_DISCUSSION_HOME_PANEL is not enabled,
     #   since subscribers who receive digests in that case will only be able to unsubscribe via links embedded in
     #   their emails, and they will have no way to resubscribe.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/4891
@@ -194,7 +181,7 @@ FEATURES = {
     # .. toggle_description: Set to False if you want to disable Django's admin site.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-09-26
-    # .. toggle_warning: It is not recommended to disable this feature as there are many settings available on
+    # .. toggle_warnings: It is not recommended to disable this feature as there are many settings available on
     #  Django's admin site and will be inaccessible to the superuser.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/829
     'ENABLE_DJANGO_ADMIN_SITE': True,
@@ -225,7 +212,7 @@ FEATURES = {
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2014-09-09
     # .. toggle_target_removal_date: None
-    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
+    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
     'ENABLE_OAUTH2_PROVIDER': False,
 
     # .. toggle_name: FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']
@@ -251,7 +238,7 @@ FEATURES = {
     #   Courses link will be visible. Set to False if courses list and Explore Courses link need to be hidden.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-09-28
-    # .. toggle_warning: This Effects views and templates.
+    # .. toggle_warnings: This Effects views and templates.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1073
     'COURSES_ARE_BROWSABLE': True,
 
@@ -315,7 +302,7 @@ FEATURES = {
     # .. toggle_description: Set to True to enable Custom Courses for edX, a feature that is more commonly known as
     #   CCX. Documentation for configuring and using this feature is available at
     #   https://edx.readthedocs.io/projects/open-edx-ca/en/latest/set_up_course/custom_courses.html
-    # .. toggle_warning: When set to true, 'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider' will
+    # .. toggle_warnings: When set to true, 'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider' will
     #    be added to MODULESTORE_FIELD_OVERRIDE_PROVIDERS
     # .. toggle_use_cases: opt_in, circuit_breaker
     # .. toggle_creation_date: 2015-04-10
@@ -348,7 +335,7 @@ FEATURES = {
     #   can be turned off by enabling this feature flag.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-07-25
-    # .. toggle_warning: If this has been set to True then the account activation email will be skipped.
+    # .. toggle_warnings: If this has been set to True then the account activation email will be skipped.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/417
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
@@ -370,7 +357,7 @@ FEATURES = {
     # .. toggle_description: Enable the login micro frontend.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2018-05-07
-    # .. toggle_warning: The login MFE domain name should be listed in LOGIN_REDIRECT_WHITELIST.
+    # .. toggle_warnings: The login MFE domain name should be listed in LOGIN_REDIRECT_WHITELIST.
     'ENABLE_LOGIN_MICROFRONTEND': False,
 
     # .. toggle_name: FEATURES['SKIP_EMAIL_VALIDATION']
@@ -380,7 +367,7 @@ FEATURES = {
     #   Beware, as this leaves the door open to potential spam abuse.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2018-05-07
-    # .. toggle_warning: The login MFE domain name should be listed in LOGIN_REDIRECT_WHITELIST.
+    # .. toggle_warnings: The login MFE domain name should be listed in LOGIN_REDIRECT_WHITELIST.
     'SKIP_EMAIL_VALIDATION': False,
 
     # .. toggle_name: FEATURES['ENABLE_COSMETIC_DISPLAY_PRICE']
@@ -391,7 +378,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-10-10
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6876
-    # .. toggle_warning: The use case of this feature toggle is uncertain.
+    # .. toggle_warnings: The use case of this feature toggle is uncertain.
     'ENABLE_COSMETIC_DISPLAY_PRICE': False,
 
     # Automatically approve student identity verification attempts
@@ -445,7 +432,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-02-27
     # .. toggle_target_removal_date: None
-    # .. toggle_warning: reverse proxy should be configured appropriately for example Client IP address headers
+    # .. toggle_warnings: reverse proxy should be configured appropriately for example Client IP address headers
     #   (e.g HTTP_X_FORWARDED_FOR) should be configured.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2749
     'EMBARGO': False,
@@ -472,7 +459,7 @@ FEATURES = {
     # .. toggle_description: Toggle to enable alternate urls for marketing links.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-24
-    # .. toggle_warning: When this is enabled, the MKTG_URLS setting should be defined. The use case of this feature
+    # .. toggle_warnings: When this is enabled, the MKTG_URLS setting should be defined. The use case of this feature
     #   toggle is uncertain.
     'ENABLE_MKTG_SITE': False,
 
@@ -536,7 +523,7 @@ FEATURES = {
     #   the footer.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-01-13
-    # .. toggle_warning: If you set this to True then you should also set your mobile application's app store and play
+    # .. toggle_warnings: If you set this to True then you should also set your mobile application's app store and play
     #   store URLs in the MOBILE_STORE_URLS settings dictionary. These links are not part of the default theme. If you
     #   want these links on your footer then you should use the edx.org theme.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6588
@@ -549,7 +536,7 @@ FEATURES = {
     # .. toggle_description: This toggle enables the students to save and manage their annotations in the
     #   course using the notes service. The bulk of the actual work in storing the notes is done by
     #   a separate service (see the edx-notes-api repo).
-    # .. toggle_warning: Requires the edx-notes-api service properly running and to have configured the django settings
+    # .. toggle_warnings: Requires the edx-notes-api service properly running and to have configured the django settings
     #   EDXNOTES_INTERNAL_API and EDXNOTES_PUBLIC_API. If you update this setting, also update it in Studio.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-01-04
@@ -580,7 +567,7 @@ FEATURES = {
     #   pages for searching courseware data.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-01-29
-    # .. toggle_warning: In order to get this working, your courses data should be indexed in Elasticsearch. You will
+    # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch. You will
     #   see the search widget on the courseware page only if the DISABLE_COURSE_OUTLINE_PAGE_FLAG is set.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
     'ENABLE_COURSEWARE_SEARCH': False,
@@ -592,7 +579,7 @@ FEATURES = {
     #   pages for searching courseware data but for course staff users only.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2019-12-06
-    # .. toggle_warning: In order to get this working, your courses data should be indexed in Elasticsearch. If
+    # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch. If
     #   ENABLE_COURSEWARE_SEARCH is enabled then the search widget will be visible to all learners and this flag's
     #   value does not matter in that case. This flag is enabled in devstack by default.
     # .. toggle_tickets: https://openedx.atlassian.net/browse/TNL-6931
@@ -606,7 +593,7 @@ FEATURES = {
     #   courseware data.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-01-29
-    # .. toggle_warning: In order to get this working, your courses data should be indexed in Elasticsearch.
+    # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
     'ENABLE_DASHBOARD_SEARCH': False,
 
@@ -627,7 +614,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable course certificates on your instance of Open edX.
-    # .. toggle_warning: You must enable this feature flag in both Studio and the LMS and complete the configuration tasks
+    # .. toggle_warnings: You must enable this feature flag in both Studio and the LMS and complete the configuration tasks
     #   described here:
     #   https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/enable_certificates.html  pylint: disable=line-too-long,useless-suppression
     # .. toggle_use_cases: open_edx
@@ -640,7 +627,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable custom certificate templates which are configured via Django admin.
-    # .. toggle_warning: None
+    # .. toggle_warnings: None
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-08-13
     # .. toggle_target_removal_date: None
@@ -656,7 +643,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-04-23
     # .. toggle_target_removal_date: None
-    # .. toggle_warning: The COURSE_DISCOVERY_MEANINGS setting should be properly defined.
+    # .. toggle_warnings: The COURSE_DISCOVERY_MEANINGS setting should be properly defined.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7845
     'ENABLE_COURSE_DISCOVERY': False,
 
@@ -668,7 +655,7 @@ FEATURES = {
     # .. toggle_creation_date: 2021-03-16
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: None
-    # .. toggle_warning: Turning this feature ON will affect all generated filenames which are related to CCX courses.
+    # .. toggle_warnings: Turning this feature ON will affect all generated filenames which are related to CCX courses.
     'ENABLE_COURSE_FILENAME_CCX_SUFFIX': False,
 
     # Setting for overriding default filtering facets for Course discovery
@@ -699,7 +686,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Enables support for the creation of OpenBadges as a method of awarding credentials.
-    # .. toggle_warning: The following settings (all of which are in the same file) should be set or reviewed prior to
+    # .. toggle_warnings: The following settings (all of which are in the same file) should be set or reviewed prior to
     #    enabling this setting: BADGING_BACKEND, BADGR_API_TOKEN, BADGR_BASE_URL, BADGR_ISSUER_SLUG, BADGR_TIMEOUT.
     #    Full guide for setting up OpenBadges available here:
     #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/enable_badging.html  pylint: disable=line-too-long,useless-suppression
@@ -713,7 +700,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: When set to True, Open edX site can be used as an LTI Provider to other systems
     #    and applications.
-    # .. toggle_warning: After enabling this feature flag there are multiple steps invloved to configure edX
+    # .. toggle_warnings: After enabling this feature flag there are multiple steps invloved to configure edX
     #    as LTI provider. Full guide is available here:
     #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/lti/index.html
     # .. toggle_use_cases: open_edx
@@ -727,7 +714,7 @@ FEATURES = {
     # .. toggle_description: When set to True, language selector will be visible in the header.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-05-25
-    # .. toggle_warning: You should set the languages in the DarkLangConfig table to get this working. If you have
+    # .. toggle_warnings: You should set the languages in the DarkLangConfig table to get this working. If you have
     #   not set any languages in the DarkLangConfig table then the language selector will not be visible in the header.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15133
     'SHOW_HEADER_LANGUAGE_SELECTOR': False,
@@ -743,7 +730,7 @@ FEATURES = {
     # .. toggle_description: When set to True, language selector will be visible in the footer.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-05-25
-    # .. toggle_warning: LANGUAGE_COOKIE_NAME is required to use footer-language-selector, set it if it has not been set.
+    # .. toggle_warnings: LANGUAGE_COOKIE_NAME is required to use footer-language-selector, set it if it has not been set.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15133
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
 
@@ -754,7 +741,7 @@ FEATURES = {
     #   student activities to MySQL, in a separate database.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-11-05
-    # .. toggle_warning: Even though most Open edX instances run with a separate CSMH database, it may not always be
+    # .. toggle_warnings: Even though most Open edX instances run with a separate CSMH database, it may not always be
     #   the case. When disabling this feature flag, remember to remove "lms.djangoapps.coursewarehistoryextended"
     #   from the INSTALLED_APPS and the "StudentModuleHistoryExtendedRouter" from the DATABASE_ROUTERS.
     'ENABLE_CSMH_EXTENDED': True,
@@ -823,7 +810,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Whether HTML Block returns HTML content with the Course Blocks API when the API
     #   is called with student_view_data=html query parameter.
-    # .. toggle_warning: Because the Course Blocks API caches its data, the cache must be cleared (e.g. by
+    # .. toggle_warnings: Because the Course Blocks API caches its data, the cache must be cleared (e.g. by
     #   re-publishing the course) for changes to this flag to take effect.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-08-28
@@ -877,7 +864,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-09-08
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/24908'
-    # .. toggle_warning: Also set settings.AUTHN_MICROFRONTEND_URL for rollout. This temporary feature
+    # .. toggle_warnings: Also set settings.AUTHN_MICROFRONTEND_URL for rollout. This temporary feature
     #   toggle does not have a target removal date.
     'ENABLE_AUTHN_MICROFRONTEND': os.environ.get("EDXAPP_ENABLE_AUTHN_MFE", False),
 
@@ -892,7 +879,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
+    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_ALL_FILE_URLS': False,
 
     # .. toggle_name: FEATURES['ENABLE_ORA_USER_STATE_UPLOAD_DATA']
@@ -904,7 +891,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
+    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
 
     # .. toggle_name: FEATURES['ENABLE_ORA_USERNAMES_ON_DATA_EXPORT']
@@ -916,7 +903,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-06-11
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/TNL-7273
-    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
+    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_USERNAMES_ON_DATA_EXPORT': False,
 
     # .. toggle_name: FEATURES['ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL']
@@ -947,7 +934,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-03-11
     # .. toggle_target_removal_date: None
-    # .. toggle_warning: None
+    # .. toggle_warnings: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/OSPR-5290'
     'ENABLE_BULK_USER_RETIREMENT': False,
 
@@ -965,60 +952,14 @@ FEATURES = {
     # .. toggle_name: FEATURES['ENABLE_INTEGRITY_SIGNATURE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Whether to display honor code agreement for learners before their first grade assignment
+    # .. toggle_description: Whether to replace ID verification course/certificate requirement
+    # with an in-course Honor Code agreement
     # (https://github.com/edx/edx-name-affirmation)
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-02-15
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
     'ENABLE_INTEGRITY_SIGNATURE': False,
-
-    # .. toggle_name: FEATURES['ENABLE_NEW_BULK_EMAIL_EXPERIENCE']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: When true, replaces the bulk email tool found on the
-    #   instructor dashboard with a link to the new communications MFE version instead.
-    #   Stting the tool to false will leave the old bulk email tool experience in place.
-    # .. toggle_use_cases: opt_in
-    # .. toggle_creation_date: 2022-03-21
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1758'
-    'ENABLE_NEW_BULK_EMAIL_EXPERIENCE': False,
-
-    # .. toggle_name: MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: If enabled, the Library Content Block is marked as complete when users view it.
-    #   Otherwise (by default), all children of this block must be completed.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2022-03-22
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/28268
-    # .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
-    #   in the LMS and CMS.
-    'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': False,
-
-    # .. toggle_name: FEATURES['DISABLE_UNENROLLMENT']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to disable self-unenrollments via REST API.
-    #   This also hides the "Unenroll" button on the Learner Dashboard.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2021-10-11
-    # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
-    #   in the LMS and CMS.
-    # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
-    'DISABLE_UNENROLLMENT': False,
-
-    # .. toggle_name: FEATURES['ENABLE_CERTIFICATES_IDV_REQUIREMENT']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Whether to enforce ID Verification requirements for couse certificates generation
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2022-04-26
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1458'
-    'ENABLE_CERTIFICATES_IDV_REQUIREMENT': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -1057,6 +998,8 @@ SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
 SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
 
 RETRY_CALENDAR_SYNC_EMAIL_MAX_ATTEMPTS = 5
+# Deadline message configurations
+COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
 
 MARKETING_EMAILS_OPT_IN = False
 
@@ -1072,9 +1015,6 @@ ENABLE_COPPA_COMPLIANCE = False
 
 # VAN-741 - save for later api put behind a flag to make it only available for edX
 ENABLE_SAVE_FOR_LATER = False
-
-# VAN-887 - save for later reminder emails threshold days
-SAVE_FOR_LATER_REMINDER_EMAIL_THRESHOLD = 15
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
@@ -1106,7 +1046,6 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
-    'openedx.core.lib.blockstore_api.db_routers.BlockstoreRouter',
     'edx_django_utils.db.read_replica.ReadReplicaRouter',
 ]
 
@@ -1322,7 +1261,7 @@ DEFAULT_TEMPLATE_ENGINE_DIRS = DEFAULT_TEMPLATE_ENGINE['DIRS'][:]
 
 AUTHENTICATION_BACKENDS = [
     'rules.permissions.ObjectPermissionBackend',
-    'django.contrib.auth.backends.AllowAllUsersModelBackend',
+    'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
     'bridgekeeper.backends.RulePermissionBackend',
 ]
 
@@ -1666,7 +1605,12 @@ DATABASES = {
         'PASSWORD': 'password',
         'PORT': '3306',
         'USER': 'edxapp001'
-    }
+    },
+
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'edx',
+    },
 }
 
 
@@ -1978,7 +1922,7 @@ WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children o
 # .. toggle_description: Enabling this allows access to anonymous users.
 #   For the original docs, see:
 #   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
-# .. toggle_warning: Setting allow anonymous access to `True` may have styling issues.
+# .. toggle_warnings: Setting allow anonymous access to `True` may have styling issues.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2012-08-21
 WIKI_ANONYMOUS = False
@@ -2193,6 +2137,9 @@ MIDDLEWARE = [
 
     'lms.djangoapps.discussion.django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
+
+    # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
+    'ratelimitbackend.middleware.RateLimitMiddleware',
 
     # for expiring inactive sessions
     'openedx.core.djangoapps.session_inactivity_timeout.middleware.SessionInactivityTimeout',
@@ -2713,17 +2660,11 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 ################################# CELERY ######################################
 
-CELERY_IMPORTS = [
+CELERY_IMPORTS = (
     # Since xblock-poll is not a Django app, and XBlocks don't get auto-imported
     # by celery workers, its tasks will not get auto-discovered:
     'poll.tasks',
-]
-
-# .. setting_name: CELERY_EXTRA_IMPORTS
-# .. setting_default: []
-# .. setting_description: Adds extra packages that don't get auto-imported (Example: XBlocks).
-#    These packages are added in addition to those added by CELERY_IMPORTS.
-CELERY_EXTRA_IMPORTS = []
+)
 
 # Message configuration
 
@@ -2854,7 +2795,7 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     #   files are kept for each structure, and the rest are cleaned up. The number of versions that
     #   are kept can be specified in the `BlockStructureConfiguration`, which can be edited in
     #   Django Admin. The default number of versions that are kept is `5`.
-    # .. toggle_warning: This toggle will likely be deprecated and removed.
+    # .. toggle_warnings: This toggle will likely be deprecated and removed.
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2018-03-22
     # .. toggle_target_removal_date: 2018-06-22
@@ -3125,6 +3066,10 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'lms.djangoapps.course_blocks',
 
+
+    # Coursegraph
+    'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
+
     # Mailchimp Syncing
     'lms.djangoapps.mailing',
 
@@ -3206,6 +3151,7 @@ INSTALLED_APPS = [
     'openedx.features.calendar_sync',
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
+    'openedx.features.course_search',
     'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
     'openedx.features.learner_profile',
     'openedx.features.course_duration_limits',
@@ -3245,6 +3191,8 @@ INSTALLED_APPS = [
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
+    'ratelimitbackend',
+
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
 
@@ -3265,9 +3213,6 @@ INSTALLED_APPS = [
 
     # For save for later
     'lms.djangoapps.save_for_later',
-
-    # Blockstore
-    'blockstore.apps.bundles',
 ]
 
 ######################### CSRF #########################################
@@ -3289,7 +3234,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
     'EXCEPTION_HANDLER': 'openedx.core.lib.request_utils.expected_error_exception_handler',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 20,
     'URL_FORMAT_OVERRIDE': None,
     'DEFAULT_THROTTLE_RATES': {
         'user': '60/minute',
@@ -3541,7 +3486,7 @@ REGISTRATION_EXTRA_FIELDS = {
     'year_of_birth': 'optional',
     'mailing_address': 'optional',
     'goals': 'optional',
-    'honor_code': 'required',
+    'honor_code': 'hidden',
     'terms_of_service': 'hidden',
     'city': 'hidden',
     'country': 'hidden',
@@ -3638,7 +3583,7 @@ BADGR_TIMEOUT = 10
 #    learners will be notified by email when they earn a badge.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2021-07-29
-# .. toggle_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
+# .. toggle_warnings: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_ENABLE_NOTIFICATIONS = False
 
 ###################### Grade Downloads ######################
@@ -4150,6 +4095,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "phone_number",
         "activation_key",
         "pending_name_change",
+        "user_attendance",
     ]
 )
 
@@ -4455,7 +4401,7 @@ DEFAULT_SITE_THEME = None
 #   defined by DEFAULT_SITE_THEME.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2016-06-30
-ENABLE_COMPREHENSIVE_THEMING = False
+ENABLE_COMPREHENSIVE_THEMING = True
 
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
@@ -4507,7 +4453,7 @@ ENTERPRISE_INTEGRATIONS_EMAIL = "enterprise-integrations@edx.org"
 INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = {}
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
-# The LMS communicates with the Enterprise service via the requests.Session() client
+# The LMS communicates with the Enterprise service via the EdxRestApiClient class
 # These default settings are utilized by the LMS when interacting with the service,
 # and are overridden by the configuration parameter accessors defined in production.py
 
@@ -4646,18 +4592,6 @@ COURSE_ENROLLMENT_MODES = {
         "id": 10,
         "slug": "paid-executive-education",
         "display_name": _("Paid Executive Education"),
-        "min_price": 1
-    },
-    "unpaid-bootcamp": {
-        "id": 11,
-        "slug": "unpaid-bootcamp",
-        "display_name": _("Unpaid Bootcamp"),
-        "min_price": 0
-    },
-    "paid-bootcamp": {
-        "id": 12,
-        "slug": "paid-bootcamp",
-        "display_name": _("Paid Bootcamp"),
         "min_price": 1
     },
 }
@@ -4874,51 +4808,6 @@ DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. toggle_creation_date: 2021-12-03
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-666
 ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
-# .. toggle_name: ENABLE_AUTHN_REGISTER_HIBP_POLICY
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy on Authn MFE's registration.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2022-03-25
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-669
-ENABLE_AUTHN_REGISTER_HIBP_POLICY = False
-HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3
-
-# .. toggle_name: ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-668
-ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY = False
-HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
-
-# .. toggle_name: ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-667
-ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
-HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
-
-# .. toggle_name: ENABLE_DYNAMIC_REGISTRATION_FIELDS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle adds fields configured in
-# REGISTRATION_EXTRA_FIELDS to Authn MFE
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2022-04-21
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
-ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 
 ############### Settings for the ace_common plugin #################
 ACE_ENABLED_CHANNELS = ['django_email']
@@ -5006,10 +4895,6 @@ MAILCHIMP_NEW_USER_LIST_ID = ""
 BLOCKSTORE_PUBLIC_URL_ROOT = 'http://localhost:18250'
 BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 
-# Disable the Blockstore app API by default.
-# See openedx.core.lib.blockstore_api.config for details.
-BLOCKSTORE_USE_BLOCKSTORE_APP_API = False
-
 # .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
 # .. setting_default: default
 # .. setting_description: The django cache key of the cache to use for storing anonymous user state for XBlocks.
@@ -5025,39 +4910,9 @@ XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 #     configured to expire after one hour.
 BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 3000
 
-# .. setting_name: BUNDLE_ASSET_URL_STORAGE_KEY
-# .. setting_default: None
-# .. setting_description: When this is set, `BUNDLE_ASSET_URL_STORAGE_SECRET` is
-#  set, and `boto3` is installed, this is used as an AWS IAM access key for
-#  generating signed, read-only URLs for blockstore assets stored in S3.
-#  Otherwise, URLs are generated based on the default storage configuration.
-#  See `blockstore.apps.bundles.storage.LongLivedSignedUrlStorage` for details.
-BUNDLE_ASSET_URL_STORAGE_KEY = None
-
-# .. setting_name: BUNDLE_ASSET_URL_STORAGE_SECRET
-# .. setting_default: None
-# .. setting_description: When this is set, `BUNDLE_ASSET_URL_STORAGE_KEY` is
-#  set, and `boto3` is installed, this is used as an AWS IAM secret key for
-#  generating signed, read-only URLs for blockstore assets stored in S3.
-#  Otherwise, URLs are generated based on the default storage configuration.
-#  See `blockstore.apps.bundles.storage.LongLivedSignedUrlStorage` for details.
-BUNDLE_ASSET_URL_STORAGE_SECRET = None
-
-# .. setting_name: BUNDLE_ASSET_STORAGE_SETTINGS
-# .. setting_default: dict, appropriate for file system storage.
-# .. setting_description: When this is set, `BUNDLE_ASSET_URL_STORAGE_KEY` is
-#  set, and `boto3` is installed, this provides the bucket name and location for blockstore assets stored in S3.
-#  See `blockstore.apps.bundles.storage.LongLivedSignedUrlStorage` for details.
-BUNDLE_ASSET_STORAGE_SETTINGS = dict(
-    # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
-    # STORAGE_KWARGS=dict(bucket='bundle-asset-bucket', location='/path-to-bundles/'),
-    STORAGE_CLASS='django.core.files.storage.FileSystemStorage',
-    STORAGE_KWARGS=dict(
-        location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
-    ),
-)
+######################### MICROSITE ###############################
+MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
+MICROSITE_CONFIGURATION = {}
 
 SYSLOG_SERVER = ''
 FEEDBACK_SUBMISSION_EMAIL = ''
@@ -5138,13 +4993,3 @@ DISCUSSION_MODERATION_CLOSE_REASON_CODES = {
     "duplicate": _("Post is a duplicate"),
     "off-topic": _("Post is off-topic"),
 }
-
-################# Settings for edx-financial-assistance #################
-IS_ELIGIBLE_FOR_FINANCIAL_ASSISTANCE_URL = '/core/api/course_eligibility/'
-FINANCIAL_ASSISTANCE_APPLICATION_STATUS_URL = "/core/api/financial_assistance_application/status/"
-CREATE_FINANCIAL_ASSISTANCE_APPLICATION_URL = '/core/api/financial_assistance_applications'
-
-######################## Enterprise API Client ########################
-ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_KEY = "enterprise-backend-service-key"
-ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_SECRET = "enterprise-backend-service-secret"
-ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://127.0.0.1:8000/oauth2"

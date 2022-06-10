@@ -26,10 +26,9 @@ from lms.djangoapps.courseware.masquerade import (
     setup_masquerade,
 )
 
-from lms.djangoapps.courseware.tests.helpers import (
-    LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member, set_preview_mode,
-)
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
@@ -43,6 +42,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # li
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MasqueradeMixin):
     """
     Base class for masquerade tests that sets up a test course and enrolls a user in the course.
@@ -189,6 +189,32 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         assert 200 == masquerade_as_group_member(self.test_user, self.course, partition_id, group_id)
 
 
+class NormalStudentVisibilityTest(MasqueradeTestCase):
+    """
+    Verify the course displays as expected for a "normal" student (to ensure test setup is correct).
+    """
+
+    def create_user(self):
+        """
+        Creates a normal student user.
+        """
+        return UserFactory()
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_staff_debug_not_visible(self):
+        """
+        Tests that staff debug control is not present for a student.
+        """
+        self.verify_staff_debug_present(False)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_show_answer_not_visible(self):
+        """
+        Tests that "Show Answer" is not visible for a student.
+        """
+        self.verify_show_answer_present(False)
+
+
 class StaffMasqueradeTestCase(MasqueradeTestCase):
     """
     Base class for tests of the masquerade behavior for a staff member.
@@ -259,7 +285,6 @@ class TestMasqueradeOptionsNoContentGroups(StaffMasqueradeTestCase):
         assert is_target_available == expected
 
 
-@set_preview_mode(True)
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as student.

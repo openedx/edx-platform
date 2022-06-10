@@ -7,7 +7,6 @@ from unittest.mock import Mock, patch
 from uuid import uuid4
 
 from common.djangoapps.student.models import CourseEnrollment
-from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.subtasks import queue_subtasks_for_query
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
@@ -35,7 +34,7 @@ class TestSubtasks(InstructorTaskCourseTestCase):
             course_id=self.course.id,
             task_id=task_id,
             task_key='dummy_task_key',
-            task_type=InstructorTaskTypes.BULK_COURSE_EMAIL,
+            task_type='bulk_course_email',
         )
 
         self._enroll_students_in_course(self.course.id, initial_count)

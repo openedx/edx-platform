@@ -727,6 +727,8 @@ def get_module_system_for_user(
     system = LmsModuleSystem(
         track_function=track_function,
         static_url=settings.STATIC_URL,
+        # TODO (cpennington): Figure out how to share info between systems
+        filestore=descriptor.runtime.resources_fs,
         get_module=inner_get_module,
         user=user,
         debug=settings.DEBUG,

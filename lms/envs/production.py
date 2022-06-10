@@ -82,7 +82,6 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'CELERY_QUEUES',
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
-        'REST_FRAMEWORK',
     ]
     for key in KEYS_WITH_MERGED_VALUES:
         if key in __config_copy__:
@@ -151,7 +150,7 @@ EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
 EMAIL_HOST = ENV_TOKENS.get('EMAIL_HOST', 'localhost')  # django default is localhost
 EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', 25)  # django default is 25
 EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', False)  # django default is False
-SITE_NAME = ENV_TOKENS.get('SITE_NAME', SITE_NAME)
+SITE_NAME = ENV_TOKENS['SITE_NAME']
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 SESSION_COOKIE_HTTPONLY = ENV_TOKENS.get('SESSION_COOKIE_HTTPONLY', True)
 
@@ -206,7 +205,7 @@ if ENV_TOKENS.get('SESSION_COOKIE_NAME', None):
 # By default, it's set to the same thing as the SESSION_COOKIE_DOMAIN, but we want to make it overrideable.
 SHARED_COOKIE_DOMAIN = ENV_TOKENS.get('SHARED_COOKIE_DOMAIN', SESSION_COOKIE_DOMAIN)
 
-CACHES = ENV_TOKENS.get('CACHES', CACHES)
+CACHES = ENV_TOKENS['CACHES']
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
 if 'loc_cache' not in CACHES:
@@ -316,11 +315,11 @@ for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
 
 
 local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
-LOG_DIR = ENV_TOKENS.get('LOG_DIR', LOG_DIR)
+LOG_DIR = ENV_TOKENS['LOG_DIR']
 DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 
 LOGGING = get_logger_config(LOG_DIR,
-                            logging_env=ENV_TOKENS.get('LOGGING_ENV', LOGGING_ENV),
+                            logging_env=ENV_TOKENS['LOGGING_ENV'],
                             local_loglevel=local_loglevel,
                             service_variant=SERVICE_VARIANT)
 
@@ -445,11 +444,11 @@ LMS_SEGMENT_KEY = AUTH_TOKENS.get('SEGMENT_KEY')
 
 SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
 
-AWS_ACCESS_KEY_ID = AUTH_TOKENS.get("AWS_ACCESS_KEY_ID", AWS_ACCESS_KEY_ID)
+AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
 if AWS_ACCESS_KEY_ID == "":
     AWS_ACCESS_KEY_ID = None
 
-AWS_SECRET_ACCESS_KEY = AUTH_TOKENS.get("AWS_SECRET_ACCESS_KEY", AWS_SECRET_ACCESS_KEY)
+AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
 if AWS_SECRET_ACCESS_KEY == "":
     AWS_SECRET_ACCESS_KEY = None
 
@@ -469,7 +468,7 @@ else:
 
 # If there is a database called 'read_replica', you can use the use_read_replica_if_available
 # function in util/query.py, which is useful for very large database reads
-DATABASES = AUTH_TOKENS.get('DATABASES', DATABASES)
+DATABASES = AUTH_TOKENS['DATABASES']
 
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
@@ -485,7 +484,7 @@ for name, database in DATABASES.items():
             'PORT': os.environ.get('DB_MIGRATION_PORT', database['PORT']),
         })
 
-XQUEUE_INTERFACE = AUTH_TOKENS.get('XQUEUE_INTERFACE', XQUEUE_INTERFACE)
+XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 
 # Get the MODULESTORE from auth.json, but if it doesn't exist,
 # use the one from common.py
@@ -881,7 +880,7 @@ INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = ENV_TOKENS.get(
 )
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
-# The LMS communicates with the Enterprise service via the requests.Session() client
+# The LMS communicates with the Enterprise service via the EdxRestApiClient class
 # The below environmental settings are utilized by the LMS when interacting with
 # the service, and override the default parameters which are defined in common.py
 
@@ -1065,9 +1064,3 @@ DISCUSSIONS_MICROFRONTEND_URL = ENV_TOKENS.get('DISCUSSIONS_MICROFRONTEND_URL', 
 
 ################### Discussions micro frontend Feedback URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = ENV_TOKENS.get('DISCUSSIONS_MFE_FEEDBACK_URL', DISCUSSIONS_MFE_FEEDBACK_URL)
-
-############## DRF overrides ##############
-REST_FRAMEWORK.update(ENV_TOKENS.get('REST_FRAMEWORK', {}))
-
-############################# CELERY ############################
-CELERY_IMPORTS.extend(ENV_TOKENS.get('CELERY_EXTRA_IMPORTS', []))

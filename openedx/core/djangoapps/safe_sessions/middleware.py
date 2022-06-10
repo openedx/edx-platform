@@ -91,10 +91,10 @@ from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils.cache import RequestCache
-from edx_django_utils.logging import encrypt_for_log
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import SettingToggle
 
+from common.djangoapps.util.log_sensitive import encrypt_for_log
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
@@ -106,7 +106,7 @@ from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 #      information on the request. This will also track the location where the change is coming from to quickly find
 #      issues. If user verification fails at response time, all of the information about these
 #      changes will be logged.
-# .. toggle_warning: Adds some processing overhead to all requests to gather debug info. Will also double the logging
+# .. toggle_warnings: Adds some processing overhead to all requests to gather debug info. Will also double the logging
 #      for failed verification checks.
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-03-25
@@ -120,7 +120,7 @@ LOG_REQUEST_USER_CHANGES = getattr(settings, 'LOG_REQUEST_USER_CHANGES', False)
 #      any user id change detected by safe sessions. The headers will provide additional debugging information. The
 #      headers will be logged for all requests up until LOG_REQUEST_USER_CHANGE_HEADERS_DURATION seconds after
 #      the time of the last mismatch. The header details will be encrypted, and only available with the private key.
-# .. toggle_warning: Logging headers of subsequent requests following a mismatch will only work if
+# .. toggle_warnings: Logging headers of subsequent requests following a mismatch will only work if
 #      LOG_REQUEST_USER_CHANGES is enabled and ENFORCE_SAFE_SESSIONS is disabled; otherwise, only headers of the inital
 #      mismatch will be logged. Also, SAFE_SESSIONS_DEBUG_PUBLIC_KEY must be set. See
 #      https://github.com/edx/edx-platform/blob/master/common/djangoapps/util/log_sensitive.py
@@ -142,7 +142,7 @@ LOG_REQUEST_USER_CHANGE_HEADERS_DURATION = getattr(settings, 'LOG_REQUEST_USER_C
 #   response cancelled (changed to an error). This is intended as a backup
 #   safety measure in case an attacker (or bug) is able to change the user
 #   on a session in an unexpected way.
-# .. toggle_warning: Should be disabled if debugging mismatches using the
+# .. toggle_warnings: Should be disabled if debugging mismatches using the
 #   LOG_REQUEST_USER_CHANGE_HEADERS toggle, otherwise series of mismatching
 #   requests from the same user cannot be investigated.  Additionally, if
 #   enabling for the first time, confirm that incidences of the string

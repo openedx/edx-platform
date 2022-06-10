@@ -19,6 +19,8 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.validators import ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction
 from django.urls import NoReverseMatch, reverse
+from common.djangoapps.edxmako.shortcuts import marketing_link
+
 from django.utils.translation import gettext as _
 from pytz import UTC
 
@@ -247,10 +249,14 @@ def get_redirect_url_with_host(root_url, redirect_to):
         parse_root_url = urllib.parse.urlsplit(root_url)
         redirect_to = urllib.parse.urlunsplit((parse_root_url.scheme, parse_root_url.netloc, path, query, fragment))
 
+    logging.info("____helper_start_____" , redirect_to )
     return redirect_to
 
 
 def get_next_url_for_login_page(request, include_host=False):
+    
+    
+    #import pdb;pdb.set_trace()
     """
     Determine the URL to redirect to following login/registration/third_party_auth
 
@@ -273,14 +279,18 @@ def get_next_url_for_login_page(request, include_host=False):
         request_params=request_params,
         request_is_https=request.is_secure(),
     )
+    logging.info("____helper1_____" , redirect_to )
     root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    logging.info("____helper1.1_____" , root_url )
     if not redirect_to:
         if settings.ROOT_URLCONF == 'lms.urls':
             login_redirect_url = configuration_helpers.get_value('DEFAULT_REDIRECT_AFTER_LOGIN')
+            logging.info("____helper1.2_____" , login_redirect_url )
 
             if login_redirect_url:
                 try:
                     redirect_to = reverse(login_redirect_url)
+                    logging.info("____helper2_____" , redirect_to )
                 except NoReverseMatch:
                     log.warning(
                         'Default redirect after login doesn\'t exist: %(login_redirect_url)r. '
@@ -292,11 +302,16 @@ def get_next_url_for_login_page(request, include_host=False):
             if not redirect_to:
                 # Tries reversing the LMS dashboard if the url doesn't exist
                 redirect_to = reverse('dashboard')
+                logging.info("____helper3_____" ,redirect_to  )
+                
+                redirect_to = reverse('courses')
+                #redirect_to = marketing_link('COURSES')
 
         elif settings.ROOT_URLCONF == 'cms.urls':
             redirect_to = reverse('home')
             scheme = "https" if settings.HTTPS == "on" else "http"
             root_url = f'{scheme}://{settings.CMS_BASE}'
+            logging.info("____helper4_____" ,root_url  )
 
     if any(param in request_params for param in POST_AUTH_PARAMS):
         # Before we redirect to next/dashboard, we need to handle auto-enrollment:
@@ -304,6 +319,7 @@ def get_next_url_for_login_page(request, include_host=False):
 
         params.append(('next', redirect_to))  # After auto-enrollment, user will be sent to payment page or to this URL
         redirect_to = '{}?{}'.format(reverse('finish_auth'), urllib.parse.urlencode(params))
+        logging.info("____helper5_____" , redirect_to )
         # Note: if we are resuming a third party auth pipeline, then the next URL will already
         # be saved in the session as part of the pipeline state. That URL will take priority
         # over this one.
@@ -323,10 +339,13 @@ def get_next_url_for_login_page(request, include_host=False):
             params['tpa_hint'] = [tpa_hint]
             query = urllib.parse.urlencode(params, doseq=True)
             redirect_to = urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
+            logging.info("____helper6_____" , redirect_to )
 
     if include_host:
+        logging.info("____helper7_____" , redirect_to , root_url)
         return redirect_to, root_url
-
+        
+    logging.info("____helper8_____" ,  redirect_to  )
     return redirect_to
 
 
@@ -343,11 +362,21 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
     Returns: str
         redirect url if safe else None
     """
-    redirect_to = request_params.get('next')
-    header_accept = request_headers.get('HTTP_ACCEPT', '')
-    accepts_text_html = any(
-        mime_type in header_accept
-        for mime_type in ['*/*', 'text/*', 'text/html']
+    
+    if settings.ROOT_URLCONF == 'lms.urls':
+        redirect_to = request_params.get('next')
+        header_accept = request_headers.get('HTTP_ACCEPT', '')
+        accepts_text_html = any(
+            mime_type in header_accept
+            for mime_type in ['*/*', 'text/*', 'text/html']
+    )
+
+    else:
+        redirect_to = request_params.get('next')
+        header_accept = request_headers.get('HTTP_ACCEPT', '')
+        accepts_text_html = any(
+            mime_type in header_accept
+            for mime_type in ['*/*', 'text/*', 'text/html']
     )
 
     # If we get a redirect parameter, make sure it's safe i.e. not redirecting outside our domain.

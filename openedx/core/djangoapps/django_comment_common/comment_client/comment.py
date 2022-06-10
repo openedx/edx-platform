@@ -20,7 +20,6 @@ class Comment(models.Model):
     updatable_fields = [
         'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'closed',
         'user_id', 'endorsed', 'endorsement_user_id', 'edit_reason_code',
-        'closing_user_id', 'editing_user_id',
     ]
 
     initializable_fields = updatable_fields

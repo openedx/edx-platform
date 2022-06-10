@@ -2,6 +2,7 @@
 Helper code for working with Blockstore bundles that contain OLX
 """
 
+import dateutil.parser
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
 
 from functools import lru_cache  # lint-amnesty, pylint: disable=wrong-import-order
@@ -346,17 +347,12 @@ class LibraryBundle:
             problem/quiz1/definition.xml
             problem/quiz1/static/image1.png
         Then this will return
-            [BundleFileData(path="image1.png", size, url, hash_digest)]
+            [BundleFile(path="image1.png", size, url, hash_digest)]
         """
         path_prefix = self.get_static_prefix_for_definition(definition_key)
         path_prefix_len = len(path_prefix)
         return [
-            blockstore_api.BundleFileData(
-                path=f.path[path_prefix_len:],
-                size=f.size,
-                url=f.url,
-                hash_digest=f.hash_digest,
-            )
+            blockstore_api.BundleFile(path=f.path[path_prefix_len:], size=f.size, url=f.url, hash_digest=f.hash_digest)
             for f in get_bundle_files_cached(self.bundle_uuid, draft_name=self.draft_name)
             if f.path.startswith(path_prefix)
         ]
@@ -373,7 +369,8 @@ class LibraryBundle:
         version = get_bundle_version_number(self.bundle_uuid)
         if version == 0:
             return None
-        last_published_time = blockstore_api.get_bundle_version(self.bundle_uuid, version).created_at
+        created_at_str = blockstore_api.get_bundle_version(self.bundle_uuid, version)['snapshot']['created_at']
+        last_published_time = dateutil.parser.parse(created_at_str)
         self.cache.set(cache_key, last_published_time)
         return last_published_time
 

@@ -861,17 +861,15 @@ class ExportTestCase(CourseTestCase):
         root_dir = path(tempfile.mkdtemp())
         try:
             export_library_to_xml(self.store, contentstore(), lib_key, root_dir, name)
-            with open(root_dir / name / LIBRARY_ROOT) as xml_root:
-                lib_xml = lxml.etree.XML(xml_root.read())
-                self.assertEqual(lib_xml.get('org'), lib_key.org)
-                self.assertEqual(lib_xml.get('library'), lib_key.library)
-                block = lib_xml.find('video')
-                self.assertIsNotNone(block)
-                self.assertEqual(block.get('url_name'), video_block.url_name)
-            with open(root_dir / name / 'video' / video_block.url_name + '.xml') as xml_block:
-                video_xml = lxml.etree.XML(xml_block.read())
-                self.assertEqual(video_xml.tag, 'video')
-                self.assertEqual(video_xml.get('youtube_id_1_0'), youtube_id)
+            lib_xml = lxml.etree.XML(open(root_dir / name / LIBRARY_ROOT).read())
+            self.assertEqual(lib_xml.get('org'), lib_key.org)
+            self.assertEqual(lib_xml.get('library'), lib_key.library)
+            block = lib_xml.find('video')
+            self.assertIsNotNone(block)
+            self.assertEqual(block.get('url_name'), video_block.url_name)
+            video_xml = lxml.etree.XML(open(root_dir / name / 'video' / video_block.url_name + '.xml').read())
+            self.assertEqual(video_xml.tag, 'video')
+            self.assertEqual(video_xml.get('youtube_id_1_0'), youtube_id)
         finally:
             shutil.rmtree(root_dir / name)
 

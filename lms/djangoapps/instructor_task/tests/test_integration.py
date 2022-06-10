@@ -30,7 +30,6 @@ from lms.djangoapps.instructor_task.api import (
     submit_rescore_problem_for_student,
     submit_reset_problem_attempts_for_all_students
 )
-from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.tasks_helper.grades import CourseGradeReport
 from lms.djangoapps.instructor_task.tests.test_base import (
@@ -276,9 +275,7 @@ class TestRescoringTask(TestIntegrationTask):
         with patch('capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
             mock_rescore.side_effect = ZeroDivisionError(expected_message)
             instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
-        self._assert_task_failure(
-            instructor_task.id, InstructorTaskTypes.RESCORE_PROBLEM, problem_url_name, expected_message
-        )
+        self._assert_task_failure(instructor_task.id, 'rescore_problem', problem_url_name, expected_message)
 
     def test_rescoring_bad_unicode_input(self):
         """Generate a real failure in rescoring a problem, with an answer including unicode"""
@@ -301,7 +298,7 @@ class TestRescoringTask(TestIntegrationTask):
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         assert instructor_task.task_state == 'SUCCESS'
         assert instructor_task.requester.username == 'instructor'
-        assert instructor_task.task_type == InstructorTaskTypes.RESCORE_PROBLEM
+        assert instructor_task.task_type == 'rescore_problem'
         task_input = json.loads(instructor_task.task_input)
         assert 'student' not in task_input
         assert task_input['problem_url'] == str(InstructorTaskModuleTestCase.problem_location(problem_url_name))
@@ -493,9 +490,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
         with patch('lms.djangoapps.courseware.models.StudentModule.save') as mock_save:
             mock_save.side_effect = ZeroDivisionError(expected_message)
             instructor_task = self.reset_problem_attempts('instructor', location)
-        self._assert_task_failure(
-            instructor_task.id, InstructorTaskTypes.RESET_PROBLEM_ATTEMPTS, problem_url_name, expected_message
-        )
+        self._assert_task_failure(instructor_task.id, 'reset_problem_attempts', problem_url_name, expected_message)
 
     def test_reset_non_problem(self):
         """confirm that a non-problem can still be successfully reset"""
@@ -557,9 +552,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
         with patch('lms.djangoapps.courseware.models.StudentModule.delete') as mock_delete:
             mock_delete.side_effect = ZeroDivisionError(expected_message)
             instructor_task = self.delete_problem_state('instructor', location)
-        self._assert_task_failure(
-            instructor_task.id, InstructorTaskTypes.DELETE_PROBLEM_STATE, problem_url_name, expected_message
-        )
+        self._assert_task_failure(instructor_task.id, 'delete_problem_state', problem_url_name, expected_message)
 
     def test_delete_non_problem(self):
         """confirm that a non-problem can still be successfully deleted"""

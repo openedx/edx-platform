@@ -27,9 +27,7 @@ from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
     NonCompliantPasswordWarning
 )
-from openedx.core.djangoapps.password_policy.hibp import PwnedPasswordsAPI
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
-from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_PWNED_PASSWORD_API
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangoapps.user_authn.views.login import (
@@ -376,35 +374,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
             mock_audit_log, 'warning', ['Login failed', 'password for', str(self.user.id), 'invalid']
         )
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [self.user_email])
-
-    @override_settings(ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY=True)
-    @override_waffle_switch(ENABLE_PWNED_PASSWORD_API, True)
-    def test_password_compliance_block_error(self):
-        """
-        Test that if HIBP Block flag is set to True and user's password lies
-        within block threshold, then login fails and user is not authenticated.
-        """
-        password = hashlib.sha1(self.password.encode('utf-8')).hexdigest().upper()
-        api_response = {password[5:]: 1000000}
-        with patch.object(PwnedPasswordsAPI, 'range', return_value=api_response):
-            response, _ = self._login_response(self.user_email, self.password)
-
-        self._assert_response(response, success=False, error_code='require-password-change')
-
-    @override_settings(ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY=True)
-    @override_waffle_switch(ENABLE_PWNED_PASSWORD_API, True)
-    def test_password_compliance_nudge_error(self):
-        """
-        Test that if HIBP Nudge flag is set to True and user's password lies
-        within nudge threshold, then user is authenticated and response contains
-        proper error code.
-        """
-        password = hashlib.sha1(self.password.encode('utf-8')).hexdigest().upper()
-        api_response = {password[5:]: 10}
-        with patch.object(PwnedPasswordsAPI, 'range', return_value=api_response):
-            response, _ = self._login_response(self.user_email, self.password)
-
-        self._assert_response(response, success=False, error_code='nudge-password-change')
 
     def test_login_not_activated_no_pii(self):
         # De-activate the user

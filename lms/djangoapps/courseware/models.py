@@ -18,7 +18,6 @@ import itertools
 import logging
 
 from config_models.models import ConfigurationModel
-from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
@@ -501,33 +500,3 @@ class LastSeenCoursewareTimezone(models.Model):
 
     class Meta:
         app_label = "courseware"
-
-
-class FinancialAssistanceConfiguration(ConfigurationModel):
-    """
-    Manages configuration for connecting to Financial Assistance backend service and using its API.
-    """
-
-    api_base_url = models.URLField(
-        verbose_name=_('Internal API Base URL'),
-        help_text=_('Financial Assistance Backend API Base URL.')
-    )
-
-    service_username = models.CharField(
-        max_length=100,
-        default='financial_assistance_service_user',
-        null=False,
-        blank=False,
-        help_text=_('Username created for Financial Assistance Backend, e.g. financial_assistance_service_user.')
-    )
-
-    fa_backend_enabled_courses_percentage = models.IntegerField(
-        default=0,
-        help_text=_('Percentage of courses allowed to use edx-financial-assistance')
-    )
-
-    def get_service_user(self):
-        """
-        Getter function to get service user for Financial Assistance backend.
-        """
-        return get_user_model().objects.get(username=self.service_username)

@@ -32,7 +32,8 @@ from xmodule.seq_module import SequenceBlock  # lint-amnesty, pylint: disable=wr
 from xmodule.util.xmodule_django import add_webpack_to_fragment  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.vertical_block import VerticalBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import (  # lint-amnesty, pylint: disable=wrong-import-order
-    PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW, shim_xmodule_js,
+    PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW,
+    XModule, XModuleDescriptor, shim_xmodule_js,
 )
 
 log = logging.getLogger(__name__)
@@ -113,7 +114,7 @@ def wrap_xblock(
     if view == STUDENT_VIEW and getattr(block, 'HIDDEN', False):
         css_classes.append('is-hidden')
 
-    if getattr(block, 'uses_xmodule_styles_setup', False):
+    if isinstance(block, (XModule, XModuleDescriptor)) or getattr(block, 'uses_xmodule_styles_setup', False):
         if view in PREVIEW_VIEWS:
             # The block is acting as an XModule
             css_classes.append('xmodule_display')
@@ -122,6 +123,10 @@ def wrap_xblock(
             css_classes.append('xmodule_edit')
 
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
+
+    if isinstance(block, (XModule, XModuleDescriptor)):
+        data['type'] = block.js_module_name
+        shim_xmodule_js(frag, block.js_module_name)
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
@@ -149,6 +154,10 @@ def wrap_xblock(
         template_context['js_init_parameters'] = frag.json_init_args
     else:
         template_context['js_init_parameters'] = ""
+
+    if isinstance(block, (XModule, XModuleDescriptor)):
+        # Add the webpackified asset tags
+        add_webpack_to_fragment(frag, class_name)
 
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
@@ -285,9 +294,9 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
         histogram = None
         render_histogram = False
 
-    if settings.FEATURES.get('ENABLE_LMS_MIGRATION') and hasattr(block.runtime, 'resources_fs'):
+    if settings.FEATURES.get('ENABLE_LMS_MIGRATION') and hasattr(block.runtime, 'filestore'):
         [filepath, filename] = getattr(block, 'xml_attributes', {}).get('filename', ['', None])
-        osfs = block.runtime.resources_fs
+        osfs = block.runtime.filestore
         if filename is not None and osfs.exists(filename):
             # if original, unmangled filename exists then use it (github
             # doesn't like symlinks)

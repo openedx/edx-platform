@@ -5,16 +5,19 @@ Test for split test XModule
 
 from unittest.mock import MagicMock
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class SplitTestBase(ModuleStoreTestCase):
     """
     Sets up a basic course and user for split test testing.
@@ -115,7 +118,12 @@ class SplitTestBase(ModuleStoreTestCase):
             value=str(user_tag)
         )
 
-        resp = self.client.get(reverse('render_xblock', args=[str(self.sequential.location)]))
+        resp = self.client.get(reverse(
+            'courseware_section',
+            kwargs={'course_id': str(self.course.id),
+                    'chapter': self.chapter.url_name,
+                    'section': self.sequential.url_name}
+        ))
         unicode_content = resp.content.decode(resp.charset)
 
         # Assert we see the proper icon in the top display

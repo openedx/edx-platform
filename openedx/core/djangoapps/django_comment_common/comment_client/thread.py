@@ -28,7 +28,7 @@ class Thread(models.Model):
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'read',
         'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type',
-        'close_reason_code', 'edit_reason_code', 'closing_user_id', 'editing_user_id',
+        'close_reason_code', 'edit_reason_code',
     ]
 
     # metric_tag_fields are used by Datadog to record metrics about the model

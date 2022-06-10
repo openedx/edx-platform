@@ -2,7 +2,7 @@
 Views for serving static textbooks.
 """
 
-
+import logging
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -12,6 +12,9 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.static_replace import replace_static_urls
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
+
+
+log = logging.getLogger(__name__)
 
 
 @login_required
@@ -77,6 +80,10 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
 
     page:  (optional) one-based page number to display within the PDF.  Defaults to first page.
     """
+    # log.info("____viewer1____" , request ,book_index)
+    # import pdb;pdb.set_trace()
+
+
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     staff_access = bool(has_access(request.user, 'staff', course))
@@ -109,9 +116,13 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
     viewer_params += '#zoom=page-fit&disableRange=true'
     if page is not None:
         viewer_params += f'&page={page}'
+        
 
     if request.GET.get('viewer', '') == 'true':
         template = 'pdf_viewer.html'
+
+        # log.info("____viewer2____" , template , current_url ,book_index)
+
     else:
         template = 'static_pdfbook.html'
 

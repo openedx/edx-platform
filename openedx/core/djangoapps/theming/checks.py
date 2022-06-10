@@ -24,7 +24,7 @@ def check_comprehensive_theme_settings(app_configs, **kwargs):  # lint-amnesty, 
     Returns:
         List of any Errors.
     """
-    if not SettingToggle("ENABLE_COMPREHENSIVE_THEMING", default=False).is_enabled():
+    if not SettingToggle("ENABLE_COMPREHENSIVE_THEMING", default=True).is_enabled():
         # Only perform checks when comprehensive theming is enabled.
         return []
 

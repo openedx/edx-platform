@@ -10,7 +10,7 @@ import re
 import time
 from collections import Counter
 from datetime import datetime
-from smtplib import SMTPConnectError, SMTPDataError, SMTPException, SMTPServerDisconnected, SMTPSenderRefused
+from smtplib import SMTPConnectError, SMTPDataError, SMTPException, SMTPServerDisconnected
 from time import sleep
 
 from boto.exception import AWSConnectionError
@@ -87,13 +87,12 @@ LIMITED_RETRY_ERRORS = (
 # An example is if email is being sent too quickly, but may succeed if sent
 # more slowly.  When caught by a task, it triggers an exponential backoff and retry.
 # Retries happen continuously until the email is sent.
-# Note that the (SMTPDataErrors and SMTPSenderRefused)  here are only those within the 4xx range.
+# Note that the SMTPDataErrors here are only those within the 4xx range.
 # Those not in this range (i.e. in the 5xx range) are treated as hard failures
 # and thus like SINGLE_EMAIL_FAILURE_ERRORS.
 INFINITE_RETRY_ERRORS = (
     SESMaxSendingRateExceededError,  # Your account's requests/second limit has been exceeded.
     SMTPDataError,
-    SMTPSenderRefused,
 )
 
 # Errors that are known to indicate an inability to send any more emails,
@@ -566,11 +565,11 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                     f"{recipient_num}/{total_recipients}, Recipient UserId: {current_recipient['pk']}"
                 )
                 message.send()
-            except (SMTPDataError, SMTPSenderRefused) as exc:
+            except SMTPDataError as exc:
                 # According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure.
                 total_recipients_failed += 1
                 log.exception(
-                    f"BulkEmail ==> Status: Failed({exc.smtp_error}), Task: {parent_task_id}, SubTask: {task_id}, "
+                    f"BulkEmail ==> Status: Failed(SMTPDataError), Task: {parent_task_id}, SubTask: {task_id}, "
                     f"EmailId: {email_id}, Recipient num: {recipient_num}/{total_recipients}, Recipient UserId: "
                     f"{current_recipient['pk']}"
                 )

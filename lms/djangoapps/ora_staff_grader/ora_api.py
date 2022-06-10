@@ -154,19 +154,3 @@ def delete_submission_lock(request, usage_id, submission_uuid):
         raise XBlockInternalError(context={"handler": handler_name})
 
     return json.loads(response.content)
-
-
-def batch_delete_submission_locks(request, usage_id, submission_uuids):
-    """
-    Batch delete a list of submission locks. Limited only to those in the list the user owns.
-
-    Returns: none
-    """
-    handler_name = "batch_delete_submission_lock"
-    body = {"submission_uuids": submission_uuids}
-
-    response = call_xblock_json_handler(request, usage_id, handler_name, body)
-
-    # Errors should raise a blanket exception. Otherwise body is empty, 200 is implicit success
-    if response.status_code != 200:
-        raise XBlockInternalError(context={"handler": handler_name})

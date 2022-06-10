@@ -223,14 +223,6 @@ class ProviderConfig(ConfigurationModel):
         )
     )
 
-    was_valid_at = models.DateTimeField(
-        blank=True,
-        null=True,
-        help_text=(
-            "Timestamped field that indicates a user has successfully logged in using this configuration at least once."
-        )
-    )
-
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
     accepts_logins = True  # Whether to display a sign-in button when the provider is enabled
@@ -706,6 +698,14 @@ class SAMLProviderConfig(ProviderConfig):
         limit_choices_to=active_saml_configurations_filter,
         null=True,
         blank=True,
+    )
+
+    was_valid_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text=(
+            "Timestamped field that indicates a user has successfully logged in using this configuration at least once."
+        )
     )
 
     def clean(self):

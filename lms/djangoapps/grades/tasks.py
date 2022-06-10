@@ -28,7 +28,7 @@ from openedx.core.djangoapps.content.course_overviews.models import \
     CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
-from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE
+from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
 from .constants import ScoreDatabaseTableEnum
 from .course_grade_factory import CourseGradeFactory
 from .exceptions import DatabaseNotReadyError
@@ -58,7 +58,7 @@ def compute_all_grades_for_course(**kwargs):
     Kicks off a series of compute_grades_for_course_v2 tasks
     to cover all of the students in the course.
     """
-    if DISABLE_REGRADE_ON_POLICY_CHANGE.is_enabled():
+    if waffle().is_enabled(DISABLE_REGRADE_ON_POLICY_CHANGE):
         log.debug('Grades: ignoring policy change regrade due to waffle switch')
     else:
         course_key = CourseKey.from_string(kwargs.pop('course_key'))

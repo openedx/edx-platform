@@ -22,7 +22,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from edx_django_utils.monitoring import set_custom_attribute
-from edx_toggles.toggles import WaffleFlag
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from openedx_events.learning.data import UserData, UserPersonalData
 from openedx_events.learning.signals import STUDENT_REGISTRATION_COMPLETED
 from openedx_filters.learning.filters import StudentRegistrationRequested
@@ -114,8 +114,12 @@ REGISTER_USER = Signal()
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2020-04-30
 # .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
-REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag('registration.enable_failure_logging', __name__)
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+REGISTRATION_FAILURE_LOGGING_FLAG = LegacyWaffleFlag(
+    waffle_namespace=LegacyWaffleFlagNamespace(name='registration'),
+    flag_name='enable_failure_logging',
+    module_name=__name__,
+)
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 
 
@@ -201,8 +205,8 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
     # Can't have terms of service for certain SHIB users, like at Stanford
     registration_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     tos_required = (
-        registration_fields.get('terms_of_service') != 'hidden' or
-        registration_fields.get('honor_code') != 'hidden'
+        registration_fields.get('terms_of_service') == 'optional' or
+        registration_fields.get('honor_code') == 'hidden'
     )
 
     form = AccountCreationForm(
@@ -523,6 +527,8 @@ class RegistrationView(APIView):
     # so do not require authentication.
     authentication_classes = []
 
+    
+
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
@@ -553,6 +559,8 @@ class RegistrationView(APIView):
                 address already exists
             HttpResponse: 403 operation not allowed
         """
+
+        #import pdb;pdb.set_trace()
         should_be_rate_limited = getattr(request, 'limited', False)
         if should_be_rate_limited:
             return JsonResponse({'error_code': 'forbidden-request'}, status=403)

@@ -19,7 +19,7 @@ from opaque_keys.edx.locator import CourseLocator
 from lms.djangoapps.verify_student.models import ManualVerification
 from openedx.core.djangoapps.django_comment_common.models import assign_role
 from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
-from openedx.features.course_experience import course_home_url
+from openedx.features.course_experience import course_home_url_name
 from common.djangoapps.student.helpers import (
     AccountValidationError,
     authenticate_new_user,
@@ -170,9 +170,9 @@ def auto_auth(request):  # pylint: disable=too-many-statements
         elif course_id:
             # Redirect to the course homepage (in LMS) or outline page (in Studio)
             try:
-                redirect_url = reverse('course_handler', kwargs={'course_key_string': course_id})  # Studio
+                redirect_url = reverse(course_home_url_name(course_key), kwargs={'course_id': course_id})
             except NoReverseMatch:
-                redirect_url = course_home_url(course_key)  # LMS
+                redirect_url = reverse('course_handler', kwargs={'course_key_string': course_id})
         else:
             # Redirect to the learner dashboard (in LMS) or homepage (in Studio)
             try:

@@ -6,31 +6,25 @@ already been submitted, filtered either by running state or input
 arguments.
 
 """
-import datetime
+
+
 import hashlib
-import logging
 from collections import Counter
 
-import dateutil
-import pytz
 from celery.states import READY_STATES
 
 from common.djangoapps.util import milestones_helpers
-from lms.djangoapps.bulk_email.api import get_course_email
+from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api_helper import (
-    QueueConnectionError,
     check_arguments_for_overriding,
     check_arguments_for_rescoring,
     check_entrance_exam_problems_for_rescoring,
     encode_entrance_exam_and_student_input,
     encode_problem_and_student_input,
-    schedule_task,
-    submit_task,
-    submit_scheduled_task,
+    submit_task
 )
-from lms.djangoapps.instructor_task.data import InstructorTaskTypes
-from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule, SCHEDULED
+from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.tasks import (
     calculate_grades_csv,
     calculate_may_enroll_csv,
@@ -51,10 +45,7 @@ from lms.djangoapps.instructor_task.tasks import (
     send_bulk_course_email,
     generate_anonymous_ids_for_course
 )
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-
-log = logging.getLogger(__name__)
 
 
 class SpecificStudentIdMissingError(Exception):
@@ -121,7 +112,7 @@ def submit_rescore_problem_for_student(request, usage_key, student, only_if_high
     # check arguments:  let exceptions return up to the caller.
     check_arguments_for_rescoring(usage_key)
 
-    task_type = InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER if only_if_higher else InstructorTaskTypes.RESCORE_PROBLEM
+    task_type = 'rescore_problem_if_higher' if only_if_higher else 'rescore_problem'
     task_class = rescore_problem
     task_input, task_key = encode_problem_and_student_input(usage_key, student)
     task_input.update({'only_if_higher': only_if_higher})
@@ -143,7 +134,7 @@ def submit_override_score(request, usage_key, student, score):
     the problem is not a ScorableXBlock.
     """
     check_arguments_for_overriding(usage_key, score)
-    task_type = InstructorTaskTypes.OVERRIDE_PROBLEM_SCORE
+    task_type = override_problem_score.__name__
     task_class = override_problem_score
     task_input, task_key = encode_problem_and_student_input(usage_key, student)
     task_input['score'] = score
@@ -167,7 +158,7 @@ def submit_rescore_problem_for_all_students(request, usage_key, only_if_higher=F
     check_arguments_for_rescoring(usage_key)
 
     # check to see if task is already running, and reserve it otherwise
-    task_type = InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER if only_if_higher else InstructorTaskTypes.RESCORE_PROBLEM
+    task_type = 'rescore_problem_if_higher' if only_if_higher else 'rescore_problem'
     task_class = rescore_problem
     task_input, task_key = encode_problem_and_student_input(usage_key)
     task_input.update({'only_if_higher': only_if_higher})
@@ -193,7 +184,7 @@ def submit_rescore_entrance_exam_for_student(request, usage_key, student=None, o
     check_entrance_exam_problems_for_rescoring(usage_key)
 
     # check to see if task is already running, and reserve it otherwise
-    task_type = InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER if only_if_higher else InstructorTaskTypes.RESCORE_PROBLEM
+    task_type = 'rescore_problem_if_higher' if only_if_higher else 'rescore_problem'
     task_class = rescore_problem
     task_input, task_key = encode_entrance_exam_and_student_input(usage_key, student)
     task_input.update({'only_if_higher': only_if_higher})
@@ -216,7 +207,7 @@ def submit_reset_problem_attempts_for_all_students(request, usage_key):  # pylin
     # an exception will be raised.  Let it pass up to the caller.
     modulestore().get_item(usage_key)
 
-    task_type = InstructorTaskTypes.RESET_PROBLEM_ATTEMPTS
+    task_type = 'reset_problem_attempts'
     task_class = reset_problem_attempts
     task_input, task_key = encode_problem_and_student_input(usage_key)
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
@@ -240,7 +231,7 @@ def submit_reset_problem_attempts_in_entrance_exam(request, usage_key, student):
     # check arguments:  make sure entrance exam(section) exists for given usage_key
     modulestore().get_item(usage_key)
 
-    task_type = InstructorTaskTypes.RESET_PROBLEM_ATTEMPTS
+    task_type = 'reset_problem_attempts'
     task_class = reset_problem_attempts
     task_input, task_key = encode_entrance_exam_and_student_input(usage_key, student)
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
@@ -262,7 +253,7 @@ def submit_delete_problem_state_for_all_students(request, usage_key):  # pylint:
     # an exception will be raised.  Let it pass up to the caller.
     modulestore().get_item(usage_key)
 
-    task_type = InstructorTaskTypes.DELETE_PROBLEM_STATE
+    task_type = 'delete_problem_state'
     task_class = delete_problem_state
     task_input, task_key = encode_problem_and_student_input(usage_key)
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
@@ -295,13 +286,13 @@ def submit_delete_entrance_exam_state_for_student(request, usage_key, student): 
         relationship='fulfills'
     )
 
-    task_type = InstructorTaskTypes.DELETE_PROBLEM_STATE
+    task_type = 'delete_problem_state'
     task_class = delete_problem_state
     task_input, task_key = encode_entrance_exam_and_student_input(usage_key, student)
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
-def submit_bulk_course_email(request, course_key, email_id, schedule=None):
+def submit_bulk_course_email(request, course_key, email_id):
     """
     Request to have bulk email sent as a background task.
 
@@ -315,7 +306,7 @@ def submit_bulk_course_email(request, course_key, email_id, schedule=None):
     # appropriate access to the course. But make sure that the email exists.
     # We also pull out the targets argument here, so that is displayed in
     # the InstructorTask status.
-    email_obj = get_course_email(email_id)
+    email_obj = CourseEmail.objects.get(id=email_id)
     # task_input has a limit to the size it can store, so any target_type with count > 1 is combined and counted
     targets = Counter([target.target_type for target in email_obj.targets.all()])
     targets = [
@@ -324,16 +315,12 @@ def submit_bulk_course_email(request, course_key, email_id, schedule=None):
         for target, count in targets.items()
     ]
 
-    task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
+    task_type = 'bulk_course_email'
     task_class = send_bulk_course_email
     task_input = {'email_id': email_id, 'to_option': targets}
     task_key_stub = str(email_id)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
-
-    if schedule:
-        return schedule_task(request, task_type, course_key, task_input, task_key, schedule)
-
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
@@ -346,7 +333,7 @@ def submit_calculate_problem_responses_csv(
 
     Raises AlreadyRunningError if said file is already being updated.
     """
-    task_type = InstructorTaskTypes.PROBLEM_RESPONSES_CSV
+    task_type = 'problem_responses_csv'
     task_class = calculate_problem_responses_csv
     task_input = {
         'problem_locations': problem_locations,
@@ -362,7 +349,7 @@ def submit_calculate_grades_csv(request, course_key, **task_kwargs):
     """
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
-    task_type = InstructorTaskTypes.GRADE_COURSE
+    task_type = 'grade_course'
     task_class = calculate_grades_csv
     task_input = task_kwargs
     task_key = ""
@@ -375,7 +362,7 @@ def submit_problem_grade_report(request, course_key, **task_kwargs):
     Submits a task to generate a CSV grade report containing problem
     values.
     """
-    task_type = InstructorTaskTypes.GRADE_PROBLEMS
+    task_type = 'grade_problems'
     task_class = calculate_problem_grade_report
     task_input = task_kwargs
     task_key = ""
@@ -388,7 +375,7 @@ def submit_calculate_students_features_csv(request, course_key, features, **task
 
     Raises AlreadyRunningError if said CSV is already being updated.
     """
-    task_type = InstructorTaskTypes.PROFILE_INFO_CSV
+    task_type = 'profile_info_csv'
     task_class = calculate_students_features_csv
     task_input = dict(features=features, **task_kwargs)
     task_key = ""
@@ -403,7 +390,7 @@ def submit_calculate_may_enroll_csv(request, course_key, features):
 
     Raises AlreadyRunningError if said file is already being updated.
     """
-    task_type = InstructorTaskTypes.MAY_ENROLL_INFO_CSV
+    task_type = 'may_enroll_info_csv'
     task_class = calculate_may_enroll_csv
     task_input = {'features': features}
     task_key = ""
@@ -417,7 +404,7 @@ def submit_course_survey_report(request, course_key):
 
     Raises AlreadyRunningError if HTML File is already being updated.
     """
-    task_type = InstructorTaskTypes.COURSE_SURVEY_REPORT
+    task_type = 'course_survey_report'
     task_class = course_survey_report_csv
     task_input = {}
     task_key = ""
@@ -431,7 +418,7 @@ def submit_proctored_exam_results_report(request, course_key):
 
     Raises AlreadyRunningError if HTML File is already being updated.
     """
-    task_type = InstructorTaskTypes.PROCTORED_EXAM_RESULTS_REPORT
+    task_type = 'proctored_exam_results_report'
     task_class = proctored_exam_results_csv
     task_input = {}
     task_key = ""
@@ -445,7 +432,7 @@ def submit_cohort_students(request, course_key, file_name):
 
     Raises AlreadyRunningError if students are currently being cohorted.
     """
-    task_type = InstructorTaskTypes.COHORT_STUDENTS
+    task_type = 'cohort_students'
     task_class = cohort_students
     task_input = {'file_name': file_name}
     task_key = ""
@@ -457,7 +444,7 @@ def submit_export_ora2_data(request, course_key):
     """
     AlreadyRunningError is raised if an ora2 report is already being generated.
     """
-    task_type = InstructorTaskTypes.EXPORT_ORA2_DATA
+    task_type = 'export_ora2_data'
     task_class = export_ora2_data
     task_input = {}
     task_key = ''
@@ -470,7 +457,7 @@ def submit_export_ora2_submission_files(request, course_key):
     Submits a task to download and compress all submissions
     files (texts, attachments) for given course.
     """
-    task_type = InstructorTaskTypes.EXPORT_ORA2_SUBMISSION_FILES
+    task_type = 'export_ora2_submission_files'
     task_class = export_ora2_submission_files
     task_input = {}
     task_key = ''
@@ -482,7 +469,7 @@ def submit_export_ora2_summary(request, course_key):
     """
     AlreadyRunningError is raised if an ora2 report is already being generated.
     """
-    task_type = InstructorTaskTypes.EXPORT_ORA2_SUMMARY
+    task_type = 'export_ora2_summary'
     task_class = export_ora2_summary
     task_input = {}
     task_key = ''
@@ -507,11 +494,11 @@ def generate_certificates_for_students(request, course_key, student_set=None, sp
     Raises SpecificStudentIdMissingError if student_set is 'specific_student' and specific_student_id is 'None'
     """
     if student_set:
-        task_type = InstructorTaskTypes.GENERATE_CERTIFICATES_STUDENT_SET
+        task_type = 'generate_certificates_student_set'
         task_input = {'student_set': student_set}
 
         if student_set == 'specific_student':
-            task_type = InstructorTaskTypes.GENERATE_CERTIFICATES_CERTAIN_STUDENT
+            task_type = 'generate_certificates_certain_student'
             if specific_student_id is None:
                 raise SpecificStudentIdMissingError(
                     "Attempted to generate certificate for a single student, "
@@ -519,7 +506,7 @@ def generate_certificates_for_students(request, course_key, student_set=None, sp
                 )
             task_input.update({'specific_student_id': specific_student_id})
     else:
-        task_type = InstructorTaskTypes.GENERATE_CERTIFICATES_ALL_STUDENT
+        task_type = 'generate_certificates_all_student'
         task_input = {}
 
     task_class = generate_certificates
@@ -544,7 +531,7 @@ def regenerate_certificates(request, course_key, statuses_to_regenerate):
 
     Raises AlreadyRunningError if certificates are currently being generated.
     """
-    task_type = InstructorTaskTypes.REGENERATE_CERTIFICATES_ALL_STUDENT
+    task_type = 'regenerate_certificates_all_student'
     task_input = {}
 
     task_input.update({"statuses_to_regenerate": statuses_to_regenerate})
@@ -567,59 +554,9 @@ def generate_anonymous_ids(request, course_key):
     """
     Generate anonymize id CSV report.
     """
-    task_type = InstructorTaskTypes.GENERATE_ANONYMOUS_IDS_FOR_COURSE
+    task_type = 'generate_anonymous_ids_for_course'
     task_class = generate_anonymous_ids_for_course
     task_input = {}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
-
-
-def process_scheduled_instructor_tasks():
-    """
-    Utility function that retrieves tasks whose schedules have elapsed and should be processed. Only retrieves
-    instructor tasks that are in the `SCHEDULED` state. Then submits these tasks for processing by Celery.
-    """
-    now = datetime.datetime.now(pytz.utc)
-    due_schedules = InstructorTaskSchedule.objects.filter(task__task_state=SCHEDULED).filter(task_due__lte=now)
-    log.info(f"Retrieved {due_schedules.count()} scheduled instructor tasks due for execution")
-    for schedule in due_schedules:
-        try:
-            log.info(f"Attempting to queue scheduled task with id '{schedule.task.id}'")
-            submit_scheduled_task(schedule)
-        except QueueConnectionError as exc:
-            log.error(f"Error processing scheduled task with task id '{schedule.task.id}': {exc}")
-
-
-def convert_schedule_to_utc_from_local(schedule, browser_timezone, user):
-    """
-    Utility function to help convert the schedule of an instructor task from the requesters local time and timezone
-    (taken from the request) to a UTC datetime.
-
-    Args:
-        schedule (String): The desired time to execute a scheduled task, in local time, in the form of an ISO8601
-            string.
-        timezone (String): The time zone, as captured by the user's web browser, in the form of a string.
-        user (User): The user requesting the action, captured from the originating web request. Used to lookup the
-            the time zone preference as set in the user's account settings.
-
-    Returns:
-        DateTime: A datetime instance describing when to execute this schedule task converted to the UTC timezone.
-    """
-    # look up the requesting user's timezone from their account settings
-    preferred_timezone = get_user_preference(user, 'time_zone', username=user.username)
-    # use the user's preferred timezone (if available), otherwise use the browser timezone.
-    timezone = preferred_timezone if preferred_timezone else browser_timezone
-
-    # convert the schedule to UTC
-    log.info(f"Converting requested schedule from local time '{schedule}' with the timezone '{timezone}' to UTC")
-
-    local_tz = dateutil.tz.gettz(timezone)
-    if local_tz is None:
-        raise ValueError(
-            "Unable to determine the time zone to use to convert the schedule to UTC"
-        )
-    local_dt = dateutil.parser.parse(schedule).replace(tzinfo=local_tz)
-    schedule_utc = local_dt.astimezone(pytz.utc)
-
-    return schedule_utc

@@ -16,7 +16,7 @@ class SAMLConfigurationMixin:
     serializer_class = SAMLConfigurationSerializer
 
 
-class SAMLConfigurationViewSet(SAMLConfigurationMixin, viewsets.ReadOnlyModelViewSet):
+class SAMLConfigurationViewSet(SAMLConfigurationMixin, viewsets.ModelViewSet):
     """
     A View to handle SAMLConfiguration GETs
 

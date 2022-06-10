@@ -2287,7 +2287,7 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
         self.staff_user = AdminFactory.create()
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
-    @ddt.data(*itertools.product(("http://test.url", None), (True, False), (True, True)))
+    @ddt.data(*itertools.product(("http://test.url", None), (True, False), (True, False)))
     @ddt.unpack
     def test_staff_user(self, mfe_url, toggle_enabled, is_staff):
         """

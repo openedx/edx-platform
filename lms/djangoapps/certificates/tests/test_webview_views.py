@@ -242,7 +242,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
     def _create_custom_template_with_verified_description(self, org_id=None, course_key=None, language=None):
         """
         Creates a custom certificate template entry in DB. This custom certificate can be used to test
-        that the correct language is used if the IDV requirement on certificates has been enabled for a course.
+        that the correct language is used if the integrity signature feature has been enabled for a course.
         """
         template_html = """
             <%namespace name='static' file='static_content.html'/>
@@ -253,8 +253,8 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
                 mode: verified
                 ${accomplishment_copy_course_description}
                 ${certificate_type_description}
-                % if not idv_enabled_for_certificates:
-                <p> IDV disabled </p>
+                % if is_integrity_signature_enabled_for_course:
+                <p> Integrity signature enabled </p>
                 %endif
                 ${twitter_url}
                 <img class="custom-logo" src="${static.certificate_asset_url('custom-logo')}" />
@@ -1658,11 +1658,11 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         True,
         False
     )
-    def test_verified_certificate_description(self, enable_cert_idv_requirement):
+    def test_verified_certificate_description(self, enable_integrity_signature):
         """
         Test that for a verified cert, the correct language is used when the integrity signature feature is enabled.
         """
-        with patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_cert_idv_requirement):
+        with patch.dict(settings.FEATURES, ENABLE_INTEGRITY_SIGNATURE=enable_integrity_signature):
             self._add_course_certificates(count=1, signatory_count=2, is_active=True)
             self._create_custom_template_with_verified_description()
             self.cert.mode = 'verified'
@@ -1675,12 +1675,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
             response = self.client.get(test_url)
             assert response.status_code == 200
-            if enable_cert_idv_requirement:
+            if not enable_integrity_signature:
                 self.assertContains(response, 'identity of the learner has been checked and is valid')
-                self.assertNotContains(response, 'IDV disabled')
+                self.assertNotContains(response, 'Integrity signature enabled')
             else:
                 self.assertNotContains(response, 'identity of the learner has been checked and is valid')
-                self.assertContains(response, 'IDV disabled')
+                self.assertContains(response, 'Integrity signature enabled')
 
 
 class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):

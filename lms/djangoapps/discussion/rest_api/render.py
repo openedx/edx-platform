@@ -13,7 +13,7 @@ ALLOWED_TAGS = bleach.ALLOWED_TAGS + [
 ]
 ALLOWED_PROTOCOLS = ["http", "https", "ftp", "mailto"]
 ALLOWED_ATTRIBUTES = {
-    "a": ["href", "title", "target", "rel"],
+    "a": ["href", "title"],
     "img": ["src", "alt", "title", "width", "height"],
 }
 

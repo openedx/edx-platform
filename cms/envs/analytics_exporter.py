@@ -10,4 +10,4 @@ startup checks from the theming app will throw an error due to missing themes.
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
-ENABLE_COMPREHENSIVE_THEMING = False
+ENABLE_COMPREHENSIVE_THEMING = True

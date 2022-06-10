@@ -14,7 +14,7 @@ from xblock.fields import NO_CACHE_VALUE, UNIQUE_ID, ScopeIds
 from xblock.runtime import Runtime
 
 from openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion import DiscussionXBlock
-from openedx.core.lib.safe_lxml import etree
+from safe_lxml import etree  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def attribute_pair_repr(self):
@@ -29,9 +29,9 @@ AttributePair = namedtuple("AttributePair", ["name", "value"])
 AttributePair.__repr__ = attribute_pair_repr
 
 
-ID_ATTR_NAMES = ("discussion_id",)
+ID_ATTR_NAMES = ("discussion_id", "id",)
 CATEGORY_ATTR_NAMES = ("discussion_category",)
-TARGET_ATTR_NAMES = ("discussion_target",)
+TARGET_ATTR_NAMES = ("discussion_target", "for", )
 
 
 def _random_string():

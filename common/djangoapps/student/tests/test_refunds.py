@@ -235,7 +235,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         )
         assert self.enrollment.is_order_voucher_refundable() is False
 
-    @patch('openedx.core.djangoapps.commerce.utils.get_ecommerce_api_client')
+    @patch('openedx.core.djangoapps.commerce.utils.ecommerce_api_client')
     def test_get_order_attribute_from_ecommerce(self, mock_ecommerce_api_client):
         """
         Assert that the get_order_attribute_from_ecommerce method returns order details if it's already cached,
@@ -254,7 +254,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         assert self.enrollment.get_order_attribute_from_ecommerce("vouchers") == order_details["vouchers"]
         mock_ecommerce_api_client.assert_not_called()
 
-    @patch('openedx.core.djangoapps.commerce.utils.get_ecommerce_api_client')
+    @patch('openedx.core.djangoapps.commerce.utils.ecommerce_api_client')
     def test_refund_cutoff_date_with_date_placed_attr(self, mock_ecommerce_api_client):
         """
         Assert that the refund_cutoff_date returns order placement date if order:date_placed

@@ -1,4 +1,4 @@
-<%page expression_filter="h" args="cert_status, course_ended_not_passing, course_overview, enrollment" />
+<%page expression_filter="h" args="cert_status, course_ended_not_passing, course_overview, enrollment, reverify_link" />
 
 <%!
 from django.urls import reverse
@@ -155,6 +155,12 @@ else:
             </li>
           </ul>
         % endif
+      % endif
+
+      % if cert_status['status'] == 'downloadable' and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
+        <div class="certificate-explanation">
+            ${_('Since we did not have a valid set of verification photos from you when your {cert_name_long} was generated, we could not grant you a verified {cert_name_short}. An honor code {cert_name_short} has been granted instead.').format(cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
+        </div>
       % endif
 
     </div>

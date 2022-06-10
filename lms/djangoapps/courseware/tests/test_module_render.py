@@ -3,6 +3,7 @@ Test for lms courseware app, module render unit
 """
 
 
+import itertools
 import json
 import textwrap
 from datetime import datetime
@@ -56,7 +57,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import STUDENT_VIEW, CombinedSystem  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps import static_replace
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
@@ -100,6 +101,20 @@ class PureXBlock(XBlock):
     Pure XBlock to use in tests.
     """
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
+
+
+class EmptyXModule(XModule):  # pylint: disable=abstract-method
+    """
+    Empty XModule for testing with no dependencies.
+    """
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+
+
+class EmptyXModuleDescriptor(XModuleDescriptor):  # pylint: disable=abstract-method
+    """
+    Empty XModule for testing with no dependencies.
+    """
+    module_class = EmptyXModule
 
 
 class GradedStatelessXBlock(XBlock):
@@ -1842,6 +1857,11 @@ PER_STUDENT_ANONYMIZED_XBLOCKS = [
     VideoBlock,
 ]
 
+# The "set" here is to work around the bug that load_classes returns duplicates for multiply-declared classes.
+PER_STUDENT_ANONYMIZED_DESCRIPTORS = sorted(set([
+    class_ for (name, class_) in XModuleDescriptor.load_classes()
+] + PER_STUDENT_ANONYMIZED_XBLOCKS), key=str)
+
 
 @ddt.ddt
 class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -1899,7 +1919,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         current_user = module.xmodule_runtime.service(module, 'user').get_current_user()
         return current_user.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
 
-    @ddt.data(*PER_STUDENT_ANONYMIZED_XBLOCKS)
+    @ddt.data(*PER_STUDENT_ANONYMIZED_DESCRIPTORS)
     def test_per_student_anonymized_id(self, descriptor_class):
         for course_id in ('MITx/6.00x/2012_Fall', 'MITx/6.00x/2013_Spring'):
             assert 'de619ab51c7f4e9c7216b4644c24f3b5' == \
@@ -2211,13 +2231,15 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.mock_user.id = 1
         self.request_factory = RequestFactoryNoCsrf()
 
+    @ddt.data('xblock', 'xmodule')
     @XBlock.register_temp_plugin(PureXBlock, identifier='xblock')
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptor, identifier='xmodule')
     @patch.object(render, 'make_track_function')
-    def test_event_publishing(self, mock_track_function):
+    def test_event_publishing(self, block_type, mock_track_function):
         request = self.request_factory.get('')
         request.user = self.mock_user
         course = CourseFactory()
-        descriptor = ItemFactory(category='xblock', parent=course)
+        descriptor = ItemFactory(category=block_type, parent=course)
         field_data_cache = FieldDataCache([course, descriptor], course.id, self.mock_user)
         block = render.get_module(self.mock_user, request, descriptor.location, field_data_cache)
 
@@ -2296,6 +2318,22 @@ class PureXBlockWithChildren(PureXBlock):
     has_children = True
 
 
+class EmptyXModuleWithChildren(EmptyXModule):  # pylint: disable=abstract-method
+    """
+    Empty XModule for testing with no dependencies.
+    """
+    has_children = True
+
+
+class EmptyXModuleDescriptorWithChildren(EmptyXModuleDescriptor):  # pylint: disable=abstract-method
+    """
+    Empty XModule for testing with no dependencies.
+    """
+    module_class = EmptyXModuleWithChildren
+    has_children = True
+
+
+BLOCK_TYPES = ['xblock', 'xmodule']
 USER_NUMBERS = list(range(2))
 
 
@@ -2316,58 +2354,81 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
+    @ddt.data(*BLOCK_TYPES)
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    def test_unbound(self):
-        block = self._load_block()
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
+    def test_unbound(self, block_type):
+        block = self._load_block(block_type)
         self.assertUnboundChildren(block)
 
-    @ddt.data(*USER_NUMBERS)
+    @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
+    @ddt.unpack
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    def test_unbound_then_bound_as_descriptor(self, user_number):
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
+    def test_unbound_then_bound_as_descriptor(self, block_type, user_number):
         user = self.users[user_number]
-        block = self._load_block()
-        self.assertUnboundChildren(block)
-        self._bind_block(block, user)
-        self.assertBoundChildren(block, user)
-
-    @ddt.data(*USER_NUMBERS)
-    @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    def test_unbound_then_bound_as_xmodule(self, user_number):
-        user = self.users[user_number]
-        block = self._load_block()
+        block = self._load_block(block_type)
         self.assertUnboundChildren(block)
         self._bind_block(block, user)
         self.assertBoundChildren(block, user)
 
-    @ddt.data(*USER_NUMBERS)
+    @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
+    @ddt.unpack
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    def test_bound_only_as_descriptor(self, user_number):
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
+    def test_unbound_then_bound_as_xmodule(self, block_type, user_number):
         user = self.users[user_number]
-        block = self._load_block()
+        block = self._load_block(block_type)
+        self.assertUnboundChildren(block)
+        self._bind_block(block, user)
+
+        # Validate direct XModule access as well
+        if isinstance(block, XModuleDescriptor):
+            self.assertBoundChildren(block._xmodule, user)  # pylint: disable=protected-access
+        else:
+            self.assertBoundChildren(block, user)
+
+    @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
+    @ddt.unpack
+    @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
+    def test_bound_only_as_descriptor(self, block_type, user_number):
+        user = self.users[user_number]
+        block = self._load_block(block_type)
         self._bind_block(block, user)
         self.assertBoundChildren(block, user)
 
-    @ddt.data(*USER_NUMBERS)
+    @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
+    @ddt.unpack
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
-    def test_bound_only_as_xmodule(self, user_number):
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
+    def test_bound_only_as_xmodule(self, block_type, user_number):
         user = self.users[user_number]
-        block = self._load_block()
+        block = self._load_block(block_type)
         self._bind_block(block, user)
-        self.assertBoundChildren(block, user)
 
-    def _load_block(self):
+        # Validate direct XModule access as well
+        if isinstance(block, XModuleDescriptor):
+            self.assertBoundChildren(block._xmodule, user)  # pylint: disable=protected-access
+        else:
+            self.assertBoundChildren(block, user)
+
+    def _load_block(self, block_type):
         """
-        Instantiate an XBlock with the appropriate set of children.
+        Instantiate an XBlock of `block_type` with the appropriate set of children.
         """
-        self.parent = ItemFactory(category='xblock', parent=self.course)
+        self.parent = ItemFactory(category=block_type, parent=self.course)
 
-        # Create a child for each user
+        # Create a child of each block type for each user
         self.children_for_user = {
-            user: ItemFactory(category='xblock', parent=self.parent).scope_ids.usage_id  # lint-amnesty, pylint: disable=no-member
+            user: [
+                ItemFactory(category=child_type, parent=self.parent).scope_ids.usage_id  # lint-amnesty, pylint: disable=no-member
+                for child_type in BLOCK_TYPES
+            ]
             for user in self.users.values()
         }
 
-        self.all_children = self.children_for_user.values()
+        self.all_children = sum(list(self.children_for_user.values()), [])
 
         return modulestore().get_item(self.parent.scope_ids.usage_id)  # lint-amnesty, pylint: disable=no-member
 
@@ -2404,13 +2465,13 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
             key = obj
         if key == self.parent.scope_ids.usage_id:  # lint-amnesty, pylint: disable=no-member
             return AccessResponse(True)
-        return AccessResponse(key == self.children_for_user[user])
+        return AccessResponse(key in self.children_for_user[user])
 
     def assertBoundChildren(self, block, user):
         """
         Ensure the bound children are indeed children.
         """
-        self.assertChildren(block, [self.children_for_user[user]])
+        self.assertChildren(block, self.children_for_user[user])
 
     def assertUnboundChildren(self, block):
         """

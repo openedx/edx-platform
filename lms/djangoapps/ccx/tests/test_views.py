@@ -17,6 +17,7 @@ from django.test.utils import override_settings
 from django.urls import resolve, reverse
 from django.utils.translation import gettext as _
 from edx_django_utils.cache import RequestCache
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from xmodule.modulestore import ModuleStoreEnum
@@ -40,6 +41,7 @@ from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
@@ -1217,8 +1219,12 @@ class TestStudentViewsWithCCX(ModuleStoreTestCase):
         assert response.status_code == 200
         assert re.search('Test CCX', response.content.decode('utf-8'))
 
+    @override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
     def test_load_courseware(self):
         self.client.login(username=self.student.username, password=self.student_password)
-        sequence_key = self.ccx_course_key.make_usage_key('sequential', 'sequential_x1')
-        response = self.client.get(reverse('render_xblock', args=[str(sequence_key)]))
+        response = self.client.get(reverse('courseware_section', kwargs={
+            'course_id': str(self.ccx_course_key),
+            'chapter': 'chapter_x',
+            'section': 'sequential_x1',
+        }))
         assert response.status_code == 200

@@ -91,6 +91,11 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
                 </div>
             % endif
             <div style="flex-shrink: 1; text-align: center;">
+            % if microfrontend_link:
+                <a class="btn btn-primary" style="border: solid 1px white;" href="${microfrontend_link}">
+                    ${_("View in the new experience")}
+                </a>
+            % endif
             % if studio_url:
                 <a
                     class="btn btn-primary view-in-studio"

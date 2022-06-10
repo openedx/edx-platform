@@ -4,7 +4,6 @@ This file contains celery tasks for credentials-related functionality.
 
 import math
 import time
-from urllib.parse import urljoin
 
 from celery import shared_task
 from celery.exceptions import MaxRetriesExceededError
@@ -26,7 +25,7 @@ from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled_for_org
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
-from openedx.core.djangoapps.credentials.utils import get_credentials_api_base_url, get_credentials_api_client
+from openedx.core.djangoapps.credentials.utils import get_credentials_api_client
 from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded, handle_course_cert_changed
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
@@ -49,9 +48,7 @@ MAX_RETRIES = 11
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def send_grade_to_credentials(self, username, course_run_key, verified, letter_grade, percent_grade):
-    """
-    Celery task to notify the Credentials IDA of a grade change via POST.
-    """
+    """ Celery task to notify the Credentials IDA of a grade change via POST. """
     logger.info(f"Running task send_grade_to_credentials for username {username} and course {course_run_key}")
 
     countdown = 2 ** self.request.retries
@@ -59,31 +56,28 @@ def send_grade_to_credentials(self, username, course_run_key, verified, letter_g
 
     try:
         credentials_client = get_credentials_api_client(
-            User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)
+            User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
+            org=course_key.org,
         )
-        api_url = urljoin(f"{get_credentials_api_base_url(org=course_key.org)}/", "grades/")
-        response = credentials_client.post(
-            api_url,
-            data={
-                'username': username,
-                'course_run': str(course_key),
-                'letter_grade': letter_grade,
-                'percent_grade': percent_grade,
-                'verified': verified,
-            }
-        )
-        response.raise_for_status()
+
+        credentials_client.grades.post({
+            'username': username,
+            'course_run': str(course_key),
+            'letter_grade': letter_grade,
+            'percent_grade': percent_grade,
+            'verified': verified,
+        })
 
         logger.info(f"Sent grade for course {course_run_key} to user {username}")
 
-    except Exception:  # lint-amnesty, pylint: disable=W0703
+    except Exception as exc:  # lint-amnesty, pylint: disable=unused-variable
         grade_str = f'(percent: {percent_grade} letter: {letter_grade})'
         error_msg = f'Failed to send grade{grade_str} for course {course_run_key} to user {username}.'
         logger.exception(error_msg)
         exception = MaxRetriesExceededError(
             f"Failed to send grade to credentials. Reason: {error_msg}"
         )
-        raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)  # pylint: disable=raise-missing-from
+        raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)
 
 
 @shared_task(base=LoggedTask, ignore_result=True)
@@ -402,22 +396,14 @@ def backfill_date_for_all_course_runs():
                 credentials_client = get_credentials_api_client(
                     User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
                 )
-                api_url = urljoin(f"{get_credentials_api_base_url()}/", "course_certificates/")
-                response = credentials_client.post(
-                    api_url,
-                    json={
-                        "course_id": course_key,
-                        "certificate_type": modes[0],
-                        "certificate_available_date": course_run.certificate_available_date.strftime(
-                            '%Y-%m-%dT%H:%M:%SZ'
-                        ),
-                        "is_active": True,
-                    }
-                )
-                response.raise_for_status()
-
+                credentials_client.course_certificates.post({
+                    "course_id": course_key,
+                    "certificate_type": modes[0],
+                    "certificate_available_date": course_run.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    "is_active": True,
+                })
                 logger.info(f"certificate_available_date updated for course {course_key}")
-            except Exception:  # lint-amnesty, pylint: disable=W0703
+            except Exception as exc:  # lint-amnesty, pylint: disable=unused-variable,W0703
                 error_msg = f"Failed to send certificate_available_date for course {course_key}."
                 logger.exception(error_msg)
         if index % 10 == 0:
@@ -456,20 +442,14 @@ def clean_certificate_available_date():
                 credentials_client = get_credentials_api_client(
                     User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
                 )
-                credentials_api_base_url = get_credentials_api_base_url()
-                api_url = urljoin(f"{credentials_api_base_url}/", "course_certificates/")
-                response = credentials_client.post(
-                    api_url,
-                    json={
-                        "course_id": course_key,
-                        "certificate_type": modes[0],
-                        "certificate_available_date": None,
-                        "is_active": True,
-                    }
-                )
-                response.raise_for_status()
+                credentials_client.course_certificates.post({
+                    "course_id": course_key,
+                    "certificate_type": modes[0],
+                    "certificate_available_date": None,
+                    "is_active": True,
+                })
                 logger.info(f"certificate_available_date updated for course {course_key}")
-            except Exception:  # lint-amnesty, pylint: disable=W0703
+            except Exception as exc:  # lint-amnesty, pylint: disable=unused-variable,W0703
                 error_msg = f"Failed to send certificate_available_date for course {course_key}."
                 logger.exception(error_msg)
         if index % 10 == 0:

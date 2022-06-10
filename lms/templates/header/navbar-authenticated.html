@@ -26,39 +26,35 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
     help_link = doc_link
 %>
 
-<div class="nav-links">
-  <div class="main">
-    % if show_dashboard_tabs:
-      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}"
-             aria-current="${'page' if reverse('dashboard') == request.path else 'false'}">
-             ${_("Courses")}
-        </a>
-      </div>
-      % if show_program_listing:
-        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-          <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}"
-             aria-current="${'page' if reverse('program_listing_view') == request.path else 'false'}">
-             ${_("Programs")}
-          </a>
-        </div>
-      % endif
-    % endif
-    % if show_explore_courses:
-      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-          <a class="tab-nav-link discover-new-link" href="${marketing_link('COURSES')}"
-             aria-current="${'page' if '/courses' in request.path else 'false'}">
-             ${_('Discover New')}
-          </a>
-      </div>
-    % endif
+<header style="display: flex; justify-content: space-between; padding: 8px 72px;">
+  <img src="../../static/images/logo.svg" width="160px"/>
+  <div style="display: flex; align-items:center; gap: 20px;">
+      <ul style="list-style: none; display: flex; gap: 40px">
+          <li style="color: #000; font-size: 20px; font-weight: 900">
+            % if show_explore_courses:
+            <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}" style='color : #000000'
+            aria-current="${'page' if reverse('dashboard') == request.path else 'false'}">
+            ${_("Dashboard")}
+            </a>
+          % endif
+          </li>
+          <li style="color: #000; font-size: 20px; font-weight: 900">
+            <a class="coading-link" href="" style="color: #000"  target="_blank">${_("Coading Lab")}</a> 
+          </li>
+          <li style="color: #000; font-size: 20px; font-weight: 900">
+            % if enable_help_link:
+              <div class="mobile-nav-item hidden-mobile nav-item">
+                <a class="help-link discover-new-link" style="color: #000000" href="${marketing_link('COURSES')}"rel="noopener" target="_blank">${_("Learn")}</a>
+              </div>
+            % endif
+          </li>
+      </ul>
+      <ul style="list-style: none; padding: 0; display: flex; gap: 20px; align-items: center;">
+          <li style="display: flex; align-items: center;"><img src="../../static/images/icon_coin_back.svg" /> <span style="color: #FFC12D; font-size: 20px; font-weight: 600">3</span> </li>
+          <li style="display: flex; align-items: center;"><img src="../../static/images/icon.svg" /> <span style="color: #C88E57; margin-left: 6px; display: block; font-size: 20px; font-weight: 600">1</span> </li>
+          <%include file="user_dropdown.html"/>
+      </ul>
   </div>
-  <div class="secondary">
-    % if enable_help_link:
-      <div class="mobile-nav-item hidden-mobile nav-item">
-        <a class="help-link" href="${help_link}" rel="noopener" target="_blank">${_("Help")}</a>
-      </div>
-    % endif
-    <%include file="user_dropdown.html"/>
-  </div>
-</div>
+</header>
+
+

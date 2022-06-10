@@ -132,6 +132,7 @@ class LoginWithAccessTokenView(APIView):
         return False
 
     @method_decorator(csrf_exempt)
+    #@csrf_exempt
     def post(self, request):
         """
         Handler for the POST method to this view.

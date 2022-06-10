@@ -3,7 +3,7 @@ Tests for Outline Tab API in the Course Home API
 """
 
 import itertools
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -15,12 +15,11 @@ from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, 
 
 from cms.djangoapps.contentstore.outlines import update_outline_from_modulestore
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, CourseVisibility
 from openedx.core.djangoapps.course_date_signals.utils import MIN_DURATION
@@ -46,10 +45,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     def setUp(self):
         super().setUp()
         self.url = reverse('course-home:outline-tab', args=[self.course.id])
-
-    def update_course_and_overview(self):
-        self.update_course(self.course, self.user.id)
-        CourseOverview.load_from_module_store(self.course.id)
 
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
@@ -151,6 +146,13 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     def test_get_unknown_course(self):
         url = reverse('course-home:outline-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
+        assert response.status_code == 404
+
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
+    @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
+    def test_legacy_view_enabled(self, enrollment_mode):
+        CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
+        response = self.client.get(self.url)
         assert response.status_code == 404
 
     @ddt.data(True, False)
@@ -317,7 +319,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             self.user.save()
         if course_visibility:
             self.course.course_visibility = course_visibility
-            self.update_course_and_overview()
+            self.course = self.update_course(self.course, self.user.id)
 
         self.store.create_item(
             self.user.id, self.course.id, 'course_info', 'handouts', fields={'data': '<p>Handouts</p>'}
@@ -398,42 +400,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     def test_user_has_passing_grade(self):
         CourseEnrollment.enroll(self.user, self.course.id)
         self.course._grading_policy['GRADE_CUTOFFS']['Pass'] = 0  # pylint: disable=protected-access
-        self.update_course_and_overview()
+        self.update_course(self.course, self.user.id)
         CourseGradeFactory().update(self.user, self.course)
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.data['user_has_passing_grade'] is True
-
-    def assert_can_enroll(self, can_enroll):
-        response = self.client.get(self.url)
-        assert response.status_code == 200
-        assert response.data['enroll_alert']['can_enroll'] == can_enroll
-
-    def test_can_enroll_basic(self):
-        self.assert_can_enroll(True)
-
-    def test_cannot_enroll_invitation_only(self):
-        self.course.invitation_only = True
-        self.update_course_and_overview()
-        self.assert_can_enroll(False)
-
-    def test_cannot_enroll_masters_only(self):
-        CourseMode.objects.all().delete()
-        CourseModeFactory(course_id=self.course.id, mode_slug=CourseMode.MASTERS)
-        self.assert_can_enroll(False)
-
-    def test_cannot_enroll_before_enrollment(self):
-        self.course.enrollment_start = datetime.now(timezone.utc) + timedelta(days=1)
-        self.update_course_and_overview()
-        self.assert_can_enroll(False)
-
-    def test_cannot_enroll_after_enrollment(self):
-        self.course.enrollment_end = datetime.now(timezone.utc) - timedelta(days=1)
-        self.update_course_and_overview()
-        self.assert_can_enroll(False)
-
-    def test_cannot_enroll_if_full(self):
-        self.course.max_student_enrollments_allowed = 1
-        self.update_course_and_overview()
-        CourseEnrollment.enroll(UserFactory(), self.course.id)  # grr, some rando took our spot!
-        self.assert_can_enroll(False)

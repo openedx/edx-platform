@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, enrollments_fbe_is_on, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_voucher_refundable, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
+<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_voucher_refundable, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
 
 <%!
 import datetime
@@ -12,10 +12,12 @@ from django.urls import reverse
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import enrollment_mode_display
 from common.djangoapps.student.helpers import user_has_passing_grade_in_course
+from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.course_experience import course_home_url
+from openedx.features.course_experience import course_home_url_name
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from common.djangoapps.student.helpers import (
   VERIFY_STATUS_NEED_TO_VERIFY,
   VERIFY_STATUS_SUBMITTED,
@@ -58,11 +60,12 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 
 <%namespace name='static' file='../static_content.html'/>
 
-<li class="course-item">
+<li class="course-item" style="background: #fff; box-shadow: 0 2px 7px 0 rgba(0,0,0,.08); padding-bottom:0; margin-bottom: 36px; overflow: hidden; border-radius: 8px; flex: 1 1 100%; display: flex; justify-content: space-between;">
   % if display_course_modes_on_dashboard:
     <%
         course_verified_certs = enrollment_mode_display(
             enrollment.mode,
+            verification_status.get('status'),
             course_overview.id
         )
     %>
@@ -74,20 +77,24 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
   % else:
     <% mode_class = '' %>
   % endif
-      <div class="course-container"
+      <div class="" style="width: 100%; overflow: hidden;"
         % if getattr(course_overview, 'language'):
           lang="${course_overview.language}"
         % endif
       >
+      
 <article class="course${mode_class}" aria-labelledby="course-title-${enrollment.course_id}" id="course-card-${course_card_index}">
-  <% course_target = course_home_url(course_overview.id) %>
+  <% course_target = reverse(course_home_url_name(course_overview.id), args=[str(course_overview.id)]) if course_home_legacy_is_active(course_overview.id) else get_learning_mfe_home_url(course_key=course_overview.id, url_fragment="home") %>
   <section class="details" aria-labelledby="details-heading-${enrollment.course_id}">
       <h2 class="hd hd-2 sr" id="details-heading-${enrollment.course_id}">${_('Course details')}</h2>
     <div class="wrapper-course-image" aria-hidden="true">
+     
       % if show_courseware_link and not is_unfulfilled_entitlement:
         % if not is_course_expired:
             <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover course-target-link" tabindex="-1">
-              <img src="${course_overview.image_urls['small']}" class="course-image" alt="${_('{course_number} {course_name} Home Page').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
+              <img
+              style=" border-radius: 12px 0 0 12px"
+              src="${course_overview.image_urls['small']}" class="course-image" alt="${_('{course_number} {course_name} Home Page').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
             </a>
         % else:
             <a class="fade-cover">
@@ -113,9 +120,9 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
         <h3 class="course-title" id="course-title-${enrollment.course_id}">
           % if show_courseware_link and not is_unfulfilled_entitlement:
             % if not is_course_expired:
-              <a data-course-key="${enrollment.course_id}" href="${course_target}" class="course-target-link">${course_overview.display_name_with_default}</a>
+              <a data-course-key="${enrollment.course_id}" href="${course_target}" class="course-target-link" style=" font-weight:600 ; color:#000; font-family: Roboto">${course_overview.display_name_with_default}</a>
             % else:
-              <a class="disable-look" data-course-key="${enrollment.course_id}">${course_overview.display_name_with_default}</a>
+              <a class="disable-look" data-course-key="${enrollment.course_id}" >${course_overview.display_name_with_default}</a>
             % endif
           % else:
             <span>${course_overview.display_name_with_default}</span>
@@ -124,8 +131,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
         <div class="wrapper-course-info-actions">
           <div class="wrapper-course-info-row">
             <div class="course-info">
-              <span class="info-university">${course_overview.display_org_with_default} - </span>
-              <span class="info-course-id">${course_overview.display_number_with_default}</span>
+             
               <%
                 enrollment_date = course_overview.self_paced and enrollment and enrollment.created
                 if course_overview.start_date_is_still_default:
@@ -255,11 +261,11 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 % endif
 
                 ## We should only show the gear dropdown if the user is able to refund/unenroll from their entitlement
-                ## and/or if they have selected a course run, unenrollment is not disabled, and email_settings are enabled
+                ## and/or if they have selected a course run and email_settings are enabled
                 ## as these are the only actions currently available
                 % if entitlement and (can_refund_entitlement or show_email_settings):
                     <%include file='_dashboard_entitlement_actions.html' args='course_overview=course_overview,entitlement=entitlement,dashboard_index=dashboard_index, can_refund_entitlement=can_refund_entitlement, show_email_settings=show_email_settings'/>
-                % elif not entitlement and (can_unenroll or partner_managed_enrollment or show_email_settings):
+                % elif not entitlement:
                     <div class="wrapper-action-more" data-course-key="${enrollment.course_id}">
                       <button type="button" class="action action-more" id="actions-dropdown-link-${dashboard_index}" aria-haspopup="true" aria-expanded="false" aria-controls="actions-dropdown-${dashboard_index}" data-course-number="${course_overview.number}" data-course-name="${course_overview.display_name_with_default}" data-dashboard-index="${dashboard_index}">
                         <span class="sr">${_('Course options for')}</span>
@@ -374,48 +380,51 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
           <%include file="_dashboard_show_consent.html" args="course_overview=course_overview, course_target=course_target, enrollment=enrollment, enterprise_customer_name=enterprise_customer_name"/>
         %endif
 
-        % if display_course_upgrade:
-          <div class="message message-upsell has-actions is-shown">
-            <div class="wrapper-extended">
-              <div class="wrapper-icon-message">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="" aria-hidden="true" focusable="false">
-                  <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 003.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" fill="currentColor"></path>
-                </svg>
-                <div class="message-copy" align="auto">
-                % if enrollment.course_id in enrollments_fbe_is_on:
-                  ${Text(_("{start_bold}Get the most out of your course!{end_bold} Upgrade to get full access to the course material, unlock both graded and non-graded assignments, and earn a {link_start}verified certificate{link_end} to showcase on your resumé.")).format(
-                          start_bold=HTML('<strong class="message-copy-bold">'),
-                          end_bold=HTML('</strong>'),
-                          link_start=HTML('<a href="{}" class="verified-info" data-course-key="{}">').format(
-                            marketing_link('WHAT_IS_VERIFIED_CERT'),
-                            enrollment.course_id
-                          ),
-                          link_end=HTML('</a>')
-                        )}
+        % if verification_status.get('should_display') and verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_RESUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY]:
+          <div class="message message-status wrapper-message-primary is-shown">
+            % if verification_status['status'] == VERIFY_STATUS_NEED_TO_VERIFY:
+              <div class="verification-reminder">
+                % if verification_status['days_until_deadline'] is not None:
+                  <h4 class="message-title">${_('To earn a certificate, you must verify your ID')}</h4>
+                  <p class="message-copy">${ungettext(
+                    'You only have {days} day left to verify for this course.',
+                    'You only have {days} days left to verify for this course.',
+                    verification_status['days_until_deadline']
+                  ).format(days=verification_status['days_until_deadline'])}</p>
                 % else:
-                  ${Text(_("{start_bold}Get the most out of your course!{end_bold} Upgrade to earn a {link_start}verified certificate{link_end} to showcase on your resumé.")).format(
-                          start_bold=HTML('<strong class="message-copy-bold">'),
-                          end_bold=HTML('</strong>'),
-                          link_start=HTML('<a href="{}" class="verified-info" data-course-key="{}">').format(
-                            marketing_link('WHAT_IS_VERIFIED_CERT'),
-                            enrollment.course_id
-                          ),
-                          link_end=HTML('</a>')
-                        )}
+                  <h4 class="message-title">${_('Almost there!')}</h4>
+                  <p class="message-copy">${_('You still need to verify for this course.')}</p>
                 % endif
-                </div>
               </div>
-              <div class="action-upgrade-container">
-                <a class="action action-upgrade track_course_dashboard_green_button" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
-                  <span class="wrapper-copy">
-                    <span class="copy" id="upgrade-to-verified">${_("Upgrade")}</span>
-                      <span class="sr">&nbsp;${_(course_overview.display_name_with_default)}</span>
-                  </span>
-                </a>
+              <div class="verification-cta">
+                <a href="${IDVerificationService.get_verify_location(course_overview.id)}" class="btn" data-course-id="${course_overview.id}">${_('Verify Now')}</a>
               </div>
-            </div>
+            % elif verification_status['status'] == VERIFY_STATUS_SUBMITTED:
+              <h4 class="message-title">${_('You have submitted your verification information.')}</h4>
+              <p class="message-copy">${_('You will see a message on your dashboard when the verification process is complete (usually within 5-7 days).')}</p>
+            % elif verification_status['status'] == VERIFY_STATUS_RESUBMITTED:
+              <h4 class="message-title">${_('Your current verification will expire soon!')}</h4>
+              <p class="message-copy">${_('You have submitted your reverification information. You will see a message on your dashboard when the verification process is complete (usually within 5-7 days).')}</p>
+            % elif verification_status['status'] == VERIFY_STATUS_APPROVED:
+              <h4 class="message-title">${_('You have successfully verified your ID with {platform_name}').format(platform_name=settings.PLATFORM_NAME)}</h4>
+              % if verification_status.get('verification_good_until') is not None:
+                <p class="message-copy">${_('Your current verification is effective until {date}.').format(date=verification_status['verification_good_until'])}
+              % endif
+            % elif verification_status['status'] == VERIFY_STATUS_NEED_TO_REVERIFY:
+              <h4 class="message-title">${_('Your current verification will expire soon.')}</h4>
+              ## Translators: start_link and end_link will be replaced with HTML tags;
+              ## please do not translate these.
+              <p class="message-copy">${Text(_('Your current verification will expire in {days} days. {start_link}Re-verify your identity now{end_link} using a webcam and a government-issued photo ID.')).format(
+                  start_link=HTML('<a href="{href}">').format(href=IDVerificationService.get_verify_location()),
+                  end_link=HTML('</a>'),
+                  days=settings.VERIFY_STUDENT.get("EXPIRING_SOON_WINDOW")
+                )}
+              </p>
+            % endif
           </div>
         % endif
+
+      
 
         % if course_requirements:
         ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element

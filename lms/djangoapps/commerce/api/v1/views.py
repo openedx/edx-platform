@@ -4,12 +4,11 @@ Commerce views
 
 
 import logging
-from urllib.parse import urljoin
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import Http404
+from edx_rest_api_client import exceptions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from requests.exceptions import HTTPError
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -17,7 +16,7 @@ from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.util.json_request import JsonResponse
-from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.lib.api.mixins import PutAsCreateMixin
 
@@ -85,11 +84,7 @@ class OrderView(APIView):
             except User.DoesNotExist:
                 return JsonResponse(status=403)
         try:
-            api_url = urljoin(f"{get_ecommerce_api_base_url()}/", f"orders/{number}/")
-            response = get_ecommerce_api_client(request.user).get(api_url)
-            response.raise_for_status()
-            return JsonResponse(response.json())
-        except HTTPError as err:
-            if err.response.status_code == 404:
-                return JsonResponse(status=404)
-            raise
+            order = ecommerce_api_client(request.user).orders(number).get()
+            return JsonResponse(order)
+        except exceptions.HttpNotFoundError:
+            return JsonResponse(status=404)

@@ -10,7 +10,7 @@ from django.urls import path, re_path
 from django.utils.translation import gettext_lazy as _
 from auth_backends.urls import oauth2_urlpatterns
 from edx_api_doc_tools import make_docs_urls
-from django.contrib import admin
+from ratelimitbackend import admin
 
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
@@ -18,6 +18,8 @@ import openedx.core.djangoapps.lang_pref.views
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import views as contentstore_views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
+from cms.djangoapps.contentstore.views.live_class import LiveClassesApiListView ,CourseListView,UserCourseUnEnrollment, LiveClassesDeleteUpdateApiView , UserDetailsListApiView ,EnrollLiveClassCreateView,EnrollLiveClassUserDetailsView ,EnrollLiveClassUserDeleteApiView , UserCourseEnrollment ,EnrollCourseUserDetailsView , LoginStaffCourseDetailsList
+
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
@@ -90,6 +92,28 @@ urlpatterns = oauth2_urlpatterns + [
     # restful api
     path('', contentstore_views.howitworks, name='homepage'),
     path('howitworks', contentstore_views.howitworks, name='howitworks'),
+    
+    path('live_class/details/', LiveClassesApiListView.as_view(), name='user_live_class' ),
+    path('live_class/<id>', LiveClassesDeleteUpdateApiView.as_view(), name='live_class_delete_update' ),
+    path('accounts/details', UserDetailsListApiView.as_view(), name='all_user_details' ),
+    path('live_class/user/enrollment', EnrollLiveClassCreateView.as_view(), name='enroll_live_class_to_user' ),
+
+    path('live_class/enroll/detail/<live_class_id>', EnrollLiveClassUserDetailsView.as_view(), name='live_class_user_details' ),
+
+    path('course/enroll/course/detail/<course_id>', EnrollCourseUserDetailsView.as_view(), name='course_user_details' ),
+    
+    path('staff/course/detail/<edited_by_id>', LoginStaffCourseDetailsList.as_view(), name='live_class_user_details' ),
+
+    path('courses/all/courses', CourseListView.as_view(), name="course-list"),
+
+
+
+    path('live_class/enroll/live_class/detail/<id>', EnrollLiveClassUserDeleteApiView.as_view(), name='enroll_user_live_class_delete' ),
+
+    path('user/enrollment', UserCourseEnrollment.as_view() , name='user_course_enrollment'),
+    path('user/course/unenrollment/<id>', UserCourseUnEnrollment.as_view() , name='user_course_enrollment'),
+    
+    
     path('signin_redirect_to_lms', contentstore_views.login_redirect_to_lms, name='login_redirect_to_lms'),
     path('request_course_creator', contentstore_views.request_course_creator, name='request_course_creator'),
     re_path(fr'^course_team/{COURSELIKE_KEY_PATTERN}(?:/(?P<email>.+))?$',
@@ -270,8 +294,6 @@ if settings.DEBUG:
         urlpatterns += dev_urlpatterns
     except ImportError:
         pass
-
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     urlpatterns += static(
         settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['base_url'],

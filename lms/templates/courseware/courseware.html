@@ -25,6 +25,11 @@ from openedx.features.course_experience import course_home_page_title, DISABLE_C
    completion_aggregator_url = settings.COMPLETION_AGGREGATOR_URL if settings.FEATURES.get("SHOW_PROGRESS_BAR", False) else ""
 %>
 
+% if display_reset_dates_banner:
+    <script type="text/javascript">
+        $('.reset-deadlines-banner').css('display', 'flex');
+    </script>
+% endif
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>

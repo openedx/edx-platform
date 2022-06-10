@@ -102,6 +102,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     pacing = serializers.CharField()
     user_timezone = serializers.CharField()
     show_calculator = serializers.BooleanField()
+    can_view_legacy_courseware = serializers.BooleanField()
     can_access_proctored_exams = serializers.BooleanField()
     notes = serializers.DictField()
     marketing_url = serializers.CharField()

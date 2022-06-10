@@ -137,12 +137,9 @@ class RuntimeShim:
     @property
     def filestore(self):
         """
-        Alternate name for 'resources_fs'.
+        Alternate name for 'resources_fs'. Not sure if either name is deprecated
+        but we should deprecate one :)
         """
-        warnings.warn(
-            'filestore is deprecated. Please use runtime.resources_fs instead.',
-            DeprecationWarning, stacklevel=3,
-        )
         return self.resources_fs
 
     @property
@@ -226,7 +223,7 @@ class RuntimeShim:
         # XBlock repo at xblock.reference.plugins.FSService and is available in
         # the old runtime as the 'fs' service.
         warnings.warn(
-            "Use of legacy runtime.resources_fs won't be able to find resources.",
+            "Use of legacy runtime.resources_fs or .filestore won't be able to find resources.",
             stacklevel=3,
         )
         fake_fs = MemoryFS()

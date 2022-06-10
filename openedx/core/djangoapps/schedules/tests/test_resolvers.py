@@ -12,29 +12,26 @@ import pytz
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edx_toggles.toggles.testutils import override_waffle_switch
 from testfixtures import LogCapture
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from waffle.testutils import override_switch
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.schedules.config import (
-    _EXTERNAL_COURSE_UPDATES_FLAG,
-    COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH,
-)
+from openedx.core.djangoapps.schedules.config import _EXTERNAL_COURSE_UPDATES_FLAG
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.resolvers import (
     LOG,
     BinnedSchedulesBaseResolver,
     CourseNextSectionUpdate,
-    CourseUpdateResolver,
+    CourseUpdateResolver
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, skip_unless_lms
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class SchedulesResolverTestMixin(CacheIsolationMixin):
@@ -170,7 +167,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             'contact_mailing_address': '123 Sesame Street',
             'course_ids': [str(self.course.id)],
             'course_name': self.course.display_name,
-            'course_url': f'http://learning-mfe/course/{self.course.id}/home',
+            'course_url': f'/courses/{self.course.id}/course/',
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
             'mobile_store_urls': {},
@@ -186,7 +183,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         }
         assert schedules == [(self.user, None, expected_context)]
 
-    @override_waffle_switch(COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH, True)
+    @override_switch('schedules.course_update_show_unsubscribe', True)
     def test_schedule_context_show_unsubscribe(self):
         resolver = self.create_resolver()
         schedules = list(resolver.schedules_for_bin())
@@ -261,7 +258,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'contact_mailing_address': '123 Sesame Street',
             'course_ids': [str(self.course.id)],
             'course_name': self.course.display_name,
-            'course_url': f'http://learning-mfe/course/{self.course.id}/home',
+            'course_url': f'/courses/{self.course.id}/course/',
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
             'mobile_store_urls': {},
@@ -277,7 +274,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         }
         assert schedules == [(self.user, None, expected_context)]
 
-    @override_waffle_switch(COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH, True)
+    @override_switch('schedules.course_update_show_unsubscribe', True)
     def test_schedule_context_show_unsubscribe(self):
         resolver = self.create_resolver()
         schedules = list(resolver.get_schedules())

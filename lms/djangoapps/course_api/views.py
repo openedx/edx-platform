@@ -2,6 +2,7 @@
 Course API Views
 """
 
+import logging
 
 from django.core.exceptions import ValidationError
 from django.core.paginator import InvalidPage
@@ -17,6 +18,9 @@ from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE
 from .api import course_detail, list_course_keys, list_courses
 from .forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
 from .serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
+
+
+log = logging.getLogger(__name__)
 
 
 @view_auth_classes(is_authenticated=False)
@@ -119,7 +123,7 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
         form = CourseDetailGetForm(requested_params, initial={'requesting_user': self.request.user})
         if not form.is_valid():
             raise ValidationError(form.errors)
-
+        log.info("<<<---course1-----> " , CourseDetailSerializer)
         return course_detail(
             self.request,
             form.cleaned_data['username'],
@@ -240,101 +244,109 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
         return page_list
 
 
-@view_auth_classes(is_authenticated=False)
-class CourseListView(DeveloperErrorViewMixin, ListAPIView):
-    """
-    **Use Cases**
 
-        Request information on all courses visible to the specified user.
 
-    **Example Requests**
 
-        GET /api/courses/v1/courses/
+# @view_auth_classes(is_authenticated=False)
+# class CourseListView(DeveloperErrorViewMixin, ListAPIView):
+#     """
+#     **Use Cases**
 
-    **Response Values**
+#         Request information on all courses visible to the specified user.
 
-        Body comprises a list of objects as returned by `CourseDetailView`.
+#     **Example Requests**
 
-    **Parameters**
+#         GET /api/courses/v1/courses/
 
-        search_term (optional):
-            Search term to filter courses (used by ElasticSearch).
+#     **Response Values**
 
-        username (optional):
-            The username of the specified user whose visible courses we
-            want to see. The username is not required only if the API is
-            requested by an Anonymous user.
+#         Body comprises a list of objects as returned by `CourseDetailView`.
 
-        org (optional):
-            If specified, visible `CourseOverview` objects are filtered
-            such that only those belonging to the organization with the
-            provided org code (e.g., "HarvardX") are returned.
-            Case-insensitive.
+#     **Parameters**
 
-        permissions (optional):
-            If specified, it filters visible `CourseOverview` objects by
-            checking if each permission specified is granted for the username.
-            Notice that Staff users are always granted permission to list any
-            course.
+#         search_term (optional):
+#             Search term to filter courses (used by ElasticSearch).
 
-    **Returns**
+#         username (optional):
+#             The username of the specified user whose visible courses we
+#             want to see. The username is not required only if the API is
+#             requested by an Anonymous user.
 
-        * 200 on success, with a list of course discovery objects as returned
-          by `CourseDetailView`.
-        * 400 if an invalid parameter was sent or the username was not provided
-          for an authenticated request.
-        * 403 if a user who does not have permission to masquerade as
-          another user specifies a username other than their own.
-        * 404 if the specified user does not exist, or the requesting user does
-          not have permission to view their courses.
+#         org (optional):
+#             If specified, visible `CourseOverview` objects are filtered
+#             such that only those belonging to the organization with the
+#             provided org code (e.g., "HarvardX") are returned.
+#             Case-insensitive.
 
-        Example response:
+#         permissions (optional):
+#             If specified, it filters visible `CourseOverview` objects by
+#             checking if each permission specified is granted for the username.
+#             Notice that Staff users are always granted permission to list any
+#             course.
 
-            [
-              {
-                "blocks_url": "/api/courses/v1/blocks/?course_id=edX%2Fexample%2F2012_Fall",
-                "media": {
-                  "course_image": {
-                    "uri": "/c4x/edX/example/asset/just_a_test.jpg",
-                    "name": "Course Image"
-                  }
-                },
-                "description": "An example course.",
-                "end": "2015-09-19T18:00:00Z",
-                "enrollment_end": "2015-07-15T00:00:00Z",
-                "enrollment_start": "2015-06-15T00:00:00Z",
-                "course_id": "edX/example/2012_Fall",
-                "name": "Example Course",
-                "number": "example",
-                "org": "edX",
-                "start": "2015-07-17T12:00:00Z",
-                "start_display": "July 17, 2015",
-                "start_type": "timestamp"
-              }
-            ]
-    """
-    class CourseListPageNumberPagination(LazyPageNumberPagination):
-        max_page_size = 100
+#     **Returns**
 
-    pagination_class = CourseListPageNumberPagination
-    serializer_class = CourseSerializer
-    throttle_classes = (CourseListUserThrottle,)
+#         * 200 on success, with a list of course discovery objects as returned
+#           by `CourseDetailView`.
+#         * 400 if an invalid parameter was sent or the username was not provided
+#           for an authenticated request.
+#         * 403 if a user who does not have permission to masquerade as
+#           another user specifies a username other than their own.
+#         * 404 if the specified user does not exist, or the requesting user does
+#           not have permission to view their courses.
 
-    def get_queryset(self):
-        """
-        Yield courses visible to the user.
-        """
-        form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
-        if not form.is_valid():
-            raise ValidationError(form.errors)
-        return list_courses(
-            self.request,
-            form.cleaned_data['username'],
-            org=form.cleaned_data['org'],
-            filter_=form.cleaned_data['filter_'],
-            search_term=form.cleaned_data['search_term'],
-            permissions=form.cleaned_data['permissions']
-        )
+#         Example response:
+
+#             [
+#               {
+#                 "blocks_url": "/api/courses/v1/blocks/?course_id=edX%2Fexample%2F2012_Fall",
+#                 "media": {
+#                   "course_image": {
+#                     "uri": "/c4x/edX/example/asset/just_a_test.jpg",
+#                     "name": "Course Image"
+#                   }
+#                 },
+#                 "description": "An example course.",
+#                 "end": "2015-09-19T18:00:00Z",
+#                 "enrollment_end": "2015-07-15T00:00:00Z",
+#                 "enrollment_start": "2015-06-15T00:00:00Z",
+#                 "course_id": "edX/example/2012_Fall",
+#                 "name": "Example Course",
+#                 "number": "example",
+#                 "org": "edX",
+#                 "start": "2015-07-17T12:00:00Z",
+#                 "start_display": "July 17, 2015",
+#                 "start_type": "timestamp"
+#               }
+#             ]
+#     """
+#     class CourseListPageNumberPagination(LazyPageNumberPagination):
+#         max_page_size = 100
+
+#     pagination_class = CourseListPageNumberPagination
+#     serializer_class = CourseSerializer
+#     throttle_classes = (CourseListUserThrottle,)
+
+#     def get_queryset(self):
+#         """
+#         Yield courses visible to the user.
+#         """
+#         form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
+#         if not form.is_valid():
+        
+#             raise ValidationError(form.errors)
+#         log.info("<<<---course2-----> " , CourseDetailSerializer)
+#         return list_courses(
+#             self.request,
+#             form.cleaned_data['username'],
+#             org=form.cleaned_data['org'],
+#             filter_=form.cleaned_data['filter_'],
+#             search_term=form.cleaned_data['search_term'],
+#             permissions=form.cleaned_data['permissions']
+            
+#         )
+
+
 
 
 class CourseIdListUserThrottle(UserRateThrottle):

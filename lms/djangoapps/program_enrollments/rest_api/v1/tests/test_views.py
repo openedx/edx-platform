@@ -2098,7 +2098,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
     def test_course_run_url(self):
         self.log_in()
 
-        course_run_url = f'http://learning-mfe/course/{str(self.course_id)}/home'
+        course_run_url = f'http://testserver/courses/{str(self.course_id)}/course/'
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
         assert status.HTTP_200_OK == response_status_code

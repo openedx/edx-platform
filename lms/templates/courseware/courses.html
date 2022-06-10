@@ -57,9 +57,10 @@
         % endif
 
         <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
-          <ul class="courses-listing courses-list">
+          <h3 style="font-weight: 900; margin-bottom: 24px; font-size: 24px;">Welcome to Launchpad learning</h3>
+          <ul class="courses-listing courses-list" style="display: flex; flex-direction: column;">
             %for course in courses:
-            <li class="courses-listing-item">
+            <li class="courses-listing-item" style=" width: 100%">
               <%include file="../course.html" args="course=course" />
             </li>
             %endfor

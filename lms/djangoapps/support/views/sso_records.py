@@ -10,24 +10,12 @@ from social_django.models import UserSocialAuth
 
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.support.decorators import require_support_permission
-from lms.djangoapps.support.serializers import (
-    serialize_sso_records,
-)
+from lms.djangoapps.support.serializers import serialize_sso_records
 
 
 class SsoView(GenericAPIView):
     """
     Returns a list of SSO records for a given user.
-    Sample response:
-    [
-        {
-            "provider": "tpa-saml",
-            "uid": "new-channel:testuser",
-            "created": "2022-03-02T04:41:33.145Z",
-            "modified": "2022-03-15T11:28:17.809Z",
-            "extraData": "{}",
-        }
-    ]
     """
     @method_decorator(require_support_permission)
     def get(self, request, username_or_email):  # lint-amnesty, pylint: disable=missing-function-docstring

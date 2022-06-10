@@ -24,15 +24,13 @@
                             <%- gettext('Cohort Name') %> *
                             <span class="sr"><%- gettext('(Required Field)')%></span>
                     </label>
-                    <input
-                        name="cohort-name"
-                        value="<%- cohort_name_value %>"
-                        class="input cohort-name"
-                        id="cohort-name"
-                        placeholder="<%- placeholder_value %>"
-                        required="required"
-                        type="text"
-                    >
+                    <input name="cohort-name" value="<%- cohort_name_value %>" class="input cohort-name
+                        <% if (cohort.disableEditingName) { %>
+                           readonly" readonly
+                        <% } else { %>
+                           "
+                        <% } %>
+                        id="cohort-name" placeholder="<%- placeholder_value %>" required="required" type="text">
                 </div>
                 <hr class="divider divider-lv1">
                 <% if (isDefaultCohort) { %>

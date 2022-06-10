@@ -236,16 +236,3 @@ class AuthenticationRequiredAccessError(AccessError):
         developer_message = "User must be authenticated to view the course"
         user_message = _("You must be logged in to see this course")
         super().__init__(error_code, developer_message, user_message)
-
-
-class OldMongoAccessError(AccessError):
-    """
-    Access denied because the course is in Old Mongo and we no longer support them. See DEPR-58.
-    """
-    def __init__(self, courselike):
-        error_code = 'old_mongo'
-        developer_message = 'Access to Old Mongo courses is unsupported'
-        user_message = _('{course_name} is no longer available.').format(
-            course_name=courselike.display_name_with_default,
-        )
-        super().__init__(error_code, developer_message, user_message)

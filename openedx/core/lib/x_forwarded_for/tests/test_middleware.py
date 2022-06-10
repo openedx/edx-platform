@@ -39,11 +39,11 @@ class TestXForwardedForMiddleware(TestCase):
             },
         ),
 
-        # REMOTE_ADDR can also be overridden (chooses rightmost)
+        # REMOTE_ADDR can also be overridden
         (
             {'HTTP_X_FORWARDED_FOR': '7.8.9.0, 1.2.3.4'},
             {
-                'REMOTE_ADDR': '1.2.3.4',
+                'REMOTE_ADDR': '7.8.9.0',
             },
         ),
     )
@@ -60,19 +60,16 @@ class TestXForwardedForMiddleware(TestCase):
 
     @ddt.unpack
     @ddt.data(
-        (None, 1, 'priv'),
-        ('1.2.3.4', 2, 'pub-priv'),
-        ('XXXXXXXX, 1.2.3.4, 5.5.5.5', 4, 'unknown-pub-pub-priv'),
+        (None, 0),
+        ('1.2.3.4', 1),
+        ('7.8.9.0, 1.2.3.4, 5.5.5.5', 3),
     )
     @patch("openedx.core.lib.x_forwarded_for.middleware.set_custom_attribute")
-    def test_xff_metrics(self, xff, expected_count, expected_types, mock_set_custom_attribute):
+    def test_xff_metrics(self, xff, expected_count, mock_set_custom_attribute):
         request = RequestFactory().get('/somewhere')
         if xff is not None:
             request.META['HTTP_X_FORWARDED_FOR'] = xff
 
         XForwardedForMiddleware().process_request(request)
 
-        mock_set_custom_attribute.assert_has_calls([
-            call('ip_chain.count', expected_count),
-            call('ip_chain.types', expected_types),
-        ])
+        mock_set_custom_attribute.assert_has_calls([call('header.x-forwarded-for.count', expected_count)])

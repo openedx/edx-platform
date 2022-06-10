@@ -293,7 +293,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         assert expected_title == content('.page-title').contents()[0].strip()
 
         if expected_subtitle is None:
-            assert not content('.page-subtitle')
+            assert [] == content('.page-subtitle')
         else:
             assert expected_subtitle == content('.page-subtitle').contents()[0].strip()
 
@@ -410,8 +410,8 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
 
     def test_num_queries_instructor_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 41, 2)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 42, 2)
 
     def test_num_queries_self_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.self_paced_course, 41, 2)
+        self.fetch_course_info_with_queries(self.self_paced_course, 42, 2)

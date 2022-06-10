@@ -93,19 +93,19 @@ def get_login_session_form(request):
 
     # Translators: This label appears above a field on the login form
     # meant to hold the user's email address.
-    email_label = _("Email")
+    email_label = _("Email address")
 
     # Translators: These instructions appear on the login form, immediately
     # below a field meant to hold the user's email address.
-    email_instructions = _("The email address you used to register with {platform_name}").format(
-        platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-    )
+    # email_instructions = _("The email address you used to register with {platform_name}").format(
+    #     platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+    # )
 
     form_desc.add_field(
         "email",
         field_type="email",
         label=email_label,
-        instructions=email_instructions,
+        #instructions=email_instructions,
         restrictions={
             "min_length": accounts.EMAIL_MIN_LENGTH,
             "max_length": accounts.EMAIL_MAX_LENGTH,
@@ -133,7 +133,7 @@ def get_login_session_form(request):
     method='GET',
     block=True
 )
-@ensure_csrf_cookie
+#@ensure_csrf_cookie
 @xframe_allow_whitelisted
 def login_and_registration_form(request, initial_mode="login"):
     """Render the combined login/registration form, defaulting to login

@@ -56,7 +56,7 @@ class OptionalFieldsDataViewTest(APITestCase):
                 'label': "Tell us why you're interested in {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
-                'error_message': '',
+                'error_message': 'Tell us your goals.',
             }
         }
         response = self.client.get(self.url)

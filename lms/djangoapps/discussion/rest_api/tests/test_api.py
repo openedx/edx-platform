@@ -2244,17 +2244,8 @@ class CreateCommentTest(
             parent_id=parent_id
         )
         data = self.minimal_data.copy()
-        editable_fields = [
-            "abuse_flagged",
-            "anonymous",
-            "edit_reason_code",
-            "raw_body",
-            "voted",
-        ]
         if parent_id:
             data["parent_id"] = parent_id
-        else:
-            editable_fields.insert(3, "endorsed")
 
         _set_course_discussion_blackout(course=self.course, user_id=self.user.id)
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_MODERATOR)
@@ -2280,7 +2271,14 @@ class CreateCommentTest(
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": editable_fields,
+            "editable_fields": [
+                "abuse_flagged",
+                "anonymous",
+                "edit_reason_code",
+                "endorsed",
+                "raw_body",
+                "voted",
+            ],
             "child_count": 0,
             "can_delete": True,
             "anonymous": False,
@@ -2560,8 +2558,7 @@ class UpdateThreadTest(
             'anonymous_to_peers': ['False'],
             'closed': ['False'],
             'pinned': ['False'],
-            'read': ['False'],
-            'editing_user_id': [str(self.user.id)],
+            'read': ['False']
         }
 
     def test_nonexistent_thread(self):
@@ -2862,38 +2859,6 @@ class UpdateThreadTest(
             assert role_name == FORUM_ROLE_STUDENT
             assert error.message_dict == {"edit_reason_code": ["This field is not editable."]}
 
-    @ddt.data(
-        FORUM_ROLE_ADMINISTRATOR,
-        FORUM_ROLE_MODERATOR,
-        FORUM_ROLE_COMMUNITY_TA,
-        FORUM_ROLE_STUDENT,
-    )
-    @mock.patch("lms.djangoapps.discussion.rest_api.serializers.CLOSE_REASON_CODES", {
-        "test-close-reason": "Test Close Reason",
-    })
-    def test_update_thread_with_close_reason_code(self, role_name):
-        """
-        Test editing comments, specifying and retrieving edit reason codes.
-        """
-        _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
-        self.register_thread()
-        try:
-            result = update_thread(self.request, "test_thread", {
-                "closed": True,
-                "close_reason_code": "test-close-reason",
-            })
-            assert role_name != FORUM_ROLE_STUDENT
-            assert result["closed"]
-            request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
-            assert request_body["close_reason_code"] == ["test-close-reason"]
-            assert request_body["closing_user_id"] == [str(self.user.id)]
-        except ValidationError as error:
-            assert role_name == FORUM_ROLE_STUDENT
-            assert error.message_dict == {
-                "closed": ["This field is not editable."],
-                "close_reason_code": ["This field is not editable."],
-            }
-
 
 @ddt.ddt
 @disable_signal(api, 'comment_edited')
@@ -3001,8 +2966,7 @@ class UpdateCommentTest(
             'user_id': [str(self.user.id)],
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],
-            'endorsed': ['False'],
-            'editing_user_id': [str(self.user.id)],
+            'endorsed': ['False']
         }
 
     def test_nonexistent_comment(self):

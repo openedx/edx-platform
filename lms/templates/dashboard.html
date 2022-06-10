@@ -22,10 +22,13 @@ from common.djangoapps.student.models import CourseEnrollment
 %>
 
 <%
+  show_explore_courses = settings.FEATURES.get('COURSES_ARE_BROWSABLE')
   cert_name_short = settings.CERT_NAME_SHORT
   cert_name_long = settings.CERT_NAME_LONG
 %>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+<link rel="stylesheet" href="../../static/css/style.css"/>
+<link rel="stylesheet" href="../../static/css/demo.css">
 
 <%block name="pagetitle">${_("Dashboard")}</%block>
 <%block name="bodyclass">view-dashboard is-authenticated</%block>
@@ -53,6 +56,41 @@ from common.djangoapps.student.models import CourseEnrollment
       });
     });
   </script>
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+<script src="../../static/js/calendar.js"></script>
+<script>
+  var $calendar;
+  $(document).ready(function () {
+    let container = $("#container").simpleCalendar({
+      fixedStartDay: 0, // begin weeks by sunday
+      disableEmptyDetails: true,
+      events: [
+        // generate new event after tomorrow for one hour
+        {
+          startDate: new Date(new Date().setHours(new Date().getHours() + 24)).toDateString(),
+          endDate: new Date(new Date().setHours(new Date().getHours() + 25)).toISOString(),
+          summary: '<a class="primarybtn">Join Class</a>'
+        },
+        // generate new event for yesterday at noon
+        {
+          startDate: new Date(new Date().setHours(new Date().getHours() - new Date().getHours() - 12, 0)).toISOString(),
+          endDate: new Date(new Date().setHours(new Date().getHours() - new Date().getHours() - 11)).getTime(),
+          summary: 'Restaurant'
+        },
+        // generate new event for the last two days
+        {
+          startDate: new Date(new Date().setHours(new Date().getHours() - 48)).toISOString(),
+          endDate: new Date(new Date().setHours(new Date().getHours() - 24)).getTime(),
+          summary: 'Visit of the Louvre'
+        }
+      ],
+
+    });
+    $calendar = container.data('plugin_simpleCalendar')
+  });
+</script>
   <%static:webpack entry="UnenrollmentFactory">
     UnenrollmentFactory({
       urls: {
@@ -149,9 +187,7 @@ from common.djangoapps.student.models import CourseEnrollment
     <div class="dashboard" id="dashboard-main">
       <div class="main-container">
         <div class="my-courses" id="my-courses">
-          % if display_dashboard_courses:
-          <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
-          % endif
+          
 
           % if len(course_entitlements + course_enrollments) > 0:
             <ul class="listing-courses">
@@ -161,6 +197,14 @@ from common.djangoapps.student.models import CourseEnrollment
                     getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
                 )
             %>
+           
+            <div class="live_class">
+              <h3 style="font-size: 24px; font-weight: 900; margin-bottom: 24px">Live Classes</h3>
+              <div id="output" class="out" style="position: relative;display: none;"></div>
+            </div>
+
+
+          <h3 style="font-size: 24px; margin-bottom: 28px; font-weight: 900;">My Courses</h3>
             % for dashboard_index, enrollment in enumerate(course_entitlements + course_enrollments):
               <%
                 # Check if the course run is an entitlement and if it has an associated session
@@ -209,23 +253,29 @@ from common.djangoapps.student.models import CourseEnrollment
                 cert_status = cert_statuses.get(session_id)
                 can_refund_entitlement = entitlement and entitlement.is_entitlement_refundable()
                 partner_managed_enrollment = enrollment.mode == 'masters'
-                # checks if we can unenroll based on the value of partner_managed_enrollment
-                can_unenroll_partner_managed_enrollment = False if partner_managed_enrollment else (not cert_status)
-                # checks if we can unenroll based on the value of unfulfilled_entitlement
-                can_unenroll_unfulfilled_entitlement = cert_status.get('can_unenroll') if cert_status and not unfulfilled_entitlement else False
-                # compares the three different parameters by which we can unenroll
-                can_unenroll = (can_unenroll_partner_managed_enrollment or can_unenroll_unfulfilled_entitlement) and not disable_unenrollment
+                can_unenroll = False if partner_managed_enrollment else (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
                 credit_status = credit_statuses.get(session_id)
                 course_mode_info = all_course_modes.get(session_id)
                 is_paid_course = True if entitlement else (session_id in enrolled_courses_either_paid)
                 is_course_voucher_refundable = (session_id in enrolled_courses_voucher_refundable)
+                course_verification_status = verification_status_by_course.get(session_id, {})
                 course_requirements = courses_requirements_not_met.get(session_id)
                 related_programs = inverted_programs.get(six.text_type(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
                 show_consent_link = (session_id in consent_required_courses)
                 resume_button_url = resume_button_urls[dashboard_index]
               %>
-              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, enrollments_fbe_is_on=enrollments_fbe_is_on, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_voucher_refundable=is_course_voucher_refundable, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url, partner_managed_enrollment=partner_managed_enrollment' />
+              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_voucher_refundable=is_course_voucher_refundable, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url, partner_managed_enrollment=partner_managed_enrollment' />
+              
+              
             % endfor
+            % if show_explore_courses:
+              <div style="padding-top: 50px; text-align: center">
+                <a class="tab-nav-link discover-new-link" href="${marketing_link('COURSES')}" style="color: #fff; background: #ff7f27; border-radius: 12px; padding: 12px 40px"
+                  aria-current="${'page' if '/courses' in request.path else 'false'}">
+                  ${_('View More Courses')}
+                </a>
+              </div>
+            % endif 
             % if show_load_all_courses_link:
                 <br/>
                  ${len(course_enrollments)} ${_("results successfully populated,")}
@@ -235,22 +285,7 @@ from common.djangoapps.student.models import CourseEnrollment
             % endif
             </ul>
           % else:
-            <div class="empty-dashboard-message">
-              % if display_dashboard_courses:
-                <p>${_("You are not enrolled in any courses yet.")}</p>
-                % if empty_dashboard_message:
-                  <p class="custom-message">${empty_dashboard_message | n, decode.utf8}</p>
-                %endif
-                % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-                  <a class="btn btn-primary" href="${marketing_link('COURSES')}">
-                    ${_("Explore courses")}
-                  </a>
-                %endif
-              % else:
-              <p>${_("Activate your account!")}</p>
-              <p class="custom-message">${ activate_account_message | n, decode.utf8 }</p>
-              % endif
-          </div>
+          
           % endif
 
           % if staff_access and len(errored_courses) > 0:
@@ -271,7 +306,50 @@ from common.djangoapps.student.models import CourseEnrollment
           % endif
         </div>
       </div>
-      <div class="side-container" role="complementary" aria-label="messages">
+      <div class="side-container" role="complementary" aria-label="messages" style="max-width: 388px; width: 100%">
+        <div>
+          
+            
+          <h3 style="font-size: 24px; font-weight: 500; margin-bottom: 28px;">Learning Path</h3>
+          <div style="background-color: #fff; border-radius: 12px;">
+            <section class="ftco-section" style="padding: 0">
+              <div id="container" class="calendar-container"></div>
+            </section>
+              <div class="livecalss" style="padding: 24px">
+                  <h3 style="font-size: 24px; font-weight: 500; margin-bottom: 24px; margin-top: 0">Live Class</h3>
+                  <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap:20px; padding:12px">
+                      <li class="liveclass1" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                          <div>
+                              <h3 style="font-size: 16px; font-weight: 500; margin-bottom: 4px; margin-top:0">Roblox Game Maker</h3>
+                              <p style="margin:0; color: #8499B1;">15:00-16:00 hrs</p>
+                          </div>
+                          <button style="background-color: #FF7F27; background-image: none; text-shadow: 0 0; padding: 4px 24px; color: #fff; font-size: 16px; min-width: 86px; font-weight: 500; border: 1px solid #FF7F27; box-shadow: 0px 5px 0px #EE6100; border-radius: 16px">join</button>
+                      </li>
+                      <li class="liveclass2">
+                          <h3 style="font-size: 16px; font-weight: 500; margin-bottom: 4px; margin-top:0">Roblox Game Maker</h3>
+                          <p style="margin:0; color: #8499B1;">15:00-16:00 hrs</p>
+                      </li>
+                      <li class="liveclass3">
+                          <h3 style="font-size: 16px; font-weight: 500; margin-bottom: 4px; margin-top:0">Roblox Game Maker</h3>
+                          <p style="margin:0; color: #8499B1;">15:00-16:00 hrs</p>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+      <div style="padding: 40px 20px 0">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+              <h3 style="font-size: 24px; font-weight: 500; margin-bottom: 16px;">Announcements</h3>
+              <button style="background-color: #FF7F27; background-image: none; text-shadow: 0 0; padding: 4px 24px; color: #fff; font-size: 16px; min-width: 86px; font-weight: 500; border: 1px solid #FF7F27; box-shadow: 0px 5px 0px #EE6100; border-radius: 16px">New</button>
+          </div>
+          <div>
+              <ul style="list-style: none; padding: 0; margin: 0;">
+                  <li style="font-size: 11px; margin-bottom: 15px"> <span style="border-radius: 50px; background: #ff7f27; box-shadow:0 2px rgba(0,0,0,.8); display: inline-block; width: 10px; height: 10px; margin-right: 10px;"></span>Today will be a test in python course</li>
+                  <li style="font-size: 11px; margin-bottom: 15px"> <span style="border-radius: 50px; background: #ff7f27; box-shadow:0 2px rgba(0,0,0,.8); display: inline-block; width: 10px; height: 10px; margin-right: 10px;"></span>Announcement 2</li>
+                  <li style="font-size: 11px; margin-bottom: 15px"> <span style="border-radius: 50px; background: #ff7f27; box-shadow:0 2px rgba(0,0,0,.8); display: inline-block; width: 10px; height: 10px; margin-right: 10px;"></span>Announcement 3</li>
+              </ul>
+          </div>
+      </div>
         %if display_sidebar_account_activation_message:
           <div class="sidebar-notification">
             <%include file="${static.get_template_path('registration/account_activation_sidebar_notice.html')}" />
@@ -305,6 +383,20 @@ from common.djangoapps.student.models import CourseEnrollment
           <%include file='dashboard/_dashboard_announcements.html' />
         % endif
 
+        % if display_sidebar_on_dashboard:
+          <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
+            <header class="profile">
+              <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
+            </header>
+            <div class="user-info">
+              <ul>
+
+                <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
+
+              </ul>
+            </div>
+          </div>
+        % endif
       </div>
     </div>
 </main>
@@ -402,3 +494,7 @@ from common.djangoapps.student.models import CourseEnrollment
 </div>
 
 <%include file="dashboard/_dashboard_entitlement_unenrollment_modal.html"/>
+
+
+
+

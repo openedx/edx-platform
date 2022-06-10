@@ -46,16 +46,15 @@ class LtiSerializer(serializers.ModelSerializer):
         lti_config = validated_data.pop('lti_config', None)
         instance = LtiConfiguration()
         instance.version = 'lti_1p1'
-        instance.config_store = LtiConfiguration.CONFIG_ON_DB
 
         for key, value in validated_data.items():
             if key in set(self.Meta.fields).difference(self.Meta.read_only):
                 setattr(instance, key, value)
 
-        share_email, share_username = self.pii_sharing_allowed()
+        pii_sharing_allowed = self.context.get('pii_sharing_allowed', False)
         instance.lti_config = {
-            "pii_share_username": share_username,
-            "pii_share_email": share_email,
+            "pii_share_username": pii_sharing_allowed,
+            "pii_share_email": pii_sharing_allowed,
             "additional_parameters": lti_config['additional_parameters']
         }
         instance.save()
@@ -75,23 +74,11 @@ class LtiSerializer(serializers.ModelSerializer):
                 if key in self.Meta.fields:
                     setattr(instance, key, value)
 
-            share_email, share_username = self.pii_sharing_allowed()
-            instance.pii_share_username = share_username
-            instance.pii_share_email = share_email
+            pii_sharing_allowed = self.context.get('pii_sharing_allowed', False)
+            instance.pii_share_username = pii_sharing_allowed
+            instance.pii_share_email = pii_sharing_allowed
             instance.save()
         return instance
-
-    def pii_sharing_allowed(self):
-        """
-        Check if email and username sharing is required and allowed
-        """
-        pii_sharing_allowed = self.context.get('pii_sharing_allowed', False)
-        provider = AVAILABLE_PROVIDERS.get(self.context.get('provider_type', None))
-
-        email = pii_sharing_allowed and provider['pii_sharing']['email'] if provider else False
-        username = pii_sharing_allowed and provider['pii_sharing']['username'] if provider else False
-
-        return email, username
 
 
 class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
@@ -166,7 +153,6 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
             partial=True,
             context={
                 'pii_sharing_allowed': self.context.get('pii_sharing_allowed', False),
-                'provider_type': self.context.get('provider_type', ''),
             }
         )
         if lti_serializer.is_valid(raise_exception=True):

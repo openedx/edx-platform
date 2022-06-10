@@ -27,23 +27,3 @@ class AuthFailedError(Exception):
                 resp[attr] = self.__getattribute__(attr)
 
         return resp
-
-
-class VulnerablePasswordError(Exception):
-    """
-    This is a helper for the login view, allowing the view to error out if password
-    is vulnerable.
-    """
-    def __init__(self, value, error_code, redirect_url=None):
-        super().__init__()
-        self.value = value
-        self.error_code = error_code
-        self.redirect_url = redirect_url
-
-    def get_response(self):
-        return {
-            'value': self.value,
-            'error_code': self.error_code,
-            'redirect_url': self.redirect_url,
-            'success': False
-        }

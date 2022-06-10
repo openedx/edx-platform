@@ -9,7 +9,7 @@ from unittest import mock
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
@@ -20,9 +20,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
-from ..api import (
-    UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses, get_course_members, get_course_run_url,
-)
+from ..api import UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses, get_course_members
 from ..exceptions import OverEnrollmentLimitException
 from .mixins import CourseApiFactoryMixin
 
@@ -428,13 +426,3 @@ class TestGetCourseMembers(CourseApiTestMixin, SharedModuleStoreTestCase):
         """
         with self.assertRaises(OverEnrollmentLimitException):
             get_course_members(self.course.id)
-
-
-class TestGetCourseRunUrl(TestCase):
-    """
-    Tests of get_course_run_url.
-    """
-    def test_simple_lookup(self):
-        request = Request(APIRequestFactory().get('/'))
-        url = get_course_run_url(request, 'course-v1:org+course+run')
-        assert url == 'http://learning-mfe/course/course-v1:org+course+run/home'

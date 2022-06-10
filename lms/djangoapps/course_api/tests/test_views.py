@@ -5,20 +5,19 @@ Tests for Course API views.
 from datetime import datetime
 from hashlib import md5
 from unittest import TestCase
-
-import ddt
 import pytest
+import ddt
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
-from edx_toggles.toggles.testutils import override_waffle_switch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
+from waffle.testutils import override_switch
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -27,7 +26,6 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.auth import add_users
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
-from lms.djangoapps.course_api import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -140,14 +138,14 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
 
     @ddt.data(('staff', False, 10), ('user', False, 2), ('unknown', True, None))
     @ddt.unpack
-    @override_waffle_switch(USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, active=True)
+    @override_switch('course_list_api_rate_limit.rate_limit_2', active=True)
     def test_throttle_rate_2(self, user_scope, throws_exception, expected_rate):
         """ Make sure throttle rate 2 is set correctly for different user scopes. """
         self.assert_throttle_configured_correctly(user_scope, throws_exception, expected_rate)
 
     @ddt.data(('staff', False, 20), ('user', False, 10), ('unknown', True, None))
     @ddt.unpack
-    @override_waffle_switch(USE_RATE_LIMIT_10_FOR_COURSE_LIST_API, active=True)
+    @override_switch('course_list_api_rate_limit.rate_limit_10', active=True)
     def test_throttle_rate_20(self, user_scope, throws_exception, expected_rate):
         """ Make sure throttle rate 20 is set correctly for different user scopes. """
         self.assert_throttle_configured_correctly(user_scope, throws_exception, expected_rate)

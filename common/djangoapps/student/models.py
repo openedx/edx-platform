@@ -11,6 +11,8 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
 
+
+import crum
 import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
@@ -19,9 +21,9 @@ from collections import defaultdict, namedtuple  # lint-amnesty, pylint: disable
 from datetime import date, datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
 from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
-from urllib.parse import urlencode, urljoin
+from urllib.parse import urlencode  # lint-amnesty, pylint: disable=wrong-import-order
+import warnings  # lint-amnesty, pylint: disable=wrong-import-order
 
-import crum
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
@@ -36,35 +38,42 @@ from django.db.models import Count, Index, Q
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
+
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 from django_countries.fields import CountryField
-from edx_django_utils import monitoring
 from edx_django_utils.cache import RequestCache, TieredCache, get_cache_key
+from edx_django_utils import monitoring
+from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
 from opaque_keys.edx.keys import CourseKey
-from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
+from pytz import UTC, timezone
+from simple_history.models import HistoricalRecords
+from slumber.exceptions import HttpClientError, HttpServerError
+from user_util import user_util
+
+from openedx_events.learning.data import (
+    CourseData,
+    CourseEnrollmentData,
+    UserData,
+    UserPersonalData,
+)
 from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CHANGED,
     COURSE_ENROLLMENT_CREATED,
     COURSE_UNENROLLMENT_COMPLETED,
 )
 from openedx_filters.learning.filters import CourseEnrollmentStarted, CourseUnenrollmentStarted
-from pytz import UTC, timezone
-from requests.exceptions import HTTPError, RequestException
-from simple_history.models import HistoricalRecords
-from user_util import user_util
-
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from common.djangoapps.student.emails import send_proctoring_requirements_email
 from common.djangoapps.student.email_helpers import (
     generate_proctoring_requirements_email_context,
-    should_send_proctoring_requirements_email,
+    should_send_proctoring_requirements_email
 )
-from common.djangoapps.student.emails import send_proctoring_requirements_email
 from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from common.djangoapps.track import contexts, segment
 from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
@@ -77,7 +86,7 @@ from lms.djangoapps.courseware.models import (
 )
 from lms.djangoapps.courseware.toggles import streak_celebration_is_active
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview , LiveClasses
 from openedx.core.djangoapps.enrollments.api import (
     _default_course_mode,
     get_enrollment_attributes,
@@ -153,11 +162,12 @@ class AnonymousUserId(models.Model):
     course_id = LearningContextKeyField(db_index=True, max_length=255, blank=True)
 
 
-def anonymous_id_for_user(user, course_id):
+def anonymous_id_for_user(user, course_id, save='DEPRECATED'):
     """
     Inputs:
         user: User model
         course_id: string or None
+        save: Deprecated and ignored: ID is always saved in an AnonymousUserId object
 
     Return a unique id for a (user, course_id) pair, suitable for inserting
     into e.g. personalized survey links.
@@ -169,6 +179,13 @@ def anonymous_id_for_user(user, course_id):
 
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
+
+    if save != 'DEPRECATED':
+        warnings.warn(
+            "anonymous_id_for_user no longer accepts save param and now "
+            "always saves the ID in the database",
+            DeprecationWarning
+        )
 
     if user.is_anonymous:
         return None
@@ -511,6 +528,7 @@ class UserProfile(models.Model):
     # for users imported from our first class.
     location = models.CharField(blank=True, max_length=255, db_index=True)
 
+
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now(UTC).year
     VALID_YEARS = list(range(this_year, this_year - 120, -1))
@@ -612,6 +630,9 @@ class UserProfile(models.Model):
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
+    #attendance = models.CharField(max_length=250, null=True, db_index=True)
+    user_attendance = models.CharField(max_length=250, null=True, db_index=True)
+
 
     @property
     def has_profile_image(self):
@@ -859,11 +880,20 @@ class UserSignupSource(models.Model):
     site = models.CharField(max_length=255, db_index=True)
 
 
-def unique_id_for_user(user):
+def unique_id_for_user(user, save='DEPRECATED'):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
+
+    Keyword arguments:
+    save -- Deprecated and ignored: ID is always saved in an AnonymousUserId object
     """
+    if save != 'DEPRECATED':
+        warnings.warn(
+            "unique_id_for_user no longer accepts save param and now "
+            "always saves the ID in the database",
+            DeprecationWarning
+        )
     # Setting course_id to '' makes it not affect the generated hash,
     # and thus produce the old per-student anonymous id
     return anonymous_id_for_user(user, None)
@@ -1209,6 +1239,16 @@ class CourseEnrollmentManager(models.Manager):
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
 
 
+
+
+class LiveClassEnrollment(models.Model):
+
+    live_class = models.ForeignKey(LiveClasses, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -1242,6 +1282,7 @@ class CourseEnrollment(models.Model):
     # If is_active is False, then the student is not considered to be enrolled
     # in the course (is_enrolled() will return False)
     is_active = models.BooleanField(default=True)
+
 
     # Represents the modes that are possible. We'll update this later with a
     # list of possible values.
@@ -1964,7 +2005,6 @@ class CourseEnrollment(models.Model):
         # Due to circular import issues this import was placed close to usage. To move this to the
         # top of the file would require a large scale refactor of the refund code.
         import lms.djangoapps.certificates.api
-
         # If the student has already been given a certificate in a non refundable status they should not be refunded
         certificate = lms.djangoapps.certificates.api.get_certificate_for_user_id(
             self.user,
@@ -2045,7 +2085,7 @@ class CourseEnrollment(models.Model):
         """
 
         # NOTE: This is here to avoid circular references
-        from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
+        from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
         order_number = self.get_order_attribute_value('order_number')
         if not order_number:
             return None
@@ -2058,21 +2098,23 @@ class CourseEnrollment(models.Model):
         else:
             try:
                 # response is not cached, so make a call to ecommerce to fetch order details
-                api_url = urljoin(f"{get_ecommerce_api_base_url()}/", f"orders/{order_number}/")
-                response = get_ecommerce_api_client(self.user).get(api_url)
-                response.raise_for_status()
-                order = response.json()
-            except HTTPError as err:
+                order = ecommerce_api_client(self.user).orders(order_number).get()
+            except HttpClientError:
                 log.warning(
-                    "Encountered HTTPError while getting order details from ecommerce. "
-                    "Status code was %d, Order=%s and user %s", err.response.status_code, order_number, self.user.id
-                )
+                    "Encountered HttpClientError while getting order details from ecommerce. "
+                    "Order={number} and user {user}".format(number=order_number, user=self.user.id))
                 return None
-            except RequestException:
+
+            except HttpServerError:
+                log.warning(
+                    "Encountered HttpServerError while getting order details from ecommerce. "
+                    "Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                return None
+
+            except SlumberBaseException:
                 log.warning(
                     "Encountered an error while getting order details from ecommerce. "
-                    "Order=%s and user %s", order_number, self.user.id
-                )
+                    "Order={number} and user {user}".format(number=order_number, user=self.user.id))
                 return None
 
             cache_time_out = getattr(settings, 'ECOMMERCE_ORDERS_API_CACHE_TIMEOUT', 3600)
@@ -2813,7 +2855,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         ),
     )
 
-    def is_enabled(self, *key_fields):  # pylint: disable=arguments-differ
+    def is_enabled(self, *key_fields):
         """
         Checks both the model itself and share_settings to see if LinkedIn Add to Profile is enabled
         """

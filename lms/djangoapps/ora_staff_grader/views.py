@@ -14,7 +14,6 @@ from edx_rest_framework_extensions.auth.session.authentication import (
 )
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from openassessment.xblock.config_mixin import WAFFLE_NAMESPACE, ENHANCED_STAFF_GRADER
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -31,12 +30,10 @@ from lms.djangoapps.ora_staff_grader.errors import (
     InternalErrorResponse,
     LockContestedError,
     LockContestedResponse,
-    MissingParamResponse,
     UnknownErrorResponse,
     XBlockInternalError,
 )
 from lms.djangoapps.ora_staff_grader.ora_api import (
-    batch_delete_submission_locks,
     check_submission_lock,
     claim_submission_lock,
     delete_submission_lock,
@@ -46,7 +43,6 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
-    FileListSerializer,
     InitializeSerializer,
     LockStatusSerializer,
     StaffAssessSerializer,
@@ -57,7 +53,6 @@ from lms.djangoapps.ora_staff_grader.utils import require_params
 from openedx.core.djangoapps.content.course_overviews.api import (
     get_course_overview_or_none,
 )
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 log = logging.getLogger(__name__)
@@ -85,7 +80,6 @@ class InitializeView(StaffGraderBaseView):
         courseMetadata
         oraMetadata
         submissions
-        isEnabled
     }
 
     Errors:
@@ -94,19 +88,6 @@ class InitializeView(StaffGraderBaseView):
     - XBlockInternalError (HTTP 500) for an issue with ORA
     - UnknownError (HTTP 500) for other errors
     """
-
-    def _is_staff_grader_enabled(self, course_key):
-        """ Helper to evaluate if the staff grader flag / overrides are enabled """
-        # This toggle is documented on the edx-ora2 repo in openassessment/xblock/config_mixin.py
-        # Note: Do not copy this practice of directly using a toggle from a library.
-        #  Instead, see docs for exposing a wrapper api:
-        #  https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/implement_the_right_toggle_type.html#using-other-toggles pylint: disable=line-too-long
-        # pylint: disable=toggle-missing-annotation
-        enhanced_staff_grader_flag = CourseWaffleFlag(
-            f"{WAFFLE_NAMESPACE}.{ENHANCED_STAFF_GRADER}",
-            module_name='openassessment.xblock.config_mixin'
-        )
-        return enhanced_staff_grader_flag.is_enabled(course_key)
 
     @require_params([PARAM_ORA_LOCATION])
     def get(self, request, ora_location, *args, **kwargs):
@@ -123,9 +104,6 @@ class InitializeView(StaffGraderBaseView):
 
             # Get list of submissions for this ORA
             init_data["submissions"] = get_submissions(request, ora_location)
-
-            # Is the Staff Grader enabled for this course?
-            init_data["isEnabled"] = self._is_staff_grader_enabled(ora_usage_key.course_key)
 
             response_data = InitializeSerializer(init_data).data
             log.info(response_data)
@@ -271,51 +249,6 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
             return UnknownErrorResponse()
 
 
-class SubmissionFilesFetchView(StaffGraderBaseView):
-    """
-    GET file metadata for a submission.
-
-    Used to get updated file download links to avoid signed download link expiration
-    issues.
-
-    Response: {
-        files: [
-            downloadUrl (url),
-            description (string),
-            name (string),
-            size (bytes),
-        ]
-    }
-
-    Errors:
-    - MissingParamResponse (HTTP 400) for missing params
-    - XBlockInternalError (HTTP 500) for an issue with ORA
-    - UnknownError (HTTP 500) for other errors
-    """
-
-    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
-    def get(self, request, ora_location, submission_uuid, *args, **kwargs):
-        try:
-            submission_info = get_submission_info(
-                request, ora_location, submission_uuid
-            )
-
-            response_data = FileListSerializer(submission_info).data
-
-            log.info(response_data)
-            return Response(response_data)
-
-        # Issues with the XBlock handlers
-        except XBlockInternalError as ex:
-            log.error(ex)
-            return InternalErrorResponse(context=ex.context)
-
-        # Blanket exception handling in case something blows up
-        except Exception as ex:
-            log.exception(ex)
-            return UnknownErrorResponse()
-
-
 class UpdateGradeView(StaffGraderBaseView):
     """
     POST submit a grade for a submission
@@ -375,7 +308,7 @@ class UpdateGradeView(StaffGraderBaseView):
                 log.error(f"Grade contested for submission: {submission_uuid}")
                 return GradeContestedResponse(context=submission_status)
 
-            # Transform grade data and submit assessment, raises on failure
+            # Transform grade data and submit assessment, rasies on failure
             context = {"submission_uuid": submission_uuid}
             grade_data = StaffAssessSerializer(request.data, context=context).data
             submit_grade(request, ora_location, grade_data)
@@ -492,55 +425,6 @@ class SubmissionLockView(StaffGraderBaseView):
             return InternalErrorResponse(context=ex.context)
 
         # Blanket exception handling in case something blows up
-        except Exception as ex:
-            log.exception(ex)
-            return UnknownErrorResponse()
-
-
-class SubmissionBatchUnlockView(StaffGraderBaseView):
-    """
-    POST delete a group of submission locks, limited to just those in the list that the user owns.
-
-    Params:
-    - ora_location (str/UsageID): ORA location for XBlock handling
-
-    Body:
-    - submissionUUIDs (UUID): A list of submission/team submission UUIDS to lock/unlock
-
-    Response: None
-
-    Errors:
-    - MissingParamResponse (HTTP 400) for missing params
-    - XBlockInternalError (HTTP 500) for an issue within ORA
-    """
-
-    @require_params([PARAM_ORA_LOCATION])
-    def post(self, request, ora_location, *args, **kwargs):
-        """Batch delete submission locks"""
-        try:
-            # Validate ORA location
-            UsageKey.from_string(ora_location)
-
-            # Pull submission UUIDs list from request body
-            submission_uuids = request.data.get('submissionUUIDs')
-            if not isinstance(submission_uuids, list):
-                return MissingParamResponse()
-            batch_delete_submission_locks(request, ora_location, submission_uuids)
-
-            # Return empty response
-            return Response({})
-
-        # Catch bad ORA location
-        except (InvalidKeyError, ItemNotFoundError):
-            log.error(f"Bad ORA location provided: {ora_location}")
-            return BadOraLocationResponse()
-
-        # Issues with the XBlock handlers
-        except XBlockInternalError as ex:
-            log.error(ex)
-            return InternalErrorResponse(context=ex.context)
-
-        # Blanket exception handling
         except Exception as ex:
             log.exception(ex)
             return UnknownErrorResponse()

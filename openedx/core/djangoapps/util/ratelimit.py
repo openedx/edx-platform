@@ -3,22 +3,11 @@ Code to get ip from request.
 """
 from uuid import uuid4
 
-from openedx.core.djangoapps.util import ip
+from ipware.ip import get_client_ip
 
 
 def real_ip(group, request):  # pylint: disable=unused-argument
-    """
-    Get a client IP suitable for use in rate-limiting.
-
-    To prevent evasion of rate-limiting, use the safest (rightmost) IP in the
-    external IP chain.
-
-    (Intended to be called by ``django-ratelimit``, hence the unused argument.)
-    """
-    if ip.USE_LEGACY_IP.is_enabled():
-        return ip.get_legacy_ip(request)
-    else:
-        return ip.get_safest_client_ip(request)
+    return get_client_ip(request)[0]
 
 
 def request_post_email(group, request) -> str:  # pylint: disable=unused-argument

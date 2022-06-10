@@ -1,5 +1,6 @@
 {% extends "admin/base.html" %}
 {% load i18n admin_urls %}
+{% load waffle_tags %}
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 {% block branding %}
 <h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
@@ -16,7 +17,10 @@
         {% endif %}
     {% endif %}
 
-    <a href="{% url 'logout' %}">{% trans 'Log out' as tmsg%}{{tmsg|force_escape}}</a>
-
+    {% flag "user_authn.admin_auth_redirect_to_lms" %}
+        <a href="{% url 'logout' %}">{% trans 'Log out' as tmsg%}{{tmsg|force_escape}}</a>
+    {% else %}
+        <a href="{% url 'admin:logout' %}">{% trans 'Log out' as tmsg%}{{tmsg|force_escape}}</a>
+    {% endflag %}
 
 {% endblock %}

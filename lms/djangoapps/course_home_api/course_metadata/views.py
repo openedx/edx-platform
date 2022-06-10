@@ -8,7 +8,6 @@ from rest_framework.response import Response
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from lms.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 
@@ -21,6 +20,7 @@ from lms.djangoapps.courseware.context_processor import user_timezone_locale_pre
 from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.toggles import courseware_mfe_is_visible
 
 
 class CourseHomeMetadataView(RetrieveAPIView):
@@ -55,7 +55,6 @@ class CourseHomeMetadataView(RetrieveAPIView):
         title: (str) The Course's display title
         celebrations: (dict) a dict of celebration data
         user_timezone: (str) The timezone of the given user
-        can_view_certificate: Flag to determine whether or not the learner can view their course certificate.
 
     **Returns**
 
@@ -101,6 +100,12 @@ class CourseHomeMetadataView(RetrieveAPIView):
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key_string)
         user_is_enrolled = bool(enrollment and enrollment.is_active)
 
+        can_load_courseware = courseware_mfe_is_visible(
+            course_key=course_key,
+            is_global_staff=original_user_is_global_staff,
+            is_course_staff=original_user_is_staff
+        )
+
         # User locale settings
         user_timezone_locale = user_timezone_locale_prefs(request)
         user_timezone = user_timezone_locale['user_timezone']
@@ -126,9 +131,9 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'is_self_paced': getattr(course, 'self_paced', False),
             'is_enrolled': user_is_enrolled,
             'course_access': load_access.to_json(),
+            'can_load_courseware': can_load_courseware,
             'celebrations': celebrations,
             'user_timezone': user_timezone,
-            'can_view_certificate': certificates_viewable_for_course(course),
         }
         context = self.get_serializer_context()
         context['course'] = course

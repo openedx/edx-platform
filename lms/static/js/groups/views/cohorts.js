@@ -1,16 +1,19 @@
 (function(define) {
     'use strict';
     define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/models/cohort',
+        'js/groups/models/verified_track_settings',
         'js/groups/views/cohort_editor', 'js/groups/views/cohort_form',
         'js/groups/views/course_cohort_settings_notification',
+        'js/groups/views/verified_track_settings_notification',
         'edx-ui-toolkit/js/utils/html-utils',
         'js/views/base_dashboard_view',
         'js/views/file_uploader', 'js/models/notification', 'js/views/notification',
         'string_utils'],
         function($, _, Backbone, gettext, CohortModel,
-            CohortEditorView, CohortFormView,
-            CourseCohortSettingsNotificationView,
-            HtmlUtils, BaseDashboardView) {
+                 VerifiedTrackSettingsModel,
+                 CohortEditorView, CohortFormView,
+                CourseCohortSettingsNotificationView,
+                 VerifiedTrackSettingsNotificationView, HtmlUtils, BaseDashboardView) {
             var hiddenClass = 'hidden',
                 disabledClass = 'is-disabled',
                 enableCohortsSelector = '.cohorts-state';
@@ -49,6 +52,19 @@
                         cohortsEnabled: this.cohortSettings.get('is_cohorted')
                     }));
                     this.onSync();
+                    // Don't create this view until the first render is called, as at that point the
+                    // various other models whose state is required to properly view the notification
+                    // will have completed their fetch operations.
+                    if (!this.verifiedTrackSettingsNotificationView) {
+                        var verifiedTrackSettingsModel = new VerifiedTrackSettingsModel();
+                        verifiedTrackSettingsModel.url = this.context.verifiedTrackCohortingUrl;
+                        verifiedTrackSettingsModel.fetch({
+                            success: _.bind(this.renderVerifiedTrackSettingsNotificationView, this)
+                        });
+                        this.verifiedTrackSettingsNotificationView = new VerifiedTrackSettingsNotificationView({
+                            model: verifiedTrackSettingsModel
+                        });
+                    }
                     return this;
                 },
 
@@ -65,6 +81,14 @@
                         cohortEnabled: this.getCohortsEnabled()
                     });
                     cohortStateMessageNotificationView.render();
+                },
+
+                renderVerifiedTrackSettingsNotificationView: function() {
+                    if (this.verifiedTrackSettingsNotificationView) {
+                        this.verifiedTrackSettingsNotificationView.validateSettings(
+                            this.getCohortsEnabled(), this.model.models, this.$(enableCohortsSelector)
+                        );
+                    }
                 },
 
                 onSync: function(model, response, options) {
@@ -100,6 +124,7 @@
                             actionIconClass: 'fa-plus'
                         });
                     }
+                    this.renderVerifiedTrackSettingsNotificationView();
                 },
 
                 getSelectedCohort: function() {

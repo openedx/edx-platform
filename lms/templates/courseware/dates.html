@@ -1,0 +1,113 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+
+from django.utils.translation import ugettext as _
+from lms.djangoapps.courseware.date_summary import CourseAssignmentDate, TodaysDate, VerificationDeadlineDate, VerifiedUpgradeDeadlineDate
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%block name="bodyclass">view-in-course view-progress</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+<%block name="pagetitle">${_("{course.display_number_with_default} Course Info").format(course=course)}</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='dates'" />
+
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="container">
+        <div class="date-wrapper">
+            <section class="course-info" id="course-info-dates">
+                <h2 class="hd hd-2 date-title">
+                    ${_("Important Dates")}
+                </h2>
+                <%include file="/dates_banner.html" />
+                <% due_next_set = False %>
+                % for block in course_date_blocks:
+                    <% block_is_verified = (hasattr(block, 'contains_gated_content') and block.contains_gated_content) or isinstance(block, VerificationDeadlineDate) %>
+                    <% learner_has_access = not block_is_verified or learner_is_full_access %>
+                    <% access_class = '' if learner_has_access else 'no-access' %>
+                    <% is_assignment = isinstance(block, CourseAssignmentDate) %>
+                    <% assignment_type = is_assignment and block.assignment_type %>
+                    <% todays_date = 'todays-date' if isinstance(block, TodaysDate) else '' %>
+                    <% past_date = 'past-date' if block.date and block.date < block.current_time else '' %>
+                    <% past_due = 'past-due' if learner_is_full_access and is_assignment and block.past_due else '' %>
+                    <% due_in_future = True if learner_is_full_access and is_assignment and block.date and block.date >= block.current_time else False %>
+                    <% not_released = 'not-released' if learner_is_full_access and is_assignment and not block.title_html else '' %>
+                    % if not (learner_is_full_access and isinstance(block, VerifiedUpgradeDeadlineDate)):
+                        <div class="timeline-item">
+                            <div class="date-circle ${todays_date} ${past_date} ${past_due}"></div>
+                            <div class="date-content ${todays_date}">
+                                <div class="timeline-date-content ${not_released}">
+                                    % if block.date:
+                                        <div class="timeline-date">
+                                            <div class="course-date localized_datetime" aria-hidden="true" data-format="shortDate" data-datetime="${block.date}" data-language="${user_language}" data-timezone="${user_timezone}"></div>
+                                        </div>
+                                        % if todays_date:
+                                            <div class="pill today">${_('Today')}</div>
+                                        % endif
+                                        % if not learner_has_access:
+                                            <div class="pill verified"><span class="fa fa-lock verified-icon" aria-hidden="true"></span>${_('Verified Only')}</div>
+                                        % else:
+                                            % if is_assignment and block.complete:
+                                                <div class="pill completed">${_('Completed')}</div>
+                                            % elif is_assignment and block.past_due:
+                                                <div class="pill past-due">${_('Past Due')}</div>
+                                            % elif is_assignment and due_in_future and not due_next_set:
+                                                <div class="pill due-next">${_('Due Next')}</div>
+                                                <% due_next_set = True %>
+                                            % endif
+                                            % if not_released:
+                                                <div class="pill not-released">${_('Not yet released')}</div>
+                                            % endif
+                                        %endif
+                                    % endif
+                                </div>
+                                % if not todays_date:
+                                    <div class="timeline-title ${access_class} ${not_released}">
+                                        % if assignment_type:
+                                            ${assignment_type}:&nbsp;
+                                        % endif
+                                        % if block.title_html and is_assignment and learner_has_access:
+                                            ${block.title_html}
+                                        % else:
+                                            ${block.title}
+                                        % endif
+                                    </div>
+                                    <div class="timeline-description ${access_class} ${not_released}">
+                                        ${block.description}
+                                    </div>
+                                    % if block.extra_info:
+                                        <div class="timeline-extra-info ${access_class} ${not_released}">
+                                            ${block.extra_info}
+                                        </div>
+                                    % endif
+                                % endif
+                            </div>
+                        </div>
+                    % endif
+                % endfor
+            </section>
+        </div>
+    </div>
+</main>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized_datetime");
+</%static:require_module_async>
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+  var personalizedLearnerSchedulesLink = $(".personalized_learner_schedules_button");
+
+    TrackECommerceEvents.trackUpsellClick(personalizedLearnerSchedulesLink, 'dates_upgrade', {
+      pageName: "dates_tab",
+      linkType: "button",
+      linkCategory: "personalized_learner_schedules"
+    });
+
+</%static:require_module_async>

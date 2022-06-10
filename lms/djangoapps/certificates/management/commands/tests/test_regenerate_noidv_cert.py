@@ -21,9 +21,9 @@ PASSING_GRADE_METHOD = 'lms.djangoapps.certificates.generation_handler._is_passi
 WEB_CERTS_METHOD = 'lms.djangoapps.certificates.generation_handler.has_html_certificates_enabled'
 
 
-# base setup is unverified users, Enable certificates IDV requirements turned off,
+# base setup is unverified users, integrity signature turned on,
 # and normal passing grade certificates for convenience
-@mock.patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=False)
+@mock.patch.dict(settings.FEATURES, ENABLE_INTEGRITY_SIGNATURE=True)
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=False))
 @mock.patch(PASSING_GRADE_METHOD, mock.Mock(return_value=True))
 @mock.patch(WEB_CERTS_METHOD, mock.Mock(return_value=True))
