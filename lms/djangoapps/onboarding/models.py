@@ -215,6 +215,9 @@ class Organization(TimeStampedModel):
     level_of_operation = models.CharField(max_length=10, blank=True, null=True)
     focus_area = models.CharField(max_length=10, blank=True, null=True)
     total_employees = models.CharField(max_length=10, blank=True, null=True)
+    is_organization_registered = models.CharField(
+        max_length=20, blank=True, null=True, verbose_name='Is Organization Registered as 501c3?'
+    )
 
     alternate_admin_email = models.EmailField(blank=True, null=True)
 
