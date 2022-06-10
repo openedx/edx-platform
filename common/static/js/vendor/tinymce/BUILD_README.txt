@@ -11,12 +11,18 @@
 
 1. Download the tinymce-codemirror-plugin from https://gitlab.com/tinymce-plugins/tinymce-codemirror
 2. Open terminal in the downloaded plugin directory and run the following commands:
-  ```
-   npm install
-   npm run prepublish (This command will generate the minified file in the plugin directory)
-  ```
+    ```
+     npm install
+     npm run prepublish (This command will generate the minified file in the plugin directory)
+    ```
 3. Remove the tinymce-codemirror/plugins/codemirror/codemirror-4.8 directory
-4. Move the tinymce-codemirror/plugins directory to common/static/js/vendor/tinymce/js/plugins/ directory.
+4. Move the tinymce-codemirror/plugins directory to `common/static/js/vendor/tinymce/js/plugins/` directory.
+5. Apply EDX specific changes in the existing code to the `plugin.js` and `source.html` files.
+6. Install [uglify-js](https://www.npmjs.com/package/uglify-js) and generate `plugin.min.js`
+    ```
+    cd common/static/js/vendor/tinymce/js/plugins/codemirror/
+    uglify plugin.js -m -o plugin.min.js
+    ```
 
 # Instructions for creating js/tinymce.full.min.js
 
@@ -42,7 +48,8 @@ The following uses the version 5.5.1 as a reference. Change your filenames depen
 6. Generate a bundled version of the TinyMCE with all the plugins using the following command
     ```
     cd common/static/js/vendor/tinymce/js/tinymce
-    find . -name "*.min.js" -not -name "jquery*" -not -name "tinymce.full.min.js" | sort -r | xargs cat > tinymce.full.min.js
+    cat tinymce.min.js */*/*.min.js plugins/emoticons/js/emojis.min.js > tinymce.full.min.js
     ```
     This `find`s all the min.js files in the tinymce folders, sorts them reverse (local file first, folders next), and combines their content into a single file.
 
+**NOTE:** Regenerate the `tinymce.full.min.js` bundle everytime the code-mirror `plugin.min.js` is regenerated to ensure the latest changes are added to the bundle.
