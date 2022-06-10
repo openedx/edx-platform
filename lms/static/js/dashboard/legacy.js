@@ -30,6 +30,7 @@
      *         - verifyToggleBannerFailedOff
      */
      edx.dashboard.legacy.init = function(urls) {
+
          var $notifications = $('.dashboard-notifications'),
              $upgradeButtonLinks = $('.action-upgrade'),
              $verifyButtonLinks = $('.verification-cta > .cta');
@@ -38,6 +39,65 @@
          if ($notifications.children().length > 0) {
              $notifications.focus();
          }
+
+
+         live_class()
+         function live_class()
+         {
+            // alert("sd")
+            
+            $.ajax({
+                type: 'GET',
+                url: '/api/enrollment/v1/enrollment/live_class/enroll',
+                data: $(this).serializeArray(),
+                success: function(response) {
+                    //alert(JSON.stringify(response))
+                    // setTimeout(
+                    //   function(){
+                        var output = document.getElementById('output');
+                        output.style.display='block';
+                        // var response = JSON.parse(JSON.stringify(response))
+                        var response = JSON.parse(JSON.stringify(response.results))
+                        
+                        for(let i=0;i<response.length;i++)
+                          {
+                              if(response[i]['live_class']!=undefined && response[i]['live_class']!=null )
+                              {
+                                var parent = document.createElement("div");
+                                parent.classList.add('d-flex', 'justify-content-between', 'align-items-center',)
+                                parent.setAttribute("style", "background: #fff; box-shadow: 0 2px 7px 0 rgb(0, 0, 0,.8%); overflow: hidden; border-radius: 8px; margin-bottom: 24px");
+                                var image = document.createElement("img");
+                                image.setAttribute('src', 'http://via.placeholder.com/220x120')
+                                var ele = document.createElement("div");
+                                ele.setAttribute(
+                                  "style", "font-size: 1.2em; font-weight: 900; color:#000;");
+                                ele.setAttribute("id","timedrpact"+i);
+                                ele.setAttribute("class","inner");
+                                ele.appendChild(image);
+                                const span = document.createElement("span");
+                                span.innerText = response[i]['live_class']["topic_name"];
+                                span.style.marginLeft = '40px';
+                                ele.appendChild(span);
+                                parent.appendChild(ele);
+                                var ele1= document.createElement("a");
+                                ele1.setAttribute("id","timedrpact1"+i);
+                                ele1.setAttribute("class","button inner-link");
+                                ele1.setAttribute("href",response[i]['live_class']["meeting_link"]);
+                                ele1.setAttribute("target",'_black');
+                                ele1.setAttribute(
+                                  "style", "font-size: 18px; margin-right: 20px; box-shadow: 0px 5px 0px #ee6100; border: none; color:#fff; background: #ff7f27; border-radius: 12px; padding: 12px 20px; background-image: none; text-shadow: 0 0");
+                                ele1.innerHTML='Join Class';
+                                parent.appendChild(ele1);
+                                output.appendChild(parent);  
+                              }
+                           
+                                  
+                          }
+            
+                    //  }, 500); // adding timeout to make spinner animation longer
+                }
+            });
+        }
 
         // Track clicks of the upgrade button. The `trackLink` method is a helper that makes
         // a `track` call whenever a bound link is clicked. Usually the page would change before

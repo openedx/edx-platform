@@ -11,8 +11,9 @@
          var nonEmptyCheckFieldSelectors = [selectors.name, selectors.org, selectors.number];
 
          CreateUtilsFactory.call(this, selectors, classes);
-       
+      
          this.create = function(liveclassInfo, errorHandler) {
+           
              $.getJSON(
                  '/live_class/details/',
                  liveclassInfo
@@ -21,15 +22,13 @@
                 elem.innerHTML = '';
                 var output = document.getElementById('output');
                 output.style.display='block';
-                var response = JSON.parse(JSON.stringify(response))
-                
-    
+                //var response = JSON.parse(JSON.stringify(response))
+                var response = JSON.parse(JSON.stringify(response.results))
                 for(let i=0;i<response.length;i++)
                 {
                     if(response[i]["meeting_link"]!=null && response[i]["meeting_link"]!=undefined)
                     {
                         console.log(response[i])
-                        //alert(response.results[i]["topic_name"])
                         var parent = document.createElement("div");
                         var ele = document.createElement("div");
                         ele.setAttribute("id","timedrpact"+i);
