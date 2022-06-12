@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-03 17:28+0000\n"
-"PO-Revision-Date: 2022-06-03 17:28:01.509197\n"
+"POT-Creation-Date: 2022-06-12 20:43+0000\n"
+"PO-Revision-Date: 2022-06-12 20:43:41.107877\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -2434,6 +2434,7 @@ msgstr ""
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Show Reset Button"
 msgstr "Shöw Rését Büttön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
@@ -4292,6 +4293,14 @@ msgid ""
 msgstr ""
 "Çhöösé ä prößlém týpé tö fétçh fröm thé lïßrärý. Ìf \"Àný Týpé\" ïs séléçtéd"
 " nö fïltérïng ïs äpplïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid ""
+"Determines whether a 'Reset Problems' button is shown, so users may reset "
+"their answers and reshuffle selected items."
+msgstr ""
+"Détérmïnés whéthér ä 'Rését Prößléms' ßüttön ïs shöwn, sö üsérs mäý rését "
+"théïr änswérs änd réshüfflé séléçtéd ïtéms. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
@@ -10460,13 +10469,14 @@ msgid "You have signed out."
 msgstr "Ýöü hävé sïgnéd öüt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/logout.html
-#, python-brace-format
+#, python-format, python-brace-format
 msgid ""
-"{start_anchor}Click here{end_anchor} to delete your single signed on (SSO) "
-"session."
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}Click here{end_anchor} to "
+"delete your single signed on (SSO) session."
 msgstr ""
-"{start_anchor}Çlïçk héré{end_anchor} tö délété ýöür sïnglé sïgnéd ön (SSÖ) "
-"séssïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}Çlïçk héré{end_anchor} tö "
+"délété ýöür sïnglé sïgnéd ön (SSÖ) séssïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: lms/templates/logout.html
 msgid "We are signing you in."
@@ -10483,13 +10493,15 @@ msgstr ""
 "                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/logout.html
-#, python-brace-format
+#, python-format, python-brace-format
 msgid ""
-"If you are not redirected within 5 seconds, {start_anchor}click here to go "
-"to the home page{end_anchor}."
+"If you are not redirected within 5 seconds, "
+"{start_anchor}%(target)s{middle_anchor}click here to go to the home "
+"page{end_anchor}."
 msgstr ""
-"Ìf ýöü äré nöt rédïréçtéd wïthïn 5 séçönds, {start_anchor}çlïçk héré tö gö "
-"tö thé hömé pägé{end_anchor}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+"Ìf ýöü äré nöt rédïréçtéd wïthïn 5 séçönds, "
+"{start_anchor}%(target)s{middle_anchor}çlïçk héré tö gö tö thé hömé "
+"pägé{end_anchor}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -16948,6 +16960,10 @@ msgstr "Düé {date} Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/vert_module.html
 msgid "Past due"
 msgstr "Päst düé Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/vert_module.html
+msgid "Reset Problems"
+msgstr "Rését Prößléms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/video.html
 msgid "Loading video player"
