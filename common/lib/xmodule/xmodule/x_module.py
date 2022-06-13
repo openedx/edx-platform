@@ -1128,30 +1128,6 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
             return self.default_class
         return super().load_block_type(block_type)
 
-    def get_field_provenance(self, xblock, field):
-        """
-        For the given xblock, return a dict for the field's current state:
-        {
-            'default_value': what json'd value will take effect if field is unset: either the field default or
-            inherited value,
-            'explicitly_set': boolean for whether the current value is set v default/inherited,
-        }
-        :param xblock:
-        :param field:
-        """
-        # pylint: disable=protected-access
-        # in runtime b/c runtime contains app-specific xblock behavior. Studio's the only app
-        # which needs this level of introspection right now. runtime also is 'allowed' to know
-        # about the kvs, dbmodel, etc.
-
-        result = {}
-        result['explicitly_set'] = xblock._field_data.has(xblock, field.name)
-        try:
-            result['default_value'] = xblock._field_data.default(xblock, field.name)
-        except KeyError:
-            result['default_value'] = field.to_json(field.default)
-        return result
-
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         # Currently, Modulestore is responsible for instantiating DescriptorSystems
         # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
