@@ -428,6 +428,16 @@
       border-color: $blue;
     }
 
+    &.is-collapsed {
+      .xblock-render {
+        display: none;
+      }
+
+      .collapse-button .fa {
+        transform: scale(1, -1);
+      }
+    }
+
     .xblock-header:not(.is-hidden) {
       display: block;
     }
