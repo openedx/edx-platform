@@ -703,6 +703,20 @@ def get_sibling_urls(subsection, unit_location):    # pylint: disable=too-many-s
     return prev_url, next_url
 
 
+def determine_label(display_name, block_type):
+    """
+    Returns the name of the xblock to display in studio.
+    Please see TNL-9838.
+    """
+    if display_name in {"", None}:
+        if block_type == 'html':
+            return _("Text")
+        else:
+            return block_type
+    else:
+        return display_name
+
+
 @contextmanager
 def translation_language(language):
     """Context manager to override the translation language for the scope
