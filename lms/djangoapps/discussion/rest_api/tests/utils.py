@@ -413,7 +413,7 @@ class CommentsServiceMockMixin:
             status=200
         )
 
-    def register_user_active_threads(self, user_id, response={}):
+    def register_user_active_threads(self, user_id, response):
         """
         Register a mock response for GET on the CS comment active threads endpoint
         """
