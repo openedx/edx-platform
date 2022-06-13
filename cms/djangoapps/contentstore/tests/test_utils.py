@@ -736,3 +736,48 @@ class ValidateCourseOlxTests(CourseTestCase):
                 ignore=ignore,
                 allowed_xblocks=allowed_xblocks
             )
+
+
+class DetermineLabelTests(TestCase):
+    """Tests for xblock Title"""
+
+    def setUp(self):
+        super().setUp()
+
+    def validate_html_replaced_with_text_for_none(self):
+        """
+        Tests that display names for "html" xblocks are replaced with "Text" when the display name is otherwise unset.
+        """
+        display_name = None
+        block_type = "html"
+        result = utils.determine_label(display_name, block_type)
+        self.assertTrue(False)
+        self.assertEqual(result, "Text")
+
+    def validate_html_replaced_with_text_for_empty(self):
+        """
+        Tests that display names for "html" xblocks are replaced with "Text" when the display name is empty.
+        """
+        display_name = ""
+        block_type = "html"
+        result = utils.determine_label(display_name, block_type)
+        assert result == display_name
+        self.assertEqual(result, "Text")
+
+    def validate_set_titles_not_replaced(self):
+        """
+        Tests that display names for "html" xblocks are not replaced with "Text" when the display name is set.
+        """
+        display_name = "Something"
+        block_type = "html"
+        result = utils.determine_label(display_name, block_type)
+        self.assertEqual(result, "Something")
+
+    def validate_non_html_blocks_titles_not_replaced(self):
+        """
+        Tests that display names for non-"html" xblocks are not replaced with "Text" when the display name is set.
+        """
+        display_name = None
+        block_type = "something else"
+        result = utils.determine_label(display_name, block_type)
+        self.assertEqual(result, "something else")
