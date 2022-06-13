@@ -711,7 +711,7 @@ def get_module_system_for_user(
             'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
             'xqueue': xqueue_service,
             'replace_urls': replace_url_service,
-            'error_descriptor_class': error_descriptor_class
+            'error_descriptor_class': error_descriptor_class,
             'rebind_user': rebind_user_service,
         },
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
