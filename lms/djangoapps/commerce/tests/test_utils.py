@@ -74,6 +74,9 @@ class EcommerceServiceTests(TestCase):
         is_not_enabled = EcommerceService().is_enabled(self.user)
         assert not is_not_enabled
 
+    # TODO: replace override_switch with override_waffle_switch when the
+    # DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH will be defined as actual WaffleSwitch. Now
+    # we have only switch name defined in the settings
     @override_switch(settings.DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH, active=True)
     def test_is_enabled_activation_requirement_disabled(self):
         """Verify that is_enabled() returns True when ecomm checkout is enabled. """

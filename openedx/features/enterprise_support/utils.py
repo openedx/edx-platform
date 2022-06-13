@@ -13,7 +13,7 @@ from django.core.cache import cache
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
-from edx_toggles.toggles import LegacyWaffleFlag
+from edx_toggles.toggles import WaffleFlag
 from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from social_django.models import UserSocialAuth
@@ -25,7 +25,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
 
-ENTERPRISE_HEADER_LINKS = LegacyWaffleFlag('enterprise', 'enterprise_header_links', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
+ENTERPRISE_HEADER_LINKS = WaffleFlag('enterprise.enterprise_header_links', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
 
 def get_data_consent_share_cache_key(user_id, course_id, enterprise_customer_uuid=None):

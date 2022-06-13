@@ -26,7 +26,6 @@
                     cohortSettings: courseCohortSettings,
                     context: {
                         uploadCohortsCsvUrl: $cohortManagementElement.data('upload_cohorts_csv_url'),
-                        verifiedTrackCohortingUrl: $cohortManagementElement.data('verified_track_cohorting_url'),
                         studioGroupConfigurationsUrl: studioGroupConfigurationsUrl,
                         isCcxEnabled: $cohortManagementElement.data('is_ccx_enabled')
                     }

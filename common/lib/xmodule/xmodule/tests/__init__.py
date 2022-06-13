@@ -37,7 +37,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests.helpers import StubReplaceURLService, mock_render_template, StubMakoService, StubUserService
 from xmodule.util.sandboxing import SandboxService
-from xmodule.x_module import DoNothingCache, ModuleSystem, XModuleDescriptor, XModuleMixin
+from xmodule.x_module import DoNothingCache, ModuleSystem, XModuleMixin
 from openedx.core.lib.cache_utils import CacheService
 
 
@@ -153,8 +153,6 @@ def get_test_system(
         static_url='/static',
         track_function=Mock(name='get_test_system.track_function'),
         get_module=get_module,
-        debug=True,
-        hostname="edx.org",
         services={
             'user': user_service,
             'mako': mako_service,
@@ -168,7 +166,6 @@ def get_test_system(
             ),
             'replace_urls': replace_url_service
         },
-        node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         course_id=course_id,
         error_descriptor_class=ErrorBlock,
         descriptor_runtime=descriptor_system,

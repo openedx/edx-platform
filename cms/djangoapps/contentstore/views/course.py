@@ -25,7 +25,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from edx_django_utils.monitoring import function_trace
-from edx_toggles.toggles import LegacyWaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitch
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -72,7 +72,6 @@ from openedx.core.lib.courses import course_image_url
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
-from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_module import CourseBlock, DEFAULT_START_DATE, CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
@@ -131,6 +130,9 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'get_course_and_check_access']
 
 WAFFLE_NAMESPACE = 'studio_home'
+ENABLE_GLOBAL_STAFF_OPTIMIZATION = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
+    f'{WAFFLE_NAMESPACE}.enable_global_staff_optimization', __name__
+)
 
 
 class AccessListFallback(Exception):
@@ -481,10 +483,20 @@ def _accessible_courses_list_from_groups(request):
     courses_list = []
     course_keys = {}
 
+    user_global_orgs = set()
     for course_access in all_courses:
-        if course_access.course_id is None:
+        if course_access.course_id is not None:
+            course_keys[course_access.course_id] = course_access.course_id
+        elif course_access.org:
+            user_global_orgs.add(course_access.org)
+        else:
             raise AccessListFallback
-        course_keys[course_access.course_id] = course_access.course_id
+
+    if user_global_orgs:
+        # Getting courses from user global orgs
+        overviews = CourseOverview.get_all_courses(orgs=list(user_global_orgs))
+        overviews_course_keys = {overview.id: overview.id for overview in overviews}
+        course_keys.update(overviews_course_keys)
 
     course_keys = list(course_keys.values())
 
@@ -518,8 +530,7 @@ def course_listing(request):
     List all courses and libraries available to the logged in user
     """
 
-    optimization_enabled = GlobalStaff().has_user(request.user) and \
-        LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled('enable_global_staff_optimization')
+    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
 
     org = request.GET.get('org', '') if optimization_enabled else None
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
@@ -1150,8 +1161,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                 'EDITABLE_SHORT_DESCRIPTION',
                 settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
             )
-            sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
-            # self_paced_enabled = SelfPacedConfiguration.current().enabled
+            sidebar_html_enabled = ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled()
 
             verified_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
             upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and

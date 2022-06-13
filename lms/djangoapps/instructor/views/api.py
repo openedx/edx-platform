@@ -103,6 +103,7 @@ from lms.djangoapps.instructor.views.instructor_task_helpers import extract_emai
 from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic, csvs as instructor_analytics_csvs
 from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
+from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2115,7 +2116,7 @@ def list_background_email_tasks(request, course_id):
     List background email tasks.
     """
     course_id = CourseKey.from_string(course_id)
-    task_type = 'bulk_course_email'
+    task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
     # Specifying for the history of a single task type
     tasks = task_api.get_instructor_task_history(
         course_id,
@@ -2137,7 +2138,7 @@ def list_email_content(request, course_id):
     List the content of bulk emails sent
     """
     course_id = CourseKey.from_string(course_id)
-    task_type = 'bulk_course_email'
+    task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
     # First get tasks list of bulk emails sent
     emails = task_api.get_instructor_task_history(course_id, task_type=task_type)
 
@@ -2697,7 +2698,7 @@ def send_email(request, course_id):
     course_overview = CourseOverview.get_from_id(course_id)
 
     if not is_bulk_email_feature_enabled(course_id):
-        log.warning('Email is not enabled for course %s', course_id)
+        log.warning(f"Email is not enabled for course {course_id}")
         return HttpResponseForbidden("Email is not enabled for this course.")
 
     targets = json.loads(request.POST.get("send_to"))
@@ -2705,20 +2706,22 @@ def send_email(request, course_id):
     message = request.POST.get("message")
     # optional, this is a date and time in the form of an ISO8601 string
     schedule = request.POST.get("schedule", "")
-    # optional, this is the timezone captured from the author's browser when requesting a scheduled email
-    browser_timezone = request.POST.get("browser_timezone", "")
 
-    # If this is a scheduled bulk email request then we try to convert the requested schedule date to UTC. We do this
-    # before we attempt to create the email object instance in case there is an issue as we don't want to have an
-    # orphaned email object that will never be sent.
+    schedule_dt = None
     if schedule:
         try:
-            schedule = _convert_schedule_to_utc_from_local(schedule, browser_timezone, request.user)
-            _determine_valid_schedule(schedule)
-        except ValueError as error:
-            error_message = f"Error occurred while attempting to create a scheduled bulk email task: {error}"
-            log.error(f"{error_message}")
-            return HttpResponseBadRequest(repr(error_message))
+            # convert the schedule from a string to a datetime, then check if its a valid future date and time, dateutil
+            # will throw a ValueError if the schedule is no good.
+            schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
+            if schedule_dt < datetime.datetime.now(pytz.utc):
+                raise ValueError("the requested schedule is in the past")
+        except ValueError as value_error:
+            error_message = (
+                f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: "
+                f"{value_error}"
+            )
+            log.error(error_message)
+            return HttpResponseBadRequest(error_message)
 
     # Retrieve the customized email "from address" and email template from site configuration for the course/partner. If
     # there is no site configuration enabled for the current site then we use system defaults for both.
@@ -2741,7 +2744,7 @@ def send_email(request, course_id):
         return HttpResponseBadRequest(repr(err))
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    task_api.submit_bulk_course_email(request, course_id, email.id, schedule)
+    task_api.submit_bulk_course_email(request, course_id, email.id, schedule_dt)
 
     response_payload = {
         'course_id': str(course_id),
@@ -3599,49 +3602,3 @@ def _get_branded_email_template(course_overview):
         template_name = template_name.get(course_overview.display_org_with_default)
 
     return template_name
-
-
-def _convert_schedule_to_utc_from_local(schedule, browser_timezone, user):
-    """
-    Utility function to help convert the schedule of an instructor task from the requesters local time and timezone
-    (taken from the request) to a UTC datetime.
-
-    Args:
-        schedule (String): The desired time to execute a scheduled task, in local time, in the form of an ISOString.
-        timezone (String): The time zone, as captured by the user's web browser, in the form of a string.
-        user (User): The user requesting the action, captured from the originating web request. Used to lookup the
-                     the time zone preference as set in the user's account settings.
-
-    Returns:
-        DateTime: A datetime instance describing when to execute this schedule task converted to the UTC timezone.
-    """
-    # look up the requesting user's timezone from their account settings
-    preferred_timezone = get_user_preference(user, 'time_zone', username=user.username)
-    # use the user's preferred timezone (if available), otherwise use the browser timezone.
-    timezone = preferred_timezone if preferred_timezone else browser_timezone
-
-    # convert the schedule to UTC
-    log.info(f"Converting requested schedule from local time '{schedule}' with the timezone '{timezone}' to UTC")
-
-    local_tz = dateutil.tz.gettz(timezone)
-    if local_tz is None:
-        raise ValueError(
-            "Unable to determine the time zone to use to convert the schedule to UTC"
-        )
-    local_dt = dateutil.parser.parse(schedule).replace(tzinfo=local_tz)
-    schedule_utc = local_dt.astimezone(pytz.utc)
-
-    return schedule_utc
-
-
-def _determine_valid_schedule(schedule):
-    """
-    Utility function that determines if the requested schedule is in the future. Raises ValueError if the schedule time
-    has already lapsed.
-
-    Args:
-        schedule (DateTime): UTC DateTime representing the desired date and time to process a scheduled instructor task.
-    """
-    now = datetime.datetime.now(pytz.utc)
-    if schedule < now:
-        raise ValueError(f"The requested schedule '{schedule}' is in the past")

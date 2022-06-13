@@ -11,7 +11,11 @@ from simple_history.models import HistoricalRecords
 AVAILABLE_PROVIDERS = {
     'zoom': {
         'name': 'Zoom LTI PRO',
-        'features': []
+        'features': [],
+        'pii_sharing': {
+            'username': False,
+            'email': False,
+        }
     }
 }
 

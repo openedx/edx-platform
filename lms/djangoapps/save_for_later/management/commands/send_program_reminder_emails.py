@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.core.management import BaseCommand
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 
 from lms.djangoapps.save_for_later.helper import send_email
@@ -74,8 +75,11 @@ class Command(BaseCommand):
                         'reminder': True,
                         'braze_event': USER_SEND_SAVE_FOR_LATER_REMINDER_EMAIL,
                     }
-                    if user and get_program_enrollment(program_uuid=saved_program.uuid, user=user):
-                        continue
+                    try:
+                        if user and get_program_enrollment(program_uuid=saved_program.program_uuid, user=user):
+                            continue
+                    except ObjectDoesNotExist:
+                        pass
                     email_sent = send_email(saved_program.email, program_data)
                     if email_sent:
                         reminder_email_sent_ids.append(saved_program.id)

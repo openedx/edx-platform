@@ -173,7 +173,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
     def test_tab_name_imports_correctly(self):
         _module_store, _content_store, course = self.load_test_import_course()
         print(f"course tabs = {course.tabs}")
-        self.assertEqual(course.tabs[2]['name'], 'Syllabus')
+        self.assertEqual(course.tabs[1]['name'], 'Syllabus')
 
     def test_import_performance_mongo(self):
         store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)

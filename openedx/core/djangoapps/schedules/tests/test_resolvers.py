@@ -12,26 +12,29 @@ import pytz
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_switch
 from testfixtures import LogCapture
-from waffle.testutils import override_switch
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.schedules.config import _EXTERNAL_COURSE_UPDATES_FLAG
+from openedx.core.djangoapps.schedules.config import (
+    _EXTERNAL_COURSE_UPDATES_FLAG,
+    COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH,
+)
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.resolvers import (
     LOG,
     BinnedSchedulesBaseResolver,
     CourseNextSectionUpdate,
-    CourseUpdateResolver
+    CourseUpdateResolver,
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, skip_unless_lms
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class SchedulesResolverTestMixin(CacheIsolationMixin):
@@ -183,7 +186,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         }
         assert schedules == [(self.user, None, expected_context)]
 
-    @override_switch('schedules.course_update_show_unsubscribe', True)
+    @override_waffle_switch(COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH, True)
     def test_schedule_context_show_unsubscribe(self):
         resolver = self.create_resolver()
         schedules = list(resolver.schedules_for_bin())
@@ -249,7 +252,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
     def test_schedule_context(self):
         resolver = self.create_resolver()
         # using this to make sure the select_related stays intact
-        with self.assertNumQueries(41):
+        with self.assertNumQueries(38):
             sc = resolver.get_schedules()
             schedules = list(sc)
 
@@ -274,7 +277,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         }
         assert schedules == [(self.user, None, expected_context)]
 
-    @override_switch('schedules.course_update_show_unsubscribe', True)
+    @override_waffle_switch(COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH, True)
     def test_schedule_context_show_unsubscribe(self):
         resolver = self.create_resolver()
         schedules = list(resolver.get_schedules())

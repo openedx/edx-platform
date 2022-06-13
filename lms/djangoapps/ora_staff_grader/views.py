@@ -46,6 +46,7 @@ from lms.djangoapps.ora_staff_grader.ora_api import (
     submit_grade,
 )
 from lms.djangoapps.ora_staff_grader.serializers import (
+    FileListSerializer,
     InitializeSerializer,
     LockStatusSerializer,
     StaffAssessSerializer,
@@ -97,10 +98,12 @@ class InitializeView(StaffGraderBaseView):
     def _is_staff_grader_enabled(self, course_key):
         """ Helper to evaluate if the staff grader flag / overrides are enabled """
         # This toggle is documented on the edx-ora2 repo in openassessment/xblock/config_mixin.py
+        # Note: Do not copy this practice of directly using a toggle from a library.
+        #  Instead, see docs for exposing a wrapper api:
+        #  https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/implement_the_right_toggle_type.html#using-other-toggles pylint: disable=line-too-long
         # pylint: disable=toggle-missing-annotation
         enhanced_staff_grader_flag = CourseWaffleFlag(
-            WAFFLE_NAMESPACE,
-            ENHANCED_STAFF_GRADER,
+            f"{WAFFLE_NAMESPACE}.{ENHANCED_STAFF_GRADER}",
             module_name='openassessment.xblock.config_mixin'
         )
         return enhanced_staff_grader_flag.is_enabled(course_key)
@@ -268,6 +271,51 @@ class SubmissionStatusFetchView(StaffGraderBaseView):
             return UnknownErrorResponse()
 
 
+class SubmissionFilesFetchView(StaffGraderBaseView):
+    """
+    GET file metadata for a submission.
+
+    Used to get updated file download links to avoid signed download link expiration
+    issues.
+
+    Response: {
+        files: [
+            downloadUrl (url),
+            description (string),
+            name (string),
+            size (bytes),
+        ]
+    }
+
+    Errors:
+    - MissingParamResponse (HTTP 400) for missing params
+    - XBlockInternalError (HTTP 500) for an issue with ORA
+    - UnknownError (HTTP 500) for other errors
+    """
+
+    @require_params([PARAM_ORA_LOCATION, PARAM_SUBMISSION_ID])
+    def get(self, request, ora_location, submission_uuid, *args, **kwargs):
+        try:
+            submission_info = get_submission_info(
+                request, ora_location, submission_uuid
+            )
+
+            response_data = FileListSerializer(submission_info).data
+
+            log.info(response_data)
+            return Response(response_data)
+
+        # Issues with the XBlock handlers
+        except XBlockInternalError as ex:
+            log.error(ex)
+            return InternalErrorResponse(context=ex.context)
+
+        # Blanket exception handling in case something blows up
+        except Exception as ex:
+            log.exception(ex)
+            return UnknownErrorResponse()
+
+
 class UpdateGradeView(StaffGraderBaseView):
     """
     POST submit a grade for a submission
@@ -327,7 +375,7 @@ class UpdateGradeView(StaffGraderBaseView):
                 log.error(f"Grade contested for submission: {submission_uuid}")
                 return GradeContestedResponse(context=submission_status)
 
-            # Transform grade data and submit assessment, rasies on failure
+            # Transform grade data and submit assessment, raises on failure
             context = {"submission_uuid": submission_uuid}
             grade_data = StaffAssessSerializer(request.data, context=context).data
             submit_grade(request, ora_location, grade_data)

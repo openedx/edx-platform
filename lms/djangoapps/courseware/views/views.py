@@ -37,6 +37,7 @@ from ipware.ip import get_client_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx_filters.learning.filters import CourseAboutRenderStarted
 from pytz import UTC
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from rest_framework import status
@@ -61,12 +62,12 @@ from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_u
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.generation_handler import CertificateGenerationNotAllowed
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
-from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, check_public_access
-from lms.djangoapps.courseware.config import ENABLE_NEW_FINANCIAL_ASSISTANCE_FLOW
+from lms.djangoapps.courseware.access_utils import check_public_access
 from lms.djangoapps.courseware.courses import (
     can_self_enroll_in_course,
     course_open_for_self_enrollment,
@@ -74,7 +75,6 @@ from lms.djangoapps.courseware.courses import (
     get_course_overview_with_access,
     get_course_with_access,
     get_courses,
-    get_current_child,
     get_permission_for_course_about,
     get_studio_url,
     sort_by_announcement,
@@ -88,7 +88,11 @@ from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentMo
 from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
 from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from lms.djangoapps.courseware.utils import create_financial_assistance_application
+from lms.djangoapps.courseware.utils import (
+    _use_new_financial_assistance_flow,
+    create_financial_assistance_application,
+    is_eligible_for_financial_aid
+)
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -108,7 +112,6 @@ from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
@@ -116,20 +119,16 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
-from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url
-from openedx.features.course_experience.course_tools import CourseToolsPluginManager
+from openedx.features.course_experience import course_home_url
 from openedx.features.course_experience.url_helpers import (
     get_courseware_url,
     get_learning_mfe_home_url,
     is_request_from_learning_mfe
 )
 from openedx.features.course_experience.utils import dates_banner_should_display
-from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
-from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 
-from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
 from ..tabs import _get_dynamic_tabs
 from ..toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
@@ -199,18 +198,6 @@ REQUESTING_CERT_DATA = CertData(
     certificate_available_date=None
 )
 
-UNVERIFIED_CERT_DATA = CertData(
-    CertificateStatuses.unverified,
-    _('Certificate unavailable'),
-    _(
-        'You have not received a certificate because you do not have a current {platform_name} '
-        'verified identity.'
-    ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
-    download_url=None,
-    cert_web_view_url=None,
-    certificate_available_date=None
-)
-
 
 def _earned_but_not_available_cert_data(cert_downloadable_status):
     return CertData(
@@ -230,6 +217,23 @@ def _downloadable_cert_data(download_url=None, cert_web_view_url=None):
         _("You've earned a certificate for this course."),
         download_url=download_url,
         cert_web_view_url=cert_web_view_url,
+        certificate_available_date=None
+    )
+
+
+def _unverified_cert_data():
+    """
+        platform_name is dynamically updated in multi-tenant installations
+    """
+    return CertData(
+        CertificateStatuses.unverified,
+        _('Certificate unavailable'),
+        _(
+            'You have not received a certificate because you do not have a current {platform_name} '
+            'verified identity.'
+        ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
+        download_url=None,
+        cert_web_view_url=None,
         certificate_available_date=None
     )
 
@@ -425,149 +429,6 @@ def jump_to(request, course_id, location):
         )
 
     return redirect(redirect_url)
-
-
-@ensure_csrf_cookie
-@ensure_valid_course_key
-@data_sharing_consent_required
-def course_info(request, course_id):
-    """
-    Display the course's info.html, or 404 if there is no such course.
-    Assumes the course_id is in a valid format.
-    """
-    # TODO: LEARNER-611: This can be deleted with Course Info removal.  The new
-    #    Course Home is using its own processing of last accessed.
-    def get_last_accessed_courseware(course, request, user):
-        """
-        Returns the courseware module URL that the user last accessed, or None if it cannot be found.
-        """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course.id, request.user, course, depth=2
-        )
-        course_module = get_module_for_descriptor(
-            user,
-            request,
-            course,
-            field_data_cache,
-            course.id,
-            course=course,
-            will_recheck_access=True,
-        )
-        chapter_module = get_current_child(course_module)
-        if chapter_module is not None:
-            section_module = get_current_child(chapter_module)
-            if section_module is not None:
-                url = reverse('courseware_section', kwargs={
-                    'course_id': str(course.id),
-                    'chapter': chapter_module.url_name,
-                    'section': section_module.url_name
-                })
-                return url
-        return None
-
-    course_key = CourseKey.from_string(course_id)
-
-    # If the unified course experience is enabled, redirect to the "Course" tab
-    if not DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
-        return redirect(course_home_url(course_key))
-
-    with modulestore().bulk_operations(course_key):
-        course = get_course_with_access(request.user, 'load', course_key)
-
-        can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
-        masquerade, user = setup_masquerade(request, course_key, can_masquerade, reset_masquerade_data=True)
-
-        # LEARNER-612: CCX redirect handled by new Course Home (DONE)
-        # LEARNER-1697: Transition banner messages to new Course Home (DONE)
-        # if user is not enrolled in a course then app will show enroll/get register link inside course info page.
-        user_is_enrolled = CourseEnrollment.is_enrolled(user, course.id)
-        show_enroll_banner = request.user.is_authenticated and not user_is_enrolled
-
-        # If the user is not enrolled but this is a course that does not support
-        # direct enrollment then redirect them to the dashboard.
-        if not user_is_enrolled and not can_self_enroll_in_course(course_key):
-            return redirect(reverse('dashboard'))
-
-        # LEARNER-170: Entrance exam is handled by new Course Outline. (DONE)
-        # If the user needs to take an entrance exam to access this course, then we'll need
-        # to send them to that specific course module before allowing them into other areas
-        if not user_can_skip_entrance_exam(user, course):
-            return redirect(reverse('courseware', args=[str(course.id)]))
-
-        # Construct the dates fragment
-        dates_fragment = None
-
-        if request.user.is_authenticated:
-            # TODO: LEARNER-611: Remove enable_course_home_improvements
-            if SelfPacedConfiguration.current().enable_course_home_improvements:
-                # Shared code with the new Course Home (DONE)
-                dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
-
-        # Shared code with the new Course Home (DONE)
-        # Get the course tools enabled for this user and course
-        course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
-
-        course_homepage_invert_title =\
-            configuration_helpers.get_value(
-                'COURSE_HOMEPAGE_INVERT_TITLE',
-                False
-            )
-
-        course_homepage_show_subtitle =\
-            configuration_helpers.get_value(
-                'COURSE_HOMEPAGE_SHOW_SUBTITLE',
-                True
-            )
-
-        course_homepage_show_org =\
-            configuration_helpers.get_value('COURSE_HOMEPAGE_SHOW_ORG', True)
-
-        course_title = course.display_number_with_default
-        course_subtitle = course.display_name_with_default
-        if course_homepage_invert_title:
-            course_title = course.display_name_with_default
-            course_subtitle = course.display_number_with_default
-
-        context = {
-            'request': request,
-            'masquerade_user': user,
-            'course_id': str(course_key),
-            'url_to_enroll': CourseTabView.url_to_enroll(course_key),
-            'cache': None,
-            'course': course,
-            'course_title': course_title,
-            'course_subtitle': course_subtitle,
-            'show_subtitle': course_homepage_show_subtitle,
-            'show_org': course_homepage_show_org,
-            'can_masquerade': can_masquerade,
-            'masquerade': masquerade,
-            'supports_preview_menu': True,
-            'studio_url': get_studio_url(course, 'course_info'),
-            'show_enroll_banner': show_enroll_banner,
-            'user_is_enrolled': user_is_enrolled,
-            'dates_fragment': dates_fragment,
-            'course_tools': course_tools,
-        }
-        context.update(
-            get_experiment_user_metadata_context(
-                course,
-                user,
-            )
-        )
-
-        # Get the URL of the user's last position in order to display the 'where you were last' message
-        context['resume_course_url'] = None
-        # TODO: LEARNER-611: Remove enable_course_home_improvements
-        if SelfPacedConfiguration.current().enable_course_home_improvements:
-            context['resume_course_url'] = get_last_accessed_courseware(course, request, user)
-
-        if not check_course_open_for_learner(user, course):
-            # Disable student view button if user is staff and
-            # course is not yet visible to students.
-            context['disable_student_access'] = True
-            context['supports_preview_menu'] = False
-
-        return render_to_response('courseware/info.html', context)
 
 
 class StaticCourseTabView(EdxFragmentView):
@@ -890,7 +751,7 @@ class EnrollStaffView(View):
 @ensure_csrf_cookie
 @ensure_valid_course_key
 @cache_if_anonymous()
-def course_about(request, course_id):
+def course_about(request, course_id):  # pylint: disable=too-many-statements
     """
     Display the course's about page.
     """
@@ -967,7 +828,7 @@ def course_about(request, course_id):
         # Overview
         overview = CourseOverview.get_from_id(course.id)
 
-        sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
+        sidebar_html_enabled = ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled()
 
         allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
 
@@ -999,7 +860,23 @@ def course_about(request, course_id):
             'allow_anonymous': allow_anonymous,
         }
 
-        return render_to_response('courseware/course_about.html', context)
+        course_about_template = 'courseware/course_about.html'
+        try:
+            # .. filter_implemented_name: CourseAboutRenderStarted
+            # .. filter_type: org.openedx.learning.course_about.render.started.v1
+            context, course_about_template = CourseAboutRenderStarted.run_filter(
+                context=context, template_name=course_about_template,
+            )
+        except CourseAboutRenderStarted.RenderInvalidCourseAbout as exc:
+            response = render_to_response(exc.course_about_template, exc.template_context)
+        except CourseAboutRenderStarted.RedirectToPage as exc:
+            raise CourseAccessRedirect(exc.redirect_to or reverse('dashboard')) from exc
+        except CourseAboutRenderStarted.RenderCustomResponse as exc:
+            response = exc.response or render_to_response(course_about_template, context)
+        else:
+            response = render_to_response(course_about_template, context)
+
+        return response
 
 
 @ensure_csrf_cookie
@@ -1159,7 +1036,7 @@ def _downloadable_certificate_message(course, cert_downloadable_status):  # lint
 
 
 def _missing_required_verification(student, enrollment_mode):
-    return not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE') and (
+    return settings.FEATURES.get('ENABLE_CERTIFICATES_IDV_REQUIREMENT') and (
         enrollment_mode in CourseMode.VERIFIED_MODES and not IDVerificationService.user_is_verified(student)
     )
 
@@ -1176,14 +1053,11 @@ def _certificate_message(student, course, enrollment_mode):  # lint-amnesty, pyl
     if cert_downloadable_status['is_generating']:
         return GENERATING_CERT_DATA
 
-    if cert_downloadable_status['is_unverified']:
-        return UNVERIFIED_CERT_DATA
+    if cert_downloadable_status['is_unverified'] or _missing_required_verification(student, enrollment_mode):
+        return _unverified_cert_data()
 
     if cert_downloadable_status['is_downloadable']:
         return _downloadable_certificate_message(course, cert_downloadable_status)
-
-    if _missing_required_verification(student, enrollment_mode):
-        return UNVERIFIED_CERT_DATA
 
     return REQUESTING_CERT_DATA
 
@@ -1532,7 +1406,16 @@ def generate_user_cert(request, course_id):
         return HttpResponseBadRequest(_("Course is not valid"))
 
     log.info(f'Attempt will be made to generate a course certificate for {student.id} : {course_key}.')
-    certs_api.generate_certificate_task(student, course_key, 'self')
+
+    try:
+        certs_api.generate_certificate_task(student, course_key, 'self')
+    except CertificateGenerationNotAllowed as e:
+        log.exception(
+            "Certificate generation not allowed for user %s in course %s",
+            str(student),
+            course_key,
+        )
+        return HttpResponseBadRequest(str(e))
 
     if not is_course_passed(student, course):
         log.info("User %s has not passed the course: %s", student.username, course_id)
@@ -1876,10 +1759,18 @@ FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in 
 
 
 @login_required
-def financial_assistance(_request):
+def financial_assistance(request, course_id=None):
     """Render the initial financial assistance page."""
+    reason = None
+    apply_url = reverse('financial_assistance_form')
+    if course_id and _use_new_financial_assistance_flow(course_id):
+        _, reason = is_eligible_for_financial_aid(course_id)
+        apply_url = reverse('financial_assistance_form_v2', args=[course_id])
+
     return render_to_response('financial-assistance/financial-assistance.html', {
-        'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER)
+        'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER),
+        'apply_url': apply_url,
+        'reason': reason
     })
 
 
@@ -1966,8 +1857,10 @@ def financial_assistance_request_v2(request):
         if request.user.username != username:
             return HttpResponseForbidden()
 
-        lms_user_id = request.user.id
         course_id = data['course']
+        if course_id and course_id not in request.META.get('HTTP_REFERER'):
+            return HttpResponseBadRequest('Invalid Course ID provided.')
+        lms_user_id = request.user.id
         income = data['income']
         learner_reasons = data['reason_for_applying']
         learner_goals = data['goals']
@@ -1994,10 +1887,13 @@ def financial_assistance_request_v2(request):
 
 
 @login_required
-def financial_assistance_form(request):
+def financial_assistance_form(request, course_id=None):
     """Render the financial assistance application form page."""
     user = request.user
-    enrolled_courses = get_financial_aid_courses(user)
+    disabled = False
+    if course_id:
+        disabled = True
+    enrolled_courses = get_financial_aid_courses(user, course_id)
     incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000',
                '$25,000 - $40,000', '$40,000 - $55,000', '$55,000 - $70,000', '$70,000 - $85,000',
                '$85,000 - $100,000', 'More than $100,000']
@@ -2005,7 +1901,7 @@ def financial_assistance_form(request):
     annual_incomes = [
         {'name': _(income), 'value': income} for income in incomes  # lint-amnesty, pylint: disable=translation-of-non-string
     ]
-    if ENABLE_NEW_FINANCIAL_ASSISTANCE_FLOW.is_enabled():
+    if course_id and _use_new_financial_assistance_flow(course_id):
         submit_url = 'submit_financial_assistance_request_v2'
     else:
         submit_url = 'submit_financial_assistance_request'
@@ -2031,6 +1927,7 @@ def financial_assistance_form(request):
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
+                'disabled': disabled,
                 'options': enrolled_courses,
                 'instructions': gettext(
                     'Select the course for which you want to earn a verified certificate. If'
@@ -2104,8 +2001,9 @@ def financial_assistance_form(request):
     })
 
 
-def get_financial_aid_courses(user):
+def get_financial_aid_courses(user, course_id=None):
     """ Retrieve the courses eligible for financial assistance. """
+    use_new_flow = False
     financial_aid_courses = []
     for enrollment in CourseEnrollment.enrollments_for_user(user).order_by('-created'):
 
@@ -2116,6 +2014,15 @@ def get_financial_aid_courses(user):
                     Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC)),
                     course_id=enrollment.course_id,
                     mode_slug=CourseMode.VERIFIED).exists():
+            # This is a workaround to set course_id before disabling the field in case of new financial assistance flow.
+            if str(enrollment.course_overview) == course_id:
+                financial_aid_courses = [{
+                    'name': enrollment.course_overview.display_name,
+                    'value': str(enrollment.course_id),
+                    'default': True
+                }]
+                use_new_flow = True
+                break
 
             financial_aid_courses.append(
                 {
@@ -2124,6 +2031,9 @@ def get_financial_aid_courses(user):
                 }
             )
 
+    if course_id is not None and use_new_flow is False:
+        # We don't want to show financial_aid_courses if the course_id is not found in the enrolled courses.
+        return []
     return financial_aid_courses
 
 

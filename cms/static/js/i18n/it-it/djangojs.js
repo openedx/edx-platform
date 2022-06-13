@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = (n != 1);
+    const v = n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -140,6 +140,7 @@
     " From this point in time, you must follow the <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online proctoring rules</a> to pass the proctoring review for your exam. ": " Da questo momento dovrai attenerti alle <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">regole di supervisione online</a> per superare la verifica della supervisione del tuo esame.",
     " Member": [
       " Membro",
+      " Membri",
       " Membri"
     ],
     " Your Proctoring Session Has Started ": " La tua sessione di supervisione \u00e8 stata avviata",
@@ -155,6 +156,7 @@
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)scommenti (%(unread_comments_count)s commenti non letti)%(span_close)s",
     "%(errorCount)s error found in form.": [
       "%(errorCount)s errore rilevato nel modulo.",
+      "%(errorCount)s errori rilevati nel modulo.",
       "%(errorCount)s errori rilevati nel modulo."
     ],
     "%(field)s can only contain up to %(count)d characters.": "%(field)s pu\u00f2 solo contenere fino a %(count)d caratteri.",
@@ -163,35 +165,43 @@
     "%(programName)s Home Page.": "Home page di %(programName)s . ",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s di %(cnt)s selezionato",
-      "%(sel)s di %(cnt)s selezionati"
+      "%(sel)s di %(cnt)s selezionati",
+      ""
     ],
     "%(type)s Component Template Menu": "Menu template componenti %(type)s ",
     "%(value)s hour": [
       "%(value)s ora",
+      "%(value)s ore",
       "%(value)s ore"
     ],
     "%(value)s minute": [
       "%(value)s minuto",
+      "%(value)s minuti",
       "%(value)s minuti"
     ],
     "%(value)s second": [
       "%(value)s secondo",
+      "%(value)s secondi",
       "%(value)s secondi"
     ],
     "%d day": [
       "%d giorno",
+      "%d giorni",
       "%d giorni"
     ],
     "%d minute": [
       "%d minuto",
+      "%d minuti",
       "%d minuti"
     ],
     "%d month": [
       "%d mese",
+      "%d mesi",
       "%d mesi"
     ],
     "%d year": [
       "%d anno",
+      "%d anni",
       "%d anni"
     ],
     "%s ago": "%s fa",
@@ -209,6 +219,7 @@
     "(Staff)": "(Staff)",
     "(contains %(student_count)s student)": [
       "(contiene %(student_count)s studente)",
+      "(contiene %(student_count)s studenti)",
       "(contiene %(student_count)s studenti)"
     ],
     "(optional)": "(facoltativo)",
@@ -541,7 +552,7 @@
     "Cohorts": "Coorti",
     "Cohorts Disabled": "Cohort disabilitati",
     "Cohorts Enabled": "Cohort abilitati",
-    "Collapse All": "Comprimi tutti",
+    "Collapse All": "Comprimi tutto ",
     "Collapse Instructions": "Nascondi le Istruzioni",
     "Collapse/Expand this %(xblock_type)s": "Comprimi/Espandi questo %(xblock_type)s",
     "Color": "Colore",
@@ -567,6 +578,7 @@
     "Contains staff only content": "Contiene solo contenuti dello staff",
     "Contains {count} group": [
       "Contiene {count} gruppo",
+      "Contiene {count} gruppi",
       "Contiene {count} gruppi"
     ],
     "Content Group ID": "ID gruppo di contenuti",
@@ -601,6 +613,7 @@
     "Country or Region of Residence": "Paese o regione di residenza",
     "Course": [
       "Corso ",
+      "Corsi ",
       "Corsi "
     ],
     "Course Content": "Contenuto corso",
@@ -872,7 +885,7 @@
     "Exam timer and end exam button": "Pulsante timer esame e termina esame",
     "Exception Granted": "Eccezione concessa ",
     "Exit full browser": "Esci dal browser a schermo intero",
-    "Expand All": "Espandi tutti",
+    "Expand All": "Espandi tutto ",
     "Expand Instructions": "Espandi le Istruzioni",
     "Explain if other.": "Se altro, immettere una spiegazione. ",
     "Explanation": "Spiegazione",
@@ -1019,7 +1032,6 @@
     "ID": "ID",
     "ID-Verification is not required for this Professional Education course.": "La verifica tramite ID non \u00e8 richiesta per questo corso di Formazione professionale. ",
     "Identity Verification In Progress": "Verifica dell'identit\u00e0 in corso ",
-    "If the course does not have an end date, learners always see their scores when they submit answers to assessments.": "Se il corso non ha una data di fine, gli studenti vedono sempre i loro punteggi quando inviano le risposte alle valutazioni. ",
     "If the photos you submit are rejected, try moving the computer or camera orientation to change the lighting angle.  The most common reason for rejection is inability to read the text on the ID card.": "Se le foto inoltrate vengono rifiutate, provare a spostare il computer o l'orientamento della telecamera per modificare l'angolo di illuminazione. La causa di rifiuto pi\u00f9 comune \u00e8 l'impossibilit\u00e0 di leggere il testo sul documento. ",
     "If the proctoring software window is still open, close it now and confirm that you want to quit the application.": "Se la finestra del software di supervisione \u00e8 ancora aperta, chiuderla ora e confermare che si desidera uscire dall'applicazione. ",
     "If the subsection does not have a due date, learners always see their scores when they submit answers to assessments.": "Se la sottosezione non ha una data di scadenza, gli studenti vedono sempre i loro punteggi quando inviano le risposte alle valutazioni. ",
@@ -1124,7 +1136,6 @@
     "Learners are added to this cohort automatically.": "Gli studenti vengono aggiunti a questa coorte automaticamente ",
     "Learners are added to this cohort only when you provide their email addresses or usernames on this page.": "Gli studenti vengono aggiunti a questa coorte solo quando viene fornito il relativo indirizzo email o nome utente in questa pagina. ",
     "Learners do not see the subsection in the course outline. The subsection is not included in grade calculations.": "Gli studenti non vedono la sottosezione nella struttura del corso. La sottosezione non \u00e8 considerata nel calcolo del voto. ",
-    "Learners do not see whether their answers to assessments were correct or incorrect, nor the score received, until after the course end date has passed.": "Gli studenti non vedono se le loro risposte alle valutazioni erano corrette o errate, n\u00e9 il punteggio ottenuto, fino a quando la data di fine del corso non \u00e8 trascorsa. ",
     "Learners do not see whether their answers to assessments were correct or incorrect, nor the score received, until after the due date for the subsection has passed.": "Gli studenti non vedono se le loro risposte alle valutazioni erano corrette o errate, n\u00e9 il punteggio ottenuto, fino a quando non trascorre la data di scadenza della sottosezione.",
     "Learners never see whether their answers to assessments are correct or incorrect, nor the score received.": "Gli studenti non vedono mai se le loro risposte alle valutazioni sono corrette o errate, n\u00e9 il punteggio ottenuto. ",
     "Learners see the published subsection and can access its content.": "Gli studenti vedono la sottosezione pubblicata e possono accedere ai relativi contenuti. ",
@@ -1162,6 +1173,7 @@
     "Load next {numResponses} responses": "Carica le successive {numResponses} risposte",
     "Load next {num_items} result": [
       "Carica {num_items} risultato successivo ",
+      "Carica {num_items} risultati successivi ",
       "Carica {num_items} risultati successivi "
     ],
     "Loading": "Caricamento",
@@ -1290,11 +1302,13 @@
     "Note: Learners can be in only one cohort. Adding learners to this group overrides any previous group assignment.": "Nota: gli studenti possono essere presenti in una sola coorte. L'aggiunta di studenti a questo gruppo sovrascrive qualsiasi precedente assegnazione a gruppi.",
     "Note: You are %s hour ahead of server time.": [
       "Nota: Sei %s ora in anticipo rispetto al server.",
-      "Nota: Sei %s ore in anticipo rispetto al server."
+      "Nota: Sei %s ore in anticipo rispetto al server.",
+      ""
     ],
     "Note: You are %s hour behind server time.": [
       "Nota: Sei %s ora in ritardo rispetto al server.",
-      "Nota: Sei %s ore in ritardo rispetto al server."
+      "Nota: Sei %s ore in ritardo rispetto al server.",
+      ""
     ],
     "Noted in:": "Annotato in:",
     "Notes": "Note",
@@ -1653,12 +1667,13 @@
     "Show Annotations": "Mostra le Annotazioni",
     "Show Comment (%(num_comments)s)": [
       "Mostra commento (%(num_comments)s)",
+      "Mostra commenti (%(num_comments)s)",
       "Mostra commenti (%(num_comments)s)"
     ],
     "Show Deprecated Settings": "Mostra impostazioni deprecate",
     "Show Discussion": "Mostra Discussione",
-    "Show Less": "Mostra meno",
-    "Show More": "Mostra altro",
+    "Show Less": "Mostra meno ",
+    "Show More": "Mostra altro ",
     "Show Previews": "Mostra anteprime",
     "Show assessment results when subsection is past due": "Mostra i risultati della valutazione quando la sottosezione \u00e8 scaduta ",
     "Show blocks": "Mostra blocchi",
@@ -1672,6 +1687,7 @@
     "Showing all responses": "Mostrando tutte le risposte",
     "Showing first response": [
       "Visualizzazione della prima risposta",
+      "Visualizzazione delle prime {numResponses} risposte",
       "Visualizzazione delle prime {numResponses} risposte"
     ],
     "Showing results for \"{searchString}\"": "Visualizzazione risultati per \"{searchString}\"",
@@ -1826,7 +1842,6 @@
     "Textbook Name": "Nome libro di testo",
     "Textbook information": "Informazioni sul libro di testo",
     "Textbook name is required": "Il nome del libro di testo \u00e8 richiesto",
-    "Thank you for setting your course goal to {goal}!": "Grazie per aver impostato l'obiettivo del corso su {goal}! ",
     "Thank you for submitting a request! We appreciate your patience while we work to review your request.": "Grazie per averci inviato una richiesta. Apprezziamo la tua pazienza mentre ci adoperiamo per esaminare la tua richiesta. ",
     "Thank you for submitting your financial assistance application for {course_name}! You can expect a response in 2-4 business days.": "Grazie per aver inoltrato l'applicazione per l'assistenza finanziaria per {course_name}! Riceverai una risposta entro 2-4 giorni lavorativi.",
     "Thank you for submitting your photos. We will review them shortly. You can now sign up for any %(platformName)s course that offers verified certificates. Verification is good for one year. After one year, you must submit photos for verification again.": "Grazie per aver inoltrato le tue foto. Le esamineremo a breve. \u00c8 ora possibile registrarsi a qualsiasi corso %(platformName)s che offre certificati verificati. La verifica \u00e8 effettiva per un anno. Dopo un anno, \u00e8 necessario inoltrare le foto per una nuova verifica. ",
@@ -1911,9 +1926,9 @@
     "There was an error obtaining email content history for this course.": "C'\u00e8 stato un errore nell'ottenere la cronologia dei contenuti delle e-mail di questo corso.",
     "There was an error obtaining email task history for this course.": "C'\u00e8 stato un errore nell'ottenere la cronologia delle attivit\u00e0 e-mail di questo corso.",
     "There was an error retrieving preview results for this catalog. Please check that your query is correct and try again.": "Si \u00e8 verificato un errore durante il recupero dei risultati dell'anteprima per questo catalogo. Verificare che la query sia corretta e riprovare. ",
-    "There was an error updating your goal.": "Si \u00e8 verificato un errore durante l'aggiornamento del tuo obiettivo.",
     "There was an error when trying to add learners:": [
       "Si \u00e8 verificato un errore durante il tentativo di aggiungere studenti: ",
+      "Non \u00e8 stato possibile aggiungere {numErrors} studenti a questa coorte:",
       "Non \u00e8 stato possibile aggiungere {numErrors} studenti a questa coorte:"
     ],
     "There was an error while importing the new course to our database.": "Si \u00e8 verificato un errore nell'importazione del nuovo corso sul nostro database.",
@@ -1946,9 +1961,6 @@
     "This component has validation issues.": "Questo componente ha problemi di validazione.",
     "This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.": "Questa configurazione \u00e8 attualmente utilizzata negli esperimenti sui contenuti. Se apporti modifiche ai gruppi, potrebbe essere necessario modificare tali esperimenti. ",
     "This content group is used in one or more units.": "Questo gruppo di contenuti viene utilizzato in una o pi\u00f9 unit\u00e0. ",
-    "This course has automatic cohorting enabled for verified track learners, but cohorts are disabled. You must enable cohorts for the feature to work.": "Questo corso ha una coorte automatica abilitata per gli studenti con percorso verificato, ma le coorti sono disabilitate. \u00c8 necessario abilitare le coorti affinch\u00e9 la funzione sia correttamente utilizzabile.",
-    "This course has automatic cohorting enabled for verified track learners, but the required cohort does not exist. You must create a manually-assigned cohort named '{verifiedCohortName}' for the feature to work.": "Questo corso ha una coorte automatica abilitata per gli studenti con percorso verificato, ma la coorte richiesta non esiste. Affinch\u00e9 la funzione possa essere correttamente utilizzata, devi creare una coorte assegnata manualmente denominata '{verifiedCohortName}'. ",
-    "This course uses automatic cohorting for verified track learners. You cannot disable cohorts, and you cannot rename the manual cohort named '{verifiedCohortName}'. To change the configuration for verified track cohorts, contact your edX partner manager.": "Questo corso utilizza la coorte automatica per gli studenti con percorsi verificati. Non puoi disabilitare le coorti e non puoi rinominare la coorte manuale denominata '{verifiedCohortName}'. Per modificare la configurazione delle coorti con percorsi verificati, contatta il tuo partner manager edX. ",
     "This discussion could not be loaded. Refresh the page and try again.": "Impossibile caricare questa discussione. Aggiorna la pagina e riprova. ",
     "This exam has a time limit associated with it.": "Questo esame ha un limite di tempo ad esso associato.",
     "This feedback could not be submitted.": "Impossibile inoltrare il feedback.",
@@ -1993,8 +2005,6 @@
     "This role requires a divided discussions scheme.": "Questo ruolo richiede uno schema di discussione suddivisa.",
     "This section could not be loaded.": "Impossibile caricare questa sezione.",
     "This short name for the assignment type (for example, HW or Midterm) appears next to assignments on a learner's Progress page.": "Questo nome breve per il tipo di compito (ad esempio, Compiti a casa o Esame intermedio) viene visualizzato accanto ai compiti nella pagina Progressi dello studente. ",
-    "This special exam has been released to learners. You may not convert it to another type of special exam. You may revert this subsection back to being a basic exam by selecting 'None', but you will NOT be able to configure it as a special exam in the future.": "Questo esame speciale \u00e8 stato rilasciato agli studenti. Non puoi convertirlo in un altro tipo di esame speciale. Puoi ripristinare questa sottosezione come esame di base selezionando 'Nessuno', ma NON sarai in grado di configurarlo come esame speciale in futuro. ",
-    "This subsection was released to learners as a special exam, but was reverted back to a basic exam. You may not configure it as a special exam now. Contact edX Support for assistance.": "Questa sottosezione \u00e8 stata rilasciata agli studenti come esame speciale, ma \u00e8 stata ripristinata come esame di base. Adesso non puoi configurarla come esame speciale. Contatta il supporto edX per assistenza.",
     "This team does not have any members.": "Questo team non ha nessun membro",
     "This team is full.": "Questo gruppo \u00e8 completo.",
     "This thread is closed.": "Questo thread \u00e8 chiuso. ",
@@ -2022,7 +2032,6 @@
     "Titles more than 100 characters may prevent students from printing their certificate on a single page.": "Titoli con pi\u00f9 di 100 caratteri possono impedire agli studenti di stampare il proprio certificato su un'unica pagina. ",
     "To access the course, select a session.": "Per accedere al corso, selezionare una sessione. ",
     "To be sure all students can access the video, we recommend providing both an .mp4 and a .webm version of your video. Click below to add a URL for another version. These URLs cannot be YouTube URLs. The first listed video that's compatible with the student's computer will play.": "Per assicurarti che tutti gli studenti possano accedere al video, ti consigliamo di fornire una versione .mp4 e .webm del tuo video. Fare clic di seguito per aggiungere un URL per un'altra versione. Questi URL non possono essere URL di YouTube. Verr\u00e0 riprodotto il primo video elencato compatibile con il computer dello studente. ",
-    "To complete the program, you must earn a verified certificate for each course.": "Per completare il programma, \u00e8 necessario ottenere un certificato verificato per ciascun corso. ",
     "To continue learning with this account, sign in below.": "Per continuare l'apprendimento con questo account, accedere di seguito. ",
     "To invalidate a certificate for a particular learner, add the username or email address below.": "Per invalidare un certificato per un particolare studente, aggiungere il nome utente o l'indirizzo email di seguito. ",
     "To pass this exam, you must complete the problems in the time allowed.": "Per superare questo esame, dovrai completare i problemi nel tempo previsto.",
@@ -2162,6 +2171,7 @@
     "Used": "Utilizzato ",
     "Used in {count} location": [
       "Utilizzato in {count} posizione",
+      "Utilizzato in {count} posizioni",
       "Utilizzato in {count} posizioni"
     ],
     "User Email": "Email utente ",
@@ -2214,6 +2224,7 @@
     "View {span_start} {team_name} {span_end}": "Visualizza {span_start} {team_name} {span_end}",
     "Viewing %s course": [
       "Vedi %s corsi",
+      "Vedi %s coursi",
       "Vedi %s coursi"
     ],
     "Visibility": "Visibilit\u00e0",
@@ -2325,7 +2336,6 @@
     "You have selected \u201cDelete my account.\u201d Deletion of your account and personal data is permanent and cannot be undone. {platformName} will not be able to recover your account or the data that is deleted.": "Hai selezionato \u201cElimina il mio account.\u201d L'eliminazione del tuo account e dei tuoi dati personali \u00e8 permanente e non pu\u00f2 essere annullata. {platformName} non sar\u00e0 in grado di recuperare il tuo account o i dati eliminati. ",
     "You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.": "Hai impostato {beta_language} come lingua, che non \u00e8 attualmente completamente tradotta. Puoi aiutarci a tradurre completamente questa lingua unendoti alla comunit\u00e0 Transifex e aggiungendo traduzioni dall'inglese per studenti che parlano {beta_language}.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "Hai correttamente effettuato l'accesso in %(currentProvider)s, ma il tuo account %(currentProvider)s non ha un account %(platformName)s ad esso abbinato. Per collegare i tuoi account accesi utilizzando la password %(platformName)s .",
-    "You have successfully updated your goal.": "Hai aggiornato con successo il tuo obiettivo. ",
     "You have unsaved changes are you sure you want to navigate away?": "Sono presenti modifiche non salvate. Si desidera abbandonare la pagina?",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Ci sono aggiornamenti non salvati su singoli campi modificabili. Se esegui un'azione, le modifiche non salvate andranno perse.",
     "You have unsaved changes. Do you really want to leave this page?": "Hai delle modifiche non salvate. Vuoi davvero lasciare questa pagina?",
@@ -2427,6 +2437,7 @@
     "abbrev. month September\u0004Sep": "Set",
     "about %d hour": [
       "circa %d ora",
+      "circa %d ore",
       "circa %d ore"
     ],
     "about a minute": "circa un minuto",
@@ -2498,7 +2509,6 @@
     "or create a new one here": "o crearne uno nuovo qui ",
     "or sign in with": "o accedi con ",
     "path/to/introductionToCookieBaking-CH{order}.pdf": "path/to/introductionToCookieBaking-CH{order}.pdf",
-    "post anonymously": "pubblica in modo anonimo ",
     "post anonymously to classmates": "pubblica in modo anonimo per i compagni di classe ",
     "posted %(time_ago)s by %(author)s": "pubblicato %(time_ago)s da %(author)s",
     "price": "prezzo",
@@ -2519,6 +2529,7 @@
     "the more quickly and helpfully we can respond!": "rispondere nel modo pi\u00f9 veloce e utile possibile. ",
     "there is currently {numVotes} vote": [
       "attualmente \u00e8 presente {numVotes} voto",
+      "attualmente sono presenti {numVotes} voti",
       "attualmente sono presenti {numVotes} voti"
     ],
     "title_word_{uniqueId}": "title_word_{uniqueId}",
@@ -2544,10 +2555,12 @@
     "{download_link_start}Download this image (right-click or option-click, save as){link_end} and then {upload_link_start}upload{link_end} it to your backpack.": "{download_link_start}Scaricare questa immagine (clic con il tasto destro del mouse o clic su salva con nome){link_end} e {upload_link_start}caricarla{link_end} nel backpack.",
     "{earned}/{possible} point (graded)": [
       "{earned}/{possible} punto (valutato)",
+      "{earned}/{possible} punti (valutato)",
       "{earned}/{possible} punti (valutato)"
     ],
     "{earned}/{possible} point (ungraded)": [
       "{earned}/{possible} punto (non valutato)",
+      "{earned}/{possible} punti (non valutato)",
       "{earned}/{possible} punti (non valutato)"
     ],
     "{email}": "{email}",
@@ -2561,30 +2574,37 @@
     "{minutes} {unit}": "{minutes} {unit}",
     "{numMoved} learner was moved from {prevCohort}": [
       "{numMoved} studente spostato da {prevCohort}",
+      "{numMoved} studenti spostati da {prevCohort}",
       "{numMoved} studenti spostati da {prevCohort}"
     ],
     "{numPreassigned} learner was pre-assigned for this cohort. This learner will automatically be added to the cohort when they enroll in the course.": [
       "{numPreassigned} studente \u00e8 stato pre-assegnato a questa coorte. Questo studente verr\u00e0 automaticamente aggiunto alla coorte quando si iscriver\u00e0 al corso. ",
+      "{numPreassigned} studenti sono stati pre-assegnati a questa coorte. Questi studenti verranno automaticamente aggiunti alla coorte quando si iscriveranno al corso.",
       "{numPreassigned} studenti sono stati pre-assegnati a questa coorte. Questi studenti verranno automaticamente aggiunti alla coorte quando si iscriveranno al corso."
     ],
     "{numPresent} learner was already in the cohort": [
       "{numPresent} studente gi\u00e0 presente nella coorte",
+      "{numPresent} studenti gi\u00e0 presenti nella coorte",
       "{numPresent} studenti gi\u00e0 presenti nella coorte"
     ],
     "{numResponses} other response": [
       "{numResponses} altra risposta",
+      "{numResponses} altre risposte",
       "{numResponses} altre risposte"
     ],
     "{numResponses} response": [
       "{numResponses} risposta",
+      "{numResponses} risposte",
       "{numResponses} risposte"
     ],
     "{numUsersAdded} learner has been added to this cohort. ": [
       "{numUsersAdded} studente \u00e8 stato aggiunto a questa coorte.",
+      "{numUsersAdded} studenti sono stati aggiunti a questa coorte.",
       "{numUsersAdded} studenti sono stati aggiunti a questa coorte."
     ],
     "{numVotes} Vote": [
       "{numVotes} Voto",
+      "{numVotes} Voti",
       "{numVotes} Voti"
     ],
     "{num_of_hours} hour": "{num_of_hours} ora",
@@ -2593,18 +2613,22 @@
     "{num_of_minutes} minutes": "{num_of_minutes} minuti",
     "{num_points} point possible (graded)": [
       "{num_points} punto possibile (valutato)",
+      "{num_points} punti possibili (valutato)",
       "{num_points} punti possibili (valutato)"
     ],
     "{num_points} point possible (graded, results hidden)": [
       "{num_points} punto possibile (valutato, risultati nascosti)",
+      "{num_points} punti possibili (valutato, risultati nascosti)",
       "{num_points} punti possibili (valutato, risultati nascosti)"
     ],
     "{num_points} point possible (ungraded)": [
       "{num_points} punto possibile (non valutato)",
+      "{num_points} punti possibili (non valutato)",
       "{num_points} punti possibili (non valutato)"
     ],
     "{num_points} point possible (ungraded, results hidden)": [
       "{num_points} punto possibile (non valutato, risultati nascosti)",
+      "{num_points} punti possibili (non valutato, risultati nascosti)",
       "{num_points} punti possibili (non valutato, risultati nascosti)"
     ],
     "{organization}\\'s logo": "Logo {organization} ",
@@ -2622,11 +2646,13 @@
     "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on {platformName}.{strongEnd}": "{strongStart}Avvertenza: L'eliminazione dell'account \u00e8 definitiva.{strongEnd} Prima di procedere leggi attentamente quanto sopra. Questa \u00e8 un'azione irreversibile e {strongStart}non sarai pi\u00f9 in grado di utilizzare la stessa email su {platformName}.{strongEnd}",
     "{team_count} Team": [
       "{team_count} team",
+      "{team_count} team",
       "{team_count} team"
     ],
     "{totalItems} total": "{totalItems} totali",
     "{total_results} result found for \"{search_term}\"": [
       "{total_results} risultato trovato per \"{search_term}\"",
+      "{total_results} risultati trovati per \"{search_term}\"",
       "{total_results} risultati trovati per \"{search_term}\""
     ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",

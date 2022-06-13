@@ -1,7 +1,7 @@
 """
 This file contains celery tasks for programs-related functionality.
 """
-from datetime import datetime
+from urllib.parse import urljoin
 
 from celery import shared_task
 from celery.exceptions import MaxRetriesExceededError
@@ -11,18 +11,22 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from edx_django_utils.monitoring import set_code_owner_attribute
-from edx_rest_api_client import exceptions
 from opaque_keys.edx.keys import CourseKey
+from requests.exceptions import HTTPError
+from xmodule.data import CertificatesDisplayBehaviors
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import available_date_for_certificate
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
-from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_api_client
+from openedx.core.djangoapps.credentials.utils import (
+    get_credentials,
+    get_credentials_api_base_url,
+    get_credentials_api_client,
+)
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
 LOGGER = get_task_logger(__name__)
 # Maximum number of retries before giving up on awarding credentials.
@@ -96,7 +100,7 @@ def award_program_certificate(client, user, program_uuid, visible_date):
 
     Args:
         client:
-            credentials API client (EdxRestApiClient)
+            credentials API client (requests.Session)
         user:
             The student's user data
         program_uuid:
@@ -106,22 +110,27 @@ def award_program_certificate(client, user, program_uuid, visible_date):
 
     Returns:
         None
-
     """
-    client.credentials.post({
-        'username': user.username,
-        'lms_user_id': user.id,
-        'credential': {
-            'type': PROGRAM_CERTIFICATE,
-            'program_uuid': program_uuid
-        },
-        'attributes': [
-            {
-                'name': 'visible_date',
-                'value': visible_date.strftime(DATE_FORMAT)
-            }
-        ]
-    })
+    credentials_api_base_url = get_credentials_api_base_url()
+    api_url = urljoin(f"{credentials_api_base_url}/", "credentials/")
+    response = client.post(
+        api_url,
+        json={
+            'username': user.username,
+            'lms_user_id': user.id,
+            'credential': {
+                'type': PROGRAM_CERTIFICATE,
+                'program_uuid': program_uuid
+            },
+            'attributes': [
+                {
+                    'name': 'visible_date',
+                    'value': visible_date.strftime(DATE_FORMAT)
+                }
+            ]
+        }
+    )
+    response.raise_for_status()
 
 
 @shared_task(bind=True, ignore_result=True)
@@ -233,17 +242,13 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
                 LOGGER.info(f"Visible date for user {username} : program {program_uuid} is {visible_date}")
                 award_program_certificate(credentials_client, student, program_uuid, visible_date)
                 LOGGER.info(f"Awarded certificate for program {program_uuid} to user {username}")
-            except exceptions.HttpNotFoundError:
-                LOGGER.exception(
-                    f"Certificate for program {program_uuid} could not be found. " +
-                    f"Unable to award certificate to user {username}. The program might not be configured."
-                )
-            except exceptions.HttpClientError as exc:
-                # Grab the status code from the client error, because our API
-                # client handles all 4XX errors the same way. In the future,
-                # we may want to fork slumber, add 429 handling, and use that
-                # in edx_rest_api_client.
-                if exc.response.status_code == 429:  # lint-amnesty, pylint: disable=no-else-raise, no-member
+            except HTTPError as exc:
+                if exc.response.status_code == 404:
+                    LOGGER.exception(
+                        f"Certificate for program {program_uuid} could not be found. " +
+                        f"Unable to award certificate to user {username}. The program might not be configured."
+                    )
+                elif exc.response.status_code == 429:
                     rate_limit_countdown = 60
                     error_msg = (
                         f"Rate limited. "
@@ -261,7 +266,7 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
                         f"Unable to award certificate to user {username} for program {program_uuid}. "
                         "The program might not be configured."
                     )
-            except Exception as exc:  # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 # keep trying to award other certs, but retry the whole task to fix any missing entries
                 LOGGER.exception(f"Failed to award certificate for program {program_uuid} to user {username}.")
                 failed_program_certificate_award_attempts.append(program_uuid)
@@ -285,37 +290,51 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
 
 def post_course_certificate_configuration(client, cert_config, certificate_available_date=None):
     """
-    POST a configuration for a course certificate and the date the certificate
-    will be available
+    POST to a course_certificates endpoint.
+
+    POST a configuration for a course certificate and the date the certificate will be available.
     """
-    client.course_certificates.post({
-        "course_id": cert_config['course_id'],
-        "certificate_type": cert_config['mode'],
-        "certificate_available_date": certificate_available_date,
-        "is_active": True
-    })
+    credentials_api_base_url = get_credentials_api_base_url()
+    api_url = urljoin(f"{credentials_api_base_url}/", "course_certificates/")
+    response = client.post(
+        api_url,
+        json={
+            "course_id": cert_config['course_id'],
+            "certificate_type": cert_config['mode'],
+            "certificate_available_date": certificate_available_date,
+            "is_active": True
+        }
+    )
+    response.raise_for_status()
 
 
-def post_course_certificate(client, username, certificate, visible_date, date_override=None):
+def post_course_certificate(client, username, certificate, visible_date, date_override=None, org=None):
     """
     POST a certificate that has been updated to Credentials
     """
-    client.credentials.post({
-        'username': username,
-        'status': 'awarded' if certificate.is_valid() else 'revoked',  # Only need the two options at this time
-        'credential': {
-            'course_run_key': str(certificate.course_id),
-            'mode': certificate.mode,
-            'type': COURSE_CERTIFICATE,
-        },
-        'date_override': {'date': date_override.strftime(DATE_FORMAT)} if date_override else None,
-        'attributes': [
-            {
-                'name': 'visible_date',
-                'value': visible_date.strftime(DATE_FORMAT)
-            }
-        ]
-    })
+    credentials_api_base_url = get_credentials_api_base_url(org)
+    api_url = urljoin(f"{credentials_api_base_url}/", "credentials/")
+
+    response = client.post(
+        api_url,
+        json={
+            'username': username,
+            'status': 'awarded' if certificate.is_valid() else 'revoked',  # Only need the two options at this time
+            'credential': {
+                'course_run_key': str(certificate.course_id),
+                'mode': certificate.mode,
+                'type': COURSE_CERTIFICATE,
+            },
+            'date_override': {'date': date_override.strftime(DATE_FORMAT)} if date_override else None,
+            'attributes': [
+                {
+                    'name': 'visible_date',
+                    'value': visible_date.strftime(DATE_FORMAT)
+                }
+            ]
+        }
+    )
+    response.raise_for_status()
 
 
 # pylint: disable=W0613
@@ -327,14 +346,16 @@ def update_credentials_course_certificate_configuration_available_date(
     certificate_available_date=None
 ):
     """
-    This task will update the course certificate configuration's available date. This is different from the
-    "visable_date" attribute. This date will always either be the available date that is set in studio for
-    a given course, or it will be None.
+    This task will update the CourseCertificate configuration's available date
+    in Credentials. This is different from the "visible_date" attribute. This
+    date will always either be the available date that is set in Studio for a
+    given course, or it will be None.
 
     Arguments:
         course_run_key (str): The course run key to award the certificate for
-        certificate_available_date (str): A string representation of the datetime for when to make the certificate
-            available to the user. If not provided, it will be none.
+        certificate_available_date (str): A string representation of the
+            datetime for when to make the certificate available to the user. If
+            not provided, it will be None.
     """
     LOGGER.info(
         f"Running task update_credentials_course_certificate_configuration_available_date for course {course_key} \
@@ -366,7 +387,7 @@ def update_credentials_course_certificate_configuration_available_date(
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def award_course_certificate(self, username, course_run_key, certificate_available_date=None):
+def award_course_certificate(self, username, course_run_key):
     """
     This task is designed to be called whenever a student GeneratedCertificate is updated.
     It can be called independently for a username and a course_run, but is invoked on each GeneratedCertificate.save.
@@ -377,9 +398,6 @@ def award_course_certificate(self, username, course_run_key, certificate_availab
     Arguments:
         username (str): The user to award the Credentials course cert to
         course_run_key (str): The course run key to award the certificate for
-        certificate_available_date (str): A string representation of the datetime for when to make the certificate
-            available to the user. If not provided, it will calculate the date.
-
     """
     def _retry_with_custom_exception(username, course_run_key, reason, countdown):
         exception = MaxRetriesExceededError(
@@ -440,24 +458,16 @@ def award_course_certificate(self, username, course_run_key, certificate_availab
                     f"Task award_course_certificate was called without course overview data for course {course_key}"
                 )
                 return
-            credentials_client = get_credentials_api_client(User.objects.get(
-                username=settings.CREDENTIALS_SERVICE_USERNAME),
-                org=course_key.org,
+
+            credentials_client = get_credentials_api_client(
+                User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
             )
 
-            # Date is being passed via JSON and is encoded in the EMCA date time string format. The rest of the code
-            # expects a datetime.
-            if certificate_available_date:
-                certificate_available_date = datetime.strptime(certificate_available_date, DATE_FORMAT)
-
-            # Even in the cases where this task is called with a certificate_available_date, we still need to retrieve
-            # the course overview because it's required to determine if we should use the certificate_available_date or
-            # the certs modified date
             visible_date = available_date_for_certificate(
                 course_overview,
                 certificate,
-                certificate_available_date=certificate_available_date
             )
+
             LOGGER.info(
                 "Task award_course_certificate will award certificate for course "
                 f"{course_key} with a visible date of {visible_date}"
@@ -474,7 +484,9 @@ def award_course_certificate(self, username, course_run_key, certificate_availab
             except ObjectDoesNotExist:
                 date_override = None
 
-            post_course_certificate(credentials_client, username, certificate, visible_date, date_override)
+            post_course_certificate(
+                credentials_client, username, certificate, visible_date, date_override, org=course_key.org
+            )
 
             LOGGER.info(f"Awarded certificate for course {course_key} to user {username}")
     except Exception as exc:
@@ -517,22 +529,27 @@ def revoke_program_certificate(client, username, program_uuid):
     Revoke a certificate of the given student for the given program.
 
     Args:
-        client: credentials API client (EdxRestApiClient)
+        client: credentials API client (requests.Session)
         username: The username of the student
         program_uuid: uuid of the program
 
     Returns:
         None
-
     """
-    client.credentials.post({
-        'username': username,
-        'status': 'revoked',
-        'credential': {
-            'type': PROGRAM_CERTIFICATE,
-            'program_uuid': program_uuid
+    credentials_api_base_url = get_credentials_api_base_url()
+    api_url = urljoin(f"{credentials_api_base_url}/", "credentials/")
+    response = client.post(
+        api_url,
+        json={
+            'username': username,
+            'status': 'revoked',
+            'credential': {
+                'type': PROGRAM_CERTIFICATE,
+                'program_uuid': program_uuid
+            }
         }
-    })
+    )
+    response.raise_for_status()
 
 
 @shared_task(bind=True, ignore_result=True)
@@ -634,21 +651,17 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
             try:
                 revoke_program_certificate(credentials_client, username, program_uuid)
                 LOGGER.info(f"Revoked certificate for program {program_uuid} for user {username}")
-            except exceptions.HttpNotFoundError:
-                LOGGER.exception(
-                    f"Certificate for program {program_uuid} could not be found. "
-                    f"Unable to revoke certificate for user {username}"
-                )
-            except exceptions.HttpClientError as exc:
-                # Grab the status code from the client error, because our API
-                # client handles all 4XX errors the same way. In the future,
-                # we may want to fork slumber, add 429 handling, and use that
-                # in edx_rest_api_client.
-                if exc.response.status_code == 429:  # pylint: disable=no-member, no-else-raise
+            except HTTPError as exc:
+                if exc.response.status_code == 404:
+                    LOGGER.exception(
+                        f"Certificate for program {program_uuid} could not be found. "
+                        f"Unable to revoke certificate for user {username}"
+                    )
+                elif exc.response.status_code == 429:
                     rate_limit_countdown = 60
                     error_msg = (
-                        "Rate limited. "
-                        f"Retrying task to revoke certificates for user {username} in {rate_limit_countdown} seconds"
+                        "Rate limited. Retrying task to revoke certificates "
+                        f"for user {username} in {rate_limit_countdown} seconds"
                     )
                     LOGGER.info(error_msg)
                     # Retry after 60 seconds, when we should be in a new throttling window
@@ -659,7 +672,9 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
                         countdown=rate_limit_countdown
                     ) from exc
                 else:
-                    LOGGER.exception(f"Unable to revoke certificate for user {username} for program {program_uuid}.")
+                    LOGGER.exception(
+                        f"Unable to revoke certificate for user {username} for program {program_uuid}."
+                    )
             except Exception:  # pylint: disable=broad-except
                 # keep trying to revoke other certs, but retry the whole task to fix any missing entries
                 LOGGER.warning(f"Failed to revoke certificate for program {program_uuid} of user {username}.")
@@ -689,7 +704,7 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def update_certificate_visible_date_on_course_update(self, course_key, certificate_available_date):
+def update_certificate_visible_date_on_course_update(self, course_key):
     """
     This task is designed to be called whenever a course is updated with
     certificate_available_date so that visible_date is updated on credential
@@ -704,8 +719,6 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
 
     Arguments:
         course_key (str): The course identifier
-        certificate_available_date (str): The date to update the certificate availablity date to. It's a string
-            representation of a datetime object because task parameters must be JSON-able.
 
     Returns:
         None
@@ -726,9 +739,11 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
             f"Failed to update certificate availability date for course {course_key}. Reason: {error_msg}"
         )
         raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)
-    # update the course certificate with the new certificate available date if:
-    # - The course is not self paced
-    # - The certificates_display_behavior is not "end_with_date"
+
+    # Update the CourseCertificate configuration in Credentials with the new
+    # certificate_available_date if:
+    # - The course is not self paced, AND
+    # - The certificates_display_behavior is "end_with_date"
     course_overview = CourseOverview.get_from_id(course_key)
     if (
         course_overview.self_paced is False and
@@ -736,8 +751,12 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
     ):
         update_credentials_course_certificate_configuration_available_date.delay(
             str(course_key),
-            certificate_available_date
+            str(course_overview.certificate_available_date)
         )
+
+    # This code will update the visible_date in Credentials; we have moved away
+    # from relying on visible_date in favor of the above, but this still runs
+    # and visible_date is still updated
     users_with_certificates_in_course = GeneratedCertificate.eligible_available_certificates.filter(
         course_id=course_key
     ).values_list('user__username', flat=True)
@@ -747,4 +766,4 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
         f"for {len(users_with_certificates_in_course)} users in course {course_key}."
     )
     for user in users_with_certificates_in_course:
-        award_course_certificate.delay(user, str(course_key), certificate_available_date=certificate_available_date)
+        award_course_certificate.delay(user, str(course_key))

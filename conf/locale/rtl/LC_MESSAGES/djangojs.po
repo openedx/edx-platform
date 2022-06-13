@@ -1,39 +1,39 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2022.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2022.
 #
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2022.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2021 edX
+# Copyright (C) 2022 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2022.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2021 edX
+# Copyright (C) 2022 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2022.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-26 20:50+0000\n"
-"PO-Revision-Date: 2021-12-26 20:50:31.383144\n"
+"POT-Creation-Date: 2022-06-03 17:27+0000\n"
+"PO-Revision-Date: 2022-06-03 17:28:01.823212\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -3069,6 +3069,7 @@ msgid "Markdown Editing Help"
 msgstr "Mɐɹʞdøʍn Ɇdᴉʇᴉnƃ Ħǝld"
 
 #: lms/static/js/Markdown.Editor.js cms/templates/js/asset-library.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 msgid "URL"
 msgstr "ɄɌŁ"
 
@@ -3867,36 +3868,6 @@ msgstr "Ȼøɥøɹʇs Ɇnɐblǝd"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Ȼøɥøɹʇs Đᴉsɐblǝd"
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-"Ŧɥᴉs ɔønɹsǝ nsǝs ɐnʇøɯɐʇᴉɔ ɔøɥøɹʇᴉnƃ ɟøɹ ʌǝɹᴉɟᴉǝd ʇɹɐɔʞ lǝɐɹnǝɹs. Ɏøn ɔɐnnøʇ"
-" dᴉsɐblǝ ɔøɥøɹʇs, ɐnd ʎøn ɔɐnnøʇ ɹǝnɐɯǝ ʇɥǝ ɯɐnnɐl ɔøɥøɹʇ nɐɯǝd "
-"'{verifiedCohortName}'. Ŧø ɔɥɐnƃǝ ʇɥǝ ɔønɟᴉƃnɹɐʇᴉøn ɟøɹ ʌǝɹᴉɟᴉǝd ʇɹɐɔʞ "
-"ɔøɥøɹʇs, ɔønʇɐɔʇ ʎønɹ ǝdX dɐɹʇnǝɹ ɯɐnɐƃǝɹ."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-"Ŧɥᴉs ɔønɹsǝ ɥɐs ɐnʇøɯɐʇᴉɔ ɔøɥøɹʇᴉnƃ ǝnɐblǝd ɟøɹ ʌǝɹᴉɟᴉǝd ʇɹɐɔʞ lǝɐɹnǝɹs, bnʇ"
-" ʇɥǝ ɹǝbnᴉɹǝd ɔøɥøɹʇ døǝs nøʇ ǝxᴉsʇ. Ɏøn ɯnsʇ ɔɹǝɐʇǝ ɐ ɯɐnnɐllʎ-ɐssᴉƃnǝd "
-"ɔøɥøɹʇ nɐɯǝd '{verifiedCohortName}' ɟøɹ ʇɥǝ ɟǝɐʇnɹǝ ʇø ʍøɹʞ."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
-msgstr ""
-"Ŧɥᴉs ɔønɹsǝ ɥɐs ɐnʇøɯɐʇᴉɔ ɔøɥøɹʇᴉnƃ ǝnɐblǝd ɟøɹ ʌǝɹᴉɟᴉǝd ʇɹɐɔʞ lǝɐɹnǝɹs, bnʇ"
-" ɔøɥøɹʇs ɐɹǝ dᴉsɐblǝd. Ɏøn ɯnsʇ ǝnɐblǝ ɔøɥøɹʇs ɟøɹ ʇɥǝ ɟǝɐʇnɹǝ ʇø ʍøɹʞ."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -5572,38 +5543,6 @@ msgstr "Øʌǝɹɐll Sɔøɹǝ"
 msgid "Bookmark this page"
 msgstr "Ƀøøʞɯɐɹʞ ʇɥᴉs dɐƃǝ"
 
-#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
-msgid "Thank you for setting your course goal to {goal}!"
-msgstr "Ŧɥɐnʞ ʎøn ɟøɹ sǝʇʇᴉnƃ ʎønɹ ɔønɹsǝ ƃøɐl ʇø {goal}!"
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr "Ɏøn ɥɐʌǝ snɔɔǝssɟnllʎ nddɐʇǝd ʎønɹ ƃøɐl."
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr "Ŧɥǝɹǝ ʍɐs ɐn ǝɹɹøɹ nddɐʇᴉnƃ ʎønɹ ƃøɐl."
-
-#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "Ɇxdɐnd Ⱥll"
-
-#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "Ȼøllɐdsǝ Ⱥll"
-
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr "Sɥøʍ Møɹǝ"
-
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr "Sɥøʍ Łǝss"
-
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result found for \"{search_term}\""
 msgid_plural "{total_results} results found for \"{search_term}\""
@@ -7250,6 +7189,11 @@ msgstr "Ⱥɔʇᴉøns"
 msgid "Unscheduled"
 msgstr "Ʉnsɔɥǝdnlǝd"
 
+#: cms/templates/js/discussion-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Discussion"
+msgstr "Đᴉsɔnssᴉøn"
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -7486,10 +7430,6 @@ msgid "follow this post"
 msgstr "ɟølløʍ ʇɥᴉs døsʇ"
 
 #: common/static/common/templates/discussion/templates.underscore
-msgid "post anonymously"
-msgstr "døsʇ ɐnønʎɯønslʎ"
-
-#: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously to classmates"
 msgstr "døsʇ ɐnønʎɯønslʎ ʇø ɔlɐssɯɐʇǝs"
 
@@ -7554,10 +7494,6 @@ msgstr ""
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"
 msgstr "Qnǝsʇᴉøn"
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Discussion"
-msgstr "Đᴉsɔnssᴉøn"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Endorse"
@@ -7949,6 +7885,14 @@ msgid "This catalog's courses:"
 msgstr "Ŧɥᴉs ɔɐʇɐløƃ's ɔønɹsǝs:"
 
 #: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "Ɇxdɐnd Ⱥll"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "Ȼøllɐdsǝ Ⱥll"
+
+#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Sʇɐɹʇ Đɐʇǝ"
 
@@ -8032,6 +7976,14 @@ msgid ""
 msgstr ""
 "Ŧø ɹǝɔǝᴉʌǝ ɔɹǝdᴉʇ ɟøɹ dɹøblǝɯs, ʎøn ɯnsʇ sǝlǝɔʇ \"Snbɯᴉʇ\" ɟøɹ ǝɐɔɥ dɹøblǝɯ "
 "bǝɟøɹǝ ʎøn sǝlǝɔʇ \"Ɇnd Mʎ Ɇxɐɯ\"."
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "Sɥøʍ Møɹǝ"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "Sɥøʍ Łǝss"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -8678,15 +8630,6 @@ msgstr "Ȼønƃɹɐʇnlɐʇᴉøns!"
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr "Ɏønɹ Ᵽɹøƃɹɐɯ Ɉønɹnǝʎ"
-
-#: lms/templates/learner_dashboard/program_details_tab_view.underscore
-#: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"To complete the program, you must earn a verified certificate for each "
-"course."
-msgstr ""
-"Ŧø ɔøɯdlǝʇǝ ʇɥǝ dɹøƃɹɐɯ, ʎøn ɯnsʇ ǝɐɹn ɐ ʌǝɹᴉɟᴉǝd ɔǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ ǝɐɔɥ "
-"ɔønɹsǝ."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -10383,6 +10326,10 @@ msgstr "Đɐʇǝ"
 msgid "Post"
 msgstr "Ᵽøsʇ"
 
+#: cms/templates/js/discussion-editor.underscore
+msgid "Enable discussion"
+msgstr "Ɇnɐblǝ dᴉsɔnssᴉøn"
+
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
 msgstr "Đnǝ Đɐʇǝ:"
@@ -10611,6 +10558,7 @@ msgstr "Nǝʍ %(item_type)s"
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear"
 msgstr "Ȼlǝɐɹ"
@@ -10620,6 +10568,7 @@ msgstr "Ȼlǝɐɹ"
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Ȼlǝɐɹ Vɐlnǝ"
@@ -10870,24 +10819,6 @@ msgstr "Sɥøʍ ɐssǝssɯǝnʇ ɹǝsnlʇs ʍɥǝn snbsǝɔʇᴉøn ᴉs dɐsʇ 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
 "Learners do not see whether their answers to assessments were correct or "
-"incorrect, nor the score received, until after the course end date has "
-"passed."
-msgstr ""
-"Łǝɐɹnǝɹs dø nøʇ sǝǝ ʍɥǝʇɥǝɹ ʇɥǝᴉɹ ɐnsʍǝɹs ʇø ɐssǝssɯǝnʇs ʍǝɹǝ ɔøɹɹǝɔʇ øɹ "
-"ᴉnɔøɹɹǝɔʇ, nøɹ ʇɥǝ sɔøɹǝ ɹǝɔǝᴉʌǝd, nnʇᴉl ɐɟʇǝɹ ʇɥǝ ɔønɹsǝ ǝnd dɐʇǝ ɥɐs "
-"dɐssǝd."
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"If the course does not have an end date, learners always see their scores "
-"when they submit answers to assessments."
-msgstr ""
-"Ɨɟ ʇɥǝ ɔønɹsǝ døǝs nøʇ ɥɐʌǝ ɐn ǝnd dɐʇǝ, lǝɐɹnǝɹs ɐlʍɐʎs sǝǝ ʇɥǝᴉɹ sɔøɹǝs "
-"ʍɥǝn ʇɥǝʎ snbɯᴉʇ ɐnsʍǝɹs ʇø ɐssǝssɯǝnʇs."
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"Learners do not see whether their answers to assessments were correct or "
 "incorrect, nor the score received, until after the due date for the "
 "subsection has passed."
 msgstr ""
@@ -11044,25 +10975,25 @@ msgstr "Ɇxɐɯ Ŧʎdǝs"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This subsection was released to learners as a special exam, but was reverted"
-" back to a basic exam. You may not configure it as a special exam now. "
-"Contact edX Support for assistance."
+"This subsection was released to learners as a proctored exam, but was "
+"reverted back to a basic or timed exam. You may not configure it as a "
+"proctored exam now. Contact edX Support for assistance."
 msgstr ""
-"Ŧɥᴉs snbsǝɔʇᴉøn ʍɐs ɹǝlǝɐsǝd ʇø lǝɐɹnǝɹs ɐs ɐ sdǝɔᴉɐl ǝxɐɯ, bnʇ ʍɐs ɹǝʌǝɹʇǝd"
-" bɐɔʞ ʇø ɐ bɐsᴉɔ ǝxɐɯ. Ɏøn ɯɐʎ nøʇ ɔønɟᴉƃnɹǝ ᴉʇ ɐs ɐ sdǝɔᴉɐl ǝxɐɯ nøʍ. "
-"Ȼønʇɐɔʇ ǝdX Snddøɹʇ ɟøɹ ɐssᴉsʇɐnɔǝ."
+"Ŧɥᴉs snbsǝɔʇᴉøn ʍɐs ɹǝlǝɐsǝd ʇø lǝɐɹnǝɹs ɐs ɐ dɹøɔʇøɹǝd ǝxɐɯ, bnʇ ʍɐs "
+"ɹǝʌǝɹʇǝd bɐɔʞ ʇø ɐ bɐsᴉɔ øɹ ʇᴉɯǝd ǝxɐɯ. Ɏøn ɯɐʎ nøʇ ɔønɟᴉƃnɹǝ ᴉʇ ɐs ɐ "
+"dɹøɔʇøɹǝd ǝxɐɯ nøʍ. Ȼønʇɐɔʇ ǝdX Snddøɹʇ ɟøɹ ɐssᴉsʇɐnɔǝ."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This special exam has been released to learners. You may not convert it to "
-"another type of special exam. You may revert this subsection back to being a"
-" basic exam by selecting 'None', but you will NOT be able to configure it as"
-" a special exam in the future."
+"This proctored exam has been released to learners. You may not convert it to"
+" another type of special exam. You may revert this subsection back to being "
+"a basic exam by selecting 'None', or a timed exam, but you will NOT be able "
+"to configure it as a proctored exam in the future."
 msgstr ""
-"Ŧɥᴉs sdǝɔᴉɐl ǝxɐɯ ɥɐs bǝǝn ɹǝlǝɐsǝd ʇø lǝɐɹnǝɹs. Ɏøn ɯɐʎ nøʇ ɔønʌǝɹʇ ᴉʇ ʇø "
-"ɐnøʇɥǝɹ ʇʎdǝ øɟ sdǝɔᴉɐl ǝxɐɯ. Ɏøn ɯɐʎ ɹǝʌǝɹʇ ʇɥᴉs snbsǝɔʇᴉøn bɐɔʞ ʇø bǝᴉnƃ ɐ"
-" bɐsᴉɔ ǝxɐɯ bʎ sǝlǝɔʇᴉnƃ 'Nønǝ', bnʇ ʎøn ʍᴉll NØŦ bǝ ɐblǝ ʇø ɔønɟᴉƃnɹǝ ᴉʇ ɐs"
-" ɐ sdǝɔᴉɐl ǝxɐɯ ᴉn ʇɥǝ ɟnʇnɹǝ."
+"Ŧɥᴉs dɹøɔʇøɹǝd ǝxɐɯ ɥɐs bǝǝn ɹǝlǝɐsǝd ʇø lǝɐɹnǝɹs. Ɏøn ɯɐʎ nøʇ ɔønʌǝɹʇ ᴉʇ ʇø"
+" ɐnøʇɥǝɹ ʇʎdǝ øɟ sdǝɔᴉɐl ǝxɐɯ. Ɏøn ɯɐʎ ɹǝʌǝɹʇ ʇɥᴉs snbsǝɔʇᴉøn bɐɔʞ ʇø bǝᴉnƃ "
+"ɐ bɐsᴉɔ ǝxɐɯ bʎ sǝlǝɔʇᴉnƃ 'Nønǝ', øɹ ɐ ʇᴉɯǝd ǝxɐɯ, bnʇ ʎøn ʍᴉll NØŦ bǝ ɐblǝ "
+"ʇø ɔønɟᴉƃnɹǝ ᴉʇ ɐs ɐ dɹøɔʇøɹǝd ǝxɐɯ ᴉn ʇɥǝ ɟnʇnɹǝ."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"

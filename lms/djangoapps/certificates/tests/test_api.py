@@ -564,6 +564,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         assert get_certificate_for_user(self.student.username, self.nonexistent_course_id) is None
 
 
+@ddt.ddt
 class GenerateUserCertificatesTest(ModuleStoreTestCase):
     """Tests for generating certificates for students. """
 
@@ -605,7 +606,8 @@ class GenerateUserCertificatesTest(ModuleStoreTestCase):
                 assert cert.mode == CourseMode.VERIFIED
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
-    def test_generation_unverified(self):
+    @ddt.data(True, False)
+    def test_generation_unverified(self, enable_idv_requirement):
         """
         Test that a cert is successfully generated with a status of unverified
         """
@@ -614,11 +616,15 @@ class GenerateUserCertificatesTest(ModuleStoreTestCase):
 
         with mock.patch(PASSING_GRADE_METHOD, return_value=True):
             with mock.patch(ID_VERIFIED_METHOD, return_value=False):
-                generate_certificate_task(self.user, self.course_run_key)
+                with mock.patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_idv_requirement):
+                    generate_certificate_task(self.user, self.course_run_key)
 
-                cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
-                assert cert.status == CertificateStatuses.unverified
-                assert cert.mode == CourseMode.VERIFIED
+                    cert = get_certificate_for_user_id(self.user.id, self.course_run_key)
+                    assert cert.mode == CourseMode.VERIFIED
+                    if enable_idv_requirement:
+                        assert cert.status == CertificateStatuses.unverified
+                    else:
+                        assert cert.status == CertificateStatuses.downloadable
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_generation_notpassing(self):

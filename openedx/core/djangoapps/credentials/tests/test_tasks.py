@@ -55,10 +55,9 @@ class TestSendGradeToCredentialTask(TestCase):
 
         assert mock_get_api_client.call_count == 1
         assert mock_get_api_client.call_args[0] == (self.user,)
-        self.assertDictEqual(mock_get_api_client.call_args[1], {'org': 'org'})
 
-        assert api_client.grades.post.call_count == 1
-        self.assertDictEqual(api_client.grades.post.call_args[0][0], {
+        assert api_client.post.call_count == 1
+        self.assertDictEqual(api_client.post.call_args[1]['data'], {
             'username': 'user',
             'course_run': 'course-v1:org+course+run',
             'letter_grade': 'A',

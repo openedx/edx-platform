@@ -2,22 +2,28 @@
 """
 Python APIs exposed by the bulk_email app to other in-process apps.
 """
-
-# Public Bulk Email Functions
 import logging
 
 from django.conf import settings
 from django.urls import reverse
 
-from lms.djangoapps.bulk_email.models import CourseEmail
+from common.djangoapps.course_modes.models import CourseMode
+from lms.djangoapps.bulk_email.data import BulkEmailTargetChoices
+from lms.djangoapps.bulk_email.models import (
+    CohortTarget,
+    CourseEmail,
+    CourseModeTarget,
+    Target
+)
+
 from lms.djangoapps.bulk_email.models_api import (
     is_bulk_email_disabled_for_course,
-    is_bulk_email_enabled_for_course,
     is_bulk_email_feature_enabled,
     is_user_opted_out_for_course
 )
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.html_to_text import html_to_text
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +47,6 @@ def get_emails_enabled(user, course_id):
 
 def get_unsubscribed_link(username, course_id):
     """
-
     :param username: username
     :param course_id:
     :return: AES encrypted token based on the user email
@@ -61,7 +66,7 @@ def create_course_email(course_id, sender, targets, subject, html_message, text_
     Args:
         course_id (CourseKey): The CourseKey of the course.
         sender (String): Email author.
-        targets (Target): Recipient groups the message should be sent to (e.g. SEND_TO_MYSELF)
+        targets (List[String]): Recipient groups the message should be sent to.
         subject (String)): Email subject.
         html_message (String): Email body. Includes HTML markup.
         text_message (String, optional): Plaintext version of email body. Defaults to None.
@@ -87,3 +92,89 @@ def create_course_email(course_id, sender, targets, subject, html_message, text_
     except ValueError as err:
         log.exception(f"Cannot create course email for {course_id} requested by user {sender} for targets {targets}")
         raise ValueError from err
+
+
+def update_course_email(course_id, email_id, targets, subject, html_message, plaintext_message=None):
+    """
+    Utility function that allows a course_email instance to be updated after it has been created.
+
+    course_id (CourseKey): The CourseKey of the course.
+    email_id (Int): The PK `id` value of the course_email instance that is to be updated.
+    targets (List[String]): Recipient groups the message should be sent to.
+    subject (String)): Email subject.
+    html_message (String): Email body. Includes HTML markup.
+    text_message (String, optional): Plaintext version of email body. Defaults to None.
+    """
+    log.info(f"Updating course email with id '{email_id}' in course '{course_id}'")
+    # generate a new stripped version of the plaintext content from the HTML markup
+    if plaintext_message is None:
+        plaintext_message = html_to_text(html_message)
+
+    # update the targets for the message
+    new_targets = determine_targets_for_course_email(course_id, subject, targets)
+    if not new_targets:
+        raise ValueError("Must specify at least one target (recipient group) for a course email")
+
+    # get the course email and load into memory, update the fields individually since we have to update/set a M2M
+    # relationship on the instance
+    course_email = CourseEmail.objects.get(course_id=course_id, id=email_id)
+    course_email.subject = subject
+    course_email.html_message = html_message
+    course_email.text_message = plaintext_message
+    course_email.save()
+    # update the targets M2M relationship
+    course_email.targets.clear()
+    course_email.targets.add(*new_targets)
+    course_email.save()
+
+
+def get_course_email(email_id):
+    """
+    Utility function for retrieving a CourseEmail instance from a given CourseEmail id.
+
+    Args:
+        email_id (int): The ID of the CourseEmail instance you want to retrieve.
+
+    Returns:
+        CourseEmail: The CourseEmail instance, if it exists.
+    """
+    try:
+        return CourseEmail.objects.get(id=email_id)
+    except CourseEmail.DoesNotExist:
+        log.exception(f"CourseEmail instance with id '{email_id}' could not be found")
+
+    return None
+
+
+def determine_targets_for_course_email(course_id, subject, targets):
+    """
+    Utility function to determine the targets (recipient groups) selected by an author of a course email.
+
+    Historically, this used to be a piece of logic in the CourseEmail model's `create` function but has been extracted
+    here so it can be used by a REST API of the `instructor_task` app.
+    """
+    new_targets = []
+    for target in targets:
+        # split target, to handle cohort:cohort_name and track:mode_slug
+        target_split = target.split(':', 1)
+        # Ensure our desired target exists
+        if not BulkEmailTargetChoices.is_valid_target(target_split[0]):  # pylint: disable=no-else-raise
+            raise ValueError(
+                f"Course email being sent to an unrecognized target: '{target}' for '{course_id}', subject '{subject}'"
+            )
+        elif target_split[0] == BulkEmailTargetChoices.SEND_TO_COHORT:
+            # target_split[1] will contain the cohort name
+            cohort = CohortTarget.ensure_valid_cohort(target_split[1], course_id)
+            new_target, _ = CohortTarget.objects.get_or_create(target_type=target_split[0], cohort=cohort)
+        elif target_split[0] == BulkEmailTargetChoices.SEND_TO_TRACK:
+            # target_split[1] contains the desired mode slug
+            CourseModeTarget.ensure_valid_mode(target_split[1], course_id)
+            # There could exist multiple CourseModes that match this query, due to differing currency types.
+            # The currencies do not affect user lookup though, so we can just use the first result.
+            mode = CourseMode.objects.filter(course_id=course_id, mode_slug=target_split[1])[0]
+            new_target, _ = CourseModeTarget.objects.get_or_create(target_type=target_split[0], track=mode)
+        else:
+            new_target, _ = Target.objects.get_or_create(target_type=target_split[0])
+        new_targets.append(new_target)
+
+    return new_targets

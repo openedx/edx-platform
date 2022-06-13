@@ -16,7 +16,6 @@ import ddt
 import pytz
 from django.conf import settings
 from django.test.utils import override_settings
-from edx_toggles.toggles import LegacyWaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from edxval.api import (
     create_or_update_transcript_preferences,
@@ -27,7 +26,6 @@ from edxval.api import (
     get_transcript_preferences,
     get_video_info
 )
-from waffle.testutils import override_flag
 
 from cms.djangoapps.contentstore.models import VideoUploadConfig
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -36,7 +34,6 @@ from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
-    waffle_flags
 )
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -45,14 +42,11 @@ from ..videos import (
     ENABLE_VIDEO_UPLOAD_PAGINATION,
     KEY_EXPIRATION_IN_SECONDS,
     VIDEO_IMAGE_UPLOAD_ENABLED,
-    WAFFLE_SWITCHES,
     StatusDisplayStrings,
     TranscriptProvider,
     _get_default_video_image_url,
     convert_video_status
 )
-
-VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH = LegacyWaffleSwitch(WAFFLE_SWITCHES, VIDEO_IMAGE_UPLOAD_ENABLED)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
 
 class VideoUploadTestBase:
@@ -546,7 +540,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret', AWS_SECURITY_TOKEN='token')
     @patch('boto.s3.key.Key')
     @patch('boto.s3.connection.S3Connection')
-    @override_flag(waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].name, active=True)
+    @override_waffle_flag(ENABLE_DEVSTACK_VIDEO_UPLOADS, active=True)
     def test_devstack_upload_connection(self, mock_conn, mock_key):
         files = [{'file_name': 'first.mp4', 'content_type': 'video/mp4'}]
         mock_key_instances = [
@@ -651,9 +645,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
         # expected args to be passed to `set_metadata`.
         expected_args = ('course_video_upload_token', self.test_token)
 
-        DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
-            with override_flag(DEPRECATE_YOUTUBE_FLAG.name, active=data['global_waffle']):
+            with override_waffle_flag(DEPRECATE_YOUTUBE, active=data['global_waffle']):
                 response = self.client.post(
                     self.url,
                     json.dumps({'files': [file_data]}),
@@ -911,7 +904,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         self.assertIn('error', response)
         self.assertEqual(response['error'], error_message)
 
-    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH, False)
+    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED, False)
     def test_video_image_upload_disabled(self):
         """
         Tests the video image upload when the feature is disabled.
@@ -920,7 +913,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         response = self.client.post(video_image_upload_url, {'file': 'dummy_file'}, format='multipart')
         self.assertEqual(response.status_code, 404)
 
-    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH, True)
+    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
     def test_video_image(self):
         """
         Test video image is saved.
@@ -942,7 +935,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
 
         self.assertNotEqual(image_url1, image_url2)
 
-    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH, True)
+    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
     def test_video_image_no_file(self):
         """
         Test that an error error message is returned if upload request is incorrect.
@@ -951,7 +944,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         response = self.client.post(video_image_upload_url, {})
         self.verify_error_message(response, 'An image file is required.')
 
-    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH, True)
+    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
     def test_no_video_image(self):
         """
         Test image url is set to None if no video image.
@@ -1133,7 +1126,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         )
     )
     @ddt.unpack
-    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH, True)
+    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
     def test_video_image_validation_message(self, image_data, error_message):
         """
         Test video image validation gives proper error message.

@@ -22,7 +22,7 @@ from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
-from edx_toggles.toggles import LegacyWaffleFlag, SettingDictToggle
+from edx_toggles.toggles import WaffleFlag, SettingDictToggle
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
@@ -39,7 +39,7 @@ from .exceptions import NotFoundError
 from .fields import Date
 from .mako_module import MakoTemplateBlockBase
 from .progress import Progress
-from .x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW, XModule  # pylint: disable=unused-import
+from .x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW
 from .xml_module import XmlMixin
 
 
@@ -58,10 +58,8 @@ class_priority = ['video', 'problem']
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
-TIMED_EXAM_GATING_WAFFLE_FLAG = LegacyWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    waffle_namespace="xmodule",
-    flag_name='rev_1377_rollout',
-    module_name=__name__,
+TIMED_EXAM_GATING_WAFFLE_FLAG = WaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
+    'xmodule.rev_1377_rollout', __name__
 )
 
 # .. toggle_name: FEATURES['SHOW_PROGRESS_BAR']

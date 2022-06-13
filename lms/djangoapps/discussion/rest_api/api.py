@@ -27,6 +27,7 @@ from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
@@ -41,6 +42,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     CourseDiscussionSettings,
+    Role,
 )
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
@@ -51,6 +53,8 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_deleted,
     thread_edited,
     thread_voted,
+    thread_flagged,
+    comment_flagged,
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
@@ -780,12 +784,26 @@ def get_thread_list(
     if count_flagged and not context["is_requester_privileged"]:
         raise PermissionDenied("`count_flagged` can only be set by users with moderator access or higher.")
 
+    group_id = None
+    allowed_roles = [
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_MODERATOR,
+    ]
+
+    if request.GET.get("group_id", None):
+        if Role.user_has_role_for_course(request.user, course_key, allowed_roles):
+            try:
+                group_id = int(request.GET.get("group_id", None))
+            except ValueError:
+                pass
+
+    if (group_id is None) and (not context["is_requester_privileged"]):
+        group_id = get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
+
     query_params = {
         "user_id": str(request.user.id),
-        "group_id": (
-            None if context["is_requester_privileged"] else
-            get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
-        ),
+        "group_id": group_id,
         "page": page,
         "per_page": page_size,
         "text": text_search,
@@ -1018,6 +1036,11 @@ def _handle_abuse_flagged_field(form_value, user, cc_content):
     """mark or unmark thread/comment as abused"""
     if form_value:
         cc_content.flagAbuse(user, cc_content)
+        if reported_content_email_notification_enabled(CourseKey.from_string(cc_content.course_id)):
+            if cc_content.type == 'thread':
+                thread_flagged.send(sender='flag_abuse_for_thread', user=user, post=cc_content)
+            else:
+                comment_flagged.send(sender='flag_abuse_for_comment', user=user, post=cc_content)
     else:
         cc_content.unFlagAbuse(user, cc_content, removeAll=False)
 

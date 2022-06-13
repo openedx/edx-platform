@@ -784,16 +784,23 @@ class SAMLProviderConfig(ProviderConfig):
             conf['attr_defaults'][field] = default
 
         # Now get the data fetched automatically from the metadata.xml:
-        data = SAMLProviderData.current(self.entity_id)
-        if not data or not data.is_valid():
+        data_records = SAMLProviderData.objects.filter(entity_id=self.entity_id)
+        public_keys = []
+        for record in data_records:
+            if record.is_valid():
+                public_keys.append(record.public_key)
+                sso_url = record.sso_url
+        if not public_keys:
             log.error(
                 'No SAMLProviderData found for provider "%s" with entity id "%s" and IdP slug "%s". '
                 'Run "manage.py saml pull" to fix or debug.',
                 self.name, self.entity_id, self.slug
             )
             raise AuthNotConfigured(provider_name=self.name)
-        conf['x509cert'] = data.public_key
-        conf['url'] = data.sso_url
+
+        conf['x509certMulti'] = {'signing': public_keys}
+        conf['x509cert'] = ''
+        conf['url'] = sso_url
 
         # Add SAMLConfiguration appropriate for this IdP
         conf['saml_sp_configuration'] = (

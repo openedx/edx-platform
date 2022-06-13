@@ -8,6 +8,7 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.models_api import create_manual_enrollment_audit as _create_manual_enrollment_audit
@@ -23,7 +24,12 @@ from common.djangoapps.student.models_api import (
     ALLOWEDTOENROLL_TO_UNENROLLED as _ALLOWEDTOENROLL_TO_UNENROLLED,
     DEFAULT_TRANSITION_STATE as _DEFAULT_TRANSITION_STATE,
 )
-from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES as _REGISTERED_ACCESS_ROLES
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalStaff,
+    REGISTERED_ACCESS_ROLES as _REGISTERED_ACCESS_ROLES,
+)
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
@@ -114,3 +120,19 @@ def is_user_enrolled_in_course(student, course_key):
     """
     log.info(f"Checking if {student.id} is enrolled in course {course_key}")
     return CourseEnrollment.is_enrolled(student, course_key)
+
+
+def is_user_staff_or_instructor_in_course(user, course_key):
+    """
+    Determines if a user is an Instructor or part of the given course's course staff.
+
+    Also returns true for GlobalStaff.
+    """
+    if not isinstance(course_key, CourseKey):
+        course_key = CourseKey.from_string(course_key)
+
+    return (
+        GlobalStaff().has_user(user) or
+        CourseStaffRole(course_key).has_user(user) or
+        CourseInstructorRole(course_key).has_user(user)
+    )

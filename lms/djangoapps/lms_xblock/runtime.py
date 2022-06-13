@@ -47,12 +47,6 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         if not func:
             raise ValueError(f"{handler_name!r} is not a function name")
 
-        # Is the following necessary? ProxyAttribute causes an UndefinedContext error
-        # if trying this without the module system.
-        #
-        #if not getattr(func, "_is_xblock_handler", False):
-        #    raise ValueError("{!r} is not a handler name".format(handler_name))
-
     if thirdparty:
         view_name = 'xblock_handler_noauth'
 
