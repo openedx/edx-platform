@@ -3157,6 +3157,10 @@ CSRF_TRUSTED_ORIGINS = []
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 
+######################### GENPLUS SETTINGS #################################
+
+GENPLUS_SOCIAL_AUTH_REDIRECT_URL = '/'
+
 ######################### Django Rest Framework ########################
 
 REST_FRAMEWORK = {
