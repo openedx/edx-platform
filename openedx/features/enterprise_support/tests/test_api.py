@@ -709,6 +709,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         expected_path = request_mock.path if is_return_to_null else '/courses/course-v1:edX+DemoX+Demo_Course/info'
         expected_url_args = {
             'course_id': ['course-v1:edX+DemoX+Demo_Course'],
+            'source': ['lms-courseware'],
             'failure_url': ['http://localhost:8000/dashboard?consent_failed=course-v1%3AedX%2BDemoX%2BDemo_Course'],
             'enterprise_customer_uuid': ['cf246b88-d5f6-4908-a522-fc307e0b0c59'],
             'next': [f'http://localhost:8000{expected_path}']
