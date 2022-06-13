@@ -2,8 +2,14 @@
 
 
 import unittest
+from unittest.mock import Mock
 
+from xblock.field_data import DictFieldData
+
+from xmodule import x_module
 from xmodule.progress import Progress
+
+from . import get_test_system
 
 
 class ProgressTest(unittest.TestCase):
@@ -107,3 +113,14 @@ class ProgressTest(unittest.TestCase):
         # Check != while we're at it
         assert prg1 != prg2
         assert prg1 == prg3
+
+
+class ModuleProgressTest(unittest.TestCase):
+    ''' Test that get_progress() does the right thing for the different modules
+    '''
+
+    def test_xmodule_default(self):
+        '''Make sure default get_progress exists, returns None'''
+        xmod = x_module.XModule(Mock(), get_test_system(), DictFieldData({'location': 'a://b/c/d/e'}), Mock())
+        prg = xmod.get_progress()  # lint-amnesty, pylint: disable=assignment-from-none
+        assert prg is None

@@ -29,11 +29,11 @@ class LtiCourseLaunchMixin:
     """
 
     ROLE_MAP = {
-        'student': 'Student,Learner',
+        'student': 'Student',
         'staff': 'Administrator',
         'instructor': 'Instructor',
     }
-    DEFAULT_ROLE = 'Student,Learner'
+    DEFAULT_ROLE = 'Student'
 
     def _get_pii_lti_parameters(self, course: CourseBlock, request: HttpRequest) -> Dict[str, str]:
         """

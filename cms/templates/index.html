@@ -207,6 +207,15 @@ from openedx.core.djangolib.js_utils import (
             <fieldset>
               <legend class="sr">${_("Required Information to Create a New Live Class")}</legend>
               <ol class="list-input">
+                <li class="field text required" id="field-liveclass-course">
+                  <label for="new-liveclass-course">${_("Course")}</label>
+
+                <div class="dummy__item">
+                  <select name="category" id="category" class="category">
+                    <option value="" disabled selected>Select Course</option>
+                </select>
+              </div>
+                </li>
                 <li class="field text required" id="field-liveclass-name">
                   <label for="new-liveclass-name">${_("Live Class Name")}</label>
                   ## Translators: This is an example name for a new content live class, seen when

@@ -14,12 +14,13 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.urls import NoReverseMatch
+from django.urls import NoReverseMatch, reverse
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
@@ -614,6 +615,39 @@ class TestCourseAccessed(SharedModuleStoreTestCase, CompletionWaffleTestMixin):
             block_key=block_key,
             completion=completion
         )
+
+    def course_home_url(self, course):
+        """
+        Returns the URL for the course's home page.
+
+        Arguments:
+            course (CourseBlock): The course being tested.
+        """
+        return self.course_home_url_from_string(str(course.id))
+
+    def course_home_url_from_string(self, course_key_string):
+        """
+        Returns the URL for the course's home page.
+
+        Arguments:
+            course_key_string (String): The course key as string.
+        """
+        return reverse(
+            'openedx.course_experience.course_home',
+            kwargs={
+                'course_id': course_key_string,
+            }
+        )
+
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
+    def test_course_accessed_for_visit_course_home(self):
+        """
+        Test that a visit to course home does not fall under course access
+        """
+        response = self.client.get(self.course_home_url(self.course))
+        assert response.status_code == 200
+        course_accessed = is_course_accessed(self.user, str(self.course.id))
+        self.assertFalse(course_accessed)
 
     @override_settings(LMS_BASE='test_url:9999')
     def test_course_accessed_with_completion_api(self):

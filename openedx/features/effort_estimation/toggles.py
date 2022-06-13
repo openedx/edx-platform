@@ -2,10 +2,12 @@
 Feature toggles used for effort estimation.
 """
 
+from edx_toggles.toggles import LegacyWaffleFlagNamespace
+
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 
-WAFFLE_FLAG_NAMESPACE = 'effort_estimation'
+WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='effort_estimation')
 
 # .. toggle_name: effort_estimation.disabled
 # .. toggle_implementation: CourseWaffleFlag
@@ -14,4 +16,4 @@ WAFFLE_FLAG_NAMESPACE = 'effort_estimation'
 #   estimates), you can turn them off case by case here.
 # .. toggle_use_cases: opt_out
 # .. toggle_creation_date: 2021-07-27
-EFFORT_ESTIMATION_DISABLED_FLAG = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.disabled', __name__)
+EFFORT_ESTIMATION_DISABLED_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'disabled', __name__)

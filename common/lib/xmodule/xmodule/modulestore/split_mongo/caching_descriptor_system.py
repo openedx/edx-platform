@@ -46,7 +46,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         module_data: a dict mapping Location -> json that was cached from the
             underlying modulestore
         """
-        # needed by capa_problem (as runtime.resources_fs via this.resources_fs)
+        # needed by capa_problem (as runtime.filestore via this.resources_fs)
         if course_entry.course_key.course:
             root = modulestore.fs_root / course_entry.course_key.org / course_entry.course_key.course / course_entry.course_key.run  # lint-amnesty, pylint: disable=line-too-long
         else:

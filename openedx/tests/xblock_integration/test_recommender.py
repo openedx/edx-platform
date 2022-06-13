@@ -14,14 +14,17 @@ import simplejson as json
 from ddt import data, ddt
 from django.conf import settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from openedx.core.lib.url_utils import quote_slashes
 
 
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that Recommender state is saved properly
@@ -65,7 +68,14 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 display_name='recommender_second'
             )
 
-        cls.course_url = reverse('render_xblock', args=[str(cls.section.location)])
+        cls.course_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': str(cls.course.id),
+                'chapter': 'Overview',
+                'section': 'Welcome',
+            }
+        )
 
         cls.resource_urls = [
             (

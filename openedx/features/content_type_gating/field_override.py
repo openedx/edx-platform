@@ -66,6 +66,6 @@ class ContentTypeGatingFieldOverride(FieldOverrideProvider):
         return original_group_access
 
     @classmethod
-    def enabled_for(cls, course):  # pylint: disable=arguments-differ
+    def enabled_for(cls, course):
         """Check our stackable config for this specific course"""
         return ContentTypeGatingConfig.enabled_for_course(course_key=course.scope_ids.usage_id.course_key)

@@ -10,8 +10,7 @@ from django.test.utils import override_settings
 from django.utils.timezone import now
 from edx_django_utils.cache import TieredCache
 from opaque_keys.edx.keys import CourseKey
-# from slumber.exceptions import HttpClientError, HttpServerError
-from requests.exceptions import HTTPError
+from slumber.exceptions import HttpClientError, HttpServerError
 from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -153,30 +152,27 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
         api_called,
         mock_is_order_voucher_refundable
     ):
-        """
-        Test refund_order_voucher signal
-        """
+        """Test refund_order_voucher signal"""
         mock_is_order_voucher_refundable.return_value = order_voucher_refundable
         enrollment = self._create_enrollment_to_refund(no_of_days_placed, enterprise_enrollment_exists)
-        with patch('openedx.features.enterprise_support.signals.get_ecommerce_api_client') as mock_ecommerce_api_client:
+        with patch('openedx.features.enterprise_support.signals.ecommerce_api_client') as mock_ecommerce_api_client:
             enrollment.update_enrollment(is_active=False, skip_refund=skip_refund)
             assert mock_ecommerce_api_client.called == api_called
 
     @patch('common.djangoapps.student.models.CourseEnrollment.is_order_voucher_refundable')
     @ddt.data(
-        (HTTPError, 'INFO'),
+        (HttpClientError, 'INFO'),
+        (HttpServerError, 'ERROR'),
         (Exception, 'ERROR'),
     )
     @ddt.unpack
     def test_refund_order_voucher_with_client_errors(self, mock_error, log_level, mock_is_order_voucher_refundable):
-        """
-        Test refund_order_voucher signal client_error.
-        """
+        """Test refund_order_voucher signal client_error"""
         mock_is_order_voucher_refundable.return_value = True
         enrollment = self._create_enrollment_to_refund()
-        with patch('openedx.features.enterprise_support.signals.get_ecommerce_api_client') as mock_ecommerce_api_client:
+        with patch('openedx.features.enterprise_support.signals.ecommerce_api_client') as mock_ecommerce_api_client:
             client_instance = mock_ecommerce_api_client.return_value
-            client_instance.post.side_effect = mock_error()
+            client_instance.enterprise.coupons.create_refunded_voucher.post.side_effect = mock_error()
             with LogCapture(LOGGER_NAME) as logger:
                 enrollment.update_enrollment(is_active=False)
                 assert mock_ecommerce_api_client.called is True

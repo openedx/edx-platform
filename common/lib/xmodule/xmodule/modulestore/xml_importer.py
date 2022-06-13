@@ -51,7 +51,7 @@ from xmodule.modulestore.store_utilities import draft_node_constructor, get_draf
 from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
 from xmodule.tabs import CourseTabList
 from xmodule.util.misc import escape_invalid_characters
-from xmodule.x_module import XModuleMixin
+from xmodule.x_module import XModuleDescriptor, XModuleMixin
 
 from .inheritance import own_metadata
 from .store_utilities import rewrite_nonportable_content_links
@@ -1346,11 +1346,14 @@ def _update_module_location(module, new_location):
     """
     # Retrieve the content and settings fields that have been explicitly set
     # to ensure that they are properly re-keyed in the XBlock field data.
-    rekey_fields = (
-        list(module.get_explicitly_set_fields_by_scope(Scope.content).keys()) +
-        list(module.get_explicitly_set_fields_by_scope(Scope.settings).keys()) +
-        list(module.get_explicitly_set_fields_by_scope(Scope.children).keys())
-    )
+    if isinstance(module, XModuleDescriptor):
+        rekey_fields = []
+    else:
+        rekey_fields = (
+            list(module.get_explicitly_set_fields_by_scope(Scope.content).keys()) +
+            list(module.get_explicitly_set_fields_by_scope(Scope.settings).keys()) +
+            list(module.get_explicitly_set_fields_by_scope(Scope.children).keys())
+        )
 
     module.location = new_location
 

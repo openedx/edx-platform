@@ -638,7 +638,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return errs
 
     @strip_key
-    def create_course(self, org, course, run, user_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def create_course(self, org, course, run, user_id, course_type, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Creates and returns the course.
 
@@ -653,7 +653,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Returns: a CourseBlock
         """
         # first make sure an existing course doesn't already exist in the mapping
-        course_key = self.make_course_key(org, course, run)
+        course_key = self.make_course_key(org, course, run )
 
         log.info('Creating course run %s...', course_key)
         if course_key in self.mappings and self.mappings[course_key].has_course(course_key):
@@ -662,8 +662,13 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         # create the course
         store = self._verify_modulestore_support(None, 'create_course')
-        course = store.create_course(org, course, run, user_id, **kwargs)
+        log.info(">>>>>>store 1 >>>>")
+        log.info("--->", store)
+        log.info(">>>>>>store 2>>>>")
+
+        course = store.create_course(org, course, run, user_id,course_type='python', **kwargs)
         log.info('Course run %s created successfully!', course_key)
+        log.info(">>>>>course>>>>>>", course)
 
         # add new course to the mapping
         self.mappings[course_key] = store

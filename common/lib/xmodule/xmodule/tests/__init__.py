@@ -37,7 +37,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests.helpers import StubReplaceURLService, mock_render_template, StubMakoService, StubUserService
 from xmodule.util.sandboxing import SandboxService
-from xmodule.x_module import DoNothingCache, ModuleSystem, XModuleMixin
+from xmodule.x_module import DoNothingCache, ModuleSystem, XModuleDescriptor, XModuleMixin
 from openedx.core.lib.cache_utils import CacheService
 
 
@@ -81,10 +81,6 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     # Disable XBlockAsides in most tests
     def get_asides(self, block):
         return []
-
-    @property
-    def resources_fs(self):
-        return Mock(name='TestModuleSystem.resources_fs', root_path='.'),
 
     def __repr__(self):
         """
@@ -153,6 +149,7 @@ def get_test_system(
         static_url='/static',
         track_function=Mock(name='get_test_system.track_function'),
         get_module=get_module,
+        filestore=Mock(name='get_test_system.filestore', root_path='.'),
         debug=True,
         hostname="edx.org",
         services={

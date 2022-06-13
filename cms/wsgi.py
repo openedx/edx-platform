@@ -12,7 +12,7 @@ isort:skip_file
 """
 
 # Patch the xml libs before anything else.
-from openedx.core.lib.safe_lxml import defuse_xml_libs
+from safe_lxml import defuse_xml_libs
 defuse_xml_libs()
 
 import os  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position

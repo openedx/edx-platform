@@ -8,13 +8,12 @@ import os
 
 from lxml import etree
 from lxml.etree import Element, ElementTree, XMLParser
-from xblock.core import XBlock, XML_NAMESPACES
+from xblock.core import XML_NAMESPACES
 from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
-
-from .x_module import XModuleMixin
+from xmodule.x_module import XModuleDescriptor  # lint-amnesty, pylint: disable=unused-import
 
 log = logging.getLogger(__name__)
 
@@ -112,6 +111,21 @@ class XmlParserMixin:
 
     xml_attributes = Dict(help="Map of unhandled xml attributes, used only for storage between import and export",
                           default={}, scope=Scope.settings)
+
+    # VS[compat].  Backwards compatibility code that can go away after
+    # importing 2012 courses.
+    # A set of metadata key conversions that we want to make
+    metadata_translations = {
+        'slug': 'url_name',
+        'name': 'display_name',
+    }
+
+    @classmethod
+    def _translate(cls, key):
+        """
+        VS[compat]
+        """
+        return cls.metadata_translations.get(key, key)
 
     # The attributes will be removed from the definition xml passed
     # to definition_from_xml, and from the xml returned by definition_to_xml
@@ -261,6 +275,8 @@ class XmlParserMixin:
         """
         metadata = {'xml_attributes': {}}
         for attr, val in xml_object.attrib.items():
+            # VS[compat].  Remove after all key translations done
+            attr = cls._translate(attr)
 
             if attr in cls.metadata_to_strip:
                 # don't load these
@@ -279,6 +295,7 @@ class XmlParserMixin:
         through the attrmap.  Updates the metadata dict in place.
         """
         for attr, value in policy.items():
+            attr = cls._translate(attr)
             if attr not in cls.fields:
                 # Store unknown attributes coming from policy.json
                 # in such a way that they will export to xml unchanged
@@ -544,9 +561,9 @@ class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
         if cls.from_xml != XmlMixin.from_xml:
-            xml = etree.tostring(node).decode('utf-8')
-            block = cls.from_xml(xml, runtime, id_generator)
-            return block
+            # Skip the parse_xml from XmlParserMixin to get the shim parse_xml
+            # from XModuleDescriptor, which actually calls `from_xml`.
+            return super(XmlParserMixin, cls).parse_xml(node, runtime, keys, id_generator)  # pylint: disable=bad-super-call
         else:
             return super().parse_xml(node, runtime, keys, id_generator)
 
@@ -588,23 +605,12 @@ class XmlMixin(XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
         `node`.
         """
         if self.export_to_xml != XmlMixin.export_to_xml:  # lint-amnesty, pylint: disable=comparison-with-callable
-            xml_string = self.export_to_xml(self.runtime.export_fs)
-            exported_node = etree.fromstring(xml_string)
-            node.tag = exported_node.tag
-            node.text = exported_node.text
-            node.tail = exported_node.tail
-
-            for key, value in exported_node.items():
-                if key == 'url_name' and value == 'course' and key in node.attrib:
-                    # if url_name is set in ExportManager then do not override it here.
-                    continue
-                node.set(key, value)
-
-            node.extend(list(exported_node))
+            # Skip the add_xml_to_node from XmlParserMixin to get the shim add_xml_to_node
+            # from XModuleDescriptor, which actually calls `export_to_xml`.
+            super(XmlParserMixin, self).add_xml_to_node(node)  # pylint: disable=bad-super-call
         else:
             super().add_xml_to_node(node)
 
 
-@XBlock.needs("i18n")
-class XmlDescriptor(XmlMixin, XModuleMixin):  # lint-amnesty, pylint: disable=abstract-method
+class XmlDescriptor(XmlMixin, XModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method
     pass

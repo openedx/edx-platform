@@ -27,6 +27,7 @@ from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
     STUDENT_VIEW,
+    XModuleDescriptorToXBlockMixin,
     XModuleMixin,
     XModuleToXBlockMixin,
 )
@@ -43,6 +44,7 @@ class ConditionalBlock(
     SequenceMixin,
     MakoTemplateBlockBase,
     XmlMixin,
+    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,

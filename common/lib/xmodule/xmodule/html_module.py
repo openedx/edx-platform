@@ -30,6 +30,7 @@ from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
+    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
 )
 from xmodule.xml_module import XmlMixin, name_to_pathname
@@ -46,7 +47,7 @@ _ = lambda text: text
 @XBlock.needs("user")
 class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     XmlMixin, EditingMixin,
-    XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
+    XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
 ):
     """
     The HTML XBlock mixin.

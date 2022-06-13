@@ -9,8 +9,6 @@ describe('Currency factory', () => {
   let usaPosition;
   let japanPosition;
 
-  window.analytics = jasmine.createSpyObj('analytics', ['page', 'track', 'trackLink']);
-
   beforeEach(() => {
     loadFixtures('course_experience/fixtures/course-currency-fragment.html');
     canadaPosition = {
@@ -49,11 +47,6 @@ describe('Currency factory', () => {
       $.cookie('edx-price-l10n', '{"rate":2.2,"code":"CAD","symbol":"$","countryCode":"CAN"}', { expires: 1 });
       currency = new Currency();
       expect($('[name="verified_mode"].discount').filter(':visible').text()).toEqual('Pursue a Verified Certificate($198 CAD $220 CAD)');
-    });
-    it('should send event on initial load', () => {
-      $.cookie('edx-price-l10n', '{"rate":1,"code":"USD","symbol":"$","countryCode":"US"}', { path: '/' });
-      currency = new Currency();
-      expect(window.analytics.track).toHaveBeenCalledWith('edx.bi.user.track_selection.local_currency_cookie_set');
     });
   });
 });

@@ -10,8 +10,6 @@ from copy import copy
 from gettext import ngettext
 
 import bleach
-from django.conf import settings
-from django.utils.functional import classproperty
 from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
@@ -35,6 +33,7 @@ from xmodule.x_module import (
     shim_xmodule_js,
     STUDENT_VIEW,
     XModuleMixin,
+    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
 )
 
@@ -74,6 +73,7 @@ def _get_capa_types():
 class LibraryContentBlock(
     MakoTemplateBlockBase,
     XmlMixin,
+    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,
@@ -116,18 +116,7 @@ class LibraryContentBlock(
 
     show_in_read_only_mode = True
 
-    # noinspection PyMethodParameters
-    @classproperty
-    def completion_mode(cls):  # pylint: disable=no-self-argument
-        """
-        Allow overriding the completion mode with a feature flag.
-
-        This is a property, so it can be dynamically overridden in tests, as it is not evaluated at runtime.
-        """
-        if settings.FEATURES.get('MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW', False):
-            return XBlockCompletionMode.COMPLETABLE
-
-        return XBlockCompletionMode.AGGREGATOR
+    completion_mode = XBlockCompletionMode.AGGREGATOR
 
     display_name = String(
         display_name=_("Display Name"),

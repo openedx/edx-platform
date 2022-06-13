@@ -16,6 +16,7 @@ from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
+    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
 )
 from xmodule.xml_module import XmlMixin
@@ -27,6 +28,7 @@ class CustomTagTemplateBlock(  # pylint: disable=abstract-method
     RawMixin,
     XmlMixin,
     EditingMixin,
+    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,
@@ -137,6 +139,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
 
 
 class TranslateCustomTagBlock(  # pylint: disable=abstract-method
+    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     XModuleMixin,
 ):

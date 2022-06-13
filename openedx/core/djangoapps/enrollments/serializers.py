@@ -252,6 +252,16 @@ class LiveClassEnrollmentSerializer(serializers.ModelSerializer):
         CourseEnrollment.objects.create(course=instance.live_class.course, user=instance.user)
         
         return instance
+
+
+
+
+
+
+
+
+
+        
     # def create(self, validated_data):
     #     pass
 

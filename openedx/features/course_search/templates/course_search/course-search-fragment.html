@@ -1,0 +1,73 @@
+## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+import json
+import waffle
+
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+from django.urls import reverse
+
+from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import course_home_page_title
+%>
+
+<%block name="content">
+<div class="course-view page-content-container" id="course-container">
+    <header class="page-header has-secondary">
+        <div class="page-header-main">
+            <nav aria-label="${_('Search Results')}" class="sr-is-focusable" tabindex="-1">
+                <div class="has-breadcrumbs">
+                    <div class="breadcrumbs">
+                        <span class="nav-item">
+                            <a href="${course_url}">${course_home_page_title(course)}</a>
+                        </span>
+                        <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                        <span class="nav-item">${_('Search Results')}</span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="page-header-secondary">
+            <div class="page-header-search">
+                <form class="search-form input-group" role="search">
+                    <input
+                            class="field-input input-text search-field form-control"
+                            type="search"
+                            name="query"
+                            id="search"
+                            value="${query}"
+                            placeholder="${_('Search the course')}"
+                    />
+                    <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
+                    <div class="input-group-append input-group-btn">
+                        <button class="btn btn-outline-primary search-button" type="submit">${_('Search')}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </header>
+    <div class="page-content">
+        <main role="main" class="search-results" id="main" tabindex="-1">
+        </main>
+    </div>
+</div>
+</%block>
+
+<%block name="js_extra">
+<%static:require_module module_name="course_search/js/course_search_factory" class_name="CourseSearchFactory">
+    var courseId = '${course_key | n, js_escaped_string}';
+    CourseSearchFactory({
+        courseId: courseId,
+        searchHeader: $('.page-header-search'),
+        supportsActive: false,
+        query: '${query | n, js_escaped_string}'
+    });
+</%static:require_module>
+</%block>

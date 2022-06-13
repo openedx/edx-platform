@@ -11,8 +11,9 @@
          var nonEmptyCheckFieldSelectors = [selectors.name, selectors.org, selectors.number];
 
          CreateUtilsFactory.call(this, selectors, classes);
-       
+      
          this.create = function(liveclassInfo, errorHandler) {
+           
              $.getJSON(
                  '/live_class/details/',
                  liveclassInfo
@@ -21,32 +22,31 @@
                 elem.innerHTML = '';
                 var output = document.getElementById('output');
                 output.style.display='block';
-                var response = JSON.parse(JSON.stringify(response))
-                
-                for(let i=0;i<response.results.length;i++)
-                  {
-                    //alert(response.results[i]["topic_name"])
-                    var parent = document.createElement("div");
-                    var ele = document.createElement("div");
-                    ele.setAttribute("id","timedrpact"+i);
-                    ele.setAttribute("class","inner");
-                    ele.innerHTML=response.results[i]["topic_name"];
-                    parent.appendChild(ele);
-                    var ele1= document.createElement("a");
-                    ele1.setAttribute("id","timedrpact1"+i);
-                    ele1.setAttribute("class","button inner-link");
-                    ele1.setAttribute("href",response.results[i]["meeting_link"]);
-                    ele1.setAttribute("target",'_black');
-                    ele1.innerHTML='Start';
-                    parent.appendChild(ele1);
-                    // var ele2= document.createElement("div");
-                    // ele2.setAttribute("id",response.results[i]['id']);
-                    // ele2.setAttribute("class","view-users");
-                    // ele2.innerHTML='View Users';
-                    // parent.appendChild(ele2);
-                    output.appendChild(parent);  
-                          
-                  }
+                //var response = JSON.parse(JSON.stringify(response))
+                var response = JSON.parse(JSON.stringify(response.results))
+                for(let i=0;i<response.length;i++)
+                {
+                    if(response[i]["meeting_link"]!=null && response[i]["meeting_link"]!=undefined)
+                    {
+                        console.log(response[i])
+                        var parent = document.createElement("div");
+                        var ele = document.createElement("div");
+                        ele.setAttribute("id","timedrpact"+i);
+                        ele.setAttribute("class","inner");
+                        ele.innerHTML=response[i]["topic_name"];
+                        parent.appendChild(ele);
+                        var ele1= document.createElement("a");
+                        ele1.setAttribute("id","timedrpact1"+i);
+                        ele1.setAttribute("class","button inner-link");
+                        ele1.setAttribute("href",response[i]["meeting_link"]);
+                        ele1.setAttribute("target",'_black');
+                        ele1.innerHTML='Start';
+                        parent.appendChild(ele1);
+                        
+                        output.appendChild(parent);  
+                    }
+                        
+                }
                 
              }).fail(function(jqXHR, textStatus, errorThrown) {
                  var reason = errorThrown;
@@ -62,9 +62,26 @@
              });
          };
 
+         this.getCourse = function(object, errorHandler) {
+    
+            $.getJSON(
+                'courses/all/courses ',
+                object
+            ).done(function(response) {
+                
+                    var catOptions = "";
+                    for (let i=0;i<response.length;i++) {
+                        
+                        catOptions += '<option id='+response[i]['id']+'>' + response[i]['name'] + "</option>";
+                    
+                      document.getElementById("category").innerHTML = catOptions;
+        }
+            });
+         }
+
          this.getUser = function(liveclassInfo, errorHandler) {
             $.getJSON(
-                '/accounts/details?page=2',
+                '/accounts/details',
                 liveclassInfo
             ).done(function(response) {
                 errorHandler(response)
@@ -128,5 +145,7 @@
                 errorHandler(reason);
             });
         };
+
+
      };
  });
