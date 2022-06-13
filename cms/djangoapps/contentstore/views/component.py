@@ -41,11 +41,13 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['discussion', 'html', 'openassessment', 'problem', 'video']
+COMPONENT_TYPES = ['discussion', 'library', 'html', 'openassessment', 'problem', 'video']
 
 ADVANCED_COMPONENT_TYPES = sorted({name for name, class_ in XBlock.load_classes()} - set(COMPONENT_TYPES))
 
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
+
+LIBRARY_BLOCK_TYPES = settings.LIBRARY_BLOCK_TYPES
 
 CONTAINER_TEMPLATES = [
     "basic-modal", "modal-button", "edit-xblock-modal",
@@ -279,7 +281,8 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         'html': _("Text"),
         'problem': _("Problem"),
         'video': _("Video"),
-        'openassessment': _("Open Response")
+        'openassessment': _("Open Response"),
+        'library': _("Library Content"),
     }
 
     component_templates = []
@@ -288,8 +291,8 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     # by the components in the order listed in COMPONENT_TYPES.
     component_types = COMPONENT_TYPES[:]
 
-    # Libraries do not support discussions and openassessment
-    component_not_supported_by_library = ['discussion', 'openassessment']
+    # Libraries do not support discussions and openassessment and other libraries
+    component_not_supported_by_library = ['discussion', 'library', 'openassessment']
     if library:
         component_types = [component for component in component_types
                            if component not in set(component_not_supported_by_library)]
@@ -380,6 +383,37 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
                                 advanced_component_support_level,
                                 boilerplate_name,
                                 'advanced'
+                            )
+                        )
+                        categories.add(component)
+
+        # Add library block types.
+        if category == 'library' and not library:
+            disabled_block_names = [block.name for block in disabled_xblocks()]
+            library_block_types = [problem_type for problem_type in LIBRARY_BLOCK_TYPES
+                                   if problem_type['component'] not in disabled_block_names]
+            for library_block_type in library_block_types:
+                component = library_block_type['component']
+                boilerplate_name = library_block_type['boilerplate_name']
+                authorable_variations = authorable_xblocks(allow_unsupported=allow_unsupported, name=component)
+                library_component_support_level = component_support_level(
+                    authorable_variations, component, boilerplate_name
+                )
+                if library_component_support_level:
+                    try:
+                        component_display_name = xblock_type_display_name(component, default_display_name=component)
+                    except PluginMissingError:
+                        log.warning(
+                            "Unable to load xblock type %s to read display_name",
+                            component
+                        )
+                    else:
+                        templates_for_category.append(
+                            create_template_dict(
+                                component_display_name,
+                                component,
+                                library_component_support_level,
+                                boilerplate_name
                             )
                         )
                         categories.add(component)
