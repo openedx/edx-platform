@@ -106,7 +106,7 @@ RUN pip install -r requirements/edx/base-minus-local.txt
 # via pip.
 # The node environment is already 'activated' because its .../bin was put on $PATH.
 RUN nodeenv /edx/app/edxapp/nodeenv --node=12.11.1 --prebuilt
-RUN npm install -g npm@8.5.x
+# RUN npm install -g npm@8.5.x
 COPY package.json package.json
 COPY package-lock.json package-lock.json
 RUN npm set progress=false && npm install
