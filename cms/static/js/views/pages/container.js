@@ -16,11 +16,13 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
 
             events: {
                 'click .edit-button': 'editXBlock',
+                'click .button-toggle-preview': 'toggleChildrenPreviews',
                 'click .access-button': 'editVisibilitySettings',
                 'click .duplicate-button': 'duplicateXBlock',
                 'click .move-button': 'showMoveXBlockModal',
                 'click .delete-button': 'deleteXBlock',
-                'click .new-component-button': 'scrollToNewComponentButtons'
+                'click .new-component-button': 'scrollToNewComponentButtons',
+                'click .collapse-button': 'collapseXBlock'
             },
 
             options: {
@@ -206,6 +208,32 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                         self.refreshXBlock(xblockElement, false);
                     }
                 });
+            },
+
+            toggleChildrenPreviews: function toggleChildrenPreviews(event) {
+                var $button = $(event.currentTarget),
+                    $el = $(this.xblockView.el);
+                if ($button.hasClass('collapsed')) {
+                    this.updateCollapseAllButton(true);
+                    $el.find('.wrapper-xblock.is-collapsible').removeClass('is-collapsed');
+                } else {
+                    this.updateCollapseAllButton(false);
+                    $el.find('.wrapper-xblock.is-collapsible').addClass('is-collapsed');
+                }
+            },
+
+            updateCollapseAllButton: function updateCollapseAllButton(show_previews) {
+                var text = (show_previews) ? gettext('Collapse All') : gettext('Expand All'),
+                    className = (show_previews) ? 'fa-arrow-up' : 'fa-arrow-down',
+                    $button = $('.nav-actions .button-toggle-preview');
+                $button.toggleClass('collapsed');
+                $button.find('.preview-text').text(text);
+                $button.find('.icon').attr('class', 'icon fa ' + className);
+            },
+
+            collapseXBlock: function collapseXBlock(event) {
+                var $target = $(event.currentTarget);
+                $target.closest('.is-collapsible').toggleClass('is-collapsed');
             },
 
             editVisibilitySettings: function(event) {

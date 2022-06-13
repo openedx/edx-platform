@@ -190,6 +190,8 @@ def container_handler(request, usage_key_string):
                 'xblock_locator': xblock.location,
                 'unit': unit,
                 'is_unit_page': is_unit_page,
+                # ToDo: Add required context for library container only
+                'is_collapsible': True,
                 'subsection': subsection,
                 'section': section,
                 'position': index,
@@ -202,7 +204,8 @@ def container_handler(request, usage_key_string):
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
-                'templates': CONTAINER_TEMPLATES
+                'templates': CONTAINER_TEMPLATES,
+                'fullwidth_content': True
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
