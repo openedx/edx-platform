@@ -29,7 +29,7 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         # Password defined by factory.
-        self.client.login(username=self.user.username, password='test')
+        self.client.force_login(user=self.user)
 
     def url(self):
         """
