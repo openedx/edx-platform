@@ -94,7 +94,8 @@ class CourseListViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
     def test_list(self):
         """ Verify the view lists the available courses and modes. """
         user = UserFactory.create()
-        self.client.login(username=user.username, password=PASSWORD)
+        self.client.force_login(user=self.user, backend='django.contrib.auth.backends.ModelBackend')
+
         response = self.client.get(self.path, content_type=JSON_CONTENT_TYPE)
 
         assert response.status_code == 200
@@ -116,7 +117,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         super().setUp()
         self.path = reverse('commerce_api:v1:courses:retrieve_update', args=[str(self.course.id)])
         self.user = UserFactory.create()
-        self.client.login(username=self.user.username, password=PASSWORD)
+        self.client.force_login(user=self.user)
 
         permission = Permission.objects.get(name='Can change course mode')
         self.user.user_permissions.add(permission)

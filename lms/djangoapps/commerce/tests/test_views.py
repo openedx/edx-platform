@@ -12,4 +12,4 @@ class UserMixin:
 
     def _login(self):
         """ Log into LMS. """
-        self.client.login(username=self.user.username, password='test')
+        self.client.force_login(user=self.user)
