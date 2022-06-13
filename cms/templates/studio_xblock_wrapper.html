@@ -16,7 +16,6 @@ use_new_editor_problem = use_new_problem_editor()
 xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
-collapsible_class = "is-collapsible"
 label = xblock.display_name_with_default or xblock.scope_ids.block_type
 messages = xblock.validate().to_json()
 block_is_unit = is_unit(xblock)
@@ -47,7 +46,7 @@ block_is_unit = is_unit(xblock)
     <div class="studio-xblock-wrapper" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
     % endif
 
-    <section class="wrapper-xblock ${section_class} is-collapsible
+    <section class="wrapper-xblock is-collapsible ${section_class}
     % if is_visible_to_specific_partition_groups(xblock):
         has-group-visibility-set
     % endif

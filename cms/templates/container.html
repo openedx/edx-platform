@@ -170,7 +170,7 @@ from openedx.core.djangolib.markup import HTML, Text
 <div class="wrapper-content wrapper">
     <div class="inner-wrapper">
         <section class="content-area">
-            <article class="content-primary ${'content-primary-fullwidth' if fullwidth_content else ''}">
+            <article class="content-primary ${'content-primary-fullwidth' if is_fullwidth_content else ''}">
                 <div class="container-message wrapper-message"></div>
                 <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
                 </section>

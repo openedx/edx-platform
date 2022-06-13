@@ -212,18 +212,6 @@
   box-sizing: border-box;
 }
 
-//// one col layout
-//%one-col-1 {
-//  .content-primary {
-//    @include float(left);
-//
-//    width: flex-grid(12, 12);
-//    box-shadow: none;
-//    border: 0;
-//    background-color: $white;
-//  }
-//}
-
 // 3/4 - 1/4 two col layout
 %two-col-1 {
   .content-primary {

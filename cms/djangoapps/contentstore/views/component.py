@@ -205,7 +205,8 @@ def container_handler(request, usage_key_string):
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
                 'templates': CONTAINER_TEMPLATES,
-                'fullwidth_content': True
+                 # ToDo: Add required context for library container only
+                'is_fullwidth_content': True
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
