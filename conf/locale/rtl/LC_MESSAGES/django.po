@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-03 17:28+0000\n"
-"PO-Revision-Date: 2022-06-03 17:28:01.509197\n"
+"POT-Creation-Date: 2022-06-12 20:43+0000\n"
+"PO-Revision-Date: 2022-06-12 20:43:41.107877\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2139,6 +2139,7 @@ msgid "Whether to force the save button to appear on the page"
 msgstr "Wɥǝʇɥǝɹ ʇø ɟøɹɔǝ ʇɥǝ sɐʌǝ bnʇʇøn ʇø ɐddǝɐɹ øn ʇɥǝ dɐƃǝ"
 
 #: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Show Reset Button"
 msgstr "Sɥøʍ Ɍǝsǝʇ Ƀnʇʇøn"
 
@@ -3695,6 +3696,14 @@ msgid ""
 msgstr ""
 "Ȼɥøøsǝ ɐ dɹøblǝɯ ʇʎdǝ ʇø ɟǝʇɔɥ ɟɹøɯ ʇɥǝ lᴉbɹɐɹʎ. Ɨɟ \"Ⱥnʎ Ŧʎdǝ\" ᴉs sǝlǝɔʇǝd"
 " nø ɟᴉlʇǝɹᴉnƃ ᴉs ɐddlᴉǝd."
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid ""
+"Determines whether a 'Reset Problems' button is shown, so users may reset "
+"their answers and reshuffle selected items."
+msgstr ""
+"Đǝʇǝɹɯᴉnǝs ʍɥǝʇɥǝɹ ɐ 'Ɍǝsǝʇ Ᵽɹøblǝɯs' bnʇʇøn ᴉs sɥøʍn, sø nsǝɹs ɯɐʎ ɹǝsǝʇ "
+"ʇɥǝᴉɹ ɐnsʍǝɹs ɐnd ɹǝsɥnɟɟlǝ sǝlǝɔʇǝd ᴉʇǝɯs."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
@@ -9001,13 +9010,13 @@ msgid "You have signed out."
 msgstr "Ɏøn ɥɐʌǝ sᴉƃnǝd ønʇ."
 
 #: lms/templates/logout.html
-#, python-brace-format
+#, python-format, python-brace-format
 msgid ""
-"{start_anchor}Click here{end_anchor} to delete your single signed on (SSO) "
-"session."
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}Click here{end_anchor} to "
+"delete your single signed on (SSO) session."
 msgstr ""
-"{start_anchor}Ȼlᴉɔʞ ɥǝɹǝ{end_anchor} ʇø dǝlǝʇǝ ʎønɹ sᴉnƃlǝ sᴉƃnǝd øn (SSØ) "
-"sǝssᴉøn."
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}Ȼlᴉɔʞ ɥǝɹǝ{end_anchor} ʇø "
+"dǝlǝʇǝ ʎønɹ sᴉnƃlǝ sᴉƃnǝd øn (SSØ) sǝssᴉøn."
 
 #: lms/templates/logout.html
 msgid "We are signing you in."
@@ -9024,13 +9033,15 @@ msgstr ""
 "                "
 
 #: lms/templates/logout.html
-#, python-brace-format
+#, python-format, python-brace-format
 msgid ""
-"If you are not redirected within 5 seconds, {start_anchor}click here to go "
-"to the home page{end_anchor}."
+"If you are not redirected within 5 seconds, "
+"{start_anchor}%(target)s{middle_anchor}click here to go to the home "
+"page{end_anchor}."
 msgstr ""
-"Ɨɟ ʎøn ɐɹǝ nøʇ ɹǝdᴉɹǝɔʇǝd ʍᴉʇɥᴉn 5 sǝɔønds, {start_anchor}ɔlᴉɔʞ ɥǝɹǝ ʇø ƃø "
-"ʇø ʇɥǝ ɥøɯǝ dɐƃǝ{end_anchor}."
+"Ɨɟ ʎøn ɐɹǝ nøʇ ɹǝdᴉɹǝɔʇǝd ʍᴉʇɥᴉn 5 sǝɔønds, "
+"{start_anchor}%(target)s{middle_anchor}ɔlᴉɔʞ ɥǝɹǝ ʇø ƃø ʇø ʇɥǝ ɥøɯǝ "
+"dɐƃǝ{end_anchor}."
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -14646,6 +14657,10 @@ msgstr "Đnǝ {date}"
 #: lms/templates/vert_module.html
 msgid "Past due"
 msgstr "Ᵽɐsʇ dnǝ"
+
+#: lms/templates/vert_module.html
+msgid "Reset Problems"
+msgstr "Ɍǝsǝʇ Ᵽɹøblǝɯs"
 
 #: lms/templates/video.html
 msgid "Loading video player"
