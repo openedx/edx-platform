@@ -126,13 +126,13 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
         self.register_put_comment_response(cs_comment)
         self.register_post_comment_response(cs_comment, thread_id="test_thread")
 
-    def test_not_authenticated(self):
+    def test_not_authenticated(self, key="developer_message"):
         self.client.logout()
         response = self.client.get(self.url)
         self.assert_response_correct(
             response,
             401,
-            {"developer_message": "Authentication credentials were not provided."}
+            {key: "Authentication credentials were not provided."}
         )
 
     def test_inactive(self):
@@ -1445,6 +1445,44 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_thread_error_response(self.thread_id, 404)
         response = self.client.delete(self.url)
         assert response.status_code == 404
+
+
+@httpretty.activate
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for LearnerThreadView list"""
+
+    def setUp(self):
+        super().setUp()
+        self.author = UserFactory.create()
+        self.url = reverse("discussion_learner_threads", kwargs={'course_id': str(self.course.id)})
+
+    def test_basic(self):
+        expected_response = {
+            "collection": [make_minimal_cs_thread({
+                "username": self.author.username,
+                "user_id": self.author.id,
+            })],
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_user_active_threads(self.author.id, expected_response)
+        self.url += f"?user_id={self.author.id}"
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        expected_api_response = expected_response['collection']
+        for thread in expected_api_response:
+            for key in ['group_id', 'abuse_flagged_count', 'closed_by', 'close_reason_code']:
+                thread.pop(key)
+        assert response_data == expected_api_response
+
+    def test_no_user_id_given(self):
+        response = self.client.get(self.url)
+        assert response.status_code == 400
+
+    def test_not_authenticated(self, key="detail"):
+        super().test_not_authenticated(key=key)
 
 
 @ddt.ddt

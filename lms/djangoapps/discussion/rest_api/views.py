@@ -573,6 +573,15 @@ class LearnerThreadView(APIView):
         * page_size: The number of items per page (default is 10)
     """
 
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthentication,
+        SessionAuthentication,
+    )
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+
     def get(self, request, course_id=None):
         """
         Implements the GET method as described in the class docstring.
@@ -581,7 +590,11 @@ class LearnerThreadView(APIView):
         page_num = request.GET.get('page', 1)
         threads_per_page = request.GET.get('page_size', 10)
         discussion_id = None
-        user_id = request.user.id
+        try:
+            user_id = int(request.GET.get('user_id', None))
+        except (TypeError, ValueError):
+            return Response({'details': 'Invalid user id'}, status=400)
+
         group_id = None
         try:
             group_id = get_group_id_for_comments_service(request, course_key, discussion_id)
