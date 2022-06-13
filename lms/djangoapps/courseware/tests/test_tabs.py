@@ -10,9 +10,7 @@ from django.http import Http404
 from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 
-from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tabs import (
-    CourseInfoTab,
     CoursewareTab,
     DatesTab,
     ExternalDiscussionCourseTab,
@@ -24,7 +22,6 @@ from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import get_course_by_id
-from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
@@ -496,20 +493,16 @@ class TabListTestCase(TabTestCase):
 
         # invalid tabs
         self.invalid_tabs = [
-            # less than 2 tabs
-            [{'type': CoursewareTab.type}],
-            # missing course_info
-            [{'type': CoursewareTab.type}, {'type': 'discussion', 'name': 'fake_name'}],
+            # missing courseware
             [{'type': 'unknown_type'}],
             # incorrect order
             [{'type': 'discussion', 'name': 'fake_name'},
-             {'type': CourseInfoTab.type, 'name': 'fake_name'}, {'type': CoursewareTab.type}],
+             {'type': CoursewareTab.type}],
         ]
 
         # tab types that should appear only once
         unique_tab_types = [
             CoursewareTab.type,
-            CourseInfoTab.type,
             'textbooks',
             'pdf_textbooks',
             'html_textbooks',
@@ -518,7 +511,6 @@ class TabListTestCase(TabTestCase):
         for unique_tab_type in unique_tab_types:
             self.invalid_tabs.append([
                 {'type': CoursewareTab.type},
-                {'type': CourseInfoTab.type, 'name': 'fake_name'},
                 # add the unique tab multiple times
                 {'type': unique_tab_type},
                 {'type': unique_tab_type},
@@ -532,7 +524,6 @@ class TabListTestCase(TabTestCase):
             # all valid tabs
             [
                 {'type': CoursewareTab.type},
-                {'type': CourseInfoTab.type, 'name': 'fake_name'},
                 {'type': DatesTab.type},  # Add this even though we filter it out, for testing purposes
                 {'type': 'discussion', 'name': 'fake_name'},
                 {'type': ExternalLinkCourseTab.type, 'name': 'fake_name', 'link': 'fake_link'},
@@ -547,7 +538,6 @@ class TabListTestCase(TabTestCase):
             # with external discussion
             [
                 {'type': CoursewareTab.type},
-                {'type': CourseInfoTab.type, 'name': 'fake_name'},
                 {'type': ExternalDiscussionCourseTab.type, 'name': 'fake_name', 'link': 'fake_link'}
             ],
         ]
@@ -575,8 +565,7 @@ class ValidateTabsTestCase(TabListTestCase):
         """
         tab_list = xmodule_tabs.CourseTabList()
         assert len(tab_list.from_json([{'type': CoursewareTab.type},
-                                       {'type': CourseInfoTab.type, 'name': 'fake_name'},
-                                       {'type': 'no_such_type'}])) == 2
+                                       {'type': 'no_such_type'}])) == 1
 
 
 class CourseTabListTestCase(TabListTestCase):
@@ -744,33 +733,6 @@ class StaticTabTestCase(TabTestCase):
         )
         self.check_can_display_results(tab)
         self.check_get_and_set_method_for_key(tab, 'url_slug')
-
-
-class CourseInfoTabTestCase(TabTestCase):
-    """Test cases for the course info tab."""
-    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
-        self.user = self.create_mock_user()
-        self.addCleanup(set_current_request, None)
-
-    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
-    def test_default_tab(self):
-        # Verify that the course info tab is the first tab
-        tabs = get_course_tab_list(self.user, self.course)
-        assert tabs[0].type == 'course_info'
-
-    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
-    def test_default_tab_for_new_course_experience(self):
-        # Verify that the unified course experience hides the course info tab
-        tabs = get_course_tab_list(self.user, self.course)
-        assert tabs[0].type == 'courseware'
-
-    # TODO: LEARNER-611 - remove once course_info is removed.
-    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
-    def test_default_tab_for_displayable(self):
-        tabs = xmodule_tabs.CourseTabList.iterate_displayable(self.course, self.user)
-        for i, tab in enumerate(tabs):
-            if i == 0:
-                assert tab.type == 'course_info'
 
 
 class DiscussionLinkTestCase(TabTestCase):

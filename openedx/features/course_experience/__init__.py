@@ -16,11 +16,6 @@ DISABLE_COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: di
     f'{WAFFLE_FLAG_NAMESPACE}.disable_course_outline_page', __name__
 )
 
-# Waffle flag to enable a single unified "Course" tab.
-DISABLE_UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    f'{WAFFLE_FLAG_NAMESPACE}.disable_unified_course_tab', __name__
-)
-
 # Waffle flag to enable the sock on the footer of the home and courseware pages.
 DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.display_course_sock', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
@@ -100,8 +95,4 @@ def course_home_url(course_key):
         course_key (CourseKey): The course key for which the home url is being requested.
     """
     from .url_helpers import get_learning_mfe_home_url
-
-    if DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
-        return reverse('info', args=[str(course_key)])
-
     return get_learning_mfe_home_url(course_key, url_fragment='home')

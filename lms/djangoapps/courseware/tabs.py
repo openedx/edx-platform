@@ -13,7 +13,7 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from openedx.core.lib.course_tabs import CourseTabPluginManager
-from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, default_course_url
+from openedx.features.course_experience import default_course_url
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from common.djangoapps.student.models import CourseEnrollment
 
@@ -50,28 +50,8 @@ class CoursewareTab(EnrolledTab):
     @classmethod
     def is_enabled(cls, course, user=None):
         """
-        Returns true if this tab is enabled.
+        Courseware tabs are viewable to everyone, even anonymous users.
         """
-        if DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
-            return super().is_enabled(course, user)
-        # If this is the unified course tab then it is always enabled
-        return True
-
-
-class CourseInfoTab(CourseTab):
-    """
-    The course info view.
-    """
-    type = 'course_info'
-    title = gettext_noop('Home')
-    priority = 10
-    view_name = 'info'
-    tab_id = 'info'
-    is_movable = False
-    is_default = False
-
-    @classmethod
-    def is_enabled(cls, course, user=None):
         return True
 
 
@@ -355,9 +335,6 @@ def get_course_tab_list(user, course):
                 continue
             tab.name = _("Entrance Exam")
             tab.title = _("Entrance Exam")
-        # TODO: LEARNER-611 - once the course_info tab is removed, remove this code
-        if not DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id) and tab.type == 'course_info':
-            continue
         if tab.type == 'static_tab' and tab.course_staff_only and \
                 not bool(user and has_access(user, 'staff', course, course.id)):
             continue
