@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-12 20:43+0000\n"
-"PO-Revision-Date: 2022-06-12 20:43:41.107877\n"
+"POT-Creation-Date: 2022-06-13 20:01+0000\n"
+"PO-Revision-Date: 2022-06-13 20:01:05.089992\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -48,6 +48,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/item.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
+msgstr ""
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -60,11 +67,6 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/component.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
@@ -2689,22 +2691,6 @@ msgid "Enter the names of the advanced modules to use in your course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Home Sidebar Name"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the heading that you want students to see above your course handouts "
-"on the Course Home page. Your course handouts appear in the right panel of "
-"the page."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/templates/courseware/info.html
-msgid "Course Handouts"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
@@ -4047,11 +4033,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/tabs.py
 msgid "External Discussion"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
-#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
-msgid "Home"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
@@ -10049,10 +10030,6 @@ msgstr ""
 msgid "Upgrade to earn a verified certificate in %(first_course_name)s"
 msgstr ""
 
-#: openedx/core/djangoapps/self_paced/models.py
-msgid "Enable course home page improvements."
-msgstr ""
-
 #: openedx/core/djangoapps/theming/views.py
 #, python-brace-format
 msgid "Site theme changed to {site_theme}"
@@ -11177,6 +11154,10 @@ msgstr ""
 msgid ""
 "If you have concerns about sharing your data, please contact your "
 "administrator at {enterprise_customer_name}."
+msgstr ""
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Home"
 msgstr ""
 
 #: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
@@ -14871,49 +14852,6 @@ msgstr ""
 msgid "next page"
 msgstr ""
 
-#: lms/templates/courseware/info.html
-msgid "{course_number} Course Info"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "You are not enrolled yet"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid ""
-"You are not currently enrolled in this course. {link_start}Enroll "
-"now!{link_end}"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Welcome to {org}'s {course_title}!"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Welcome to {course_title}!"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "Resume Course"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "View Updates in Studio"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Course Updates and News"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Handout Navigation"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Course Tools"
-msgstr ""
-
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr ""
@@ -15050,10 +14988,6 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Opens in a new browser window"
-msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Download Your Certificate"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -15288,20 +15222,6 @@ msgid "View my {cert_name_short}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "This link will open/download a PDF document"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download my {cert_name_short}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"This link will open/download a PDF document of your verified "
-"{cert_name_long}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
 msgstr ""
 
@@ -15445,6 +15365,10 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "Resume Course"
 msgstr ""
 
 #. Translators: provider_name is the name of a credit provider or university

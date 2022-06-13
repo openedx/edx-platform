@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-09 16:44-0400\n"
+"POT-Creation-Date: 2022-06-12 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Mongolian (https://www.transifex.com/open-edx/teams/6205/mn/)\n"
@@ -83,7 +83,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.8.0\n"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -673,6 +673,10 @@ msgstr "Хичээлийн код буруу байна"
 #: common/djangoapps/student/views/management.py
 msgid "Could not enroll"
 msgstr "Элсэж чадсангүй"
+
+#: common/djangoapps/student/views/management.py
+msgid "Unenrollment is currently disabled"
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "You are not enrolled in this course"
@@ -1787,7 +1791,6 @@ msgstr ""
 #. to the site.
 #: common/lib/capa/capa/responsetypes.py
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
 msgstr "эсвэл"
@@ -2078,6 +2081,7 @@ msgid "Whether to force the save button to appear on the page"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Show Reset Button"
 msgstr "Дахин эхлүүлэх товчийг харуулах"
 
@@ -2792,7 +2796,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: lms/templates/courseware/info.html
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Course Handouts"
 msgstr "Хичээлийн гарын авлага"
 
@@ -3431,6 +3434,12 @@ msgstr ""
 msgid ""
 "Choose a problem type to fetch from the library. If \"Any Type\" is selected"
 " no filtering is applied."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid ""
+"Determines whether a 'Reset Problems' button is shown, so users may reset "
+"their answers and reshuffle selected items."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -4528,8 +4537,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/signup_modal.html themes/edx.org/lms/templates/dashboard.html
-#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: lms/templates/signup_modal.html
 msgid "Close"
 msgstr "Хаах"
 
@@ -4940,7 +4948,6 @@ msgstr ""
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
 #: cms/templates/widgets/footer.html
-#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Powered by Open edX"
 msgstr "Open edX платформд суурилав"
@@ -4950,7 +4957,6 @@ msgid "Blog"
 msgstr "Блог "
 
 #: cms/templates/widgets/sock_links.html
-#: themes/edx.org/cms/templates/widgets/sock.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr "Холбоо барих"
@@ -4997,13 +5003,11 @@ msgid "News"
 msgstr "Мэдээ мэдээлэл"
 
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
-#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 msgid "Terms of Service & Honor Code"
 msgstr ""
 
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
-#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -5519,23 +5523,6 @@ msgid ""
 "this request, please visit the link(s) below."
 msgstr ""
 
-#: lms/djangoapps/course_goals/models.py
-#: lms/templates/course_modes/track_selection.html
-msgid "Earn a certificate"
-msgstr ""
-
-#: lms/djangoapps/course_goals/models.py
-msgid "Complete the course"
-msgstr ""
-
-#: lms/djangoapps/course_goals/models.py
-msgid "Explore the course"
-msgstr ""
-
-#: lms/djangoapps/course_goals/models.py
-msgid "Not sure yet"
-msgstr ""
-
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
 "\n"
@@ -5636,7 +5623,6 @@ msgid "Disabled"
 msgstr ""
 
 #: lms/djangoapps/course_home_api/outline/serializers.py
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 #, python-brace-format
 msgid "({number} Question)"
 msgid_plural "({number} Questions)"
@@ -5648,6 +5634,11 @@ msgstr[1] ""
 msgid ""
 "Please contact your degree administrator or {platform_name} Support if you "
 "have questions."
+msgstr ""
+
+#: lms/djangoapps/course_home_api/outline/views.py
+#: lms/templates/courseware/course_about.html
+msgid "Course is full"
 msgstr ""
 
 #: lms/djangoapps/course_home_api/outline/views.py
@@ -5790,20 +5781,6 @@ msgid "Course starts"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Don't forget to add a calendar reminder!"
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
-#, python-brace-format
-msgid "Course starts in {time_remaining_string} on {course_start_date}."
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
-#, python-brace-format
-msgid "Course starts in {time_remaining_string} at {course_start_time}."
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Course ends"
 msgstr ""
 
@@ -5827,16 +5804,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-#, python-brace-format
-msgid "This course is ending in {time_remaining_string} on {course_end_date}."
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
-#, python-brace-format
-msgid "This course is ending in {time_remaining_string} at {course_end_time}."
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "You lose all access to this course, including your progress."
 msgstr ""
 
@@ -5850,22 +5817,6 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Day certificates will become available for passing verified learners."
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
-#, python-brace-format
-msgid ""
-"If you have earned a certificate, you will be able to access it "
-"{time_remaining_string} from now. You will also be able to view your "
-"certificates on your {learner_profile_link}."
-msgstr ""
-
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Learner Profile"
-msgstr "Суралцагчийн Профайл"
-
-#: lms/djangoapps/courseware/date_summary.py
-msgid "We are working on generating course certificates."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -5897,35 +5848,8 @@ msgstr ""
 msgid "by {date}"
 msgstr ""
 
-#: lms/djangoapps/courseware/date_summary.py
-#, python-brace-format
-msgid ""
-"Don't forget, you have {time_remaining_string} left to upgrade to a Verified"
-" Certificate."
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
-#, python-brace-format
-msgid "Don't forget to upgrade to a verified certificate by {localized_date}."
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
-#, python-brace-format
-msgid ""
-"In order to qualify for a certificate, you must meet all course grading "
-"requirements, upgrade before the course deadline, and successfully verify "
-"your identity on {platform_name} if you have not done so "
-"already.{button_panel}"
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
-#, python-brace-format
-msgid "Upgrade ({upgrade_price})"
-msgstr ""
-
 #: cms/templates/group_configurations.html
 #: lms/templates/courseware/program_marketing.html
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Learn More"
 msgstr "Дэлгэрэнгүй"
 
@@ -5983,6 +5907,24 @@ msgstr ""
 
 #: lms/djangoapps/courseware/models.py
 msgid "Disable the dynamic upgrade deadline for this organization."
+msgstr ""
+
+#: lms/djangoapps/courseware/models.py
+msgid "Internal API Base URL"
+msgstr ""
+
+#: lms/djangoapps/courseware/models.py
+msgid "Financial Assistance Backend API Base URL."
+msgstr ""
+
+#: lms/djangoapps/courseware/models.py
+msgid ""
+"Username created for Financial Assistance Backend, e.g. "
+"financial_assistance_service_user."
+msgstr ""
+
+#: lms/djangoapps/courseware/models.py
+msgid "Percentage of courses allowed to use edx-financial-assistance"
 msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
@@ -6055,7 +5997,6 @@ msgstr "нэвтрэх"
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-#: openedx/features/course_experience/views/course_home_messages.py
 msgid "register"
 msgstr ""
 
@@ -6106,17 +6047,6 @@ msgid "You've earned a certificate for this course."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Certificate unavailable"
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
-msgid ""
-"You have not received a certificate because you do not have a current "
-"{platform_name} verified identity."
-msgstr ""
-
-#: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate will be available soon!"
 msgstr ""
 
@@ -6131,22 +6061,30 @@ msgid "Your certificate is available"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid "To see course content, {sign_in_link} or {register_link}."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "{sign_in_link} or {register_link}."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
-#: openedx/features/course_experience/views/course_home_messages.py
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Нэвтрэх"
 
@@ -6158,7 +6096,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/features/course_experience/views/course_home_messages.py
 msgid "You must be enrolled in the course to see course content."
 msgstr ""
 
@@ -6271,6 +6208,29 @@ msgstr ""
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Good"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                        %(course_name)s: Reported content awaits review\n"
+"                    "
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
+msgid "Go to Discussion"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
+#, python-format
+msgid "%(course_name)s: Reported content awaits review"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/subject.txt
+#, python-format
+msgid " %(course_name)s %(course_id)s moderator content for review "
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
@@ -7362,7 +7322,6 @@ msgstr ""
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Programs"
 msgstr ""
 
@@ -8218,7 +8177,6 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
-#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr "Хичээл Үзэх "
 
@@ -8484,8 +8442,6 @@ msgstr ""
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
-#: themes/edx.org/lms/templates/dashboard.html
-#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "window open"
 msgstr ""
 
@@ -8736,9 +8692,6 @@ msgstr ""
 #: lms/templates/courseware/courseware.html lms/templates/dashboard.html
 #: lms/templates/edxnotes/edxnotes.html lms/templates/index.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: openedx/features/course_search/templates/course_search/course-search-fragment.html
-#: themes/edx.org/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search"
@@ -8845,7 +8798,6 @@ msgstr "%(platform_name)s Эхлэл хуудас руу очих"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "Хичээлүүд"
 
@@ -9692,7 +9644,6 @@ msgid "Student"
 msgstr "Сурагч"
 
 #: openedx/core/djangoapps/embargo/forms.py
-#: openedx/core/djangoapps/verified_track_content/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
 msgstr "ХИЧЭЭЛ ОЛДСОНГҮЙ. Хичээлийн бүртгэлийн дугаар зөв эсэхийг шалгана уу"
 
@@ -9743,6 +9694,10 @@ msgstr "{country} улс {course} хичээлийн цагаан жагсаал
 #, python-brace-format
 msgid "Blacklist {country} for {course}"
 msgstr "{country} улсыг  {course} хичээлийн  хар жагсаалтанд оруулах "
+
+#: openedx/core/djangoapps/learner_pathway/apps.py
+msgid "Learner Pathways"
+msgstr ""
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -10226,6 +10181,14 @@ msgid "Enter your full name."
 msgstr "Бүтэн нэрээ оруулна уу"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your first name."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your last name."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "The email addresses do not match."
 msgstr "Имэйл хаяг таарахгүй байна"
 
@@ -10248,6 +10211,10 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your specialty."
 msgstr "Мэргэшилээ оруулна уу"
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your state."
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your city."
@@ -10290,24 +10257,39 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr " '{field_name}' талбарыг засах боломжгүй."
 
+#: openedx/core/djangoapps/user_api/accounts/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Enter a valid name"
+msgstr ""
+
+#. Translators: This label appears above a field which allows the
+#. user to input the First Name
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "First Name"
 msgstr ""
 
+#. Translators: This label appears above a field which allows the
+#. user to input the Last Name
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Last Name"
 msgstr ""
 
+#. Translators: This label appears above a field
+#. which allows the user to input the State/Province/Region in which they
+#. live.
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "State/Province/Region"
 msgstr "Хот,аймаг/ Дүүрэг,сум/ Хороо,баг"
@@ -10337,9 +10319,12 @@ msgid "Job Title"
 msgstr "Албан тушаал"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field
+#. meant to hold the user's mailing address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's mailing address.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html
 msgid "Mailing address"
@@ -10603,7 +10588,6 @@ msgstr ""
 
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Register"
 msgstr "Бүртгүүлэх"
@@ -10725,10 +10709,6 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Full Name cannot contain the following characters: < >"
 msgstr "Нэр дараах тэмдэгтүүдийг агуулсан байж болохгүй: < >"
-
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "Enter a valid name"
-msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "A properly formatted e-mail is required"
@@ -10904,10 +10884,6 @@ msgstr "{header_open}{title}{header_close}"
 #: openedx/core/djangoapps/util/user_messages.py
 msgid "Dismiss"
 msgstr "Болих"
-
-#: openedx/core/djangoapps/verified_track_content/models.py
-msgid "The course key for the course we would like to be auto-cohorted."
-msgstr ""
 
 #: openedx/core/djangoapps/video_pipeline/models.py
 msgid "Oauth client name of VEM service."
@@ -11168,51 +11144,6 @@ msgstr ""
 msgid "Updates"
 msgstr "Шинэчлэлүүд"
 
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid "{sign_in_link} or {register_link} and then enroll in this course."
-msgstr ""
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid "Welcome to {course_display_name}"
-msgstr ""
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid ""
-"You must be enrolled in the course to see course content. Please contact "
-"your degree administrator or {platform_name} Support if you have questions."
-msgstr ""
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid ""
-"{open_enroll_link}Enroll now{close_enroll_link} to access the full course."
-msgstr ""
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid ""
-"To start, set a course goal by selecting the option below that best "
-"describes your learning plan. {goal_options_container}"
-msgstr ""
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid "Set goal to: {choice}"
-msgstr ""
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid "{choice}"
-msgstr ""
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid "Set goal to: {goal_text}"
-msgstr ""
-
 #: openedx/features/discounts/admin.py
 msgid ""
 "These define the context to disable lms-controlled discounts on. If no "
@@ -11312,12 +11243,10 @@ msgid "Continue"
 msgstr "Үргэлжлүүл "
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
-#: lms/templates/dates_banner.html
 msgid "Shift due dates"
 msgstr ""
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
-#: lms/templates/dates_banner.html
 msgid ""
 "It looks like you missed some important deadlines based on our suggested "
 "schedule."
@@ -12296,11 +12225,6 @@ msgstr "Хичээлийн нэр"
 msgid "Course Number"
 msgstr "Хичээлийн дугаар"
 
-#: cms/templates/course_outline.html
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Course Outline"
-msgstr ""
-
 #: cms/templates/html_error.html lms/templates/course_modes/error.html
 #: lms/templates/module-error.html
 msgid "Error:"
@@ -12390,61 +12314,9 @@ msgstr "Бүртгэл"
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/static_templates/help.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-#: wiki/plugins/help/wiki_plugin.py
+#: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "Тусламж"
-
-#: cms/templates/widgets/sock.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid "Looking for help with {studio_name}?"
-msgstr ""
-
-#: cms/templates/widgets/sock.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid "Hide {studio_name} Help"
-msgstr ""
-
-#: cms/templates/widgets/sock.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid "{studio_name} Documentation"
-msgstr ""
-
-#: cms/templates/widgets/sock_links.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid "Access documentation on http://docs.edx.org"
-msgstr ""
-
-#: cms/templates/widgets/sock_links.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid "edX Documentation"
-msgstr ""
-
-#: cms/templates/widgets/sock_links.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid "Enroll in edX101: Overview of Creating an edX Course"
-msgstr ""
-
-#: cms/templates/widgets/sock_links.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid "Enroll in edX101"
-msgstr ""
-
-#: cms/templates/widgets/sock_links.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid "Enroll in StudioX: Creating a Course with edX Studio"
-msgstr ""
-
-#: cms/templates/widgets/sock_links.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid "Enroll in StudioX"
-msgstr ""
-
-#: cms/templates/widgets/sock_links.html
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid "Send an email to {email}"
-msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html
 #: lms/templates/courseware/static_tab.html
@@ -12617,19 +12489,18 @@ msgstr "Бүх хичээлийг үзэх"
 
 #: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
-#: themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Нүүр хуудас"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html
 msgid "results successfully populated,"
 msgstr ""
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html
 msgid "Click to load all enrolled courses"
 msgstr ""
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html
 msgid "You are not enrolled in any courses yet."
 msgstr "Та ямар нэг хичээлд бүртгүүлээгүй байна."
 
@@ -12637,7 +12508,6 @@ msgstr "Та ямар нэг хичээлд бүртгүүлээгүй байн�
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
-#: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore courses"
 msgstr "Бусад хичээлүүд"
 
@@ -12646,16 +12516,15 @@ msgstr "Бусад хичээлүүд"
 msgid "Activate your account!"
 msgstr "Бүртгэлээ идэвхжүүлнэ үү!"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html
 msgid "Course-loading errors"
 msgstr "Хичээл-ачаалалтын алдаа"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html
 msgid "Search Your Courses"
 msgstr "Өөрийн курсуудыг хайх"
 
 #: lms/templates/courseware/courseware.html lms/templates/dashboard.html
-#: themes/edx.org/lms/templates/dashboard.html
 msgid "Clear search"
 msgstr "Хайлтыг цэвэрлэ"
 
@@ -12678,15 +12547,15 @@ msgstr ""
 msgid "Continue to {platform_name}"
 msgstr ""
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
 msgstr "{course_number} хичээлийн и-мэйлын тохиргоо"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html
 msgid "Receive course emails"
 msgstr "Хичээлийн и-мэйл хүлээн авах"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html
 msgid "Save Settings"
 msgstr "Тохиргоо хадгалах"
 
@@ -12695,82 +12564,8 @@ msgstr "Тохиргоо хадгалах"
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-#: themes/edx.org/lms/templates/dashboard.html
-#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Unenroll"
 msgstr "Бүртгэлээс хасагдах"
-
-#: lms/templates/dates_banner.html
-msgid ""
-"It looks like you missed some important deadlines based on our suggested "
-"schedule. "
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-"To keep yourself on track, you can update this schedule and shift the past "
-"due assignments into the future by visiting "
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-" Don't worry—you won't lose any of the progress you've made when you shift "
-"your due dates."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-"To keep yourself on track, you can update this schedule and shift the past "
-"due assignments into the future. Don't worry—you won't lose any of the "
-"progress you've made when you shift your due dates."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid "You are auditing this course,"
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid " which means that you are unable to participate in graded assignments."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-" It looks like you missed some important deadlines based on our suggested "
-"schedule. Graded assignments and schedule adjustment are available to "
-"Verified Track learners."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-" It looks like you missed some important deadlines based on our suggested "
-"schedule. To complete graded assignments as part of this course and shift "
-"the past due assignments into the future, you can upgrade today."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid "Upgrade to shift due dates"
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid "Graded assignments are available to Verified Track learners."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-" To complete graded assignments as part of this course, you can upgrade "
-"today."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid "We've built a suggested schedule to help you stay on track."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-"But don't worry—it's flexible so you can learn at your own pace. If you "
-"happen to fall behind on our suggested dates, you'll be able to adjust them "
-"to keep yourself on track."
-msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -13097,10 +12892,6 @@ msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr ""
 
 #: lms/templates/preview_menu.html
-msgid "View in the new experience"
-msgstr ""
-
-#: lms/templates/preview_menu.html
 msgid "View in Studio"
 msgstr ""
 
@@ -13218,9 +13009,7 @@ msgstr ""
 msgid "Sequence"
 msgstr "Дараалал"
 
-#: lms/templates/courseware/dates.html lms/templates/seq_module.html
-#: lms/templates/vert_module.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#: lms/templates/seq_module.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr ""
 
@@ -13489,7 +13278,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/vert_module.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
 msgstr ""
 
@@ -13499,6 +13287,10 @@ msgstr ""
 
 #: lms/templates/vert_module.html
 msgid "Past due"
+msgstr ""
+
+#: lms/templates/vert_module.html
+msgid "Reset Problems"
 msgstr ""
 
 #: lms/templates/video.html
@@ -14550,7 +14342,6 @@ msgid "Download student grades"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
-#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Print or share your certificate:"
 msgstr ""
 
@@ -14564,7 +14355,6 @@ msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Share on Twitter"
 msgstr ""
 
@@ -14573,7 +14363,6 @@ msgid "Tweet this Accomplishment. Pop up window."
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
-#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Add to LinkedIn Profile"
 msgstr "LinkedIn Профайл дээр нэмэх"
 
@@ -14664,40 +14453,31 @@ msgstr ""
 
 #: lms/templates/course_modes/_upgrade_button.html
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue the Verified Track"
 msgstr ""
 
 #: lms/templates/course_modes/_upgrade_button.html
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue a Verified Certificate"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Enroll In {course_name} | Choose Your Track"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to enroll you"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with the Verified Track"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with a Verified Certificate"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "Become eligible for academic credit and highlight your new skills and "
 "knowledge with a verified certificate. Use this valuable credential to "
@@ -14706,59 +14486,50 @@ msgid ""
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Benefits of the Verified Track"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Eligible for credit:{b_end} Receive academic credit after "
 "successfully completing the course"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Unlimited Course Access: {b_end}Learn at your own pace, and access "
 "materials anytime to brush up on what you've learned."
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Graded Assignments: {b_end}Build your skills through graded "
 "assignments and projects."
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn."
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Benefits of a Verified Certificate"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Official:{b_end} Receive an instructor-signed certificate with the "
 "institution's logo"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Easily shareable:{b_end} Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "Highlight your new knowledge and skills with a verified certificate. Use "
 "this valuable credential to improve your job prospects and advance your "
@@ -14766,45 +14537,38 @@ msgid ""
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Official: {b_end}Receive an instructor-signed certificate with the "
 "institution's logo"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Easily shareable: {b_end}Add the certificate to your CV or resumé, "
 "or post it directly on LinkedIn"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "{b_start}Motivating: {b_end}Give yourself an additional incentive to "
 "complete the course"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Audit This Course"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "Audit this course for free and have complete access to all the course "
 "material, activities, tests, and forums."
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Audit This Course (No Certificate)"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "Audit this course for free and have access to course materials and "
 "discussions forums. {b_start}This track does not include graded assignments,"
@@ -14812,7 +14576,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "Audit this course for free and have access to course materials and "
 "discussions forums. {b_start}This track does not include graded "
@@ -14820,7 +14583,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "Audit this course for free and have access to course materials and "
 "discussions forums. {b_start}This track does not include unlimited course "
@@ -14828,7 +14590,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
 "Audit this course for free and have complete access to all the course "
 "material, activities, tests, and forums.  {b_start}Please note that this "
@@ -14913,6 +14674,10 @@ msgid "Choose a path for your course in"
 msgstr ""
 
 #: lms/templates/course_modes/track_selection.html
+msgid "Earn a certificate"
+msgstr ""
+
+#: lms/templates/course_modes/track_selection.html
 msgid ""
 "Studies show that those who choose this option are  {start_bold}more engaged"
 " and motivated{end_bold} to complete their courses"
@@ -14936,7 +14701,6 @@ msgstr ""
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "due {date}"
 msgstr ""
 
@@ -14945,7 +14709,6 @@ msgid "{section_format} due {{date}}"
 msgstr ""
 
 #: lms/templates/courseware/accordion.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This content is graded"
 msgstr ""
 
@@ -14956,10 +14719,6 @@ msgstr ""
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr "Та энэ хичээлд элссэн байна"
-
-#: lms/templates/courseware/course_about.html
-msgid "Course is full"
-msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
@@ -15116,30 +14875,6 @@ msgstr ""
 msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr ""
 
-#: lms/templates/courseware/dates.html lms/templates/courseware/syllabus.html
-msgid "{course.display_number_with_default} Course Info"
-msgstr ""
-
-#: lms/templates/courseware/dates.html
-msgid "Important Dates"
-msgstr ""
-
-#: lms/templates/courseware/dates.html
-msgid "Today"
-msgstr ""
-
-#: lms/templates/courseware/dates.html
-msgid "Verified Only"
-msgstr ""
-
-#: lms/templates/courseware/dates.html
-msgid "Due Next"
-msgstr ""
-
-#: lms/templates/courseware/dates.html
-msgid "Not yet released"
-msgstr ""
-
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr ""
@@ -15189,8 +14924,6 @@ msgstr "{course_title} хичээлд тавтай морил!"
 
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
 msgstr "Хичээлээ үргэлжлүүлэх"
 
@@ -15207,7 +14940,6 @@ msgid "Handout Navigation"
 msgstr ""
 
 #: lms/templates/courseware/info.html
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Course Tools"
 msgstr "Хичээлийн хэрэглүүр"
 
@@ -15453,6 +15185,10 @@ msgstr ""
 msgid "No problem scores in this section"
 msgstr ""
 
+#: lms/templates/courseware/syllabus.html
+msgid "{course.display_number_with_default} Course Info"
+msgstr ""
+
 #: lms/templates/courseware/welcome-back.html
 msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
@@ -15683,7 +15419,6 @@ msgid "Share {course_name} on Facebook"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Share on Facebook"
 msgstr "Фэйсбүүк дээр хуваалцах"
 
@@ -15729,6 +15464,12 @@ msgid ""
 "access to the course material, unlock both graded and non-graded "
 "assignments, and earn a {link_start}verified certificate{link_end} to "
 "showcase on your resumé."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"{start_bold}Get the most out of your course!{end_bold} Upgrade to earn a "
+"{link_start}verified certificate{link_end} to showcase on your resumé."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -16506,7 +16247,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
 
@@ -16520,7 +16260,6 @@ msgstr ""
 
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "How it Works"
 msgstr ""
 
@@ -17924,7 +17663,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
-#: themes/edx.org/lms/templates/dashboard.html
 msgid "My Courses"
 msgstr "Миний Хичээлүүд"
 
@@ -18339,13 +18077,10 @@ msgid "Skeleton Page"
 msgstr ""
 
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search the course"
 msgstr "Хичээл хайх"
 
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Start Course"
 msgstr "Хичээлээ үзэж эхлэх"
 
@@ -18518,36 +18253,6 @@ msgstr ""
 msgid "View all course dates"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Goal: "
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Edit your course goal:"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Pursue a verified certificate"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid ""
-"Sample verified certificate with your name, the course title, the logo of "
-"the institution and the signatures of the instructors for this course."
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-msgid "Upgrade ({price})"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "Expand All"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "Prerequisite: "
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Learn About Verified Certificates"
 msgstr "Баталгаажсан Гэрчилгээний тухай судлах"
@@ -18628,18 +18333,6 @@ msgstr ""
 msgid "This course does not have any updates."
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
-msgid "Latest Update"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
-msgid "Show More"
-msgstr ""
-
-#: openedx/features/course_search/templates/course_search/course-search-fragment.html
-msgid "Search Results"
-msgstr ""
-
 #. Translators: this section lists all the third-party authentication
 #. providers
 #. (for example, Google and LinkedIn) the user can link with or unlink from
@@ -18683,9 +18376,12 @@ msgid "You haven't earned any certificates yet."
 msgstr ""
 
 #: openedx/features/learner_profile/templates/learner_profile/learner-achievements-fragment.html
-#: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore New Courses"
 msgstr "Шинэ Хичээлүүд"
+
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Learner Profile"
+msgstr "Суралцагчийн Профайл"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "View My Records"
@@ -18705,138 +18401,6 @@ msgstr ""
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "An error occurred. Try loading the page again."
 msgstr "Алдаа гарлаа. Хуудсыг дахин ачаална уу."
-
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid ""
-"Access Course Staff Support on the Partner Portal to submit or review "
-"support tickets"
-msgstr ""
-
-#: themes/edx.org/cms/templates/widgets/sock.html
-msgid "edX Partner Portal"
-msgstr ""
-
-#: themes/edx.org/lms/templates/dashboard.html
-msgid ""
-"Browse recently launched courses and see what's new in your favorite "
-"subjects."
-msgstr ""
-
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "Take advantage of free coaching!"
-msgstr ""
-
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "Get Started"
-msgstr ""
-
-#: themes/edx.org/lms/templates/footer.html
-msgid "Page Footer"
-msgstr ""
-
-#: themes/edx.org/lms/templates/footer.html
-msgid "edX Home Page"
-msgstr ""
-
-#: themes/edx.org/lms/templates/footer.html
-msgid "Connect"
-msgstr ""
-
-#: themes/edx.org/lms/templates/footer.html
-msgid "© {year} edX Inc. All rights reserved."
-msgstr ""
-
-#. Translators: This string will not be used in Open edX installations.
-#: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
-msgid "About edX Verified Certificates"
-msgstr ""
-
-#. Translators: This string will not be used in Open edX installations.
-#: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
-msgid ""
-"An edX Verified Certificate signifies that the learner has agreed to abide "
-"by the edX honor code and completed all of the required tasks of this course"
-" under its guidelines, as well as having their photo ID checked to verify "
-"their identity."
-msgstr ""
-
-#. Translators: This string will not be used in Open edX installations.
-#: themes/edx.org/lms/templates/certificates/_about-edx.html
-msgid "About edX"
-msgstr ""
-
-#. Translators: This string will not be used in Open edX installations.
-#: themes/edx.org/lms/templates/certificates/_about-edx.html
-msgid ""
-"{link_start}edX{link_end} offers interactive online classes and MOOCs from "
-"the world's best universities, including MIT, Harvard, Berkeley, University "
-"of Texas, and many others. edX is a mission driven initiative created by "
-"founding partners Harvard and MIT."
-msgstr ""
-
-#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
-msgid "Congratulations, {user_name}!"
-msgstr ""
-
-#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
-msgid ""
-"You worked hard to earn your certificate from "
-"{accomplishment_copy_course_org} {dash} share it with colleagues, friends, "
-"and family to get the word out about what you mastered in "
-"{accomplishment_course_title}."
-msgstr ""
-
-#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
-msgid "Share this certificate on Facebook (opens a new tab/window)"
-msgstr ""
-
-#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
-msgid "Tweet this certificate (opens a new tab/window)"
-msgstr ""
-
-#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
-msgid "Add this certificate to your LinkedIn profile (opens a new tab/window)"
-msgstr ""
-
-#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
-msgid "Print"
-msgstr ""
-
-#: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
-msgid "Print this certificate"
-msgstr ""
-
-#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
-msgid "edX Inc."
-msgstr ""
-
-#: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
-msgid ""
-"All rights reserved except where noted. edX, Open edX and the edX and Open "
-"edX logos are registered trademarks of edX Inc."
-msgstr ""
-
-#. Translators: This string will not be used in Open edX installations.
-#: themes/edx.org/lms/templates/course_modes/choose.html
-msgid ""
-"{b_start}Support our Mission: {b_end}EdX relies on verified certificates to "
-"help fund affordable education to everyone globally."
-msgstr ""
-
-#: themes/edx.org/lms/templates/course_modes/choose.html
-msgid ""
-"{b_start}Support our Mission: {b_end} EdX, a mission driven initiative, "
-"relies on verified certificates to help fund free education for everyone "
-"globally"
-msgstr ""
-
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Find Courses"
-msgstr ""
-
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Schools & Partners"
-msgstr ""
 
 #: themes/red-theme/lms/templates/footer.html
 msgid ""
@@ -19494,6 +19058,10 @@ msgid ""
 "Use course updates to notify students of important dates or exams, highlight"
 " particular discussions in the forums, announce schedule changes, and "
 "respond to student questions. You add or edit updates in HTML."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Course Outline"
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -22217,6 +21785,26 @@ msgstr ""
 msgid "Label"
 msgstr ""
 
+#: cms/templates/widgets/sock.html
+msgid "Looking for help with {studio_name}?"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "Hide {studio_name} Help"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "{studio_name} Documentation"
+msgstr ""
+
+#: cms/templates/widgets/sock_links.html
+msgid "Access documentation on http://docs.edx.org"
+msgstr ""
+
+#: cms/templates/widgets/sock_links.html
+msgid "edX Documentation"
+msgstr ""
+
 #: cms/templates/widgets/sock_links.html
 msgid "Access the Open edX Portal"
 msgstr "Open Edx Портал руу Хандах"
@@ -22224,6 +21812,26 @@ msgstr "Open Edx Портал руу Хандах"
 #: cms/templates/widgets/sock_links.html
 msgid "Open edX Portal"
 msgstr "Open Edx портал"
+
+#: cms/templates/widgets/sock_links.html
+msgid "Enroll in edX101: Overview of Creating an edX Course"
+msgstr ""
+
+#: cms/templates/widgets/sock_links.html
+msgid "Enroll in edX101"
+msgstr ""
+
+#: cms/templates/widgets/sock_links.html
+msgid "Enroll in StudioX: Creating a Course with edX Studio"
+msgstr ""
+
+#: cms/templates/widgets/sock_links.html
+msgid "Enroll in StudioX"
+msgstr ""
+
+#: cms/templates/widgets/sock_links.html
+msgid "Send an email to {email}"
+msgstr ""
 
 #: cms/templates/widgets/user_dropdown.html
 msgid "Currently signed in as:"

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-12 20:43+0000\n"
-"PO-Revision-Date: 2022-06-12 20:43:41.120480\n"
+"POT-Creation-Date: 2022-06-13 20:00+0000\n"
+"PO-Revision-Date: 2022-06-13 20:01:04.863306\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -3620,6 +3620,10 @@ msgid "Invalid email address: {email}"
 msgstr ""
 
 #: lms/static/js/groups/views/cohort_editor.js
+msgid "Cohort assignment not allowed: {email_or_username}"
+msgstr ""
+
+#: lms/static/js/groups/views/cohort_editor.js
 msgid "There was an error when trying to add learners:"
 msgid_plural "{numErrors} learners could not be added to this cohort:"
 msgstr[0] ""
@@ -7165,23 +7169,11 @@ msgid "Status"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-msgid "Download URL"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Grade"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Last Updated"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-msgid "Download the user's certificate"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-msgid "Not available"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore

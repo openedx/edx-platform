@@ -111,7 +111,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-09 16:44-0400\n"
+"POT-Creation-Date: 2022-06-12 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Nika Shahidian, 2022\n"
 "Language-Team: Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/)\n"
@@ -120,7 +120,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.8.0\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 #: cms/static/js/views/video_transcripts.js
@@ -185,7 +185,6 @@ msgstr "Eliminar"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
-#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
@@ -369,6 +368,14 @@ msgstr "Erro"
 #: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "A atualizar com o conteúdo mais recente"
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Loading..."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Selected blocks"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Unable to update settings"
@@ -1303,6 +1310,7 @@ msgstr "Nova janela"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/demographics_collection/Wizard.jsx
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -2091,6 +2099,10 @@ msgid "Navigate up"
 msgstr "Subir"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+msgid "Browsing"
+msgstr ""
+
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
 msgstr "Selecionar"
 
@@ -2664,9 +2676,29 @@ msgstr ""
 "Coloque, por favor, todas as perguntas relacionadas com o curso no Fórum de "
 "Discussão onde o pessoal do curso pode responder directamente."
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Details"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "the more quickly and helpfully we can respond!"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Create Support Ticket"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr ""
+
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
 msgstr "Autentique-se na {platform} para que o possamos ajudar."
+
+#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
+msgid "Need help logging in?"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -3587,19 +3619,51 @@ msgid "Get started"
 msgstr "Começar"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Section {currentPage} of {totalPages}"
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Help make edX better for everyone!"
 msgstr "Ajude a tornar o edX melhor para todos!"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Why does edX collect this information?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
-"Welcome to edX! Before you get started, please take a few minutes to fill-in"
-" the additional information below to help us understand a bit more about "
-"your background. You can always edit this information later in Account "
-"Settings."
+"An error occurred while attempting to retrieve or save the information "
+"below. Please try again later."
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"What was the total combined income, during the last 12 months, of all "
+"members of your family? "
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
+"National Guard?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What is the highest level of education that you have achieved so far?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"What is the highest level of education that any of your parents or guardians"
+" have achieved?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select employment status"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What industry do you currently work in?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What industry do you want to work in?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
@@ -3613,6 +3677,22 @@ msgstr "questionário demográfico"
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "close questionnaire"
 msgstr "fechar questionário"
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "finish later"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Return to my dashboard"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Finish later"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "next page"
+msgstr ""
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -3940,27 +4020,6 @@ msgstr "Grupos Activados"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Grupos Desativados"
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
-msgstr ""
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -4737,10 +4796,6 @@ msgid ""
 msgstr ""
 "As hiperligações são geradas a pedido e expiram após 5 minutos devido à "
 "natureza sensível da informação do estudante."
-
-#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
-msgid "You have access to the {enterpriseName} dashboard"
-msgstr ""
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
@@ -5688,40 +5743,6 @@ msgstr "Pontuação geral"
 msgid "Bookmark this page"
 msgstr "Marcar esta página como favorita"
 
-#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
-msgid "Thank you for setting your course goal to {goal}!"
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
-msgid ""
-"There was an error in setting your goal, please reload the page and try "
-"again."
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr ""
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "Expandir Tudo"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "Encolher Tudo"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr "Ver Mais"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr "Ver Menos"
-
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result found for \"{search_term}\""
 msgid_plural "{total_results} results found for \"{search_term}\""
@@ -6021,6 +6042,30 @@ msgstr "Erro ao importar o curso"
 #: cms/static/js/features/import/views/import.js
 msgid "There was an error with the upload"
 msgstr "Ocorreu um erro com o carregamento"
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "Organization:"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "Course Number:"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "Course Run:"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "(Read-only)"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "Re-run Course"
+msgstr ""
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "Visualizar ao vivo"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -7619,10 +7664,6 @@ msgid "follow this post"
 msgstr "siga esta publicação"
 
 #: common/static/common/templates/discussion/templates.underscore
-msgid "post anonymously"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously to classmates"
 msgstr "publicar anonimamente para os colegas"
 
@@ -8083,6 +8124,14 @@ msgid "This catalog's courses:"
 msgstr "Cursos deste catálogo:"
 
 #: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "Expandir Tudo"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "Encolher Tudo"
+
+#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Data de Início"
 
@@ -8167,6 +8216,14 @@ msgid ""
 msgstr ""
 "Para que as suas respostas sejam contabilizadas, clique no botão "
 "\"Submeter\" em cada questão antes de selecionar \"Terminar o exame\"."
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "Ver Mais"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "Ver Menos"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -11075,10 +11132,6 @@ msgstr ""
 #: cms/templates/js/show-textbook.underscore
 msgid "PDF Chapters"
 msgstr "Capítulos em PDF"
-
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr "Visualizar ao vivo"
 
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
