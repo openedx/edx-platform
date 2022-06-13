@@ -40,7 +40,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
 
-        self.client.login(username=self.student.username, password="test")
+        self.client.force_login(user=self.student)
 
         self.send_mail_url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         self.success_content = {
@@ -70,7 +70,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         self.client.logout()
 
-        self.client.login(username=self.instructor.username, password="test")
+        self.client.force_login(user=self.instructor)
         self.navigate_to_email_view()
 
         test_email = {
@@ -92,7 +92,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         """
         self.client.logout()
 
-        self.client.login(username=self.instructor.username, password="test")
+        self.client.force_login(user=self.instructor)
 
         unsubscribe_link = get_unsubscribed_link(self.student.username, str(self.course.id))
         response = self.client.post(unsubscribe_link, {'unsubscribe': True})
@@ -122,7 +122,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         assert CourseEnrollment.is_enrolled(self.student, self.course.id)
 
-        self.client.login(username=self.instructor.username, password="test")
+        self.client.force_login(user=self.instructor)
         self.navigate_to_email_view()
 
         test_email = {
@@ -155,7 +155,7 @@ class TestACEOptoutCourseEmails(ModuleStoreTestCase):
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
 
-        self.client.login(username=self.student.username, password="test")
+        self.client.force_login(user=self.student)
 
         self._set_email_optout(False)
         self.policy = CourseEmailOptout()

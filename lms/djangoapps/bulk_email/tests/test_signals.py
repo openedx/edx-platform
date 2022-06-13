@@ -33,7 +33,7 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
 
-        self.client.login(username=self.student.username, password="test")
+        self.client.force_login(user=self.student)
 
         self.send_mail_url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         self.success_content = {
@@ -78,7 +78,7 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
         force_optout_all(sender=self.__class__, user=self.student)
 
         # Try to send a bulk course email
-        self.client.login(username=self.instructor.username, password="test")
+        self.client.force_login(user=self.instructor)
         self.send_test_email()
 
         # Assert that self.student.email not in mail.to, outbox should only contain "myself" target

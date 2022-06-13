@@ -53,7 +53,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         course_title = "ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(display_name=course_title)
         self.instructor = AdminFactory.create()
-        self.client.login(username=self.instructor.username, password="test")
+        self.client.force_login(user=self.instructor)
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
