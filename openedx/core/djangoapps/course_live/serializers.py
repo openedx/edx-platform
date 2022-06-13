@@ -7,6 +7,7 @@ from lti_consumer.models import LtiConfiguration
 from rest_framework import serializers
 
 from .models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
+from .utils import provider_requires_custom_email
 
 
 class LtiSerializer(serializers.ModelSerializer):
@@ -34,12 +35,18 @@ class LtiSerializer(serializers.ModelSerializer):
         """
         additional_parameters = value.get('additional_parameters', None)
         custom_instructor_email = additional_parameters.get('custom_instructor_email', None)
-        if additional_parameters and custom_instructor_email:
+        requires_email = provider_requires_custom_email(self.context.get('provider_type', ''))
+
+        if additional_parameters and custom_instructor_email and requires_email:
             try:
                 validate_email(custom_instructor_email)
             except ValidationError as error:
                 raise serializers.ValidationError(f'{custom_instructor_email} is not valid email address') from error
             return value
+
+        if not requires_email:
+            return value
+
         raise serializers.ValidationError('custom_instructor_email is required value in additional_parameters')
 
     def create(self, validated_data):
@@ -107,6 +114,13 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         fields = ['course_key', 'provider_type', 'enabled', 'lti_configuration', 'pii_sharing_allowed']
         read_only_fields = ['course_key']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            self.context['provider_type'] = self.initial_data.get('provider_type', '')
+        except AttributeError:
+            self.context['provider_type'] = self.data.get('provider_type', '')
+
     def get_pii_sharing_allowed(self, instance):
         return self.context['pii_sharing_allowed']
 
@@ -159,7 +173,6 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         """
         Update LtiConfiguration
         """
-
         lti_serializer = LtiSerializer(
             instance.lti_configuration or None,
             data=lti_config,

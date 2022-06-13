@@ -15,7 +15,20 @@ AVAILABLE_PROVIDERS = {
         'pii_sharing': {
             'username': False,
             'email': False,
-        }
+        },
+        'additional_parameters': [
+            'custom_instructor_email'
+        ]
+    },
+    'big_blue_button': {
+        'name': 'Big Blue Button',
+        'has_free_tier': True,
+        'features': [],
+        'pii_sharing': {
+            'username': True,
+            'email': False,
+        },
+        'additional_parameters': []
     }
 }
 
