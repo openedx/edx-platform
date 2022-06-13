@@ -14,17 +14,21 @@ class School(TimeStampedModel):
 
 
 class GenUser(models.Model):
-    LEARNER = 'Student'
-    TEACHER = 'Faculty'
+    STUDENT = 'Student'
+    FACULTY = 'Faculty'
     AFFILIATE = 'Affiliate'
     EMPLOYEE = 'Employee'
+    TEACHING_STAFF = 'TeachingStaff'
+    NON_TEACHING_STAFF = 'NonTeachingStaff'
 
     user = models.OneToOneField(USER_MODEL, on_delete=models.CASCADE)
     role = models.CharField(blank=True, null=True, max_length=32, choices=(
-        (LEARNER, 'Learner'),
-        (TEACHER, 'Teacher'),
+        (STUDENT, 'Student'),
+        (FACULTY, 'Faculty'),
         (AFFILIATE, 'Affiliate'),
         (EMPLOYEE, 'Employee'),
+        (TEACHING_STAFF, 'TeachingStaff'),
+        (NON_TEACHING_STAFF, 'NonTeachingStaff'),
     ))
     school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True)
     year_of_entry = models.CharField(max_length=32, null=True, blank=True)
