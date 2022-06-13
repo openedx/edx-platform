@@ -24,12 +24,12 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
 
     def setUp(self):
         super().setUp()
-        self.system = get_test_system(user=self.USER_STANDIN)
+        self.runtime = get_test_system(user=self.USER_STANDIN)
         self.environ = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'POST'}
-        self.system.publish = Mock()
-        self.system.rebind_noauth_module_to_user = Mock()
+        self.runtime.publish = Mock()
+        self.runtime._services['rebind_user'] = Mock()  # pylint: disable=protected-access
 
-        self.xmodule = LTIBlock(self.system, DictFieldData({}), Mock())
+        self.xmodule = LTIBlock(self.runtime, DictFieldData({}), Mock())
         self.lti_id = self.xmodule.lti_id
         self.xmodule.due = None
         self.xmodule.graceperiod = None
@@ -250,7 +250,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         assert response.status_code == 200
         assert self.xmodule.module_score is None
         assert self.xmodule.score_comment == ''
-        (_, evt_type, called_grade_obj), _ = self.system.publish.call_args  # pylint: disable=unpacking-non-sequence
+        (_, evt_type, called_grade_obj), _ = self.runtime.publish.call_args  # pylint: disable=unpacking-non-sequence
         assert called_grade_obj ==\
                {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None, 'score_deleted': True}
         assert evt_type == 'grade'
@@ -271,7 +271,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         assert response.status_code == 200
         assert self.xmodule.module_score is None
         assert self.xmodule.score_comment == ''
-        (_, evt_type, called_grade_obj), _ = self.system.publish.call_args  # pylint: disable=unpacking-non-sequence
+        (_, evt_type, called_grade_obj), _ = self.runtime.publish.call_args  # pylint: disable=unpacking-non-sequence
         assert called_grade_obj ==\
                {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None, 'score_deleted': True}
         assert evt_type == 'grade'
@@ -288,7 +288,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         assert response.status_code == 200
         assert self.xmodule.module_score == 0.1
         assert self.xmodule.score_comment == 'ಠ益ಠ'
-        (_, evt_type, called_grade_obj), _ = self.system.publish.call_args  # pylint: disable=unpacking-non-sequence
+        (_, evt_type, called_grade_obj), _ = self.runtime.publish.call_args  # pylint: disable=unpacking-non-sequence
         assert evt_type == 'grade'
         assert called_grade_obj ==\
                {'user_id': self.USER_STANDIN.id, 'value': 0.1, 'max_value': 1.0, 'score_deleted': False}
@@ -370,7 +370,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         Test that we get a 404 when the supplied user does not exist
         """
         self.setup_system_xmodule_mocks_for_lti20_request_test()
-        self.system._services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
+        self.runtime._services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
         response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         assert response.status_code == 404

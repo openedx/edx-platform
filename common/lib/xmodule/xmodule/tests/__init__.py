@@ -153,8 +153,6 @@ def get_test_system(
         static_url='/static',
         track_function=Mock(name='get_test_system.track_function'),
         get_module=get_module,
-        debug=True,
-        hostname="edx.org",
         services={
             'user': user_service,
             'mako': mako_service,
@@ -169,7 +167,6 @@ def get_test_system(
             'replace_urls': replace_url_service,
             'error_descriptor_class': ErrorBlock
         },
-        node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         course_id=course_id,
         descriptor_runtime=descriptor_system,
     )

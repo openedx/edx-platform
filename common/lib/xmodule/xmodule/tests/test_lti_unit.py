@@ -3,18 +3,21 @@
 
 import datetime
 import textwrap
-import unittest
 from copy import copy
 from unittest.mock import Mock, PropertyMock, patch
 from urllib import parse
 
+
 import pytest
+from django.conf import settings
+from django.test import TestCase, override_settings
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator
 from pytz import UTC
 from webob.request import Request
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 from xmodule.fields import Timedelta
@@ -25,7 +28,8 @@ from xmodule.tests.helpers import StubUserService
 from . import get_test_system
 
 
-class LTIBlockTest(unittest.TestCase):
+@override_settings(LMS_BASE="edx.org")
+class LTIBlockTest(TestCase):
     """Logic tests for LTI module."""
 
     def setUp(self):
@@ -59,7 +63,7 @@ class LTIBlockTest(unittest.TestCase):
             """)
         self.system = get_test_system()
         self.system.publish = Mock()
-        self.system.rebind_noauth_module_to_user = Mock()
+        self.system._services['rebind_user'] = Mock()  # pylint: disable=protected-access
 
         self.xmodule = LTIBlock(
             self.system,
@@ -69,8 +73,9 @@ class LTIBlockTest(unittest.TestCase):
         current_user = self.system.service(self.xmodule, 'user').get_current_user()
         self.user_id = current_user.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
         self.lti_id = self.xmodule.lti_id
+
         self.unquoted_resource_link_id = '{}-i4x-2-3-lti-31de800015cf4afb973356dbe81496df'.format(
-            self.xmodule.runtime.hostname
+            settings.LMS_BASE
         )
 
         sourced_id = ':'.join(parse.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))  # lint-amnesty, pylint: disable=line-too-long

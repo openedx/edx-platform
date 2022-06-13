@@ -212,7 +212,6 @@ def _preview_module_system(request, descriptor, field_data):
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
         track_function=lambda event_type, event: None,
         get_module=partial(_load_preview_module, request),
-        debug=True,
         mixins=settings.XBLOCK_MIXINS,
         course_id=course_id,
 

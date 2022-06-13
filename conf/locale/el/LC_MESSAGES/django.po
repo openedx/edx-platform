@@ -14,6 +14,7 @@
 # Georgios Vasileiadis <gvasileiadis@outlook.com.gr>, 2014
 # Katerina Ligkovanli <kaligova@gmail.com>, 2016-2021
 # Konstantina Samara <kon.samara@hotmail.com>, 2015
+# Konstantinos Fragoulis, 2022
 # kostas kalatzis <koskalat@gmail.com>, 2015
 # Nick Gikopoulos, 2014-2017
 # Panos Chronis <panosfyra4@yahoo.gr>, 2014
@@ -90,7 +91,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-22 20:43+0000\n"
+"POT-Creation-Date: 2022-05-29 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Greek (https://www.transifex.com/open-edx/teams/6205/el/)\n"
@@ -6295,7 +6296,7 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 #, python-format
-msgid "%(course_name)s %(course_id)s Reported content awaits review"
+msgid "%(course_name)s: Reported content awaits review"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html

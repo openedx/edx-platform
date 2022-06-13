@@ -48,7 +48,11 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     strip_none
 )
 from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserException
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE
+from lms.djangoapps.discussion.toggles import (
+    ENABLE_DISCUSSIONS_MFE,
+    ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE,
+    ENABLE_DISCUSSIONS_MFE_BANNER
+)
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
 from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
@@ -748,7 +752,7 @@ def _discussions_mfe_context(query_params: Dict,
         "mfe_url": f"{forum_url}?discussions_experience=new",
         "share_feedback_url": settings.DISCUSSIONS_MFE_FEEDBACK_URL,
         "course_key": course_key,
-        "show_banner": enable_mfe and is_privileged,
+        "show_banner": enable_mfe and (is_privileged or ENABLE_DISCUSSIONS_MFE_BANNER),
         "discussions_mfe_url": mfe_url,
     }
 

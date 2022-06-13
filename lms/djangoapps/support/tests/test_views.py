@@ -1542,6 +1542,24 @@ class SsoRecordsTests(SupportViewTestCase):  # lint-amnesty, pylint: disable=mis
         assert len(data) == 1
         self.assertContains(response, '"uid": "test@example.com"')
 
+    def test_history_response(self):
+        '''Tests changes in SSO history for a user'''
+        user_social_auth = UserSocialAuth.objects.create(  # lint-amnesty, pylint: disable=unused-variable
+            user=self.student,
+            uid=self.student.email,
+            provider='tpa-saml'
+        )
+        sso = UserSocialAuth.objects.get(user=self.student)
+        sso.uid = self.student.email + ':' + sso.provider
+        sso.save()
+        response = self.client.get(self.url)
+        data = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == 200
+        assert len(data) == 1
+        assert len(data[0].get('history')) == 2
+        assert data[0].get('history')[0].get('uid') == "test@example.com:tpa-saml"
+        assert data[0].get('history')[1].get('uid') == "test@example.com"
+
 
 class FeatureBasedEnrollmentSupportApiViewTests(SupportViewTestCase):
     """

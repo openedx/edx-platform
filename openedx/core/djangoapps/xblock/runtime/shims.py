@@ -97,14 +97,6 @@ class RuntimeShim:
         # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
         return False  # Change this if/when we need to support unsafe courses in the new runtime.
 
-    @property
-    def DEBUG(self):
-        """
-        Should DEBUG mode (?) be used? This flag is only read by capa.
-        """
-        # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
-        return False
-
     def get_python_lib_zip(self):
         """
         A function returning a bytestring or None. The bytestring is the
@@ -144,16 +136,6 @@ class RuntimeShim:
             DeprecationWarning, stacklevel=3,
         )
         return self.resources_fs
-
-    @property
-    def node_path(self):
-        """
-        Get the path to Node.js
-
-        Seems only to be used by capa. Remove this if capa can be refactored.
-        """
-        # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
-        return getattr(settings, 'NODE_PATH', None)  # Only defined in the LMS
 
     def render_template(self, template_name, dictionary, namespace='main'):
         """
