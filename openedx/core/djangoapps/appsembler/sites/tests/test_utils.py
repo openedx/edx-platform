@@ -1,4 +1,7 @@
+from uuid import UUID
+
 import unittest
+from unittest.mock import Mock
 
 from django.db.models import QuerySet
 from mock import patch
@@ -9,14 +12,18 @@ from django.test.client import RequestFactory
 
 from openedx.core.djangoapps.appsembler.api.tests.factories import OrganizationFactory
 from openedx.core.djangoapps.appsembler.sites.utils import (
+    get_active_site_uuids_from_site_config_service,
+    get_active_organizations_uuids,
+    get_active_sites,
     get_current_organization,
     get_initial_page_elements,
-    get_active_sites,
-    get_lms_link_from_course_key
+    get_lms_link_from_course_key,
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 
 from organizations.models import Organization
+
+from site_config_client.exceptions import SiteConfigurationError
 
 
 class JSONMigrationUtilsTestCase(TestCase):
@@ -30,6 +37,69 @@ class JSONMigrationUtilsTestCase(TestCase):
         self.assertEqual(element['options']['text-content'], {
             'en': 'Welcome to your Tahoe trial LMS site!',
         })
+
+
+def test_get_active_site_uuids_from_site_config_service_without_client(settings):
+    """
+    Ensure `get_active_site_uuids_from_site_config_service` won't break if SITE_CONFIG_CLIENT isn't available.
+    """
+    del settings.SITE_CONFIG_CLIENT
+    assert get_active_site_uuids_from_site_config_service() == []
+
+
+def test_get_active_site_uuids_from_site_config_service(settings):
+    """
+    Ensure `get_active_site_uuids_from_site_config_service` returns UUIDs.
+    """
+    client = Mock()
+    client.list_active_sites.return_value = {"results": [{
+        "name": "site1",
+        "uuid": "198d3826-e8ce-11ec-bf0b-1f28a583771a",
+    }]}
+    settings.SITE_CONFIG_CLIENT = client
+
+    assert get_active_site_uuids_from_site_config_service() == [
+        UUID("198d3826-e8ce-11ec-bf0b-1f28a583771a"),
+    ]
+
+
+def test_get_active_site_uuids_from_site_config_service_error(settings, caplog):
+    """
+    Ensure `get_active_site_uuids_from_site_config_service` handles errors gracefully.
+    """
+    client = Mock()
+    client.list_active_sites.side_effect = SiteConfigurationError('my exception message')
+    settings.SITE_CONFIG_CLIENT = client
+
+    assert get_active_site_uuids_from_site_config_service() == [], 'Should return sane results'
+    assert 'my exception message' in caplog.text
+    assert 'An error occurred while fetching site config active sites' in caplog.text
+
+
+@patch('openedx.core.djangoapps.appsembler.sites.utils.get_active_site_uuids_from_site_config_service')
+@patch('openedx.core.djangoapps.appsembler.sites.utils.get_active_tiers_uuids_from_amc_postgres')
+def test_get_active_organizations_uuids(mock_amc_get_uuids, mock_site_config_get_uuids):
+    """
+    Ensure `get_active_organizations_uuids` reads from both AMC Postgres and Site Config and returns unique results.
+    """
+    mock_amc_get_uuids.return_value = [
+        UUID('aaaaaaaa-1111-0000-1111-dddddddddddd'),
+        UUID('aaaaaaaa-2222-0000-2222-dddddddddddd'),
+    ]
+
+    mock_site_config_get_uuids.return_value = [
+        UUID('aaaaaaaa-2222-0000-2222-dddddddddddd'),  # Duplicates the by mock_amc_get_uuids to test uniqueness
+        UUID('aaaaaaaa-5555-0000-5555-dddddddddddd'),
+    ]
+
+    assert set(get_active_organizations_uuids()) == {
+        UUID('aaaaaaaa-1111-0000-1111-dddddddddddd'),
+        UUID('aaaaaaaa-2222-0000-2222-dddddddddddd'),
+        UUID('aaaaaaaa-5555-0000-5555-dddddddddddd'),
+    }, 'Ensure get_active_organizations_uuids returns unique results'
+    assert len(get_active_organizations_uuids()) == 3, (
+        'Results should be unique and aaaaaaaa-2222-0000-2222-dddddddddddd should be mentioned only once'
+    )
 
 
 class ActiveSitesTestCase(TestCase):
