@@ -16,8 +16,10 @@ from django.template import defaultfilters
 from django.test import RequestFactory, override_settings
 from django.utils import timezone
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey
+from rest_framework.utils.serializer_helpers import ReturnList
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -33,7 +35,8 @@ from lms.djangoapps.mobile_api.testutils import (
     MobileAuthUserTestMixin,
     MobileCourseAccessTestMixin
 )
-from lms.djangoapps.mobile_api.utils import API_V1, API_V05
+from lms.djangoapps.mobile_api.waffle import VALUE_PROP_ENABLED
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V15
 from openedx.core.lib.courses import course_image_url
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
@@ -332,6 +335,27 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         CourseDurationLimitConfig.objects.create(enabled=False)
         courses = self._get_enrollment_data(api_version, expired)
         self._assert_enrollment_results(api_version, courses, num_courses_returned, False)
+
+    @ddt.data(
+        (API_V05, False),
+        (API_V05, True),
+        (API_V1, False),
+        (API_V1, True),
+        (API_V15, False),
+        (API_V15, True),
+    )
+    @ddt.unpack
+    def test_value_prop_flag(self, api_version, value_prop_flag):
+        with override_waffle_flag(VALUE_PROP_ENABLED, active=value_prop_flag):
+
+            self.login_and_enroll()
+            response = self.api_response(api_version=api_version)
+            response.status_code == 200
+            if api_version == API_V15:
+                self.assertEqual(response.data['value_prop_enabled'], value_prop_flag)
+                self.assertIn('enrollments', response.data)
+            else:
+                self.assertTrue(type(response.data) == ReturnList)
 
 
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
