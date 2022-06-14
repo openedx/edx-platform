@@ -29,7 +29,7 @@ class SetDjangoSettingsChecker(BaseChecker):
         cms_module = False
         lms_module = False
         common_module = False
-        for arg in self.linter.cmdline_parser.args:
+        for arg in self.linter._arg_parser.parse_args():
             if arg.startswith('cms'):
                 cms_module = True
             elif arg.startswith('lms'):
