@@ -126,13 +126,13 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
         self.register_put_comment_response(cs_comment)
         self.register_post_comment_response(cs_comment, thread_id="test_thread")
 
-    def test_not_authenticated(self, key="developer_message"):
+    def test_not_authenticated(self):
         self.client.logout()
         response = self.client.get(self.url)
         self.assert_response_correct(
             response,
             401,
-            {key: "Authentication credentials were not provided."}
+            {"developer_message": "Authentication credentials were not provided."}
         )
 
     def test_inactive(self):
@@ -1481,8 +1481,8 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         response = self.client.get(self.url)
         assert response.status_code == 400
 
-    def test_not_authenticated(self, key="detail"):
-        super().test_not_authenticated(key=key)
+    def test_not_authenticated(self):
+        pass
 
 
 @ddt.ddt

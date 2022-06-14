@@ -568,6 +568,8 @@ class LearnerThreadView(APIView):
 
     **GET Thread List Parameters**:
 
+        * user_id: (Required) (Integer) ID of the user whose active threads are required
+
         * page: The (1-indexed) page to retrieve (default is 1)
 
         * page_size: The number of items per page (default is 10)
