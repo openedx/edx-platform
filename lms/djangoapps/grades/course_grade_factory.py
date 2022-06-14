@@ -10,6 +10,10 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_PASSED
 )
 
+from lms.djangoapps.grades.signals.signals import (
+    COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY,
+)
+
 from .config import assume_zero_if_absent, should_persist_grades
 from .course_data import CourseData
 from .course_grade import CourseGrade, ZeroCourseGrade
@@ -171,6 +175,7 @@ class CourseGradeFactory:
             COURSE_GRADE_CHANGED signal to listeners and
             COURSE_GRADE_NOW_PASSED if learner has passed course or
             COURSE_GRADE_NOW_FAILED if learner is now failing course
+            COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY if learner has passed course
         """
         should_persist = should_persist_grades(course_data.course_key)
         if should_persist and force_update_subsections:
@@ -209,6 +214,11 @@ class CourseGradeFactory:
                 COURSE_GRADE_NOW_PASSED.send(
                     sender=CourseGradeFactory,
                     user=user,
+                    course_id=course_data.course_key,
+                )
+                COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send(
+                    sender=CourseGradeFactory,
+                    user_id=user.id,
                     course_id=course_data.course_key,
                 )
             else:

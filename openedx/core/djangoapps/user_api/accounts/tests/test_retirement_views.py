@@ -1310,6 +1310,10 @@ class TestAccountRetirementPost(RetirementTestCase):
 
         self.cache_key = UserProfile.country_cache_key_name(self.test_user.id)
         cache.set(self.cache_key, 'Timor-leste')
+        self.mock_pathways_with_course = self.setup_patch(
+            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
+            None,
+        )
 
         # Enterprise model setup
         self.course_id = 'course-v1:edX+DemoX.1+2T2017'
@@ -1370,6 +1374,16 @@ class TestAccountRetirementPost(RetirementTestCase):
         self.headers = build_jwt_headers(self.test_superuser)
         self.headers['content_type'] = "application/json"
         self.url = reverse('accounts_retire')
+
+    def setup_patch(self, function_name, return_value):
+        """
+        Patch a function with a given return value, and return the mock
+        """
+        magic_mock = mock.MagicMock(return_value=return_value)
+        new_patch = mock.patch(function_name, new=magic_mock)
+        new_patch.start()
+        self.addCleanup(new_patch.stop)
+        return magic_mock
 
     def post_and_assert_status(self, data, expected_status=status.HTTP_204_NO_CONTENT):
         """

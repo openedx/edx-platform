@@ -13,6 +13,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.config import AUTO_CERTIFICATE_GENERATION
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
+from lms.djangoapps.grades.signals.signals import COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -95,16 +96,25 @@ class TestCourseGradeFactory(GradeTestBase):
             course_id=self.course.id,
             enabled_for_course=False
         ):
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True), mock_get_score(2, 2):
-                COURSE_GRADE_NOW_PASSED.connect(handler)
-                try:
-                    CourseGradeFactory().update(self.request.user, self.course)
-                except RecursionError:
-                    pytest.fail("The COURSE_GRADE_NOW_PASSED signal fired recursively.")
+            with patch(
+                'lms.djangoapps.grades.signals.signals.COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send',
+                return_value=None
+            ) as mock_course_passed_pathway:
+                with override_waffle_switch(AUTO_CERTIFICATE_GENERATION, active=True), mock_get_score(2, 2):
+                    COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.connect(handler)
+                    COURSE_GRADE_NOW_PASSED.connect(handler)
+                    try:
+                        CourseGradeFactory().update(self.request.user, self.course)
+                    except RecursionError:
+                        pytest.fail("The COURSE_GRADE_NOW_PASSED signal fired recursively.")
 
+                    mock_course_passed_pathway.assert_called_once()
         self.mock_process_signal.assert_called_once()
+        COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.disconnect(handler)
         COURSE_GRADE_NOW_PASSED.disconnect(handler)
 
+    @patch('lms.djangoapps.grades.signals.signals.COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send',
+           Mock(return_value=None))
     def test_read_and_update(self):
         grade_factory = CourseGradeFactory()
 
@@ -170,6 +180,8 @@ class TestCourseGradeFactory(GradeTestBase):
             else:
                 assert course_grade is None
 
+    @patch('lms.djangoapps.grades.signals.signals.COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send',
+           Mock(return_value=None))
     def test_read_optimization(self):
         grade_factory = CourseGradeFactory()
         with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mocked_course_blocks:
@@ -188,6 +200,8 @@ class TestCourseGradeFactory(GradeTestBase):
                 assert not mocked_course_blocks.called
                 # no user-specific transformer calculation
 
+    @patch('lms.djangoapps.grades.signals.signals.COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send',
+           Mock(return_value=None))
     def test_subsection_grade(self):
         grade_factory = CourseGradeFactory()
         with mock_get_score(1, 2):
