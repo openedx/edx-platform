@@ -5,10 +5,12 @@ Tests for the tiers integration in the LMS.
 from django.urls import reverse
 from django.test import TestCase
 
-from openedx.core.djangoapps.appsembler.multi_tenant_emails.tests.test_utils import with_organization_context
+from ...multi_tenant_emails.tests.test_utils import with_organization_context
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
-class SiteUnavailableViewTest(TestCase):
+@skip_unless_lms
+class LMSSiteUnavailableViewTest(TestCase):
     """
     Unit tests for the Tiers views.
     """
@@ -16,8 +18,8 @@ class SiteUnavailableViewTest(TestCase):
     BLUE = 'blue2'
 
     def setUp(self):
-        super(SiteUnavailableViewTest, self).setUp()
-        self.url = reverse('site_unavailable')
+        super().setUp()
+        self.url = reverse('lms_site_unavailable')
 
     def test_site_unavailable_page(self):
         """

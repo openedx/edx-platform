@@ -1007,7 +1007,7 @@ urlpatterns += (
 
 # Tahoe Tiers URLs
 urlpatterns += (
-    url(r'^', include('lms.djangoapps.appsembler_tiers.urls')),
+    url(r'^', include('openedx.core.djangoapps.appsembler.tahoe_tiers.lms_urls')),
 )
 
 # appsembler management console endpoint for student enrollment

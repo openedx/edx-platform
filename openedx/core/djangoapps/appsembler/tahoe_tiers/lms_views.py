@@ -1,11 +1,13 @@
 """
-Views for the tiers app.
+Views for the tiers app for LMS.
+
+CMS part is in `cms/djangoapps/appsembler_tiers/`.
 """
 
 from django.views.generic import TemplateView
 
 
-class SiteUnavailableView(TemplateView):
+class LMSSiteUnavailableView(TemplateView):
     """
     LMS Site Unavailable view.
 

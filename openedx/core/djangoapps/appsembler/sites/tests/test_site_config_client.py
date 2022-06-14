@@ -1,18 +1,25 @@
 """
 Tests for site_config_client_helpers and SiteConfigAdapter.
 """
-from unittest.mock import patch
+from unittest.mock import patch, Mock
+from uuid import UUID
 import pytest
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.test import RequestFactory
 from mock import Mock
+
 from organizations.tests.factories import OrganizationFactory
+from site_config_client.exceptions import SiteConfigurationError
 
 from lms.djangoapps.courseware.access_utils import in_preview_mode
 from openedx.core.djangoapps.appsembler.sites import (
     site_config_client_helpers as client_helpers,
 )
+from openedx.core.djangoapps.appsembler.sites.site_config_client_helpers import (
+    get_active_site_uuids_from_site_config_service,
+)
+
 
 User = get_user_model()
 
@@ -116,3 +123,40 @@ def test_courseware_in_preview_mode(settings):
             assert in_preview_mode(), (
                 'New feature: example.com/?preview=true should be considered as a preview request'
             )
+
+
+def test_get_active_site_uuids_from_site_config_service_without_client(settings):
+    """
+    Ensure `get_active_site_uuids_from_site_config_service` won't break if SITE_CONFIG_CLIENT isn't available.
+    """
+    del settings.SITE_CONFIG_CLIENT
+    assert get_active_site_uuids_from_site_config_service() == []
+
+
+def test_get_active_site_uuids_from_site_config_service(settings):
+    """
+    Ensure `get_active_site_uuids_from_site_config_service` returns UUIDs.
+    """
+    client = Mock()
+    client.list_active_sites.return_value = {"results": [{
+        "name": "site1",
+        "uuid": "198d3826-e8ce-11ec-bf0b-1f28a583771a",
+    }]}
+    settings.SITE_CONFIG_CLIENT = client
+
+    assert get_active_site_uuids_from_site_config_service() == [
+        UUID("198d3826-e8ce-11ec-bf0b-1f28a583771a"),
+    ]
+
+
+def test_get_active_site_uuids_from_site_config_service_error(settings, caplog):
+    """
+    Ensure `get_active_site_uuids_from_site_config_service` handles errors gracefully.
+    """
+    client = Mock()
+    client.list_active_sites.side_effect = SiteConfigurationError('my exception message')
+    settings.SITE_CONFIG_CLIENT = client
+
+    assert get_active_site_uuids_from_site_config_service() == [], 'Should return sane results'
+    assert 'my exception message' in caplog.text
+    assert 'An error occurred while fetching site config active sites' in caplog.text
