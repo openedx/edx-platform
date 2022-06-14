@@ -219,14 +219,14 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
             },
 
             toggleChildrenPreviews: function toggleChildrenPreviews(event) {
-                var $button = $(event.currentTarget),
-                    $el = $(this.xblockView.el);
+                event.preventDefault();
+                var $button = $(event.currentTarget);
                 if ($button.hasClass('collapsed')) {
                     this.updateCollapseAllButton(true);
-                    $el.find('.wrapper-xblock.is-collapsible').removeClass('is-collapsed');
+                    this.$el.find('.wrapper-xblock.is-collapsible').removeClass('is-collapsed');
                 } else {
                     this.updateCollapseAllButton(false);
-                    $el.find('.wrapper-xblock.is-collapsible').addClass('is-collapsed');
+                    this.$el.find('.wrapper-xblock.is-collapsible').addClass('is-collapsed');
                 }
             },
 
