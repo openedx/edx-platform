@@ -174,7 +174,7 @@ class ExpectedErrorMiddleware:
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
 # .. toggle_description: If True, the stacktrace will be included with the logging message.
-# .. toggle_warnings: Requires ``LOG_ERROR`` to be set to True, otherwise this value will be ignored.
+# .. toggle_warning: Requires ``LOG_ERROR`` to be set to True, otherwise this value will be ignored.
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-03-11
 

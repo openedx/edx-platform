@@ -18,7 +18,7 @@ from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
-from xmodule.util.misc import escape_invalid_characters
+from xmodule.util.misc import escape_invalid_characters, get_library_or_course_attribute
 
 from .content import ContentStore, StaticContent, StaticContentStream
 
@@ -614,7 +614,7 @@ def query_for_course(course_key, category=None):
     dbkey = SON([
         (f'{prefix}.tag', XASSET_LOCATION_TAG),
         (f'{prefix}.org', course_key.org),
-        (f'{prefix}.course', course_key.course),
+        (f'{prefix}.course', get_library_or_course_attribute(course_key)),
     ])
     if category:
         dbkey[f'{prefix}.category'] = category

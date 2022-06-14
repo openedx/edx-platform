@@ -65,6 +65,7 @@ from urllib import parse
 
 import bleach
 import oauthlib.oauth1
+from django.conf import settings
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature
 from pkg_resources import resource_string
@@ -274,6 +275,7 @@ class LTIFields:
 @XBlock.needs("i18n")
 @XBlock.needs("mako")
 @XBlock.needs("user")
+@XBlock.needs("rebind_user")
 class LTIBlock(
     LTIFields,
     LTI20BlockMixin,
@@ -584,7 +586,7 @@ class LTIBlock(
         i4x-2-3-lti-31de800015cf4afb973356dbe81496df this part of resource_link_id:
         makes resource_link_id to be unique among courses inside same system.
         """
-        return str(parse.quote(f"{self.system.hostname}-{self.location.html_id()}"))  # lint-amnesty, pylint: disable=line-too-long
+        return str(parse.quote(f"{settings.LMS_BASE}-{self.location.html_id()}"))
 
     def get_lis_result_sourcedid(self):
         """

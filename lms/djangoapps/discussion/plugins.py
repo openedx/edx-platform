@@ -9,8 +9,6 @@ from xmodule.tabs import TabFragmentViewMixin
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.courseware.tabs import EnrolledTab
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
-from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.lti_course_tab.tab import DiscussionLtiCourseTab
 
 
@@ -37,15 +35,3 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
         if DiscussionLtiCourseTab.is_enabled(course, user):
             return False
         return utils.is_discussion_enabled(course.id)
-
-    @property
-    def link_func(self):
-        legacy_link_func = super().link_func
-
-        def _link_func(course, reverse_func):
-            config = DiscussionsConfiguration.get(course.id)
-            if config.provider_type == Provider.OPEN_EDX:
-                return get_learning_mfe_home_url(course_key=course.id, url_fragment=self.type)
-            else:
-                return legacy_link_func(course, reverse_func)
-        return _link_func

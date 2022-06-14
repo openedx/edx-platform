@@ -3,7 +3,8 @@ Basic unit tests for LibraryContentBlock
 
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
-from unittest.mock import Mock, patch
+import ddt
+from unittest.mock import MagicMock, Mock, patch
 
 from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
@@ -11,6 +12,7 @@ from lxml import etree
 from search.search_engine_base import SearchEngine
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
+from rest_framework import status
 
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
 from xmodule.library_tools import LibraryToolsService
@@ -20,6 +22,7 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
+from xmodule.capa_module import ProblemBlock
 
 from .test_course_module import DummySystem as TestImportSystem
 
@@ -30,6 +33,7 @@ class LibraryContentTest(MixedSplitTestCase):
     """
     Base class for tests of LibraryContentBlock (library_content_block.py)
     """
+
     def setUp(self):
         super().setUp()
 
@@ -164,6 +168,7 @@ class TestLibraryContentExportImport(LibraryContentTest):
         self._verify_xblock_properties(imported_lc_block)
 
 
+@ddt.ddt
 class LibraryContentBlockTestMixin:
     """
     Basic unit tests for LibraryContentBlock
@@ -378,6 +383,45 @@ class LibraryContentBlockTestMixin:
         assert len(selected) == count
         return selected
 
+    @ddt.data(
+        # User resets selected children with reset button on content block
+        (True, 8),
+        # User resets selected children without reset button on content block
+        (False, 8),
+    )
+    @ddt.unpack
+    def test_reset_selected_children_capa_blocks(self, allow_resetting_children, max_count):
+        """
+        Tests that the `reset_selected_children` method of a content block resets only
+        XBlocks that have a `reset_problem` attribute when `allow_resetting_children` is True
+
+        This test block has 4 HTML XBlocks and 4 Problem XBlocks. Therefore, if we ensure
+        that the `reset_problem` has been called len(self.problem_types) times, then
+        it means that this is working correctly
+        """
+        self.lc_block.allow_resetting_children = allow_resetting_children
+        self.lc_block.max_count = max_count
+        # Add some capa blocks
+        self._create_capa_problems()
+        self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
+        # Mock the student view to return an empty dict to be returned as response
+        self.lc_block.student_view = MagicMock()
+        self.lc_block.student_view.return_value.content = {}
+
+        with patch.object(ProblemBlock, 'reset_problem', return_value={'success': True}) as reset_problem:
+            response = self.lc_block.reset_selected_children(None, None)
+
+        if allow_resetting_children:
+            self.lc_block.student_view.assert_called_once_with({})
+            assert reset_problem.call_count == len(self.problem_types)
+            assert response.status_code == status.HTTP_200_OK
+            assert response.content_type == "text/html"
+            assert response.body == b"{}"
+        else:
+            reset_problem.assert_not_called()
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+
 
 @patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=None, autospec=True))
 class TestLibraryContentBlockNoSearchIndex(LibraryContentBlockTestMixin, LibraryContentTest):
@@ -396,6 +440,7 @@ class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, Libra
     """
     Tests for library container with mocked search engine response.
     """
+
     def _get_search_response(self, field_dictionary=None):
         """ Mocks search response as returned by search engine """
         target_type = field_dictionary.get('problem_types')

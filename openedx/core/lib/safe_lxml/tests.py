@@ -1,4 +1,12 @@
-"""Test that we have defused XML."""
+"""
+Test that we have defused XML.
+
+For these tests, the defusing will happen in one or more of the `conftest.py`
+files that runs at pytest startup calls `defuse_xml_libs()`.
+
+In production, the defusing happens when the LMS or Studio `wsgi.py` files
+call `defuse_xml_libs()`.
+"""
 
 
 import defusedxml

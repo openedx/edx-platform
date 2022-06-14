@@ -14,7 +14,7 @@ from requests import exceptions
 from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
 from common.djangoapps.third_party_auth.utils import (
     MetadataParseError,
-    create_or_update_saml_provider_data,
+    create_or_update_bulk_saml_provider_data,
     parse_metadata_xml,
 )
 
@@ -87,8 +87,8 @@ def fetch_saml_metadata():
 
             for entity_id in entity_ids:
                 log.info("Processing IdP with entityID %s", entity_id)
-                public_key, sso_url, expires_at = parse_metadata_xml(xml, entity_id)
-                changed = create_or_update_saml_provider_data(entity_id, public_key, sso_url, expires_at)
+                public_keys, sso_url, expires_at = parse_metadata_xml(xml, entity_id)
+                changed = create_or_update_bulk_saml_provider_data(entity_id, public_keys, sso_url, expires_at)
                 if changed:
                     log.info(f"→ Created new record for SAMLProviderData for entityID {entity_id}")
                     num_updated += 1

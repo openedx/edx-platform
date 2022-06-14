@@ -28,10 +28,6 @@
         "start": "2030-01-01T00:00:00Z",
         "tabs": [
             {
-                "name": "Home",
-                "type": "course_info"
-            },
-            {
                 "name": "Course",
                 "type": "courseware"
             },

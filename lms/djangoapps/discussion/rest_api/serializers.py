@@ -41,6 +41,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role,
 )
 from openedx.core.lib.api.serializers import CourseKeyField
+from common.djangoapps.student.roles import (GlobalStaff)
 
 User = get_user_model()
 
@@ -80,13 +81,14 @@ def get_context(course, request, thread=None):
     cc_requester = CommentClientUser.from_django_user(requester).retrieve()
     cc_requester["course_id"] = course.id
     course_discussion_settings = CourseDiscussionSettings.get(course.id)
+    is_global_staff = GlobalStaff().has_user(requester)
     return {
         "course": course,
         "request": request,
         "thread": thread,
         "discussion_division_enabled": course_discussion_division_enabled(course_discussion_settings),
         "group_ids_to_names": get_group_names_by_id(course_discussion_settings),
-        "is_requester_privileged": requester.id in staff_user_ids or requester.id in ta_user_ids,
+        "is_requester_privileged": requester.id in staff_user_ids or requester.id in ta_user_ids or is_global_staff,
         "staff_user_ids": staff_user_ids,
         "ta_user_ids": ta_user_ids,
         "cc_requester": cc_requester,
