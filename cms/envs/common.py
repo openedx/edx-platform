@@ -1627,6 +1627,10 @@ GENPLUS_INSTALLED_APPS = [
 
 INSTALLED_APPS.extend(GENPLUS_INSTALLED_APPS)
 
+######################### GENPLUS SETTINGS #################################
+
+GENPLUS_SOCIAL_AUTH_REDIRECT_URL = ''
+
 ################# EDX MARKETING SITE ##################################
 
 EDXMKTG_LOGGED_IN_COOKIE_NAME = 'edxloggedin'

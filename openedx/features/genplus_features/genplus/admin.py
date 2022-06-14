@@ -11,7 +11,6 @@ class GenUserAdmin(admin.ModelAdmin):
         'year_of_entry',
         'registration_group'
     )
-    readonly_fields = ('user', 'role', 'school', 'year_of_entry', 'registration_group')
     search_fields = ('user',)
 
 
@@ -22,5 +21,4 @@ class SchoolAdmin(admin.ModelAdmin):
         'name',
         'external_id'
     )
-    readonly_fields = ('guid', 'name', 'external_id')
     search_fields = ('name',)
