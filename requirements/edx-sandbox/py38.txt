@@ -20,7 +20,7 @@ cycler==0.11.0
     # via matplotlib
 joblib==1.1.0
     # via nltk
-kiwisolver==1.4.2
+kiwisolver==1.4.3
     # via matplotlib
 lxml==4.9.0
     # via
@@ -36,7 +36,7 @@ matplotlib==3.3.4
     #   -r requirements/edx-sandbox/py38.in
 mpmath==1.2.1
     # via sympy
-networkx==2.8.2
+networkx==2.8.3
     # via -r requirements/edx-sandbox/py38.in
 nltk==3.7
     # via

@@ -59,7 +59,7 @@ asgiref==3.5.2
     #   -r requirements/edx/base.txt
     #   django
     #   uvicorn
-astroid==2.11.5
+astroid==2.11.6
     # via
     #   pylint
     #   pylint-celery
@@ -224,7 +224,7 @@ cssselect==1.1.0
     # via
     #   -r requirements/edx/testing.in
     #   pyquery
-cssutils==2.4.1
+cssutils==2.4.2
     # via
     #   -r requirements/edx/base.txt
     #   pynliner
@@ -242,6 +242,7 @@ defusedxml==0.7.1
     #   python3-openid
     #   python3-saml
     #   social-auth-core
+    #   tableauserverclient
 deprecated==1.2.13
     # via
     #   -r requirements/edx/base.txt
@@ -335,7 +336,7 @@ django-config-models==2.3.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==3.12.0
+django-cors-headers==3.13.0
     # via -r requirements/edx/base.txt
 django-countries==7.3.2
     # via
@@ -402,7 +403,7 @@ django-multi-email-field==0.6.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-mysql==4.6.0
+django-mysql==4.7.0
     # via -r requirements/edx/base.txt
 django-oauth-toolkit==1.3.2
     # via
@@ -424,7 +425,7 @@ django-sekizai==3.0.1
     # via
     #   -r requirements/edx/base.txt
     #   django-wiki
-django-ses==3.0.1
+django-ses==3.1.0
     # via -r requirements/edx/base.txt
 django-simple-history==3.0.0
     # via
@@ -446,7 +447,7 @@ django-storages==1.8
     #   edxval
 django-user-tasks==3.0.0
     # via -r requirements/edx/base.txt
-django-waffle==2.4.1
+django-waffle==2.5.0
     # via
     #   -r requirements/edx/base.txt
     #   blockstore
@@ -572,7 +573,7 @@ edx-i18n-tools==0.9.1
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
     #   ora2
-edx-lint==5.2.2
+edx-lint==5.2.4
     # via -r requirements/edx/testing.in
 edx-milestones==0.4.0
     # via -r requirements/edx/base.txt
@@ -661,11 +662,11 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==13.12.0
+faker==13.13.0
     # via factory-boy
 fastapi==0.78.0
     # via pact-python
-fastavro==1.4.12
+fastavro==1.5.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
@@ -878,7 +879,7 @@ mysqlclient==2.1.0
     # via
     #   -r requirements/edx/base.txt
     #   blockstore
-newrelic==7.10.0.175
+newrelic==7.12.0.176
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -904,7 +905,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
-openedx-events==0.9.1
+openedx-events==0.10.0
     # via -r requirements/edx/base.txt
 openedx-filters==0.7.0
     # via
@@ -1180,7 +1181,7 @@ regex==2022.6.2
     # via
     #   -r requirements/edx/base.txt
     #   nltk
-requests==2.27.1
+requests==2.28.0
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
@@ -1298,7 +1299,7 @@ social-auth-app-django==5.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
-social-auth-core==4.2.0
+social-auth-core==4.3.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
@@ -1338,7 +1339,7 @@ sympy==1.10.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-calc
-tableauserverclient==0.18.0
+tableauserverclient==0.19.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1416,7 +1417,7 @@ voluptuous==0.13.1
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-watchdog==2.1.8
+watchdog==2.1.9
     # via -r requirements/edx/base.txt
 wcwidth==0.2.5
     # via
