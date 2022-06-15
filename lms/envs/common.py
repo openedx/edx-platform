@@ -1558,7 +1558,7 @@ MODULESTORE_BRANCH = 'published-only'
 DOC_STORE_CONFIG = {
     'db': 'edxapp',
     'host': 'localhost',
-    'replicaSet': '',
+    'replicaSet': 'rs0-test',
     'password': 'password',
     'port': 27017,
     'user': 'edxapp',

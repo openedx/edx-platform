@@ -166,7 +166,7 @@ CONTENTSTORE:
         password: password
         port: 27017
         read_preference: SECONDARY_PREFERRED
-        replicaSet: ''
+        replicaSet: 'rs0-test'
         socketTimeoutMS: 3000
         ssl: false
         user: edxapp
@@ -256,7 +256,7 @@ DOC_STORE_CONFIG:
     password: password
     port: 27017
     read_preference: SECONDARY_PREFERRED
-    replicaSet: ''
+    replicaSet: 'rs0-test'
     socketTimeoutMS: 3000
     ssl: false
     user: edxapp
@@ -412,7 +412,7 @@ MODULESTORE:
                     password: password
                     port: 27017
                     read_preference: SECONDARY_PREFERRED
-                    replicaSet: ''
+                    replicaSet: 'rs0-test'
                     socketTimeoutMS: 3000
                     ssl: false
                     user: edxapp
@@ -432,7 +432,7 @@ MODULESTORE:
                     password: password
                     port: 27017
                     read_preference: PRIMARY
-                    replicaSet: ''
+                    replicaSet: 'rs0-test'
                     socketTimeoutMS: 3000
                     ssl: false
                     user: edxapp

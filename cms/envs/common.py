@@ -952,13 +952,13 @@ ORA2_FILE_PREFIX = 'default_env-default_deployment/ora2'
 # Default File Upload Storage bucket and prefix. Used by the FileUpload Service.
 FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
 FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
-
+ 
 ############################ Modulestore Configuration ################################
 
 DOC_STORE_CONFIG = {
     'db': 'edxapp',
     'host': 'localhost',
-    'replicaSet': '',
+    'replicaSet': 'rs0-test',
     'user': 'edxapp',
     'port': 27017,
     'collection': 'modulestore',
