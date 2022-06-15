@@ -3,7 +3,7 @@
 
 import logging
 from datetime import timedelta
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import ddt
 from django.test.utils import override_settings
@@ -45,27 +45,12 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
     """
     Tests for the enterprise support signals.
     """
-
-    def setup_patch(self, function_name, return_value):
-        """
-        Patch a function with a given return value, and return the mock
-        """
-        mock = MagicMock(return_value=return_value)
-        new_patch = patch(function_name, new=mock)
-        new_patch.start()
-        self.addCleanup(new_patch.stop)
-        return mock
-
     def setUp(self):
         UserFactory.create(username=TEST_ECOMMERCE_WORKER)
         self.user = UserFactory.create(username='test', email=TEST_EMAIL)
         self.course_id = 'course-v1:edX+DemoX+Demo_Course'
         self.enterprise_customer = EnterpriseCustomerFactory()
         self.enterprise_customer_uuid = str(self.enterprise_customer.uuid)
-        self.mock_pathways_with_course = self.setup_patch(
-            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
-            None,
-        )
         super().setUp()
 
     @staticmethod

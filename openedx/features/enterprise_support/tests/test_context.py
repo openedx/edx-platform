@@ -1,8 +1,6 @@
 """
 Test the enterprise support APIs.
 """
-from unittest.mock import patch
-
 from django.conf import settings
 from django.test.utils import override_settings
 
@@ -35,16 +33,12 @@ class TestEnterpriseContext(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         super().setUpTestData()
 
     def test_get_enterprise_event_context(self):
-        with patch(
-            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
-            return_value=None
-        ):
-            course_enrollment = CourseEnrollmentFactory(user=self.user)
-            course = course_enrollment.course
-            enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)
-            EnterpriseCourseEnrollmentFactory(
-                enterprise_customer_user=enterprise_customer_user,
-                course_id=course.id
-            )
-            assert get_enterprise_event_context(course_id=course.id, user_id=self.user.id) == \
-                   {'enterprise_uuid': str(enterprise_customer_user.enterprise_customer_id)}
+        course_enrollment = CourseEnrollmentFactory(user=self.user)
+        course = course_enrollment.course
+        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)
+        EnterpriseCourseEnrollmentFactory(
+            enterprise_customer_user=enterprise_customer_user,
+            course_id=course.id
+        )
+        assert get_enterprise_event_context(course_id=course.id, user_id=self.user.id) == \
+               {'enterprise_uuid': str(enterprise_customer_user.enterprise_customer_id)}

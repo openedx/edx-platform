@@ -640,7 +640,7 @@ lazy==1.4
     #   acid-xblock
     #   lti-consumer-xblock
     #   ora2
-learner-pathway-progress==1.2.0
+learner-pathway-progress==1.0.1
     # via -r requirements/edx/base.in
 libsass==0.10.0
     # via
