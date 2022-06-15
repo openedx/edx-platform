@@ -1,4 +1,4 @@
-name: Migrations check on MySql 57
+name: Static assets check
 
 on:
   workflow_dispatch:
