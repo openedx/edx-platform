@@ -1,7 +1,7 @@
 """
 Tests for custom enterprise_support Serializers.
 """
-from unittest.mock import patch, MagicMock
+
 from uuid import uuid4
 
 from django.test import TestCase
@@ -19,29 +19,14 @@ class EnterpriseCourseEnrollmentSerializerTests(TestCase):
     Tests for EnterpriseCourseEnrollmentSerializer.
     """
 
-    def setup_patch(self, function_name, return_value):
-        """
-        Patch a function with a given return value, and return the mock
-        """
-        mock = MagicMock(return_value=return_value)
-        new_patch = patch(function_name, new=mock)
-        new_patch.start()
-        self.addCleanup(new_patch.stop)
-        return mock
-
-    def setUp(self):
-        self.mock_pathways_with_course = self.setup_patch(
-            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
-            None,
-        )
+    @classmethod
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         enterprise_customer_user = EnterpriseCustomerUserFactory()
         enterprise_course_enrollment = EnterpriseCourseEnrollmentFactory(
             enterprise_customer_user=enterprise_customer_user
         )
-        self.enterprise_customer_user = enterprise_customer_user
-        self.enterprise_course_enrollment = enterprise_course_enrollment
-
-        super().setUp()
+        cls.enterprise_customer_user = enterprise_customer_user
+        cls.enterprise_course_enrollment = enterprise_course_enrollment
 
     def test_data_with_license(self):
         """ Verify the correct fields are serialized when the enrollment is licensed. """

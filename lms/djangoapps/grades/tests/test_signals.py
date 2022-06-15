@@ -285,10 +285,6 @@ class CourseEventsSignalsTest(ModuleStoreTestCase):
         Configure mocks for all the dependencies of the render method
         """
         super().setUp()
-        self.signal_mock_pathway_progress = self.setup_patch(
-            'lms.djangoapps.grades.signals.signals.COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send',
-            None,
-        )
         self.user_mock = MagicMock()
         self.user_mock.id = 42
         self.get_user_mock = self.setup_patch(

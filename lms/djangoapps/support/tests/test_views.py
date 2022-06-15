@@ -343,14 +343,10 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         enterprise_customer_user = EnterpriseCustomerUserFactory(
             user_id=self.student.id
         )
-        with patch(
-            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
-            return_value=None
-        ):
-            enterprise_course_enrollment = EnterpriseCourseEnrollmentFactory(
-                course_id=self.course.id,
-                enterprise_customer_user=enterprise_customer_user
-            )
+        enterprise_course_enrollment = EnterpriseCourseEnrollmentFactory(
+            course_id=self.course.id,
+            enterprise_customer_user=enterprise_customer_user
+        )
         data_sharing_consent = DataSharingConsent(
             course_id=self.course.id,
             enterprise_customer=enterprise_customer_user.enterprise_customer,

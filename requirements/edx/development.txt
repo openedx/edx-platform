@@ -82,7 +82,7 @@ attrs==21.4.0
     #   jsonschema
     #   openedx-events
     #   pytest
-babel==2.10.2
+babel==2.10.1
     # via
     #   -r requirements/edx/testing.txt
     #   enmerkar
@@ -323,7 +323,6 @@ django==3.2.13
     #   event-tracking
     #   help-tokens
     #   jsonfield
-    #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-events
     #   openedx-filters
@@ -409,7 +408,6 @@ django-model-utils==4.2.0
     #   edx-submissions
     #   edx-when
     #   edxval
-    #   learner-pathway-progress
     #   ora2
     #   super-csv
 django-mptt==0.13.4
@@ -452,7 +450,6 @@ django-simple-history==3.0.0
     #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
-    #   learner-pathway-progress
     #   ora2
 django-splash==1.2.1
     # via -r requirements/edx/testing.txt
@@ -571,7 +568,6 @@ edx-django-utils==5.0.0
     #   edx-toggles
     #   edx-when
     #   event-tracking
-    #   learner-pathway-progress
     #   ora2
     #   super-csv
 edx-drf-extensions==8.0.1
@@ -612,7 +608,6 @@ edx-opaque-keys[django]==2.3.0
     #   edx-proctoring
     #   edx-user-state-client
     #   edx-when
-    #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-events
     #   ora2
@@ -815,7 +810,6 @@ jsonfield==3.1.0
     #   edx-enterprise
     #   edx-proctoring
     #   edx-submissions
-    #   learner-pathway-progress
     #   lti-consumer-xblock
     #   ora2
 jsonschema==4.6.0
@@ -841,8 +835,6 @@ lazy-object-proxy==1.7.1
     # via
     #   -r requirements/edx/testing.txt
     #   astroid
-learner-pathway-progress==1.2.0
-    # via -r requirements/edx/testing.txt
 libsass==0.10.0
     # via
     #   -r requirements/edx/testing.txt
@@ -1236,7 +1228,6 @@ pytz==2022.1
     #   fs
     #   icalendar
     #   interchange
-    #   learner-pathway-progress
     #   olxcleaner
     #   ora2
     #   xblock

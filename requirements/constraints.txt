@@ -73,4 +73,3 @@ scipy<1.8.0
 # This will be fixed when sphinxcontrib-openapi depends on m2r2 instead of m2r
 # See issue: https://github.com/sphinx-contrib/openapi/issues/123
 mistune<2.0.0
-

@@ -9,7 +9,7 @@ import json
 import os
 from datetime import datetime
 from textwrap import dedent
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import ddt
 import pytz
@@ -345,27 +345,6 @@ class TestCourseGrader(TestSubmittingProblems):
     """
     Suite of tests for the course grader.
     """
-    def setup_patch(self, function_name, return_value):
-        """
-        Patch a function with a given return value, and return the mock
-        """
-        magic_mock = MagicMock(return_value=return_value)
-        new_patch = patch(function_name, new=magic_mock)
-        new_patch.start()
-        self.addCleanup(new_patch.stop)
-        return magic_mock
-
-    def setUp(self):
-        super().setUp()
-        self.mock_pathways_with_course = self.setup_patch(
-            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
-            None,
-        )
-        self.signal_mock_course_passed_pathway_progress = self.setup_patch(
-            'learner_pathway_progress.signals.update_learner_pathway_progress',
-            None,
-        )
-
     # Tell Django to clean out all databases, not just default
     databases = set(connections)
 

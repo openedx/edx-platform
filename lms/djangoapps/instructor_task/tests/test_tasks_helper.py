@@ -338,40 +338,36 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         audit_user = CourseEnrollment.enroll(UserFactory.create(), course.id)
         self._verify_cell_data_for_user(audit_user.username, course.id, 'Certificate Eligible', 'N', num_rows=1)
         grading_policy_hash = GradesTransformer.grading_policy_hash(course)
-        with patch(
-            'learner_pathway_progress.signals.update_learner_pathway_progress',
-            return_value=None
-        ):
-            PersistentCourseGrade.update_or_create(
-                user_id=audit_user.user_id,
-                course_id=course.id,
-                passed=False,
-                percent_grade=0.0,
-                grading_policy_hash=grading_policy_hash,
-            )
-            self._verify_cell_data_for_user(audit_user.username, course.id, 'Certificate Eligible', 'N', num_rows=1)
-            PersistentCourseGrade.update_or_create(
-                user_id=audit_user.user_id,
-                course_id=course.id,
-                passed=True,
-                percent_grade=0.8,
-                letter_grade="pass",
-                grading_policy_hash=grading_policy_hash,
-            )
-            # verifies that audit passing learner is not eligible for certificate
-            self._verify_cell_data_for_user(audit_user.username, course.id, 'Certificate Eligible', 'N', num_rows=1)
+        PersistentCourseGrade.update_or_create(
+            user_id=audit_user.user_id,
+            course_id=course.id,
+            passed=False,
+            percent_grade=0.0,
+            grading_policy_hash=grading_policy_hash,
+        )
+        self._verify_cell_data_for_user(audit_user.username, course.id, 'Certificate Eligible', 'N', num_rows=1)
+        PersistentCourseGrade.update_or_create(
+            user_id=audit_user.user_id,
+            course_id=course.id,
+            passed=True,
+            percent_grade=0.8,
+            letter_grade="pass",
+            grading_policy_hash=grading_policy_hash,
+        )
+        # verifies that audit passing learner is not eligible for certificate
+        self._verify_cell_data_for_user(audit_user.username, course.id, 'Certificate Eligible', 'N', num_rows=1)
 
-            verified_user = CourseEnrollment.enroll(UserFactory.create(), course.id, 'verified')
-            PersistentCourseGrade.update_or_create(
-                user_id=verified_user.user_id,
-                course_id=course.id,
-                passed=True,
-                percent_grade=0.8,
-                letter_grade="pass",
-                grading_policy_hash=grading_policy_hash,
-            )
-            # verifies that verified passing learner is eligible for certificate
-            self._verify_cell_data_for_user(verified_user.username, course.id, 'Certificate Eligible', 'Y', num_rows=2)
+        verified_user = CourseEnrollment.enroll(UserFactory.create(), course.id, 'verified')
+        PersistentCourseGrade.update_or_create(
+            user_id=verified_user.user_id,
+            course_id=course.id,
+            passed=True,
+            percent_grade=0.8,
+            letter_grade="pass",
+            grading_policy_hash=grading_policy_hash,
+        )
+        # verifies that verified passing learner is eligible for certificate
+        self._verify_cell_data_for_user(verified_user.username, course.id, 'Certificate Eligible', 'Y', num_rows=2)
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 4, 47),
