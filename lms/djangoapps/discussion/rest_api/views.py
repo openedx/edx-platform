@@ -24,13 +24,8 @@ from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_group_id_for_comments_service,
-    is_user_community_ta,
-    prepare_content,
-)
+from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
@@ -54,6 +49,7 @@ from ..rest_api.api import (
     get_response_comments,
     get_thread,
     get_thread_list,
+    get_learner_active_thread_list,
     get_user_comments,
     update_comment,
     update_thread,
@@ -608,28 +604,9 @@ class LearnerThreadView(APIView):
             "per_page": threads_per_page,
             "course_id": str(course_key),
             "user_id": user_id,
+            "group_id": group_id
         }
-
-        if group_id is not None:
-            query_params['group_id'] = group_id
-            profiled_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
-        else:
-            profiled_user = comment_client.User(id=user_id, course_id=course_key)
-        threads, page, num_pages = profiled_user.active_threads(query_params)
-
-        is_staff = has_permission(request.user, 'openclose_thread', course_key)
-        is_community_ta = is_user_community_ta(request.user, course_key)
-        threads = [prepare_content(thread, course_key, is_staff, is_community_ta) for thread in threads]
-        return Response({
-            "results": threads,
-            "pagination": {
-                "num_pages": num_pages,
-                "page": page,
-                "count": len(threads),
-                "next": page + 1 if page < num_pages else None,
-                "previous": None if page <= 1 else page - 1,
-            }
-        })
+        return get_learner_active_thread_list(request, course_key, query_params)
 
 
 @view_auth_classes()

@@ -1472,17 +1472,7 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
         expected_api_response = expected_response['collection']
-        for thread in expected_api_response:
-            for key in ['group_id', 'abuse_flagged_count', 'closed_by', 'close_reason_code']:
-                thread.pop(key)
-        assert response_data["results"] == expected_api_response
-        assert response_data["pagination"] == {
-            "num_pages": 1,
-            "page": 1,
-            "count": 1,
-            "next": None,
-            "previous": None,
-        }
+        assert response_data['results'] == expected_api_response
 
     def test_no_user_id_given(self):
         response = self.client.get(self.url)

@@ -18,6 +18,7 @@ from edx_django_utils.monitoring import function_trace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
 from rest_framework.request import Request
 from xmodule.course_module import CourseBlock
 from xmodule.modulestore.django import modulestore
@@ -30,6 +31,7 @@ from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
+from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.course import (
     get_course_commentable_counts,
@@ -848,6 +850,50 @@ def get_thread_list(
     return paginator.get_paginated_response({
         "results": results,
         "text_search_rewrite": paginated_results.corrected_text,
+    })
+
+
+def get_learner_active_thread_list(request, course_key, query_params):
+    """
+    Return the list of active threads of a particular user in query params
+    user_id must be given in query_params
+
+    Parameters:
+
+    request: The django request objects used for build_absolute_uri
+    course_key: The key of the course
+    query_params: If true, fetch the count of flagged items in each thread
+
+    Returns:
+
+    A paginated result containing a list of threads.
+    """
+
+    course = _get_course(course_key, request.user)
+    context = get_context(course, request)
+
+    group_id = query_params.get('group_id', None)
+    user_id = query_params.get('user_id', None)
+    if user_id is None:
+        return Response({'details': 'Invalid user id'}, status=400)
+
+    if group_id is not None:
+        profiled_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
+    else:
+        profiled_user = comment_client.User(id=user_id, course_id=course_key)
+
+    threads, page, num_pages = profiled_user.active_threads(query_params)
+    results = _serialize_discussion_entities(
+        request, context, threads, {'profile_image'}, DiscussionEntity.thread
+    )
+    paginator = DiscussionAPIPagination(
+        request,
+        page,
+        num_pages,
+        len(threads)
+    )
+    return paginator.get_paginated_response({
+        "results": results,
     })
 
 
