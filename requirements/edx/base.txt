@@ -55,7 +55,7 @@ attrs==21.4.0
     #   blockstore
     #   edx-ace
     #   openedx-events
-babel==2.10.1
+babel==2.10.2
     # via
     #   -r requirements/edx/base.in
     #   enmerkar
@@ -727,7 +727,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/base.in
-openedx-events==0.9.1
+openedx-events==0.10.0
     # via -r requirements/edx/base.in
 openedx-filters==0.7.0
     # via
@@ -992,7 +992,7 @@ social-auth-app-django==5.0.0
     # via
     #   -r requirements/edx/base.in
     #   edx-auth-backends
-social-auth-core==4.2.0
+social-auth-core==4.3.0
     # via
     #   -r requirements/edx/base.in
     #   edx-auth-backends

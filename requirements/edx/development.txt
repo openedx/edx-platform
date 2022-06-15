@@ -63,7 +63,7 @@ asgiref==3.5.2
     #   -r requirements/edx/testing.txt
     #   django
     #   uvicorn
-astroid==2.11.5
+astroid==2.11.6
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -82,7 +82,7 @@ attrs==21.4.0
     #   jsonschema
     #   openedx-events
     #   pytest
-babel==2.10.1
+babel==2.10.2
     # via
     #   -r requirements/edx/testing.txt
     #   enmerkar
@@ -589,7 +589,7 @@ edx-i18n-tools==0.9.1
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-edx-lint==5.2.3
+edx-lint==5.2.4
     # via -r requirements/edx/testing.txt
 edx-milestones==0.4.0
     # via -r requirements/edx/testing.txt
@@ -682,7 +682,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==13.12.1
+faker==13.13.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -954,7 +954,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/testing.txt
-openedx-events==0.9.1
+openedx-events==0.10.0
     # via -r requirements/edx/testing.txt
 openedx-filters==0.7.0
     # via
@@ -1377,7 +1377,7 @@ social-auth-app-django==5.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
-social-auth-core==4.2.0
+social-auth-core==4.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
