@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
--e git+https://github.com/openedx/blockstore.git@1.2.1#egg=blockstore==1.2.1
+-e git+https://github.com/openedx/blockstore.git@1.2.2#egg=blockstore==1.2.2
     # via -r requirements/edx/testing.txt
 -e common/lib/capa
     # via
