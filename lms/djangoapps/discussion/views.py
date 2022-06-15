@@ -47,7 +47,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     strip_none,
 )
 from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserException
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
 from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
@@ -722,12 +722,15 @@ def _discussions_mfe_context(query_params: Dict,
     if not mfe_url:
         return {"show_banner": False, "show_mfe": False}
     discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
+    discussions_mfe_enabled_for_everyone = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key)
+    enabled_for_educator_or_staff = is_educator_or_staff and discussions_mfe_enabled
+    enable_mfe = enabled_for_educator_or_staff or discussions_mfe_enabled_for_everyone
     # Show the MFE if the new MFE is enabled,
     # and if the legacy experience is not requested via query param
     # and if the current view isn't only that's only supported by the legacy view
     show_mfe = (
         query_params.get("discussions_experience", "").lower() != "legacy"
-        and (discussions_mfe_enabled and is_educator_or_staff)
+        and enable_mfe
         and not legacy_only_view
     )
     forum_url = reverse("forum_form_discussion", args=[course_key])
@@ -737,7 +740,7 @@ def _discussions_mfe_context(query_params: Dict,
         "mfe_url": f"{forum_url}?discussions_experience=new",
         "share_feedback_url": settings.DISCUSSIONS_MFE_FEEDBACK_URL,
         "course_key": course_key,
-        "show_banner": (discussions_mfe_enabled and is_educator_or_staff),
+        "show_banner": enable_mfe,
         "discussions_mfe_url": mfe_url,
     }
 

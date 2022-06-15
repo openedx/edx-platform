@@ -90,7 +90,6 @@ from xmodule.x_module import (
     HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
-    XModuleDescriptorToXBlockMixin,
     XModuleMixin,
     XModuleToXBlockMixin,
 )
@@ -282,7 +281,6 @@ class LTIBlock(
     XmlMixin,
     EditingMixin,
     MakoTemplateBlockBase,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,

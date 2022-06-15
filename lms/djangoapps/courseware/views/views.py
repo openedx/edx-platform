@@ -37,6 +37,7 @@ from ipware.ip import get_client_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx_filters.learning.filters import CourseAboutRenderStarted
 from pytz import UTC
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from rest_framework import status
@@ -61,12 +62,12 @@ from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_u
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.generation_handler import CertificateGenerationNotAllowed
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, check_public_access
-from lms.djangoapps.courseware.config import ENABLE_NEW_FINANCIAL_ASSISTANCE_FLOW
 from lms.djangoapps.courseware.courses import (
     can_self_enroll_in_course,
     course_open_for_self_enrollment,
@@ -88,7 +89,11 @@ from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentMo
 from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
 from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from lms.djangoapps.courseware.utils import create_financial_assistance_application
+from lms.djangoapps.courseware.utils import (
+    _use_new_financial_assistance_flow,
+    create_financial_assistance_application,
+    is_eligible_for_financial_aid
+)
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -126,7 +131,6 @@ from openedx.features.course_experience.url_helpers import (
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
-from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 
 from ..entrance_exams import user_can_skip_entrance_exam
@@ -890,7 +894,7 @@ class EnrollStaffView(View):
 @ensure_csrf_cookie
 @ensure_valid_course_key
 @cache_if_anonymous()
-def course_about(request, course_id):
+def course_about(request, course_id):  # pylint: disable=too-many-statements
     """
     Display the course's about page.
     """
@@ -967,7 +971,7 @@ def course_about(request, course_id):
         # Overview
         overview = CourseOverview.get_from_id(course.id)
 
-        sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
+        sidebar_html_enabled = ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled()
 
         allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
 
@@ -999,7 +1003,23 @@ def course_about(request, course_id):
             'allow_anonymous': allow_anonymous,
         }
 
-        return render_to_response('courseware/course_about.html', context)
+        course_about_template = 'courseware/course_about.html'
+        try:
+            # .. filter_implemented_name: CourseAboutRenderStarted
+            # .. filter_type: org.openedx.learning.course_about.render.started.v1
+            context, course_about_template = CourseAboutRenderStarted.run_filter(
+                context=context, template_name=course_about_template,
+            )
+        except CourseAboutRenderStarted.RenderInvalidCourseAbout as exc:
+            response = render_to_response(exc.course_about_template, exc.template_context)
+        except CourseAboutRenderStarted.RedirectToPage as exc:
+            raise CourseAccessRedirect(exc.redirect_to or reverse('dashboard')) from exc
+        except CourseAboutRenderStarted.RenderCustomResponse as exc:
+            response = exc.response or render_to_response(course_about_template, context)
+        else:
+            response = render_to_response(course_about_template, context)
+
+        return response
 
 
 @ensure_csrf_cookie
@@ -1159,7 +1179,7 @@ def _downloadable_certificate_message(course, cert_downloadable_status):  # lint
 
 
 def _missing_required_verification(student, enrollment_mode):
-    return not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE') and (
+    return settings.FEATURES.get('ENABLE_CERTIFICATES_IDV_REQUIREMENT') and (
         enrollment_mode in CourseMode.VERIFIED_MODES and not IDVerificationService.user_is_verified(student)
     )
 
@@ -1532,7 +1552,16 @@ def generate_user_cert(request, course_id):
         return HttpResponseBadRequest(_("Course is not valid"))
 
     log.info(f'Attempt will be made to generate a course certificate for {student.id} : {course_key}.')
-    certs_api.generate_certificate_task(student, course_key, 'self')
+
+    try:
+        certs_api.generate_certificate_task(student, course_key, 'self')
+    except CertificateGenerationNotAllowed as e:
+        log.exception(
+            "Certificate generation not allowed for user %s in course %s",
+            str(student),
+            course_key,
+        )
+        return HttpResponseBadRequest(str(e))
 
     if not is_course_passed(student, course):
         log.info("User %s has not passed the course: %s", student.username, course_id)
@@ -1876,10 +1905,18 @@ FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in 
 
 
 @login_required
-def financial_assistance(_request):
+def financial_assistance(request, course_id=None):
     """Render the initial financial assistance page."""
+    reason = None
+    apply_url = reverse('financial_assistance_form')
+    if course_id and _use_new_financial_assistance_flow(course_id):
+        _, reason = is_eligible_for_financial_aid(course_id)
+        apply_url = reverse('financial_assistance_form_v2', args=[course_id])
+
     return render_to_response('financial-assistance/financial-assistance.html', {
-        'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER)
+        'header_text': _get_fa_header(FINANCIAL_ASSISTANCE_HEADER),
+        'apply_url': apply_url,
+        'reason': reason
     })
 
 
@@ -1966,8 +2003,10 @@ def financial_assistance_request_v2(request):
         if request.user.username != username:
             return HttpResponseForbidden()
 
-        lms_user_id = request.user.id
         course_id = data['course']
+        if course_id and course_id not in request.META.get('HTTP_REFERER'):
+            return HttpResponseBadRequest('Invalid Course ID provided.')
+        lms_user_id = request.user.id
         income = data['income']
         learner_reasons = data['reason_for_applying']
         learner_goals = data['goals']
@@ -1994,10 +2033,13 @@ def financial_assistance_request_v2(request):
 
 
 @login_required
-def financial_assistance_form(request):
+def financial_assistance_form(request, course_id=None):
     """Render the financial assistance application form page."""
     user = request.user
-    enrolled_courses = get_financial_aid_courses(user)
+    disabled = False
+    if course_id:
+        disabled = True
+    enrolled_courses = get_financial_aid_courses(user, course_id)
     incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000',
                '$25,000 - $40,000', '$40,000 - $55,000', '$55,000 - $70,000', '$70,000 - $85,000',
                '$85,000 - $100,000', 'More than $100,000']
@@ -2005,7 +2047,7 @@ def financial_assistance_form(request):
     annual_incomes = [
         {'name': _(income), 'value': income} for income in incomes  # lint-amnesty, pylint: disable=translation-of-non-string
     ]
-    if ENABLE_NEW_FINANCIAL_ASSISTANCE_FLOW.is_enabled():
+    if course_id and _use_new_financial_assistance_flow(course_id):
         submit_url = 'submit_financial_assistance_request_v2'
     else:
         submit_url = 'submit_financial_assistance_request'
@@ -2031,6 +2073,7 @@ def financial_assistance_form(request):
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
+                'disabled': disabled,
                 'options': enrolled_courses,
                 'instructions': gettext(
                     'Select the course for which you want to earn a verified certificate. If'
@@ -2104,8 +2147,9 @@ def financial_assistance_form(request):
     })
 
 
-def get_financial_aid_courses(user):
+def get_financial_aid_courses(user, course_id=None):
     """ Retrieve the courses eligible for financial assistance. """
+    use_new_flow = False
     financial_aid_courses = []
     for enrollment in CourseEnrollment.enrollments_for_user(user).order_by('-created'):
 
@@ -2116,6 +2160,15 @@ def get_financial_aid_courses(user):
                     Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC)),
                     course_id=enrollment.course_id,
                     mode_slug=CourseMode.VERIFIED).exists():
+            # This is a workaround to set course_id before disabling the field in case of new financial assistance flow.
+            if str(enrollment.course_overview) == course_id:
+                financial_aid_courses = [{
+                    'name': enrollment.course_overview.display_name,
+                    'value': str(enrollment.course_id),
+                    'default': True
+                }]
+                use_new_flow = True
+                break
 
             financial_aid_courses.append(
                 {
@@ -2124,6 +2177,9 @@ def get_financial_aid_courses(user):
                 }
             )
 
+    if course_id is not None and use_new_flow is False:
+        # We don't want to show financial_aid_courses if the course_id is not found in the enrolled courses.
+        return []
     return financial_aid_courses
 
 

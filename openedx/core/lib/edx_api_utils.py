@@ -2,6 +2,7 @@
 
 
 import logging
+from urllib.parse import urljoin
 
 from django.core.cache import cache
 
@@ -18,18 +19,23 @@ def get_fields(fields, response):
     return results
 
 
-def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=None, cache_key=None, many=True,
-                     traverse_pagination=True, fields=None, long_term_cache=False):
-    """GET data from an edX REST API.
+def get_api_data(api_config, resource, api_client, base_api_url, resource_id=None,
+                 querystring=None, cache_key=None, many=True,
+                 traverse_pagination=True, fields=None, long_term_cache=False):
+    """
+    GET data from an edX REST API endpoint using the API client.
 
     DRY utility for handling caching and pagination.
 
     Arguments:
         api_config (ConfigurationModel): The configuration model governing interaction with the API.
         resource (str): Name of the API resource being requested.
+        api_client (requests.Session): API client (either raw requests.Session or OAuthAPIClient) to use for
+            requesting data.
+        base_api_url (str): base API url, used to construct the full API URL across with resource and
+            resource_id (if any).
 
     Keyword Arguments:
-        api (APIClient): API client to use for requesting data.
         resource_id (int or str): Identifies a specific resource to be retrieved.
         querystring (dict): Optional query string parameters.
         cache_key (str): Where to cache retrieved data. The cache will be ignored if this is omitted
@@ -68,12 +74,17 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
                 return cached_response
 
     try:
-        endpoint = getattr(api, resource)
         querystring = querystring if querystring else {}
-        response = endpoint(resource_id).get(**querystring)
+        api_url = urljoin(
+            f"{base_api_url}/",
+            f"{resource}/{str(resource_id) + '/' if resource_id is not None else ''}"
+        )
+        response = api_client.get(api_url, params=querystring)
+        response.raise_for_status()
+        response = response.json()
 
         if resource_id is None and traverse_pagination:
-            results = _traverse_pagination(response, endpoint, querystring, no_data)
+            results = _traverse_pagination(response, api_client, api_url, querystring, no_data)
         else:
             results = response
 
@@ -94,8 +105,9 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
     return results
 
 
-def _traverse_pagination(response, endpoint, querystring, no_data):
-    """Traverse a paginated API response.
+def _traverse_pagination(response, api_client, api_url, querystring, no_data):
+    """
+    Traverse a paginated API response.
 
     Extracts and concatenates "results" (list of dict) returned by DRF-powered APIs.
     """
@@ -106,7 +118,9 @@ def _traverse_pagination(response, endpoint, querystring, no_data):
     while next_page:
         page += 1
         querystring['page'] = page
-        response = endpoint.get(**querystring)
+        response = api_client.get(api_url, params=querystring)
+        response.raise_for_status()
+        response = response.json()
         results += response.get('results', no_data)
         next_page = response.get('next')
 

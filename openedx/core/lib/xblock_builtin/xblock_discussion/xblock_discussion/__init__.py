@@ -72,11 +72,6 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
 
     has_author_view = True  # Tells Studio to use author_view
 
-    # support for legacy OLX format - consumed by XmlParserMixin.load_metadata
-    metadata_translations = dict(XmlParserMixin.metadata_translations)
-    metadata_translations['id'] = 'discussion_id'
-    metadata_translations['for'] = 'discussion_target'
-
     @property
     def course_key(self):
         """
@@ -243,19 +238,9 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         """
         block = super().parse_xml(node, runtime, keys, id_generator)
 
-        cls._apply_translations_to_node_attributes(block, node)
         cls._apply_metadata_and_policy(block, node, runtime)
 
         return block
-
-    @classmethod
-    def _apply_translations_to_node_attributes(cls, block, node):
-        """
-        Applies metadata translations for attributes stored on an inlined XML element.
-        """
-        for old_attr, target_attr in cls.metadata_translations.items():
-            if old_attr in node.attrib and hasattr(block, target_attr):
-                setattr(block, target_attr, node.attrib[old_attr])
 
     @classmethod
     def _apply_metadata_and_policy(cls, block, node, runtime):

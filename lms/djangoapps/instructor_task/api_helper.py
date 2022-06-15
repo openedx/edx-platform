@@ -14,11 +14,14 @@ from celery.result import AsyncResult
 from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import UsageKey
+from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.db import outer_atomic
 from lms.djangoapps.courseware.courses import get_problems_in_section
+from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import PROGRESS, SCHEDULED, InstructorTask, InstructorTaskSchedule
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+
+from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
 
 log = logging.getLogger(__name__)
 
@@ -266,6 +269,23 @@ def _get_async_result(task_id):
     return AsyncResult(task_id)
 
 
+def _determine_task_class(task_type):
+    """
+    Utility function used when processing scheduled instructor tasks. This function uses the type of an instructor task
+    to determine the associated Celery task function that will be used when processing the task via Celery.
+
+    Args:
+        task_type (String): A string describing the type of task.
+
+    Returns:
+        A Python function associated with the scheduled instructor task used during task execution.
+    """
+    if task_type == InstructorTaskTypes.BULK_COURSE_EMAIL:
+        return send_bulk_course_email
+
+    return None
+
+
 def get_updated_instructor_task(task_id):
     """
     Returns InstructorTask object corresponding to a given `task_id`.
@@ -491,3 +511,30 @@ def schedule_task(request, task_type, course_key, task_input, task_key, schedule
         # Set any orphaned instructor tasks to the FAILURE state.
         if instructor_task:
             _handle_instructor_task_failure(instructor_task, error)
+
+
+def submit_scheduled_task(schedule):
+    """
+    Helper function for submitting a scheduled task due for execution to Celery.
+    """
+    # determine the task_class needed based off the task_type
+    task_class = _determine_task_class(schedule.task.task_type)
+    if task_class:
+        try:
+            # convert the stored argument data back into a dict from text
+            task_arguments = json.loads(schedule.task_args)
+            # turn this into the format Celery expects
+            task_args = [schedule.task.id, task_arguments]
+            # submit the task
+            log.info(f"Submitting scheduled task '{schedule.task.id}' for processing")
+            task_class.apply_async(task_args, task_id=schedule.task.task_id)
+        except Exception as error:  # pylint: disable=broad-except
+            # broad except here to make sure we cast a wide net for tasks with issues that can't be processed
+            log.error(f"Error submitting scheduled task '{schedule.task.id}' to Celery: {error}")
+            # handle task failure
+            _handle_instructor_task_failure(schedule.task, error)
+    else:
+        log.warning(
+            f"Could not submit scheduled instructor task with id '{schedule.task.id}' and task type "
+            f"'{schedule.task.task_type}'. Could not determine the task class for the request."
+        )

@@ -5,16 +5,21 @@ import datetime
 import hashlib
 import json
 from unittest.mock import patch
-from testfixtures import LogCapture
+from uuid import uuid4
 
+from testfixtures import LogCapture
 from celery.states import FAILURE
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.bulk_email.api import create_course_email
 from lms.djangoapps.bulk_email.data import BulkEmailTargetChoices
-from lms.djangoapps.instructor_task.api_helper import QueueConnectionError, schedule_task
+from lms.djangoapps.instructor_task.api_helper import QueueConnectionError, schedule_task, submit_scheduled_task
+from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import SCHEDULED, InstructorTask, InstructorTaskSchedule
+from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory, InstructorTaskScheduleFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
+
+LOG_PATH = "lms.djangoapps.instructor_task.api_helper"
 
 
 class ScheduledBulkEmailInstructorTaskTests(InstructorTaskCourseTestCase):
@@ -43,7 +48,7 @@ class ScheduledBulkEmailInstructorTaskTests(InstructorTaskCourseTestCase):
         self.targets = [BulkEmailTargetChoices.SEND_TO_MYSELF]
         self.course_email = self._create_course_email(self.targets)
         self.schedule = datetime.datetime.now(datetime.timezone.utc)
-        self.task_type = "bulk_course_email"
+        self.task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
         self.task_input = json.dumps(self._generate_bulk_email_task_input(self.course_email, self.targets))
         self.task_key = hashlib.md5(str(self.course_email.id).encode('utf-8')).hexdigest()
 
@@ -132,3 +137,99 @@ class ScheduledBulkEmailInstructorTaskTests(InstructorTaskCourseTestCase):
         task = InstructorTask.objects.get(course_id=self.course.id, task_key=self.task_key)
         assert task.task_state == FAILURE
         self._verify_log_messages(expected_messages, log)
+
+
+class ScheduledInstructorTaskSubmissionTests(InstructorTaskCourseTestCase):
+    """
+    Unit tests scheduled instructor task functionality. Verifies behavior around retrieving and submission of instructor
+    tasks due for execution.
+    """
+    def setUp(self):
+        super().setUp()
+        self.initialize_course()
+        self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
+        # create an instructor task instance
+        task_id = str(uuid4())
+        self.task = InstructorTaskFactory.create(
+            task_type=InstructorTaskTypes.BULK_COURSE_EMAIL,
+            course_id=self.course.id,
+            task_input="{'email_id': 41, 'to_option': ['myself']}",
+            task_key="3416a75f4cea9109507cacd8e2f2aefc",
+            task_id=task_id,
+            task_state=SCHEDULED,
+            task_output=None,
+            requester=self.instructor
+        )
+        # associate the task with a instructor task schedule instance
+        task_args = {
+            "request_info": {
+                "username": self.instructor.username,
+                "user_id": self.instructor.id,
+                "ip": "192.168.1.100",
+                "agent": "Mozilla",
+                "host": "localhost:18000"
+            },
+            "task_id": self.task.task_id
+        }
+        self.task_schedule = InstructorTaskScheduleFactory.create(
+            task=self.task,
+            task_args=json.dumps(task_args),
+        )
+
+    @patch("lms.djangoapps.instructor_task.api_helper.send_bulk_course_email.apply_async")
+    def test_submit_scheduled_instructor_task(self, mock_task_execution):
+        """
+        A test that verifies the behavior of submitting a scheduled instructor task for execution.
+        """
+        schedule = InstructorTaskSchedule.objects.get(task=self.task.id)
+        expected_task_arguments = json.loads(schedule.task_args)
+        expected_task_args = [schedule.task.id, expected_task_arguments]
+        expected_messages = [
+            f"Submitting scheduled task '{schedule.task.id}' for processing",
+        ]
+
+        with LogCapture() as log:
+            submit_scheduled_task(schedule)
+
+        mock_task_execution.assert_called_once()
+        mock_task_execution.assert_called_with(expected_task_args, task_id=schedule.task.task_id)
+        log.check_present((LOG_PATH, "INFO", expected_messages[0]))
+
+    def test_submit_scheduled_instructor_task_bad_task_class(self):
+        """
+        A test that verifies behavior when we can't determine the task class to use when submitting our scheduled task
+        for execution.
+        """
+        schedule = InstructorTaskSchedule.objects.get(task=self.task.id)
+        task = schedule.task
+        task.task_type = "task_without_scheduling_support"
+        task.save()
+        expected_messages = [
+            f"Could not submit scheduled instructor task with id '{schedule.task.id}' and task type "
+            f"'{task.task_type}'. Could not determine the task class for the request.",
+        ]
+
+        with LogCapture() as log:
+            submit_scheduled_task(schedule)
+
+        log.check_present((LOG_PATH, "WARNING", expected_messages[0]))
+
+    def test_submit_scheduled_instructor_task_with_error(self):
+        """
+        A test that verifies our task handling if an error occurs during task submission. Verifies that the task failure
+        is correctly handled.
+        """
+        schedule = InstructorTaskSchedule.objects.get(task=self.task.id)
+        schedule.task_args = "{malformed JSON data}"
+        schedule.save()
+        expected_messages = [
+            f"Error submitting scheduled task '{schedule.task.id}' to Celery: Expecting property name enclosed in "
+            "double quotes: line 1 column 2 (char 1)",
+        ]
+
+        with self.assertRaises(QueueConnectionError):
+            with LogCapture() as log:
+                submit_scheduled_task(schedule)
+
+        assert schedule.task.task_state == FAILURE
+        log.check_present((LOG_PATH, "ERROR", expected_messages[0]))

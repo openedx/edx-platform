@@ -440,7 +440,6 @@ class CoursewareInformation(RetrieveAPIView):
             * `"empty"`: no start date is specified
         * pacing: Course pacing. Possible values: instructor, self
         * user_timezone: User's chosen timezone setting (or null for browser default)
-        * can_load_course: Whether the user can view the course (AccessResponse object)
         * user_has_passing_grade: Whether or not the effective user's grade is equal to or above the courses minimum
             passing grade
         * course_exit_page_is_active: Flag for the learning mfe on whether or not the course exit page should display

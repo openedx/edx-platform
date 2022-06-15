@@ -1,7 +1,11 @@
-"""Views for API management."""
+"""
+Views for API management.
+"""
 
 
 import logging
+from functools import cached_property
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
@@ -14,13 +18,14 @@ from django.views.generic.edit import CreateView
 from oauth2_provider.generators import generate_client_id, generate_client_secret
 from oauth2_provider.models import get_application_model
 from oauth2_provider.views import ApplicationRegistration
-from slumber.exceptions import HttpNotFoundError
+from requests.exceptions import HTTPError
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.api_admin.decorators import require_api_access
 from openedx.core.djangoapps.api_admin.forms import ApiAccessRequestForm, CatalogForm
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, Catalog
-from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
+from openedx.core.djangoapps.catalog.utils import get_catalog_api_base_url
+from openedx.core.djangoapps.catalog.utils import get_catalog_api_client as create_catalog_api_client
 
 log = logging.getLogger(__name__)
 
@@ -122,8 +127,28 @@ class ApiTosView(TemplateView):
 
 
 class CatalogApiMixin:
+    """
+    Helpers for work with Catalog API.
+    """
     def get_catalog_api_client(self, user):
+        """
+        Returns catalog API client.
+        """
         return create_catalog_api_client(user)
+
+    @cached_property
+    def catalogs_api_url(self):
+        """
+        Returns the catalogs URL for the catalog API.
+        """
+        return urljoin(f"{get_catalog_api_base_url()}/", "catalogs/")
+
+    @cached_property
+    def courses_api_url(self):
+        """
+        Returns the courses URL for the catalog API.
+        """
+        return urljoin(f"{get_catalog_api_base_url()}/", "courses/")
 
 
 class CatalogSearchView(View):
@@ -143,89 +168,115 @@ class CatalogSearchView(View):
 
 
 class CatalogListView(CatalogApiMixin, View):
-    """View to list existing catalogs and create new ones."""
-
+    """
+    View to list existing catalogs and create new ones.
+    """
     template = 'api_admin/catalogs/list.html'
 
     def _get_catalogs(self, client, username):
-        """Retrieve catalogs for a user. Returns the empty list if none are found."""
+        """
+        Retrieve catalogs for a user. Returns the empty list if none are found.
+        """
         try:
-            response = client.catalogs.get(username=username)
-            return [Catalog(attributes=catalog) for catalog in response['results']]
-        except HttpNotFoundError:
-            return []
+            response = client.get(self.catalogs_api_url, params={"username": username})
+            response.raise_for_status()
+            return [Catalog(attributes=catalog) for catalog in response.json()['results']]
+        except HTTPError as err:
+            if err.response.status_code == 404:
+                return []
+            else:
+                raise
 
     def get_context_data(self, client, username, form):
-        """ Retrieve context data for the template. """
-
+        """
+        Retrieve context data for the template.
+        """
         return {
             'username': username,
             'catalogs': self._get_catalogs(client, username),
             'form': form,
             'preview_url': reverse('api_admin:catalog-preview'),
-            'catalog_api_catalog_endpoint': client.catalogs.url().rstrip('/'),
-            'catalog_api_url': client.courses.url(),
+            'catalog_api_catalog_endpoint': self.catalogs_api_url,
+            'catalog_api_url': self.courses_api_url,
         }
 
     def get(self, request, username):
-        """Display a list of a user's catalogs."""
+        """
+        Display a list of a user's catalogs.
+        """
         client = self.get_catalog_api_client(request.user)
         form = CatalogForm(initial={'viewers': [username]})
         return render_to_response(self.template, self.get_context_data(client, username, form))
 
     def post(self, request, username):
-        """Create a new catalog for a user."""
+        """
+        Create a new catalog for a user.
+        """
         form = CatalogForm(request.POST)
         client = self.get_catalog_api_client(request.user)
         if not form.is_valid():
             return render_to_response(self.template, self.get_context_data(client, username, form), status=400)
 
         attrs = form.cleaned_data
-        catalog = client.catalogs.post(attrs)
+        response = client.post(self.catalogs_api_url, data=attrs)
+        response.raise_for_status()
+        catalog = response.json()
         return redirect(reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog['id']}))
 
 
 class CatalogEditView(CatalogApiMixin, View):
-    """View to edit an individual catalog."""
-
+    """
+    View to edit an individual catalog.
+    """
     template_name = 'api_admin/catalogs/edit.html'
 
-    def get_context_data(self, catalog, form, client):
-        """ Retrieve context data for the template. """
-
+    def get_context_data(self, catalog, form):
+        """
+        Retrieve context data for the template.
+        """
         return {
             'catalog': catalog,
             'form': form,
             'preview_url': reverse('api_admin:catalog-preview'),
-            'catalog_api_url': client.courses.url(),
-            'catalog_api_catalog_endpoint': client.catalogs.url().rstrip('/'),
+            'catalog_api_url': self.catalogs_api_url,
+            'catalog_api_catalog_endpoint': self.courses_api_url,
         }
 
     def get(self, request, catalog_id):
-        """Display a form to edit this catalog."""
+        """
+        Display a form to edit this catalog.
+        """
         client = self.get_catalog_api_client(request.user)
-        response = client.catalogs(catalog_id).get()
-        catalog = Catalog(attributes=response)
+        response = client.get(urljoin(f"{self.catalogs_api_url}/", f"{catalog_id}/"))
+        response.raise_for_status()
+        catalog = Catalog(attributes=response.json())
         form = CatalogForm(instance=catalog)
-        return render_to_response(self.template_name, self.get_context_data(catalog, form, client))
+        return render_to_response(self.template_name, self.get_context_data(catalog, form))
 
     def post(self, request, catalog_id):
-        """Update or delete this catalog."""
+        """
+        Update or delete this catalog.
+        """
         client = self.get_catalog_api_client(request.user)
         if request.POST.get('delete-catalog') == 'on':
-            client.catalogs(catalog_id).delete()
+            response = client.delete(urljoin(f"{self.catalogs_api_url}/", f"{catalog_id}/"))
+            response.raise_for_status()
             return redirect(reverse('api_admin:catalog-search'))
         form = CatalogForm(request.POST)
         if not form.is_valid():
-            response = client.catalogs(catalog_id).get()
-            catalog = Catalog(attributes=response)
-            return render_to_response(self.template_name, self.get_context_data(catalog, form, client), status=400)
-        catalog = client.catalogs(catalog_id).patch(form.cleaned_data)
-        return redirect(reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog['id']}))
+            response = client.get(urljoin(f"{self.catalogs_api_url}/", f"{catalog_id}/"))
+            response.raise_for_status()
+            catalog = Catalog(attributes=response.json())
+            return render_to_response(self.template_name, self.get_context_data(catalog, form), status=400)
+        catalog_response = client.patch(urljoin(f"{self.catalogs_api_url}/", f"{catalog_id}/"), data=form.cleaned_data)
+        catalog_response.raise_for_status()
+        return redirect(reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog_response.json()['id']}))
 
 
 class CatalogPreviewView(CatalogApiMixin, View):
-    """Endpoint to preview courses for a query."""
+    """
+    Endpoint to preview courses for a query.
+    """
 
     def get(self, request):
         """
@@ -235,7 +286,9 @@ class CatalogPreviewView(CatalogApiMixin, View):
         client = self.get_catalog_api_client(request.user)
         # Just pass along the request params including limit/offset pagination
         if 'q' in request.GET:
-            results = client.courses.get(**request.GET)
+            response = client.get(self.courses_api_url, params=request.GET)
+            response.raise_for_status()
+            results = response.json()
         # Ensure that we don't just return all the courses if no query is given
         else:
             results = {'count': 0, 'results': [], 'next': None, 'prev': None}

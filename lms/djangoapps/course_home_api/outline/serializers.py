@@ -51,7 +51,6 @@ class CourseBlockSerializer(serializers.Serializer):
                 'icon': icon,
                 'id': block_key,
                 'lms_web_url': block['lms_web_url'] if enable_links else None,
-                'legacy_web_url': block['legacy_web_url'] if enable_links else None,
                 'resume_block': block.get('resume_block', False),
                 'type': block_type,
                 'has_scheduled_content': block.get('has_scheduled_content'),

@@ -241,6 +241,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
                 anonymous_user_id=self.anonymous_student_id,
             )
         elif service_name == "mako":
+            if self.system.student_data_mode == XBlockRuntimeSystem.STUDENT_DATA_EPHEMERAL:
+                return MakoService(namespace_prefix='lms.')
             return MakoService()
         elif service_name == "i18n":
             return ModuleI18nService(block=block)

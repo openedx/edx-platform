@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -29,7 +29,7 @@
 # Rui Ribeiro <info@nau.edu.pt>, 2018-2019
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -60,9 +60,9 @@
 # Rui Ribeiro <info@nau.edu.pt>, 2018-2020
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Portuguese (Portugal) (https://www.transifex.com/open-edx/teams/6205/pt_PT/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2022.
 #
 # Translators:
 # Developer QUEO <developer@queo.pt>, 2019
@@ -71,7 +71,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/)
-# Copyright (C) 2021 edX
+# Copyright (C) 2022 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -92,7 +92,7 @@
 # Waldo Luís Ribeiro, 2016
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/)
-# Copyright (C) 2021 edX
+# Copyright (C) 2022 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -104,15 +104,16 @@
 # Manuela Silva <mmsrs@sky.com>, 2018
 # Manuela Silva <mmsrs@sky.com>, 2016
 # MS, 2016,2018
+# Nika Shahidian, 2022
 # Rui Ribeiro <info@nau.edu.pt>, 2020
 # Rui Ribeiro <info@nau.edu.pt>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-26 20:42+0000\n"
-"PO-Revision-Date: 2021-11-07 20:44+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2022-05-15 20:42+0000\n"
+"PO-Revision-Date: 2014-06-11 15:18+0000\n"
+"Last-Translator: Nika Shahidian, 2022\n"
 "Language-Team: Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/)\n"
 "Language: pt_PT\n"
 "MIME-Version: 1.0\n"
@@ -3179,6 +3180,7 @@ msgid "Markdown Editing Help"
 msgstr "Ajuda de edição de Markdown"
 
 #: lms/static/js/Markdown.Editor.js cms/templates/js/asset-library.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 msgid "URL"
 msgstr "URL"
 
@@ -3993,39 +3995,6 @@ msgstr "Grupos Activados"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Grupos Desativados"
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-"Este curso utiliza a atribuição automática de sub-comunidade para estudantes"
-" em modo validado. Não pode desativar as sub-comunidades e não pode renomear"
-" a sub-comunidade manual '{verifiedCohortName}'. Para alterar a configuração"
-" de sub-comunidades em modo validado, entre em contacto com o gestor "
-"parceiro da edX."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-"Este curso tem atribuição automática de grupo ativada para estudantes em "
-"modo validado, mas o grupo solicitado não existe. Deverá criar um grupo de "
-"atribuição manual denominada por '{verifiedCohortName}', para permitir esta "
-"funcionalidade automática."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
-msgstr ""
-"Este curso tem ativada a atribuição automática de grupo para estudantes em "
-"modo validado, mas os grupos estão desativados. Deverá ativar a opção de "
-"grupo para permitir esta funcionalidade automática."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -5749,38 +5718,6 @@ msgstr "Pontuação geral"
 msgid "Bookmark this page"
 msgstr "Marcar esta página como favorita"
 
-#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
-msgid "Thank you for setting your course goal to {goal}!"
-msgstr "Obrigado por ter definido o objetivo do seu curso para {goal}!"
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr "Atualizou com sucesso o seu objetivo."
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr "Ocorreu um erro ao atualizar o seu objetivo."
-
-#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "Expandir"
-
-#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "Colapsar Tudo"
-
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr "Ver Mais"
-
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr "Ver Menos"
-
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result found for \"{search_term}\""
 msgid_plural "{total_results} results found for \"{search_term}\""
@@ -7456,6 +7393,11 @@ msgstr "Ações"
 msgid "Unscheduled"
 msgstr "Não planeado"
 
+#: cms/templates/js/discussion-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Discussion"
+msgstr "Fórum"
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -7694,10 +7636,6 @@ msgid "follow this post"
 msgstr "siga esta publicação"
 
 #: common/static/common/templates/discussion/templates.underscore
-msgid "post anonymously"
-msgstr "publicar anonimamente"
-
-#: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously to classmates"
 msgstr "publicar anonimamente para os colegas"
 
@@ -7764,10 +7702,6 @@ msgstr ""
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"
 msgstr "Questão"
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Discussion"
-msgstr "Fórum"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Endorse"
@@ -8162,6 +8096,14 @@ msgid "This catalog's courses:"
 msgstr "Cursos deste catálogo:"
 
 #: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "Expandir Tudo"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "Encolher Tudo"
+
+#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Data de Início"
 
@@ -8246,6 +8188,14 @@ msgid ""
 msgstr ""
 "Para que as suas respostas sejam contabilizadas, clique no botão "
 "\"Submeter\" em cada questão antes de selecionar \"Terminar o exame\"."
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "Ver Mais"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "Ver Menos"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -8901,15 +8851,6 @@ msgstr "Parabéns!"
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr "O seu Percurso no Programa"
-
-#: lms/templates/learner_dashboard/program_details_tab_view.underscore
-#: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"To complete the program, you must earn a verified certificate for each "
-"course."
-msgstr ""
-"Para concluir o programa, terá de obter um certificado validado para cada "
-"curso."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -10641,6 +10582,10 @@ msgstr "Data"
 msgid "Post"
 msgstr "Artigo"
 
+#: cms/templates/js/discussion-editor.underscore
+msgid "Enable discussion"
+msgstr ""
+
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
 msgstr "Data Limite:"
@@ -10874,6 +10819,7 @@ msgstr "Criar %(item_type)s"
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear"
 msgstr "Limpar"
@@ -10883,6 +10829,7 @@ msgstr "Limpar"
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Limpar Valor"
@@ -11136,24 +11083,6 @@ msgstr ""
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
 "Learners do not see whether their answers to assessments were correct or "
-"incorrect, nor the score received, until after the course end date has "
-"passed."
-msgstr ""
-"Os estudantes não poderão ver se as suas respostas às avaliações estão "
-"corretas ou incorretas, nem a classificação recebida, até à data de fim do "
-"curso."
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"If the course does not have an end date, learners always see their scores "
-"when they submit answers to assessments."
-msgstr ""
-"Se o curso não tiver uma data de fim, os estudantes poderão ver as suas "
-"pontuações quando submeterem as respostas às avaliações."
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"Learners do not see whether their answers to assessments were correct or "
 "incorrect, nor the score received, until after the due date for the "
 "subsection has passed."
 msgstr ""
@@ -11313,25 +11242,18 @@ msgstr "Tipos de exame"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This subsection was released to learners as a special exam, but was reverted"
-" back to a basic exam. You may not configure it as a special exam now. "
-"Contact edX Support for assistance."
+"This subsection was released to learners as a proctored exam, but was "
+"reverted back to a basic or timed exam. You may not configure it as a "
+"proctored exam now. Contact edX Support for assistance."
 msgstr ""
-"Esta subsecção foi divulgada aos alunos como um exame especial, mas foi "
-"revertida de novo para um exame básico. Não pode agora configurá-lo como um "
-"exame especial. Contacte o Apoio edX para obter assistência."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This special exam has been released to learners. You may not convert it to "
-"another type of special exam. You may revert this subsection back to being a"
-" basic exam by selecting 'None', but you will NOT be able to configure it as"
-" a special exam in the future."
+"This proctored exam has been released to learners. You may not convert it to"
+" another type of special exam. You may revert this subsection back to being "
+"a basic exam by selecting 'None', or a timed exam, but you will NOT be able "
+"to configure it as a proctored exam in the future."
 msgstr ""
-"Este exame especial foi divulgado aos alunos. Não pode convertê-lo para "
-"outro tipo de exame especial. Pode reverter esta subsecção para voltar a ser"
-" um exame básico seleccionando 'Nenhum', mas NÃO poderá configurá-lo como um"
-" exame especial no futuro."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"

@@ -37,7 +37,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests.helpers import StubReplaceURLService, mock_render_template, StubMakoService, StubUserService
 from xmodule.util.sandboxing import SandboxService
-from xmodule.x_module import DoNothingCache, ModuleSystem, XModuleDescriptor, XModuleMixin
+from xmodule.x_module import DoNothingCache, ModuleSystem, XModuleMixin
 from openedx.core.lib.cache_utils import CacheService
 
 

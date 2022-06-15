@@ -383,7 +383,7 @@ class TestGetPathways(CacheIsolationTestCase):
         assert not mock_warning.called
 
 
-@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+@mock.patch(UTILS_MODULE + '.get_api_data')
 class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
     """Tests covering retrieval of program types from the catalog service."""
     @override_settings(COURSE_CATALOG_API_URL='https://api.example.com/v1/')
@@ -406,7 +406,7 @@ class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
         assert data == program
 
 
-@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+@mock.patch(UTILS_MODULE + '.get_api_data')
 class TestGetCurrency(CatalogIntegrationMixin, TestCase):
     """Tests covering retrieval of currency data from the catalog service."""
     @override_settings(COURSE_CATALOG_API_URL='https://api.example.com/v1/')
@@ -451,7 +451,7 @@ class TestGetLocalizedPriceText(TestCase):
 
 
 @skip_unless_lms
-@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+@mock.patch(UTILS_MODULE + '.get_api_data')
 class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
     """
     Tests covering retrieval of course runs from the catalog service.
@@ -471,7 +471,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
         for arg in (self.catalog_integration, 'course_runs'):
             assert arg in args
 
-        assert kwargs['api']._store['base_url'] == self.catalog_integration.get_internal_api_url()  # pylint: disable=protected-access, line-too-long
+        assert kwargs['base_api_url'] == self.catalog_integration.get_internal_api_url()  # pylint: disable=protected-access, line-too-long
 
         querystring = {
             'page_size': 20,
@@ -534,7 +534,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
 
 
 @skip_unless_lms
-@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+@mock.patch(UTILS_MODULE + '.get_api_data')
 class TestGetCourseOwners(CatalogIntegrationMixin, TestCase):
     """
     Tests covering retrieval of course runs from the catalog service.
@@ -559,7 +559,7 @@ class TestGetCourseOwners(CatalogIntegrationMixin, TestCase):
 
 
 @skip_unless_lms
-@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+@mock.patch(UTILS_MODULE + '.get_api_data')
 class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
     """
     Test Covering data related Entitlements.
@@ -667,7 +667,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
 
 
 @skip_unless_lms
-@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+@mock.patch(UTILS_MODULE + '.get_api_data')
 class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
     """
     Tests covering retrieval of information about a specific course run from the catalog service.

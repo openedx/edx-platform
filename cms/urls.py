@@ -271,6 +271,8 @@ if settings.DEBUG:
     except ImportError:
         pass
 
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
     urlpatterns += static(
         settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['base_url'],
         document_root=settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['location']

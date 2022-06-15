@@ -41,7 +41,6 @@ from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
     ResourceTemplates,
-    XModuleDescriptorToXBlockMixin,
     XModuleMixin,
     XModuleToXBlockMixin,
     shim_xmodule_js
@@ -132,7 +131,6 @@ class ProblemBlock(
     RawMixin,
     XmlMixin,
     EditingMixin,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,
@@ -163,11 +161,6 @@ class ProblemBlock(
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"
     has_author_view = True
-
-    # The capa format specifies that what we call max_attempts in the code
-    # is the attribute `attempts`. This will do that conversion
-    metadata_translations = dict(XmlMixin.metadata_translations)
-    metadata_translations['attempts'] = 'max_attempts'
 
     icon_class = 'problem'
 
@@ -559,14 +552,22 @@ class ProblemBlock(
         # Make optioninput's options index friendly by replacing the actual tag with the values
         capa_content = re.sub(r'<optioninput options="\(([^"]+)\)".*?>\s*|\S*<\/optioninput>', r'\1', self.data)
 
-        # Removing solutions and hints, as well as script and style
+        # Remove the following tags with content that can leak hints or solutions:
+        # - `solution` (with optional attributes) and `solutionset`.
+        # - `targetedfeedback` (with optional attributes) and `targetedfeedbackset`.
+        # - `answer` (with optional attributes).
+        # - `script` (with optional attributes).
+        # - `style` (with optional attributes).
+        # - various types of hints (with optional attributes) and `hintpart`.
         capa_content = re.sub(
             re.compile(
                 r"""
-                    <solution>.*?</solution> |
-                    <script>.*?</script> |
-                    <style>.*?</style> |
-                    <[a-z]*hint.*?>.*?</[a-z]*hint>
+                    <solution.*?>.*?</solution.*?> |
+                    <targetedfeedback.*?>.*?</targetedfeedback.*?> |
+                    <answer.*?>.*?</answer> |
+                    <script.*?>.*?</script> |
+                    <style.*?>.*?</style> |
+                    <[a-z]*hint.*?>.*?</[a-z]*hint.*?>
                 """,
                 re.DOTALL |
                 re.VERBOSE),

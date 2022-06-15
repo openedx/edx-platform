@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -72,7 +72,7 @@
 # Yana Lovyagina <yana.lovyagina@raccoongang.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -81,6 +81,7 @@
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # 80dca42de6d6f19a9206ebd06d0c9cb9_4216643 <e5580e6e1f445efa0c4f3eb584b99765_116976>, 2013
+# ashed <craysy@gmail.com>, 2022
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # Dellon Zerus <dellonzerus@gmail.com>, 2020
 # Dmitri Polevoi <polevaiabrest@gmail.com>, 2014
@@ -114,9 +115,9 @@
 # Павел Жилкин, 2018-2019
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Russian (https://www.transifex.com/open-edx/teams/6205/ru/).
-# Copyright (C) 2021 EdX
+# Copyright (C) 2022 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2021.
+# EdX Team <info@edx.org>, 2022.
 #
 # Translators:
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2019
@@ -125,7 +126,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)
-# Copyright (C) 2021 edX
+# Copyright (C) 2022 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -134,6 +135,7 @@
 # Anastasija Teresenkova <anastasija_te@inbox.lv>, 2020
 # Andrey Bochkarev <abocha@ya.ru>, 2015
 # Andrey Mishchenko <andrey.mishchenko@raccoongang.com>, 2020
+# ashed <craysy@gmail.com>, 2022
 # Dmitri Polevoi <polevaiabrest@gmail.com>, 2014
 # Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # SpaceOyster, 2016
@@ -159,12 +161,13 @@
 # Yana Lovyagina <yana.lovyagina@raccoongang.com>, 2016
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)
-# Copyright (C) 2021 edX
+# Copyright (C) 2022 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Alexandr Kosharny <acosarnii@gmail.com>, 2016
 # ovoschee <all.spam.there@gmail.com>, 2014
+# ashed <craysy@gmail.com>, 2022
 # Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # Eric Fischer <efischer@edx.org>, 2016
 # Iaroslav <danwill@ukr.net>, 2015
@@ -188,9 +191,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-12-26 20:42+0000\n"
-"PO-Revision-Date: 2021-11-07 20:44+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2022-05-15 20:42+0000\n"
+"PO-Revision-Date: 2014-06-11 15:18+0000\n"
+"Last-Translator: ashed <craysy@gmail.com>, 2022\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -3220,6 +3223,7 @@ msgid "Markdown Editing Help"
 msgstr "Markdown: помощь в редактировании"
 
 #: lms/static/js/Markdown.Editor.js cms/templates/js/asset-library.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 msgid "URL"
 msgstr "URL"
 
@@ -3988,39 +3992,6 @@ msgstr "Группы включены"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Группы отключены"
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course uses automatic cohorting for verified track learners. You cannot"
-" disable cohorts, and you cannot rename the manual cohort named "
-"'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
-msgstr ""
-"Этот курс использует автоматическую группировку слушателей, записанных в "
-"режиме «С подтверждением личности». Вы не можете отключить группы, и вы "
-"также не можете переименовать вручную группу, названную "
-"«{verifiedCohortName}». Чтобы изменить настройки группы с подтверждением "
-"личности, свяжитесь со своим менеджером платформы edX."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" the required cohort does not exist. You must create a manually-assigned "
-"cohort named '{verifiedCohortName}' for the feature to work."
-msgstr ""
-"Этот курс имеет автоматическую группировку для подтверждённых слушателей "
-"образовательного трека, но запрашиваемая группа не существует. Вам "
-"необходимо создать настроенную вручную группу с именем "
-"'{verifiedCohortName}' для будущей работы."
-
-#: lms/static/js/groups/views/verified_track_settings_notification.js
-msgid ""
-"This course has automatic cohorting enabled for verified track learners, but"
-" cohorts are disabled. You must enable cohorts for the feature to work."
-msgstr ""
-"Этот курс имеет автоматическую группировку для подтверждённых слушателей "
-"образовательного трека, но группирование отключено. Вам необходимо включить "
-"группирование для будущей работы."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -5655,36 +5626,6 @@ msgstr "Итоговая оценка"
 msgid "Bookmark this page"
 msgstr "Добавить страницу в мои закладки"
 
-#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
-msgid "Thank you for setting your course goal to {goal}!"
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr ""
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "Развернуть всё"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "Свернуть все"
-
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr ""
-
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result found for \"{search_term}\""
 msgid_plural "{total_results} results found for \"{search_term}\""
@@ -7284,6 +7225,11 @@ msgstr "Действия"
 msgid "Unscheduled"
 msgstr "Дата выпуска не задана"
 
+#: cms/templates/js/discussion-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Discussion"
+msgstr ""
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -7517,10 +7463,6 @@ msgid "follow this post"
 msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
-msgid "post anonymously"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously to classmates"
 msgstr ""
 
@@ -7582,10 +7524,6 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Discussion"
 msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
@@ -7978,6 +7916,14 @@ msgid "This catalog's courses:"
 msgstr "Курсы в данном каталоге:"
 
 #: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "Развернуть всё"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "Свернуть все"
+
+#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Дата начала"
 
@@ -8062,6 +8008,14 @@ msgstr ""
 "Чтобы получить зачётные баллы за задания, необходимо нажать «Отправить» для "
 "каждого отдельного задания, прежде чем вы выберете «Завершить сдачу "
 "экзамена»"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -8718,15 +8672,6 @@ msgstr "Поздравляем!"
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr ""
-
-#: lms/templates/learner_dashboard/program_details_tab_view.underscore
-#: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"To complete the program, you must earn a verified certificate for each "
-"course."
-msgstr ""
-"Чтобы полностью пройти программу, вам необходимо получить подтверждённый "
-"сертификат по каждому курсу."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -10388,6 +10333,10 @@ msgstr ""
 msgid "Post"
 msgstr "Опубликовать"
 
+#: cms/templates/js/discussion-editor.underscore
+msgid "Enable discussion"
+msgstr ""
+
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
 msgstr "Срок сдачи:"
@@ -10611,6 +10560,7 @@ msgstr "Новая %(item_type)s"
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear"
 msgstr "Очистить"
@@ -10620,6 +10570,7 @@ msgstr "Очистить"
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Очистить значение"
@@ -10869,23 +10820,6 @@ msgstr "Показывать результаты оценки по истече
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
 "Learners do not see whether their answers to assessments were correct or "
-"incorrect, nor the score received, until after the course end date has "
-"passed."
-msgstr ""
-"Слушатели не увидят, верен ли их ответ, а также полученные баллы, до "
-"окончания курса."
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"If the course does not have an end date, learners always see their scores "
-"when they submit answers to assessments."
-msgstr ""
-"Если у курса не задана дата окончания, слушатели будут видеть свои оценки, "
-"как только отправят ответы на задания."
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"Learners do not see whether their answers to assessments were correct or "
 "incorrect, nor the score received, until after the due date for the "
 "subsection has passed."
 msgstr ""
@@ -11044,17 +10978,17 @@ msgstr "Типы экзамена"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This subsection was released to learners as a special exam, but was reverted"
-" back to a basic exam. You may not configure it as a special exam now. "
-"Contact edX Support for assistance."
+"This subsection was released to learners as a proctored exam, but was "
+"reverted back to a basic or timed exam. You may not configure it as a "
+"proctored exam now. Contact edX Support for assistance."
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This special exam has been released to learners. You may not convert it to "
-"another type of special exam. You may revert this subsection back to being a"
-" basic exam by selecting 'None', but you will NOT be able to configure it as"
-" a special exam in the future."
+"This proctored exam has been released to learners. You may not convert it to"
+" another type of special exam. You may revert this subsection back to being "
+"a basic exam by selecting 'None', or a timed exam, but you will NOT be able "
+"to configure it as a proctored exam in the future."
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore

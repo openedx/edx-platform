@@ -16,6 +16,7 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_switch
 from edxval.api import create_video, get_videos_for_course
 from fs.osfs import OSFS
 from lxml import etree
@@ -23,7 +24,21 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locations import CourseLocator
 from path import Path as path
-from waffle.testutils import override_switch
+from xmodule.capa_module import ProblemBlock
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.utils import empty_asset_trashcan, restore_asset_from_trashcan
+from xmodule.course_module import CourseBlock, Textbook
+from xmodule.exceptions import InvalidVersionError
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
+from xmodule.seq_module import SequenceBlock
+from xmodule.video_module import VideoBlock
 
 from cms.djangoapps.contentstore.config import waffle
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
@@ -36,21 +51,6 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseCreatorRole, CourseInstructorRole
 from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
 from openedx.core.lib.tempdir import mkdtemp_clean
-from xmodule.capa_module import ProblemBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.contentstore.utils import empty_asset_trashcan, restore_asset_from_trashcan  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.course_module import CourseBlock, Textbook  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.exceptions import InvalidVersionError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.inheritance import own_metadata  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.xml_exporter import export_course_to_xml  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.seq_module import SequenceBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.video_module import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -1055,9 +1055,7 @@ class MiscCourseTests(ContentStoreTestCase):
             resp = self.client.get_html('/c4x/InvalidOrg/InvalidCourse/asset/invalid.png')
             self.assertEqual(resp.status_code, 404)
 
-    @override_switch(
-        f'{waffle.WAFFLE_NAMESPACE}.{waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE}',
-        active=False)
+    @override_waffle_switch(waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE, active=False)
     def test_disabled_accessibility_page(self):
         """
         Test that accessibility page returns 404 when waffle switch is disabled
@@ -2191,9 +2189,7 @@ class EntryPageTestCase(TestCase):
         # Logout redirects.
         self._test_page("/logout", 200)
 
-    @override_switch(
-        f'{waffle.WAFFLE_NAMESPACE}.{waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE}',
-        active=True)
+    @override_waffle_switch(waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE, active=True)
     def test_accessibility(self):
         self._test_page('/accessibility')
 

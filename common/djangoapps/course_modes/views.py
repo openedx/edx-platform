@@ -22,7 +22,6 @@ from django.utils.translation import get_language, to_locale
 from django.utils.translation import gettext as _
 from django.views.generic.base import View
 from edx_django_utils.monitoring.utils import increment
-from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
 from urllib.parse import urljoin  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -56,7 +55,7 @@ LOG = logging.getLogger(__name__)
 # .. toggle_creation_date: 2021-8-23
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REV-2133
-# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+# .. toggle_warning: This temporary feature toggle does not have a target removal date.
 VALUE_PROP_TRACK_SELECTION_FLAG = WaffleFlag('course_modes.use_new_track_selection', __name__)
 
 
@@ -103,12 +102,7 @@ class ChooseModeView(View):
 
         # Check whether the user has access to this course
         # based on country access rules.
-        embargo_redirect = embargo_api.redirect_if_blocked(
-            course_key,
-            user=request.user,
-            ip_address=get_client_ip(request)[0],
-            url=request.path
-        )
+        embargo_redirect = embargo_api.redirect_if_blocked(request, course_key)
         if embargo_redirect:
             return redirect(embargo_redirect)
 

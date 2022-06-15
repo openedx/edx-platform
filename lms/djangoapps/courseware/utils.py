@@ -17,12 +17,14 @@ from xmodule.partitions.partitions_service import PartitionService  # lint-amnes
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.courseware.config import ENABLE_NEW_FINANCIAL_ASSISTANCE_FLOW
 from lms.djangoapps.courseware.constants import (
     UNEXPECTED_ERROR_APPLICATION_STATUS,
     UNEXPECTED_ERROR_CREATE_APPLICATION,
     UNEXPECTED_ERROR_IS_ELIGIBLE
 )
 from lms.djangoapps.courseware.models import FinancialAssistanceConfiguration
+from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 
 log = logging.getLogger(__name__)
 
@@ -210,3 +212,19 @@ def get_course_hash_value(course_key):
         return int(m.hexdigest(), base=16) % 100
 
     return out_of_bound_value
+
+
+def _use_new_financial_assistance_flow(course_id):
+    """
+    Returns if the course_id can be used in the new financial assistance flow.
+    """
+    is_financial_assistance_enabled_for_course = WaffleFlagCourseOverrideModel.override_value(
+        ENABLE_NEW_FINANCIAL_ASSISTANCE_FLOW.name, course_id
+    )
+    financial_assistance_configuration = FinancialAssistanceConfiguration.current()
+    if financial_assistance_configuration.enabled and (
+            is_financial_assistance_enabled_for_course == WaffleFlagCourseOverrideModel.ALL_CHOICES.on or
+            get_course_hash_value(course_id) <= financial_assistance_configuration.fa_backend_enabled_courses_percentage
+    ):
+        return True
+    return False

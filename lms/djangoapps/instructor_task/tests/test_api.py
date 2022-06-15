@@ -3,23 +3,32 @@ Test for LMS instructor background task queue management
 """
 
 import datetime
+import json
 from unittest.mock import MagicMock, Mock, patch
+from uuid import uuid4
 
+import dateutil
 import pytest
 import pytz
 import ddt
-from celery.states import FAILURE
+from testfixtures import LogCapture
+from celery.states import FAILURE, SUCCESS
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import normalize_repr
-from lms.djangoapps.bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
+from lms.djangoapps.bulk_email.api import create_course_email
+from lms.djangoapps.bulk_email.data import BulkEmailTargetChoices
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api import (
+    convert_schedule_to_utc_from_local,
     SpecificStudentIdMissingError,
+    generate_anonymous_ids,
     generate_certificates_for_students,
     get_instructor_task_history,
     get_running_instructor_tasks,
+    process_scheduled_instructor_tasks,
     regenerate_certificates,
     submit_bulk_course_email,
     submit_calculate_may_enroll_csv,
@@ -37,12 +46,16 @@ from lms.djangoapps.instructor_task.api import (
     submit_rescore_problem_for_student,
     submit_reset_problem_attempts_for_all_students,
     submit_reset_problem_attempts_in_entrance_exam,
-    generate_anonymous_ids
 )
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
-from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
-from lms.djangoapps.instructor_task.tasks import export_ora2_data, export_ora2_submission_files, \
-    generate_anonymous_ids_for_course
+from lms.djangoapps.instructor_task.data import InstructorTaskTypes
+from lms.djangoapps.instructor_task.models import PROGRESS, SCHEDULED, InstructorTask
+from lms.djangoapps.instructor_task.tasks import (
+    export_ora2_data,
+    export_ora2_submission_files,
+    generate_anonymous_ids_for_course,
+)
+from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory, InstructorTaskScheduleFactory
 from lms.djangoapps.instructor_task.tests.test_base import (
     TEST_COURSE_KEY,
     InstructorTaskCourseTestCase,
@@ -50,7 +63,9 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskTestCase,
     TestReportMixin
 )
-from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, delete_user_preference
+
+LOG_PATH = 'lms.djangoapps.instructor_task.api'
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
@@ -82,7 +97,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
                     in get_instructor_task_history(
                         TEST_COURSE_KEY,
                         usage_key=self.problem_url,
-                        task_type='rescore_problem'
+                        task_type=InstructorTaskTypes.RESCORE_PROBLEM
                     )]
         assert set(task_ids) == set(expected_ids)
         # make the same call using a non-existent task_type:
@@ -131,29 +146,45 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             submit_rescore_problem_for_all_students(request, problem_url)
 
     @ddt.data(
-        (normalize_repr(submit_rescore_problem_for_all_students), 'rescore_problem'),
+        (normalize_repr(submit_rescore_problem_for_all_students), InstructorTaskTypes.RESCORE_PROBLEM),
         (
             normalize_repr(submit_rescore_problem_for_all_students),
-            'rescore_problem_if_higher',
+            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
             {'only_if_higher': True}
         ),
-        (normalize_repr(submit_rescore_problem_for_student), 'rescore_problem', {'student': True}),
+        (normalize_repr(submit_rescore_problem_for_student), InstructorTaskTypes.RESCORE_PROBLEM, {'student': True}),
         (
             normalize_repr(submit_rescore_problem_for_student),
-            'rescore_problem_if_higher',
+            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
             {'student': True, 'only_if_higher': True}
         ),
-        (normalize_repr(submit_reset_problem_attempts_for_all_students), 'reset_problem_attempts'),
-        (normalize_repr(submit_delete_problem_state_for_all_students), 'delete_problem_state'),
-        (normalize_repr(submit_rescore_entrance_exam_for_student), 'rescore_problem', {'student': True}),
+        (normalize_repr(submit_reset_problem_attempts_for_all_students), InstructorTaskTypes.RESET_PROBLEM_ATTEMPTS),
+        (normalize_repr(submit_delete_problem_state_for_all_students), InstructorTaskTypes.DELETE_PROBLEM_STATE),
         (
             normalize_repr(submit_rescore_entrance_exam_for_student),
-            'rescore_problem_if_higher',
-            {'student': True, 'only_if_higher': True},
+            InstructorTaskTypes.RESCORE_PROBLEM,
+            {'student': True}
         ),
-        (normalize_repr(submit_reset_problem_attempts_in_entrance_exam), 'reset_problem_attempts', {'student': True}),
-        (normalize_repr(submit_delete_entrance_exam_state_for_student), 'delete_problem_state', {'student': True}),
-        (normalize_repr(submit_override_score), 'override_problem_score', {'student': True, 'score': 0})
+        (
+            normalize_repr(submit_rescore_entrance_exam_for_student),
+            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
+            {'student': True, 'only_if_higher': True}
+        ),
+        (
+            normalize_repr(submit_reset_problem_attempts_in_entrance_exam),
+            InstructorTaskTypes.RESET_PROBLEM_ATTEMPTS,
+            {'student': True}
+        ),
+        (
+            normalize_repr(submit_delete_entrance_exam_state_for_student),
+            InstructorTaskTypes.DELETE_PROBLEM_STATE,
+            {'student': True}
+        ),
+        (
+            normalize_repr(submit_override_score),
+            InstructorTaskTypes.OVERRIDE_PROBLEM_SCORE,
+            {'student': True, 'score': 0}
+        )
     )
     @ddt.unpack
     def test_submit_task(self, task_function, expected_task_type, params=None):
@@ -207,12 +238,15 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
     def _define_course_email(self):
         """Create CourseEmail object for testing."""
-        # TODO: convert to use bulk_email app's `create_course_email` API function and remove direct import and use of
-        # bulk_email model
-        course_email = CourseEmail.create(
+        email_recipient_groups = [
+            BulkEmailTargetChoices.SEND_TO_MYSELF,
+            BulkEmailTargetChoices.SEND_TO_STAFF,
+            BulkEmailTargetChoices.SEND_TO_LEARNERS
+        ]
+        course_email = create_course_email(
             self.course.id,
             self.instructor,
-            [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS],
+            email_recipient_groups,
             "Test Subject",
             "<p>This is a test message</p>"
         )
@@ -232,6 +266,41 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         instructor_task.save()
         with pytest.raises(AlreadyRunningError):
             api_call()
+
+    def _generate_scheduled_task(self, task_state=None):
+        return InstructorTaskFactory.create(
+            task_type=InstructorTaskTypes.BULK_COURSE_EMAIL,
+            course_id=self.course.id,
+            task_input="{'email_id': 1, 'to_option': ['myself']}",
+            task_key="3416a75f4cea9109507cacd8e2f2aefc",
+            task_id=str(uuid4()),
+            task_state=task_state if task_state else SCHEDULED,
+            task_output=None,
+            requester=self.instructor
+        )
+
+    def _generate_scheduled_task_schedule(self, task, due_date):
+        return InstructorTaskScheduleFactory.create(
+            task=task,
+            task_args=json.dumps(self._generate_task_args()),
+            task_due=due_date
+        )
+
+    def _generate_task_args(self):
+        """
+        Utility function that creates a sample `task_args` value for a scheduled task.
+        """
+        task_args = {
+            "request_info": {
+                "username": self.instructor.username,
+                "user_id": self.instructor.id,
+                "ip": "127.0.0.1",
+                "agent": "Mozilla",
+                "host": "localhost:18000"
+            },
+            "task_id": "622748b3-2831-432e-b519-4fde2706ca59"
+        }
+        return task_args
 
     def test_submit_bulk_email_all(self):
         email_id = self._define_course_email()
@@ -288,7 +357,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             submit_export_ora2_data(request, self.course.id)
 
             mock_submit_task.assert_called_once_with(
-                request, 'export_ora2_data', export_ora2_data, self.course.id, {}, '')
+                request, InstructorTaskTypes.EXPORT_ORA2_DATA, export_ora2_data, self.course.id, {}, '')
 
     def test_submit_export_ora2_submission_files(self):
         request = self.create_task_request(self.instructor)
@@ -299,7 +368,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
             mock_submit_task.assert_called_once_with(
                 request,
-                'export_ora2_submission_files',
+                InstructorTaskTypes.EXPORT_ORA2_SUBMISSION_FILES,
                 export_ora2_submission_files,
                 self.course.id,
                 {},
@@ -385,7 +454,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
             mock_submit_task.assert_called_once_with(
                 request,
-                'generate_anonymous_ids_for_course',
+                InstructorTaskTypes.GENERATE_ANONYMOUS_IDS_FOR_COURSE,
                 generate_anonymous_ids_for_course,
                 self.course.id,
                 {},
@@ -395,6 +464,9 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
     @patch("lms.djangoapps.instructor_task.api.schedule_task")
     @patch("lms.djangoapps.instructor_task.api.submit_task")
     def test_submit_bulk_course_email_with_schedule(self, mock_submit_task, mock_schedule_task):
+        """
+        A test to determine if the right helper function is being called when a scheduled task is being processed.
+        """
         email_id = self._define_course_email()
         schedule = datetime.datetime(2030, 8, 15, 8, 15, 12, 0, pytz.utc)
         submit_bulk_course_email(
@@ -405,3 +477,131 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         )
         mock_schedule_task.assert_called_once()
         mock_submit_task.assert_not_called()
+
+    @patch("lms.djangoapps.instructor_task.api.submit_scheduled_task")
+    def test_process_scheduled_tasks(self, mock_submit_scheduled_task):
+        """
+        A test to verify the functionality of the `process_scheduled_tasks` function. This function determines which
+        scheduled instructor tasks are due for execution.
+
+        This test generates three scheduled tasks; one that has been processed, one that is due for processing, and one
+        that is due in the future. In this test, one only of these tasks should be eligible for processing.
+        """
+        base_date = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
+        executed_instructor_task = self._generate_scheduled_task(task_state=SUCCESS)
+        executed_instructor_task_due_date = base_date - datetime.timedelta(days=5)
+        self._generate_scheduled_task_schedule(executed_instructor_task, executed_instructor_task_due_date)
+
+        due_instructor_task = self._generate_scheduled_task()
+        due_instructor_task_due_date = base_date - datetime.timedelta(days=1)
+        due_instructor_task_schedule = self._generate_scheduled_task_schedule(
+            due_instructor_task,
+            due_instructor_task_due_date
+        )
+
+        future_instructor_task = self._generate_scheduled_task()
+        future_instructor_task_due_date = base_date + datetime.timedelta(days=15)
+        self._generate_scheduled_task_schedule(future_instructor_task, future_instructor_task_due_date)
+
+        expected_messages = [
+            f"Attempting to queue scheduled task with id '{due_instructor_task.id}'"
+        ]
+
+        with LogCapture() as log:
+            process_scheduled_instructor_tasks()
+
+        mock_submit_scheduled_task.assert_called_once_with(due_instructor_task_schedule)
+        log.check_present((LOG_PATH, "INFO", expected_messages[0]),)
+
+    @patch("lms.djangoapps.instructor_task.api.submit_scheduled_task", side_effect=QueueConnectionError("blammo!"))
+    def test_process_scheduled_tasks_expect_error(self, mock_scheduled_task):
+        """
+        A test that verifies the behavior of the `process_scheduled_tasks` function when there is an error processing
+        the request.
+        """
+        base_date = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
+        due_instructor_task = self._generate_scheduled_task()
+        due_instructor_task_due_date = base_date - datetime.timedelta(days=1)
+        self._generate_scheduled_task_schedule(due_instructor_task, due_instructor_task_due_date)
+        expected_messages = [
+            f"Error processing scheduled task with task id '{due_instructor_task.id}': blammo!",
+        ]
+
+        with LogCapture() as log:
+            process_scheduled_instructor_tasks()
+
+        log.check_present((LOG_PATH, "ERROR", expected_messages[0]),)
+
+
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+class ScheduledInstructorTaskTests(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests API methods that support scheduled instructor tasks
+    """
+    def setUp(self):
+        super().setUp()
+        self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
+
+    def tearDown(self):
+        super().tearDown()
+        delete_user_preference(self.instructor, 'time_zone', self.instructor.username)
+
+    def _get_expected_schedule(self, schedule, timezone):
+        local_tz = dateutil.tz.gettz(timezone)
+        local_dt = dateutil.parser.parse(schedule).replace(tzinfo=local_tz)
+        return local_dt.astimezone(pytz.utc)
+
+    def test_convert_schedule_to_utc_from_local_no_user_preference(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies that we use
+        the browser provided timezone data if there is no preferred timezone set by the user in their account settings.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        browser_timezone = "America/New_York"
+        expected_schedule = self._get_expected_schedule(schedule, browser_timezone)
+
+        schedule_utc = convert_schedule_to_utc_from_local(schedule, browser_timezone, self.instructor)
+
+        assert schedule_utc == expected_schedule
+
+    def test_convert_schedule_to_utc_from_local_with_preferred_timezone(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies that we use the
+        preferred timezone if a user has set one in their account settings.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        preferred_timezone = "America/Anchorage"
+        set_user_preference(self.instructor, 'time_zone', preferred_timezone)
+        expected_schedule = self._get_expected_schedule(schedule, preferred_timezone)
+
+        schedule_utc = convert_schedule_to_utc_from_local(schedule, "", self.instructor)
+
+        assert schedule_utc == expected_schedule
+
+    def test_convert_schedule_to_utc_from_local_with_preferred_and_browser_timezone(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies that we use
+        the preferred timezone over the browser timezone when provided both values.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        browser_timezone = "America/New_York"
+        preferred_timezone = "America/Anchorage"
+        set_user_preference(self.instructor, 'time_zone', preferred_timezone)
+        expected_schedule = self._get_expected_schedule(schedule, preferred_timezone)
+
+        schedule_utc = convert_schedule_to_utc_from_local(schedule, browser_timezone, self.instructor)
+
+        assert schedule_utc == expected_schedule
+
+    def test_convert_schedule_to_utc_from_local_with_invalid_timezone(self):
+        """
+        A test that verifies the behavior of the `convert_schedule_to_utc_from_local` function. Verifies an error
+        condition if the application cannot determine a timezone to use for conversion.
+        """
+        schedule = "2099-05-02T14:00:00.000Z"
+        expected_error_message = "Unable to determine the time zone to use to convert the schedule to UTC"
+
+        with self.assertRaises(ValueError) as value_err:
+            convert_schedule_to_utc_from_local(schedule, "Flim/Flam", self.instructor)
+
+        assert str(value_err.exception) == expected_error_message

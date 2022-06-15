@@ -7,11 +7,10 @@ from unittest.mock import patch
 
 import crum
 import ddt
-import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
 from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from freezegun import freeze_time
 from pytz import utc
 from xmodule.modulestore import ModuleStoreEnum
@@ -20,6 +19,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.certificates.config import AUTO_CERTIFICATE_GENERATION
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.courseware.courses import get_course_date_blocks
 from lms.djangoapps.courseware.date_summary import (
@@ -30,12 +31,12 @@ from lms.djangoapps.courseware.date_summary import (
     CourseStartDate,
     TodaysDate,
     VerificationDeadlineDate,
-    VerifiedUpgradeDeadlineDate
+    VerifiedUpgradeDeadlineDate,
 )
 from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
-    OrgDynamicUpgradeDeadlineConfiguration
+    OrgDynamicUpgradeDeadlineConfiguration,
 )
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -45,7 +46,6 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 
 
 @ddt.ddt
@@ -477,7 +477,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         assert block.link == f'{configuration.basket_checkout_page}?sku={sku}'
 
     ## CertificateAvailableDate
-    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
+    @override_waffle_switch(AUTO_CERTIFICATE_GENERATION, True)
     def test_no_certificate_available_date(self):
         course = create_course_run(days_till_start=-1)
         user = create_user()
@@ -487,7 +487,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         assert not block.is_allowed
 
     ## CertificateAvailableDate
-    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
+    @override_waffle_switch(AUTO_CERTIFICATE_GENERATION, True)
     def test_no_certificate_available_date_for_self_paced(self):
         course = create_self_paced_course_run()
         verified_user = create_user()
@@ -521,7 +521,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         assert not block.is_allowed
         assert block.date is not None
 
-    @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
+    @override_waffle_switch(AUTO_CERTIFICATE_GENERATION, True)
     def test_certificate_available_date_defined(self):
         course = create_course_run()
         audit_user = create_user()

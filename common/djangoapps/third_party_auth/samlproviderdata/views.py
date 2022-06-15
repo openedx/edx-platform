@@ -2,6 +2,7 @@
     Viewset for auth/saml/v0/samlproviderdata
 """
 import logging
+from requests.exceptions import SSLError, MissingSchema
 
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -94,7 +95,7 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
         """
         return self.requested_enterprise_uuid
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['post', 'put'])
     def sync_provider_data(self, request):
         """
         Creates or updates a SAMProviderData record using info fetched from remote SAML metadata
@@ -110,7 +111,12 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
             return Response('metadata_url is required!', status.HTTP_400_BAD_REQUEST)
 
         # part 1: fetch information from remote metadata based on metadataUrl in samlproviderconfig
-        xml = fetch_metadata_xml(metadata_url)
+        try:
+            xml = fetch_metadata_xml(metadata_url)
+        except (SSLError, MissingSchema) as ex:
+            msg = f'Could not verify provider metadata url. Exc type: {type(ex).__name__}'
+            log.warning(msg)
+            return Response(msg, status.HTTP_406_NOT_ACCEPTABLE)
 
         # part 2: create/update samlproviderdata
         log.info("Processing IdP with entityID %s", entity_id)

@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_voucher_refundable, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
+<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, enrollments_fbe_is_on, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_voucher_refundable, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
 
 <%!
 import datetime
@@ -255,11 +255,11 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 % endif
 
                 ## We should only show the gear dropdown if the user is able to refund/unenroll from their entitlement
-                ## and/or if they have selected a course run and email_settings are enabled
+                ## and/or if they have selected a course run, unenrollment is not disabled, and email_settings are enabled
                 ## as these are the only actions currently available
                 % if entitlement and (can_refund_entitlement or show_email_settings):
                     <%include file='_dashboard_entitlement_actions.html' args='course_overview=course_overview,entitlement=entitlement,dashboard_index=dashboard_index, can_refund_entitlement=can_refund_entitlement, show_email_settings=show_email_settings'/>
-                % elif not entitlement:
+                % elif not entitlement and (can_unenroll or partner_managed_enrollment or show_email_settings):
                     <div class="wrapper-action-more" data-course-key="${enrollment.course_id}">
                       <button type="button" class="action action-more" id="actions-dropdown-link-${dashboard_index}" aria-haspopup="true" aria-expanded="false" aria-controls="actions-dropdown-${dashboard_index}" data-course-number="${course_overview.number}" data-course-name="${course_overview.display_name_with_default}" data-dashboard-index="${dashboard_index}">
                         <span class="sr">${_('Course options for')}</span>
@@ -382,6 +382,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                   <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 003.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" fill="currentColor"></path>
                 </svg>
                 <div class="message-copy" align="auto">
+                % if enrollment.course_id in enrollments_fbe_is_on:
                   ${Text(_("{start_bold}Get the most out of your course!{end_bold} Upgrade to get full access to the course material, unlock both graded and non-graded assignments, and earn a {link_start}verified certificate{link_end} to showcase on your resumé.")).format(
                           start_bold=HTML('<strong class="message-copy-bold">'),
                           end_bold=HTML('</strong>'),
@@ -389,9 +390,19 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                             marketing_link('WHAT_IS_VERIFIED_CERT'),
                             enrollment.course_id
                           ),
-                          link_end=HTML('</a>'),
-                          cert_name_long=cert_name_long
+                          link_end=HTML('</a>')
                         )}
+                % else:
+                  ${Text(_("{start_bold}Get the most out of your course!{end_bold} Upgrade to earn a {link_start}verified certificate{link_end} to showcase on your resumé.")).format(
+                          start_bold=HTML('<strong class="message-copy-bold">'),
+                          end_bold=HTML('</strong>'),
+                          link_start=HTML('<a href="{}" class="verified-info" data-course-key="{}">').format(
+                            marketing_link('WHAT_IS_VERIFIED_CERT'),
+                            enrollment.course_id
+                          ),
+                          link_end=HTML('</a>')
+                        )}
+                % endif
                 </div>
               </div>
               <div class="action-upgrade-container">

@@ -28,7 +28,6 @@ from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
 )
 from xmodule.xml_module import XmlMixin
@@ -41,7 +40,6 @@ _ = lambda text: text
 class PollBlock(
     MakoTemplateBlockBase,
     XmlMixin,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,

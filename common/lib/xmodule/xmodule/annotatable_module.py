@@ -19,7 +19,6 @@ from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
 )
 
@@ -35,7 +34,6 @@ class AnnotatableBlock(
     RawMixin,
     XmlMixin,
     EditingMixin,
-    XModuleDescriptorToXBlockMixin,
     XModuleToXBlockMixin,
     HTMLSnippet,
     ResourceTemplates,
