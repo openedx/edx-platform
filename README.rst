@@ -7,8 +7,9 @@ Installation
 
 Installing and running an Open edX instance is not simple.  We strongly
 recommend that you use a service provider to run the software for you.  They
-have free trials that make it easy to get started:
-https://openedx.org/get-started/
+have free trials that make it easy to `GET STARTED <https://openedx.org/get-started/>`_.
+
+
 
 If you will be modifying edx-platform code, the `Open edX Developer Stack`_ (Devstack) is
 a Docker-based development environment.
