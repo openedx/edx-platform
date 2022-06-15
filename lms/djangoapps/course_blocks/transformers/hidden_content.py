@@ -10,7 +10,7 @@ from pytz import utc
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from xmodule.seq_module import SequenceBlock  # lint-amnesty, pylint: disable=wrong-import-order
 
-from .utils import collect_merged_boolean_field
+from .utils import collect_merged_boolean_field, collect_merged_date_field
 
 MAXIMUM_DATE = utc.localize(datetime.max)
 
@@ -31,9 +31,10 @@ class HiddenContentTransformer(BlockStructureTransformer):
     IMPORTANT: Must be run _after_ the DateOverrideTransformer from edx-when
     in case the 'due' date on a block has been shifted for a user.
     """
-    WRITE_VERSION = 3
+    WRITE_VERSION = 4
     READ_VERSION = 3
     MERGED_HIDE_AFTER_DUE = 'merged_hide_after_due'
+    MERGED_END_DATE = 'merged_end_date'
 
     @classmethod
     def name(cls):
@@ -65,6 +66,13 @@ class HiddenContentTransformer(BlockStructureTransformer):
             transformer=cls,
             xblock_field_name='hide_after_due',
             merged_field_name=cls.MERGED_HIDE_AFTER_DUE,
+        )
+        collect_merged_date_field(
+            block_structure,
+            transformer=cls,
+            xblock_field_name='end',
+            merged_field_name=cls.MERGED_END_DATE,
+            default_date=MAXIMUM_DATE
         )
 
         block_structure.request_xblock_fields('self_paced', 'end', 'due')
