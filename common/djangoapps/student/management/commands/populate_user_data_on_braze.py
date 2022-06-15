@@ -106,7 +106,7 @@ class Command(BaseCommand):
             user_id__gte=batch_start_id,
             user_id__lt=batch_end_id,
             name=MARKETING_EMAIL_ATTRIBUTE_NAME,
-            value=True,
+            value__in=['True', 'true', '1'],
         ).values_list('user_id', flat=True).order_by('user_id')
         return set(use_read_replica_if_available(get_marketable_users_query))
 

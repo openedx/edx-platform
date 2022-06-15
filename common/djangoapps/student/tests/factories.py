@@ -121,7 +121,7 @@ class UserAttributeFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable
 
     user = factory.SubFactory(UserFactory)
     name = factory.Sequence('{}'.format)
-    value = True
+    value = factory.Sequence('{}'.format)
 
 
 class RequestFactoryNoCsrf(RequestFactory):
