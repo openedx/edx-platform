@@ -620,7 +620,16 @@ class LearnerThreadView(APIView):
         is_staff = has_permission(request.user, 'openclose_thread', course_key)
         is_community_ta = is_user_community_ta(request.user, course_key)
         threads = [prepare_content(thread, course_key, is_staff, is_community_ta) for thread in threads]
-        return Response(threads)
+        return Response({
+            "results": threads,
+            "pagination": {
+                "num_pages": num_pages,
+                "page": page,
+                "count": len(threads),
+                "next": page + 1 if page < num_pages else None,
+                "previous": None if page <= 1 else page - 1,
+            }
+        })
 
 
 @view_auth_classes()
