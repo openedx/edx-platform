@@ -63,14 +63,13 @@ def plugin_settings(settings):
     if settings.FEATURES.get('ENABLE_TIERS_APP', False):
         settings.TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
         settings.TIERS_EXPIRED_REDIRECT_URL = settings.ENV_TOKENS.get('TIERS_EXPIRED_REDIRECT_URL', None)
-        settings.TIERS_ORGANIZATION_TIER_GETTER_NAME = 'get_tier_for_org'
 
         settings.TIERS_DATABASE_URL = settings.AUTH_TOKENS.get('TIERS_DATABASE_URL')
         settings.DATABASES['tiers'] = dj_database_url.parse(settings.TIERS_DATABASE_URL, ssl_require=True)
         settings.DATABASE_ROUTERS.insert(0, 'openedx.core.djangoapps.appsembler.tahoe_tiers.db_routers.TiersDbRouter')
 
         settings.MIDDLEWARE += [
-            'tiers.middleware.TierMiddleware',
+            'openedx.core.djangoapps.appsembler.tahoe_tiers.middleware.TahoeTierMiddleware',
         ]
         settings.INSTALLED_APPS += [
             'tiers',

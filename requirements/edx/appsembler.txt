@@ -19,9 +19,8 @@ https://github.com/edx-solutions/xblock-google-drive/archive/589d9f51f9b.tar.gz 
 -e git+https://github.com/appsembler/edx-sga.git@821cf8c563c86d92630e57e2cae06ab1dfaeff09#egg=v0.11.0-appsembler2
 
 # Tahoe plugins and customizations
-django-tiers==0.2.4
+django-tiers==0.2.7
 fusionauth-client==1.36.0
 tahoe-sites==0.1.6
 tahoe-lti==0.3.0
 site-configuration-client==0.1.11
-

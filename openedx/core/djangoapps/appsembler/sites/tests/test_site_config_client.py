@@ -7,6 +7,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.test import RequestFactory
+from django.utils import timezone
 from mock import Mock
 
 from organizations.tests.factories import OrganizationFactory
@@ -18,8 +19,10 @@ from openedx.core.djangoapps.appsembler.sites import (
 )
 from openedx.core.djangoapps.appsembler.sites.site_config_client_helpers import (
     get_active_site_uuids_from_site_config_service,
+    get_current_configuration_adapter,
+    get_current_site_config_tier_info,
 )
-
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 User = get_user_model()
 
@@ -70,7 +73,7 @@ def test_get_configuration_adapter(site_with_org):
     site, org = site_with_org
     request = RequestFactory().get('/', data={'preview': 'true'})
     with patch('crum.get_current_request', return_value=request):
-        adapter = client_helpers.get_configuration_adapter(site)
+        adapter = client_helpers.init_site_configuration_adapter(site)
     assert adapter, 'Should return if client package is installed'
     assert adapter.site_uuid == org.edx_uuid, 'Should set the correct ID'
     assert adapter.status == 'draft', 'can be set to draft based on current request parameters'
@@ -80,7 +83,7 @@ def test_get_configuration_adapter(site_with_org):
 def test_get_configuration_adapter(site_with_org):
     site, org = site_with_org
 
-    adapter = client_helpers.get_configuration_adapter(site)
+    adapter = client_helpers.init_site_configuration_adapter(site)
     assert adapter, 'Should return if client package is installed'
     assert adapter.site_uuid == org.edx_uuid, 'Should set the correct ID'
     assert adapter.status == 'live', 'by default should be live status'
@@ -160,3 +163,49 @@ def test_get_active_site_uuids_from_site_config_service_error(settings, caplog):
     assert get_active_site_uuids_from_site_config_service() == [], 'Should return sane results'
     assert 'my exception message' in caplog.text
     assert 'An error occurred while fetching site config active sites' in caplog.text
+
+
+def test_get_current_configuration_adapter_no_site_config():
+    """
+    Ensure it works while get_current_site_configuration returning `None`.
+    """
+    with patch('openedx.core.djangoapps.appsembler.sites.site_config_client_helpers') as helpers:
+        helpers.get_current_site_configuration.return_value = None
+        assert get_current_configuration_adapter() is None
+
+
+@pytest.mark.django_db
+def test_get_current_configuration_adapter_with_site_config():
+    """
+    Needs get_current_site_configuration to return an instance.
+    """
+    with with_site_configuration_context() as site:
+        mock_api_adapter = Mock()
+        site.configuration.api_adapter = mock_api_adapter
+        assert get_current_configuration_adapter() == mock_api_adapter, "Return current site\'s api adapter"
+
+
+def test_get_current_site_config_tier_info_non_request():
+    """
+    Ensure `get_current_site_config_tier_info` works in non-request contexts.
+    """
+    assert not get_current_site_config_tier_info(), 'No tier info without a current site'
+
+
+@pytest.mark.django_db
+def test_get_current_site_config_tier_info():
+    """
+    Ensure `get_current_site_config_tier_info` works in the basic form.
+    """
+    mock_api_adapter = Mock()
+    mock_api_adapter.get_site_info.return_value = {
+        'always_active': True,
+        'subscription_ends': timezone.now(),  # The date doesn't matter because `always_active=True`
+        'tier': 'trial',
+    }
+    with with_site_configuration_context() as site:
+        site.configuration.api_adapter = mock_api_adapter
+        tier_info = get_current_site_config_tier_info()
+
+    assert not tier_info.has_subscription_ended(), 'Should return valid TierInfo object'
+

@@ -101,7 +101,7 @@ class SiteConfiguration(models.Model):
             site_config_client_helpers as site_helpers,
         )
         if site_helpers.is_enabled_for_site(site):
-            self.api_adapter = site_helpers.get_configuration_adapter(site)
+            self.api_adapter = site_helpers.init_site_configuration_adapter(site)
 
     @beeline.traced('site_config.get_value')
     def get_value(self, name, default=None):
