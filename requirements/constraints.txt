@@ -74,3 +74,5 @@ scipy<1.8.0
 # See issue: https://github.com/sphinx-contrib/openapi/issues/123
 mistune<2.0.0
 
+# breaking change on openedx-events==0.10.0
+openedx-events==0.9.1
