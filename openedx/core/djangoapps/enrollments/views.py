@@ -1066,7 +1066,7 @@ class LiveClassesListApiListView(DeveloperErrorViewMixin, ListAPIView):
 
 
     
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = ()
     throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = LiveClassesSerializer
     #ypagination_class = CourseEnrollmentsApiListPagination
