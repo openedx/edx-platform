@@ -166,6 +166,7 @@ class LibrarySourcedBlock(
             # to make edits to the children
             context['can_move'] = False
             context['selectable'] = True
+            context['can_collapse'] = True
             self.render_children(context, fragment, can_reorder=False, can_add=False)
             return fragment
         context['is_loading'] = is_loading
