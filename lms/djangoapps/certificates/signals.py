@@ -31,7 +31,7 @@ from openedx.core.djangoapps.signals.signals import (
 from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
-CERTIFICATE_DELAY_SECONDS = 0.5
+CERTIFICATE_DELAY_SECONDS = getattr(settings, 'CERTIFICATE_DELAY_SECONDS', 2)
 
 
 @receiver(COURSE_PACING_CHANGED, dispatch_uid="update_cert_settings_on_pacing_change")
