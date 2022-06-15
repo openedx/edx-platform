@@ -155,14 +155,10 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
             course_id=modulestore_course.id,
             user=cls.user
         )
-        with mock.patch(
-            'learner_pathway_progress.signals.get_learner_pathways_associated_with_course',
-            return_value=None
-        ):
-            EnterpriseCourseEnrollmentFactory(
-                course_id=modulestore_course.id,
-                enterprise_customer_user=enterprise_customer_user
-            )
+        EnterpriseCourseEnrollmentFactory(
+            course_id=modulestore_course.id,
+            enterprise_customer_user=enterprise_customer_user
+        )
 
         cls.program = ProgramFactory(
             uuid=cls.program_uuid,

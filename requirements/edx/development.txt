@@ -841,7 +841,7 @@ lazy-object-proxy==1.7.1
     # via
     #   -r requirements/edx/testing.txt
     #   astroid
-learner-pathway-progress==1.2.0
+learner-pathway-progress==1.0.1
     # via -r requirements/edx/testing.txt
 libsass==0.10.0
     # via
