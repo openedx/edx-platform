@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
--e git+https://github.com/openedx/blockstore.git@1.2.2#egg=blockstore==1.2.2
+-e git+https://github.com/openedx/blockstore.git@1.2.1#egg=blockstore==1.2.1
     # via -r requirements/edx/github.in
 -e common/lib/capa
     # via
@@ -275,7 +275,7 @@ django-crum==0.7.9
     #   edx-rbac
     #   edx-toggles
     #   super-csv
-django-environ==0.8.1
+django-environ==0.9.0
     # via blockstore
 django-fernet-fields==0.6
     # via
