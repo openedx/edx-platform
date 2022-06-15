@@ -912,7 +912,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
-openedx-events==0.10.0
+openedx-events==0.9.1
     # via -r requirements/edx/base.txt
 openedx-filters==0.7.0
     # via
