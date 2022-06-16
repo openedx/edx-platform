@@ -177,7 +177,7 @@ def add_profession_field(is_field_required=False):
 
 def add_specialty_field(is_field_required=False):
     """
-    Returns the user speciality field description
+    Returns the user specialty field description
     """
     # Translators: This label appears above a dropdown menu to select
     # the user's specialty
