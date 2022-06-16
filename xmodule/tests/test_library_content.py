@@ -4,16 +4,18 @@ Basic unit tests for LibraryContentBlock
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
 from unittest.mock import MagicMock, Mock, patch
-import ddt
 
+import ddt
 from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
 from lxml import etree
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from rest_framework import status
 from search.search_engine_base import SearchEngine
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
-from rest_framework import status
 
+from xmodule.capa_module import ProblemBlock
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
@@ -22,7 +24,6 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
-from xmodule.capa_module import ProblemBlock
 
 from .test_course_module import DummySystem as TestImportSystem
 
@@ -72,6 +73,32 @@ class LibraryContentTest(MixedSplitTestCase):
 
         module_system.get_module = get_module
         module.xmodule_runtime = module_system
+
+
+@ddt.ddt
+class LibraryContentGeneralTest(LibraryContentTest):
+    """
+    Test the base functionality of the LibraryContentBlock.
+    """
+
+    @ddt.data(
+        ('library-v1:ProblemX+PR0B', LibraryLocator),
+        ('lib:ORG:test-1', LibraryLocatorV2)
+    )
+    @ddt.unpack
+    def test_source_library_key(self, library_key, expected_locator_type):
+        """
+        Test the source_library_key property of the xblock.
+
+        The method should correctly work either with V1 or V2 libraries.
+        """
+        library = self.make_block(
+            "library_content",
+            self.vertical,
+            max_count=1,
+            source_library_id=library_key
+        )
+        assert isinstance(library.source_library_key, expected_locator_type)
 
 
 class TestLibraryContentExportImport(LibraryContentTest):

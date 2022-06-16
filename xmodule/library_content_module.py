@@ -8,37 +8,36 @@ import logging
 import random
 from copy import copy
 from gettext import ngettext
-from rest_framework import status
 
 import bleach
+from capa.responsetypes import registry
 from django.conf import settings
 from django.utils.functional import classproperty
 from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from pkg_resources import resource_string
+from rest_framework import status
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
-from xblock.fields import Integer, List, Scope, String, Boolean
-
-from xmodule.capa.responsetypes import registry
+from xblock.fields import Boolean, Integer, List, Scope, String
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.xml_module import XmlMixin
 from xmodule.x_module import (
+    STUDENT_VIEW,
     HTMLSnippet,
     ResourceTemplates,
-    shim_xmodule_js,
-    STUDENT_VIEW,
     XModuleMixin,
     XModuleToXBlockMixin,
+    shim_xmodule_js,
 )
-
+from xmodule.xml_module import XmlMixin
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -189,9 +188,14 @@ class LibraryContentBlock(
     @property
     def source_library_key(self):
         """
-        Convenience method to get the library ID as a LibraryLocator and not just a string
+        Convenience method to get the library ID as a LibraryLocator and not just a string.
+
+        Supports either library v1 or library v2 locators.
         """
-        return LibraryLocator.from_string(self.source_library_id)
+        try:
+            return LibraryLocator.from_string(self.source_library_id)
+        except InvalidKeyError:
+            return LibraryLocatorV2.from_string(self.source_library_id)
 
     @classmethod
     def make_selection(cls, selected, children, max_count, mode):
