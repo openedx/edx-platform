@@ -26,12 +26,12 @@ def test_quality_matrix_is_complete():
     """
     This test should fail if a new python directory/file is added in code but quality checks don't cover it
     """
-    quality_ci_yml = f'{os.getcwd()}/.github/workflows/pylint-checks.yml'
+    quality_ci_yml = f'{os.getcwd()}/.github/workflows/pylint.yml'
     with open(quality_ci_yml) as fp:
         quality_yaml = yaml.safe_load(fp)
 
         matrix_dirs = []
-        for matrix_item in quality_yaml['jobs']['run_pylint']['strategy']['matrix']['include']:
+        for matrix_item in quality_yaml['jobs']['pylint']['strategy']['matrix']['include']:
             matrix_dirs.extend(matrix_item['path'].split(' '))
 
         for module in ['lms', 'lms/djangoapps', 'openedx', 'openedx/core', 'openedx/core/djangoapps']:

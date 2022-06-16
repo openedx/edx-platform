@@ -1,4 +1,4 @@
-name: unit-tests
+name: Tests
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - master
 
 jobs:
-  run-tests:
+  pytest:
     if: github.repository == 'openedx/edx-platform' || github.repository == 'edx/edx-platform-private'
     runs-on: [ edx-platform-runner ]
     strategy:
@@ -19,24 +19,24 @@ jobs:
         shard_name: [
             "lms-1",
             "lms-2",
-            "lms-3",
+            "lms-3-courseware",
             "lms-4",
             "lms-5",
             "lms-6",
-            "openedx-1",
-            "openedx-2",
-            "openedx-3",
-            "openedx-4",
-            "cms-1",
-            "cms-2",
-            "common-1",
-            "common-2",
-            "common-3",
-            "xmodule-1"
+            "openedx-1-lms",
+            "openedx-2-lms",
+            "openedx-1-cms",
+            "openedx-2-cms",
+            "cms-other",
+            "cms-contentstore",
+            "common-djangoapps-lms",
+            "common-lib-lms",
+            "common-djangoapps-cms",
+            "xmodule-lms",
         ]
 
 
-    name: python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
+    name: pytest ${{ matrix.shard_name }} (python=${{ matrix.python-version }}, django=${{ matrix.django-version }})
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
@@ -78,7 +78,7 @@ jobs:
 
   compile-warnings-report:
     runs-on: [ edx-platform-runner ]
-    needs: [ run-tests ]
+    needs: [ pytest ]
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*

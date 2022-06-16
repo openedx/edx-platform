@@ -4,7 +4,7 @@ import sys
 
 
 def get_all_unit_test_shards():
-    unit_tests_json = '.github/workflows/unit-test-shards.json'
+    unit_tests_json = '.github/workflows/pytest-shards.json'
     with open(unit_tests_json) as file:
         unit_test_workflow_shards = json.load(file)
 

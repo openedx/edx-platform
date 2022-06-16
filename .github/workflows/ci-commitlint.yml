@@ -1,6 +1,6 @@
 # Run commitlint on the commit messages in a pull request.
 
-name: Lint Commit Messages
+name: Commit Linting
 
 on:
   - pull_request

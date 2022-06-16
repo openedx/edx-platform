@@ -1,4 +1,4 @@
-name: Pylint checks
+name: Quality
 
 on:
   pull_request:
@@ -8,7 +8,8 @@ on:
       - open-release/lilac.master
 
 jobs:
-  run_pylint:
+
+  pylint:
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
@@ -28,7 +29,6 @@ jobs:
             path: "cms"
           - module-name: xmodule
             path: "xmodule"
-
 
     name: pylint ${{ matrix.module-name }}
     steps:
@@ -66,3 +66,152 @@ jobs:
     - name: Run Quality Tests
       run: |
         pylint  ${{ matrix.path }}
+
+  check-types:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ['3.8']
+        os: ['ubuntu-20.04']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install system requirements
+        run: sudo apt update && sudo apt install -y libxmlsec1-dev
+
+      - name: Install pip
+        run: python -m pip install -r requirements/pip.txt
+
+      - name: Get pip cache dir
+        id: pip-cache-dir
+        run: echo "::set-output name=dir::$(pip cache dir)"
+
+      - name: Cache pip dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Install python dependencies
+        run: pip install -r requirements/edx/development.txt
+
+      - name: Static code analysis
+        run: make check-types
+
+  check-misc-quality:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+        python-version: [ 3.8 ]
+        node-version: [ 16 ]
+        
+    steps:
+
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+
+    - name: Fetch base branch for comparison
+      run: git fetch --depth=1 origin ${{ github.base_ref }}
+
+    - name: Install Required System Packages
+      run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Setup npm
+      run: npm i -g npm@8.5.x
+
+    - name: Get pip cache dir
+      id: pip-cache-dir
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+
+    - name: Cache pip dependencies
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/testing.txt') }}
+        restore-keys: ${{ runner.os }}-pip-
+
+    - name: Install Required Python Dependencies
+      env:
+        PIP_SRC_DIR: ${{ runner.temp }}
+      run: |
+        pip install -r requirements/pip.txt
+        pip install -r requirements/edx/testing.txt -r requirements/edx/django.txt --src $PIP_SRC_DIR
+
+    - name: Run Quality Tests
+      env:
+        TEST_SUITE: quality
+        SCRIPT_TO_RUN: ./scripts/generic-ci-tests.sh
+        SHARD: 4
+        PIP_SRC_DIR: ${{ runner.temp }}
+        TARGET_BRANCH: ${{ github.base_ref }}
+      run: |
+        ./scripts/all-tests.sh
+
+    - name: Save Job Artifacts
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: Build-Artifacts
+        path: |
+          **/reports/**/*
+          test_root/log/**/*.log
+          *.log
+
+  verify-dunder-init-files:
+
+    runs-on: ubuntu-20.04
+
+    steps:
+
+    - name: Check out branch
+      uses: actions/checkout@v2
+
+    - name: Ensure git is installed
+      run: |
+        sudo apt-get update && sudo apt-get install git
+
+    - name: Verify __init__.py files exist
+      run: |
+        scripts/verify-dunder-init.sh
+
+  verify-unit-test-count:
+
+    runs-on: ubuntu-20.04
+    steps:
+      - name: sync directory owner
+        run: sudo chown runner:runner -R .*
+
+      - uses: actions/checkout@v2
+      - name: install requirements
+        run: |
+          sudo pip install -r requirements/pip.txt
+          sudo pip install -r requirements/edx/testing.txt
+
+      - name: verify unit tests count
+        uses: ./.github/actions/verify-tests-count
+
+  verify-package-lock-version:
+
+    uses: edx/.github/.github/workflows/lockfileversion-check.yml@master

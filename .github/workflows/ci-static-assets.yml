@@ -1,4 +1,4 @@
-name: static assets check for lms and cms
+name: Static Assets
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - master
 
 jobs:
-  static_assets_check:
+  check-update-assets:
     name: static-assets-check
     runs-on: ${{ matrix.os }}
     strategy:
