@@ -115,5 +115,5 @@ def _listen_for_user_email_changed(sender, user, **kwargs):
         braze_client = get_braze_client()
         if braze_client:
             braze_client.track_user(attributes=attributes)
-    except Exception:   # pylint: disable=broad-except
-        logger.warning(f'Unable to sync new email [{email}] with Braze for user [{user_id}]')
+    except Exception as exc:   # pylint: disable=broad-except
+        logger.warning(f'Unable to sync new email [{email}] with Braze for user [{user_id}]: {str(exc)}')
