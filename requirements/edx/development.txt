@@ -82,7 +82,7 @@ attrs==21.4.0
     #   jsonschema
     #   openedx-events
     #   pytest
-babel==2.10.2
+babel==2.10.3
     # via
     #   -r requirements/edx/testing.txt
     #   enmerkar
@@ -137,7 +137,7 @@ celery==5.2.7
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-certifi==2022.5.18.1
+certifi==2022.6.15
     # via
     #   -r requirements/edx/testing.txt
     #   elasticsearch
@@ -366,7 +366,7 @@ django-crum==0.7.9
     #   super-csv
 django-debug-toolbar==3.4.0
     # via -r requirements/edx/development.in
-django-environ==0.8.1
+django-environ==0.9.0
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
@@ -755,7 +755,7 @@ importlib-metadata==4.11.4
     #   markdown
     #   pytest-randomly
     #   sphinx
-importlib-resources==5.7.1
+importlib-resources==5.8.0
     # via jsonschema
 inflection==0.5.1
     # via
