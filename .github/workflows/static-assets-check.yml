@@ -62,4 +62,4 @@ jobs:
     - name: Run Tests
       run: |
         echo "Running the CMS migrations."
-        paver update_assets cms --settings=bok_choy
+        paver update_assets --settings=devstack_docker
