@@ -55,6 +55,10 @@ jobs:
     - name: Setup npm
       run: npm i -g npm@8.5.x
 
+    - name: Initiate Services
+      run: |
+        sudo systemctl start mongod
+
     - name: Run Tests
       run: |
         echo "Running the CMS migrations."
