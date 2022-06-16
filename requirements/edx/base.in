@@ -109,6 +109,7 @@ ipaddress                           # Ip network support for Embargo feature
 jsonfield                           # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 lxml                                # XML parser
+learner-pathway-progress==1.0.1     # A plugin for lms to track learners progress in pathays
 lti-consumer-xblock>=4.1.1
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako                                # Primary template language used for server-side page rendering

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-03 17:28+0000\n"
-"PO-Revision-Date: 2022-06-03 17:28:01.509197\n"
+"POT-Creation-Date: 2022-06-13 20:01+0000\n"
+"PO-Revision-Date: 2022-06-13 20:01:05.089992\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -48,6 +48,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/item.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
+msgstr "Ŧǝxʇ"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -61,11 +68,6 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Đᴉsɔnssᴉøn"
-
-#: cms/djangoapps/contentstore/views/component.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
-msgstr "Ŧǝxʇ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -2139,6 +2141,7 @@ msgid "Whether to force the save button to appear on the page"
 msgstr "Wɥǝʇɥǝɹ ʇø ɟøɹɔǝ ʇɥǝ sɐʌǝ bnʇʇøn ʇø ɐddǝɐɹ øn ʇɥǝ dɐƃǝ"
 
 #: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Show Reset Button"
 msgstr "Sɥøʍ Ɍǝsǝʇ Ƀnʇʇøn"
 
@@ -2929,25 +2932,6 @@ msgid "Enter the names of the advanced modules to use in your course."
 msgstr "Ɇnʇǝɹ ʇɥǝ nɐɯǝs øɟ ʇɥǝ ɐdʌɐnɔǝd ɯødnlǝs ʇø nsǝ ᴉn ʎønɹ ɔønɹsǝ."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Home Sidebar Name"
-msgstr "Ȼønɹsǝ Ħøɯǝ Sᴉdǝbɐɹ Nɐɯǝ"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the heading that you want students to see above your course handouts "
-"on the Course Home page. Your course handouts appear in the right panel of "
-"the page."
-msgstr ""
-"Ɇnʇǝɹ ʇɥǝ ɥǝɐdᴉnƃ ʇɥɐʇ ʎøn ʍɐnʇ sʇndǝnʇs ʇø sǝǝ ɐbøʌǝ ʎønɹ ɔønɹsǝ ɥɐndønʇs "
-"øn ʇɥǝ Ȼønɹsǝ Ħøɯǝ dɐƃǝ. Ɏønɹ ɔønɹsǝ ɥɐndønʇs ɐddǝɐɹ ᴉn ʇɥǝ ɹᴉƃɥʇ dɐnǝl øɟ "
-"ʇɥǝ dɐƃǝ."
-
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/templates/courseware/info.html
-msgid "Course Handouts"
-msgstr "Ȼønɹsǝ Ħɐndønʇs"
-
-#: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
@@ -3695,6 +3679,14 @@ msgid ""
 msgstr ""
 "Ȼɥøøsǝ ɐ dɹøblǝɯ ʇʎdǝ ʇø ɟǝʇɔɥ ɟɹøɯ ʇɥǝ lᴉbɹɐɹʎ. Ɨɟ \"Ⱥnʎ Ŧʎdǝ\" ᴉs sǝlǝɔʇǝd"
 " nø ɟᴉlʇǝɹᴉnƃ ᴉs ɐddlᴉǝd."
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid ""
+"Determines whether a 'Reset Problems' button is shown, so users may reset "
+"their answers and reshuffle selected items."
+msgstr ""
+"Đǝʇǝɹɯᴉnǝs ʍɥǝʇɥǝɹ ɐ 'Ɍǝsǝʇ Ᵽɹøblǝɯs' bnʇʇøn ᴉs sɥøʍn, sø nsǝɹs ɯɐʎ ɹǝsǝʇ "
+"ʇɥǝᴉɹ ɐnsʍǝɹs ɐnd ɹǝsɥnɟɟlǝ sǝlǝɔʇǝd ᴉʇǝɯs."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
@@ -4520,11 +4512,6 @@ msgstr "Ŧɥᴉs ɔønʇǝnʇ ǝxdǝɹᴉɯǝnʇ ɥɐs ᴉssnǝs ʇɥɐʇ ɐɟɟ
 #: common/lib/xmodule/xmodule/tabs.py
 msgid "External Discussion"
 msgstr "Ɇxʇǝɹnɐl Đᴉsɔnssᴉøn"
-
-#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
-#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
-msgid "Home"
-msgstr "Ħøɯǝ"
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/courseware/views/views.py
@@ -9001,13 +8988,13 @@ msgid "You have signed out."
 msgstr "Ɏøn ɥɐʌǝ sᴉƃnǝd ønʇ."
 
 #: lms/templates/logout.html
-#, python-brace-format
+#, python-format, python-brace-format
 msgid ""
-"{start_anchor}Click here{end_anchor} to delete your single signed on (SSO) "
-"session."
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}Click here{end_anchor} to "
+"delete your single signed on (SSO) session."
 msgstr ""
-"{start_anchor}Ȼlᴉɔʞ ɥǝɹǝ{end_anchor} ʇø dǝlǝʇǝ ʎønɹ sᴉnƃlǝ sᴉƃnǝd øn (SSØ) "
-"sǝssᴉøn."
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}Ȼlᴉɔʞ ɥǝɹǝ{end_anchor} ʇø "
+"dǝlǝʇǝ ʎønɹ sᴉnƃlǝ sᴉƃnǝd øn (SSØ) sǝssᴉøn."
 
 #: lms/templates/logout.html
 msgid "We are signing you in."
@@ -9024,13 +9011,15 @@ msgstr ""
 "                "
 
 #: lms/templates/logout.html
-#, python-brace-format
+#, python-format, python-brace-format
 msgid ""
-"If you are not redirected within 5 seconds, {start_anchor}click here to go "
-"to the home page{end_anchor}."
+"If you are not redirected within 5 seconds, "
+"{start_anchor}%(target)s{middle_anchor}click here to go to the home "
+"page{end_anchor}."
 msgstr ""
-"Ɨɟ ʎøn ɐɹǝ nøʇ ɹǝdᴉɹǝɔʇǝd ʍᴉʇɥᴉn 5 sǝɔønds, {start_anchor}ɔlᴉɔʞ ɥǝɹǝ ʇø ƃø "
-"ʇø ʇɥǝ ɥøɯǝ dɐƃǝ{end_anchor}."
+"Ɨɟ ʎøn ɐɹǝ nøʇ ɹǝdᴉɹǝɔʇǝd ʍᴉʇɥᴉn 5 sǝɔønds, "
+"{start_anchor}%(target)s{middle_anchor}ɔlᴉɔʞ ɥǝɹǝ ʇø ƃø ʇø ʇɥǝ ɥøɯǝ "
+"dɐƃǝ{end_anchor}."
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -11182,10 +11171,6 @@ msgstr "Ʉdƃɹɐdǝ ʇø ǝɐɹn ɐ ʌǝɹᴉɟᴉǝd ɔǝɹʇᴉɟᴉɔɐʇǝ 
 msgid "Upgrade to earn a verified certificate in %(first_course_name)s"
 msgstr "Ʉdƃɹɐdǝ ʇø ǝɐɹn ɐ ʌǝɹᴉɟᴉǝd ɔǝɹʇᴉɟᴉɔɐʇǝ ᴉn %(first_course_name)s"
 
-#: openedx/core/djangoapps/self_paced/models.py
-msgid "Enable course home page improvements."
-msgstr "Ɇnɐblǝ ɔønɹsǝ ɥøɯǝ dɐƃǝ ᴉɯdɹøʌǝɯǝnʇs."
-
 #: openedx/core/djangoapps/theming/views.py
 #, python-brace-format
 msgid "Site theme changed to {site_theme}"
@@ -12440,6 +12425,10 @@ msgid ""
 msgstr ""
 "Ɨɟ ʎøn ɥɐʌǝ ɔønɔǝɹns ɐbønʇ sɥɐɹᴉnƃ ʎønɹ dɐʇɐ, dlǝɐsǝ ɔønʇɐɔʇ ʎønɹ "
 "ɐdɯᴉnᴉsʇɹɐʇøɹ ɐʇ {enterprise_customer_name}."
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Home"
+msgstr "Ħøɯǝ"
 
 #: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
 msgid "Enterprise Course Enrollments"
@@ -14647,6 +14636,10 @@ msgstr "Đnǝ {date}"
 msgid "Past due"
 msgstr "Ᵽɐsʇ dnǝ"
 
+#: lms/templates/vert_module.html
+msgid "Reset Problems"
+msgstr "Ɍǝsǝʇ Ᵽɹøblǝɯs"
+
 #: lms/templates/video.html
 msgid "Loading video player"
 msgstr "Łøɐdᴉnƃ ʌᴉdǝø dlɐʎǝɹ"
@@ -16631,51 +16624,6 @@ msgstr "øɟ"
 msgid "next page"
 msgstr "nǝxʇ dɐƃǝ"
 
-#: lms/templates/courseware/info.html
-msgid "{course_number} Course Info"
-msgstr "{course_number} Ȼønɹsǝ Ɨnɟø"
-
-#: lms/templates/courseware/info.html
-msgid "You are not enrolled yet"
-msgstr "Ɏøn ɐɹǝ nøʇ ǝnɹøllǝd ʎǝʇ"
-
-#: lms/templates/courseware/info.html
-msgid ""
-"You are not currently enrolled in this course. {link_start}Enroll "
-"now!{link_end}"
-msgstr ""
-"Ɏøn ɐɹǝ nøʇ ɔnɹɹǝnʇlʎ ǝnɹøllǝd ᴉn ʇɥᴉs ɔønɹsǝ. {link_start}Ɇnɹøll "
-"nøʍ!{link_end}"
-
-#: lms/templates/courseware/info.html
-msgid "Welcome to {org}'s {course_title}!"
-msgstr "Wǝlɔøɯǝ ʇø {org}'s {course_title}!"
-
-#: lms/templates/courseware/info.html
-msgid "Welcome to {course_title}!"
-msgstr "Wǝlɔøɯǝ ʇø {course_title}!"
-
-#: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "Resume Course"
-msgstr "Ɍǝsnɯǝ Ȼønɹsǝ"
-
-#: lms/templates/courseware/info.html
-msgid "View Updates in Studio"
-msgstr "Vᴉǝʍ Ʉddɐʇǝs ᴉn Sʇndᴉø"
-
-#: lms/templates/courseware/info.html
-msgid "Course Updates and News"
-msgstr "Ȼønɹsǝ Ʉddɐʇǝs ɐnd Nǝʍs"
-
-#: lms/templates/courseware/info.html
-msgid "Handout Navigation"
-msgstr "Ħɐndønʇ Nɐʌᴉƃɐʇᴉøn"
-
-#: lms/templates/courseware/info.html
-msgid "Course Tools"
-msgstr "Ȼønɹsǝ Ŧøøls"
-
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "Nǝʍs - MƗŦx 6.002x"
@@ -16815,10 +16763,6 @@ msgstr "Vᴉǝʍ Ȼǝɹʇᴉɟᴉɔɐʇǝ"
 #: lms/templates/courseware/progress.html
 msgid "Opens in a new browser window"
 msgstr "Ødǝns ᴉn ɐ nǝʍ bɹøʍsǝɹ ʍᴉndøʍ"
-
-#: lms/templates/courseware/progress.html
-msgid "Download Your Certificate"
-msgstr "Đøʍnløɐd Ɏønɹ Ȼǝɹʇᴉɟᴉɔɐʇǝ"
 
 #: lms/templates/courseware/progress.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -17090,22 +17034,6 @@ msgid "View my {cert_name_short}"
 msgstr "Vᴉǝʍ ɯʎ {cert_name_short}"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "This link will open/download a PDF document"
-msgstr "Ŧɥᴉs lᴉnʞ ʍᴉll ødǝn/døʍnløɐd ɐ ⱣĐF døɔnɯǝnʇ"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download my {cert_name_short}"
-msgstr "Đøʍnløɐd ɯʎ {cert_name_short}"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"This link will open/download a PDF document of your verified "
-"{cert_name_long}."
-msgstr ""
-"Ŧɥᴉs lᴉnʞ ʍᴉll ødǝn/døʍnløɐd ɐ ⱣĐF døɔnɯǝnʇ øɟ ʎønɹ ʌǝɹᴉɟᴉǝd "
-"{cert_name_long}."
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
 msgstr "Ȼøɯdlǝʇǝ ønɹ ɔønɹsǝ ɟǝǝdbɐɔʞ snɹʌǝʎ"
 
@@ -17258,6 +17186,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
 msgstr "Ʉdƃɹɐdǝ"
+
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "Resume Course"
+msgstr "Ɍǝsnɯǝ Ȼønɹsǝ"
 
 #. Translators: provider_name is the name of a credit provider or university
 #. (e.g. State University)

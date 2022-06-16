@@ -63,7 +63,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-29 20:43+0000\n"
+"POT-Creation-Date: 2022-06-12 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Myagmarjav Enkhbileg <miigaa.lucky@gmail.com>, 2018\n"
 "Language-Team: Mongolian (http://www.transifex.com/open-edx/edx-platform/language/mn/)\n"
@@ -2479,7 +2479,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
-msgstr "Дэлгэрэнгүй"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "the more quickly and helpfully we can respond!"
@@ -5463,15 +5463,15 @@ msgstr "Файл хуулахад алдаа гарлаа."
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr "Байгууллага:"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr "Хичээлийн дугаар:"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr "Хичээлийн хугацаа:"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
@@ -5481,10 +5481,9 @@ msgstr ""
 msgid "Re-run Course"
 msgstr ""
 
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
-msgstr "LMS-д үзэх"
+msgstr "LMS-д харах"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."

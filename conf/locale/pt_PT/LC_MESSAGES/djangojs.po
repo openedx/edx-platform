@@ -111,7 +111,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-29 20:43+0000\n"
+"POT-Creation-Date: 2022-06-12 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Nika Shahidian, 2022\n"
 "Language-Team: Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/)\n"
@@ -371,11 +371,11 @@ msgstr "A atualizar com o conteúdo mais recente"
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
 msgid "Loading..."
-msgstr "Carregando..."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
 msgid "Selected blocks"
-msgstr "Blocos selecionados"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Unable to update settings"
@@ -2100,7 +2100,7 @@ msgstr "Subir"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Browsing"
-msgstr "Navegação"
+msgstr ""
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
@@ -2678,19 +2678,19 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
-msgstr "Detalhes"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "the more quickly and helpfully we can respond!"
-msgstr "O mais rápido e útil que conseguimos responder!"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
-msgstr "Criar Pedido de Apoio"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr "Em que podemos ajudá-lo, {username}?"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2698,7 +2698,7 @@ msgstr "Autentique-se na {platform} para que o possamos ajudar."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Need help logging in?"
-msgstr "Precisa de ajuda para iniciar sessão?"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -3624,54 +3624,47 @@ msgstr "Ajude a tornar o edX melhor para todos!"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Why does edX collect this information?"
-msgstr "Por que é que a edX recolhe estas informações?"
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "An error occurred while attempting to retrieve or save the information "
 "below. Please try again later."
 msgstr ""
-"Ocorreu um erro ao tentar recuperar ou salvar as informações abaixo. Por "
-"favor, tente novamente mais tarde."
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What was the total combined income, during the last 12 months, of all "
 "members of your family? "
 msgstr ""
-"Qual foi o rendimento total combinado, de todos os seus membros da sua "
-"família, durante os últimos 12 meses? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
 "National Guard?"
 msgstr ""
-"Já serviu, em ativo, nas Forças Armadas, Reservas ou Guarda Nacional dos "
-"EUA?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What is the highest level of education that you have achieved so far?"
-msgstr "Qual o nível mais alto de educação que atingiu até agora?"
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What is the highest level of education that any of your parents or guardians"
 " have achieved?"
 msgstr ""
-"Qual o nível mais alto de educação que um dos seus pais ou tutores atingiu?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select employment status"
-msgstr "Selecione o estatuto profissional."
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you currently work in?"
-msgstr "Em que sector trabalha atualmente?"
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you want to work in?"
-msgstr "Em que sector pretende trabalhar?"
+msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -3687,19 +3680,19 @@ msgstr "fechar questionário"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "finish later"
-msgstr "terminar mais tarde"
+msgstr ""
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Return to my dashboard"
-msgstr "Voltar ao meu painel"
+msgstr ""
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Finish later"
-msgstr "Terminar mais tarde"
+msgstr ""
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "next page"
-msgstr "página seguinte"
+msgstr ""
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -6052,28 +6045,27 @@ msgstr "Ocorreu um erro com o carregamento"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr "Organização:"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr "Número do Curso:"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr "Curso de Formação:"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr "(Só leitura)"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
-msgstr "Reexecutar Curso"
+msgstr ""
 
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
-msgstr "Ver em directo"
+msgstr "Visualizar ao vivo"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."

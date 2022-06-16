@@ -50,7 +50,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-29 20:43+0000\n"
+"POT-Creation-Date: 2022-06-12 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>, 2017,2019-2020\n"
 "Language-Team: Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)\n"
@@ -2545,7 +2545,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
-msgstr "Xehetasunak"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "the more quickly and helpfully we can respond!"
@@ -2557,7 +2557,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr "Zertan lagundu ahal dizugu, {username}?"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2565,7 +2565,7 @@ msgstr "Hasi saioa {platform} plataforman laguntza hobea eman ahal izateko."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Need help logging in?"
-msgstr "Laguntza behar duzu saioa hasteko?"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -3467,7 +3467,7 @@ msgstr ""
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "next page"
-msgstr "hurrengo orria"
+msgstr ""
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -5575,25 +5575,24 @@ msgstr "Errorea gertatu da igotzean"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr "Erakundea:"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr "Ikastaro-zenbakia"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr "Ikastaroa ematea:"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr "(Irakurtzekoa baino ez)"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
-msgstr "Errepikatu ikastaroa"
+msgstr ""
 
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Ikusi zuzenean"

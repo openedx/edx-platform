@@ -125,7 +125,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-29 20:43+0000\n"
+"POT-Creation-Date: 2022-06-12 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2021\n"
 "Language-Team: Italian (Italy) (https://www.transifex.com/open-edx/teams/6205/it_IT/)\n"
@@ -2322,6 +2322,7 @@ msgstr ""
 "pagina"
 
 #: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Show Reset Button"
 msgstr "Mostra il pulsante di reset"
 
@@ -3935,6 +3936,12 @@ msgid ""
 msgstr ""
 "Scegliere un tipo di problema da prendere dalla libreria. Se \"Any Type\" è "
 "selezionato, nessun filtro viene applicato."
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid ""
+"Determines whether a 'Reset Problems' button is shown, so users may reset "
+"their answers and reshuffle selected items."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
@@ -7007,19 +7014,6 @@ msgid "You've earned a certificate for this course."
 msgstr "Hai ottenuto un certificato per questo corso."
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Certificate unavailable"
-msgstr "Certificato non disponibile"
-
-#: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
-msgid ""
-"You have not received a certificate because you do not have a current "
-"{platform_name} verified identity."
-msgstr ""
-"Non è stato ricevuto un certificato perché non si dispone di un'identità "
-"verificata {platform_name} corrente."
-
-#: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate will be available soon!"
 msgstr "Il tuo certificato sarà presto disponibile!"
 
@@ -7034,6 +7028,19 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate is available"
 msgstr "Il tuo certificato è disponibile"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Certificate unavailable"
+msgstr "Certificato non disponibile"
+
+#: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity."
+msgstr ""
+"Non è stato ricevuto un certificato perché non si dispone di un'identità "
+"verificata {platform_name} corrente."
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
@@ -7192,14 +7199,21 @@ msgid "Good"
 msgstr "Buono"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 #, python-format
-msgid "%(course_name)s: Reported content awaits review"
+msgid ""
+"\n"
+"                        %(course_name)s: Reported content awaits review\n"
+"                    "
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 msgid "Go to Discussion"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
+#, python-format
+msgid "%(course_name)s: Reported content awaits review"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/subject.txt
@@ -9324,13 +9338,11 @@ msgid "You have signed out."
 msgstr "Ti sei disconnesso."
 
 #: lms/templates/logout.html
-#, python-brace-format
+#, python-format, python-brace-format
 msgid ""
-"{start_anchor}Click here{end_anchor} to delete your single signed on (SSO) "
-"session."
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}Click here{end_anchor} to "
+"delete your single signed on (SSO) session."
 msgstr ""
-"{start_anchor}Fare clic qui{end_anchor} per eliminare la propria sessione "
-"SSO (Single Signed On)."
 
 #: lms/templates/logout.html
 msgid "We are signing you in."
@@ -9347,13 +9359,12 @@ msgstr ""
 "                "
 
 #: lms/templates/logout.html
-#, python-brace-format
+#, python-format, python-brace-format
 msgid ""
-"If you are not redirected within 5 seconds, {start_anchor}click here to go "
-"to the home page{end_anchor}."
+"If you are not redirected within 5 seconds, "
+"{start_anchor}%(target)s{middle_anchor}click here to go to the home "
+"page{end_anchor}."
 msgstr ""
-"Se non si è reindirizzati in 5 secondi, {start_anchor}far clic qui per "
-"passare alla home page{end_anchor}."
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -11718,6 +11729,11 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr "Impossibile modificare il campo '{field_name}'."
 
+#: openedx/core/djangoapps/user_api/accounts/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Enter a valid name"
+msgstr ""
+
 #. Translators: This label appears above a field which allows the
 #. user to input the First Name
 #. Translators: This label appears above a field on the registration form
@@ -12222,10 +12238,6 @@ msgstr "L'access_token fornito non è valido."
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Full Name cannot contain the following characters: < >"
 msgstr "Il nome non può contenere i seguenti caratteri: < >"
-
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "Enter a valid name"
-msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "A properly formatted e-mail is required"
@@ -15042,6 +15054,10 @@ msgstr "Scadenza {date}"
 msgid "Past due"
 msgstr "Scaduto "
 
+#: lms/templates/vert_module.html
+msgid "Reset Problems"
+msgstr ""
+
 #: lms/templates/video.html
 msgid "Loading video player"
 msgstr "Caricamento del riproduttore video"
@@ -16927,8 +16943,8 @@ msgid "Share with friends and family!"
 msgstr "Condividi con i tuoi amici!"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
-msgid "I just enrolled in {number} {title} through {account}: {url}"
-msgstr "Mi sono iscritto a {number} {title} tramite {account}: {url}"
+msgid "I just enrolled in {number} {title} through {account} {url}"
+msgstr ""
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {platform} {url}"
