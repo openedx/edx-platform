@@ -5,19 +5,27 @@ import hashlib
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator, LibraryUsageLocatorV2, BlockUsageLocator
+from opaque_keys.edx.locator import (
+    BlockUsageLocator,
+    LibraryLocator,
+    LibraryLocatorV2,
+    LibraryUsageLocator,
+    LibraryUsageLocatorV2,
+)
 from search.search_engine_base import SearchEngine
 from xblock.fields import Scope
-
-from openedx.core.djangoapps.content_libraries import api as library_api
-from openedx.core.djangoapps.xblock.api import load_block
-from openedx.core.lib import blockstore_api
-from common.djangoapps.student.auth import has_studio_write_access
 from xmodule.capa_module import ProblemBlock
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from common.djangoapps.student.auth import has_studio_write_access
+from openedx.core.djangoapps.content_libraries import api as library_api
+from openedx.core.djangoapps.content_libraries.models import ContentLibrary
+from openedx.core.djangoapps.xblock.api import load_block
+from openedx.core.lib import blockstore_api
 
 
 def normalize_key_for_search(library_key):
@@ -27,39 +35,63 @@ def normalize_key_for_search(library_key):
 
 class LibraryToolsService:
     """
-    Service that allows LibraryContentBlock to interact with libraries in the
-    modulestore.
+    Service for LibraryContentBlock and LibrarySourcedBlock.
+
+    Allows to interact with libraries in the modulestore and blockstore.
     """
     def __init__(self, modulestore, user_id):
         self.store = modulestore
         self.user_id = user_id
 
-    def _get_library(self, library_key):
+    def _get_library(self, library_key, is_v2_lib):
         """
-        Given a library key like "library-v1:ProblemX+PR0B", return the
-        'library' XBlock with meta-information about the library.
+        Helper method to get either V1 or V2 library.
 
-        A specific version may be specified.
+        Given a library key like "library-v1:ProblemX+PR0B" (V1) or "lib:RG:rg-1" (v2), return the 'library'.
+
+        is_v2_lib (bool) indicates which library storage should be requested:
+            True - blockstore (V2 library);
+            False - modulestore (V1 library).
 
         Returns None on error.
         """
-        if not isinstance(library_key, LibraryLocator):
-            library_key = LibraryLocator.from_string(library_key)
-
-        try:
-            return self.store.get_library(
-                library_key, remove_version=False, remove_branch=False, head_validation=False
-            )
-        except ItemNotFoundError:
-            return None
+        if is_v2_lib:
+            try:
+                return library_api.get_library(library_key)
+            except ContentLibrary.DoesNotExist:
+                return None
+        else:
+            try:
+                return self.store.get_library(
+                    library_key, remove_version=False, remove_branch=False, head_validation=False
+                )
+            except ItemNotFoundError:
+                return None
 
     def get_library_version(self, lib_key):
         """
-        Get the version (an ObjectID) of the given library.
-        Returns None if the library does not exist.
+        Get the version of the given library.
+
+        The return value (library version) could be:
+            ObjectID - for V1 library;
+            int      - for V2 library.
+            None     - if the library does not exist.
         """
-        library = self._get_library(lib_key)
+        if not isinstance(lib_key, (LibraryLocator, LibraryLocatorV2)):
+            try:
+                lib_key = LibraryLocator.from_string(lib_key)
+                is_v2_lib = False
+            except InvalidKeyError:
+                lib_key = LibraryLocatorV2.from_string(lib_key)
+                is_v2_lib = True
+        else:
+            is_v2_lib = isinstance(lib_key, LibraryLocatorV2)
+
+        library = self._get_library(lib_key, is_v2_lib)
+
         if library:
+            if is_v2_lib:
+                return library.version
             # We need to know the library's version so ensure it's set in library.location.library_key.version_guid
             assert library.location.library_key.version_guid is not None
             return library.location.library_key.version_guid
@@ -137,11 +169,13 @@ class LibraryToolsService:
 
     def update_children(self, dest_block, user_perms=None, version=None):
         """
-        This method is to be used when the library that a LibraryContentBlock
-        references has been updated. It will re-fetch all matching blocks from
-        the libraries, and copy them as children of dest_block. The children
-        will be given new block_ids, but the definition ID used should be the
-        exact same definition ID used in the library.
+        Update xBlock's children.
+
+        Re-fetch all matching blocks from the libraries, and copy them as children of dest_block.
+        The children will be given new block_ids.
+
+        NOTE: V1 libraies blocks definition ID should be the
+        exact same definition ID used in the copy block.
 
         This method will update dest_block's 'source_library_version' field to
         store the version number of the libraries used, so we easily determine
@@ -155,49 +189,69 @@ class LibraryToolsService:
             return
 
         source_blocks = []
+
         library_key = dest_block.source_library_key
-        if version:
+        is_v2_lib = isinstance(library_key, LibraryLocatorV2)
+
+        if version and not is_v2_lib:
             library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
-        library = self._get_library(library_key)
+
+        library = self._get_library(library_key, is_v2_lib)
         if library is None:
             raise ValueError(f"Requested library {library_key} not found.")
-        if user_perms and not user_perms.can_read(library_key):
-            raise PermissionDenied()
-        filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
-        if filter_children:
-            # Apply simple filtering based on CAPA problem types:
-            source_blocks.extend(self._problem_type_filter(library, dest_block.capa_type))
-        else:
-            source_blocks.extend(library.children)
 
-        with self.store.bulk_operations(dest_block.location.course_key):
-            dest_block.source_library_version = str(library.location.library_key.version_guid)
+        filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
+
+        if not is_v2_lib:
+            if user_perms and not user_perms.can_read(library_key):
+                raise PermissionDenied()
+            if filter_children:
+                # Apply simple filtering based on CAPA problem types:
+                source_blocks.extend(self._problem_type_filter(library, dest_block.capa_type))
+            else:
+                source_blocks.extend(library.children)
+
+            with self.store.bulk_operations(dest_block.location.course_key):
+                dest_block.source_library_version = str(library.location.library_key.version_guid)
+                self.store.update_item(dest_block, self.user_id)
+                head_validation = not version
+                dest_block.children = self.store.copy_from_template(
+                    source_blocks, dest_block.location, self.user_id, head_validation=head_validation
+                )
+                # ^-- copy_from_template updates the children in the DB
+                # but we must also set .children here to avoid overwriting the DB again
+        else:
+            # TODO: add filtering by capa_type when V2 library will support different problem types
+            source_blocks = library_api.get_library_blocks(library_key, block_types=None)
+            source_block_ids = [str(block.usage_key) for block in source_blocks]
+            dest_block.source_library_version = str(library.version)
             self.store.update_item(dest_block, self.user_id)
-            head_validation = not version
-            dest_block.children = self.store.copy_from_template(
-                source_blocks, dest_block.location, self.user_id, head_validation=head_validation
-            )
-            # ^-- copy_from_template updates the children in the DB
-            # but we must also set .children here to avoid overwriting the DB again
+            self.import_from_blockstore(dest_block, source_block_ids)
 
     def list_available_libraries(self):
         """
         List all known libraries.
-        Returns tuples of (LibraryLocator, display_name)
+
+        Collects V1 libraries along with V2.
+        Returns tuples of (library key, display_name).
         """
-        return [
+        user = User.objects.get(id=self.user_id)
+
+        v1_libs = [
             (lib.location.library_key.replace(version_guid=None, branch=None), lib.display_name)
             for lib in self.store.get_library_summaries()
         ]
+        v2_query = library_api.get_libraries_for_user(user)
+        v2_libs_with_meta = library_api.get_metadata_from_index(v2_query)
+        v2_libs = [(lib.key, lib.title) for lib in v2_libs_with_meta]
+
+        return v1_libs + v2_libs
 
     def import_from_blockstore(self, dest_block, blockstore_block_ids):
         """
         Imports a block from a blockstore-based learning context (usually a
         content library) into modulestore, as a new child of dest_block.
         Any existing children of dest_block are replaced.
-
-        This is only used by LibrarySourcedBlock. It should verify first that
-        the number of block IDs is reasonable.
         """
         dest_key = dest_block.scope_ids.usage_id
         if not isinstance(dest_key, BlockUsageLocator):
@@ -254,7 +308,7 @@ class LibraryToolsService:
         new_block_key = generate_block_key(source_key, dest_parent_key)
         try:
             new_block = self.store.get_item(new_block_key)
-            if new_block.parent != dest_parent_key:
+            if new_block.parent.block_id != dest_parent_key.block_id:
                 raise ValueError(
                     "Expected existing block {} to be a child of {} but instead it's a child of {}".format(
                         new_block_key, dest_parent_key, new_block.parent,
