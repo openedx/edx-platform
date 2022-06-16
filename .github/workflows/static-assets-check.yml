@@ -52,7 +52,7 @@ jobs:
         pip uninstall -y xmlsec
         pip install --no-binary xmlsec xmlsec
 
-     - name: Setup npm
+    - name: Setup npm
       run: npm i -g npm@8.5.x
 
     - name: Run Tests
