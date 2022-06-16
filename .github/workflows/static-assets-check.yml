@@ -63,4 +63,4 @@ jobs:
 
       run: |
         echo "Running the CMS migrations."
-        paver update_assets  lms --settings=test_static_optimized
+        paver update_assets --settings=test_static_optimized
