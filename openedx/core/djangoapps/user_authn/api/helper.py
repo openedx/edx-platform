@@ -99,6 +99,10 @@ class RegistrationFieldsContext(APIView):
             else:
                 field_handler = getattr(form_fields, f'add_{field}_field', None)
                 if field_handler:
-                    response[field] = field_handler(self.field_type == 'required')
+                    if field == 'confirm_email':
+                        if self.field_type == 'required':
+                            response[field] = field_handler(self.field_type == 'required')
+                    else:
+                        response[field] = field_handler(self.field_type == 'required')
 
         return response
