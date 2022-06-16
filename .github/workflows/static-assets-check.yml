@@ -65,4 +65,4 @@ jobs:
 
       run: |
         echo "Running the CMS migrations."
-        paver update_assets --settings=devstack_docker
+        paver update_assets  lms --settings=devstack_docker
