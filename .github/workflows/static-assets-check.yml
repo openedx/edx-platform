@@ -62,6 +62,7 @@ jobs:
     - name: Run Tests
       env:
         LMS_CFG: lms/envs/bok_choy.yml
+        STUDIO_CFG: cms/envs/bok_choy.yml
 
       run: |
         echo "Running the CMS migrations."
