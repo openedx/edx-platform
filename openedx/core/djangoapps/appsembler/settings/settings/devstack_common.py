@@ -35,6 +35,10 @@ def plugin_settings(settings):
 
     settings.CUSTOMER_THEMES_BACKEND_OPTIONS = {}
 
+    if settings.FEATURES.get('ENABLE_TIERS_APP'):
+        # Database in devstack has no SSL
+        settings.DATABASES['tiers']['OPTIONS']['sslmode'] = 'allow'
+
     # Those are usually hardcoded in devstack.py for some reason
     settings.LMS_BASE = settings.ENV_TOKENS.get('LMS_BASE')
     settings.LMS_ROOT_URL = settings.ENV_TOKENS.get('LMS_ROOT_URL')
