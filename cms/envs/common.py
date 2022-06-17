@@ -1629,7 +1629,7 @@ INSTALLED_APPS.extend(GENPLUS_INSTALLED_APPS)
 
 ######################### GENPLUS SETTINGS #################################
 
-GENPLUS_SOCIAL_AUTH_REDIRECT_URL = ''
+GENPLUS_FRONTEND_URL = ''
 
 ################# EDX MARKETING SITE ##################################
 

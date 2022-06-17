@@ -3159,7 +3159,7 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 
 ######################### GENPLUS SETTINGS #################################
 
-GENPLUS_SOCIAL_AUTH_REDIRECT_URL = '/'
+GENPLUS_FRONTEND_URL = '/'
 
 ######################### Django Rest Framework ########################
 

@@ -442,9 +442,9 @@ class CoursewareIndex(View):
             'section_title': None,
             'sequence_title': None,
             # 'disable_accordion': not DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
-            'disable_accordion': settings.DISABLE_ACCORDION, 
+            'disable_accordion': settings.DISABLE_ACCORDION,
             'show_search': show_search,
-            'genplus_social_auth_redirect_url': settings.GENPLUS_SOCIAL_AUTH_REDIRECT_URL + 'lessons/',
+            'genplus_social_auth_redirect_url': settings.GENPLUS_FRONTEND_URL + 'lessons/',
         }
         courseware_context.update(
             get_experiment_user_metadata_context(
