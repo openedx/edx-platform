@@ -70,4 +70,5 @@ jobs:
         LMS_CFG: lms/envs/bok_choy.yml
       run: |
         npm install
+        npm install -g rtlcss
         ./scripts/update-assets-dev.sh
