@@ -11,7 +11,7 @@ from common.djangoapps.student.models import UserAttribute
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
-MARKETING_EMAILS_OPT_IN = 'is_marketable'
+IS_MARKETABLE = 'is_marketable'
 
 
 @skip_unless_lms
@@ -29,16 +29,24 @@ class TestPopulateMarketingOptInUserAttribute(TransactionTestCase):
         Test population of is_marketable attribute with an existing user.
         """
         assert UserAttribute.objects.count() == 0
-        call_command('populate_is_marketable_user_attribute')
-        assert UserAttribute.objects.filter(name=MARKETING_EMAILS_OPT_IN).count() == User.objects.count()
+        call_command(
+            'populate_is_marketable_user_attribute',
+            start_user_id=1,
+            start_userattribute_id=1
+        )
+        assert UserAttribute.objects.filter(name=IS_MARKETABLE).count() == User.objects.count()
 
     def test_command_with_new_user(self):
         """
         Test population of is_marketable attribute with a new user.
         """
         user = UserFactory()
-        call_command('populate_is_marketable_user_attribute')
-        assert UserAttribute.objects.filter(name=MARKETING_EMAILS_OPT_IN).count() == User.objects.count()
+        call_command(
+            'populate_is_marketable_user_attribute',
+            start_user_id=0,
+            start_userattribute_id=1
+        )
+        assert UserAttribute.objects.filter(name=IS_MARKETABLE).count() == User.objects.count()
 
     def test_command_rename_to_new_attribute(self):
         """
@@ -46,9 +54,13 @@ class TestPopulateMarketingOptInUserAttribute(TransactionTestCase):
         """
         user = UserFactory()
         UserAttribute.objects.create(user=user, name='marketing_emails_opt_in', value='true')
-        call_command('populate_is_marketable_user_attribute')
+        call_command(
+            'populate_is_marketable_user_attribute',
+            start_user_id=1,
+            start_userattribute_id=1
+        )
         assert UserAttribute.objects.filter(name='marketing_emails_opt_in').count() == 0
-        assert UserAttribute.get_user_attribute(user, MARKETING_EMAILS_OPT_IN) == 'true'
+        assert UserAttribute.get_user_attribute(user, IS_MARKETABLE) == 'true'
 
     def test_command_with_invalid_argument(self):
         """
@@ -56,6 +68,8 @@ class TestPopulateMarketingOptInUserAttribute(TransactionTestCase):
         """
         with pytest.raises(TypeError):
             call_command(
-                "populate_is_marketable_user_attribute",
-                batch_size='1000'
+                'populate_is_marketable_user_attribute',
+                batch_size='1000',
+                start_user_id=1,
+                start_userattribute_id=1
             )
