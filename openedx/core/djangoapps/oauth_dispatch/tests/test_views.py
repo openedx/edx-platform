@@ -377,6 +377,18 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         assert data['expires_in'] > 0
         assert data['token_type'] == 'JWT'
 
+    @ddt.data('dot_app')
+    def test_jwt_access_token_exchange_calls_dispatched_view_with_disabled_user(self, client_attr):
+        self.user.set_unusable_password()
+        self.user.save()
+        client = getattr(self, client_attr)
+        self.oauth_client = client
+        self._setup_provider_response(success=True)
+        response = self._post_request(self.user, client, token_type='jwt')
+        assert response.status_code == 403
+        data = json.loads(response.content.decode('utf-8'))
+        assert data['error'] == 'account_disabled'
+
 
 # pylint: disable=abstract-method
 @ddt.ddt
