@@ -19,7 +19,8 @@
 -e common/lib/symmath  # via -r requirements/edx/local.in
 -e openedx/core/lib/xblock_builtin/xblock_discussion  # via -r requirements/edx/local.in
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive  # via -r requirements/edx/github.in
--e git+https://github.com/edly-io/edx_xblock_scorm.git@v1.1.1#egg=scorm-xblock
+-e git+https://github.com/GenPlusLeaders/openedx-scorm-xblock.git@master#egg=openedx-scorm-xblock  # via -r requirements/edx/github.in
+-e git+https://github.com/raccoongang/xblock-pdf.git@master#egg=xblock-pdf  # via -r requirements/edx/github.in
 -e common/lib/xmodule  # via -r requirements/edx/local.in
 amqp==2.6.1               # via kombu
 analytics-python==1.2.9   # via -r requirements/edx/base.in

@@ -3163,7 +3163,7 @@ RM_UNIFY_SECRET = 'rmunify-secret'
 
 ######################### GENPLUS SETTINGS #################################
 
-GENPLUS_SOCIAL_AUTH_REDIRECT_URL = '/'
+GENPLUS_FRONTEND_URL = '/'
 
 ######################### Django Rest Framework ########################
 
