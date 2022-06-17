@@ -5,12 +5,11 @@ helper functions
 import logging
 from datetime import datetime
 from django.conf import settings
-from braze.client import BrazeClient
 from eventtracking import tracker
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
 from common.djangoapps.course_modes.models import CourseMode
+from lms.djangoapps.utils import get_braze_client
 
 log = logging.getLogger(__name__)
 
@@ -100,11 +99,10 @@ def send_email(email, data):
     Send email through Braze
     """
     event_properties = _get_event_properties(data)
-    braze_client = BrazeClient(
-        api_key=settings.EDX_BRAZE_API_KEY,
-        api_url=settings.EDX_BRAZE_API_SERVER,
-        app_id='',
-    )
+    braze_client = get_braze_client()
+
+    if not braze_client:
+        return False
 
     try:
         attributes = None

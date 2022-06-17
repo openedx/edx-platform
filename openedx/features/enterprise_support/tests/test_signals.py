@@ -45,7 +45,6 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
     """
     Tests for the enterprise support signals.
     """
-
     def setUp(self):
         UserFactory.create(username=TEST_ECOMMERCE_WORKER)
         self.user = UserFactory.create(username='test', email=TEST_EMAIL)

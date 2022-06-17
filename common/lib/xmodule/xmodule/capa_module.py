@@ -490,6 +490,15 @@ class ProblemBlock(
 
         return self.display_name
 
+    @property
+    def debug(self):
+        """
+        If CAPA block fails to render, we want course authors to be able to see
+        the error in Studio. At the same time, in production, we don't want
+        to show errors to students.
+        """
+        return getattr(self.runtime, 'is_author_mode', False) or settings.DEBUG
+
     @classmethod
     def filter_templates(cls, template, course):
         """
@@ -618,7 +627,6 @@ class ProblemBlock(
             get_python_lib_zip=None,
             DEBUG=None,
             i18n=self.runtime.service(self, "i18n"),
-            node_path=None,
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=None,
@@ -680,7 +688,6 @@ class ProblemBlock(
             get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, self.runtime.course_id)),
             DEBUG=None,
             i18n=self.runtime.service(self, "i18n"),
-            node_path=None,
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=1,
@@ -827,9 +834,8 @@ class ProblemBlock(
             cache=cache_service,
             can_execute_unsafe_code=sandbox_service.can_execute_unsafe_code,
             get_python_lib_zip=sandbox_service.get_python_lib_zip,
-            DEBUG=self.runtime.DEBUG,
+            DEBUG=self.debug,
             i18n=self.runtime.service(self, "i18n"),
-            node_path=self.runtime.node_path,
             render_template=self.runtime.service(self, 'mako').render_template,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
@@ -1063,8 +1069,7 @@ class ProblemBlock(
             str(err)
         )
 
-        # TODO (vshnayder): another switch on DEBUG.
-        if self.runtime.DEBUG:
+        if self.debug:
             msg = HTML(
                 '[courseware.capa.capa_module] '
                 'Failed to generate HTML for problem {url}'
@@ -1780,7 +1785,7 @@ class ProblemBlock(
             self.set_last_submission_time()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
-            if self.runtime.DEBUG:
+            if self.debug:
                 log.warning(
                     "StudentInputError in capa_module:problem_check",
                     exc_info=True
@@ -1814,7 +1819,7 @@ class ProblemBlock(
             self.set_state_from_lcp()
             self.set_score(self.score_from_lcp(self.lcp))
 
-            if self.runtime.DEBUG:
+            if self.debug:
                 msg = f"Error checking problem: {str(err)}"
                 msg += f'\nTraceback:\n{traceback.format_exc()}'
                 return {'success': msg}

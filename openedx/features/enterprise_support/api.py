@@ -352,7 +352,8 @@ def data_sharing_consent_required(view_func):
         Otherwise, just call the wrapped view function.
         """
         # Redirect to the consent URL, if consent is required.
-        consent_url = get_enterprise_consent_url(request, course_id, enrollment_exists=True)
+        source = getattr(view_func, '__name__', '')
+        consent_url = get_enterprise_consent_url(request, course_id, enrollment_exists=True, source=source)
         if consent_url:
             real_user = getattr(request.user, 'real_user', request.user)
             LOGGER.info(
@@ -721,7 +722,7 @@ def get_consent_required_courses(user, course_ids):
 
 
 @enterprise_is_enabled(otherwise='')
-def get_enterprise_consent_url(request, course_id, user=None, return_to=None, enrollment_exists=False):
+def get_enterprise_consent_url(request, course_id, user=None, return_to=None, enrollment_exists=False, source='lms'):
     """
     Build a URL to redirect the user to the Enterprise app to provide data sharing
     consent for a specific course ID.
@@ -753,6 +754,7 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     url_params = {
         'enterprise_customer_uuid': enterprise_customer_uuid_for_request(request),
         'course_id': course_id,
+        'source': source,
         'next': request.build_absolute_uri(return_path),
         'failure_url': request.build_absolute_uri(
             reverse('dashboard') + '?' + urlencode(

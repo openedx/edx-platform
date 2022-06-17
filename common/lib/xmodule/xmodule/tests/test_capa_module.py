@@ -17,6 +17,7 @@ import ddt
 import requests
 import webob
 from codejail.safe_exec import SafeExecException
+from django.test import override_settings
 from django.utils.encoding import smart_str
 from edx_user_state_client.interface import XBlockUserState
 from lxml import etree
@@ -961,6 +962,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             # but that this was considered the second attempt for grading purposes
             assert module.lcp.context['attempt'] == 2
 
+    @override_settings(DEBUG=True)
     def test_submit_problem_other_errors(self):
         """
         Test that errors other than the expected kinds give an appropriate message.
@@ -969,9 +971,6 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         """
         # Create the module
         module = CapaFactory.create(attempts=1, user_is_staff=False)
-
-        # Ensure that DEBUG is on
-        module.system.DEBUG = True
 
         # Simulate answering a problem that raises the exception
         with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
@@ -1711,9 +1710,6 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # is asked to render itself as HTML
         module.lcp.get_html = Mock(side_effect=Exception("Test"))
 
-        # Turn off DEBUG
-        module.system.DEBUG = False
-
         # Try to render the module with DEBUG turned off
         html = module.get_problem_html()
 
@@ -1727,6 +1723,31 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Expect that the module has created a new dummy problem with the error
         assert original_problem != module.lcp
 
+    def test_get_problem_html_error_preview(self):
+        """
+        Test the html response when an error occurs with DEBUG off in Studio.
+        """
+        render_template = Mock(return_value="<div>Test Template HTML</div>")
+        module = CapaFactory.create(render_template=render_template)
+
+        # Simulate throwing an exception when the capa problem
+        # is asked to render itself as HTML
+        error_msg = "Superterrible error happened: ☠"
+        module.lcp.get_html = Mock(side_effect=Exception(error_msg))
+
+        module.system.is_author_mode = True
+
+        # Try to render the module with the author mode turned on
+        html = module.get_problem_html()
+
+        assert html is not None
+
+        # Check the rendering context
+        render_args, _ = render_template.call_args
+        context = render_args[1]
+        assert error_msg in context['problem']['html']
+
+    @override_settings(DEBUG=True)
     def test_get_problem_html_error_w_debug(self):
         """
         Test the html response when an error occurs with DEBUG on
@@ -1738,9 +1759,6 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # is asked to render itself as HTML
         error_msg = "Superterrible error happened: ☠"
         module.lcp.get_html = Mock(side_effect=Exception(error_msg))
-
-        # Make sure DEBUG is on
-        module.system.DEBUG = True
 
         # Try to render the module with DEBUG turned on
         html = module.get_problem_html()

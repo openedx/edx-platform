@@ -1,50 +1,21 @@
-Status: Maintenance
+=================
+Learner dashboard
+=================
 
-Responsibilities
-================
+This djangoapp houses 2 related dashboards owned and developed, currently by 2 separate teams:
 
-This Django app hosts dashboard pages used by edX learners. The intent is for
-this Django app to include the following dashboard tabs:
+1. Courses Dashboard
+2. Programs Dashboard
 
- - Courses
- - Programs
+Courses Dashboard
+=================
 
-Direction: Deprecate
-====================
-This is being replaced by new UI that is in active development.  New functionality should not be added here.
+The Courses section of the Learner Dashboard is a backend supporting a new MFE experience of the learner dashboard.
 
-Glossary
-========
+This aims to replace the existing dashboard at::
+    /common/djangoapps/student/views/dashboard.py
 
-Courses
--------
-
-The learner-facing dashboard listing active and archived enrollments. The
-current implementation of the dashboard resides in
-``common/djangoapps/student/``.
-
-Programs
---------
-
-A page listing programs in which the learner is engaged. The page also shows
-learners' progress towards completing the programs. Programs are structured
-collections of course runs which culminate into a certificate.
-
-
-More Documentation
+Programs Dashboard
 ==================
 
-Implementation
-^^^^^^^^^^^^^^
-
-The ``views`` module contains the Django views used to serve the Program listing
-page. The corresponding Backbone app is in the
-``edx-platform/static/js/learner_dashboard``.
-
-Configuration
-^^^^^^^^^^^^^
-
-In order to turn on the Programs tab, you need to update the ``Programs API
-Config`` object in the lms Django admin. Make sure you set the values
-``Enabled``, ``Do we want to show program listing page`` and ``Do we want to
-show xseries program advertising`` to be true
+See :ref:`programs`.rst doc.

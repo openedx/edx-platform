@@ -69,3 +69,12 @@ ENABLE_DISCUSSION_MODERATION_REASON_CODES = CourseWaffleFlag(
 ENABLE_REPORTED_CONTENT_EMAIL_NOTIFICATIONS = CourseWaffleFlag(
     f'{WAFFLE_FLAG_NAMESPACE}.enable_reported_content_email_notifications', __name__
 )
+
+# .. toggle_name: discussions.enable_mfe_banner_for_learners
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to enable new MFE banner for learners
+# .. toggle_use_cases: temporary, open_edx
+# .. toggle_creation_date: 2022-06-08
+# .. toggle_target_removal_date: 2022-09-05
+ENABLE_DISCUSSIONS_MFE_BANNER = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.enable_mfe_banner_for_learners', __name__)
