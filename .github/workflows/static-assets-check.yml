@@ -66,8 +66,6 @@ jobs:
         sudo systemctl start mongod
 
     - name: Run Tests
-      env:
-        LMS_CFG: lms/envs/bok_choy.yml
       run: |
-        echo "Running the CMS migrations."
-        paver update_assets --settings=bok_choy
+        cd edx-platform
+        ./scripts/update-assets-dev.sh
