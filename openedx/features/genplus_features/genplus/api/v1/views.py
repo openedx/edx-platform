@@ -51,7 +51,7 @@ class CharacterView(generics.ListAPIView):
     queryset = Character.objects.all()
 
 
-class UserOnBoard(views.APIView):
+class StudentOnBoard(views.APIView):
     """
     API for on-boarding the student
     """
