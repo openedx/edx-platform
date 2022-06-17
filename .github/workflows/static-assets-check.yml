@@ -67,5 +67,6 @@ jobs:
 
     - name: Run Tests
       run: |
+        ls -la
         cd edx-platform
         ./scripts/update-assets-dev.sh
