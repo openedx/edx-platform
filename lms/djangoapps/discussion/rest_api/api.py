@@ -92,7 +92,7 @@ from .serializers import (
     UserStatsSerializer,
     get_context,
 )
-from .utils import discussion_open_for_user
+from .utils import discussion_open_for_user, set_threads_attribute_value
 
 User = get_user_model()
 
@@ -883,6 +883,7 @@ def get_learner_active_thread_list(request, course_key, query_params):
         profiled_user = comment_client.User(id=user_id, course_id=course_key)
 
     threads, page, num_pages = profiled_user.active_threads(query_params)
+    threads = set_threads_attribute_value(threads, "pinned", False)
     results = _serialize_discussion_entities(
         request, context, threads, {'profile_image'}, DiscussionEntity.thread
     )
