@@ -2,44 +2,44 @@ import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
-import { Button, Hyperlink, Table } from '@edx/paragon';
+import { Button, Hyperlink, DataTable } from '@edx/paragon';
 
 const entitlementColumns = [
   {
-    label: 'User',
-    key: 'user',
+    Header: 'User',
+    accessor: 'user',
   },
   {
-    label: 'Course UUID',
-    key: 'courseUuid',
+    Header: 'Course UUID',
+    accessor: 'courseUuid',
   },
   {
-    label: 'Mode',
-    key: 'mode',
+    Header: 'Mode',
+    accessor: 'mode',
   },
   {
-    label: 'Enrollment',
-    key: 'enrollmentCourseRun',
+    Header: 'Enrollment',
+    accessor: 'enrollmentCourseRun',
   },
   {
-    label: 'Expired At',
-    key: 'expiredAt',
+    Header: 'Expired At',
+    accessor: 'expiredAt',
   },
   {
-    label: 'Created',
-    key: 'createdAt',
+    Header: 'Created',
+    accessor: 'createdAt',
   },
   {
-    label: 'Modified',
-    key: 'modifiedAt',
+    Header: 'Modified',
+    accessor: 'modifiedAt',
   },
   {
-    label: 'Order',
-    key: 'orderNumber',
+    Header: 'Order',
+    accessor: 'orderNumber',
   },
   {
-    label: 'Actions',
-    key: 'button',
+    Header: 'Actions',
+    accessor: 'button',
     columnSortable: false,
     hideHeader: false,
   },
@@ -66,9 +66,10 @@ const parseEntitlementData = (entitlements, ecommerceUrl, openReissueForm) =>
   });
 
 const EntitlementSupportTable = props => (
-  <Table
+  <DataTable
     data={parseEntitlementData(props.entitlements, props.ecommerceUrl, props.openReissueForm)}
     columns={entitlementColumns}
+    itemCount={props.entitlements.length}
   />
 );
 
