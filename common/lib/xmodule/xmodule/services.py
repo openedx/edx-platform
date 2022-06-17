@@ -4,10 +4,26 @@ Module contains various XModule/XBlock services
 
 
 import inspect
+import logging
+
+from functools import partial
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
+from edx_when.field_data import DateLookupFieldData
 from xmodule.modulestore.django import modulestore
+from xblock.reference.plugins import Service
+from xblock.runtime import KvsFieldData
+
+
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
+from openedx.core.lib.courses import get_course_by_id
+
+
+log = logging.getLogger(__name__)
 
 
 class SettingsService:
@@ -119,3 +135,91 @@ class TeamsConfigurationService:
         if not self._course:
             self._course = self.get_course(course_id)
         return self._course.teams_configuration
+
+
+class RebindUserServiceError(Exception):
+    pass
+
+
+class RebindUserService(Service):
+    """
+    An XBlock Service that allows modules to get rebound to real users if it was previously bound to an AnonymousUser.
+
+    This used to be a local function inside the `lms.djangoapps.courseware.module_render.get_module_system_for_user`
+    method, and was passed as a constructor argument to x_module.ModuleSystem. This has been refactored out into a
+    service to simplify the ModuleSystem and lives in this module temporarily.
+
+    TODO: Only the old LTI XBlock uses it in 2 places for LTI 2.0 integration. As the LTI XBlock is deprecated in
+    favour of the LTI Consumer XBlock, this should be removed when the LTI XBlock is removed.
+
+    Arguments:
+        user (User) - A Django User object
+        course_id (str) - Course ID
+        course (Course) - Course Object
+        get_module_system_for_user (function) - The helper function that will be called to create a module system
+            for a specfic user. This is the parent function from which this service was reactored out.
+            `lms.djangoapps.courseware.module_render.get_module_system_for_user`
+        kwargs (dict) - all the keyword arguments that need to be passed to the `get_module_system_for_user`
+            function when it is called during rebinding
+    """
+    def __init__(self, user, course_id, get_module_system_for_user, **kwargs):
+        super().__init__(**kwargs)
+        self.user = user
+        self.course_id = course_id
+        self._ref = {
+            "get_module_system_for_user": get_module_system_for_user
+        }
+        self._kwargs = kwargs
+
+    def rebind_noauth_module_to_user(self, block, real_user):
+        """
+        Function that rebinds the module to the real_user.
+
+        Will only work within a module bound to an AnonymousUser, e.g. one that's instantiated by the noauth_handler.
+
+        Arguments:
+            block (any xblock type):  the module to rebind
+            real_user (django.contrib.auth.models.User):  the user to bind to
+
+        Returns:
+            nothing (but the side effect is that module is re-bound to real_user)
+        """
+        if self.user.is_authenticated:
+            err_msg = "rebind_noauth_module_to_user can only be called from a module bound to an anonymous user"
+            log.error(err_msg)
+            raise RebindUserServiceError(err_msg)
+
+        field_data_cache_real_user = FieldDataCache.cache_for_descriptor_descendents(
+            self.course_id,
+            real_user,
+            block,
+            asides=XBlockAsidesConfig.possible_asides(),
+        )
+        student_data_real_user = KvsFieldData(DjangoKeyValueStore(field_data_cache_real_user))
+
+        with modulestore().bulk_operations(self.course_id):
+            course = modulestore().get_course(course_key=self.course_id)
+
+        (inner_system, inner_student_data) = self._ref["get_module_system_for_user"](
+            user=real_user,
+            student_data=student_data_real_user,  # These have implicit user bindings, rest of args considered not to
+            descriptor=block,
+            course_id=self.course_id,
+            course=course,
+            **self._kwargs
+        )
+
+        block.bind_for_student(
+            inner_system,
+            real_user.id,
+            [
+                partial(DateLookupFieldData, course_id=self.course_id, user=self.user),
+                partial(OverrideFieldData.wrap, real_user, course),
+                partial(LmsFieldData, student_data=inner_student_data),
+            ],
+        )
+
+        block.scope_ids = block.scope_ids._replace(user_id=real_user.id)
+        # now bind the module to the new ModuleSystem instance and vice-versa
+        block.runtime = inner_system
+        inner_system.xmodule_instance = block

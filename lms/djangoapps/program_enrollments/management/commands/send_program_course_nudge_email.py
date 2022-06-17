@@ -20,6 +20,7 @@ from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.core.constants import COURSE_PUBLISHED
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.features.enterprise_support.api import get_enterprise_learner_data_from_db
 
 User = get_user_model()
 
@@ -84,11 +85,11 @@ class Command(BaseCommand):
         Returns: Suggested program and course_run dicts
         """
         for program in programs_progress:
-            for not_started_courses in program['not_started']:
-                for course_run in not_started_courses['course_runs']:
+            for not_started_course in program['not_started']:
+                for course_run in not_started_course['course_runs']:
                     if self.valid_course_run(course_run) and course_run['key'] != completed_course_id:
-                        return program, course_run
-        return None, None
+                        return program, course_run, not_started_course
+        return None, None, None
 
     def sort_programs(self, programs):
         """
@@ -124,17 +125,28 @@ class Command(BaseCommand):
             if program['uuid'] == program_progress['uuid']:
                 return program
 
-    def emit_event(self, user, program, suggested_course_run, completed_course_run):
+    def emit_event(self, user, program, suggested_course_run, suggested_course, completed_course_run):
         """
          Emit the Segment event which will be used by Braze to send the email
         """
+        learner_data = get_enterprise_learner_data_from_db(user)
+        enterprise_customer = learner_data[0]['enterprise_customer'] if learner_data else None
+        if enterprise_customer and enterprise_customer['enable_learner_portal']:
+            # If user is an enterprise learner then we want to redirect to B2B course landing page on learner portal.
+            recommended_course_url = urljoin(
+                settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL,
+                '/'.join([enterprise_customer['slug'], 'course', suggested_course['key']]),
+            )
+        else:
+            recommended_course_url = urljoin(settings.MKTG_URLS.get('ROOT'), suggested_course_run['marketing_url'])
+
         event_properties = {
             'COURSE_ONE_NAME': completed_course_run['title'],
             'PROGRAM_TYPE': program['type'],
             'PROGRAM_TITLE': program['title'],
             'COURSE_TWO_NAME': suggested_course_run['title'],
             'COURSE_TWO_SHORT_DESCRIPTION': suggested_course_run['short_description'],
-            'COURSE_TWO_LINK': urljoin(settings.MKTG_URLS.get('ROOT'), suggested_course_run['marketing_url']),
+            'COURSE_TWO_LINK': recommended_course_url,
             'COURSE_TWO_IMAGE_LINK': suggested_course_run['image'].get('src'),
         }
         segment.track(user.id, 'edx.bi.program.course-enrollment.nudge', event_properties)
@@ -177,14 +189,16 @@ class Command(BaseCommand):
                 for user in users:
                     meter = ProgramProgressMeter(site=site, user=user, include_course_entitlements=False)
                     programs_progress = meter.progress(programs=course_linked_programs, count_only=False)
-                    suggested_program_progress, suggested_course_run = self.get_course_run_to_suggest(
+                    suggested_program_progress, suggested_course_run, suggested_course = self.get_course_run_to_suggest(
                         programs_progress, completed_course_id
                     )
-                    if suggested_course_run:
+                    if suggested_course_run and suggested_course:
                         suggested_program = self.get_program(course_linked_programs, suggested_program_progress)
                         completed_course_run = self.get_course_run(suggested_program, completed_course_id)
                         if should_commit:
-                            self.emit_event(user, suggested_program, suggested_course_run, completed_course_run)
+                            self.emit_event(
+                                user, suggested_program, suggested_course_run, suggested_course, completed_course_run,
+                            )
                         email_sent_records.append(
                             f'User: {user.username}, Completed Course: {completed_course_id}, '
                             f'Suggested Course: {suggested_course_run["key"]}'

@@ -43,13 +43,14 @@ def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None, sco
     )
 
 
-def create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=None):
+def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
     """
-    Returns a JWT created from the given access token.
+    Returns a JWT access token dict based on the provided access token.
 
     Arguments:
         token_dict (dict): An access token structure as returned from an
-            underlying OAuth provider.
+            underlying OAuth provider. Dict includes "access_token",
+            "expires_in", "token_type", and "scope".
 
     Deprecated Arguments (to be removed):
         oauth_adapter (DOPAdapter|DOTAdapter): An OAuth adapter that will
@@ -61,25 +62,52 @@ def create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=None):
     access_token = oauth_adapter.get_access_token(token_dict['access_token'])
     client = oauth_adapter.get_client_for_token(access_token)
 
-    # .. setting_name: JWT_ACCESS_TOKEN_EXPIRE_SECONDS
-    # .. setting_default: 60 * 60
-    # .. setting_description: The number of seconds a JWT access token remains valid. We use this
-    #     custom setting for JWT formatted access tokens, rather than the django-oauth-toolkit setting
-    #     ACCESS_TOKEN_EXPIRE_SECONDS, because the JWT is non-revocable and we want it to be shorter
-    #     lived than the legacy Bearer (opaque) access tokens, and thus to have a smaller default.
-    # .. setting_warning: For security purposes, 1 hour (the default) is the maximum recommended setting
-    #     value. For tighter security, you can use a shorter amount of time.
-    token_dict['expires_in'] = getattr(settings, 'JWT_ACCESS_TOKEN_EXPIRE_SECONDS', 60 * 60)
+    jwt_expires_in = _get_jwt_access_token_expire_seconds()
 
-    # TODO (ARCH-204) put access_token as a JWT ID claim (jti)
-    return _create_jwt(
+    jwt_access_token = _create_jwt(
         access_token.user,
         scopes=token_dict['scope'].split(' '),
-        expires_in=token_dict['expires_in'],
+        expires_in=jwt_expires_in,
         use_asymmetric_key=use_asymmetric_key,
         is_restricted=oauth_adapter.is_client_restricted(client),
         filters=oauth_adapter.get_authorization_filters(client),
     )
+
+    jwt_token_dict = token_dict.copy()
+    # Note: only "scope" is not overwritten at this point.
+    jwt_token_dict.update({
+        "access_token": jwt_access_token,
+        "token_type": "JWT",
+        "expires_in": jwt_expires_in,
+    })
+    return jwt_token_dict
+
+
+def create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=None):
+    """
+    Returns a JWT created from the provided access token dict.
+
+    Note: if you need the token dict, and not just the JWT, use
+        create_jwt_token_dict instead. See its docs for more details.
+    """
+    jwt_token_dict = create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key)
+    return jwt_token_dict["access_token"]
+
+
+def _get_jwt_access_token_expire_seconds():
+    """
+    Returns the number of seconds before a JWT access token expires.
+
+    .. setting_name: JWT_ACCESS_TOKEN_EXPIRE_SECONDS
+    .. setting_default: 60 * 60
+    .. setting_description: The number of seconds a JWT access token remains valid. We use this
+        custom setting for JWT formatted access tokens, rather than the django-oauth-toolkit setting
+        ACCESS_TOKEN_EXPIRE_SECONDS, because the JWT is non-revocable and we want it to be shorter
+        lived than the legacy Bearer (opaque) access tokens, and thus to have a smaller default.
+    .. setting_warning: For security purposes, 1 hour (the default) is the maximum recommended setting
+        value. For tighter security, you can use a shorter amount of time.
+    """
+    return getattr(settings, 'JWT_ACCESS_TOKEN_EXPIRE_SECONDS', 60 * 60)
 
 
 def _create_jwt(

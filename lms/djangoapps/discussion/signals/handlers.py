@@ -7,6 +7,7 @@ import logging
 
 from django.conf import settings
 from django.dispatch import receiver
+from django.utils.html import strip_tags
 from opaque_keys.edx.locator import LibraryLocator
 from xmodule.modulestore.django import SignalHandler
 
@@ -103,16 +104,23 @@ def create_message_context_for_reported_content(user, post, site, sender):
     """
     Create message context for reported content.
     """
+    def get_comment_type(comment):
+        """
+        Returns type of comment.
+        """
+        return 'response' if comment.get('parent_id', None) is None else 'comment'
+
     context = {
         'user_id': user.id,
         'course_id': str(post.course_id),
         'thread_id': post.thread.id if sender == 'flag_abuse_for_comment' else post.id,
         'title': post.thread.title if sender == 'flag_abuse_for_comment' else post.title,
-        'content_type': post.type,
-        'comment_body': post.body,
+        'content_type': 'post' if sender == 'flag_abuse_for_thread' else get_comment_type(post),
+        'content_body': strip_tags(post.body),
         'thread_created_at': post.created_at,
         'thread_commentable_id': post.commentable_id,
         'site_id': site.id,
+        'comment_id': post.id if sender == 'flag_abuse_for_comment' else None,
     }
     return context
 

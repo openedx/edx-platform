@@ -6,9 +6,9 @@
 #
 alabaster==0.7.12
     # via sphinx
-babel==2.10.1
+babel==2.10.2
     # via sphinx
-certifi==2022.5.18.1
+certifi==2022.6.15
     # via requests
 charset-normalizer==2.0.12
     # via requests
@@ -54,7 +54,7 @@ pytz==2022.1
     # via babel
 pyyaml==6.0
     # via code-annotations
-requests==2.27.1
+requests==2.28.0
     # via sphinx
 six==1.16.0
     # via edx-sphinx-theme
@@ -62,7 +62,7 @@ smmap==5.0.0
     # via gitdb
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==4.5.0
+sphinx==5.0.1
     # via
     #   -r requirements/edx/doc.in
     #   edx-sphinx-theme

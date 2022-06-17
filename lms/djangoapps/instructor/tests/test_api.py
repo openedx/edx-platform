@@ -95,7 +95,7 @@ from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMM
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, delete_user_preference
+from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
@@ -3399,11 +3399,6 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         super().tearDown()
         delete_user_preference(self.instructor, 'time_zone', username=self.instructor.username)
 
-    def _get_expected_schedule(self, schedule, timezone):
-        local_tz = dateutil.tz.gettz(timezone)
-        local_dt = dateutil.parser.parse(schedule).replace(tzinfo=local_tz)
-        return local_dt.astimezone(pytz.utc)
-
     def test_send_email_as_logged_in_instructor(self):
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, self.full_test_message)
@@ -3491,15 +3486,13 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
                                                template_name=org_template, from_addr=org_email).count()
 
     @patch("lms.djangoapps.instructor.views.api.task_api.submit_bulk_course_email")
-    def test_send_email_with_schedule_and_timezone(self, mock_task_api):
+    def test_send_email_with_schedule(self, mock_task_api):
         """
         Test for the new scheduling logic added to the `send_email` function.
         """
-        schedule = "2030-05-02T14:00:00.000Z"
-        timezone = "America/New_York"
+        schedule = "2099-05-02T14:00:00.000Z"
         self.full_test_message['schedule'] = schedule
-        self.full_test_message['browser_timezone'] = timezone
-        expected_schedule = self._get_expected_schedule(schedule, timezone)
+        expected_schedule = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
 
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, self.full_test_message)
@@ -3509,95 +3502,36 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         assert arg_schedule == expected_schedule
 
     @patch("lms.djangoapps.instructor.views.api.task_api.submit_bulk_course_email")
-    def test_send_email_with_schedule_and_no_browser_timezone(self, mock_task_api):
-        """
-        Test that verifies we will retrieve and use the preferred time zone if possible.
-        """
-        schedule = "2030-05-02T14:00:00.000Z"
-        timezone = "America/New_York"
-        self.full_test_message['schedule'] = schedule
-        self.full_test_message['browser_timezone'] = ""
-        expected_schedule = self._get_expected_schedule(schedule, timezone)
-        set_user_preference(self.instructor, 'time_zone', timezone)
-
-        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
-        response = self.client.post(url, self.full_test_message)
-
-        assert response.status_code == 200
-        _, _, _, arg_schedule = mock_task_api.call_args.args
-        assert arg_schedule == expected_schedule
-
-    @patch("lms.djangoapps.instructor.views.api.task_api.submit_bulk_course_email")
-    def test_send_email_with_schedule_and_preferred_timezone(self, mock_task_api):
-        """
-        Test that verifies we will use the preferred timezone over the browser timezone if possible.
-        """
-        schedule = "2030-05-02T14:00:00.000Z"
-        preferred_timezone = "America/Anchorage"
-        self.full_test_message['schedule'] = schedule
-        self.full_test_message['browser_timezone'] = "America/New_York"
-        expected_schedule = self._get_expected_schedule(schedule, preferred_timezone)
-        set_user_preference(self.instructor, 'time_zone', preferred_timezone)
-
-        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
-        response = self.client.post(url, self.full_test_message)
-
-        assert response.status_code == 200
-        _, _, _, arg_schedule = mock_task_api.call_args.args
-        assert arg_schedule == expected_schedule
-
-    def test_send_email_with_malformed_schedule_expect_error(self):
+    def test_send_email_with_malformed_schedule_expect_error(self, mock_task_api):
+        schedule = "Blub Glub"
         self.full_test_message['schedule'] = "Blub Glub"
-        self.full_test_message['browser_timezone'] = "America/New_York"
-        expected_messages = [
-            "Error occurred while attempting to create a scheduled bulk email task: unknown string format",
-        ]
+        expected_message = (
+            f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: Unknown "
+            "string format: Blub Glub"
+        )
 
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         with LogCapture() as log:
             response = self.client.post(url, self.full_test_message)
 
         assert response.status_code == 400
-        log.check_present(
-            (LOG_PATH, "ERROR", expected_messages[0]),
-        )
-
-    def test_send_email_with_malformed_timezone_expect_error(self):
-        self.full_test_message['schedule'] = "2030-05-02T14:00:00.000Z"
-        self.full_test_message['browser_timezone'] = "Flim/Flam"
-        expected_messages = [
-            "Error occurred while attempting to create a scheduled bulk email task: Unable to determine the time zone "
-            "to use to convert the schedule to UTC",
-        ]
-
-        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
-        with LogCapture() as log:
-            response = self.client.post(url, self.full_test_message)
-
-        assert response.status_code == 400
-        log.check_present(
-            (LOG_PATH, "ERROR", expected_messages[0]),
-        )
+        log.check_present((LOG_PATH, "ERROR", expected_message),)
+        mock_task_api.assert_not_called()
 
     def test_send_email_with_lapsed_date_expect_error(self):
         schedule = "2020-01-01T00:00:00.000Z"
-        timezone = "America/New_York"
         self.full_test_message['schedule'] = schedule
-        self.full_test_message['browser_timezone'] = timezone
-        expected_schedule = self._get_expected_schedule(schedule, timezone)
-        expected_messages = [
-            "Error occurred while attempting to create a scheduled bulk email task: The requested schedule "
-            f"'{expected_schedule}' is in the past"
-        ]
+        expected_message = (
+            f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: the "
+            "requested schedule is in the past"
+        )
 
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         with LogCapture() as log:
             response = self.client.post(url, self.full_test_message)
 
         assert response.status_code == 400
-        log.check_present(
-            (LOG_PATH, "ERROR", expected_messages[0]),
-        )
+        log.check_present((LOG_PATH, "ERROR", expected_message),)
 
 
 class MockCompletionInfo:

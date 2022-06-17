@@ -79,6 +79,7 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
 from common.djangoapps.student.signals import REFUND_ORDER
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.student.signals import USER_EMAIL_CHANGED
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger("edx.student")
@@ -902,6 +903,8 @@ def confirm_email_change(request, key):
             return response
 
         response = render_to_response("email_change_successful.html", address_context)
+
+        USER_EMAIL_CHANGED.send(sender=None, user=user)
         return response
 
 

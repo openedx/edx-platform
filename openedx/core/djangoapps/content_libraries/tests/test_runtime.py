@@ -5,7 +5,7 @@ import json
 from gettext import GNUTranslations
 
 from completion.test_utils import CompletionWaffleTestMixin
-from django.db import connections
+from django.db import connections, transaction
 from django.test import LiveServerTestCase, TestCase
 from django.utils.text import slugify
 from organizations.models import Organization
@@ -51,17 +51,18 @@ class ContentLibraryContentTestMixin:
             short_name="CL-TEST",
         )
         _, slug = self.id().rsplit('.', 1)
-        self.library = library_api.create_library(
-            collection_uuid=self.collection.uuid,
-            library_type=COMPLEX,
-            org=self.organization,
-            slug=slugify(slug),
-            title=(f"{slug} Test Lib"),
-            description="",
-            allow_public_learning=True,
-            allow_public_read=False,
-            library_license=ALL_RIGHTS_RESERVED,
-        )
+        with transaction.atomic():
+            self.library = library_api.create_library(
+                collection_uuid=self.collection.uuid,
+                library_type=COMPLEX,
+                org=self.organization,
+                slug=slugify(slug),
+                title=(f"{slug} Test Lib"),
+                description="",
+                allow_public_learning=True,
+                allow_public_read=False,
+                library_license=ALL_RIGHTS_RESERVED,
+            )
 
 
 class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
@@ -83,17 +84,18 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         library_api.create_library_block_child(unit_block_key, "problem", "p1")
         library_api.publish_changes(self.library.key)
         # Now do the same in a different library:
-        library2 = library_api.create_library(
-            collection_uuid=self.collection.uuid,
-            org=self.organization,
-            slug="idolx",
-            title=("Identical OLX Test Lib 2"),
-            description="",
-            library_type=COMPLEX,
-            allow_public_learning=True,
-            allow_public_read=False,
-            library_license=CC_4_BY,
-        )
+        with transaction.atomic():
+            library2 = library_api.create_library(
+                collection_uuid=self.collection.uuid,
+                org=self.organization,
+                slug="idolx",
+                title=("Identical OLX Test Lib 2"),
+                description="",
+                library_type=COMPLEX,
+                allow_public_learning=True,
+                allow_public_read=False,
+                library_license=CC_4_BY,
+            )
         unit_block2_key = library_api.create_library_block(library2.key, "unit", "u1").usage_key
         library_api.create_library_block_child(unit_block2_key, "problem", "p1")
         library_api.publish_changes(library2.key)

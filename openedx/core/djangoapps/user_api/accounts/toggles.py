@@ -13,7 +13,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2019-04-11
 # .. toggle_target_removal_date: 2020-12-31
-# .. toggle_warnings: Also set settings.ORDER_HISTORY_MICROFRONTEND_URL and site's
+# .. toggle_warning: Also set settings.ORDER_HISTORY_MICROFRONTEND_URL and site's
 #   ENABLE_ORDER_HISTORY_MICROFRONTEND.
 # .. toggle_tickets: DEPR-17
 REDIRECT_TO_ORDER_HISTORY_MICROFRONTEND = WaffleFlag('order_history.redirect_to_microfrontend', __name__)
@@ -34,7 +34,7 @@ def should_redirect_to_order_history_microfrontend():
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2019-04-30
 # .. toggle_target_removal_date: 2021-12-31
-# .. toggle_warnings: Also set settings.ACCOUNT_MICROFRONTEND_URL.
+# .. toggle_warning: Also set settings.ACCOUNT_MICROFRONTEND_URL.
 # .. toggle_tickets: DEPR-17
 REDIRECT_TO_ACCOUNT_MICROFRONTEND = WaffleFlag('account.redirect_to_microfrontend', __name__)
 

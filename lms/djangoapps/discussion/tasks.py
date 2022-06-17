@@ -18,10 +18,10 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from six.moves.urllib.parse import urljoin
+from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.track import segment
-from common.lib.xmodule.xmodule.modulestore.django import modulestore
 from lms.djangoapps.discussion.django_comment_client.utils import (
     permalink,
     get_users_with_moderator_roles,
@@ -155,9 +155,9 @@ def _should_send_message(context):
 
 
 def _is_content_still_reported(context):
-    if context.get('thread_id'):
-        return len(cc.Thread.find(context['thread_id']).abuse_flaggers) > 0
-    return len(cc.Comment.find(context['comment_id']).abuse_flaggers) > 0
+    if context.get('comment_id') is not None:
+        return len(cc.Comment.find(context['comment_id']).abuse_flaggers) > 0
+    return len(cc.Thread.find(context['thread_id']).abuse_flaggers) > 0
 
 
 def _is_not_subcomment(comment_id):

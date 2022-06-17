@@ -26,7 +26,11 @@ from rest_framework.serializers import Serializer
 
 from lms.djangoapps.courseware.courses import get_course, get_course_with_access
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.course_groups.models import CohortMembership
+from openedx.core.djangoapps.course_groups.models import (
+    CohortAssignmentNotAllowed,
+    CohortChangeNotAllowed,
+    CohortMembership,
+)
 from openedx.core.djangoapps.course_groups.permissions import IsStaffOrAdmin
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
@@ -321,6 +325,7 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
     unknown = []
     preassigned = []
     invalid = []
+    not_allowed = []
     for username_or_email in split_by_comma_and_whitespace(users):
         if not username_or_email:
             continue
@@ -346,6 +351,8 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
             invalid.append(username_or_email)
         except ValueError:
             present.append(username_or_email)
+        except (CohortAssignmentNotAllowed, CohortChangeNotAllowed):
+            not_allowed.append(username_or_email)
 
     return json_http_response({'success': True,
                                'added': added,
@@ -353,7 +360,8 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
                                'present': present,
                                'unknown': unknown,
                                'preassigned': preassigned,
-                               'invalid': invalid})
+                               'invalid': invalid,
+                               'not_allowed': not_allowed})
 
 
 @ensure_csrf_cookie

@@ -104,7 +104,6 @@ class LoncapaSystem(object):
         get_python_lib_zip,
         DEBUG,
         i18n,
-        node_path,
         render_template,
         resources_fs,
         seed,      # Why do we do this if we have self.seed?
@@ -119,7 +118,6 @@ class LoncapaSystem(object):
         self.get_python_lib_zip = get_python_lib_zip
         self.DEBUG = DEBUG                              # pylint: disable=invalid-name
         self.i18n = i18n
-        self.node_path = node_path
         self.render_template = render_template
         self.resources_fs = resources_fs
         self.seed = seed                     # Why do we do this if we have self.seed?

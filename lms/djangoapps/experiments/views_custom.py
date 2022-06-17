@@ -32,7 +32,7 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 # .. toggle_creation_date: 2019-09-05
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REV-934
-# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+# .. toggle_warning: This temporary feature toggle does not have a target removal date.
 MOBILE_UPSELL_FLAG = WaffleFlag('experiments.mobile_upsell_rev934', __name__)
 MOBILE_UPSELL_EXPERIMENT = 'mobile_upsell_experiment'
 
