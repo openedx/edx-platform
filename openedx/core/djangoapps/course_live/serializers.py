@@ -141,7 +141,7 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         lti_config = validated_data.pop('lti_configuration')
         instance = CourseLiveConfiguration()
         instance = self._update_course_live_instance(instance, validated_data)
-        if not self.context['provider'].has_free_tier:
+        if not validated_data.get('free_tier', False):
             instance = self._update_lti(instance, lti_config)
         instance.save()
         return instance
@@ -152,7 +152,7 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         """
         lti_config = validated_data.pop('lti_configuration')
         instance = self._update_course_live_instance(instance, validated_data)
-        if not self.context['provider'].has_free_tier:
+        if not validated_data.get('free_tier', False):
             instance = self._update_lti(instance, lti_config)
         instance.save()
         return instance
@@ -192,11 +192,3 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
             lti_serializer.save()
         instance.lti_configuration = lti_serializer.instance
         return instance
-
-
-"""
-Notes
-check if free tier is selected and available on provider
-in courseLive serializer
-
-"""

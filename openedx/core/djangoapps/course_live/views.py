@@ -19,13 +19,9 @@ from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.course_live.permissions import IsEnrolledOrStaff, IsStaffOrInstructor
 from openedx.core.djangoapps.course_live.tab import CourseLiveTab
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-# from .utils import provider_requires_pii_sharing
 from .providers import ProviderManager
-
-providers = ProviderManager().get_enabled_providers()
-
 from ...lib.api.view_utils import verify_course_exists
-from .models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
+from .models import CourseLiveConfiguration
 from .serializers import CourseLiveConfigurationSerializer
 
 
@@ -118,7 +114,7 @@ class CourseLiveConfigurationView(APIView):
         Handle HTTP/POST requests
         """
         pii_sharing_allowed = get_lti_pii_sharing_state_for_course(course_id)
-        provider = providers.get(request.data.get('provider_type', ''), None)
+        provider = ProviderManager().get_enabled_providers().get(request.data.get('provider_type', ''), None)
         if not pii_sharing_allowed and provider.requires_pii_sharing():
             return Response({
                 "pii_sharing_allowed": pii_sharing_allowed,
@@ -204,10 +200,12 @@ class CourseLiveProvidersView(APIView):
             Dict: course Live providers
         """
         configuration = CourseLiveConfiguration.get(course_id)
+        providers = ProviderManager().get_enabled_providers()
+        selected_provider = providers.get(configuration.provider_type if configuration else None, None)
         return {
             "providers": {
-                "active": configuration.provider_type if configuration else "",
-                "available": AVAILABLE_PROVIDERS
+                "active": selected_provider.id if selected_provider else "",
+                "available": {key: provider.__dict__() for (key, provider) in providers.items()}
             }
         }
 

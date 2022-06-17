@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTe
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..config.waffle import ENABLE_COURSE_LIVE
-from ..models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
+from ..models import CourseLiveConfiguration
 from ..providers import ProviderManager
 
 providers = ProviderManager().get_enabled_providers()
@@ -331,7 +331,7 @@ class TestCourseLiveProvidersView(ModuleStoreTestCase, APITestCase):
         expected_data = {
             'providers': {
                 'active': '',
-                'available': AVAILABLE_PROVIDERS
+                'available': {key: provider.__dict__() for (key, provider) in providers.items()}
             }
         }
         response = self.client.get(self.url)

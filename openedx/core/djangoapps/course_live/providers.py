@@ -1,16 +1,28 @@
+"""
+LTI Providers for course live module
+"""
 from abc import ABC
 from typing import List, Dict
 from django.conf import settings
 
 
 class LiveProvider(ABC):
+    """
+    Defines basic structure of lti provider
+    """
     id: str
     name: str
     features: List[str] = []
     requires_username: bool = False
     requires_email: bool = False
     additional_parameters: List[str] = []
-    has_free_tier: bool = False
+
+    @property
+    def has_free_tier(self) -> bool:
+        """
+        Property defines if provider has free tier
+        """
+        return False
 
     def requires_pii_sharing(self):
         """
@@ -24,11 +36,31 @@ class LiveProvider(ABC):
         """
         return 'custom_instructor_email' in self.additional_parameters
 
+    @property
     def is_enabled(self):
+        """
+        To check if provider is enabled
+        To be implemented in subclasses
+        """
         raise NotImplementedError()
+
+    def __dict__(self):
+        return {
+            'name': self.name,
+            'has_free_tier': self.has_free_tier,
+            'features': self.features,
+            'pii_sharing': {
+                'username': self.requires_username,
+                'email': self.requires_email,
+            },
+            'additional_parameters': self.additional_parameters
+        }
 
 
 class Zoom(LiveProvider):
+    """
+    Zoom LTI PRO live provider
+    """
     id = 'zoom'
     name = 'Zoom LTI PRO'
     additional_parameters = [
@@ -41,6 +73,9 @@ class Zoom(LiveProvider):
 
 
 class BigBlueButton(LiveProvider):
+    """
+    Big Blue Button LTI provider
+    """
     id = 'big_blue_button'
     name = 'Big Blue Button'
     requires_username: bool = True
@@ -61,7 +96,6 @@ class BigBlueButton(LiveProvider):
         """
         Get keys from settings
         """
-        breakpoint()
         try:
             return settings.COURSE_LIVE_GLOBAL_CREDENTIALS.get('BIG_BLUE_BUTTON', {})
         except AttributeError:
@@ -78,6 +112,9 @@ class BigBlueButton(LiveProvider):
 
 
 class ProviderManager:
+    """
+    This class provides access to all available provider objects
+    """
     providers: Dict[str, LiveProvider]
 
     def __init__(self):

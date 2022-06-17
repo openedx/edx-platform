@@ -8,30 +8,6 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
-AVAILABLE_PROVIDERS = {
-    'zoom': {
-        'name': 'Zoom LTI PRO',
-        'features': [],
-        'pii_sharing': {
-            'username': False,
-            'email': False,
-        },
-        'additional_parameters': [
-            'custom_instructor_email'
-        ]
-    },
-    'big_blue_button': {
-        'name': 'Big Blue Button',
-        'has_free_tier': True,
-        'features': [],
-        'pii_sharing': {
-            'username': True,
-            'email': False,
-        },
-        'additional_parameters': []
-    }
-}
-
 
 class CourseLiveConfiguration(TimeStampedModel):
     """
