@@ -19,7 +19,10 @@ from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.course_live.permissions import IsEnrolledOrStaff, IsStaffOrInstructor
 from openedx.core.djangoapps.course_live.tab import CourseLiveTab
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-from .utils import provider_requires_pii_sharing
+# from .utils import provider_requires_pii_sharing
+from .providers import ProviderManager
+
+providers = ProviderManager().get_enabled_providers()
 
 from ...lib.api.view_utils import verify_course_exists
 from .models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
@@ -115,7 +118,8 @@ class CourseLiveConfigurationView(APIView):
         Handle HTTP/POST requests
         """
         pii_sharing_allowed = get_lti_pii_sharing_state_for_course(course_id)
-        if not pii_sharing_allowed and provider_requires_pii_sharing(request.data.get('provider_type', '')):
+        provider = providers.get(request.data.get('provider_type', ''), None)
+        if not pii_sharing_allowed and provider.requires_pii_sharing():
             return Response({
                 "pii_sharing_allowed": pii_sharing_allowed,
                 "message": "PII sharing is not allowed on this course"
@@ -127,7 +131,8 @@ class CourseLiveConfigurationView(APIView):
             data=request.data,
             context={
                 "pii_sharing_allowed": pii_sharing_allowed,
-                "course_id": course_id
+                "course_id": course_id,
+                "provider": provider
             }
         )
         if not serializer.is_valid():

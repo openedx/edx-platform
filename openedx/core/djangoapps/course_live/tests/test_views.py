@@ -15,7 +15,9 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..config.waffle import ENABLE_COURSE_LIVE
 from ..models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
-from ..utils import provider_requires_pii_sharing
+from ..providers import ProviderManager
+
+providers = ProviderManager().get_enabled_providers()
 
 
 @ddt.ddt
@@ -48,7 +50,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         creates a courseLiveConfiguration
         """
-        if provider_requires_pii_sharing(provider):
+        if providers.get(provider).requires_pii_sharing():
             CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=True)
 
         lti_config = {
@@ -86,6 +88,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
                 'version': 'lti_1p1',
                 'lti_config': {}
             },
+            'free_tier': False,
             'pii_sharing_allowed': False
         }
         self.assertEqual(response.data, expected_data)
@@ -108,6 +111,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
                 'lti_config': {},
                 'version': 'lti_1p1'
             },
+            'free_tier': False,
             'provider_type': ''
         }
         content = json.loads(response.content.decode('utf-8'))
@@ -150,6 +154,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
             'enabled': True,
             'pii_sharing_allowed': share_email or share_username,
             'provider_type': provider,
+            'free_tier': False,
             'lti_configuration': {
                 'lti_1p1_client_key': 'this_is_key',
                 'lti_1p1_client_secret': 'this_is_secret',
@@ -164,6 +169,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
                 },
             },
         }
+
         content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(content, expected_data)
@@ -196,6 +202,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
             'course_key': str(self.course.id),
             'provider_type': provider,
             'enabled': False,
+            'free_tier': False,
             'lti_configuration': {
                 'lti_1p1_client_key': 'new_key',
                 'lti_1p1_client_secret': 'new_secret',
@@ -258,6 +265,46 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
             'title': 'Live',
             'url': f'http://learning-mfe/course/{self.course.id}/live'
         })
+
+    @ddt.data(('big_blue_button', False, True))
+    @ddt.unpack
+    def test_create_configurations_response_free_tier(self, provider, share_email, share_username):
+        """
+        Create and test POST request response data
+        """
+        if providers.get(provider).requires_pii_sharing():
+            CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=True)
+
+        lti_config = {
+            'lti_1p1_client_key': 'this_is_key',
+            'lti_1p1_client_secret': 'this_is_secret',
+            'lti_1p1_launch_url': 'example.com',
+            'lti_config': {
+                'additional_parameters': {
+                    'custom_instructor_email': "email@example.com"
+                }
+            },
+        }
+        course_live_config_data = {
+            'free_tier': True,
+            'enabled': True,
+            'provider_type': provider,
+            'lti_configuration': lti_config
+        }
+        response = self._post(course_live_config_data)
+
+        expected_data = {
+            'course_key': str(self.course.id),
+            'enabled': True,
+            'pii_sharing_allowed': share_email or share_username,
+            'provider_type': provider,
+            'free_tier': True,
+            'lti_configuration': None
+        }
+
+        content = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(content, expected_data)
 
 
 class TestCourseLiveProvidersView(ModuleStoreTestCase, APITestCase):

@@ -55,6 +55,10 @@ class CourseLiveConfiguration(TimeStampedModel):
         verbose_name=_("LTI provider"),
         help_text=_("The LTI provider's id"),
     )
+    free_tier = models.BooleanField(
+        default=False,
+        help_text=_("True, if LTI credential are provided by Org globally")
+    )
     history = HistoricalRecords()
 
     def __str__(self):

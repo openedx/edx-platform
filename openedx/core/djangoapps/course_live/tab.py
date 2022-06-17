@@ -41,7 +41,16 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
         """
         Get course live configurations
         """
-        return CourseLiveConfiguration.get(course.id).lti_configuration
+        course_live_configurations = CourseLiveConfiguration.get(course.id)
+        if course_live_configurations.free_tier:
+            return LtiConfiguration(
+                lti_1p1_launch_url='',
+                lti_1p1_client_key='',
+                lti_1p1_client_secret='',
+                version='lti_1p1',
+                config_store=LtiConfiguration.CONFIG_ON_DB,
+            )
+        return course_live_configurations.lti_configuration
 
     @classmethod
     @request_cached()
@@ -49,6 +58,8 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
         """
         Check if the tab is enabled.
         """
-        return (ENABLE_COURSE_LIVE.is_enabled(course.id) and
-                super().is_enabled(course, user) and
-                CourseLiveConfiguration.is_enabled(course.id))
+        return (
+            ENABLE_COURSE_LIVE.is_enabled(course.id) and
+            super().is_enabled(course, user) and
+            CourseLiveConfiguration.is_enabled(course.id)
+        )
