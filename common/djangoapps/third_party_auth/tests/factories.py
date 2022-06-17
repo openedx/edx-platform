@@ -35,7 +35,7 @@ class SAMLProviderConfigFactory(DjangoModelFactory):
 
     enabled = True
     slug = factory.LazyAttribute(lambda x: FAKER.slug())
-    name = "TestShib College"
+    name = factory.LazyAttribute(lambda x: FAKER.company())
 
     entity_id = factory.LazyAttribute(lambda x: FAKER.uri())
     metadata_source = factory.LazyAttribute(lambda x: FAKER.uri())
