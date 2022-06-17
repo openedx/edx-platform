@@ -60,8 +60,8 @@ cp -f --target-directory=common/static/common/js/vendor \
 # Run webpack.
 # (reimplementing pavelib.assets:webpack)
 NODE_ENV=development \
-	STATIC_ROOT_LMS=/edx/var/edxapp/staticfiles \
-	STATIC_ROOT_CMS=/edx/var/edxapp/staticfiles/studio \
+	STATIC_ROOT_LMS=edx/var/edxapp/staticfiles \
+	STATIC_ROOT_CMS=edx/var/edxapp/staticfiles/studio \
 	JS_ENV_EXTRA_CONFIG="{}" \
 	$(npm bin)/webpack --config=webpack.dev.config.js
 
