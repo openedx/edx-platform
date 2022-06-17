@@ -58,6 +58,7 @@
 # Mireille Cabuay, 2018
 # moocit-france <contact@moocit.fr>, 2014-2018,2020
 # mtyaka <mtyaka@gmail.com>, 2015-2016
+# Nicolas François Leperlier <leperlier.n@gmail.com>, 2022
 # Nikolaos Maris, 2013
 # Nikolaos Maris, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
@@ -206,7 +207,7 @@
 # Ramarohetra Malalatiana <mtiana8@gmail.com>, 2014
 # Muhammad Ayub khan <ayubkhan@edx.org>, 2018
 # eddy01 <ngwa.edwin@yahoo.com>, 2014
-# Nicolas François Leperlier <leperlier.n@gmail.com>, 2021
+# Nicolas François Leperlier <leperlier.n@gmail.com>, 2021-2022
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # PETIT Yannick <yannick.petit@gmail.com>, 2013
@@ -312,7 +313,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-22 20:43+0000\n"
+"POT-Creation-Date: 2022-06-12 20:44+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Alexandre DS <alexandre@cleverm8.com>, 2020\n"
 "Language-Team: French (https://www.transifex.com/open-edx/teams/6205/fr/)\n"
@@ -970,7 +971,7 @@ msgstr "Inscription impossible"
 
 #: common/djangoapps/student/views/management.py
 msgid "Unenrollment is currently disabled"
-msgstr "La désinscription est actuellement désactivée"
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "You are not enrolled in this course"
@@ -2514,6 +2515,7 @@ msgid "Whether to force the save button to appear on the page"
 msgstr "Forcer le bouton enregistrer pour apparaître sur la page"
 
 #: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Show Reset Button"
 msgstr "Afficher le bouton Réinitialiser"
 
@@ -4127,6 +4129,12 @@ msgid ""
 msgstr ""
 "Choisir un type de problème à récupérer de la bibliothèque. If \"Tout Type\""
 " est sélectionné aucun filtre n'est appliqué."
+
+#: common/lib/xmodule/xmodule/library_content_module.py
+msgid ""
+"Determines whether a 'Reset Problems' button is shown, so users may reset "
+"their answers and reshuffle selected items."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
@@ -6794,7 +6802,6 @@ msgstr ""
 "Veuillez contacter l'administrateur de votre diplôme ou le {platform_name} "
 "si vous avez des questions."
 
-#: lms/djangoapps/course_home_api/outline/views.py
 #: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "Ce cours est complet"
@@ -7104,23 +7111,21 @@ msgstr ""
 
 #: lms/djangoapps/courseware/models.py
 msgid "Internal API Base URL"
-msgstr "URL de base de l&#39;API interne"
+msgstr ""
 
 #: lms/djangoapps/courseware/models.py
 msgid "Financial Assistance Backend API Base URL."
-msgstr "URL de base de l&#39;API Backend de l&#39;assistance financière."
+msgstr ""
 
 #: lms/djangoapps/courseware/models.py
 msgid ""
 "Username created for Financial Assistance Backend, e.g. "
 "financial_assistance_service_user."
 msgstr ""
-"Nom d&#39;utilisateur créé pour Financial Assistance Backend, par exemple "
-"financial_assistance_service_user."
 
 #: lms/djangoapps/courseware/models.py
 msgid "Percentage of courses allowed to use edx-financial-assistance"
-msgstr "Pourcentage de cours autorisés à utiliser edx-financial-assistance"
+msgstr ""
 
 #: lms/djangoapps/courseware/plugins.py lms/djangoapps/courseware/tabs.py
 #: lms/templates/peer_grading/peer_grading.html
@@ -7263,19 +7268,6 @@ msgid "You've earned a certificate for this course."
 msgstr "Vous avez obtenu un certificat pour ce cours."
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Certificate unavailable"
-msgstr "Certificat non disponible"
-
-#: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
-msgid ""
-"You have not received a certificate because you do not have a current "
-"{platform_name} verified identity."
-msgstr ""
-"Vous n'avez pas reçu de certificat parce que vous n'avez actuellement pas "
-"d'identité vérifiée sur {platform_name}."
-
-#: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate will be available soon!"
 msgstr "Votre attestation sera bientôt disponible!"
 
@@ -7290,6 +7282,19 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate is available"
 msgstr "Votre certificat est disponible"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Certificate unavailable"
+msgstr "Certificat non disponible"
+
+#: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity."
+msgstr ""
+"Vous n'avez pas reçu de certificat parce que vous n'avez actuellement pas "
+"d'identité vérifiée sur {platform_name}."
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
@@ -7453,14 +7458,21 @@ msgid "Good"
 msgstr "Bien"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 #, python-format
-msgid "%(course_name)s %(course_id)s Reported content awaits review"
+msgid ""
+"\n"
+"                        %(course_name)s: Reported content awaits review\n"
+"                    "
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 msgid "Go to Discussion"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
+#, python-format
+msgid "%(course_name)s: Reported content awaits review"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/subject.txt
@@ -9618,12 +9630,11 @@ msgid "You have signed out."
 msgstr "Vous vous êtes déconnecté."
 
 #: lms/templates/logout.html
-#, python-brace-format
+#, python-format, python-brace-format
 msgid ""
-"{start_anchor}Click here{end_anchor} to delete your single signed on (SSO) "
-"session."
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}Click here{end_anchor} to "
+"delete your single signed on (SSO) session."
 msgstr ""
-"{start_anchor}Cliquer ici{end_anchor} pour supprimer votre session (SSO)."
 
 #: lms/templates/logout.html
 msgid "We are signing you in."
@@ -9639,13 +9650,12 @@ msgstr ""
 "Ceci prendra une minute. Si vous n'êtes pas redirigés, allez à la page d'accueil."
 
 #: lms/templates/logout.html
-#, python-brace-format
+#, python-format, python-brace-format
 msgid ""
-"If you are not redirected within 5 seconds, {start_anchor}click here to go "
-"to the home page{end_anchor}."
+"If you are not redirected within 5 seconds, "
+"{start_anchor}%(target)s{middle_anchor}click here to go to the home "
+"page{end_anchor}."
 msgstr ""
-"Si vous n'êtes pas redirigé dans les 5 secondes, {start_anchor} cliquez ici "
-"pour accéder à la page d'accueil {end_anchor}."
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -12047,6 +12057,11 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr "Le champ '{field_name}' ne peut pas être modifié."
 
+#: openedx/core/djangoapps/user_api/accounts/api.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Enter a valid name"
+msgstr "Entrez un nom valide"
+
 #. Translators: This label appears above a field which allows the
 #. user to input the First Name
 #. Translators: This label appears above a field on the registration form
@@ -12571,10 +12586,6 @@ msgid "Full Name cannot contain the following characters: < >"
 msgstr "Le Nom complet ne peut pas contenir les caractères: < >"
 
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "Enter a valid name"
-msgstr "Entrez un nom valide"
-
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "A properly formatted e-mail is required"
 msgstr "Une adresse e-mail valide est requise"
 
@@ -12758,7 +12769,6 @@ msgid "{header_open}{title}{header_close}"
 msgstr "{header_open}{title}{header_close}"
 
 #: openedx/core/djangoapps/util/user_messages.py
-#: cms/templates/course_outline.html cms/templates/index.html
 msgid "Dismiss"
 msgstr "Renvoyer"
 
@@ -15418,6 +15428,10 @@ msgstr "Échéance {date}"
 msgid "Past due"
 msgstr "En retard"
 
+#: lms/templates/vert_module.html
+msgid "Reset Problems"
+msgstr ""
+
 #: lms/templates/video.html
 msgid "Loading video player"
 msgstr "Chargement du lecteur vidéo"
@@ -17341,8 +17355,8 @@ msgid "Share with friends and family!"
 msgstr "Partager avec ses amis et sa famille !"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
-msgid "I just enrolled in {number} {title} through {account}: {url}"
-msgstr "Je me suis inscrit à {number} {title} via {account} : {url}"
+msgid "I just enrolled in {number} {title} through {account} {url}"
+msgstr "Je viens de m&#39;inscrire à {number} {title} via {account} {url}"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {platform} {url}"
@@ -22235,7 +22249,7 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Course Outline"
-msgstr "Plan du Cours"
+msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""

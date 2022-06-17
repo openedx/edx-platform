@@ -350,6 +350,7 @@ def _link_user_to_third_party_provider(
 def _track_user_registration(user, profile, params, third_party_provider, registration):
     """ Track the user's registration. """
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
+        is_marketable = params.get('marketing_emails_opt_in') in ['true', '1']
         traits = {
             'email': user.email,
             'username': user.username,
@@ -361,10 +362,10 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'address': profile.mailing_address,
             'gender': profile.gender_display,
             'country': str(profile.country),
-            'is_marketable': params.get('marketing_emails_opt_in') == 'true'
+            'is_marketable': is_marketable
         }
         if settings.MARKETING_EMAILS_OPT_IN and params.get('marketing_emails_opt_in'):
-            email_subscribe = 'subscribed' if params.get('marketing_emails_opt_in') == 'true' else 'unsubscribed'
+            email_subscribe = 'subscribed' if is_marketable else 'unsubscribed'
             traits['email_subscribe'] = email_subscribe
 
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
@@ -386,7 +387,7 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
         }
         # VAN-738 - added below properties to experiment marketing emails opt in/out events on Braze.
         if params.get('marketing_emails_opt_in') and settings.MARKETING_EMAILS_OPT_IN:
-            properties['marketing_emails_opt_in'] = params.get('marketing_emails_opt_in') == 'true'
+            properties['marketing_emails_opt_in'] = is_marketable
 
         # DENG-803: For segment events forwarded along to Hubspot, duplicate the `properties` section of
         # the event payload into the `traits` section so that they can be received. This is a temporary
@@ -792,8 +793,11 @@ class RegistrationValidationView(APIView):
     def name_handler(self, request):
         """ Validates whether fullname is valid """
         name = request.data.get('name')
+        validation_error = get_name_validation_error(name)
+        if validation_error:
+            return validation_error
         self.username_suggestions = generate_username_suggestions(name)
-        return get_name_validation_error(name)
+        return validation_error
 
     def username_handler(self, request):
         """ Validates whether the username is valid. """

@@ -505,8 +505,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
     # .. toggle_description: When enabled, along with the ENABLE_MKTG_SITE feature toggle, users who attempt to access a
-    #   course "about" page will be redirected to the course home url. This url might be the course "info" page or the
-    #   unified course tab (when the DISABLE_UNIFIED_COURSE_TAB_FLAG waffle is not enabled).
+    #   course "about" page will be redirected to the course home url.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2019-01-15
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19604
@@ -1090,16 +1089,6 @@ COURSES_ROOT = ENV_ROOT / "data"
 NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
-
-# For Node.js
-
-system_node_path = os.environ.get("NODE_PATH", NODE_MODULES_ROOT)
-
-node_paths = [
-    COMMON_ROOT / "static/js/vendor",
-    system_node_path,
-]
-NODE_PATH = ':'.join(node_paths)
 
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
@@ -3152,9 +3141,6 @@ INSTALLED_APPS = [
     # Catalog integration
     'openedx.core.djangoapps.catalog',
 
-    # Self-paced course configuration
-    'openedx.core.djangoapps.self_paced',
-
     'sorl.thumbnail',
 
     # edx-milestones service
@@ -4925,15 +4911,10 @@ HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 
 ############### Settings for the ace_common plugin #################
-ACE_ENABLED_CHANNELS = ['django_email']
-ACE_ENABLED_POLICIES = ['bulk_email_optout']
-ACE_CHANNEL_SAILTHRU_DEBUG = True
-ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = None
-ACE_ROUTING_KEY = 'edx.lms.core.default'
-ACE_CHANNEL_DEFAULT_EMAIL = 'django_email'
-ACE_CHANNEL_TRANSACTIONAL_EMAIL = 'django_email'
-ACE_CHANNEL_SAILTHRU_API_KEY = ""
-ACE_CHANNEL_SAILTHRU_API_SECRET = ""
+# Note that all settings are actually defined by the plugin
+# pylint: disable=wrong-import-position
+from openedx.core.djangoapps.ace_common.settings import common as ace_common_settings
+ACE_ROUTING_KEY = ace_common_settings.ACE_ROUTING_KEY
 
 ############### Settings swift #####################################
 SWIFT_USERNAME = None

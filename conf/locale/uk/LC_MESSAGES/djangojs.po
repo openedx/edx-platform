@@ -31,7 +31,7 @@
 # Sofiia <s.prokopchuk13@gmail.com>, 2015
 # Zoriana Zaiats, 2015
 # Tetiana Korshun, 2014
-# Tetiana Korshun, 2014
+# Tanya Korshun, 2014
 # Volodymyr Matskiv <xxwolfsilver@gmail.com>, 2014
 # Юра Антонов <yuraantonov11@gmail.com>, 2015
 # Zapadenska <oruda@ymail.com>, 2014
@@ -55,7 +55,7 @@
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # Zapadenska <oruda@ymail.com>, 2014
 # Zoriana Zaiats, 2015
-# Tetiana Korshun, 2014
+# Tanya Korshun, 2014
 # Waheed Ahmed <waheed@edx.org>, 2019
 # Zoriana Zaiats, 2015
 # Ксенія Воронова <ksenya.voronova@gmail.com>, 2016
@@ -84,7 +84,7 @@
 # olexiim <olexiim@gmail.com>, 2014-2015
 # Olga Filipova <chudaol@gmail.com>, 2014,2016-2017
 # Olga Filipova <olga.filipova@feedzai.com>, 2016,2018
-# Tetiana Korshun, 2014
+# Tanya Korshun, 2014
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
@@ -96,13 +96,13 @@
 # Denis <prohibiti@gmail.com>, 2015
 # Irene Korotkova <irca.gav@gmail.com>, 2017
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
-# Tetiana Korshun, 2014
+# Tanya Korshun, 2014
 # Ксенія Воронова <ksenya.voronova@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-05-22 20:43+0000\n"
+"POT-Creation-Date: 2022-06-12 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Andrey Kryachko, 2018\n"
 "Language-Team: Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)\n"
@@ -2605,7 +2605,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
-msgstr "Деталі"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "the more quickly and helpfully we can respond!"
@@ -5844,7 +5844,7 @@ msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr "Номер Курсу:"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
@@ -5852,7 +5852,7 @@ msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr "(Лише для читання)"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"

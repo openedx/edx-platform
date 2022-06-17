@@ -157,8 +157,44 @@ class TestUtils(TestCase):
             </md:EntityDescriptor>
         '''
         xml = etree.fromstring(xml_text, parser)
-        public_key, sso_url, _ = parse_metadata_xml(xml, entity_id)
-        assert public_key == 'abc+hkIuUktxkg='
+        public_keys, sso_url, _ = parse_metadata_xml(xml, entity_id)
+        assert public_keys == ['abc+hkIuUktxkg=']
+        assert sso_url == 'https://idp/SSOService.php'
+
+    def test_parse_metadata_uses_multiple_signing_cert(self):
+        entity_id = 'http://testid'
+        parser = etree.XMLParser(remove_comments=True)
+        xml_text = '''<?xml version="1.0"?>
+            <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="http://testid">
+                <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                    <md:KeyDescriptor use="signing">
+                        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                            <ds:X509Data>
+                            <ds:X509Certificate>abc+hkIuUktxkg=</ds:X509Certificate>
+                            </ds:X509Data>
+                        </ds:KeyInfo>
+                    </md:KeyDescriptor>
+                    <md:KeyDescriptor use="signing">
+                        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                            <ds:X509Data>
+                            <ds:X509Certificate>xyz+ayylmao=</ds:X509Certificate>
+                            </ds:X509Data>
+                        </ds:KeyInfo>
+                    </md:KeyDescriptor>
+                    <md:KeyDescriptor use="encryption">
+                        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                            <ds:X509Data>
+                            <ds:X509Certificate>blachabc+hkIuUktxkg=blaal;skdjf;ksd</ds:X509Certificate>
+                            </ds:X509Data>
+                        </ds:KeyInfo>
+                    </md:KeyDescriptor>
+                    <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp/SSOService.php"/>
+                </md:IDPSSODescriptor>
+            </md:EntityDescriptor>
+        '''
+        xml = etree.fromstring(xml_text, parser)
+        public_keys, sso_url, _ = parse_metadata_xml(xml, entity_id)
+        assert public_keys == ['abc+hkIuUktxkg=', 'xyz+ayylmao=']
         assert sso_url == 'https://idp/SSOService.php'
 
     def test_parse_metadata_with_use_attribute_missing(self):
@@ -179,6 +215,6 @@ class TestUtils(TestCase):
             </md:EntityDescriptor>
         '''
         xml = etree.fromstring(xml_text, parser)
-        public_key, sso_url, _ = parse_metadata_xml(xml, entity_id)
-        assert public_key == 'abc+hkIuUktxkg='
+        public_keys, sso_url, _ = parse_metadata_xml(xml, entity_id)
+        assert public_keys == ['abc+hkIuUktxkg=']
         assert sso_url == 'https://idp/SSOService.php'

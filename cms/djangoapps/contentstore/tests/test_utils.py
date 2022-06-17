@@ -738,32 +738,41 @@ class ValidateCourseOlxTests(CourseTestCase):
             )
 
 
-class DetermineLabelTestCase(TestCase):
-    """Tests for xblock Title quirks"""
+class DetermineLabelTests(TestCase):
+    """Tests for xblock Title"""
 
-    def validate_html_replaced_with_text(self):
+    def test_html_replaced_with_text_for_none(self):
         """
-        Tests that display names for "html" xblocks are repleaced with "Text" when the display name is otherwise unset.
+        Tests that display names for "html" xblocks are replaced with "Text" when the display name is otherwise unset.
         """
         display_name = None
         block_type = "html"
         result = utils.determine_label(display_name, block_type)
-        self.assertEqual(result, display_name)
+        self.assertEqual(result, "Text")
 
-    def validate_set_titles_not_replaced(self):
+    def test_html_replaced_with_text_for_empty(self):
         """
-        Tests that display names for "html" xblocks are not repleaced with "Text" when the display name is set.
+        Tests that display names for "html" xblocks are replaced with "Text" when the display name is empty.
+        """
+        display_name = ""
+        block_type = "html"
+        result = utils.determine_label(display_name, block_type)
+        self.assertEqual(result, "Text")
+
+    def test_set_titles_not_replaced(self):
+        """
+        Tests that display names for "html" xblocks are not replaced with "Text" when the display name is set.
         """
         display_name = "Something"
         block_type = "html"
         result = utils.determine_label(display_name, block_type)
-        self.assertEqual(result, display_name)
+        self.assertEqual(result, "Something")
 
-    def validate_non_html_blocks_titles_not_replaced(self):
+    def test_non_html_blocks_titles_not_replaced(self):
         """
-        Tests that display names for non-"html" xblocks are not repleaced with "Text" when the display name is set.
+        Tests that display names for non-"html" xblocks are not replaced with "Text" when the display name is set.
         """
         display_name = None
         block_type = "something else"
         result = utils.determine_label(display_name, block_type)
-        self.assertEqual(result, display_name)
+        self.assertEqual(result, "something else")

@@ -15,8 +15,6 @@ class RegistrationFieldsContext(APIView):
     """
     Registration Fields View used by optional and required fields view.
     """
-    # allow to define custom set of required/optional/hidden fields via configuration
-    FIELD_TYPE = 'hidden'
 
     EXTRA_FIELDS = [
         'confirm_email',
@@ -58,8 +56,9 @@ class RegistrationFieldsContext(APIView):
 
         return field_order
 
-    def __init__(self):
+    def __init__(self, field_type='required'):
         super().__init__()
+        self.field_type = field_type
         self._fields_setting = copy.deepcopy(configuration_helpers.get_value('REGISTRATION_EXTRA_FIELDS'))
         if not self._fields_setting:
             self._fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
@@ -70,18 +69,18 @@ class RegistrationFieldsContext(APIView):
             ordered_extra_fields.remove('year_of_birth')
 
         self.valid_fields = [
-            field for field in ordered_extra_fields if self._fields_setting.get(field) == self.FIELD_TYPE
+            field for field in ordered_extra_fields if self._fields_setting.get(field) == self.field_type
         ]
 
         custom_form = get_registration_extension_form()
         if custom_form:
             for field_name, field in custom_form.fields.items():
-                # If the FIELD_TYPE is required make sure the custom field is required in the form and if the
-                # FIELD_TYPE is optional only add field if it is not required. This is to make sure field is
+                # If the field_type is required make sure the custom field is required in the form and if the
+                # field_type is optional only add field if it is not required. This is to make sure field is
                 # added only once either on Registration Page or Progressive Profiling page.
                 if (
-                    field.required and self.FIELD_TYPE == 'required' or
-                    not field.required and self.FIELD_TYPE == 'optional'
+                    field.required and self.field_type == 'required' or
+                    not field.required and self.field_type == 'optional'
                 ):
                     self.valid_fields.append(field_name)
 
@@ -95,11 +94,15 @@ class RegistrationFieldsContext(APIView):
         for field in self.valid_fields:
             if custom_form and field in custom_form.fields:
                 response[field] = form_fields.add_extension_form_field(
-                    field, custom_form, custom_form.fields[field], self.FIELD_TYPE
+                    field, custom_form, custom_form.fields[field], self.field_type
                 )
             else:
                 field_handler = getattr(form_fields, f'add_{field}_field', None)
                 if field_handler:
-                    response[field] = field_handler(self.FIELD_TYPE == 'required')
+                    if field == 'confirm_email':
+                        if self.field_type == 'required':
+                            response[field] = field_handler(self.field_type == 'required')
+                    else:
+                        response[field] = field_handler(self.field_type == 'required')
 
         return response

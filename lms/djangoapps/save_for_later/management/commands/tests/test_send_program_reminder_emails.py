@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import ddt
 from django.core.management import call_command
+from django.test.utils import override_settings
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -26,10 +27,14 @@ class SavedProgramReminderEmailsTest(SharedModuleStoreTestCase):
         self.program = ProgramFactory(uuid=self.uuid)
         self.saved_program = SavedPogramFactory.create(program_uuid=self.uuid)
 
+    @override_settings(
+        EDX_BRAZE_API_KEY='test-key',
+        EDX_BRAZE_API_SERVER='http://test.url'
+    )
     @patch('lms.djangoapps.save_for_later.management.commands.send_program_reminder_emails.get_programs')
     def test_send_reminder_emails(self, mock_get_programs):
         mock_get_programs.return_value = self.program
-        with patch('lms.djangoapps.save_for_later.helper.BrazeClient') as mock_task:
+        with patch('lms.djangoapps.utils.BrazeClient') as mock_task:
             call_command('send_program_reminder_emails', '--batch-size=1')
             mock_task.assert_called()
 

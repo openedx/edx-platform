@@ -11,7 +11,7 @@
                     margin: 20px 20px 30px 30px;
                     color: rgba(0,0,0,.75);">
     <h3> <b> You are receiving this email because the following {{ content_type }} was reported for review </b> </h3>
-    <h3> <b> {{ title }} </b> </h3>
+    <h3> <b> Post Title: {{ title }} </b> </h3>
     {{ content_body }}
 </div>
 

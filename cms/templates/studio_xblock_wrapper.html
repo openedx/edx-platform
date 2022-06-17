@@ -59,7 +59,12 @@ block_is_unit = is_unit(xblock)
     % if not show_preview:
         is-collapsed
     % endif
-    ">
+    "
+    use-new-editor-text = ${use_new_editor_text}
+    use-new-editor-video = ${use_new_editor_video}
+    use-new-editor-problem = ${use_new_editor_problem}
+    authoring_MFE_base_url = ${get_editor_page_base_url(xblock.location.course_key)}
+    >
         <div class="header-details">
             % if show_inline:
             <a href="#" data-tooltip="${_('Expand or Collapse')}" class="action expand-collapse collapse">
@@ -80,12 +85,7 @@ block_is_unit = is_unit(xblock)
                     % if can_edit:
                         % if not show_inline:
                             <li class="action-item action-edit">
-                                <button class="btn-default edit-button action-button"
-                                    use-new-editor-text = ${use_new_editor_text}
-                                    use-new-editor-video = ${use_new_editor_video}
-                                    use-new-editor-problem = ${use_new_editor_problem}
-                                    authoring_MFE_base_url = ${get_editor_page_base_url(xblock.location.course_key)}
-                                >
+                                <button class="btn-default edit-button action-button">
                                     <span class="icon fa fa-pencil" aria-hidden="true"></span>
                                     <span class="action-button-text">${_("Edit")}</span>
                                 </button>

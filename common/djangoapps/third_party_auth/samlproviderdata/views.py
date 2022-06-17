@@ -18,7 +18,7 @@ from rest_framework.response import Response
 
 from common.djangoapps.third_party_auth.utils import (
     convert_saml_slug_provider_id,
-    create_or_update_saml_provider_data,
+    create_or_update_bulk_saml_provider_data,
     fetch_metadata_xml,
     parse_metadata_xml,
     validate_uuid4_string
@@ -110,12 +110,12 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
         entity_id = request.POST.get('entity_id')
         metadata_url = request.POST.get('metadata_url')
         sso_url = request.POST.get('sso_url')
-        public_key = request.POST.get('public_key')
+        public_keys = request.POST.get('public_key')
         if not entity_id:
             return Response('entity_id is required', status.HTTP_400_BAD_REQUEST)
-        if not metadata_url and not (sso_url and public_key):
+        if not metadata_url and not (sso_url and public_keys):
             return Response('either metadata_url or sso and public key are required', status.HTTP_400_BAD_REQUEST)
-        if metadata_url and (sso_url or public_key):
+        if metadata_url and (sso_url or public_keys):
             return Response(
                 'either metadata_url or sso and public key can be provided, not both', status.HTTP_400_BAD_REQUEST
             )
@@ -131,18 +131,18 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
 
             # part 2: create/update samlproviderdata
             log.info("Processing IdP with entityID %s", entity_id)
-            public_key, sso_url, expires_at = parse_metadata_xml(xml, entity_id)
+            public_keys, sso_url, expires_at = parse_metadata_xml(xml, entity_id)
         else:
             now = datetime.now()
             expires_at = now.replace(year=now.year + 10)
-        changed = create_or_update_saml_provider_data(entity_id, public_key, sso_url, expires_at)
+        changed = create_or_update_bulk_saml_provider_data(entity_id, public_keys, sso_url, expires_at)
         if changed:
-            str_message = f" Created new record for SAMLProviderData for entityID {entity_id}"
+            str_message = f" Created new record(s) for SAMLProviderData for entityID {entity_id}"
             log.info(str_message)
             response = str_message
             http_status = status.HTTP_201_CREATED
         else:
-            str_message = f" Updated existing SAMLProviderData for entityID {entity_id}"
+            str_message = f" Updated existing SAMLProviderData record(s) for entityID {entity_id}"
             log.info(str_message)
             response = str_message
             http_status = status.HTTP_200_OK
