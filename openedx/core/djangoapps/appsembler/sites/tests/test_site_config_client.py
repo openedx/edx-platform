@@ -208,4 +208,3 @@ def test_get_current_site_config_tier_info():
         tier_info = get_current_site_config_tier_info()
 
     assert not tier_info.has_subscription_ended(), 'Should return valid TierInfo object'
-
