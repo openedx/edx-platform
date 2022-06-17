@@ -1454,25 +1454,124 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
     def setUp(self):
         super().setUp()
-        self.author = UserFactory.create()
+        self.author = self.user
+        self.remove_keys = [
+            "abuse_flaggers",
+            "body",
+            "children",
+            "commentable_id",
+            "endorsed",
+            "last_activity_at",
+            "resp_total",
+            "thread_type",
+            "user_id",
+            "username",
+            "votes",
+        ]
+        self.replace_keys = [
+            {"from": "unread_comments_count", "to": "unread_comment_count"},
+            {"from": "comments_count", "to": "comment_count"},
+        ]
+        self.add_keys = [
+            {"key": "author", "value": self.author.username},
+            {"key": "abuse_flagged", "value": False},
+            {"key": "author_label", "value": None},
+            {"key": "can_delete", "value": True},
+            {"key": "close_reason", "value": None},
+            {
+                "key": "comment_list_url",
+                "value": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread"
+            },
+            {
+                "key": "editable_fields",
+                "value": [
+                    'abuse_flagged', 'anonymous', 'following', 'raw_body',
+                    'read', 'title', 'topic_id', 'type', 'voted'
+                ]
+            },
+            {"key": "endorsed_comment_list_url", "value": None},
+            {"key": "following", "value": False},
+            {"key": "group_name", "value": None},
+            {"key": "has_endorsed", "value": False},
+            {"key": "last_edit", "value": None},
+            {"key": "non_endorsed_comment_list_url", "value": None},
+            {"key": "preview_body", "value": "Test body"},
+            {"key": "raw_body", "value": "Test body"},
+
+            {"key": "rendered_body", "value": "<p>Test body</p>"},
+            {"key": "response_count", "value": 0},
+            {"key": "topic_id", "value": "test_topic"},
+            {"key": "type", "value": "discussion"},
+            {"key": "users", "value": {
+                self.user.username: {
+                    "profile": {
+                        "image": {
+                            "has_image": False,
+                            "image_url_full": "http://testserver/static/default_500.png",
+                            "image_url_large": "http://testserver/static/default_120.png",
+                            "image_url_medium": "http://testserver/static/default_50.png",
+                            "image_url_small": "http://testserver/static/default_30.png",
+                        }
+                    }
+                }
+            }},
+            {"key": "vote_count", "value": 4},
+            {"key": "voted", "value": False},
+
+        ]
         self.url = reverse("discussion_learner_threads", kwargs={'course_id': str(self.course.id)})
 
+    def update_thread(self, thread):
+        """
+        This function updates the thread by adding and remove some keys.
+        Value of these keys has been defined in setUp function
+        """
+        for element in self.add_keys:
+            thread[element['key']] = element['value']
+        for pair in self.replace_keys:
+            thread[pair['to']] = thread.pop(pair['from'])
+        for key in self.remove_keys:
+            thread.pop(key)
+        thread['comment_count'] += 1
+        return thread
+
     def test_basic(self):
-        expected_response = {
+        self.register_get_user_response(self.user)
+        expected_cs_comments_response = {
             "collection": [make_minimal_cs_thread({
-                "username": self.author.username,
-                "user_id": self.author.id,
+                "id": "test_thread",
+                "course_id": str(self.course.id),
+                "commentable_id": "test_topic",
+                "user_id": str(self.user.id),
+                "username": self.user.username,
+                "created_at": "2015-04-28T00:00:00Z",
+                "updated_at": "2015-04-28T11:11:11Z",
+                "title": "Test Title",
+                "body": "Test body",
+                "votes": {"up_count": 4},
+                "comments_count": 5,
+                "unread_comments_count": 3,
             })],
             "page": 1,
             "num_pages": 1,
         }
-        self.register_user_active_threads(self.author.id, expected_response)
-        self.url += f"?user_id={self.author.id}"
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        self.url += f"?user_id={self.user.id}"
         response = self.client.get(self.url)
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
-        expected_api_response = expected_response['collection']
+        expected_api_response = expected_cs_comments_response['collection']
+
+        for thread in expected_api_response:
+            self.update_thread(thread)
+
         assert response_data['results'] == expected_api_response
+        assert response_data['pagination'] == {
+            "next": None,
+            "previous": None,
+            "count": 1,
+            "num_pages": 1,
+        }
 
     def test_no_user_id_given(self):
         response = self.client.get(self.url)
