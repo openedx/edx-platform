@@ -67,4 +67,5 @@ jobs:
 
     - name: Run Tests
       run: |
+        npm install
         ./scripts/update-assets-dev.sh
