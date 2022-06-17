@@ -12,6 +12,7 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteFacto
 
 FAKER = FakerFactory.create()
 
+
 class SAMLConfigurationFactory(DjangoModelFactory):
     """
     Factory or SAMLConfiguration model in third_party_auth app.
