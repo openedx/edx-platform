@@ -1,20 +1,21 @@
 name: Static assets check
 
 on:
-  workflow_dispatch:
   pull_request:
   push:
     branches:
       - master
 
 jobs:
-  check_migrations:
-    name: check migrations
+  static_assets_check:
+    name: Static Assets check
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
+        node-version: [ 16 ]
+        npm-version: [ 8.5.x ]
 
     steps:
     - name: Checkout repo
@@ -25,40 +26,13 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install system Packages
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libxmlsec1-dev
-
-    - name: Get pip cache dir
-      id: pip-cache-dir
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
-
-    - name: Cache pip dependencies
-      id: cache-dependencies
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.pip-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
-
-    - name: Install Python dependencies
-      run: |
-        pip install -r requirements/pip.txt
-        pip install -r requirements/edx/development.txt
-        pip uninstall -y mysqlclient
-        pip install --no-binary mysqlclient mysqlclient
-        pip uninstall -y xmlsec
-        pip install --no-binary xmlsec xmlsec
-
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
 
     - name: Setup npm
-      run: npm i -g npm@8.5.x
+      run: npm i -g npm@${{ matrix.npm-version }}
 
 
     - name: Initiate Services
@@ -71,6 +45,6 @@ jobs:
         CMS_CFG: cms/envs/bok_choy.yml
       run: |
         # npm install
-        npm install -g rtlcss
+        # npm install -g rtlcss
         # ./scripts/update-assets-dev.sh
         paver update_assets
