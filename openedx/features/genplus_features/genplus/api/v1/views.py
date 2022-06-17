@@ -26,17 +26,19 @@ class UserInfo(views.APIView):
         get user's basic info
         """
         try:
-            gen_user_role = GenUser.objects.get(user=self.request.user).role
+            gen_user = GenUser.objects.get(user=self.request.user)
         except GenUser.DoesNotExist:
-            gen_user_role = None
+            gen_user = None
 
         user_info = {
             'id': self.request.user.id,
             'name': self.request.user.profile.name,
             'username': self.request.user.username,
             'csrf_token': csrf.get_token(self.request),
-            'role': gen_user_role
+            'role': gen_user.role
         }
+        if gen_user.role == GenUser.STUDENT:
+            user_info.update({'on_board': gen_user.student.on_board})
         return Response(status=status.HTTP_200_OK, data=user_info)
 
 
