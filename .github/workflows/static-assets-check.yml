@@ -36,6 +36,7 @@ jobs:
 
     - name: Install Python dependencies
       run: |
+        pip install -r requirements/pip.txt
         pip install -r requirements/edx/development.txt
 
     - name: Initiate Services
