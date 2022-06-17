@@ -34,6 +34,9 @@ jobs:
     - name: Setup npm
       run: npm i -g npm@${{ matrix.npm-version }}
 
+    - name: Install Python dependencies
+      run: |
+        pip install -r requirements/edx/paver.txt
 
     - name: Initiate Services
       run: |
