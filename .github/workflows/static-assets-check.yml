@@ -21,6 +21,11 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v2
 
+    - name: Install system Packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxmlsec1-dev
+
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
