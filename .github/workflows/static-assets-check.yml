@@ -68,6 +68,7 @@ jobs:
     - name: Run Tests
       env:
         LMS_CFG: lms/envs/bok_choy.yml
+        CMS_CFG: cms/envs/bok_choy.yml
       run: |
         npm install
         npm install -g rtlcss
