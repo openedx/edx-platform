@@ -27,7 +27,7 @@ toxenv = os.environ.get('TOXENV')
 if toxenv and toxenv != 'quality-django32':
     PYTHON_REQ_FILES = ['requirements/edx/testing.txt']
 elif toxenv and toxenv == 'quality-django32':
-    PYTHON_REQ_FILES = ['requirements/edx/testing.txt', 'requirements/edx/django.txt']
+    PYTHON_REQ_FILES = ['requirements/edx/testing.txt', 'requirements/edx/django32.txt']
 else:
     PYTHON_REQ_FILES = ['requirements/edx/development.txt']
 

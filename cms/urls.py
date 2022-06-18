@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from auth_backends.urls import oauth2_urlpatterns
 from edx_api_doc_tools import make_docs_urls
 from ratelimitbackend import admin
+# from django.contrib import admin
 
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
@@ -19,7 +20,7 @@ from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import views as contentstore_views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 from cms.djangoapps.contentstore.views.live_class import LiveClassesApiListView ,CourseListView,UserCourseUnEnrollment, LiveClassesDeleteUpdateApiView , UserDetailsListApiView ,EnrollLiveClassCreateView,EnrollLiveClassUserDetailsView ,EnrollLiveClassUserDeleteApiView , UserCourseEnrollment ,EnrollCourseUserDetailsView , LoginStaffCourseDetailsList
-
+from cms.djangoapps.contentstore.views.course import doc_upload_view, uploaded_doc_view, update_doc # To Import
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
@@ -104,7 +105,7 @@ urlpatterns = oauth2_urlpatterns + [
     
     path('staff/course/detail/<edited_by_id>', LoginStaffCourseDetailsList.as_view(), name='live_class_user_details' ),
 
-    path('courses/all/courses', CourseListView.as_view(), name="course-list"),
+    path('home/courses/all/courses', CourseListView.as_view(), name="course-list"),
 
 
 
@@ -112,6 +113,12 @@ urlpatterns = oauth2_urlpatterns + [
 
     path('user/enrollment', UserCourseEnrollment.as_view() , name='user_course_enrollment'),
     path('user/course/unenrollment/<id>', UserCourseUnEnrollment.as_view() , name='user_course_enrollment'),
+    
+    
+    
+    path('upload_doc', doc_upload_view, name='upload_doc'),
+    path('update_doc', update_doc, name='update_doc'),
+    path('view_doc/', uploaded_doc_view, name='view_doc'),
     
     
     path('signin_redirect_to_lms', contentstore_views.login_redirect_to_lms, name='login_redirect_to_lms'),

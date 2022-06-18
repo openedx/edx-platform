@@ -725,6 +725,27 @@ from lms.envs.common import (
     COURSE_KEY_PATTERN, COURSE_KEY_REGEX, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN ,LIVE_CLASS_ID_PATTERN
 )
 
+# S3BotoStorage insists on a timeout for uploaded assets. We should make it
+# permanent instead, but rather than trying to figure out exactly where that
+# setting is, I'm just bumping the expiration time to something absurd (100
+# years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
+# in the global settings.py
+AWS_SES_REGION_NAME = 'us-east-1'
+AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
+AWS_ACCESS_KEY_ID = 'AKIA43ATNRFGIW6HF5CV'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_SECURITY_TOKEN = None
+AWS_QUERYSTRING_AUTH = False
+AWS_STORAGE_BUCKET_NAME = 'edxlaunchpad'
+AWS_S3_FILE_OVERWRITE = False
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_HEADERS = {'Access-Control-Allow-Origin': '*'} 
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# File store here 
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/' 
+
+
 ######################### CSRF #########################################
 
 # Forwards-compatibility with Django 1.7

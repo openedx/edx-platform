@@ -1,0 +1,24 @@
+Metadata-Version: 2.1
+Name: edx-opaque-keys
+Version: 2.3.0
+Summary: UNKNOWN
+Home-page: https://github.com/edx/opaque-keys
+Author: edX
+License: AGPL-3.0
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 3.2
+Classifier: Framework :: Django :: 4.0
+License-File: LICENSE
+License-File: AUTHORS
+Requires-Dist: pymongo (<4.0,>=2.7.2)
+Requires-Dist: stevedore (>=0.14.1)
+Provides-Extra: django
+
+UNKNOWN
+

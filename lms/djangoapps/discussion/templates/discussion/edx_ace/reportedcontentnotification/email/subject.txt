@@ -1,3 +1,0 @@
-{% load i18n %}
-
-{% blocktrans %} {{ course_name }} {{ course_id }} moderator content for review {% endblocktrans %}

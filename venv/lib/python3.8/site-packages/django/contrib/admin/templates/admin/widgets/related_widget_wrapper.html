@@ -1,0 +1,31 @@
+{% load i18n static %}
+<div class="related-widget-wrapper">
+    {{ rendered_widget }}
+    {% block links %}
+        {% spaceless %}
+        {% if not is_hidden %}
+        {% if can_change_related %}
+        <a class="related-widget-wrapper-link change-related" id="change_id_{{ name }}"
+            data-href-template="{{ change_related_template_url }}?{{ url_params }}"
+            title="{% blocktranslate %}Change selected {{ model }}{% endblocktranslate %}">
+            <img src="{% static 'admin/img/icon-changelink.svg' %}" alt="{% translate 'Change' %}">
+        </a>
+        {% endif %}
+        {% if can_add_related %}
+        <a class="related-widget-wrapper-link add-related" id="add_id_{{ name }}"
+            href="{{ add_related_url }}?{{ url_params }}"
+            title="{% blocktranslate %}Add another {{ model }}{% endblocktranslate %}">
+            <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="{% translate 'Add' %}">
+        </a>
+        {% endif %}
+        {% if can_delete_related %}
+        <a class="related-widget-wrapper-link delete-related" id="delete_id_{{ name }}"
+            data-href-template="{{ delete_related_template_url }}?{{ url_params }}"
+            title="{% blocktranslate %}Delete selected {{ model }}{% endblocktranslate %}">
+            <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="{% translate 'Delete' %}">
+        </a>
+        {% endif %}
+        {% endif %}
+        {% endspaceless %}
+    {% endblock %}
+</div>

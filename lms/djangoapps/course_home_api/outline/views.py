@@ -177,7 +177,7 @@ class OutlineTabView(RetrieveAPIView):
         # Enable NR tracing for this view based on course
         monitoring_utils.set_custom_attribute('course_id', course_key_string)
         monitoring_utils.set_custom_attribute('user_id', request.user.id)
-        monitoring_utils.set_custom_attribute('is_active', request.user.is_active)
+        monitoring_utils.set_custom_attribute('is_staff', request.user.is_staff)
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
 
@@ -233,8 +233,9 @@ class OutlineTabView(RetrieveAPIView):
         welcome_message_html = None
 
         is_enrolled = enrollment and enrollment.is_active
-        is_active = bool(has_access(request.user, 'staff', course_key))
-        show_enrolled = is_enrolled or is_active
+        is_staff = bool(has_access(request.user, 'staff', course_key))
+        
+        show_enrolled = is_enrolled or is_staff
         enable_proctored_exams = False
         if is_enrolled:
             course_blocks = get_course_outline_block_tree(request, course_key_string, request.user)
@@ -273,7 +274,7 @@ class OutlineTabView(RetrieveAPIView):
 
 
 
-        elif is_active:
+        elif not is_enrolled:
             course_blocks = get_course_outline_block_tree(request, course_key_string, request.user)
 
             # course_blocks['children']=course_blocks['children'][0:2] 
@@ -287,7 +288,8 @@ class OutlineTabView(RetrieveAPIView):
             course_blocks['children'] = children_list
 
             # return Response (course_blocks)
-            
+
+              
 
 
         else:
@@ -300,6 +302,10 @@ class OutlineTabView(RetrieveAPIView):
                 ).format(platform_name=settings.PLATFORM_NAME)
             elif course_is_invitation_only(course):
                 enroll_alert['can_enroll'] = False
+
+        @property
+        def is_locked(self):
+            pass  
 
 
 

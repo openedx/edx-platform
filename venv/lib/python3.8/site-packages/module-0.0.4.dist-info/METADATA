@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: module
+Version: 0.0.4
+Summary: A warning to be more careful when pulling in dependencies
+Home-page: https://github.com/adityasaky/module
+Author: Aditya Saky
+Author-email: aditya@saky.in
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+A warning to be more careful when pulling in supply chain dependencies. Prints a link to a supply chain security paper.
+
+

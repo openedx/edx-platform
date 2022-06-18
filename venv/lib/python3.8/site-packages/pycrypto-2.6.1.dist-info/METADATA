@@ -1,0 +1,22 @@
+Metadata-Version: 2.1
+Name: pycrypto
+Version: 2.6.1
+Summary: Cryptographic modules for Python.
+Home-page: http://www.pycrypto.org/
+Author: Dwayne C. Litzenberger
+Author-email: dlitz@dlitz.net
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: Public Domain
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: Unix
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Topic :: Security :: Cryptography
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+
+UNKNOWN
+
+

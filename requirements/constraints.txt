@@ -19,16 +19,26 @@ celery>=5.2.2,<6.0.0
 # required for celery>=5.2.0;<5.3.0
 click>=8.0,<9.0
 
+# edx-platform currently only supported for Django 3.2.x
+django<3.3
+
+# We do not support version django-config-models<1.0.0
+django-config-models>=1.0.0
+
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.49.5
+edx-enterprise==3.41.2
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
+
+# 4.5.1 introduced a bug when used together with xmlsec: https://bugs.launchpad.net/lxml/+bug/1880251
+# Tests passed, but hit a problem in stage
+lxml<4.5.1
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -45,11 +55,25 @@ pandas==0.22.0
 # networkx>=2.6 requires pandas>=1.1
 networkx<2.6
 
+# Constraint from astroid 2.3.3
+wrapt==1.11.*
+
 # tests failing for pymongo==3.11
 pymongo<3.11
 
+# sympy latest version causing test failures.
+# may be related to python35 version drop in 1.7.0. Needs to be tested before removing.
+sympy==1.6.2
+
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
+
+# latest version of diff-cover conflicts with pygments version see https://github.com/Bachmann1234/diff_cover/commit/01f91760321cee1ad28cfa0d801c4acd8b9765a6
+diff-cover==4.0.0
+
+# transifex-client==0.14.2(latest) requires python-slugify<5.0.0 for Python 2.0 support.
+# This can be removed once transifex-client drops support for Python 2.0 and removes the required constraint.
+python-slugify<5.0.0
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
@@ -80,3 +104,7 @@ scipy<1.8.0
 # See issue: https://github.com/sphinx-contrib/openapi/issues/123
 mistune<2.0.0
 
+# django-celery-results==2.3.0 requires psycopg2 as dependency but hasn't explicitly added in package requirements.
+# The PR https://github.com/celery/django-celery-results/pull/292 fixing this issue has been merged but
+# new version hasn't been released yet with the fix so pinning the version until django-celery-results>2.3.0 is out.
+django-celery-results<2.3.0

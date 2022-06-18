@@ -36,7 +36,7 @@ class TestStringLines(TestCase):
         {'string': '\ntest\n', 'line_number': 2, 'line': 'test'},
         {'string': '\ntest\n', 'line_number': 3, 'line': ''},
     )
-    def test_string_lines_line_numbers(self, data):
+    def test_string_lines_start_end_index(self, data):
         """
         Test line_number_to_line.
         """

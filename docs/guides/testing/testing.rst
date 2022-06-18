@@ -9,7 +9,8 @@ Testing
 Overview
 ========
 
-We maintain two kinds of tests: unit tests and integration tests.
+We maintain three kinds of tests: unit tests, integration tests, and
+acceptance tests.
 
 Overall, you want to write the tests that **maximize coverage** while
 **minimizing maintenance**. In practice, this usually means investing
@@ -21,8 +22,8 @@ the code base.
 
    Test Pyramid
 
-The pyramid above shows the relative number of unit tests and integration
-tests. Most of our tests are unit tests or
+The pyramid above shows the relative number of unit tests, integration
+tests, and acceptance tests. Most of our tests are unit tests or
 integration tests.
 
 Test Types
@@ -66,6 +67,19 @@ Integration Tests
 
 .. _Django test client: https://docs.djangoproject.com/en/dev/topics/testing/overview/
 
+
+UI Acceptance Tests
+~~~~~~~~~~~~~~~~~~~
+
+-  There should be very few UI acceptance tests since they are generally slow and
+   flaky. Use these to test only bare minimum happy paths for necessary features.
+
+-  We use `Bok Choy`_ to write end-user acceptance tests directly in Python,
+   using the framework to maximize reliability and maintainability.
+
+.. _Bok Choy: https://bok-choy.readthedocs.org/en/latest/tutorial.html
+
+
 Test Locations
 --------------
 
@@ -80,6 +94,14 @@ Test Locations
    the test for ``src/views/module.js`` should be written in
    ``spec/views/module_spec.js``.
 
+-  UI acceptance tests:
+
+   -  Set up and helper methods, and stubs for external services:
+      ``common/djangoapps/terrain``
+   -  Bok Choy Acceptance Tests: located under ``common/test/acceptance/tests``
+   -  Bok Choy Accessibility Tests: located under ``common/test/acceptance/tests`` and tagged with ``@attr("a11y")``
+   -  Bok Choy PageObjects: located under ``common/test/acceptance/pages``
+
 Running Tests
 =============
 
@@ -87,7 +109,8 @@ You can run all of the unit-level tests using this command::
 
     paver test
 
-This includes python, JavaScript, and documentation tests.
+This includes python, JavaScript, and documentation tests. It does not,
+however, run any acceptance tests.
 
 Note -
 `paver` is a scripting tool. To get information about various options, you can run the this command::
@@ -287,6 +310,226 @@ Note: the port is also output to the console that you ran the tests from if you 
 These paver commands call through to Karma. For more
 info, see `karma-runner.github.io <https://karma-runner.github.io/>`__.
 
+Running Bok Choy Acceptance Tests
+---------------------------------
+
+We use `Bok Choy`_ for acceptance testing. Bok Choy is a UI-level acceptance
+test framework for writing robust `Selenium`_ tests in `Python`_. Bok Choy
+makes your acceptance tests reliable and maintainable by utilizing the Page
+Object and Promise design patterns.
+
+**Prerequisites**:
+
+These prerequisites are all automatically installed and available in
+`Devstack`_, the supported development enviornment for the Open edX platform.
+
+* Chromedriver and Chrome
+
+* Mongo
+
+* Memcache
+
+* mySQL
+
+To run all the bok choy acceptance tests run this command::
+
+    paver test_bokchoy
+
+Once the database has been set up and the static files collected, you
+can use the 'fast' option to skip those tasks. This option can also be
+used with any of the test specs below::
+
+    paver test_bokchoy --fasttest
+
+For example to run a single test, specify the name of the test file::
+
+    paver test_bokchoy -t lms/test_lms.py
+
+Notice the test file location is relative to
+common/test/acceptance/tests. This is another example::
+
+    paver test_bokchoy -t studio/test_studio_bad_data.py
+
+To run a single test faster by not repeating setup tasks use the ``--fasttest`` option::
+
+    paver test_bokchoy -t studio/test_studio_bad_data.py --fasttest
+
+To test only a certain feature, specify the file and the testcase class::
+
+    paver test_bokchoy -t studio/test_studio_bad_data.py::BadComponentTest
+
+To execute only a certain test case, specify the file name, class, and
+test case method::
+
+    paver test_bokchoy -t lms/test_lms.py::RegistrationTest::test_register
+
+During acceptance test execution, log files and also screenshots of
+failed tests are captured in test\_root/log.
+
+Use this command to put a temporary debugging breakpoint in a test.
+If you check this in, your tests will hang on jenkins::
+
+    breakpoint()
+
+By default, all bokchoy tests are run with the 'split' ModuleStore. To
+override the modulestore that is used, use the default\_store option.
+The currently supported stores are: 'split'
+(xmodule.modulestore.split\_mongo.split\_draft.DraftVersioningModuleStore)
+and 'draft' (xmodule.modulestore.mongo.DraftMongoModuleStore). This is an example
+for the 'draft' store::
+
+    paver test_bokchoy --default_store='draft'
+
+Running Bok Choy Accessibility Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We use Bok Choy for `automated accessibility testing`_.  Bok Choy, a UI-level
+acceptance test framework for writing robust `Selenium`_ tests in `Python`_,
+includes the ability to perform accessibility audits on web pages using `Google
+Accessibility Developer Tools`_ or `Deque's aXe Core`_.  For more details about
+how to write accessibility tests, please read the `Bok Choy documentation`_ and
+the `Automated Accessibility Tests`_ Open edX Confluence page.
+
+.. _automated accessibility testing: https://bok-choy.readthedocs.org/en/latest/accessibility.html
+.. _Selenium: http://docs.seleniumhq.org/
+.. _Python: https://www.python.org/
+.. _Google Accessibility Developer Tools: https://github.com/GoogleChrome/accessibility-developer-tools/
+.. _Deque's aXe Core: https://github.com/dequelabs/axe-core/
+.. _Bok Choy documentation: https://bok-choy.readthedocs.org/en/latest/accessibility.html
+.. _Automated Accessibility Tests: https://openedx.atlassian.net/wiki/display/TE/Automated+Accessibility+Tests
+
+
+**Prerequisites**:
+
+These prerequisites are all automatically installed and available in
+`Devstack`_ (since the Cypress release), the supported development environment
+for the Open edX platform.
+
+.. _Devstack: https://github.com/edx/configuration/wiki/edX-Developer-Stack
+
+* Mongo
+
+* Memcache
+
+* mySQL
+
+To run all the bok choy accessibility tests use this command::
+
+    paver test_a11y
+
+To run specific tests, use the ``-t`` flag to specify a pytest-style test spec
+relative to the ``common/test/acceptance/tests`` directory. This is an example for it::
+
+    paver test_a11y -t lms/test_lms_dashboard.py::LmsDashboardA11yTest::test_dashboard_course_listings_a11y
+
+**Coverage**:
+
+To generate the coverage report for the views run during accessibility tests::
+
+    paver a11y_coverage
+
+Note that this coverage report is just a guideline to find areas that
+are missing tests.  If the view isn't 'covered', there definitely
+isn't a test for it.  If it is 'covered', we are loading that page
+during the tests but not necessarily calling ``page.a11y_audit.check_for_accessibility_errors`` on it.
+
+
+Options for Faster Development Cycles in Bok-Choy Tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following are ways in which a developer could shorten the development
+cycle for faster feedback. The options below can often be used together.
+
+**Multiprocessing Mode**
+
+Bok-choy tests can be threaded using the `-n` switch.  Using 2 threads generally
+reduces test cycles by 33%.  The recommendation is to make sure the
+number of threads is no more than the number of processors available. For
+example, the Cypress release of devstack is provisioned by default with 2
+processors. In that case, to run tests in multiprocess mode::
+
+    paver test_bokchoy -n 2
+
+*Caveat*: Not all tests have been designed with multiprocessing in mind; some
+testcases (approx 10%) will fail in multiprocess mode for various reasons
+(e.g., shared fixtures, unexpected state, etc). If you have tests that fail
+in multiprocessing mode, it may be worthwhile to run them in single-stream mode
+to understand if you are encountering such a failure. With that noted, this
+can speed development for most test classes.
+
+**Leave Your Servers Running**
+
+There are two additional switches available in the `paver test_bokchoy` task.
+Used together, they can shorten the cycle between test runs. Similar to above,
+there are a handful of tests that won't work with this approach, due to insufficient
+teardown and other unmanaged state.
+
+1. Start your servers in one terminal/ssh session::
+
+    paver test_bokchoy --serversonly
+
+   Note if setup has already been done, you can run::
+
+    paver test_bokchoy --serversonly --fasttest
+
+2. Run your tests only in another terminal/ssh session::
+
+    paver test_bokchoy --testsonly --fasttest
+
+You must run BOTH `--testsonly` and `--fasttest`.
+
+3. When done, you can kill your servers in the first terminal/ssh session with
+Control-C. *Warning*: Only hit Control-C one time so the pytest framework can
+properly clean up.
+
+Acceptance Test Techniques
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. **Element existence on the page**: Do not use splinter's built-in browser
+   methods directly for determining if elements exist. Use the
+   world.is\_css\_present and world.is\_css\_not\_present wrapper
+   functions instead. Otherwise errors can arise if checks for the css
+   are performed before the page finishes loading. Also these wrapper
+   functions are optimized for the amount of wait time spent in both
+   cases of positive and negative expectation.
+
+2. **Dealing with alerts**: Chrome can hang on javascripts alerts. If a
+   javascript alert/prompt/confirmation is expected, use the step 'I
+   will confirm all alerts', 'I will cancel all alerts' or 'I will anser
+   all prompts with "(.\*)"' before the step that causes the alert in
+   order to properly deal with it.
+
+3. **Dealing with stale element reference exceptions**: These exceptions
+   happen if any part of the page is refreshed in between finding an
+   element and accessing the element. When possible, use any of the css
+   functions in common/djangoapps/terrain/ui\_helpers.py as they will
+   retry the action in case of this exception. If the functionality is
+   not there, wrap the function with world.retry\_on\_exception. This
+   function takes in a function and will retry and return the result of
+   the function if there was an exception.
+
+4. **Scenario Level Constants**: If you want an object to be available for
+   the entire scenario, it can be stored in world.scenario\_dict. This
+   object is a dictionary that gets refreshed at the beginning on the
+   scenario. Currently, the current logged in user and the current
+   created course are stored under 'COURSE' and 'USER'. This will help
+   prevent strings from being hard coded so the acceptance tests can
+   become more flexible.
+
+5. **Internal edX Jenkins considerations**: Acceptance tests are run in
+   Jenkins as part of the edX development workflow. They are broken into
+   shards and split across workers. Therefore if you add a new .feature
+   file, you need to define what shard they should be run in or else
+   they will not get executed. See someone from TestEng to help you
+   determine where they should go.
+
+   Also, the test results are rolled up in Jenkins for ease of
+   understanding, with the acceptance tests under the top level of "CMS"
+   and "LMS" when they follow this convention: name your feature in the
+   .feature file CMS or LMS with a single period and then no other
+   periods in the name. The name can contain spaces. E.g. "CMS.Sign Up"
+
+
 Testing internationalization with dummy translations
 ----------------------------------------------------
 
@@ -402,7 +645,7 @@ Other Testing Tips
 Connecting to Browser
 ---------------------
 
-If you want to see the browser being automated for JavaScript,
+If you want to see the browser being automated for JavaScript or bok-choy tests,
 you can connect to the container running it via VNC.
 
 +------------------------+----------------------+

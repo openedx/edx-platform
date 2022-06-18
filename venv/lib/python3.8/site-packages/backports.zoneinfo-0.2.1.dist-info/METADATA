@@ -1,0 +1,114 @@
+Metadata-Version: 2.1
+Name: backports.zoneinfo
+Version: 0.2.1
+Summary: Backport of the standard library zoneinfo module
+Home-page: https://github.com/pganssle/zoneinfo
+Author: Python Software Foundation
+Author-email: datetime-sig@python.org
+License: Apache-2.0
+Project-URL: Source, https://github.com/pganssle/zoneinfo
+Project-URL: Documentation, https://zoneinfo.readthedocs.io/en/latest/
+Project-URL: Bug Reports, https://github.com/pganssle/zoneinfo/issues
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: importlib-resources ; python_version < "3.7"
+Provides-Extra: tzdata
+Requires-Dist: tzdata ; extra == 'tzdata'
+
+# `backports.zoneinfo`: Backport of the standard library module `zoneinfo`
+
+This package was originally the reference implementation for [PEP 615](https://www.python.org/dev/peps/pep-0615/), which proposes support for the IANA time zone database in the standard library, and now serves as a backport to Python 3.6+ (including PyPy).
+
+This exposes the `backports.zoneinfo` module, which is a backport of the [`zoneinfo`](https://docs.python.org/3.9/library/zoneinfo.html#module-zoneinfo) module. The backport's documentation can be found [on readthedocs](https://zoneinfo.readthedocs.io/en/latest/).
+
+The module uses the system time zone data if available, and falls back to the [`tzdata`](https://tzdata.readthedocs.io/en/latest/) package (available [on PyPI](https://pypi.org/project/tzdata/)) if installed.
+
+## Installation and depending on this library
+
+This module is called [`backports.zoneinfo`](https://pypi.org/project/backports.zoneinfo) on PyPI. To install it in your local environment, use:
+
+```
+pip install backports.zoneinfo
+```
+
+Or (particularly on Windows), you can also use the `tzdata` extra (which basically just declares a dependency on `tzdata`, so this doesn't actually save you any typing 😅):
+
+```
+pip install backports.zoneinfo[tzdata]
+```
+
+If you want to use this in your application, it is best to use [PEP 508 environment markers](https://www.python.org/dev/peps/pep-0508/#environment-markers) to declare a dependency *conditional on the Python version*:
+
+```
+backports.zoneinfo;python_version<"3.9"
+```
+
+Support for `backports.zoneinfo` in Python 3.9+ is currently minimal, since it is expected that you would use the standard library `zoneinfo` module instead.
+
+## Use
+
+The `backports.zoneinfo` module should be a drop-in replacement for the Python 3.9 standard library module `zoneinfo`. If you do not support anything earlier than Python 3.9, **you do not need this library**; if you are supporting Python 3.6+, you may want to use this idiom to "fall back" to ``backports.zoneinfo``:
+
+```python
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
+```
+
+To get access to time zones with this module, construct a `ZoneInfo` object and attach it to your datetime:
+
+```python
+>>> from backports.zoneinfo import ZoneInfo
+>>> from datetime import datetime, timedelta, timezone
+>>> dt = datetime(1992, 3, 1, tzinfo=ZoneInfo("Europe/Minsk"))
+>>> print(dt)
+1992-03-01 00:00:00+02:00
+>>> print(dt.utcoffset())
+2:00:00
+>>> print(dt.tzname())
+EET
+```
+
+Arithmetic works as expected without the need for a "normalization" step:
+
+```python
+>>> dt += timedelta(days=90)
+>>> print(dt)
+1992-05-30 00:00:00+03:00
+>>> dt.utcoffset()
+datetime.timedelta(seconds=10800)
+>>> dt.tzname()
+'EEST'
+```
+
+Ambiguous and imaginary times are handled using the `fold` attribute added in [PEP 495](https://www.python.org/dev/peps/pep-0495/):
+
+```python
+>>> dt = datetime(2020, 11, 1, 1, tzinfo=ZoneInfo("America/Chicago"))
+>>> print(dt)
+2020-11-01 01:00:00-05:00
+>>> print(dt.replace(fold=1))
+2020-11-01 01:00:00-06:00
+
+>>> UTC = timezone.utc
+>>> print(dt.astimezone(UTC))
+2020-11-01 06:00:00+00:00
+>>> print(dt.replace(fold=1).astimezone(UTC))
+2020-11-01 07:00:00+00:00
+```
+
+# Contributing
+
+Currently we are not accepting contributions to this repository because we have not put the CLA in place and we would like to avoid complicating the process of adoption into the standard library. Contributions to [CPython](https://github.com/python/cpython) will eventually be backported to this repository — see [the Python developer's guide](https://devguide.python.org/) for more information on how to contribute to CPython.
+
+

@@ -9,4 +9,5 @@ out from edx-platform into separate packages at some point.
     :maxdepth: 2
 
     common/lib/capa/modules
+    common/lib/safe_lxml/modules
     common/lib/xmodule/modules

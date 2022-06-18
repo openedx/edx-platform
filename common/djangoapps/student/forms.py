@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.http import int_to_base36
 from edx_ace import ace
 from edx_ace.recipient import Recipient
+from django import forms
 
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -16,6 +17,7 @@ from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from common.djangoapps.student.message_types import AccountRecovery as AccountRecoveryMessage
+from common.djangoapps.student.models import DocumentStorage
 
 
 def send_account_recovery_email_for_user(user, request, email=None):
@@ -51,3 +53,11 @@ def send_account_recovery_email_for_user(user, request, email=None):
         user_context=message_context,
     )
     ace.send(msg)
+
+
+
+class DocumentForm(forms.ModelForm):
+    
+    class Meta:
+        model = DocumentStorage
+        exclude= ('created_by', 'added_on', 'updated_on', 'course','course_id')

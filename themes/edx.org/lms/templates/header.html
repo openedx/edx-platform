@@ -1,0 +1,4 @@
+## mako
+<%page expression_filter="h" args="online_help_token, use_cookie_banner=True"/>
+<%namespace name='static' file='static_content.html'/>
+<%include file="${static.get_template_path(relative_path='header/header.html')}"  args="online_help_token=online_help_token, use_cookie_banner=use_cookie_banner" />

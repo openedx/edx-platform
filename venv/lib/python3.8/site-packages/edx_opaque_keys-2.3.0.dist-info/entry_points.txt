@@ -1,0 +1,31 @@
+[asset_key]
+asset-v1 = opaque_keys.edx.locator:AssetLocator
+
+[block_type]
+block-type-v1 = opaque_keys.edx.block_types:BlockTypeKeyV1
+
+[context_key]
+course-v1 = opaque_keys.edx.locator:CourseLocator
+lib = opaque_keys.edx.locator:LibraryLocatorV2
+library-v1 = opaque_keys.edx.locator:LibraryLocator
+slashes = opaque_keys.edx.locator:CourseLocator
+
+[definition_key]
+aside-def-v1 = opaque_keys.edx.asides:AsideDefinitionKeyV1
+aside-def-v2 = opaque_keys.edx.asides:AsideDefinitionKeyV2
+bundle-olx = opaque_keys.edx.locator:BundleDefinitionLocator
+def-v1 = opaque_keys.edx.locator:DefinitionLocator
+
+[opaque_keys.testing]
+base10 = opaque_keys.tests.test_opaque_keys:Base10Key
+dict = opaque_keys.tests.test_opaque_keys:DictKey
+hex = opaque_keys.tests.test_opaque_keys:HexKey
+
+[usage_key]
+aside-usage-v1 = opaque_keys.edx.asides:AsideUsageKeyV1
+aside-usage-v2 = opaque_keys.edx.asides:AsideUsageKeyV2
+block-v1 = opaque_keys.edx.locator:BlockUsageLocator
+lb = opaque_keys.edx.locator:LibraryUsageLocatorV2
+lib-block-v1 = opaque_keys.edx.locator:LibraryUsageLocator
+location = opaque_keys.edx.locations:DeprecatedLocation
+

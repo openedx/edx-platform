@@ -1,0 +1,53 @@
+Metadata-Version: 2.1
+Name: django-waffle
+Version: 2.4.1
+Summary: A feature flipper for Django.
+Home-page: http://github.com/django-waffle/django-waffle
+Author: James Socol
+Author-email: me@jamessocol.com
+License: BSD
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 2.2
+Classifier: Framework :: Django :: 3.0
+Classifier: Framework :: Django :: 3.1
+Classifier: Framework :: Django :: 3.2
+Classifier: Framework :: Django :: 4.0
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+License-File: LICENSE
+
+======
+README
+======
+
+Django Waffle is (yet another) feature flipper for Django. You can
+define the conditions for which a flag should be active, and use it in
+a number of ways.
+
+.. image:: https://github.com/django-waffle/django-waffle/workflows/Python%20package/badge.svg?branch=master
+   :target: https://github.com/django-waffle/django-waffle/actions
+   :alt: Build Status
+.. image:: https://badge.fury.io/py/django-waffle.svg
+   :target: https://badge.fury.io/py/django-waffle
+   :alt: PyPI status badge
+
+:Code:          https://github.com/django-waffle/django-waffle
+:License:       BSD; see LICENSE file
+:Issues:        https://github.com/django-waffle/django-waffle/issues
+:Documentation: https://waffle.readthedocs.io/
+
+

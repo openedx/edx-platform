@@ -4,13 +4,13 @@
 #
 #    make upgrade
 #
-click==8.1.3
+click==8.0.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   pip-tools
 pep517==0.12.0
     # via pip-tools
-pip-tools==6.6.2
+pip-tools==6.5.1
     # via -r requirements/edx/pip-tools.in
 tomli==2.0.1
     # via pep517

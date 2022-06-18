@@ -4,17 +4,17 @@
 #
 #    make upgrade
 #
-common/lib/sandbox-packages
+-e file:///home/sujeet99/edx/edx-platform/common/lib/sandbox-packages
     # via -r requirements/edx-sandbox/py38.in
 cffi==1.15.0
     # via cryptography
 chem==1.2.0
     # via -r requirements/edx-sandbox/py38.in
-click==8.1.3
+click==8.0.4
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   nltk
-cryptography==37.0.2
+cryptography==36.0.2
     # via -r requirements/edx-sandbox/py38.in
 cycler==0.11.0
     # via matplotlib
@@ -22,10 +22,11 @@ decorator==4.4.2
     # via networkx
 joblib==1.1.0
     # via nltk
-kiwisolver==1.4.2
+kiwisolver==1.4.0
     # via matplotlib
-lxml==4.8.0
+lxml==4.5.0
     # via
+    #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   openedx-calc
 markupsafe==2.1.1
@@ -55,11 +56,11 @@ numpy==1.16.6
     #   scipy
 openedx-calc==3.0.1
     # via -r requirements/edx-sandbox/py38.in
-pillow==9.1.1
+pillow==9.0.1
     # via matplotlib
 pycparser==2.21
     # via cffi
-pyparsing==3.0.9
+pyparsing==3.0.7
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
@@ -71,7 +72,7 @@ python-dateutil==2.4.0
     #   matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
-regex==2022.4.24
+regex==2022.3.15
     # via nltk
 scipy==1.7.3
     # via
@@ -83,9 +84,10 @@ six==1.16.0
     # via
     #   chem
     #   python-dateutil
-sympy==1.10.1
+sympy==1.6.2
     # via
+    #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
     #   openedx-calc
-tqdm==4.64.0
+tqdm==4.63.0
     # via nltk

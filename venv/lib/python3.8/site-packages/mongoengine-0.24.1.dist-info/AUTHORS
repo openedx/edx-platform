@@ -1,0 +1,266 @@
+The PRIMARY AUTHORS are (and/or have been):
+
+Ross Lawley <ross.lawley@gmail.com>
+Harry Marr <harry@hmarr.com>
+Matt Dennewitz <mattdennewitz@gmail.com>
+Deepak Thukral <iapain@yahoo.com>
+Florian Schlachter <flori@n-schlachter.de>
+Steve Challis <steve@stevechallis.com>
+Wilson Júnior <wilsonpjunior@gmail.com>
+Dan Crosta https://github.com/dcrosta
+Laine Herron https://github.com/LaineHerron
+
+CONTRIBUTORS
+
+Derived from the git logs, inevitably incomplete but all of whom and others
+have submitted patches, reported bugs and generally helped make MongoEngine
+that much better:
+
+ * blackbrrr
+ * Florian Schlachter
+ * Vincent Driessen
+ * Steve Challis
+ * flosch
+ * Deepak Thukral
+ * Colin Howe
+ * Wilson Júnior (https://github.com/wpjunior)
+ * Alistair Roche
+ * Dan Crosta
+ * Viktor Kerkez
+ * Stephan Jaekel
+ * Rached Ben Mustapha
+ * Greg Turner
+ * Daniel Hasselrot
+ * Mircea Pasoi
+ * Matt Chisholm
+ * James Punteney
+ * TimothéePeignier
+ * Stuart Rackham
+ * Serge Matveenko
+ * Matt Dennewitz
+ * Don Spaulding
+ * Ales Zoulek
+ * sshwsfc
+ * sib
+ * Samuel Clay
+ * Nick Vlku
+ * martin
+ * Flavio Amieiro
+ * Анхбаяр Лхагвадорж
+ * Zak Johnson
+ * Victor Farazdagi
+ * vandersonmota
+ * Theo Julienne
+ * sp
+ * Slavi Pantaleev
+ * Richard Henry
+ * Nicolas Perriault
+ * Nick Vlku Jr
+ * Michael Henson
+ * Leo Honkanen
+ * kuno
+ * Josh Ourisman
+ * Jaime
+ * Igor Ivanov
+ * Gregg Lind
+ * Gareth Lloyd
+ * Albert Choi
+ * John Arnfield
+ * grubberr
+ * Paul Aliagas
+ * Paul Cunnane
+ * Julien Rebetez
+ * Marc Tamlyn
+ * Karim Allah
+ * Adam Parrish
+ * jpfarias
+ * jonrscott
+ * Alice Zoë Bevan-McGregor (https://github.com/amcgregor/)
+ * Stephen Young
+ * tkloc
+ * aid
+ * yamaneko1212
+ * dave mankoff
+ * Alexander G. Morano
+ * jwilder
+ * Joe Shaw
+ * Adam Flynn
+ * Ankhbayar
+ * Jan Schrewe
+ * David Koblas
+ * Crittercism
+ * Alvin Liang
+ * andrewmlevy
+ * Chris Faulkner
+ * Ashwin Purohit
+ * Shalabh Aggarwal
+ * Chris Williams
+ * Robert Kajic
+ * Jacob Peddicord
+ * Nils Hasenbanck
+ * mostlystatic
+ * Greg Banks
+ * swashbuckler
+ * Adam Reeve
+ * Anthony Nemitz
+ * deignacio
+ * Shaun Duncan
+ * Meir Kriheli
+ * Andrey Fedoseev
+ * aparajita
+ * Tristan Escalada
+ * Alexander Koshelev
+ * Jaime Irurzun
+ * Alexandre González
+ * Thomas Steinacher
+ * Tommi Komulainen
+ * Peter Landry
+ * biszkoptwielki
+ * Anton Kolechkin
+ * Sergey Nikitin
+ * psychogenic
+ * Stefan Wójcik (https://github.com/wojcikstefan)
+ * dimonb
+ * Garry Polley
+ * James Slagle
+ * Adrian Scott
+ * Peter Teichman
+ * Jakub Kot
+ * Jorge Bastida
+ * Aleksandr Sorokoumov
+ * Yohan Graterol
+ * bool-dev
+ * Russ Weeks
+ * Paul Swartz
+ * Sundar Raman
+ * Benoit Louy
+ * Loic Raucy (https://github.com/lraucy)
+ * hellysmile
+ * Jaepil Jeong
+ * Daniil Sharou
+ * Pete Campton
+ * Martyn Smith
+ * Marcelo Anton
+ * Aleksey Porfirov (https://github.com/lexqt)
+ * Nicolas Trippar
+ * Manuel Hermann
+ * Gustavo Gawryszewski
+ * Max Countryman
+ * caitifbrito
+ * lcya86 刘春洋
+ * Martin Alderete (https://github.com/malderete)
+ * Nick Joyce
+ * Jared Forsyth
+ * Kenneth Falck
+ * Lukasz Balcerzak
+ * Nicolas Cortot
+ * Alex (https://github.com/kelsta)
+ * Jin Zhang
+ * Daniel Axtens
+ * Leo-Naeka
+ * Ryan Witt (https://github.com/ryanwitt)
+ * Jiequan (https://github.com/Jiequan)
+ * hensom (https://github.com/hensom)
+ * zhy0216 (https://github.com/zhy0216)
+ * istinspring (https://github.com/istinspring)
+ * Massimo Santini (https://github.com/mapio)
+ * Nigel McNie (https://github.com/nigelmcnie)
+ * ygbourhis (https://github.com/ygbourhis)
+ * Bob Dickinson (https://github.com/BobDickinson)
+ * Michael Bartnett (https://github.com/michaelbartnett)
+ * Alon Horev (https://github.com/alonho)
+ * Kelvin Hammond (https://github.com/kelvinhammond)
+ * Jatin Chopra (https://github.com/jatin)
+ * Paul Uithol (https://github.com/PaulUithol)
+ * Thom Knowles (https://github.com/fleat)
+ * Paul (https://github.com/squamous)
+ * Olivier Cortès (https://github.com/Karmak23)
+ * crazyzubr (https://github.com/crazyzubr)
+ * FrankSomething (https://github.com/FrankSomething)
+ * Alexandr Morozov (https://github.com/LK4D4)
+ * mishudark (https://github.com/mishudark)
+ * Joe Friedl (https://github.com/grampajoe)
+ * Daniel Ward (https://github.com/danielward)
+ * Aniket Deshpande (https://github.com/anicake)
+ * rfkrocktk (https://github.com/rfkrocktk)
+ * Gustavo Andrés Angulo (https://github.com/woakas)
+ * Dmytro Popovych (https://github.com/drudim)
+ * Tom (https://github.com/tomprimozic)
+ * j0hnsmith (https://github.com/j0hnsmith)
+ * Damien Churchill (https://github.com/damoxc)
+ * Jonathan Simon Prates (https://github.com/jonathansp)
+ * Thiago Papageorgiou (https://github.com/tmpapageorgiou)
+ * Omer Katz (https://github.com/thedrow)
+ * Falcon Dai (https://github.com/falcondai)
+ * Polyrabbit (https://github.com/polyrabbit)
+ * Sagiv Malihi (https://github.com/sagivmalihi)
+ * Dmitry Konishchev (https://github.com/KonishchevDmitry)
+ * Martyn Smith (https://github.com/martynsmith)
+ * Andrei Zbikowski (https://github.com/b1naryth1ef)
+ * Ronald van Rij (https://github.com/ronaldvanrij)
+ * François Schmidts (https://github.com/jaesivsm)
+ * Eric Plumb (https://github.com/professorplumb)
+ * Damien Churchill (https://github.com/damoxc)
+ * Aleksandr Sorokoumov (https://github.com/Gerrrr)
+ * Clay McClure (https://github.com/claymation)
+ * Bruno Rocha (https://github.com/rochacbruno)
+ * Norberto Leite (https://github.com/nleite)
+ * Bob Cribbs (https://github.com/bocribbz)
+ * Jay Shirley (https://github.com/jshirley)
+ * David Bordeynik (https://github.com/DavidBord)
+ * Axel Haustant (https://github.com/noirbizarre)
+ * David Czarnecki (https://github.com/czarneckid)
+ * Vyacheslav Murashkin (https://github.com/a4tunado)
+ * André Ericson https://github.com/aericson)
+ * Mikhail Moshnogorsky (https://github.com/mikhailmoshnogorsky)
+ * Diego Berrocal (https://github.com/cestdiego)
+ * Matthew Ellison (https://github.com/seglberg)
+ * Jimmy Shen (https://github.com/jimmyshen)
+ * J. Fernando Sánchez (https://github.com/balkian)
+ * Michael Chase (https://github.com/rxsegrxup)
+ * Eremeev Danil (https://github.com/elephanter)
+ * Catstyle Lee (https://github.com/Catstyle)
+ * Kiryl Yermakou (https://github.com/rma4ok)
+ * Matthieu Rigal (https://github.com/MRigal)
+ * Charanpal Dhanjal (https://github.com/charanpald)
+ * Emmanuel Leblond (https://github.com/touilleMan)
+ * Breeze.Kay (https://github.com/9nix00)
+ * Vicki Donchenko (https://github.com/kivistein)
+ * Emile Caron (https://github.com/emilecaron)
+ * Amit Lichtenberg (https://github.com/amitlicht)
+ * Gang Li (https://github.com/iici-gli)
+ * Lars Butler (https://github.com/larsbutler)
+ * George Macon (https://github.com/gmacon)
+ * Ashley Whetter (https://github.com/AWhetter)
+ * Paul-Armand Verhaegen (https://github.com/paularmand)
+ * Steven Rossiter (https://github.com/BeardedSteve)
+ * Luo Peng (https://github.com/RussellLuo)
+ * Bryan Bennett (https://github.com/bbenne10)
+ * Gilb's Gilb's (https://github.com/gilbsgilbs)
+ * Joshua Nedrud (https://github.com/Neurostack)
+ * Shu Shen (https://github.com/shushen)
+ * xiaost7 (https://github.com/xiaost7)
+ * Victor Varvaryuk
+ * Stanislav Kaledin (https://github.com/sallyruthstruik)
+ * Dmitry Yantsen (https://github.com/mrTable)
+ * Renjianxin (https://github.com/Davidrjx)
+ * Erdenezul Batmunkh (https://github.com/erdenezul)
+ * Andy Yankovsky (https://github.com/werat)
+ * Bastien Gérard (https://github.com/bagerard)
+ * Trevor Hall (https://github.com/tjhall13)
+ * Gleb Voropaev (https://github.com/buggyspace)
+ * Paulo Amaral (https://github.com/pauloAmaral)
+ * Gaurav Dadhania (https://github.com/GVRV)
+ * Yurii Andrieiev (https://github.com/yandrieiev)
+ * Filip Kucharczyk (https://github.com/Pacu2)
+ * Eric Timmons (https://github.com/daewok)
+ * Matthew Simpson (https://github.com/mcsimps2)
+ * Leonardo Domingues (https://github.com/leodmgs)
+ * Agustin Barto (https://github.com/abarto)
+ * Stankiewicz Mateusz (https://github.com/mas15)
+ * Felix Schultheiß (https://github.com/felix-smashdocs)
+ * Jan Stein (https://github.com/janste63)
+ * Timothé Perez (https://github.com/AchilleAsh)
+ * oleksandr-l5 (https://github.com/oleksandr-l5)
+ * Ido Shraga (https://github.com/idoshr)
+ * Terence Honles (https://github.com/terencehonles)

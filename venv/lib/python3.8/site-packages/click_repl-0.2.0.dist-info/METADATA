@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: click-repl
+Version: 0.2.0
+Summary: REPL plugin for Click
+Home-page: https://github.com/untitaker/click-repl
+Author: Markus Unterwaditzer
+Author-email: markus@unterwaditzer.net
+License: MIT
+Platform: UNKNOWN
+Requires-Dist: click
+Requires-Dist: prompt-toolkit
+Requires-Dist: six
+
+UNKNOWN
+
+

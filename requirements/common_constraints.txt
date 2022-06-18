@@ -25,6 +25,3 @@ Django<4.0
 elasticsearch<7.14.0
 
 setuptools<60
-
-# django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
-django-simple-history==3.0.0

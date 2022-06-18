@@ -1,0 +1,31 @@
+// Certificate overrides for edx.org
+
+.certificate-card {
+  // Note: edx.org no longer supports audit certificates, but there are
+  // legacy certificates that might be rendered. In this situation, they
+  // are styled as honor certificates.
+  &.mode-honor,
+  &.mode-audit {
+    border-color: $honor-mode-color;
+
+    .card-logo {
+      background-image: url('#{$static-path}/images/certificates/honor.png');
+    }
+  }
+
+  &.mode-verified {
+    border-color: $verified-mode-color;
+
+    .card-logo {
+      background-image: url('#{$static-path}/images/certificates/verified.png');
+    }
+  }
+
+  &.mode-professional {
+    border-color: $professional-certificate-color;
+
+    .card-logo {
+      background-image: url('#{$static-path}/images/certificates/professional.png');
+    }
+  }
+}

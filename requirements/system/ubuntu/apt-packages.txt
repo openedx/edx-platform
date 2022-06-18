@@ -25,7 +25,6 @@ graphviz
 libgraphviz-dev
 graphviz-dev
 mysql-server
-libmysqlclient-dev
 libgeos-dev
 libreadline6
 libreadline6-dev

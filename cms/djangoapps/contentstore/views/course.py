@@ -12,7 +12,7 @@ import string
 from collections import defaultdict
 from typing import Dict
 
-
+from rest_framework.parsers import JSONParser
 
 
 
@@ -20,7 +20,10 @@ from typing import Dict
 from django.contrib.auth.models import User 
 from opaque_keys import InvalidKeyError 
 
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication # To Import
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order# To Import
 
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser # To
 
 import django.utils
 from ccx_keys.locator import CCXLocator
@@ -42,7 +45,14 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
+from common.djangoapps.student.forms import DocumentForm 
+from common.djangoapps.student.models import DocumentStorage 
+from common.djangoapps.student.views.serializer import CourseSerializer 
+from django.views.decorators.csrf import csrf_exempt # To Import
+
 
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
@@ -124,6 +134,31 @@ from .library import (
     user_can_create_library,
     should_redirect_to_library_authoring_mfe
 )
+
+
+from cms.envs import common # To Import
+import boto # To Import
+from boto.s3.key import Key # To Import
+from .s3boto import * # To Import
+
+# s3 = bt3.resource(
+#     service_name='s3',
+#     region_name='us-east-2',
+#     aws_access_key_id='AKIA43ATNRFGIW6HF5CV',
+#     aws_secret_access_key='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'
+# )
+s3 = boto.connect_s3(
+    # service_name='s3',
+    
+    # region_name=common.AWS_SES_REGION_NAME,
+    'AKIA43ATNRFGIW6HF5CV',
+    "EUuMamQtokFW+sM23eriRcYVkdA8txjnKqPN8wF3",
+    host="us-east-1",
+    # ,aws_s3_file_overwrite=common.AWS_S3_FILE_OVERWRITE
+    )
+
+# bucket = s3.get_bucket(common.AWS_STORAGE_BUCKET_NAME)
+
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -1924,6 +1959,115 @@ def _get_course_creator_status(user):
         course_creator_status = 'granted'
 
     return course_creator_status
+
+
+
+@api_view(['POST',])
+@authentication_classes((
+    JwtAuthentication,
+    BearerAuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser,
+))
+@permission_classes((IsAuthenticated,))
+@csrf_exempt
+#for post / upload doc.
+def doc_upload_view(request):
+    method = request.method
+    try:
+        if method == 'POST':
+            if request.user.is_staff:
+                # log.info(request.POST, request.FILES)
+                file = request.FILES.get('document')
+                course = request.POST.get('course')
+                form_data = DocumentForm(request.POST, request.FILES)
+                try:
+                    course =  CourseOverview.objects.get(id=course)
+                except Exception as e:
+                    return JsonResponse({"success":False, "message":{"error":f"Course does not exist {e}"}})
+                if form_data.is_valid():
+                    url_save = upload_to_s3(file)
+                    form_data = form_data.save(commit=False)
+                    form_data.created_by_id = request.user.id
+                    form_data.course= course
+                    form_data.document = url_save
+                    form_data.save()
+                    return JsonResponse({"success":True})
+                return JsonResponse({"success":False, 'message':form_data.errors})
+            return JsonResponse({"success":False, "message":{"error":"User not authorized"}})
+        return JsonResponse({"success":False, "messages":{"method": f"{request.method} is invalid method"}})
+    except Exception as e:
+        return JsonResponse({"success":False, "message":{"error":f"{e}"} })
+
+
+
+
+@api_view(['POST',])
+@authentication_classes((
+    JwtAuthentication,
+    BearerAuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser,
+))
+@permission_classes((IsAuthenticated,))
+@csrf_exempt
+#for update doc
+def update_doc(request):
+    method = request.method
+    try:
+        if method == "POST":
+            doc_id = request.POST.get('doc_id', None)
+            file = request.FILES.get('document')
+            if doc_id:
+                try:
+                    form_data = DocumentStorage.objects.get(id=doc_id)
+                except Exception as e:
+                    return JsonResponse({"success":False, "message":{"error":f"{e}"}})
+                form_data = DocumentForm(request.POST,request.FILES,instance=form_data)
+                if form_data.is_valid():
+                    form_data = form_data.save(commit=False)
+                    if file:
+                        url_save = upload_to_s3(file)
+                        form_data.document = url_save
+                    form_data.save()
+                    return JsonResponse({"success":True})
+                return JsonResponse({"success":False, 'messages':form_data.errors})
+            return JsonResponse({"success":False, "messages":{"doc_id":"Document Id not Provided"}})
+        return JsonResponse({"success":False, "messages":{"method": f"{request.method} is invalid method"}})
+    except Exception as e:
+        return JsonResponse({"success":False, "message":{"error":f"{e}"} })
+
+
+# @api_view(['POST', 'GET'])
+@authentication_classes(())
+@permission_classes(())
+#for retrive / delete doc 
+def uploaded_doc_view(request):
+    try:
+        method = request.method
+        # log.info('----method-----'  , method)
+        data = JSONParser().parse(request)
+        id = data.get('doc_id', None)
+        if id:
+            if method == "POST" :
+                # log.info('==user==' , request.user)
+                if request.user.is_staff:
+                    
+                    try:
+                        DocumentStorage.objects.get(id=id).delete()
+                        return JsonResponse({"success":True, "message":{"deleted": "Data deleted Successfully."}})
+                    except Exception as e:
+                        return JsonResponse({"success":False, 'message':{"error":f"{e}"}})
+                return JsonResponse({"success":False, 'message':{"role": 'Unauthorized action'}})
+            elif method == "GET":
+                stored_docs = DocumentStorage.objects.filter(course_id=id)
+                stored_docs = [{'id':stored_doc.id, 'course_id': id, 'chapter_name': stored_doc.chapter_name, 'document_type': stored_doc.document_type, 'document_name': stored_doc.document_name, 'document':f"{stored_doc.document}"} for stored_doc in stored_docs]
+                return JsonResponse({"success":True, "data":stored_docs})
+            return JsonResponse({"success":False, "message":{"method": f"{method} is invalid."}})
+        return JsonResponse({"success":False, 'message':{'id':'Document Id not provided.'}})  
+    except Exception as e:
+        return JsonResponse({"success":False, "message":{"error":f"{e}"} })
+      
+        
+
 
 
 

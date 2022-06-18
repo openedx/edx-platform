@@ -1,0 +1,38 @@
+{% extends "admin/change_form.html" %}
+{% load formset_tags %}
+{% block extrahead %}{{ block.super }}
+    {% formset_prefixes adminform as prefixes %}
+    {% if prefixes %}
+
+        <script src="/static/dynamic_formsets/js/jquery/jquery.min.js"></script>
+
+        <script src="/static/dynamic_formsets/js/jquery-formset/jquery.formset.min.js"></script>
+        {% for prefix in prefixes %}
+            <script type="text/javascript">
+                $(function () {
+                    $('.{{ prefix }}-array-model-field tbody').formset({
+                        extraClasses: [],
+                        prefix: '{{ prefix }}'
+                    })
+                })
+            </script>
+        {% endfor %}
+        <style type="text/css">
+            .add-row {
+                padding-left: 18px;
+                background: url(/static/dynamic_formsets/images/add.png) no-repeat left center;
+            }
+
+            .delete-row {
+                float: right;
+                display: block;
+                margin: 5px 0 0 5px;
+                text-indent: -6000px;
+                background: url(/static/dynamic_formsets/images/delete.png) no-repeat left center;
+                width: 16px;
+                height: 16px;
+            }
+        </style>
+    {% endif %}
+
+{% endblock %}

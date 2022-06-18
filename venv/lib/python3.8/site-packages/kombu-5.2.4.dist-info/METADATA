@@ -1,0 +1,67 @@
+Metadata-Version: 2.1
+Name: kombu
+Version: 5.2.4
+Summary: Messaging library for Python.
+Home-page: https://kombu.readthedocs.io
+Author: Ask Solem
+Author-email: auvipy@gmail.com, ask@celeryproject.org
+License: BSD
+Keywords: messaging message amqp rabbitmq redis actor producer consumer
+Platform: any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Communications
+Classifier: Topic :: System :: Distributed Computing
+Classifier: Topic :: System :: Networking
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.7
+License-File: LICENSE
+Requires-Dist: amqp (<6.0.0,>=5.0.9)
+Requires-Dist: vine
+Requires-Dist: importlib-metadata (>=0.18) ; python_version < "3.8"
+Requires-Dist: cached-property ; python_version < "3.8"
+Provides-Extra: azureservicebus
+Requires-Dist: azure-servicebus (>=7.0.0) ; extra == 'azureservicebus'
+Provides-Extra: azurestoragequeues
+Requires-Dist: azure-storage-queue ; extra == 'azurestoragequeues'
+Provides-Extra: consul
+Requires-Dist: python-consul (>=0.6.0) ; extra == 'consul'
+Provides-Extra: librabbitmq
+Requires-Dist: librabbitmq (>=2.0.0) ; extra == 'librabbitmq'
+Provides-Extra: mongodb
+Requires-Dist: pymongo (<3.12.1,>=3.3.0) ; extra == 'mongodb'
+Provides-Extra: msgpack
+Requires-Dist: msgpack ; extra == 'msgpack'
+Provides-Extra: pyro
+Requires-Dist: pyro4 ; extra == 'pyro'
+Provides-Extra: qpid
+Requires-Dist: qpid-python (>=0.26) ; extra == 'qpid'
+Requires-Dist: qpid-tools (>=0.26) ; extra == 'qpid'
+Provides-Extra: redis
+Requires-Dist: redis (!=4.0.0,!=4.0.1,>=3.4.1) ; extra == 'redis'
+Provides-Extra: slmq
+Requires-Dist: softlayer-messaging (>=1.0.3) ; extra == 'slmq'
+Provides-Extra: sqlalchemy
+Requires-Dist: sqlalchemy ; extra == 'sqlalchemy'
+Provides-Extra: sqs
+Requires-Dist: boto3 (>=1.9.12) ; extra == 'sqs'
+Requires-Dist: pycurl (~=7.44.1) ; extra == 'sqs'
+Requires-Dist: urllib3 (>=1.26.7) ; extra == 'sqs'
+Provides-Extra: yaml
+Requires-Dist: PyYAML (>=3.10) ; extra == 'yaml'
+Provides-Extra: zookeeper
+Requires-Dist: kazoo (>=1.3.1) ; extra == 'zookeeper'
+
+UNKNOWN
+

@@ -1,0 +1,90 @@
+Metadata-Version: 2.1
+Name: drf-jwt
+Version: 1.19.2
+Summary: JSON Web Token based authentication for Django REST framework
+Home-page: https://github.com/Styria-Digital/django-rest-framework-jwt
+Author: Styria Digital
+Author-email: digital-development@styria.hr
+License: MIT
+Keywords: Styria CMS,JSON API
+Platform: POSIX
+Platform: Microsoft
+Platform: MacOS
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Topic :: Internet :: WWW/HTTP
+Requires-Python: !=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7
+Description-Content-Type: text/markdown
+Requires-Dist: PyJWT[crypto] (<3.0.0,>=1.5.2)
+Requires-Dist: Django (>=1.11)
+Requires-Dist: djangorestframework (>=3.7)
+Provides-Extra: dev
+Requires-Dist: tox ; extra == 'dev'
+Provides-Extra: docs
+Requires-Dist: mkdocs (==0.13.2) ; extra == 'docs'
+Provides-Extra: lint
+Requires-Dist: isort ; extra == 'lint'
+Requires-Dist: black ; extra == 'lint'
+Requires-Dist: flake8 ; extra == 'lint'
+Provides-Extra: test
+Requires-Dist: mock ; extra == 'test'
+Requires-Dist: pytest (>=3.0) ; extra == 'test'
+Requires-Dist: pytest-cov ; extra == 'test'
+Requires-Dist: pytest-django ; extra == 'test'
+Requires-Dist: pytest-runner ; extra == 'test'
+Requires-Dist: six ; extra == 'test'
+
+# REST framework JWT Auth
+
+[![Build Status](https://travis-ci.org/Styria-Digital/django-rest-framework-jwt.svg?branch=master)](https://travis-ci.org/Styria-Digital/django-rest-framework-jwt)
+[![Coverage](https://codecov.io/github/Styria-Digital/django-rest-framework-jwt/branch/master/graph/badge.svg)](https://codecov.io/github/Styria-Digital/django-rest-framework-jwt/branch/master)
+
+JSON Web Token Authentication support for Django REST Framework
+
+## Overview
+
+This package provides [JSON Web Token Authentication][jwt-auth-spec] support
+for [Django REST framework][drf].
+
+If you want to know more about JWT, check out the following resources:
+
+ - DjangoCon 2014 - JSON Web Tokens [Video][jwt-video] | [Slides][jwt-slides]
+ - [Auth with JSON Web Tokens][auth-jwt]
+ - [JWT.io][jwt-io]
+
+## Requirements
+
+-  Python 2.7, 3.4+
+-  Django 1.11+
+-  Django REST Framework 3.7+
+
+## Installation
+
+```bash
+$ pip install drf-jwt
+```
+
+## Documentation & Support
+
+Full documentation for the project is available at [docs][docs].
+
+[jwt-auth-spec]: http://tools.ietf.org/html/draft-ietf-oauth-json-web-token
+[drf]: http://django-rest-framework.org/
+[jwt-video]: https://www.youtube.com/watch?v=825hodQ61bg
+[jwt-slides]: https://speakerdeck.com/jpadilla/djangocon-json-web-tokens
+[auth-jwt]: http://jpadilla.com/post/73791304724/auth-with-json-web-tokens
+[jwt-io]: http://jwt.io/
+[docs]: http://styria-digital.github.io/django-rest-framework-jwt
+
+

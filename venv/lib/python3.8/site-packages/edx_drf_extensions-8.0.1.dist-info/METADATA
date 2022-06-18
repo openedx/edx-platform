@@ -1,0 +1,37 @@
+Metadata-Version: 2.1
+Name: edx-drf-extensions
+Version: 8.0.1
+Summary: edX extensions of Django REST Framework
+Home-page: https://github.com/edx/edx-drf-extensions
+Author: edX
+Author-email: oscm@edx.org
+License: Apache 2.0
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 2.2
+Classifier: Framework :: Django :: 3.0
+Classifier: Framework :: Django :: 3.1
+Classifier: Framework :: Django :: 3.2
+Requires-Dist: django-waffle
+Requires-Dist: python-dateutil (>=2.0)
+Requires-Dist: six
+Requires-Dist: djangorestframework (>=3.9.0)
+Requires-Dist: semantic-version
+Requires-Dist: edx-opaque-keys
+Requires-Dist: Django (>=2.2)
+Requires-Dist: drf-jwt
+Requires-Dist: edx-django-utils (>=3.8.0)
+Requires-Dist: pyjwt[crypto] (>=2.1.0)
+Requires-Dist: requests (>=2.7.0)
+Requires-Dist: pyjwkest
+
+UNKNOWN
+
+

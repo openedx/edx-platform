@@ -1,6 +1,7 @@
 # Python libraries to install that are local to the edx-platform repo
 -e .
 -e common/lib/capa
+-e common/lib/safe_lxml
 -e common/lib/sandbox-packages
 -e common/lib/xmodule
 
