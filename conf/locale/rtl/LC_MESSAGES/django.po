@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-13 20:01+0000\n"
-"PO-Revision-Date: 2022-06-13 20:01:05.089992\n"
+"POT-Creation-Date: 2022-06-19 20:42+0000\n"
+"PO-Revision-Date: 2022-06-19 20:42:57.069270\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -5341,6 +5341,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Confirm Email"
 msgstr "Ȼønɟᴉɹɯ Ɇɯɐᴉl"
@@ -11286,6 +11287,10 @@ msgstr "Ɇnʇǝɹ ʎønɹ lɐsʇ nɐɯǝ."
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "The email addresses do not match."
 msgstr "Ŧɥǝ ǝɯɐᴉl ɐddɹǝssǝs dø nøʇ ɯɐʇɔɥ."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your confirm email"
+msgstr "Ɇnʇǝɹ ʎønɹ ɔønɟᴉɹɯ ǝɯɐᴉl"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your country or region of residence."
