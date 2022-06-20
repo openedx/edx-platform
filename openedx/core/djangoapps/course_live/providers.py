@@ -57,6 +57,28 @@ class LiveProvider(ABC):
         }
 
 
+class HasGlobalCredentials(ABC):
+    """
+    Defines structure for providers with global credentials
+    """
+    key: str
+    secret: str
+    url: str
+
+    @staticmethod
+    def get_global_keys() -> Dict:
+        """
+        Get keys from settings
+        """
+        raise NotImplementedError()
+
+    def has_valid_global_keys(self) -> bool:
+        """
+        Check if keys are valid and not None
+        """
+        raise NotImplementedError()
+
+
 class Zoom(LiveProvider):
     """
     Zoom LTI PRO live provider
@@ -72,7 +94,7 @@ class Zoom(LiveProvider):
         return True
 
 
-class BigBlueButton(LiveProvider):
+class BigBlueButton(LiveProvider, HasGlobalCredentials):
     """
     Big Blue Button LTI provider
     """
@@ -85,14 +107,14 @@ class BigBlueButton(LiveProvider):
         """
         Check if free tier is enabled by checking for valid keys
         """
-        return self._has_valid_global_keys()
+        return self.has_valid_global_keys()
 
     @property
     def is_enabled(self) -> bool:
         return True
 
     @staticmethod
-    def _get_global_keys() -> Dict:
+    def get_global_keys() -> Dict:
         """
         Get keys from settings
         """
@@ -101,13 +123,18 @@ class BigBlueButton(LiveProvider):
         except AttributeError:
             return {}
 
-    def _has_valid_global_keys(self) -> bool:
+    def has_valid_global_keys(self) -> bool:
         """
         Check if keys are valid and not None
         """
-        key = self._get_global_keys()
-        if key:
-            return bool(key.get("KEY", None) and key.get("SECRET", None) and key.get("URL", None))
+        credentials = self.get_global_keys()
+        if credentials:
+            self.key = credentials['KEY']
+            self.secret = credentials['SECRET']
+            self.url = credentials['URL']
+            return bool(credentials.get("KEY", None)
+                        and credentials.get("SECRET", None)
+                        and credentials.get("URL", None))
         return False
 
 
