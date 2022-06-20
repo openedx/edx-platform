@@ -497,6 +497,8 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile', on_delete=models.CASCADE)
     name = models.CharField(blank=True, max_length=255, db_index=True)
 
+    # How meta field works: meta will only store those fields which are available in extended_profile configuration,
+    # so in order to store a field in meta, it must be available in extended_profile configuration.
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
