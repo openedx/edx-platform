@@ -62,7 +62,7 @@ smmap==5.0.0
     # via gitdb
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==5.0.1
+sphinx==5.0.2
     # via
     #   -r requirements/edx/doc.in
     #   edx-sphinx-theme

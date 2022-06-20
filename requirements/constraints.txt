@@ -36,6 +36,10 @@ django-oauth-toolkit<=1.3.2
 # Will be updated once we update python-dateutil package
 matplotlib<3.4.0
 
+# constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
+# Major upgrade will be done in separate ticket.
+pymongo<4.0.0
+
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
 
