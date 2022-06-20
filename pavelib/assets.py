@@ -376,7 +376,7 @@ class XModuleAssetsWatcher(PatternMatchingEventHandler):
         """
         Register files with observer
         """
-        observer.schedule(self, 'xmodule/', recursive=True)
+        observer.schedule(self, 'common/lib/xmodule/', recursive=True)
 
     @debounce()
     def on_any_event(self, event):
@@ -889,7 +889,7 @@ def watch_assets(options):
     observer = Observer(timeout=wait)
 
     SassWatcher().register(observer, sass_directories)
-    XModuleSassWatcher().register(observer, ['xmodule/'])
+    XModuleSassWatcher().register(observer, ['common/lib/xmodule/'])
     XModuleAssetsWatcher().register(observer)
 
     print("Starting asset watcher...")

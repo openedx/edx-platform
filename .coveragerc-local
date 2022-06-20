@@ -10,7 +10,6 @@ source =
     openedx
     pavelib
     scripts
-    xmodule
 
 omit =
     cms/envs/*
