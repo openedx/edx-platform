@@ -24,6 +24,7 @@ from xmodule.capa_module import ProblemBlock
 from xmodule.conditional_module import ConditionalBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.library_content_module import LibraryContentBlock
+from xmodule.library_sourced_block import LibrarySourcedBlock
 from xmodule.lti_module import LTIBlock
 from xmodule.poll_module import PollBlock
 from xmodule.seq_module import SequenceBlock
@@ -78,6 +79,7 @@ XBLOCK_CLASSES = [
     CustomTagBlock,
     HtmlBlock,
     LibraryContentBlock,
+    LibrarySourcedBlock,
     LTIBlock,
     PollBlock,
     ProblemBlock,

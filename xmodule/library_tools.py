@@ -200,7 +200,10 @@ class LibraryToolsService:
         if library is None:
             raise ValueError(f"Requested library {library_key} not found.")
 
-        filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
+        if hasattr(dest_block, 'capa_type'):
+            filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
+        else:
+            filter_children = None
 
         if not is_v2_lib:
             if user_perms and not user_perms.can_read(library_key):
