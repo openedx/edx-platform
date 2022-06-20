@@ -8,4 +8,3 @@ Python Docstrings
     common_index
     lms_index
     openedx/modules
-    xmodule/modules
