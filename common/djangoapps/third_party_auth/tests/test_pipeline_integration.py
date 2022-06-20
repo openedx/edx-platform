@@ -402,6 +402,7 @@ class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
             'fullname': u'Grown Up {}'.format(self.user.profile.name),
             'country': 'PK',
             'non_existing_field': 'value',
+            'year_of_birth': 1999,
         }
 
         # Mocks
@@ -430,6 +431,7 @@ class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
         assert user.email == 'new+{}'.format(self.old_email)
         assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
         assert user.profile.country == 'PK'
+        assert user.profile.year_of_birth == 1999
 
         # Now verify that username field is not updated
         assert user.username == self.old_username
@@ -456,6 +458,7 @@ class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
         assert user.email == self.old_email
         assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
         assert user.profile.country == 'PK'
+        assert user.profile.year_of_birth == 1999
 
         # Now verify that username field is not updated
         assert user.username == self.old_username
@@ -486,6 +489,7 @@ class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
         assert user.username == self.old_username
         assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
         assert user.profile.country == 'PK'
+        assert user.profile.year_of_birth == 1999
 
         # An email should still be sent because the email changed.
         assert len(mail.outbox) == 1
