@@ -7,9 +7,6 @@ from unittest.mock import patch
 from crum import set_current_request
 from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.courseware.entrance_exams import (
     course_has_entrance_exam,
@@ -17,6 +14,9 @@ from lms.djangoapps.courseware.entrance_exams import (
     user_can_skip_entrance_exam,
     user_has_passed_entrance_exam
 )
+
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback, toc_for_course
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
