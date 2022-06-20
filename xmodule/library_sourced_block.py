@@ -16,6 +16,7 @@ from xblock.core import XBlock
 from xblock.fields import List, Scope, String
 from xblock.validation import ValidationMessage
 from xblockutils.resources import ResourceLoader
+from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock as EditableChildrenMixin
@@ -34,6 +35,7 @@ _ = lambda text: text
 @XBlock.wants('library_tools')  # Only needed in studio
 @XBlock.wants('studio_user_permissions')  # Only available in studio
 class LibrarySourcedBlock(
+    StudioEditableXBlockMixin,
     MakoTemplateBlockBase,
     XModuleToXBlockMixin,
     HTMLSnippet,
@@ -53,7 +55,7 @@ class LibrarySourcedBlock(
     """
     display_name = String(
         help=_("The display name for this component."),
-        default="Library Sourced Content",
+        default="Library Reference Block",
         display_name=_("Display Name"),
         scope=Scope.content,
     )
@@ -73,7 +75,7 @@ class LibrarySourcedBlock(
         help=_("Enter the IDs of the library XBlocks that you wish to use."),
         scope=Scope.content,
     )
-    editable_fields = ("display_name", "source_block_ids")
+    editable_fields = ("source_block_ids",)
     has_children = True
     has_author_view = True
 
@@ -102,6 +104,33 @@ class LibrarySourcedBlock(
 
     def __str__(self):
         return f"LibrarySourcedBlock: {self.display_name}"
+
+    def render_children(self, context, fragment, can_reorder=False, can_add=False):
+        """
+        Renders the children of the module with HTML appropriate for Studio. If can_reorder is True,
+        then the children will be rendered to support drag and drop.
+        """
+        contents = []
+
+        for child in self.get_children():  # pylint: disable=no-member
+            if can_reorder:
+                context['reorderable_items'].add(child.location)
+            context['can_add'] = can_add
+            context['selected'] = str(child.location) in self.source_block_ids
+            rendered_child = child.render(StudioEditableModule.get_preview_view_name(child), context)
+            fragment.add_fragment_resources(rendered_child)
+
+            contents.append({
+                'id': str(child.location),
+                'content': rendered_child.content
+            })
+
+        fragment.add_content(self.runtime.service(self, 'mako').render_template("studio_render_children_view.html", {  # pylint: disable=no-member
+            'items': contents,
+            'xblock_context': context,
+            'can_add': can_add,
+            'can_reorder': can_reorder,
+        }))
 
     def studio_view(self, _context):
         """
@@ -209,6 +238,8 @@ class LibrarySourcedBlock(
                     action_label=_("Select a Library.")
                 )
             )
+            return validation
+
         self._validate_library_version(validation, self.tools, self.source_library_version, self.source_library_key)
         return validation
 
@@ -285,18 +316,11 @@ class LibrarySourcedBlock(
             except ValueError:
                 pass  # The validation area will display an error message, no need to do anything now.
 
-    @XBlock.json_handler
-    def set_block_ids(self, data, suffix=''):
-        """
-        Save source_block_ids.
-        """
-        if data.get('source_library_id'):
-            self.source_library_id = data.get('source_library_id')
-            return {'source_library_id': self.source_library_id}
-
     @XBlock.handler
-    def get_block_ids(self, data, suffix=''):
+    def get_block_ids(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return source_block_ids.
         """
-        return Response(json.dumps({'source_library_id': self.source_library_id}))
+        return Response(json.dumps({'source_block_ids': self.source_block_ids}))
+
+StudioEditableModule = EditableChildrenMixin
