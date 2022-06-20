@@ -52,6 +52,11 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
         restore-keys: ${{ runner.os }}-pip-
 
+    - name: Install Required Python Dependencies
+      run: |
+        pip install -r requirements/pip.txt
+        pip install -r requirements/edx/base.txt
+
     - name: Initiate Mongo DB Service
       run: |
         sudo systemctl start mongod
