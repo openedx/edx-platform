@@ -1,4 +1,4 @@
-name: Static assets check lms
+name: lms static assets
 
 on:
   pull_request:
@@ -39,10 +39,23 @@ jobs:
     - name: Setup npm
       run: npm i -g npm@${{ matrix.npm-version }}
 
-    - name: Install Python dependencies
+    - name: Get pip cache dir
+      id: pip-cache-dir
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+
+    - name: Cache pip dependencies
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+        restore-keys: ${{ runner.os }}-pip-
+
+    - name: Install Required Python Dependencies
       run: |
         pip install -r requirements/pip.txt
-        pip install -r requirements/edx/development.txt
+        pip install -r requirements/edx/base.txt
 
     - name: Initiate Mongo DB Service
       run: |
