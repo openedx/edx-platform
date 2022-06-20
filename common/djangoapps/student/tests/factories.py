@@ -21,6 +21,7 @@ from common.djangoapps.student.models import (
     PendingEmailChange,
     Registration,
     User,
+    UserAttribute,
     UserProfile,
     UserStanding
 )
@@ -112,6 +113,15 @@ class UserFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-
 
         for group_name in extracted:
             self.groups.add(GroupFactory.simple_generate(create, name=group_name))  # lint-amnesty, pylint: disable=no-member
+
+
+class UserAttributeFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
+        model = UserAttribute
+
+    user = factory.SubFactory(UserFactory)
+    name = factory.Sequence('{}'.format)
+    value = factory.Sequence('{}'.format)
 
 
 class RequestFactoryNoCsrf(RequestFactory):
