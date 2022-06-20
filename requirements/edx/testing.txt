@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
--e git+https://github.com/openedx/blockstore.git@1.2.1#egg=blockstore==1.2.1
+-e git+https://github.com/openedx/blockstore.git@1.2.4#egg=blockstore==1.2.4
     # via -r requirements/edx/base.txt
 -e common/lib/capa
     # via -r requirements/edx/base.txt
@@ -78,7 +78,7 @@ attrs==21.4.0
     #   openedx-events
     #   outcome
     #   pytest
-babel==2.10.2
+babel==2.10.3
     # via
     #   -r requirements/edx/base.txt
     #   enmerkar
@@ -367,7 +367,7 @@ django-fernet-fields==0.6
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edxval
-django-filter==21.1
+django-filter==22.1
     # via
     #   -r requirements/edx/base.txt
     #   blockstore
