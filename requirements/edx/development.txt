@@ -429,7 +429,7 @@ django-multi-email-field==0.6.2
     #   edx-enterprise
 django-mysql==4.7.1
     # via -r requirements/edx/testing.txt
-django-oauth-toolkit==1.3.2
+django-oauth-toolkit==1.7.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -701,7 +701,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==15.0.0
+
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -846,6 +846,7 @@ jsonschema==4.16.0
 jwcrypto==1.4.2
     # via
     #   -r requirements/edx/testing.txt
+    #   django-oauth-toolkit
     #   pylti1p3
 kombu==5.2.4
     # via
@@ -980,9 +981,8 @@ numpy==1.22.4
     #   chem
     #   openedx-calc
     #   scipy
-oauthlib==3.0.1
+oauthlib==3.2.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-oauth-toolkit
     #   lti-consumer-xblock
@@ -999,9 +999,7 @@ openedx-filters==0.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-optimizely-sdk==4.1.0
-    # via -r requirements/edx/testing.txt
-ora2==4.5.1
+
     # via -r requirements/edx/testing.txt
 oscrypto==1.3.0
     # via
@@ -1601,7 +1599,7 @@ urllib3==1.26.12
     #   tableauserverclient
 user-util==1.0.0
     # via -r requirements/edx/testing.txt
-uvicorn==0.18.3
+
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
