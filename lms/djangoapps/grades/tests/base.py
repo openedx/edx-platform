@@ -4,10 +4,10 @@ Base file for Grades tests
 
 
 from crum import set_current_request
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks

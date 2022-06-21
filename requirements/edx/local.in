@@ -1,6 +1,5 @@
 # Python libraries to install that are local to the edx-platform repo
 -e .
 -e common/lib/capa
--e common/lib/xmodule
 
 -e openedx/core/lib/xblock_builtin/xblock_discussion

@@ -74,7 +74,7 @@ Test Locations
    located in ``common/lib/capa/capa/tests``.
 
 -  Javascript unit tests: Located in ``spec`` folders. For example,
-   ``common/lib/xmodule/xmodule/js/spec`` and
+   ``xmodule/js/spec`` and
    ``{cms,lms}/static/js/spec`` For consistency, you should use the
    same directory structure for implementation and test. For example,
    the test for ``src/views/module.js`` should be written in
@@ -122,7 +122,7 @@ Various ways to run tests using pytest::
 
 For example, this command runs a single python unit test file::
 
-    pytest common/lib/xmodule/xmodule/tests/test_stringify.py
+    pytest xmodule/tests/test_stringify.py
 
 Note -
 edx-platorm has multiple services (lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in jenkins. To make sure tests will pass in each of these environments (especially for tests in "common" directory), you will need to test in each seperately. Add --rootdir flag at end of your pytest call and specify the env you are testing in::
@@ -133,7 +133,7 @@ Various tools like ddt create tests with very complex names, rather than figurin
 
 1. Select tests to run based on their name, provide an expression to the `pytest -k option`_ which performs a substring match on test names::
 
-    pytest common/lib/xmodule/xmodule/tests/test_stringify.py -k test_stringify
+    pytest xmodule/tests/test_stringify.py -k test_stringify
 
 .. _pytest -k option: https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name
 .. _node ID: https://docs.pytest.org/en/latest/example/markers.html#node-id
@@ -141,7 +141,7 @@ Various tools like ddt create tests with very complex names, rather than figurin
 
 2. Alternatively, you can the get the name of all test methods in a class, file, or project, including all ddt.data variations, by running pytest with `--collectonly`::
 
-    pytest common/lib/xmodule/xmodule/tests/test_stringify.py --collectonly
+    pytest xmodule/tests/test_stringify.py --collectonly
 
 Testing with migrations
 ***********************
@@ -215,7 +215,7 @@ Use this command to generate an HTML report::
 
     coverage html
 
-The report is then saved in reports/common/lib/xmodule/cover/index.html
+The report is then saved in reports/xmodule/cover/index.html
 
 To run tests for stub servers, for example for `YouTube stub server`_, you can
 run one of these commands::

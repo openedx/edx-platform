@@ -14,10 +14,10 @@ from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from edx_toggles.toggles.testutils import override_waffle_flag
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 from lti_consumer.models import LtiConfiguration
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.learner_dashboard.config.waffle import ENABLE_PROGRAM_TAB_VIEW
 from lms.djangoapps.program_enrollments.rest_api.v1.tests.test_views import ProgramCacheMixin
