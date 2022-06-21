@@ -55,7 +55,7 @@ attrs==21.4.0
     #   blockstore
     #   edx-ace
     #   openedx-events
-babel==2.10.2
+babel==2.10.3
     # via
     #   -r requirements/edx/base.in
     #   enmerkar
@@ -178,7 +178,6 @@ defusedxml==0.7.1
     #   djangorestframework-xml
     #   ora2
     #   python3-openid
-    #   python3-saml
     #   social-auth-core
     #   tableauserverclient
 deprecated==1.2.13
@@ -287,7 +286,7 @@ django-fernet-fields==0.6
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edxval
-django-filter==21.1
+django-filter==22.1
     # via
     #   -r requirements/edx/base.in
     #   blockstore
@@ -578,7 +577,7 @@ future==0.18.2
     # via
     #   edx-celeryutils
     #   pyjwkest
-geoip2==4.5.0
+geoip2==4.6.0
     # via -r requirements/edx/base.in
 glob2==0.7
     # via -r requirements/edx/base.in
@@ -655,7 +654,7 @@ loremipsum==1.0.5
     # via ora2
 lti-consumer-xblock==4.1.1
     # via -r requirements/edx/base.in
-lxml==4.9.0
+lxml==4.6.5
     # via
     #   -r requirements/edx/base.in
     #   capa
@@ -664,6 +663,7 @@ lxml==4.9.0
     #   olxcleaner
     #   openedx-calc
     #   ora2
+    #   python3-saml
     #   xblock
     #   xmlsec
 mailsnake==1.6.4
@@ -882,10 +882,8 @@ python3-openid==3.2.0 ; python_version >= "3"
     # via
     #   -r requirements/edx/base.in
     #   social-auth-core
-python3-saml==1.9.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.in
+python3-saml==1.14.0
+    # via -r requirements/edx/base.in
 pytz==2022.1
     # via
     #   -r requirements/edx/base.in
