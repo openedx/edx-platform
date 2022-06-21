@@ -14,7 +14,7 @@
 #
 # Exits 0 if no errors, 1 otherwise.
 # Missing __init__.py files are printed to STDOUT.
-# Extra info is printed to STDIN.
+# Extra info is printed to STDERR.
 
 set -euo pipefail # Strict mode.
 
