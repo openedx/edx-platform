@@ -26,7 +26,8 @@ from xmodule.tabs import CourseTabList
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE, \
+    ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
@@ -185,9 +186,9 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
 
         course_discussion_settings = CourseDiscussionSettings.get(course_key)
         if (
-                not context["is_requester_privileged"] and
-                cc_thread["group_id"] and
-                is_commentable_divided(course.id, cc_thread["commentable_id"], course_discussion_settings)
+            not context["is_requester_privileged"] and
+            cc_thread["group_id"] and
+            is_commentable_divided(course.id, cc_thread["commentable_id"], course_discussion_settings)
         ):
             requester_group_id = get_group_id_for_user(request.user, course_discussion_settings)
             if requester_group_id is not None and cc_thread["group_id"] != requester_group_id:
@@ -605,9 +606,9 @@ def _get_users(discussion_entity_type, discussion_entity, username_profile_dict)
         users[discussion_entity['author']] = _user_profile(username_profile_dict[discussion_entity['author']])
 
     if (
-            discussion_entity_type == DiscussionEntity.comment
-            and discussion_entity['endorsed']
-            and discussion_entity['endorsed_by']
+        discussion_entity_type == DiscussionEntity.comment
+        and discussion_entity['endorsed']
+        and discussion_entity['endorsed_by']
     ):
         users[discussion_entity['endorsed_by']] = _user_profile(username_profile_dict[discussion_entity['endorsed_by']])
     return users
@@ -680,9 +681,9 @@ def _serialize_discussion_entities(request, context, discussion_entities, reques
             if serialized_entity['author'] and serialized_entity['author'] not in usernames:
                 usernames.append(serialized_entity['author'])
             if (
-                    'endorsed' in serialized_entity and serialized_entity['endorsed'] and
-                    'endorsed_by' in serialized_entity and
-                    serialized_entity['endorsed_by'] and serialized_entity['endorsed_by'] not in usernames
+                'endorsed' in serialized_entity and serialized_entity['endorsed'] and
+                'endorsed_by' in serialized_entity and
+                serialized_entity['endorsed_by'] and serialized_entity['endorsed_by'] not in usernames
             ):
                 usernames.append(serialized_entity['endorsed_by'])
 
@@ -1034,9 +1035,11 @@ def _handle_following_field(form_value, user, cc_content):
 
 def _handle_abuse_flagged_field(form_value, user, cc_content):
     """mark or unmark thread/comment as abused"""
+    course_key = CourseKey.from_string(cc_content.course_id)
     if form_value:
         cc_content.flagAbuse(user, cc_content)
-        if reported_content_email_notification_enabled(CourseKey.from_string(cc_content.course_id)):
+        if ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key) and reported_content_email_notification_enabled(
+                course_key):
             if cc_content.type == 'thread':
                 thread_flagged.send(sender='flag_abuse_for_thread', user=user, post=cc_content)
             else:
@@ -1120,8 +1123,8 @@ def create_thread(request, thread_data):
     _check_initializable_thread_fields(thread_data, context)
     discussion_settings = CourseDiscussionSettings.get(course_key)
     if (
-            "group_id" not in thread_data and
-            is_commentable_divided(course_key, thread_data.get("topic_id"), discussion_settings)
+        "group_id" not in thread_data and
+        is_commentable_divided(course_key, thread_data.get("topic_id"), discussion_settings)
     ):
         thread_data = thread_data.copy()
         thread_data["group_id"] = get_group_id_for_user(user, discussion_settings)
