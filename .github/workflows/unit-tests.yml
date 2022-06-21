@@ -32,6 +32,7 @@ jobs:
             "common-1",
             "common-2",
             "common-3",
+            "xmodule-1"
         ]
 
 
