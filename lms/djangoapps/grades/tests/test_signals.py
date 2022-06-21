@@ -391,7 +391,7 @@ class CourseEventsSignalsTest(ModuleStoreTestCase):
     @patch('lms.djangoapps.grades.events.segment.track')
     def test_segment_event_on_course_grade_passed_first_time(self, segment_track_mock):
         course = CourseOverviewFactory()
-        __ = CourseEnrollmentFactory(
+        enrollment = CourseEnrollmentFactory(
             is_active=True,
             mode='verified',
             course=course,
@@ -420,10 +420,8 @@ class CourseEventsSignalsTest(ModuleStoreTestCase):
             self.user.id,
             'edx.course.learner.passed.first_time',
             {
-                'LMS_USER_ID': self.user.id,
-                'COURSERUN_KEY': str(course.id),
+                'LMS_ENROLLMENT_ID': enrollment.id,
                 'COURSE_TITLE': course.display_name,
                 'COURSE_ORG_NAME': course.org,
-                'PASSED': 1,
             }
         )
