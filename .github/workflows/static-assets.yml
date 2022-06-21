@@ -1,4 +1,4 @@
-name: cms static assets
+name: static assets
 
 on:
   pull_request:
@@ -65,4 +65,6 @@ jobs:
         LMS_CFG: lms/envs/bok_choy.yml
         CMS_CFG: cms/envs/bok_choy.yml
 
-      run: paver update_assets cms
+      run: |
+        paver update_assets lms
+        paver update_assets cms
