@@ -606,8 +606,6 @@ SOCIAL_SHARING_SETTINGS = {
     'DASHBOARD_TWITTER': False
 }
 
-SOCIAL_MEDIA_FOOTER_URLS = {}
-
 # This is just a placeholder image.
 # Site operators can customize this with their organization's image.
 FOOTER_ORGANIZATION_IMAGE = "images/logo.png"
@@ -2265,11 +2263,6 @@ DEFAULT_MOBILE_AVAILABLE = False
 
 # How long to cache OpenAPI schemas and UI, in seconds.
 OPENAPI_CACHE_TIMEOUT = 0
-
-################# Mobile URLS ##########################
-
-# These are URLs to the app store for mobile.
-MOBILE_STORE_URLS = {}
 
 ############################# Persistent Grades ####################################
 

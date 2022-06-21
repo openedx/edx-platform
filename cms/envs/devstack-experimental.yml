@@ -354,7 +354,7 @@ MEDIA_ROOT: /edx/var/edxapp/media/
 MEDIA_URL: /media/
 MKTG_URLS: {}
 MKTG_URL_LINK_MAP: {}
-MOBILE_STORE_URLS: {}
+MOBILE_STORE_ACE_URLS: {}
 MODULESTORE:
     default:
         ENGINE: xmodule.modulestore.mixed.MixedModuleStore

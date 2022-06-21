@@ -3376,7 +3376,36 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
 
 # The footer URLs dictionary maps social footer names
 # to URLs defined in configuration.
-SOCIAL_MEDIA_FOOTER_URLS = {}
+SOCIAL_MEDIA_FOOTER_ACE_URLS = {
+    'reddit': 'http://www.reddit.com/r/edx',
+    'twitter': 'https://twitter.com/edXOnline',
+    'linkedin': 'http://www.linkedin.com/company/edx',
+    'facebook': 'http://www.facebook.com/EdxOnline',
+}
+
+# The mobile store URLs dictionary maps mobile store names
+# to URLs defined in configuration.
+MOBILE_STORE_ACE_URLS = {
+    'google': 'https://play.google.com/store/apps/details?id=org.edx.mobile',
+    'apple': 'https://itunes.apple.com/us/app/edx/id945480667?mt=8',
+}
+
+# The social media logo urls dictionary maps social media names
+# to the respective icons
+SOCIAL_MEDIA_LOGO_URLS = {
+    'reddit': 'http://email-media.s3.amazonaws.com/edX/2021/social_5_reddit.png',
+    'twitter': 'http://email-media.s3.amazonaws.com/edX/2021/social_2_twitter.png',
+    'linkedin': 'http://email-media.s3.amazonaws.com/edX/2021/social_3_linkedin.png',
+    'facebook': 'http://email-media.s3.amazonaws.com/edX/2021/social_1_fb.png',
+}
+
+# The mobile store logo urls dictionary maps mobile store names
+# to the respective icons
+MOBILE_STORE_LOGO_URLS = {
+    'google': 'http://email-media.s3.amazonaws.com/edX/2021/store_google_253x78.jpg',
+    'apple': 'http://email-media.s3.amazonaws.com/edX/2021/store_apple_229x78.jpg',
+}
+
 
 # The display dictionary defines the title
 # and icon class for each social media link.
@@ -3451,11 +3480,6 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
 
 #################SOCAIL AUTH OAUTH######################
 SOCIAL_AUTH_OAUTH_SECRETS = {}
-
-################# Mobile URLS ##########################
-
-# These are URLs to the app store for mobile.
-MOBILE_STORE_URLS = {}
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
