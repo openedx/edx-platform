@@ -44,8 +44,7 @@ class EnrollmentTrackPartitionGroupsOutlineProcessor(OutlineProcessor):
             self.user,
             partition_dict_key='id'
         )
-        # TODO: fix type annotation: https://github.com/openedx/tcril-engineering/issues/313
-        self.user_group = self.enrollment_track_groups.get(ENROLLMENT_TRACK_PARTITION_ID)  # type: ignore
+        self.user_group = self.enrollment_track_groups.get(ENROLLMENT_TRACK_PARTITION_ID)
 
     def _is_user_excluded_by_partition_group(self, user_partition_groups):
         """
