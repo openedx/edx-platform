@@ -1,4 +1,4 @@
-name: static assets
+name: static assets check for lms and cms
 
 on:
   pull_request:
