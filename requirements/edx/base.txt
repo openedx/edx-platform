@@ -55,7 +55,7 @@ attrs==21.4.0
     #   blockstore
     #   edx-ace
     #   openedx-events
-babel==2.10.2
+babel==2.10.3
     # via
     #   -r requirements/edx/base.in
     #   enmerkar
@@ -287,7 +287,7 @@ django-fernet-fields==0.6
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edxval
-django-filter==21.1
+django-filter==22.1
     # via
     #   -r requirements/edx/base.in
     #   blockstore
@@ -329,10 +329,8 @@ django-multi-email-field==0.6.2
     # via edx-enterprise
 django-mysql==4.7.0
     # via -r requirements/edx/base.in
-django-oauth-toolkit==1.3.2
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.in
+django-oauth-toolkit==2.0.0
+    # via -r requirements/edx/base.in
 django-object-actions==4.0.0
     # via edx-enterprise
 django-pipeline==2.0.8
@@ -578,7 +576,7 @@ future==0.18.2
     # via
     #   edx-celeryutils
     #   pyjwkest
-geoip2==4.5.0
+geoip2==4.6.0
     # via -r requirements/edx/base.in
 glob2==0.7
     # via -r requirements/edx/base.in
@@ -632,7 +630,9 @@ jsonfield==3.1.0
     #   lti-consumer-xblock
     #   ora2
 jwcrypto==1.3.1
-    # via pylti1p3
+    # via
+    #   django-oauth-toolkit
+    #   pylti1p3
 kombu==5.2.4
     # via celery
 laboratory==1.0.2
@@ -731,9 +731,8 @@ numpy==1.22.4
     #   chem
     #   openedx-calc
     #   scipy
-oauthlib==3.0.1
+oauthlib==3.2.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   django-oauth-toolkit
     #   lti-consumer-xblock
