@@ -347,10 +347,14 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         super().setUp()
 
     def _post_body(self, user, client, token_type=None, scope=None):
-        return {
+        body = {
             'client_id': client.client_id,
             'access_token': self.access_token,
         }
+        if token_type:
+            body['token_type'] = token_type
+
+        return body
 
     @ddt.data('dot_app')
     def test_access_token_exchange_calls_dispatched_view(self, client_attr):
@@ -359,6 +363,31 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         self._setup_provider_response(success=True)
         response = self._post_request(self.user, client)
         assert response.status_code == 200
+
+    @ddt.data('dot_app')
+    def test_jwt_access_token_exchange_calls_dispatched_view(self, client_attr):
+        client = getattr(self, client_attr)
+        self.oauth_client = client
+        self._setup_provider_response(success=True)
+        response = self._post_request(self.user, client, token_type='jwt')
+        assert response.status_code == 200
+
+        data = json.loads(response.content.decode('utf-8'))
+        assert 'expires_in' in data
+        assert data['expires_in'] > 0
+        assert data['token_type'] == 'JWT'
+
+    @ddt.data('dot_app')
+    def test_jwt_access_token_exchange_calls_dispatched_view_with_disabled_user(self, client_attr):
+        self.user.set_unusable_password()
+        self.user.save()
+        client = getattr(self, client_attr)
+        self.oauth_client = client
+        self._setup_provider_response(success=True)
+        response = self._post_request(self.user, client, token_type='jwt')
+        assert response.status_code == 403
+        data = json.loads(response.content.decode('utf-8'))
+        assert data['error'] == 'account_disabled'
 
 
 # pylint: disable=abstract-method
