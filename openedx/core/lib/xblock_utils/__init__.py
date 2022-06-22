@@ -1,5 +1,5 @@
 """
-Functions that can are used to modify XBlock fragments for use in the LMS and Studio
+Functions that are used to modify XBlock fragments for use in the LMS and Studio
 """
 
 
@@ -32,7 +32,10 @@ from xmodule.seq_module import SequenceBlock  # lint-amnesty, pylint: disable=wr
 from xmodule.util.xmodule_django import add_webpack_to_fragment  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.vertical_block import VerticalBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import (  # lint-amnesty, pylint: disable=wrong-import-order
-    PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW, shim_xmodule_js,
+    PREVIEW_VIEWS,
+    STUDENT_VIEW,
+    STUDIO_VIEW,
+    shim_xmodule_js
 )
 
 log = logging.getLogger(__name__)
@@ -510,3 +513,27 @@ def get_icon(block):
     It can be overridden by setting `OVERRIDE_GET_UNIT_ICON` to an alternative implementation.
     """
     return block.get_icon_class()
+
+
+def get_css_dependencies(group):
+    """
+    Returns list of CSS dependencies belonging to `group` in settings.PIPELINE['STYLESHEETS'].
+
+    Respects `PIPELINE['PIPELINE_ENABLED']` setting.
+    """
+    if settings.PIPELINE['PIPELINE_ENABLED']:
+        return [settings.PIPELINE['STYLESHEETS'][group]['output_filename']]
+    else:
+        return settings.PIPELINE['STYLESHEETS'][group]['source_filenames']
+
+
+def get_js_dependencies(group):
+    """
+    Returns list of JS dependencies belonging to `group` in settings.PIPELINE['JAVASCRIPT'].
+
+    Respects `PIPELINE['PIPELINE_ENABLED']` setting.
+    """
+    if settings.PIPELINE['PIPELINE_ENABLED']:
+        return [settings.PIPELINE['JAVASCRIPT'][group]['output_filename']]
+    else:
+        return settings.PIPELINE['JAVASCRIPT'][group]['source_filenames']
