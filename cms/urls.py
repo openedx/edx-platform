@@ -207,6 +207,9 @@ urlpatterns = oauth2_urlpatterns + [
     path('api/val/v0/', include('edxval.urls')),
     path('api/tasks/v0/', include('user_tasks.urls')),
     path('accessibility', contentstore_views.accessibility, name='accessibility'),
+    path('upload_doc', doc_upload_view, name='upload_doc'),
+    path('update_doc', update_doc, name='update_doc'),
+    path('view_doc/', delete_doc, name='view_doc'),
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:

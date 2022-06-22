@@ -227,7 +227,7 @@ from openedx.core.djangolib.js_utils import (
                 </li>
                 <li class="field text required" id="field-liveclass-notes">
                   <label for="new-liveclass-notes">${_("Meeting Notes")}</label>
-                  
+                  $newLiveClassForm.find(".new-liveclass-startdate").val();
                   <textarea  class="new-liveclass-notes" id="new-liveclass-notes" name="new-liveclass-notes" required placeholder="${_('e.g. Notes')}" aria-describedby="tip-new-liveclass-notes tip-error-new-liveclass-notes"></textarea>
                   <!-- <span class="tip" id="tip-new-liveclass-notes">${_("The public notes for your liveclass.")}</span> -->
                   <span class="tip tip-error is-hiding" id="tip-error-new-liveclass-notes"></span>
@@ -327,6 +327,19 @@ from openedx.core.djangolib.js_utils import (
                     </tr>
                   </table>
                 </li>
+
+
+                <li class="field text required" id="field-liveclass-zone">
+                  <label for="new-liveclass-zone">${_("Zone")}</label>
+  
+                <div class="dummy__item">
+                  <select name="category_zone" id="category_zone" class="category_zone">
+                    <option value="0" disabled selected>India</option>
+                    <option value="-37800">Canada</option>
+                </select>
+              </div>
+                </li>
+
                 </ol>
 <!-- 
               <ol class="list-input">
@@ -360,7 +373,8 @@ from openedx.core.djangolib.js_utils import (
                   <span class="tip tip-error is-hiding" id="tip-error-new-library-number"></span>
                 </li>
               </ol> -->
-
+             
+            
             </fieldset>
           </div>
 

@@ -152,6 +152,12 @@ if (is_proctored_exam) {
                             <span class="sr action-button-text"><%- gettext('Configure') %></span>
                         </a>
                     </li>
+                    <li class="action-item action-upload">
+                        <a href="#" data-tooltip="<%- gettext('Upload Document') %>" class="doc-upload-button action-button">
+                            <span class="icon fa fa-file" aria-hidden="true"></span>
+                            <span class="sr action-button-text"><%- gettext('Upload Document') %></span>
+                        </a>
+                    </li>
                 <% } %>
                 <% if (xblockInfo.isDuplicable()) { %>
                     <li class="action-item action-duplicate">

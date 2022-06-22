@@ -58,6 +58,13 @@ from common.djangoapps.util.milestones_helpers import (
     remove_prerequisite_course,
     set_prerequisite_courses
 )
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication # To Import
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order# To Import
+
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser # To Import
+from common.djangoapps.student.forms import DocumentForm # To Import
+from common.djangoapps.student.models import DocumentStorage # To Import
+from common.djangoapps.student.views.serializer import CourseSerializer # To Import
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from openedx.core import toggles as core_toggles
@@ -113,6 +120,10 @@ from .library import (
     user_can_create_library,
     should_redirect_to_library_authoring_mfe
 )
+from cms.envs import common # To Import
+import boto # To Import
+from boto.s3.key import Key # To Import
+from .s3boto import * # To Import
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -1899,3 +1910,97 @@ def _get_course_creator_status(user):
         course_creator_status = 'granted'
 
     return course_creator_status
+
+@api_view(['POST',])
+@authentication_classes((
+    JwtAuthentication,
+    BearerAuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser,
+))
+@permission_classes((IsAuthenticated,))
+def doc_upload_view(request):
+    method = request.method
+    try:
+        if method == 'POST':
+            # if request.user.is_staff:
+                log.info(request.POST, request.FILES)
+                file = request.FILES.get('document')
+                course = request.POST.get('course')
+                form_data = DocumentForm(request.POST, request.FILES)
+                try:
+                    course =  CourseOverview.objects.get(id=course)
+                except Exception as e:
+                    return JsonResponse({"success":False, "message":{"error":f"Course does not exist {e}"}})
+                if form_data.is_valid():
+                    url_save = upload_to_s3(file)
+                    form_data = form_data.save(commit=False)
+                    form_data.created_by_id = 1
+                    form_data.course= course
+                    form_data.document = url_save
+                    form_data.save()
+                    return JsonResponse({"success":True})
+                return JsonResponse({"success":False, 'message':form_data.errors})
+            # return JsonResponse({"success":False, "message":{"error":"User not authorized"}})
+        return JsonResponse({"success":False, "messages":{"method": f"{request.method} is invalid method"}})
+    except Exception as e:
+        return JsonResponse({"success":False, "message":{"error":f"{e}"} })
+
+
+
+
+@api_view(['POST',])
+@authentication_classes((
+    JwtAuthentication,
+    BearerAuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser,
+))
+@permission_classes((IsAuthenticated,))
+@csrf_exempt
+def update_doc(request):
+    method = request.method
+    try:
+        if method == "POST":
+            doc_id = request.POST.get('doc_id', None)
+            file = request.FILES.get('document')
+            if doc_id:
+                try:
+                    form_data = DocumentStorage.objects.get(id=doc_id)
+                except Exception as e:
+                    return JsonResponse({"success":False, "message":{"error":f"{e}"}})
+                form_data = DocumentForm(request.POST,request.FILES,instance=form_data)
+                if form_data.is_valid():
+                    form_data = form_data.save(commit=False)
+                    if file:
+                        url_save = upload_to_s3(file)
+                        form_data.document = url_save
+                    form_data.save()
+                    return JsonResponse({"success":True})
+                return JsonResponse({"success":False, 'messages':form_data.errors})
+            return JsonResponse({"success":False, "messages":{"doc_id":"Document Id not Provided"}})
+        return JsonResponse({"success":False, "messages":{"method": f"{request.method} is invalid method"}})
+    except Exception as e:
+        return JsonResponse({"success":False, "message":{"error":f"{e}"} })
+
+
+# @api_view(['POST', 'GET'])
+@csrf_exempt
+def delete_doc(request):
+    try:
+        method = request.method
+        data = JSONParser().parse(request)
+        id = data.get('doc_id', None)
+        if id:
+            if method == "POST" :
+                # if request.user.is_staff:
+                    try:
+                        DocumentStorage.objects.get(id=id).delete()
+                        return JsonResponse({"success":True, "message":{"deleted": "Data deleted Successfully."}})
+                    except Exception as e:
+                        return JsonResponse({"success":False, 'message':{"error":f"{e}"}})
+                # return JsonResponse({"success":False, 'message':{"role": 'Unauthorized action'}})
+            return JsonResponse({"success":False, 'message':{'id':'Document Id not provided.'}})  
+    except Exception as e:
+        return JsonResponse({"success":False, "message":{"error":f"{e}"} })
+      
+        
+

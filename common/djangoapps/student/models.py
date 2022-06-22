@@ -3514,3 +3514,22 @@ class UserPasswordToggleHistory(TimeStampedModel):
 
     def __str__(self):
         return self.comment
+
+class DocumentStorage(models.Model):
+    objects = None
+    id = models.AutoField(primary_key=True)
+    course= models.ForeignKey(CourseOverview, related_name='Course', on_delete=models.CASCADE)
+    chapter_name = models.CharField(max_length=50, help_text='Course Chapter Name', null=True, blank=True)
+    document_type = models.CharField(max_length=10, null=True, blank=True)
+    document_name = models.CharField(max_length=50, null=True, blank=True, help_text='Enter Document Name')
+    document = models.FileField(upload_to="course_docs")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    added_on = models.DateTimeField(auto_now=True)
+    updated_on = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return json.dumps({"course_id":self.course_id, "document_id":self.document_id})
+
+    class Meta:
+        db_table = 'cms_doc_storage'
