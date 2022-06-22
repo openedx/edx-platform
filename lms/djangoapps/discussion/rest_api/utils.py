@@ -16,12 +16,12 @@ def discussion_open_for_user(course, user):
     return course.forum_posts_allowed or has_discussion_privileges(user, course.id)
 
 
-def set_threads_attribute_value(threads, attribute, value):
+def set_attribute(threads, attribute, value):
     """
-    It iterates over thread list and assign thread attribute the value
+    Iterates over the list of dicts and assigns the provided value to the given attribute
 
     Arguments:
-        threads: List containing threads
+        threads: List of threads (dict objects)
         attribute: the key for thread dict
         value: the value to assign to the thread attribute
     """

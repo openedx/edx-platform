@@ -578,6 +578,7 @@ class LearnerThreadView(APIView):
     )
     permission_classes = (
         permissions.IsAuthenticated,
+        IsStaffOrCourseTeamOrEnrolled,
     )
 
     def get(self, request, course_id=None):

@@ -1453,6 +1453,9 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for LearnerThreadView list"""
 
     def setUp(self):
+        """
+        Sets up the test case
+        """
         super().setUp()
         self.author = self.user
         self.remove_keys = [
@@ -1536,6 +1539,12 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         return thread
 
     def test_basic(self):
+        """
+        Tests the data is fetched correctly
+
+        Note: test_basic is required as the name because DiscussionAPIViewTestMixin
+              calls this test case automatically
+        """
         self.register_get_user_response(self.user)
         expected_cs_comments_response = {
             "collection": [make_minimal_cs_thread({
@@ -1574,11 +1583,18 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         }
 
     def test_no_user_id_given(self):
+        """
+        Tests that 400 response is returned when no user_id is passed
+        """
         response = self.client.get(self.url)
         assert response.status_code == 400
 
     def test_not_authenticated(self):
-        pass
+        """
+        This test is called by DiscussionAPIViewTestMixin and is not required in
+        our case
+        """
+        assert True
 
 
 @ddt.ddt

@@ -17,6 +17,7 @@ from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
+from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -92,7 +93,7 @@ from .serializers import (
     UserStatsSerializer,
     get_context,
 )
-from .utils import discussion_open_for_user, set_threads_attribute_value
+from .utils import discussion_open_for_user, set_attribute
 
 User = get_user_model()
 
@@ -855,18 +856,34 @@ def get_thread_list(
 
 def get_learner_active_thread_list(request, course_key, query_params):
     """
-    Return the list of active threads of a particular user in query params
+    Returns a list of active threads for a particular user
     user_id must be given in query_params
 
     Parameters:
 
     request: The django request objects used for build_absolute_uri
     course_key: The key of the course
-    query_params: If true, fetch the count of flagged items in each thread
+    query_params: Parameters to fetch data from comments service. It must contain
+                        user_id, course_id, page, per_page, group_id
 
     Returns:
 
     A paginated result containing a list of threads.
+
+    ** Sample Response
+    {
+        "results": [
+            { thread_1 },
+            { thread_2 }, ...
+        ],
+        "pagination": {
+            "next": None,
+            "previous": None,
+            "count": 10,
+            "num_pages": 1
+        }
+    }
+
     """
 
     course = _get_course(course_key, request.user)
@@ -875,15 +892,15 @@ def get_learner_active_thread_list(request, course_key, query_params):
     group_id = query_params.get('group_id', None)
     user_id = query_params.get('user_id', None)
     if user_id is None:
-        return Response({'details': 'Invalid user id'}, status=400)
+        return Response({'detail': 'Invalid user id'}, status=status.HTTP_400_BAD_REQUEST)
 
-    if group_id is not None:
-        profiled_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
+    if group_id is None:
+        comment_client_user = comment_client.User(id=user_id, course_id=course_key)
     else:
-        profiled_user = comment_client.User(id=user_id, course_id=course_key)
+        comment_client_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
 
-    threads, page, num_pages = profiled_user.active_threads(query_params)
-    threads = set_threads_attribute_value(threads, "pinned", False)
+    threads, page, num_pages = comment_client_user.active_threads(query_params)
+    threads = set_attribute(threads, "pinned", False)
     results = _serialize_discussion_entities(
         request, context, threads, {'profile_image'}, DiscussionEntity.thread
     )
