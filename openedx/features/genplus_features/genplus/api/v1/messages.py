@@ -1,5 +1,5 @@
 class SuccessMessage:
-    ON_BOARD_SUCCESS = 'Your onboarding process has been completed successfully'
+    CHARACTER_SELECTED = 'Your character has been selected.'
 
 
 class ErrorMessages:

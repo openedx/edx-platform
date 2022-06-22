@@ -5,8 +5,9 @@ from rest_framework import generics, status, views, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
-from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
+from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import GenUser, Character
 from .serializers import CharacterSerializer
 from .permissions import IsStudent
@@ -17,10 +18,9 @@ class UserInfo(views.APIView):
     """
     API for genplus user information
     """
-    authentication_classes = [SessionAuthentication]
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated]
 
-    @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
         get user's basic info
@@ -28,7 +28,7 @@ class UserInfo(views.APIView):
         try:
             gen_user = GenUser.objects.get(user=self.request.user)
         except GenUser.DoesNotExist:
-            gen_user = None
+            return Response(ErrorMessages.INTERNAL_SERVER, status=status.HTTP_400_BAD_REQUEST)
 
         user_info = {
             'id': self.request.user.id,
@@ -37,40 +37,32 @@ class UserInfo(views.APIView):
             'csrf_token': csrf.get_token(self.request),
             'role': gen_user.role
         }
-        if gen_user.role == GenUser.STUDENT:
-            user_info.update({'on_board': gen_user.student.on_board})
+        if gen_user.is_student:
+            user_info.update({'onboarded': gen_user.student.onboarded})
+
         return Response(status=status.HTTP_200_OK, data=user_info)
 
 
-class CharacterView(generics.ListAPIView):
+class CharacterViewSet(viewsets.ModelViewSet):
     """
-    API for characters list
+    Viewset for character APIs
     """
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated & IsStudent]
     serializer_class = CharacterSerializer
     queryset = Character.objects.all()
 
-
-class StudentOnBoard(views.APIView):
-    """
-    API for on-boarding the student
-    """
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticated & IsStudent]
-
-    @method_decorator(ensure_csrf_cookie_cross_domain)
-    def post(self, *args, **kwargs):  # pylint: disable=unused-argument
+    @action(detail=True, methods=['post'])
+    def select_character(self, request, pk=None):  # pylint: disable=unused-argument
         """
-        onboard user and bind the character
+        select character at the time of onboarding or changing character from
+        the profile
         """
-        try:
-            character = Character.objects.get(pk=self.request.data['character_id'])
-            genuser = GenUser.objects.get(user_id=self.request.user.id)
-            genuser.student.character = character
-            genuser.student.save()
-            return Response(SuccessMessage.ON_BOARD_SUCCESS, status=status.HTTP_204_NO_CONTENT)
-        except Character.DoesNotExist:
-            return Response(ErrorMessages.INTERNAL_SERVER, status=status.HTTP_400_BAD_REQUEST)
+        character = self.get_object()
+        genuser = GenUser.objects.get(user=self.request.user)
+        genuser.student.character = character
+        if request.data.get("onboarded") and not genuser.student.onboarded:
+            genuser.student.onboarded = True
 
-
-
+        genuser.student.save()
+        return Response(SuccessMessage.CHARACTER_SELECTED, status=status.HTTP_204_NO_CONTENT)
