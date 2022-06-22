@@ -69,6 +69,7 @@ django-user-tasks
 django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework
+docopt
 done-xblock
 edx-ace
 edx-api-doc-tools
@@ -85,6 +86,7 @@ edx-drf-extensions
 edx-enterprise
 edx-milestones
 edx-name-affirmation
+edx-opaque-keys
 edx-organizations
 edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
@@ -124,6 +126,7 @@ openedx-calc                        # Library supporting mathematical calculatio
 openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
 ora2>=4.4.0
+path
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
 py2neo                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
@@ -163,6 +166,7 @@ staff-graded-xblock                 # An XBlock that allows for off-site bulk sc
 super-csv                           # Generic CSV processor
 unicodecsv                          # Easier support for CSV files with unicode text
 user-util                           # Functionality for retiring users (GDPR compliance)
+webob
 web-fragments                       # Provides the ability to render fragments of web pages
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock

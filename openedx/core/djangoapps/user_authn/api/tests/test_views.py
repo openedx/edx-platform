@@ -202,6 +202,11 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['registration_fields']['fields'] == {}
 
+    @with_site_configuration(
+        configuration={
+            'extended_profile_fields': ['first_name', 'last_name']
+        }
+    )
     @override_settings(
         ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
         REGISTRATION_EXTRA_FIELDS={'state': 'required', 'last_name': 'required', 'first_name': 'required'},
@@ -241,7 +246,8 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
 
     @with_site_configuration(
         configuration={
-            'EXTRA_FIELD_OPTIONS': {'profession': ['Software Engineer', 'Teacher', 'Other']}
+            'EXTRA_FIELD_OPTIONS': {'profession': ['Software Engineer', 'Teacher', 'Other']},
+            'extended_profile_fields': ['profession', 'specialty']
         }
     )
     @override_settings(
@@ -272,6 +278,11 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         assert response.status_code == status.HTTP_200_OK
         assert response.data['optional_fields']['fields'] == expected_response
 
+    @with_site_configuration(
+        configuration={
+            'extended_profile_fields': ['specialty']
+        }
+    )
     @override_settings(
         ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
         REGISTRATION_EXTRA_FIELDS={'goals': 'optional', 'specialty': 'optional'},
@@ -284,6 +295,26 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         response = self.client.get(self.url)
         assert response.status_code == status.HTTP_200_OK
         assert list(response.data['optional_fields']['fields'].keys()) == ['specialty', 'goals']
+
+    @with_site_configuration(
+        configuration={
+            'extended_profile_fields': ['specialty']
+        }
+    )
+    @override_settings(
+        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
+        REGISTRATION_EXTRA_FIELDS={'profession': 'required', 'specialty': 'required'},
+        REGISTRATION_FIELD_ORDER=['specialty', 'profession'],
+    )
+    def test_field_not_available_in_extended_profile_config(self):
+        """
+        Test that if the field is not available in extended_profile configuration then the field
+        will not be sent in response.
+        """
+        self.query_params.update({'is_registered': True})
+        response = self.client.get(self.url, self.query_params)
+        assert response.status_code == status.HTTP_200_OK
+        assert list(response.data['registration_fields']['fields'].keys()) == ['specialty']
 
 
 @skip_unless_lms

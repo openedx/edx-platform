@@ -227,7 +227,11 @@ def fire_segment_event_on_course_grade_passed_first_time(user_id, course_locator
     )
 
     try:
-        __ = CourseEnrollment.objects.get(user_id=user_id, course_id=courserun_key, mode__in=paid_enrollment_modes)
+        enrollment = CourseEnrollment.objects.get(
+            user_id=user_id,
+            course_id=courserun_key,
+            mode__in=paid_enrollment_modes
+        )
     except CourseEnrollment.DoesNotExist:
         return
 
@@ -237,11 +241,9 @@ def fire_segment_event_on_course_grade_passed_first_time(user_id, course_locator
         return
 
     event_properties = {
-        'LMS_USER_ID': user_id,
-        'COURSERUN_KEY': courserun_key,
+        'LMS_ENROLLMENT_ID': enrollment.id,
         'COURSE_TITLE': courserun_display_name,
         'COURSE_ORG_NAME': courserun_org,
-        'PASSED': 1,
     }
     segment.track(user_id, event_name, event_properties)
 

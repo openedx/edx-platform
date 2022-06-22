@@ -4,11 +4,12 @@ Tests for discussions tasks.
 import ddt
 import mock
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from openedx_events.learning.data import DiscussionTopicContext
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course
+
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @ddt.ddt

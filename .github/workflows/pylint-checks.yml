@@ -26,6 +26,8 @@ jobs:
             path: "common"
           - module-name: cms
             path: "cms"
+          - module-name: xmodule
+            path: "xmodule"
 
 
     name: pylint ${{ matrix.module-name }}

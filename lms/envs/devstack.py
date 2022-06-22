@@ -252,6 +252,12 @@ ENTERPRISE_LEARNER_PORTAL_BASE_URL = 'http://' + ENTERPRISE_LEARNER_PORTAL_NETLO
 ENTERPRISE_ADMIN_PORTAL_NETLOC = 'localhost:1991'
 ENTERPRISE_ADMIN_PORTAL_BASE_URL = 'http://' + ENTERPRISE_ADMIN_PORTAL_NETLOC
 
+########################## GRADEBOOK APP ##############################
+WRITABLE_GRADEBOOK_URL = 'http://localhost:1994'
+
+########################## ORA STAFF GRADING APP ##############################
+ORA_GRADING_MICROFRONTEND_URL = 'http://localhost:1993'
+
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
