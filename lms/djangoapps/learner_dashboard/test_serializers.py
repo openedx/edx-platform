@@ -2,7 +2,6 @@
 
 from unittest import TestCase
 from unittest import mock
-from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 from lms.djangoapps.learner_dashboard.serializers import (
