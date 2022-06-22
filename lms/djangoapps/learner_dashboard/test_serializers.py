@@ -5,13 +5,13 @@ from unittest import mock
 from uuid import uuid4
 
 from lms.djangoapps.learner_dashboard.serializers import (
-    EdxSerializer,
+    PlatformSettingsSerializer,
     LearnerDashboardSerializer,
 )
 
 
-class TestEdxSerializer(TestCase):
-    """Tests for the EdxSerializer"""
+class TestPlatformSettingsSerializer(TestCase):
+    """Tests for the PlatformSettingsSerializer"""
 
     def test_happy_path(self):
         input_data = {
@@ -20,7 +20,7 @@ class TestEdxSerializer(TestCase):
             "billingEmail": f"{uuid4()}@example.com",
             "courseSearchUrl": f"{uuid4()}.example.com/search",
         }
-        output_data = EdxSerializer(input_data).data
+        output_data = PlatformSettingsSerializer(input_data).data
 
         assert output_data == {
             "feedbackEmail": input_data["feedbackEmail"],
@@ -67,15 +67,15 @@ class TestLearnerDashboardSerializer(TestCase):
         }
         serializer = LearnerDashboardSerializer(input_data)
         with mock.patch(
-            "lms.djangoapps.learner_dashboard.serializers.EdxSerializer.to_representation"
-        ) as mock_edx_serializer:
-            mock_edx_serializer.return_value = mock_edx_serializer
+            "lms.djangoapps.learner_dashboard.serializers.PlatformSettingsSerializer.to_representation"
+        ) as mock_platform_settings_serializer:
+            mock_platform_settings_serializer.return_value = mock_platform_settings_serializer
             output_data = serializer.data
 
         self.assertDictEqual(
             output_data,
             {
-                "edx": mock_edx_serializer,
+                "edx": mock_platform_settings_serializer,
                 "enrollments": [],
                 "unfulfilledEntitlements": [],
                 "suggestedCourses": [],
@@ -83,11 +83,11 @@ class TestLearnerDashboardSerializer(TestCase):
         )
 
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.serializers.EdxSerializer.to_representation"
+        "lms.djangoapps.learner_dashboard.serializers.PlatformSettingsSerializer.to_representation"
     )
-    def test_linkage2(self, mock_edx_serializer):
+    def test_linkage2(self, mock_platform_settings_serializer):
         """Second example of paradigm using test-level patching"""
-        mock_edx_serializer.return_value = mock_edx_serializer
+        mock_platform_settings_serializer.return_value = mock_platform_settings_serializer
 
         input_data = {
             "edx": {},
@@ -100,7 +100,7 @@ class TestLearnerDashboardSerializer(TestCase):
         self.assertDictEqual(
             output_data,
             {
-                "edx": mock_edx_serializer,
+                "edx": mock_platform_settings_serializer,
                 "enrollments": [],
                 "unfulfilledEntitlements": [],
                 "suggestedCourses": [],

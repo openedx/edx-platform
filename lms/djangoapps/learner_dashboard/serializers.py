@@ -5,8 +5,8 @@ Serializers for the Learner Dashboard
 from rest_framework import serializers
 
 
-class EdxSerializer(serializers.Serializer):
-    """Serializer for edX-related emails and URLs"""
+class PlatformSettingsSerializer(serializers.Serializer):
+    """Serializer for edX platform-level info, emails, and URLs"""
 
     feedbackEmail = serializers.EmailField()
     supportEmail = serializers.EmailField()
@@ -29,7 +29,7 @@ class SuggestedCourseSerializer(serializers.Serializer):
 class LearnerDashboardSerializer(serializers.Serializer):
     """Serializer for all info required to render the Learner Dashboard"""
 
-    edx = EdxSerializer()
+    edx = PlatformSettingsSerializer()
     enrollments = serializers.ListField(child=EnrollmentSerializer(), allow_empty=True)
     unfulfilledEntitlements = serializers.ListField(child=EntitlementSerializer(), allow_empty=True)
     suggestedCourses = serializers.ListField(child=SuggestedCourseSerializer(), allow_empty=True)
