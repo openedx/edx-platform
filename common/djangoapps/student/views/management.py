@@ -80,7 +80,8 @@ from common.djangoapps.student.signals import REFUND_ORDER
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-
+from common.djangoapps.student.models import DocumentStorage  # To import
+from rest_framework.parsers import JSONParser
 log = logging.getLogger("edx.student")
 
 AUDIT_LOG = logging.getLogger("audit")
@@ -954,3 +955,22 @@ def change_email_settings(request):
         )
 
     return JsonResponse({"success": True})
+
+
+
+# @api_view(['POST', 'GET'])
+@csrf_exempt
+def uploaded_doc_view(request):
+    try:
+        method = request.method
+        data = JSONParser().parse(request)
+        id = data.get('doc_id', None)
+        if id:
+            if method == "POST":
+                stored_docs = DocumentStorage.objects.filter(course_id=id)
+                stored_docs = [{'id':stored_doc.id, 'course_id': id, 'chapter_name': stored_doc.chapter_name, 'document_type': stored_doc.document_type, 'document_name': stored_doc.document_name, 'document':f"{stored_doc.document}"} for stored_doc in stored_docs]
+                return JsonResponse({"success":True, "data":stored_docs})
+            return JsonResponse({"success":False, "message":{"method":f"{method} is invalid"}})
+        return JsonResponse({"success":False, 'message':{'id':'Document Id not provided.'}})  
+    except Exception as e:
+        return JsonResponse({"success":False, "message":{"error":f"{e}"} })    

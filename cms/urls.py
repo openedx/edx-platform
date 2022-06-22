@@ -24,6 +24,9 @@ from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
+from cms.djangoapps.contentstore.views.course import doc_upload_view, delete_doc, update_doc # To Import
+from common.djangoapps.student.views.management import uploaded_doc_view
+
 
 
 django_autodiscover()
@@ -210,6 +213,8 @@ urlpatterns = oauth2_urlpatterns + [
     path('upload_doc', doc_upload_view, name='upload_doc'),
     path('update_doc', update_doc, name='update_doc'),
     path('view_doc/', delete_doc, name='view_doc'),
+    path("get_doc/", uploaded_doc_view, name='uploaded_doc_view'),
+
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:

@@ -33,7 +33,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from rest_framework.exceptions import ValidationError
-
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -49,6 +49,7 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     UserBasedRole
 )
+from rest_framework.permissions import IsAuthenticated
 from common.djangoapps.util.course import get_link_for_about_page
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
@@ -124,6 +125,7 @@ from cms.envs import common # To Import
 import boto # To Import
 from boto.s3.key import Key # To Import
 from .s3boto import * # To Import
+from django.views.decorators.csrf import csrf_exempt # To Import
 
 log = logging.getLogger(__name__)
 User = get_user_model()
