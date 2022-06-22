@@ -39,7 +39,7 @@ def create_dot_access_token(request, user, client, expires_in=None, scopes=None)
     # for details https://github.com/oauthlib/oauthlib/blob/v3.2.0/oauthlib/oauth2/rfc6749/tokens.py#L303
 
     token = token_generator.create_token(request, refresh_token=True)
-    token_generator.request_validator.save_bearer_token(token, request)
+    token_generator.request_validator.save_token(token, request)
 
     return token
 
