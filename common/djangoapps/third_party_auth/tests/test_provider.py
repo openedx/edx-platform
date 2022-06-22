@@ -85,7 +85,7 @@ class RegistryTest(testutil.TestCase):
         self.enable_saml()
         provider_count = 5
         for i in range(provider_count):
-            self.configure_saml_provider(enabled=True, slug="saml-slug-%s" % i)
+            self.configure_saml_provider(enabled=True, slug=f"saml-slug-{i}", entity_id=f"saml-entity-id-{i}")
 
         with CaptureQueriesContext(connections[DEFAULT_DB_ALIAS]) as cq:
             enabled_slugs = {p.slug for p in provider.Registry.enabled()}
