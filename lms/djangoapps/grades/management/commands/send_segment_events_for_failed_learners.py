@@ -58,7 +58,7 @@ class Command(BaseCommand):
         log.info(f"Found {thirty_one_days_ago_ended_course_keys} courses that were ended on [{thirty_one_days_ago}]")
         return courses
 
-    def get_course_failed_user_ids(self, course):
+    def get_failed_enrollment_and_user_ids(self, course):
         """
         Get list of all the enrolled users that failed the given course. This method will only consider paid enrolments.
 
@@ -79,15 +79,15 @@ class Command(BaseCommand):
 
             failed_grade_user_ids = list(page.object_list)
             # exclude all non-paid enrollments
-            failed_user_ids = CourseEnrollment.objects.filter(
+            failed_enrollment_and_user_ids = CourseEnrollment.objects.filter(
                 course_id=course.id,
                 user_id__in=failed_grade_user_ids,
                 mode__in=PAID_ENROLLMENT_MODES,
                 is_active=True
-            ).values_list('user_id', flat=True)
-            failed_user_ids = list(failed_user_ids)
+            ).values_list('id', 'user_id')
+            failed_enrollment_and_user_ids = list(failed_enrollment_and_user_ids)
 
-            yield failed_user_ids
+            yield failed_enrollment_and_user_ids
 
     def handle(self, *args, **options):
         """
@@ -100,7 +100,7 @@ class Command(BaseCommand):
             log_prefix = '[DRY RUN]'
 
         stats = {
-            'failed_course_user_ids': {},
+            'failed_course_enrollment_ids': {},
         }
 
         log.info(f'{log_prefix} Command started.')
@@ -111,22 +111,20 @@ class Command(BaseCommand):
             course_id = str(course.id)
             course_display_name = course.display_name
 
-            stats['failed_course_user_ids'][course_id] = []
+            stats['failed_course_enrollment_ids'][course_id] = []
 
-            for course_failed_user_ids in self.get_course_failed_user_ids(course):
+            for enrollment_and_user_ids in self.get_failed_enrollment_and_user_ids(course):
                 # for each failed enrollment, send a segment event
-                for course_failed_user_id in course_failed_user_ids:
+                for failed_enrollment_id, failed_user_id in enrollment_and_user_ids:
                     event_properties = {
-                        'LMS_USER_ID': course_failed_user_id,
-                        'COURSERUN_KEY': course_id,
+                        'LMS_ENROLLMENT_ID': failed_enrollment_id,
                         'COURSE_TITLE': course_display_name,
                         'COURSE_ORG_NAME': course_org,
-                        'PASSED': 0,
                     }
                     if should_fire_event:
-                        segment.track(course_failed_user_id, EVENT_NAME, event_properties)
+                        segment.track(failed_user_id, EVENT_NAME, event_properties)
 
-                    stats['failed_course_user_ids'][course_id].append(course_failed_user_id)
+                    stats['failed_course_enrollment_ids'][course_id].append(failed_enrollment_id)
 
                     log.info(
                         "{} Segment event fired for failed learner. Event: [{}], Data: [{}]".format(
@@ -136,4 +134,4 @@ class Command(BaseCommand):
                         )
                     )
 
-        log.info(f"{log_prefix} Command completed. Stats: [{stats['failed_course_user_ids']}]")
+        log.info(f"{log_prefix} Command completed. Stats: [{stats['failed_course_enrollment_ids']}]")

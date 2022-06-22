@@ -84,17 +84,15 @@ class TestSendSegmentEventsForFailedLearnersCommand(SharedModuleStoreTestCase):
         """
         event_call_data = []
         for course in self.command.get_courses():
-            for course_failed_user_ids in self.command.get_course_failed_user_ids(course):
-                for course_failed_user_id in course_failed_user_ids:
+            for enrollment_and_user_ids in self.command.get_failed_enrollment_and_user_ids(course):
+                for failed_enrollment_id, failed_user_id in enrollment_and_user_ids:
                     event_call_data.append([
-                        course_failed_user_id,
+                        failed_user_id,
                         EVENT_NAME,
                         {
-                            'LMS_USER_ID': course_failed_user_id,
-                            'COURSERUN_KEY': str(course.id),
+                            'LMS_ENROLLMENT_ID': failed_enrollment_id,
                             'COURSE_TITLE': course.display_name,
                             'COURSE_ORG_NAME': course.org,
-                            'PASSED': 0,
                         }
                     ])
         return event_call_data
@@ -111,16 +109,17 @@ class TestSendSegmentEventsForFailedLearnersCommand(SharedModuleStoreTestCase):
 
     def test_get_course_failed_user_ids(self):
         """
-        Verify that `get_course_failed_user_ids` method returns correct user ids.
+        Verify that `get_failed_enrollment_and_user_ids` method returns correct user ids.
 
         * user id must have a paid enrollment
         * user id must have a failed grade
         """
         for course in self.course_overviews:
-            for user_ids in self.command.get_course_failed_user_ids(course):
-                for user_id in user_ids:
+            for enrollment_and_user_ids in self.command.get_failed_enrollment_and_user_ids(course):
+                for enrollment_id, user_id in enrollment_and_user_ids:
                     # user id must have a paid enrollment
                     assert CourseEnrollment.objects.filter(
+                        id=enrollment_id,
                         course_id=course.id,
                         user_id=user_id,
                         mode__in=PAID_ENROLLMENT_MODES,
