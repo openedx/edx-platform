@@ -83,7 +83,7 @@ attrs==21.4.0
     #   jsonschema
     #   openedx-events
     #   pytest
-babel==2.10.2
+babel==2.10.3
     # via
     #   -r requirements/edx/testing.txt
     #   enmerkar
@@ -382,7 +382,7 @@ django-fernet-fields==0.6
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edxval
-django-filter==21.1
+django-filter==22.1
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
@@ -1424,7 +1424,7 @@ soupsieve==2.3.2.post1
     # via
     #   -r requirements/edx/testing.txt
     #   beautifulsoup4
-sphinx==5.0.1
+sphinx==5.0.2
     # via
     #   edx-sphinx-theme
     #   sphinxcontrib-httpdomain
