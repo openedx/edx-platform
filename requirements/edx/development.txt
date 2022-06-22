@@ -23,7 +23,7 @@
 -e common/lib/xmodule  # via -r requirements/edx/testing.txt
 alabaster==0.7.12         # via sphinx
 amqp==1.4.9               # via -r requirements/edx/testing.txt, kombu
-analytics-python==1.2.9   # via -r requirements/edx/testing.txt
+analytics-python==1.4.0   # RED-2969: To enable sync_mode for workers server
 aniso8601==8.0.0          # via -r requirements/edx/testing.txt, edx-tincan-py35
 anyjson==0.3.3            # via -r requirements/edx/testing.txt, kombu
 apipkg==1.5               # via -r requirements/edx/testing.txt, execnet

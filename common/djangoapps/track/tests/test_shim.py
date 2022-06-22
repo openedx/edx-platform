@@ -4,13 +4,14 @@
 from collections import namedtuple
 
 import ddt
+from django.conf import settings
 from django.test.utils import override_settings
 from mock import sentinel
 
 from openedx.core.lib.tests.assertions.events import assert_events_equal
 
 from .. import transformers
-from ..shim import PrefixedEventProcessor
+from ..shim import PrefixedEventProcessor, is_celery_worker
 from . import FROZEN_TIME, EventTrackingTestCase
 
 LEGACY_SHIM_PROCESSOR = [
@@ -319,3 +320,29 @@ class PrefixedEventProcessorTestCase(EventTrackingTestCase):
         self.assertEqual(result[u'event_type'], u'seq_goto')
         self.assertEqual(result[u'event'][u'old'], 2)
         self.assertEqual(result[u'event'][u'new'], 5)
+
+
+@ddt.ddt
+class TestDefaultMultipleSegmentClient(EventTrackingTestCase):
+    """
+    Tests for DefaultMultipleSegmentClient
+    """
+    def test_is_celery_worker_no_settings(self):
+        """
+        is_celery_worker must return <False> if <IS_CELERY_WORKER> attribute is missing
+        """
+        assert not hasattr(settings, 'IS_CELERY_WORKER')
+        assert is_celery_worker() is False
+
+    @ddt.data(
+        (True, True),
+        (False, False),
+        (None, False),
+    )
+    @ddt.unpack
+    def test_is_celery_worker_with_settings(self, settings_value, expected_result):
+        """
+        Verify is_celery_worker
+        """
+        with override_settings(IS_CELERY_WORKER=settings_value):
+            assert is_celery_worker() is expected_result
