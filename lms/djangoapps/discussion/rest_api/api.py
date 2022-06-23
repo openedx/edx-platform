@@ -857,7 +857,6 @@ def get_thread_list(
 def get_learner_active_thread_list(request, course_key, query_params):
     """
     Returns a list of active threads for a particular user
-    user_id must be given in query_params
 
     Parameters:
 
@@ -873,8 +872,66 @@ def get_learner_active_thread_list(request, course_key, query_params):
     ** Sample Response
     {
         "results": [
-            { thread_1 },
-            { thread_2 }, ...
+            {
+                "id": "thread_id",
+                "author": "author_username",
+                "author_label": "Staff",
+                "created_at": "2010-01-01T12:00:00Z",
+                "updated_at": "2010-01-01T12:00:00Z",
+                "raw_body": "<p></p>",
+                "rendered_body": "<p></p>",
+                "abuse_flagged": false,
+                "voted": false,
+                "vote_count": 0,
+                "editable_fields": [
+                    "abuse_flagged", "anonymous", "close_reason_code", "closed",
+                    "edit_reason_code", "following", "pinned", "raw_body", "read",
+                    "title", "topic_id", "type", "voted"
+                ],
+                "can_delete": true,
+                "anonymous": false,
+                "anonymous_to_peers": false,
+                "last_edit": {
+                    "original_body": "<p></p>",
+                    "reason_code": null,
+                    "editor_username": "author_username",
+                    "created_at": "2010-01-01T12:00:00Z"
+                },
+                "course_id": "course-v1:edX+DemoX+Demo_Course",
+                "topic_id": "i4x-edx-eiorguegnru-course-foobarbaz",
+                "group_id": null,
+                "group_name": null,
+                "type": "discussion",
+                "preview_body": "",
+                "abuse_flagged_count": null,
+                "title": "Post Title",
+                "pinned": false,
+                "closed": false,
+                "following": false,
+                "comment_count": 1,
+                "unread_comment_count": 0,
+                "comment_list_url": "http://localhost:18000/api/discussion/v1/comments/?thread_id=thread_id",
+                "endorsed_comment_list_url": null,
+                "non_endorsed_comment_list_url": null,
+                "read": true,
+                "has_endorsed": false,
+                "close_reason": null,
+                "closed_by": null,
+                "users": {
+                    "username": {
+                        "profile": {
+                            "image": {
+                                "has_image": false,
+                                "image_url_full": "http://localhost:18000/static/images/profiles/default_500.png",
+                                "image_url_large": "http://localhost:18000/static/images/profiles/default_120.png",
+                                "image_url_medium": "http://localhost:18000/static/images/profiles/default_50.png",
+                                "image_url_small": "http://localhost:18000/static/images/profiles/default_30.png"
+                            }
+                        }
+                    }
+                }
+            },
+            ...
         ],
         "pagination": {
             "next": None,
