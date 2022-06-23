@@ -2,11 +2,11 @@
 
 from django.urls import path, re_path
 
-from lms.djangoapps.learner_dashboard import courses_views, programs, program_views
+from lms.djangoapps.learner_dashboard import learner_views, programs, program_views
 
 # Learner Dashboard Routing
 urlpatterns = [
-    path('learner/', courses_views.course_listing, name='course_listing_view')
+    path('learner/', learner_views.dashboard_view, name='dashboard_view')
 ]
 
 # Program Dashboard Routing
