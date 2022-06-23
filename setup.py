@@ -24,7 +24,6 @@ XBLOCKS = [
     "library_content = xmodule.library_content_module:LibraryContentBlock",
     "library_sourced = xmodule.library_sourced_block:LibrarySourcedBlock",
     "lti = xmodule.lti_module:LTIBlock",
-    "nonstaff_error = xmodule.error_module:NonStaffErrorBlock",
     "poll_question = xmodule.poll_module:PollBlock",
     "problem = xmodule.capa_module:ProblemBlock",
     "randomize = xmodule.randomize_module:RandomizeBlock",

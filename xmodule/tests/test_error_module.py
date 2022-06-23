@@ -1,5 +1,5 @@
 """
-Tests for ErrorBlock and NonStaffErrorBlock
+Tests for ErrorBlock
 """
 
 
@@ -7,7 +7,7 @@ import unittest
 
 from opaque_keys.edx.locator import CourseLocator
 
-from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
+from xmodule.error_module import ErrorBlock
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests import get_test_system
 from xmodule.x_module import STUDENT_VIEW
@@ -42,28 +42,3 @@ class TestErrorBlock(SetupTestErrorBlock):
         context_repr = self.system.render(descriptor, STUDENT_VIEW).content
         assert self.error_msg in context_repr
         assert repr(self.valid_xml) in context_repr
-
-
-class TestNonStaffErrorBlock(SetupTestErrorBlock):
-    """
-    Tests for NonStaffErrorBlock.
-    """
-
-    def test_non_staff_error_block_create(self):
-        descriptor = NonStaffErrorBlock.from_xml(
-            self.valid_xml,
-            self.system,
-            CourseLocationManager(self.course_id)
-        )
-        assert isinstance(descriptor, NonStaffErrorBlock)
-
-    def test_from_xml_render(self):
-        descriptor = NonStaffErrorBlock.from_xml(
-            self.valid_xml,
-            self.system,
-            CourseLocationManager(self.course_id)
-        )
-        descriptor.xmodule_runtime = self.system
-        context_repr = self.system.render(descriptor, STUDENT_VIEW).content
-        assert self.error_msg not in context_repr
-        assert repr(self.valid_xml) not in context_repr

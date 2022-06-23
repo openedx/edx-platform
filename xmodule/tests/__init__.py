@@ -29,7 +29,6 @@ from xblock.fields import Reference, ReferenceList, ReferenceValueDict, ScopeIds
 from capa.xqueue_interface import XQueueService
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorBlock
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
@@ -167,7 +166,6 @@ def get_test_system(
             'replace_urls': replace_url_service
         },
         course_id=course_id,
-        error_descriptor_class=ErrorBlock,
         descriptor_runtime=descriptor_system,
     )
 

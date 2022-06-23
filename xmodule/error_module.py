@@ -227,20 +227,3 @@ class ErrorBlock(
             node.set(key, value)
 
         node.extend(list(exported_node))
-
-
-class NonStaffErrorBlock(ErrorBlock):  # pylint: disable=abstract-method
-    """
-    Block that gets shown to students when there has been an error while
-    loading or rendering other blocks.
-    """
-    def student_view(self, _context):
-        """
-        Return a fragment that contains the html for the student view.
-        """
-        fragment = Fragment(self.runtime.service(self, 'mako').render_template('module-error.html', {
-            'staff_access': False,
-            'data': '',
-            'error': '',
-        }))
-        return fragment
