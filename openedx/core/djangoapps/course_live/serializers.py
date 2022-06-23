@@ -6,7 +6,11 @@ from django.core.validators import validate_email
 from lti_consumer.models import LtiConfiguration
 from rest_framework import serializers
 
-from .models import AVAILABLE_PROVIDERS, CourseLiveConfiguration
+from .models import CourseLiveConfiguration
+# from .utils import provider_requires_custom_email
+from .providers import ProviderManager
+
+providers = ProviderManager().get_enabled_providers()
 
 
 class LtiSerializer(serializers.ModelSerializer):
@@ -34,12 +38,18 @@ class LtiSerializer(serializers.ModelSerializer):
         """
         additional_parameters = value.get('additional_parameters', None)
         custom_instructor_email = additional_parameters.get('custom_instructor_email', None)
-        if additional_parameters and custom_instructor_email:
+        requires_email = self.context.get('provider').requires_custom_email()
+
+        if additional_parameters and custom_instructor_email and requires_email:
             try:
                 validate_email(custom_instructor_email)
             except ValidationError as error:
                 raise serializers.ValidationError(f'{custom_instructor_email} is not valid email address') from error
             return value
+
+        if not requires_email:
+            return value
+
         raise serializers.ValidationError('custom_instructor_email is required value in additional_parameters')
 
     def create(self, validated_data):
@@ -75,9 +85,7 @@ class LtiSerializer(serializers.ModelSerializer):
                 if key in self.Meta.fields:
                     setattr(instance, key, value)
 
-            share_email, share_username = self.pii_sharing_allowed()
-            instance.pii_share_username = share_username
-            instance.pii_share_email = share_email
+            instance.pii_share_email, instance.pii_share_username = self.pii_sharing_allowed()
             instance.save()
         return instance
 
@@ -86,12 +94,10 @@ class LtiSerializer(serializers.ModelSerializer):
         Check if email and username sharing is required and allowed
         """
         pii_sharing_allowed = self.context.get('pii_sharing_allowed', False)
-        provider = AVAILABLE_PROVIDERS.get(self.context.get('provider_type', None))
-
-        email = pii_sharing_allowed and provider['pii_sharing']['email'] if provider else False
-        username = pii_sharing_allowed and provider['pii_sharing']['username'] if provider else False
-
-        return email, username
+        provider = self.context.get('provider')
+        if pii_sharing_allowed and provider:
+            return provider.requires_email, provider.requires_username
+        return False, False
 
 
 class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
@@ -104,15 +110,27 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseLiveConfiguration
 
-        fields = ['course_key', 'provider_type', 'enabled', 'lti_configuration', 'pii_sharing_allowed']
+        fields = ['course_key', 'provider_type', 'enabled', 'lti_configuration', 'pii_sharing_allowed', 'free_tier']
         read_only_fields = ['course_key']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            self.context['provider_type'] = self.initial_data.get('provider_type', '')
+        except AttributeError:
+            self.context['provider_type'] = self.data.get('provider_type', '')
+
+    def validate_free_tier(self, value):
+        if value == self.context['provider'].has_free_tier:
+            return value
+        raise serializers.ValidationError('Provider does not support free tier')
 
     def get_pii_sharing_allowed(self, instance):
         return self.context['pii_sharing_allowed']
 
     def to_representation(self, instance):
         payload = super().to_representation(instance)
-        if not payload['lti_configuration']:
+        if not payload['lti_configuration'] and not instance.free_tier:
             payload['lti_configuration'] = LtiSerializer(LtiConfiguration()).data
         return payload
 
@@ -123,7 +141,8 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         lti_config = validated_data.pop('lti_configuration')
         instance = CourseLiveConfiguration()
         instance = self._update_course_live_instance(instance, validated_data)
-        instance = self._update_lti(instance, lti_config)
+        if not validated_data.get('free_tier', False):
+            instance = self._update_lti(instance, lti_config)
         instance.save()
         return instance
 
@@ -133,7 +152,8 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         """
         lti_config = validated_data.pop('lti_configuration')
         instance = self._update_course_live_instance(instance, validated_data)
-        instance = self._update_lti(instance, lti_config)
+        if not validated_data.get('free_tier', False):
+            instance = self._update_lti(instance, lti_config)
         instance.save()
         return instance
 
@@ -143,9 +163,9 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         """
         instance.course_key = self.context.get('course_id')
         instance.enabled = self.validated_data.get('enabled', False)
-
-        if data.get('provider_type') in AVAILABLE_PROVIDERS:
-            instance.provider_type = data.get('provider_type')
+        instance.free_tier = self.validated_data.get('free_tier', False)
+        if provider := self.context.get('provider'):
+            instance.provider_type = provider.id
         else:
             raise serializers.ValidationError(
                 f'Provider type {data.get("provider_type")} does not exist')
@@ -159,14 +179,13 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         """
         Update LtiConfiguration
         """
-
         lti_serializer = LtiSerializer(
             instance.lti_configuration or None,
             data=lti_config,
             partial=True,
             context={
                 'pii_sharing_allowed': self.context.get('pii_sharing_allowed', False),
-                'provider_type': self.context.get('provider_type', ''),
+                'provider': self.context.get('provider'),
             }
         )
         if lti_serializer.is_valid(raise_exception=True):
