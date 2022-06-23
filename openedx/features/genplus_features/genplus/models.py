@@ -16,10 +16,10 @@ class School(TimeStampedModel):
 
 
 class Class(TimeStampedModel):
-    school = models.ForeignKey(School, on_delete=models.CASCADE)
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='classes')
     group_id = models.CharField(primary_key=True, max_length=128)
     name = models.CharField(max_length=128)
-    year_group = models.ForeignKey(YearGroup, on_delete=models.SET_NULL, null=True)
+    year_group = models.ForeignKey(YearGroup, on_delete=models.SET_NULL, null=True, related_name='classes')
     is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
 
     def __str__(self):
@@ -29,7 +29,7 @@ class Class(TimeStampedModel):
 class Character(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField()
-    skills = models.ManyToManyField(Skill, related_name='skills')
+    skills = models.ManyToManyField(Skill, related_name='characters')
     profile_pic = models.ImageField(upload_to='gen_plus_avatars',
                                     help_text='Upload the image which will be seen by student on their dashboard')
     standing = models.ImageField(upload_to='gen_plus_avatars',
@@ -79,19 +79,19 @@ class GenUser(models.Model):
 
 
 class Teacher(models.Model):
-    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE)
+    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
     profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True)
-    classes = models.ManyToManyField(Class, related_name='classes')
+    classes = models.ManyToManyField(Class, related_name='teachers')
 
     def __str__(self):
         return self.gen_user.user.username
 
 
 class Student(models.Model):
-    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE)
+    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='student')
     character = models.ForeignKey(Character,on_delete=models.SET_NULL, null=True)
     onboarded = models.BooleanField(default=False)
-    year_groups = models.ManyToManyField(YearGroup, related_name='year_groups')
+    year_groups = models.ManyToManyField(YearGroup, related_name='students')
 
     def __str__(self):
         return self.gen_user.user.username
