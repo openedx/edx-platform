@@ -413,6 +413,18 @@ class CommentsServiceMockMixin:
             status=200
         )
 
+    def register_user_active_threads(self, user_id, response):
+        """
+        Register a mock response for GET on the CS comment active threads endpoint
+        """
+        assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
+        httpretty.register_uri(
+            httpretty.GET,
+            f"http://localhost:4567/api/v1/users/{user_id}/active_threads",
+            body=json.dumps(response),
+            status=200
+        )
+
     def assert_query_params_equal(self, httpretty_request, expected_params):
         """
         Assert that the given mock request had the expected query parameters
