@@ -24,13 +24,8 @@ from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_group_id_for_comments_service,
-    is_user_community_ta,
-    prepare_content,
-)
+from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
@@ -54,6 +49,7 @@ from ..rest_api.api import (
     get_response_comments,
     get_thread,
     get_thread_list,
+    get_learner_active_thread_list,
     get_user_comments,
     update_comment,
     update_thread,
@@ -568,10 +564,22 @@ class LearnerThreadView(APIView):
 
     **GET Thread List Parameters**:
 
+        * user_id: (Required) (Integer) ID of the user whose active threads are required
+
         * page: The (1-indexed) page to retrieve (default is 1)
 
         * page_size: The number of items per page (default is 10)
     """
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthentication,
+        SessionAuthentication,
+    )
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsStaffOrCourseTeamOrEnrolled,
+    )
 
     def get(self, request, course_id=None):
         """
@@ -581,7 +589,11 @@ class LearnerThreadView(APIView):
         page_num = request.GET.get('page', 1)
         threads_per_page = request.GET.get('page_size', 10)
         discussion_id = None
-        user_id = request.user.id
+        try:
+            user_id = int(request.GET.get('user_id', None))
+        except (TypeError, ValueError):
+            return Response({'details': 'Invalid user id'}, status=400)
+
         group_id = None
         try:
             group_id = get_group_id_for_comments_service(request, course_key, discussion_id)
@@ -593,19 +605,9 @@ class LearnerThreadView(APIView):
             "per_page": threads_per_page,
             "course_id": str(course_key),
             "user_id": user_id,
+            "group_id": group_id
         }
-
-        if group_id is not None:
-            query_params['group_id'] = group_id
-            profiled_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
-        else:
-            profiled_user = comment_client.User(id=user_id, course_id=course_key)
-        threads, page, num_pages = profiled_user.active_threads(query_params)
-
-        is_staff = has_permission(request.user, 'openclose_thread', course_key)
-        is_community_ta = is_user_community_ta(request.user, course_key)
-        threads = [prepare_content(thread, course_key, is_staff, is_community_ta) for thread in threads]
-        return Response(threads)
+        return get_learner_active_thread_list(request, course_key, query_params)
 
 
 @view_auth_classes()
