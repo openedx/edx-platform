@@ -13,7 +13,7 @@
     "@edx/edx-proctoring": "^4.12.2",
     "@edx/frontend-component-cookie-policy-banner": "1.0.0",
     "@edx/paragon": "2.6.4",
-    "@edx/paragon-new": "npm:@edx/paragon@^0.0.0-qa",
+    "@edx/paragon-new": "github:openedx/paragon#feat/BD-39",
     "@edx/studio-frontend": "^1.17.0",
     "axios": "^0.21.1",
     "babel-loader": "8.2.4",
@@ -68,7 +68,7 @@
     "underscore": "1.8.3",
     "underscore.string": "3.3.5",
     "universal-cookie": "^4.0.3",
-    "webpack": "5.71.0",
+    "webpack": "^2.7.0",
     "webpack-bundle-tracker": "0.2.1",
     "webpack-merge": "4.1.1",
     "whatwg-fetch": "2.0.3",
@@ -105,6 +105,7 @@
     "selenium-webdriver": "3.4.0",
     "sinon": "2.3.5",
     "squirejs": "0.1.0",
-    "stylelint-formatter-pretty": "1.0.3"
+    "stylelint-formatter-pretty": "1.0.3",
+    "webpack-cli": "^4.10.0"
   }
 }
