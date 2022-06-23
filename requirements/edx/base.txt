@@ -22,7 +22,7 @@
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive  # via -r requirements/edx/github.in
 -e common/lib/xmodule  # via -r requirements/edx/local.in
 amqp==1.4.9               # via kombu
-analytics-python==1.2.9   # via -r requirements/edx/base.in
+analytics-python==1.4.0   # RED-2969: To enable sync_mode for workers server
 aniso8601==8.0.0          # via edx-tincan-py35
 anyjson==0.3.3            # via kombu
 appdirs==1.4.4            # via fs

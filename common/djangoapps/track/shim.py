@@ -8,6 +8,7 @@ import copy
 
 import analytics
 from analytics.client import Client
+from django.conf import settings
 
 from openedx.core.djangoapps.site_configuration import helpers
 from openedx.core.djangoapps.appsembler.eventtracking import exceptions, utils
@@ -121,6 +122,18 @@ class PrefixedEventProcessor(object):
         return event
 
 
+def is_celery_worker():
+    """
+    Check if this execution is for celery of not. If the result is <False>; it's not guaranteed that the execution is
+    not for Celery. Because the method returns <False> if <IS_CELERY_WORKER> attribute is missing in settings
+
+    <IS_CELERY_WORKER> value is set during deployment using <celery_worker> variable in <edxapp> role
+
+    :return: <True> if the execution is for Celery; and <False> otherwise
+    """
+    return getattr(settings, 'IS_CELERY_WORKER', False) or False
+
+
 class DefaultMultipleSegmentClient(object):
     """
     Proxy client to call original segment account and site account
@@ -130,7 +143,7 @@ class DefaultMultipleSegmentClient(object):
         self._main_client = self._create_client(analytics.write_key)
 
     def _create_client(self, write_key):
-        params = {}
+        params = {'sync_mode': is_celery_worker()}
         for param in ['host', 'debug', 'on_error', 'send']:
             if hasattr(analytics, param):
                 params[param] = getattr(analytics, param)
