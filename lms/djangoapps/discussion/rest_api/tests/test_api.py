@@ -453,13 +453,13 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 "Z": {"id": "non-courseware-4", "sort_key": "W"},
             }
             self.store.update_item(self.course, self.user.id)
-            self.make_discussion_xblock("courseware-1", "First", "A", sort_key="D")
-            self.make_discussion_xblock("courseware-2", "First", "B", sort_key="B")
+            self.make_discussion_xblock("courseware-1", "First", "A", sort_key="B")
+            self.make_discussion_xblock("courseware-2", "First", "B", sort_key="D")
             self.make_discussion_xblock("courseware-3", "First", "C", sort_key="E")
-            self.make_discussion_xblock("courseware-4", "Second", "A", sort_key="F")
-            self.make_discussion_xblock("courseware-5", "Second", "B", sort_key="G")
+            self.make_discussion_xblock("courseware-4", "Second", "A", sort_key="A")
+            self.make_discussion_xblock("courseware-5", "Second", "B", sort_key="B")
             self.make_discussion_xblock("courseware-6", "Second", "C")
-            self.make_discussion_xblock("courseware-7", "Second", "D", sort_key="A")
+            self.make_discussion_xblock("courseware-7", "Second", "D", sort_key="D")
 
         actual = self.get_course_topics()
         expected = {
@@ -468,8 +468,8 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                     None,
                     "First",
                     [
-                        self.make_expected_tree("courseware-2", "B"),
                         self.make_expected_tree("courseware-1", "A"),
+                        self.make_expected_tree("courseware-2", "B"),
                         self.make_expected_tree("courseware-3", "C"),
                     ]
                 ),
@@ -477,10 +477,10 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                     None,
                     "Second",
                     [
-                        self.make_expected_tree("courseware-7", "D"),
-                        self.make_expected_tree("courseware-6", "C"),
                         self.make_expected_tree("courseware-4", "A"),
                         self.make_expected_tree("courseware-5", "B"),
+                        self.make_expected_tree("courseware-6", "C"),
+                        self.make_expected_tree("courseware-7", "D"),
                     ]
                 ),
             ],
@@ -522,7 +522,6 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
 
         with self.store.bulk_operations(self.course.id, emit_signals=False):
             self.store.update_item(self.course, self.user.id)
-            self.make_discussion_xblock("courseware-1", "First", "Everybody")
             self.make_discussion_xblock(
                 "courseware-2",
                 "First",
@@ -535,13 +534,14 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 "Cohort B",
                 group_access={self.partition.id: [self.partition.groups[1].id]}
             )
-            self.make_discussion_xblock("courseware-4", "Second", "Staff Only", visible_to_staff_only=True)
+            self.make_discussion_xblock("courseware-1", "First", "Everybody")
             self.make_discussion_xblock(
                 "courseware-5",
                 "Second",
                 "Future Start Date",
                 start=datetime.now(UTC) + timedelta(days=1)
             )
+            self.make_discussion_xblock("courseware-4", "Second", "Staff Only", visible_to_staff_only=True)
 
         student_actual = self.get_course_topics()
         student_expected = {

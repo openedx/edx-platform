@@ -376,7 +376,7 @@ def get_courseware_topics(
 
     for category in sorted(xblocks_by_category.keys()):
         children = []
-        for xblock in get_sorted_xblocks(category):
+        for xblock in xblocks_by_category[category]:
             if not topic_ids or xblock.discussion_id in topic_ids:
                 discussion_topic = DiscussionTopic(
                     xblock.discussion_id,
