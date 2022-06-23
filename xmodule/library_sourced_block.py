@@ -8,13 +8,13 @@ from copy import copy
 import bleach
 from lazy import lazy
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
 from xblock.fields import List, Scope, String
-from xblock.validation import ValidationMessage
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
@@ -22,7 +22,7 @@ from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock as EditableChildrenMixin
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.x_module import HTMLSnippet, ResourceTemplates, XModuleMixin, XModuleToXBlockMixin, shim_xmodule_js
+from xmodule.x_module import STUDENT_VIEW, HTMLSnippet, ResourceTemplates, XModuleMixin, XModuleToXBlockMixin, shim_xmodule_js
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)
@@ -100,7 +100,6 @@ class LibrarySourcedBlock(
     studio_view_css = {
         'scss': [],
     }
-    MAX_BLOCKS_ALLOWED = 10
 
     def __str__(self):
         return f"LibrarySourcedBlock: {self.display_name}"
@@ -117,7 +116,7 @@ class LibrarySourcedBlock(
                 context['reorderable_items'].add(child.location)
             context['can_add'] = can_add
             context['selected'] = str(child.location) in self.source_block_ids
-            rendered_child = child.render(StudioEditableModule.get_preview_view_name(child), context)
+            rendered_child = child.render(EditableChildrenMixin.get_preview_view_name(child), context)
             fragment.add_fragment_resources(rendered_child)
 
             contents.append({
@@ -157,33 +156,40 @@ class LibrarySourcedBlock(
         fragment.initialize_js('LibrarySourceAuthorView')
         return fragment
 
+    def _get_selected_child_blocks(self):
+        """
+        Generator returning XBlock instances of the children selected for the
+        current user.
+        """
+        for block_id in self.source_block_ids:
+            usage_key = UsageKey.from_string(block_id)
+            yield self.runtime.get_block(usage_key)
+
     def student_view(self, context):
         """
         Renders the view that learners see.
         """
-        result = Fragment()
-        child_frags = self.runtime.render_children(self, context=context)
-        result.add_resources(child_frags)
-        result.add_content('<div class="library-sourced-content">')
-        for frag in child_frags:
-            result.add_content(frag.content)
-        result.add_content('</div>')
-        return result
+        fragment = Fragment()
+        child_context = {} if not context else copy(context)
 
-    def validate_field_data(self, validation, data):
-        """
-        Validate this block's field data. Instead of checking fields like self.name, check the
-        fields set on data, e.g. data.name. This allows the same validation method to be re-used
-        for the studio editor.
-        """
-        if len(data.source_block_ids) > self.MAX_BLOCKS_ALLOWED:
-            # Because importing library blocks is an expensive operation
-            validation.add(
-                ValidationMessage(
-                    ValidationMessage.ERROR,
-                    _("A maximum of {0} components may be added.").format(self.MAX_BLOCKS_ALLOWED)
-                )
-            )
+        fragment.add_content('<div class="library-sourced-content">')
+        for child in self._get_selected_child_blocks():
+            if child is None:
+                # TODO: Fix the underlying issue in TNL-7424
+                # This shouldn't be happening, but does for an as-of-now
+                # unknown reason. Until we address the underlying issue,
+                # let's at least log the error explicitly, ignore the
+                # exception, and prevent the page from resulting in a
+                # 500-response.
+                log.error('Skipping display for child block that is None')
+                continue
+            for displayable in child.displayable_items():
+                rendered_child = displayable.render(STUDENT_VIEW, child_context)
+                fragment.add_content(rendered_child.content)
+                fragment.add_fragment_resources(rendered_child)
+
+        fragment.add_content('</div>')
+        return fragment
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
         """
@@ -285,6 +291,17 @@ class LibrarySourcedBlock(
         """
         return self.runtime.service(self, 'library_tools')
 
+    def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
+        """
+        If source_library_id has been edited, refresh_children automatically.
+        """
+        old_source_library_id = old_metadata.get('source_library_id', [])
+        if old_source_library_id != self.source_library_id:
+            try:
+                self.refresh_children()
+            except ValueError:
+                pass  # The validation area will display an error message, no need to do anything now.
+
     @XBlock.handler
     def refresh_children(self, request=None, suffix=None):  # lint-amnesty, pylint: disable=unused-argument
         """
@@ -305,22 +322,9 @@ class LibrarySourcedBlock(
         self.tools.update_children(self, user_perms)
         return Response()
 
-    def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
-        """
-        If source_library_id has been edited, refresh_children automatically.
-        """
-        old_source_library_id = old_metadata.get('source_library_id', [])
-        if old_source_library_id != self.source_library_id:
-            try:
-                self.refresh_children()
-            except ValueError:
-                pass  # The validation area will display an error message, no need to do anything now.
-
     @XBlock.handler
     def get_block_ids(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return source_block_ids.
         """
         return Response(json.dumps({'source_block_ids': self.source_block_ids}))
-
-StudioEditableModule = EditableChildrenMixin
