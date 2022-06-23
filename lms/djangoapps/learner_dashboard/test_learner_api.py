@@ -4,7 +4,7 @@ from unittest import TestCase
 from unittest.mock import patch
 from uuid import uuid4
 
-from lms.djangoapps.learner_dashboard.learner_apis import get_platform_settings
+from lms.djangoapps.learner_dashboard.learner_api import get_platform_settings
 
 
 class TestGetPlatformSettings(TestCase):
