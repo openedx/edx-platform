@@ -1,7 +1,5 @@
 from django.conf import settings
 from django.db import models
-from django.dispatch import receiver
-from django.db.models.signals import post_save
 from django_extensions.db.models import TimeStampedModel
 from openedx.features.genplus_features.genplus_learning.models import Skill, YearGroup
 
@@ -76,18 +74,27 @@ class GenUser(models.Model):
     def is_teacher(self):
         return self.role == self.TEACHING_STAFF
 
+    def __str__(self):
+        return self.user.username
+
 
 class Teacher(models.Model):
-    user_profile = models.OneToOneField(GenUser, on_delete=models.CASCADE)
+    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE)
     profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True)
     classes = models.ManyToManyField(Class, related_name='classes')
 
+    def __str__(self):
+        return self.gen_user.user.username
+
 
 class Student(models.Model):
-    user_profile = models.OneToOneField(GenUser, on_delete=models.CASCADE)
+    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE)
     character = models.ForeignKey(Character,on_delete=models.SET_NULL, null=True)
-    on_board = models.BooleanField(default=False)
+    onboarded = models.BooleanField(default=False)
     year_groups = models.ManyToManyField(YearGroup, related_name='year_groups')
+
+    def __str__(self):
+        return self.gen_user.user.username
 
 
 class TempStudent(TimeStampedModel):
@@ -96,12 +103,3 @@ class TempStudent(TimeStampedModel):
 
     def __str__(self):
         return self.username
-
-
-@receiver(post_save, sender=GenUser)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        if instance.role == GenUser.STUDENT:
-            Student.objects.create(user_profile=instance)
-        elif instance.role == GenUser.TEACHING_STAFF:
-            Teacher.objects.create(user_profile=instance)
