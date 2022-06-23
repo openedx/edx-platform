@@ -51,8 +51,8 @@ class SkillAdmin(admin.ModelAdmin):
 
 
 # TODO: Remove after testing the login flow
+@admin.register(Teacher)
+class TeacherAdmin(admin.ModelAdmin):
+    filter_horizontal = ('classes',)
+
 admin.site.register(Student)
-admin.site.register(Teacher)
-
-
-
