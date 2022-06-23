@@ -336,7 +336,9 @@ CONTENTSTORE['DOC_STORE_CONFIG']['replicaSet'] = None
 #####################################################################
 # set replica sets of moduelstore to none as we haven't setup any for lms in devstack
 for store in MODULESTORE['default']['OPTIONS']['stores']:
-    store['DOC_STORE_CONFIG']['replicaSet'] = None
+    if 'DOC_STORE_CONFIG' in store and 'replicaSet' in store['DOC_STORE_CONFIG']:
+        store['DOC_STORE_CONFIG']['replicaSet'] = None
+
 
 #####################################################################
 # Lastly, run any migrations, if needed.
