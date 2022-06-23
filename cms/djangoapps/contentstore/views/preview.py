@@ -17,7 +17,6 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.runtime import KvsFieldData
 
 from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorBlock
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
@@ -218,7 +217,6 @@ def _preview_module_system(request, descriptor, field_data):
         # Set up functions to modify the fragment produced by student_view
         wrappers=wrappers,
         wrappers_asides=wrappers_asides,
-        error_descriptor_class=ErrorBlock,
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={

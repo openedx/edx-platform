@@ -1667,7 +1667,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         descriptor_runtime,
         publish=None,
         course_id=None,
-        error_descriptor_class=None,
         **kwargs,
     ):
         """
@@ -1689,8 +1688,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         course_id - the course_id containing this module
 
         publish(event) - A function that allows XModules to publish events (such as grade changes)
-
-        error_descriptor_class - The class to use to render XModules with errors
         """
 
         kwargs.setdefault('id_reader', getattr(descriptor_runtime, 'id_reader', OpaqueKeyReader()))
@@ -1704,7 +1701,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         if publish:
             self.publish = publish
-        self.error_descriptor_class = error_descriptor_class
         self.xmodule_instance = None
 
         self.descriptor_runtime = descriptor_runtime

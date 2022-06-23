@@ -14,7 +14,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.conditional_module import ConditionalBlock
-from xmodule.error_module import NonStaffErrorBlock
+from xmodule.error_module import ErrorBlock
 from xmodule.modulestore.xml import CourseLocationManager, ImportSystem, XMLModuleStore
 from xmodule.tests import DATA_DIR, get_test_descriptor_system, get_test_system
 from xmodule.tests.xml import XModuleXmlImportTest
@@ -72,7 +72,7 @@ class ConditionalFactory:
                                             "problem", "SampleProblem", deprecated=True)
         if source_is_error_module:
             # Make an error descriptor and module
-            source_descriptor = NonStaffErrorBlock.from_xml(
+            source_descriptor = ErrorBlock.from_xml(
                 'some random xml data',
                 system,
                 id_generator=CourseLocationManager(source_location.course_key),

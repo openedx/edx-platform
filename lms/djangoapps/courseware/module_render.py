@@ -40,7 +40,6 @@ from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
 from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -727,12 +726,6 @@ def get_module_system_for_user(
     system.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
     system.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
     system.set('days_early_for_beta', descriptor.days_early_for_beta)
-
-    # make an ErrorBlock -- assuming that the descriptor's system is ok
-    if has_access(user, 'staff', descriptor.location, course_id):
-        system.error_descriptor_class = ErrorBlock
-    else:
-        system.error_descriptor_class = NonStaffErrorBlock
 
     return system, field_data
 
