@@ -61,12 +61,14 @@ jobs:
     - name: Run Static Assets Check for lms
       env:
         LMS_CFG: lms/envs/bok_choy.yml
+        CMS_CFG: cms/envs/bok_choy.yml
 
       run: |
         paver update_assets lms --settings=production
 
     - name: Run Static Assets Check for cms
       env:
+        LMS_CFG: lms/envs/bok_choy.yml
         CMS_CFG: cms/envs/bok_choy.yml
 
       run: |
