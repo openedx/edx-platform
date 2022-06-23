@@ -73,7 +73,6 @@ class TestPlatformSettingsSerializer(TestCase):
         output_data = PlatformSettingsSerializer(input_data).data
 
         assert output_data == {
-            "feedbackEmail": input_data["feedbackEmail"],
             "supportEmail": input_data["supportEmail"],
             "billingEmail": input_data["billingEmail"],
             "courseSearchUrl": input_data["courseSearchUrl"],

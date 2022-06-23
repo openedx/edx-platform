@@ -8,7 +8,6 @@ from rest_framework import serializers
 class PlatformSettingsSerializer(serializers.Serializer):
     """Serializer for edX platform-level info, emails, and URLs"""
 
-    feedbackEmail = serializers.EmailField()
     supportEmail = serializers.EmailField()
     billingEmail = serializers.EmailField()
     courseSearchUrl = serializers.URLField()
