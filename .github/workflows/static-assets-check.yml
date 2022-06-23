@@ -58,11 +58,16 @@ jobs:
     - name: Add node_modules bin to $Path
       run: echo $GITHUB_WORKSPACE/node_modules/.bin >> $GITHUB_PATH
 
-    - name: Run Static Assets Check
+    - name: Run Static Assets Check for lms
       env:
         LMS_CFG: lms/envs/bok_choy.yml
+
+      run: |
+        paver update_assets lms --settings=production
+
+    - name: Run Static Assets Check for cms
+      env:
         CMS_CFG: cms/envs/bok_choy.yml
 
       run: |
-        paver update_assets lms
-        paver update_assets cms
+        paver update_assets cms --settings=production
