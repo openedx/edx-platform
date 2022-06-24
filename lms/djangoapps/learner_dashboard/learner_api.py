@@ -1,3 +1,5 @@
+"""APIs used to source data/interactions for the Learner Dashboard"""
+
 from django.conf import settings
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
