@@ -188,6 +188,39 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                 }
             },
 
+            uploadXBlock: function() {
+                var modal;
+                console.log("Inside uploadXBlock");
+                // var enableProctoredExams = false;
+                // var enableTimedExams = false;
+                // var unitLevelDiscussions = false;
+                // if (this.model.get('category') === 'sequential') {
+                //     if (this.parentView.parentView.model.has('enable_proctored_exams')) {
+                //         enableProctoredExams = this.parentView.parentView.model.get('enable_proctored_exams');
+                //     }
+                //     if (this.parentView.parentView.model.has('enable_timed_exams')) {
+                //         enableTimedExams = this.parentView.parentView.model.get('enable_timed_exams');
+                //     }
+                // }
+                // if (this.model.get('category') === 'vertical') {
+                //     unitLevelDiscussions = this.parentView.parentView.parentView.model.get('unit_level_discussions');
+                // }
+                modal = CourseOutlineModalsFactory.getModal('upload', this.model, {
+                    onSave: this.refresh.bind(this),
+                    parentInfo: this.parentInfo,
+                    // enable_proctored_exams: enableProctoredExams,
+                    // enable_timed_exams: enableTimedExams,
+                    // unit_level_discussions: unitLevelDiscussions,
+                    xblockType: XBlockViewUtils.getXBlockType(
+                        this.model.get('category'), this.parentView.model, true
+                    )
+                });
+
+                if (modal) {
+                    modal.show();
+                }
+            },
+
             publishXBlock: function() {
                 var modal = CourseOutlineModalsFactory.getModal('publish', this.model, {
                     onSave: this.refresh.bind(this),
@@ -220,6 +253,10 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                 element.find('.configure-button').click(function(event) {
                     event.preventDefault();
                     this.editXBlock();
+                }.bind(this));
+                element.find('.doc-upload-button').click(function(event) {
+                    event.preventDefault();
+                    this.uploadXBlock();
                 }.bind(this));
                 element.find('.publish-button').click(function(event) {
                     event.preventDefault();

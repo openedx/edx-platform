@@ -20,12 +20,12 @@ from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import views as contentstore_views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 from cms.djangoapps.contentstore.views.live_class import LiveClassesApiListView ,CourseListView,UserCourseUnEnrollment, LiveClassesDeleteUpdateApiView , UserDetailsListApiView ,EnrollLiveClassCreateView,EnrollLiveClassUserDetailsView ,EnrollLiveClassUserDeleteApiView , UserCourseEnrollment ,EnrollCourseUserDetailsView , LoginStaffCourseDetailsList
-from cms.djangoapps.contentstore.views.course import doc_upload_view, uploaded_doc_view, update_doc # To Import
+from cms.djangoapps.contentstore.views.course import doc_upload_view, delete_doc, update_doc # To Import
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
-
+from common.djangoapps.student.views.management import uploaded_doc_view
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
@@ -118,7 +118,12 @@ urlpatterns = oauth2_urlpatterns + [
     
     path('upload_doc', doc_upload_view, name='upload_doc'),
     path('update_doc', update_doc, name='update_doc'),
-    path('view_doc/', uploaded_doc_view, name='view_doc'),
+    path('delete_doc/', delete_doc, name='view_doc'),
+
+
+
+    path("get_doc/", uploaded_doc_view, name='uploaded_doc_view'),
+
     
     
     path('signin_redirect_to_lms', contentstore_views.login_redirect_to_lms, name='login_redirect_to_lms'),

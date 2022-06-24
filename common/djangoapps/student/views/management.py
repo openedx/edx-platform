@@ -1,13 +1,14 @@
 """  # lint-amnesty, pylint: disable=cyclic-import
 Student Views
 """
-
+from common.djangoapps.student.models import DocumentStorage  # To import
 
 import datetime
 import logging
 import urllib.parse
 import uuid
 from collections import namedtuple
+from rest_framework.parsers import JSONParser
 
 from django.conf import settings
 from django.contrib import messages
@@ -953,3 +954,21 @@ def change_email_settings(request):
         )
 
     return JsonResponse({"success": True})
+
+
+# @api_view(['POST', 'GET'])
+@csrf_exempt
+def uploaded_doc_view(request):
+    try:
+        method = request.method
+        data = JSONParser().parse(request)
+        id = data.get('doc_id', None)
+        if id:
+            if method == "POST":
+                stored_docs = DocumentStorage.objects.filter(course_id=id)
+                stored_docs = [{'id':stored_doc.id, 'course_id': id, 'chapter_name': stored_doc.chapter_name, 'document_type': stored_doc.document_type, 'document_name': stored_doc.document_name, 'document':f"{stored_doc.document}"} for stored_doc in stored_docs]
+                return JsonResponse({"success":True, "data":stored_docs})
+            return JsonResponse({"success":False, "message":{"method":f"{method} is invalid"}})
+        return JsonResponse({"success":False, 'message':{'id':'Document Id not provided.'}})  
+    except Exception as e:
+        return JsonResponse({"success":False, "message":{"error":f"{e}"} })

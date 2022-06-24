@@ -1962,6 +1962,8 @@ def _get_course_creator_status(user):
 
 
 
+
+
 @api_view(['POST',])
 @authentication_classes((
     JwtAuthentication,
@@ -1970,7 +1972,6 @@ def _get_course_creator_status(user):
 ))
 @permission_classes((IsAuthenticated,))
 @csrf_exempt
-#for post / upload doc.
 def doc_upload_view(request):
     method = request.method
     try:
@@ -2009,7 +2010,6 @@ def doc_upload_view(request):
 ))
 @permission_classes((IsAuthenticated,))
 @csrf_exempt
-#for update doc
 def update_doc(request):
     method = request.method
     try:
@@ -2036,11 +2036,12 @@ def update_doc(request):
         return JsonResponse({"success":False, "message":{"error":f"{e}"} })
 
 
+
 # @api_view(['POST', 'GET'])
 @authentication_classes(())
 @permission_classes(())
 #for retrive / delete doc 
-def uploaded_doc_view(request):
+def delete_doc(request):
     try:
         method = request.method
         # log.info('----method-----'  , method)
@@ -2057,10 +2058,10 @@ def uploaded_doc_view(request):
                     except Exception as e:
                         return JsonResponse({"success":False, 'message':{"error":f"{e}"}})
                 return JsonResponse({"success":False, 'message':{"role": 'Unauthorized action'}})
-            elif method == "GET":
-                stored_docs = DocumentStorage.objects.filter(course_id=id)
-                stored_docs = [{'id':stored_doc.id, 'course_id': id, 'chapter_name': stored_doc.chapter_name, 'document_type': stored_doc.document_type, 'document_name': stored_doc.document_name, 'document':f"{stored_doc.document}"} for stored_doc in stored_docs]
-                return JsonResponse({"success":True, "data":stored_docs})
+            # elif method == "GET":
+            #     stored_docs = DocumentStorage.objects.filter(course_id=id)
+            #     stored_docs = [{'id':stored_doc.id, 'course_id': id, 'chapter_name': stored_doc.chapter_name, 'document_type': stored_doc.document_type, 'document_name': stored_doc.document_name, 'document':f"{stored_doc.document}"} for stored_doc in stored_docs]
+            #     return JsonResponse({"success":True, "data":stored_docs})
             return JsonResponse({"success":False, "message":{"method": f"{method} is invalid."}})
         return JsonResponse({"success":False, 'message':{'id':'Document Id not provided.'}})  
     except Exception as e:

@@ -53,6 +53,7 @@ from openedx.core.djangoapps.verified_track_content import views as verified_tra
 from openedx.features.enterprise_support.api import enterprise_enabled
 from common.djangoapps.student import views as student_views
 from common.djangoapps.util import views as util_views
+from common.djangoapps.student.views.management import uploaded_doc_view
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
@@ -164,6 +165,9 @@ urlpatterns = [
 
     path('catalog/', include(('openedx.core.djangoapps.catalog.urls', 'openedx.core.djangoapps.catalog'),
                              namespace='catalog')),
+
+
+    path("get_doc/", uploaded_doc_view, name='uploaded_doc_view'),
 
     # Update session view
     path('lang_pref/session_language', lang_pref_views.update_session_language, name='session_language'),

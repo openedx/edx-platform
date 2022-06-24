@@ -279,13 +279,13 @@ def get_next_url_for_login_page(request, include_host=False):
         request_params=request_params,
         request_is_https=request.is_secure(),
     )
-    logging.info("____helper1_____" , redirect_to )
+    # logging.info("____helper1_____" , redirect_to )
     root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
-    logging.info("____helper1.1_____" , root_url )
+    # logging.info("____helper1.1_____" , root_url )
     if not redirect_to:
         if settings.ROOT_URLCONF == 'lms.urls':
             login_redirect_url = configuration_helpers.get_value('DEFAULT_REDIRECT_AFTER_LOGIN')
-            logging.info("____helper1.2_____" , login_redirect_url )
+            # logging.info("____helper1.2_____" , login_redirect_url )
 
             if login_redirect_url:
                 try:
@@ -302,7 +302,7 @@ def get_next_url_for_login_page(request, include_host=False):
             if not redirect_to:
                 # Tries reversing the LMS dashboard if the url doesn't exist
                 redirect_to = reverse('dashboard')
-                logging.info("____helper3_____" ,redirect_to  )
+                # logging.info("____helper3_____" ,redirect_to  )
                 
                 redirect_to = reverse('courses')
                 #redirect_to = marketing_link('COURSES')
@@ -311,7 +311,7 @@ def get_next_url_for_login_page(request, include_host=False):
             redirect_to = reverse('home')
             scheme = "https" if settings.HTTPS == "on" else "http"
             root_url = f'{scheme}://{settings.CMS_BASE}'
-            logging.info("____helper4_____" ,root_url  )
+            # logging.info("____helper4_____" ,root_url  )
 
     if any(param in request_params for param in POST_AUTH_PARAMS):
         # Before we redirect to next/dashboard, we need to handle auto-enrollment:
@@ -319,7 +319,7 @@ def get_next_url_for_login_page(request, include_host=False):
 
         params.append(('next', redirect_to))  # After auto-enrollment, user will be sent to payment page or to this URL
         redirect_to = '{}?{}'.format(reverse('finish_auth'), urllib.parse.urlencode(params))
-        logging.info("____helper5_____" , redirect_to )
+        # logging.info("____helper5_____" , redirect_to )
         # Note: if we are resuming a third party auth pipeline, then the next URL will already
         # be saved in the session as part of the pipeline state. That URL will take priority
         # over this one.
@@ -339,13 +339,13 @@ def get_next_url_for_login_page(request, include_host=False):
             params['tpa_hint'] = [tpa_hint]
             query = urllib.parse.urlencode(params, doseq=True)
             redirect_to = urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
-            logging.info("____helper6_____" , redirect_to )
+            # logging.info("____helper6_____" , redirect_to )
 
     if include_host:
-        logging.info("____helper7_____" , redirect_to , root_url)
+        # logging.info("____helper7_____" , redirect_to , root_url)
         return redirect_to, root_url
         
-    logging.info("____helper8_____" ,  redirect_to  )
+    # logging.info("____helper8_____" ,  redirect_to  )
     return redirect_to
 
 
