@@ -4,6 +4,8 @@ from django.urls import path, re_path
 
 from lms.djangoapps.learner_dashboard import learner_views, programs, program_views
 
+app_name='learner_dash'
+
 # Learner Dashboard Routing
 urlpatterns = [
     path('learner/', learner_views.dashboard_view, name='dashboard_view')

@@ -191,8 +191,8 @@ urlpatterns = [
     path('api-admin/', include(('openedx.core.djangoapps.api_admin.urls', 'openedx.core.djangoapps.api_admin'),
                                namespace='api_admin')),
 
-    path('dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
-    # Dashboard REST APIs
+    # Learner Dashboard
+    path('dashboard/', include('lms.djangoapps.learner_dashboard.urls', namespace='dashboard')),
     path('api/dashboard/', include('lms.djangoapps.learner_dashboard.api.urls', namespace='dashboard_api')),
 
     path(
