@@ -202,7 +202,8 @@ def container_handler(request, usage_key_string):
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
-                'templates': CONTAINER_TEMPLATES
+                'templates': CONTAINER_TEMPLATES,
+                'is_sourced_block': xblock.location.block_type == 'library_sourced',
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
