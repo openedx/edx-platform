@@ -90,8 +90,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
 
         meter = ProgramProgressMeter(request.site, request.user, uuid=program_uuid)
         program_data = meter.programs[0]
-
-        if not program_data:
+        if not program_data or program_data.get('status', '') == 'unpublished':
             raise Http404
 
         try:
