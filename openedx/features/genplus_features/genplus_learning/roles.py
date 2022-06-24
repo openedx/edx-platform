@@ -2,13 +2,13 @@ from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.student.roles import AccessRole
 from lms.djangoapps.instructor.access import allow_access, revoke_access
-from .models import YearGroup
+from .models import Program
 
 
-class YearGroupRole(AccessRole):
-    def __init__(self, role_name, year_group: YearGroup):
+class ProgramAccessRole(AccessRole):
+    def __init__(self, role_name, program: Program):
         super().__init__()
-        self.year_group = year_group
+        self.program = program
         self._role_name = role_name
         self._store = modulestore()
 
@@ -16,34 +16,32 @@ class YearGroupRole(AccessRole):
         pass
 
     def add_users(self, *gen_users, send_email):
-        units = self.year_group.units.all()
+        units = self.program.units.all()
         for unit in units:
-            course = self._store.get_course(unit.course_key)
             for gen_user in gen_users:
-                allow_access(course, gen_user.user, self._role_name, send_email)
+                allow_access(unit, gen_user.user, self._role_name, send_email)
 
     def remove_users(self, *gen_users, send_email):
-        units = self.year_group.units.all()
+        units = self.program.units.all()
         for unit in units:
-            course = self._store.get_course(unit.course_key)
             for gen_user in gen_users:
-                revoke_access(course, gen_user.user, self._role_name, send_email)
+                revoke_access(unit, gen_user.user, self._role_name, send_email)
 
 
     def users_with_role(self):
         pass
 
 
-class YearGroupStaffRole(YearGroupRole):
-    """A Staff member of all courses in a year group"""
+class ProgramStaffRole(ProgramAccessRole):
+    """A Staff member of all courses in a Program"""
     ROLE_NAME = 'staff'
 
     def __init__(self, *args, **kwargs):
         super().__init__(self.ROLE_NAME, *args, **kwargs)
 
 
-class YearGroupInstructorRole(YearGroupRole):
-    """Instructor of all courses in a year group"""
+class ProgramInstructorRole(ProgramAccessRole):
+    """Instructor of all courses in a Program"""
     ROLE_NAME = 'instructor'
 
     def __init__(self, *args, **kwargs):

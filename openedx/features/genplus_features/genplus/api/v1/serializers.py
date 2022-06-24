@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from openedx.features.genplus_features.genplus.models import Character
-from openedx.features.genplus_features.genplus_learning.models import Skill
+from openedx.features.genplus_features.genplus.models import Character, Skill
 
 
 class SkillSerializer(serializers.ModelSerializer):
