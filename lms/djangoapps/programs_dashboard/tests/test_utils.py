@@ -6,7 +6,7 @@ Unit test module covering utils module
 import ddt
 from django.test import TestCase
 
-from lms.djangoapps.learner_dashboard import utils
+from lms.djangoapps.programs_dashboard import utils
 
 
 @ddt.ddt

@@ -19,7 +19,7 @@ from lti_consumer.models import LtiConfiguration
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.learner_dashboard.config.waffle import ENABLE_PROGRAM_TAB_VIEW
+from lms.djangoapps.programs_dashboard.config.waffle import ENABLE_PROGRAM_TAB_VIEW
 from lms.djangoapps.program_enrollments.rest_api.v1.tests.test_views import ProgramCacheMixin
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.catalog.constants import PathwayType
@@ -35,7 +35,7 @@ from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 PROGRAMS_UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
-PROGRAMS_MODULE = 'lms.djangoapps.learner_dashboard.programs'
+PROGRAMS_MODULE = 'lms.djangoapps.programs_dashboard.programs'
 
 
 def load_serialized_data(response, key):
@@ -279,7 +279,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
 
         self.client.login(username=self.user.username, password=self.password)
 
-        with mock.patch('lms.djangoapps.learner_dashboard.programs.get_certificates') as certs:
+        with mock.patch('lms.djangoapps.programs_dashboard.programs.get_certificates') as certs:
             certs.return_value = [{'type': 'program', 'url': '/'}]
             response = self.client.get(self.url)
 

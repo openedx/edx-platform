@@ -17,7 +17,7 @@ from web_fragments.fragment import Fragment
 
 from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.student.roles import GlobalStaff
-from lms.djangoapps.learner_dashboard.utils import program_tab_view_is_enabled
+from lms.djangoapps.programs_dashboard.utils import program_tab_view_is_enabled
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.models import (
@@ -63,7 +63,7 @@ class ProgramsFragmentView(EdxFragmentView):
             'programs': meter.engaged_programs,
             'progress': meter.progress()
         }
-        html = render_to_string('learner_dashboard/programs_fragment.html', context)
+        html = render_to_string('programs_dashboard/programs_fragment.html', context)
         programs_fragment = Fragment(html)
         self.add_fragment_resource_urls(programs_fragment)
 
@@ -142,7 +142,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             }
         }
 
-        html = render_to_string('learner_dashboard/program_details_fragment.html', context)
+        html = render_to_string('programs_dashboard/program_details_fragment.html', context)
         program_details_fragment = Fragment(html)
         self.add_fragment_resource_urls(program_details_fragment)
         return program_details_fragment

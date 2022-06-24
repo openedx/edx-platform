@@ -64,7 +64,7 @@ def get_program_and_course_data(site, user, program_uuid, mobile_only=False):
 
 def get_program_urls(program_data):
     """Returns important urls of program."""
-    from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
+    from lms.djangoapps.programs_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
     program_uuid = program_data.get('uuid')
     skus = program_data.get('skus')
     ecommerce_service = EcommerceService()

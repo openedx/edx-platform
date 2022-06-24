@@ -3154,6 +3154,9 @@ INSTALLED_APPS = [
     # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
     'openedx.core.djangoapps.verified_track_content',
 
+    # Programs dashboard
+    'lms.djangoapps.programs_dashboard',
+
     # Learner's dashboard
     'lms.djangoapps.learner_dashboard',
 

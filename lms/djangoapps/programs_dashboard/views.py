@@ -1,4 +1,4 @@
-"""Learner dashboard views"""
+"""Programs dashboard views"""
 
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
@@ -7,9 +7,9 @@ from rest_framework import permissions, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from lms.djangoapps.learner_dashboard.utils import masters_program_tab_view_is_enabled, is_enrolled_or_staff
+from lms.djangoapps.programs_dashboard.utils import masters_program_tab_view_is_enabled, is_enrolled_or_staff
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from lms.djangoapps.learner_dashboard.programs import (
+from lms.djangoapps.programs_dashboard.programs import (
     ProgramDetailsFragmentView,
     ProgramDiscussionLTI,
     ProgramsFragmentView, ProgramLiveLTI
@@ -35,7 +35,7 @@ def program_listing(request):
         'uses_bootstrap': True,
     }
 
-    return render_to_response('learner_dashboard/programs.html', context)
+    return render_to_response('programs_dashboard/programs.html', context)
 
 
 @login_required
@@ -56,7 +56,7 @@ def program_details(request, program_uuid):
         'uses_bootstrap': True,
     }
 
-    return render_to_response('learner_dashboard/program_details.html', context)
+    return render_to_response('programs_dashboard/program_details.html', context)
 
 
 class ProgramDiscussionIframeView(APIView, ProgramSpecificViewMixin):

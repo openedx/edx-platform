@@ -1,5 +1,5 @@
 """
-Unit tests for Learner Dashboard REST APIs and Views
+Unit tests for Programs Dashboard REST APIs and Views
 """
 
 from unittest import mock
@@ -41,7 +41,7 @@ class TestProgramProgressDetailView(ProgramsApiConfigMixin, SharedModuleStoreTes
     """Unit tests for the program progress detail page."""
     program_uuid = str(uuid4())
     password = 'test'
-    url = reverse_lazy('learner_dashboard:v0:program_progress_detail', kwargs={'program_uuid': program_uuid})
+    url = reverse_lazy('programs_dashboard:v0:program_progress_detail', kwargs={'program_uuid': program_uuid})
 
     @classmethod
     def setUpClass(cls):
@@ -95,7 +95,7 @@ class TestProgramProgressDetailView(ProgramsApiConfigMixin, SharedModuleStoreTes
         mock_get_programs.return_value = self.program_data
         mock_get_pathways.return_value = self.pathway_data
 
-        with mock.patch('lms.djangoapps.learner_dashboard.api.v0.views.get_certificates') as certs:
+        with mock.patch('lms.djangoapps.programs_dashboard.api.v0.views.get_certificates') as certs:
             certs.return_value = [{'type': 'program', 'url': '/'}]
             response = self.client.get(self.url)
 
@@ -135,7 +135,7 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
     enterprise_uuid = str(uuid4())
     program_uuid = str(uuid4())
     password = 'test'
-    url = reverse_lazy('learner_dashboard:v0:program_list', kwargs={'enterprise_uuid': enterprise_uuid})
+    url = reverse_lazy('programs_dashboard:v0:program_list', kwargs={'enterprise_uuid': enterprise_uuid})
 
     @classmethod
     def setUpClass(cls):

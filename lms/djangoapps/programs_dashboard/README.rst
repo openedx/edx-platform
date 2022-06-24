@@ -45,7 +45,7 @@ Implementation
 
 The ``views`` module contains the Django views used to serve the Program listing
 page. The corresponding Backbone app is in the
-``edx-platform/static/js/learner_dashboard``.
+``edx-platform/static/js/programs_dashboard``.
 
 Configuration
 ^^^^^^^^^^^^^

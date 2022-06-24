@@ -13,7 +13,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.learner_dashboard.config.waffle import ENABLE_PROGRAM_TAB_VIEW, ENABLE_MASTERS_PROGRAM_TAB_VIEW
+from lms.djangoapps.programs_dashboard.config.waffle import ENABLE_PROGRAM_TAB_VIEW, ENABLE_MASTERS_PROGRAM_TAB_VIEW
 from lms.djangoapps.program_enrollments.rest_api.v1.tests.test_views import ProgramCacheMixin
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
