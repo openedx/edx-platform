@@ -330,7 +330,9 @@ django-multi-email-field==0.6.2
 django-mysql==4.7.0
     # via -r requirements/edx/base.in
 django-oauth-toolkit==2.0.0
-    # via -r requirements/edx/base.in
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.in
 django-object-actions==4.0.0
     # via edx-enterprise
 django-pipeline==2.0.8
