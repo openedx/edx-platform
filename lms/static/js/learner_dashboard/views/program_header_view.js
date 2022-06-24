@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-import pageTpl from '../../../templates/learner_dashboard/program_header_view.underscore';
+import pageTpl from '../../../templates/programs_dashboard/program_header_view.underscore';
 import MicroMastersLogo from '../../../images/programs/micromasters-program-details.svg';
 import XSeriesLogo from '../../../images/programs/xseries-program-details.svg';
 import ProfessionalCertificateLogo from '../../../images/programs/professional-certificate-program-details.svg';

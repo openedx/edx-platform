@@ -60,6 +60,7 @@
       "lms/djangoapps/mobile_api/",
       "lms/djangoapps/monitoring/",
       "lms/djangoapps/ora_staff_grader/",
+      "lms/djangoapps/programs_dashboard/",
       "lms/djangoapps/program_enrollments/",
       "lms/djangoapps/rss_proxy/",
       "lms/djangoapps/save_for_later/",

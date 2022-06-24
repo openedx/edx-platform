@@ -5,7 +5,7 @@ import picturefill from 'picturefill';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-import programCardTpl from '../../../templates/learner_dashboard/program_card.underscore';
+import programCardTpl from '../../../templates/programs_dashboard/program_card.underscore';
 
 class ProgramCardView extends Backbone.View {
   constructor(options) {

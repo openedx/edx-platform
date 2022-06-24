@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-import pageTpl from '../../../templates/learner_dashboard/course_enroll.underscore';
+import pageTpl from '../../../templates/programs_dashboard/course_enroll.underscore';
 
 class CourseEnrollView extends Backbone.View {
   constructor(options) {

@@ -40,7 +40,7 @@ from common.djangoapps.student.models import CourseEnrollment
 
 <%block name="js_extra">
   <script src="${static.url('js/commerce/credit.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/learner_dashboard/certificate_api.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/programs_dashboard/certificate_api.js')}"></script>
   <%static:js group='dashboard'/>
   <script type="text/javascript">
     $(document).ready(function() {
@@ -150,7 +150,7 @@ from common.djangoapps.student.models import CourseEnrollment
       <div class="main-container">
         <div class="my-courses" id="my-courses">
           % if display_dashboard_courses:
-          <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
+          <%include file="programs_dashboard/_dashboard_navigation_courses.html"/>
           % endif
 
           % if len(course_entitlements + course_enrollments) > 0:

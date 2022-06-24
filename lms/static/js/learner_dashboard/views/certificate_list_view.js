@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-import certificateTpl from '../../../templates/learner_dashboard/certificate_list.underscore';
+import certificateTpl from '../../../templates/programs_dashboard/certificate_list.underscore';
 
 class CertificateListView extends Backbone.View {
   initialize(options) {

@@ -8,7 +8,7 @@ import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import CertificateView from './certificate_list_view';
 import ProgramProgressView from './progress_circle_view';
 
-import sidebarTpl from '../../../templates/learner_dashboard/program_details_sidebar.underscore';
+import sidebarTpl from '../../../templates/programs_dashboard/program_details_sidebar.underscore';
 
 class ProgramDetailsSidebarView extends Backbone.View {
   constructor(options) {

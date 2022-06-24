@@ -9,7 +9,7 @@ import ExpiredNotificationView from './expired_notification_view';
 import CourseEnrollView from './course_enroll_view';
 import EntitlementView from './course_entitlement_view';
 
-import pageTpl from '../../../templates/learner_dashboard/course_card.underscore';
+import pageTpl from '../../../templates/programs_dashboard/course_card.underscore';
 
 class CourseCardView extends Backbone.View {
   constructor(options) {

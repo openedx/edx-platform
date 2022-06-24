@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-import exploreTpl from '../../../templates/learner_dashboard/explore_new_programs.underscore';
+import exploreTpl from '../../../templates/programs_dashboard/explore_new_programs.underscore';
 
 class ExploreNewProgramsView extends Backbone.View {
   constructor(options) {

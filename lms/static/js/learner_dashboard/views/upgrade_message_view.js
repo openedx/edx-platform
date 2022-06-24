@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-import upgradeMessageTpl from '../../../templates/learner_dashboard/upgrade_message.underscore';
+import upgradeMessageTpl from '../../../templates/programs_dashboard/upgrade_message.underscore';
 import trackECommerceEvents from '../../commerce/track_ecommerce_events';
 
 class UpgradeMessageView extends Backbone.View {

@@ -10,8 +10,8 @@ import CourseCardView from './course_card_view';
 import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
 
-import pageTpl from '../../../templates/learner_dashboard/program_details_view.underscore';
-import tabPageTpl from '../../../templates/learner_dashboard/program_details_tab_view.underscore';
+import pageTpl from '../../../templates/programs_dashboard/program_details_view.underscore';
+import tabPageTpl from '../../../templates/programs_dashboard/program_details_tab_view.underscore';
 import trackECommerceEvents from '../../commerce/track_ecommerce_events';
 
 class ProgramDetailsView extends Backbone.View {

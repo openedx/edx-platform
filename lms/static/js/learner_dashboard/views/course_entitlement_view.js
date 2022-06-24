@@ -10,8 +10,8 @@ import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 import EntitlementModel from '../models/course_entitlement_model';
 import CourseCardModel from '../models/course_card_model';
 
-import pageTpl from '../../../templates/learner_dashboard/course_entitlement.underscore';
-import verificationPopoverTpl from '../../../templates/learner_dashboard/verification_popover.underscore';
+import pageTpl from '../../../templates/programs_dashboard/course_entitlement.underscore';
+import verificationPopoverTpl from '../../../templates/programs_dashboard/verification_popover.underscore';
 
 class CourseEntitlementView extends Backbone.View {
   constructor(options) {

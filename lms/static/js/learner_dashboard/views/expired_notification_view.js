@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-import expiredNotificationTpl from '../../../templates/learner_dashboard/expired_notification.underscore';
+import expiredNotificationTpl from '../../../templates/programs_dashboard/expired_notification.underscore';
 
 class ExpiredNotificationView extends Backbone.View {
   initialize(options) {
