@@ -1609,7 +1609,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         try:
             # .. filter_implemented_name: XBlockRenderStarted
             # .. filter_type: org.openedx.learning.xblock.render.started.v1
-            context, template_name = XBlockRenderStarted.run_filter(context, template_name)
+            context, template_name = XBlockRenderStarted.run_filter(block, context, template_name)
         except XBlockRenderStarted.RenderCustomReponse as exc:
             response = exc.response
         else:
