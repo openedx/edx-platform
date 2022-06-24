@@ -72,3 +72,8 @@ mistune<2.0.0
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
 learner-pathway-progress==1.0.1
+
+
+# greater version has breaking changes.
+# https://github.com/jazzband/django-oauth-toolkit/blob/master/CHANGELOG.md#200-2022-04-24
+django-oauth-toolkit<=2.0.0
