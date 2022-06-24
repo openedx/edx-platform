@@ -97,6 +97,7 @@ module.exports = Merge.smart({
             DemographicsCollectionModal: './lms/static/js/demographics_collection/DemographicsCollectionModal.jsx',
             AxiosJwtTokenService: './lms/static/js/jwt_auth/AxiosJwtTokenService.js',
             EnterpriseLearnerPortalModal: './lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx',
+            RecommendationsPanel: './lms/static/js/learner_dashboard/RecommendationsPanel.jsx',
 
             // Learner Dashboard
             EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',
