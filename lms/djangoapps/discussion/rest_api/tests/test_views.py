@@ -21,12 +21,12 @@ from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import get_retired_username_by_username
+from common.djangoapps.student.models import get_retired_username_by_username, CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
@@ -2890,7 +2890,8 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
 
 @ddt.ddt
 @httpretty.activate
-class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase):
+class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase,
+                              SharedModuleStoreTestCase):
     """
     Tests for the course stats endpoint
     """
@@ -2898,11 +2899,12 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self) -> None:
         super().setUp()
-        self.course_key = 'course-v1:test+test+test'
-        seed_permissions_roles(self.course_key)
+        self.course = CourseFactory.create()
+        self.course_key = str(self.course.id)
+        seed_permissions_roles(self.course.id)
         self.user = UserFactory(username='user')
         self.moderator = UserFactory(username='moderator')
-        moderator_role = Role.objects.get(name="Moderator", course_id=self.course_key)
+        moderator_role = Role.objects.get(name="Moderator", course_id=self.course.id)
         moderator_role.users.add(self.moderator)
         self.stats = [
             {
@@ -2915,6 +2917,16 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
             }
             for idx in range(10)
         ]
+
+        for stat in self.stats:
+            user = UserFactory.create(
+                username=stat['username'],
+                email=f"{stat['username']}@example.com",
+                password='12345'
+            )
+            CourseEnrollment.enroll(user, self.course.id, mode='audit')
+
+        CourseEnrollment.enroll(self.moderator, self.course.id, mode='audit')
         self.stats_without_flags = [{**stat, "active_flags": None, "inactive_flags": None} for stat in self.stats]
         self.register_course_stats_response(self.course_key, self.stats, 1, 3)
         self.url = reverse("discussion_course_activity_stats", kwargs={"course_key_string": self.course_key})
@@ -2973,3 +2985,35 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         self.client.login(username=self.user.username, password='test')
         response = self.client.get(self.url, {"order_by": order_by})
         assert "order_by" in response.json()["field_errors"]
+
+    @ddt.data(
+        ('user', 'user-0,user-1,user-2,user-3,user-4,user-5,user-6,user-7,user-8,user-9'),
+        ('moderator', 'moderator'),
+    )
+    @ddt.unpack
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param(self, username_search_string, comma_separated_usernames):
+        """
+        Test for endpoint with username param.
+        """
+        params = {'username': username_search_string}
+        self.client.login(username=self.moderator.username, password='test')
+        self.client.get(self.url, params)
+        assert urlparse(
+            httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
+        ).path == f'/api/v1/users/{self.course_key}/stats'
+        assert parse_qs(
+            urlparse(httpretty.last_request().path).query  # lint-amnesty, pylint: disable=no-member
+        ).get('usernames', [None]) == [comma_separated_usernames]
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param_with_no_matches(self):
+        """
+        Test for endpoint with username param with no matches.
+        """
+        params = {'username': 'unknown'}
+        self.client.login(username=self.moderator.username, password='test')
+        response = self.client.get(self.url, params)
+        data = response.json()
+        self.assertFalse(data['results'])
+        assert data['pagination']['count'] == 0
