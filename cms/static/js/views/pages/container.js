@@ -44,6 +44,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 BasePage.prototype.initialize.call(this, options);
                 this.viewClass = options.viewClass || this.defaultViewClass;
                 this.isLibraryPage = (this.model.attributes.category === 'library');
+                this.isLibrarySourced = (this.model.attributes.category === 'library_sourced');
                 this.nameEditor = new XBlockStringFieldEditor({
                     el: this.$('.wrapper-xblock-field'),
                     model: this.model
@@ -97,7 +98,8 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                         model: this.model
                     });
                     this.unitOutlineView.render();
-
+                }
+                if (this.isLibrarySourced) {
                     this.selectedLibraryComponents = [];
                     this.storeSelectedLibraryComponents = [];
                     this.getSelectedLibraryComponents();

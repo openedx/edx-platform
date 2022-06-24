@@ -22,7 +22,14 @@ from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock as EditableChildrenMixin
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.x_module import STUDENT_VIEW, HTMLSnippet, ResourceTemplates, XModuleMixin, XModuleToXBlockMixin, shim_xmodule_js
+from xmodule.x_module import (
+    STUDENT_VIEW,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleMixin,
+    XModuleToXBlockMixin,
+    shim_xmodule_js
+)
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)
@@ -115,7 +122,7 @@ class LibrarySourcedBlock(
             if can_reorder:
                 context['reorderable_items'].add(child.location)
             context['can_add'] = can_add
-            context['selected'] = str(child.location) in self.source_block_ids
+            context['is_selected'] = str(child.location) in self.source_block_ids
             rendered_child = child.render(EditableChildrenMixin.get_preview_view_name(child), context)
             fragment.add_fragment_resources(rendered_child)
 
@@ -151,6 +158,7 @@ class LibrarySourcedBlock(
         context = {} if not context else copy(context)  # Isolate context - without this there are weird bugs in Studio
         # EditableChildrenMixin.render_children will render HTML that allows instructors to make edits to the children
         context['can_move'] = False
+        context['selectable'] = True
         self.render_children(context, fragment, can_reorder=False, can_add=False)
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_source_edit.js'))
         fragment.initialize_js('LibrarySourceAuthorView')
@@ -223,7 +231,9 @@ class LibrarySourcedBlock(
         return True
 
     def _set_validation_error_if_empty(self, validation, summary):
-        """  Helper method to only set validation summary if it's empty """
+        """
+        Helper method to only set validation summary if it's empty
+        """
         if validation.empty:
             validation.set_summary(summary)
 
