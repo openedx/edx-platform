@@ -1018,18 +1018,6 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1458'
     'ENABLE_CERTIFICATES_IDV_REQUIREMENT': False,
-
-    # .. toggle_name: FEATURES['ENABLE_MFE_API']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to enable MFE Config REST API. This is disabled by
-    #   default.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2022-05-20
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
-    # .. toggle_tickets: None
-    'ENABLE_MFE_API': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -4924,12 +4912,6 @@ HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 
-# .. setting_name: MFE_API_CONFIG_CACHE_TIMEOUT
-# .. setting_default: 60*5
-# .. setting_description: The MFE_CONFIG site configuration will be cached during the
-#   specified time
-MFE_API_CONFIG_CACHE_TIMEOUT = 60 * 5
-
 ############### Settings for the ace_common plugin #################
 # Note that all settings are actually defined by the plugin
 # pylint: disable=wrong-import-position
@@ -5160,3 +5142,21 @@ ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://127.0.0.1:8000/oaut
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
 
 PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
+
+# .. toggle_name: ENABLE_MFE_API
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Set to True to enable MFE Config REST API. This is disabled by
+#   default.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2022-05-20
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
+# .. toggle_tickets: None
+ENABLE_MFE_API = False
+
+# .. setting_name: MFE_API_CONFIG_CACHE_TIMEOUT
+# .. setting_default: 60*5
+# .. setting_description: The MFE_CONFIG site configuration will be cached during the
+#   specified time
+MFE_API_CONFIG_CACHE_TIMEOUT = 60 * 5

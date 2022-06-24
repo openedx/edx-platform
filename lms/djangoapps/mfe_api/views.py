@@ -3,7 +3,7 @@ MFE API Views for useful information related to mfes.
 """
 
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import HttpResponseNotFound, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework import status
@@ -30,7 +30,7 @@ class MFEConfigView(APIView):
             "BASE_URL": "https://name_of_mfe.example.com",
             "LANGUAGE_PREFERENCE_COOKIE_NAME": "example-language-preference",
             "CREDENTIALS_BASE_URL": "https://credentials.example.com",
-            "DOSCOVERY_API_BASE_URL": "https://discovery.example.com",
+            "DISCOVERY_API_BASE_URL": "https://discovery.example.com",
             "LMS_BASE_URL": "https://courses.example.com",
             "LOGIN_URL": "https://courses.example.com/login",
             "LOGOUT_URL": "https://courses.example.com/logout",
@@ -40,9 +40,8 @@ class MFEConfigView(APIView):
         ```
         """
 
-        if not settings.FEATURES.get('ENABLE_MFE_API'):
-            msg = 'MFE API not found. Try setting FEATURES["ENABLE_MFE_API"] to true.'
-            return JsonResponse({'message': msg}, status=status.HTTP_404_NOT_FOUND)
+        if not settings.ENABLE_MFE_API:
+            return HttpResponseNotFound()
 
         mfe_config = configuration_helpers.get_value('MFE_CONFIG', {})
         if request.query_params.get('mfe'):

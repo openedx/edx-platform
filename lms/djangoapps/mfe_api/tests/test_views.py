@@ -2,9 +2,7 @@
 Test the use cases of the views of the mfe api.
 """
 
-from unittest.mock import patch
-
-from django.conf import settings
+from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
 
@@ -47,7 +45,7 @@ class MFEConfigTestCase(ApiTestCase):
         response_json = self.get_json(f'{self.mfe_config_api_url}?mfe={mfe}')
         assert response_json == mfe_config
 
-    @patch.dict(settings.FEATURES, {'ENABLE_MFE_API': False})
+    @override_settings(ENABLE_MFE_API=False)
     def test_404_get_mfe_config(self):
         """Test the 404 not found response from get mfe config.
 
