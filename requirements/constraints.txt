@@ -76,4 +76,4 @@ learner-pathway-progress==1.0.1
 
 # greater version has breaking changes.
 # https://github.com/jazzband/django-oauth-toolkit/blob/master/CHANGELOG.md#200-2022-04-24
-django-oauth-toolkit<=2.0.0
+django-oauth-toolkit<2.0.0
