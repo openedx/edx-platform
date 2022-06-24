@@ -144,7 +144,7 @@ from openedx.core.djangolib.markup import HTML, Text
                         </a>
                     </li>
                 % else:
-                    % if True:
+                    % if is_sourced_block:
                     <li class="action-item action-save nav-item">
                         <a href="#" class="button button-save action-button save-button is-hidden">
                             <span class="action-button-text">${_("Save changes")}</span>
