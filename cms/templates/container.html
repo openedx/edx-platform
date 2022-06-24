@@ -144,6 +144,13 @@ from openedx.core.djangolib.markup import HTML, Text
                         </a>
                     </li>
                 % else:
+                    % if True:
+                    <li class="action-item action-save nav-item">
+                        <a href="#" class="button button-save action-button save-button is-hidden">
+                            <span class="action-button-text">${_("Save changes")}</span>
+                        </a>
+                    </li>
+                    % endif
                     <li class="action-item action-edit nav-item">
                         <a href="#" class="button button-edit action-button edit-button">
                             <span class="icon fa fa-pencil" aria-hidden="true"></span>
