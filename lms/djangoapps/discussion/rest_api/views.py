@@ -173,12 +173,14 @@ class CourseActivityStatsView(DeveloperErrorViewMixin, APIView):
             raise ValidationError(form_query_string.errors)
         order_by = form_query_string.cleaned_data.get('order_by', None)
         order_by = UserOrdering(order_by) if order_by else None
+        username_search_string = form_query_string.cleaned_data.get('username', None)
         data = get_course_discussion_user_stats(
             request,
             course_key_string,
             form_query_string.cleaned_data['page'],
             form_query_string.cleaned_data['page_size'],
             order_by,
+            username_search_string,
         )
         return data
 

@@ -94,7 +94,13 @@ from .serializers import (
     UserStatsSerializer,
     get_context,
 )
-from .utils import discussion_open_for_user, set_attribute
+
+from .utils import (
+    discussion_open_for_user,
+    get_usernames_from_search_string,
+    add_stats_for_users_with_no_discussion_content,
+    set_attribute,
+)
 
 User = get_user_model()
 
@@ -1602,6 +1608,7 @@ def get_course_discussion_user_stats(
     page: int,
     page_size: int,
     order_by: UserOrdering = None,
+    username_search_string: str = None,
 ) -> Dict:
     """
     Get paginated course discussion stats for users in the course.
@@ -1612,6 +1619,7 @@ def get_course_discussion_user_stats(
         page (int): Page number to fetch
         page_size (int): Number of items in each page
         order_by (UserOrdering): The ordering to use for the user stats
+        username_search_string (str): Partial string to match user names
 
     Returns:
         Paginated data of a user's discussion stats sorted based on the specified ordering.
@@ -1625,11 +1633,31 @@ def get_course_discussion_user_stats(
         order_by = order_by or UserOrdering.BY_ACTIVITY
         if order_by != UserOrdering.BY_ACTIVITY:
             raise ValidationError({"order_by": "Invalid value"})
-    course_stats_response = get_course_user_stats(course_key, {
+    params = {
         'sort_key': str(order_by),
         'page': page,
         'per_page': page_size,
-    })
+    }
+    comma_separated_usernames = matched_users_count = matched_users_pages = None
+    if username_search_string:
+        comma_separated_usernames, matched_users_count, matched_users_pages = get_usernames_from_search_string(
+            course_key, username_search_string, page, page_size
+        )
+        if not comma_separated_usernames:
+            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
+                "results": [],
+            })
+        params['usernames'] = comma_separated_usernames
+
+    course_stats_response = get_course_user_stats(course_key, params)
+
+    if comma_separated_usernames:
+        updated_course_stats = add_stats_for_users_with_no_discussion_content(
+            course_stats_response["user_stats"],
+            comma_separated_usernames,
+        )
+        course_stats_response["user_stats"] = updated_course_stats
+
     serializer = UserStatsSerializer(
         course_stats_response["user_stats"],
         context={"is_privileged": is_privileged},
@@ -1639,8 +1667,8 @@ def get_course_discussion_user_stats(
     paginator = DiscussionAPIPagination(
         request,
         course_stats_response["page"],
-        course_stats_response["num_pages"],
-        course_stats_response["count"],
+        matched_users_pages if username_search_string else course_stats_response["num_pages"],
+        matched_users_count if username_search_string else course_stats_response["count"],
     )
     return paginator.get_paginated_response({
         "results": serializer.data,
