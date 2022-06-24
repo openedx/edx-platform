@@ -73,7 +73,16 @@ block_is_unit = is_unit(xblock)
             </a>
             % endif
             <div class="xblock-display-title">
+                % if True:
+                <input type="checkbox" name="library-component" id="${xblock.location}"
+                       class="header-library-checkbox" ${'checked="checked"' if is_selected else ''}>
+                <label for="${xblock.location}" class="xblock-display-name header-library-checkbox-label">
+                    <span class="sr-only">${_("Select this problem")}</span>
+                    ${label}
+                </label>
+                % else:
                 <span class="xblock-display-name">${label}</span>
+                % endif
                 % if selected_groups_label:
                 <p class="xblock-group-visibility-label">${selected_groups_label}</p>
                 % endif

@@ -6,10 +6,10 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'common/js/components/utils/view_utils', 'js/views/container', 'js/views/xblock',
     'js/views/components/add_xblock', 'js/views/modals/edit_xblock', 'js/views/modals/move_xblock_modal',
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
-    'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils'],
+    'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils', 'js/utils/module'],
     function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
           EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
-          ContainerSubviews, UnitOutlineView, XBlockUtils) {
+          ContainerSubviews, UnitOutlineView, XBlockUtils, ModuleUtils) {
         'use strict';
         var XBlockContainerPage = BasePage.extend({
             // takes XBlockInfo as a model
@@ -20,7 +20,9 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 'click .duplicate-button': 'duplicateXBlock',
                 'click .move-button': 'showMoveXBlockModal',
                 'click .delete-button': 'deleteXBlock',
-                'click .new-component-button': 'scrollToNewComponentButtons'
+                'click .save-button': 'saveSelectedLibraryComponents',
+                'click .new-component-button': 'scrollToNewComponentButtons',
+                'change .header-library-checkbox': 'toggleLibraryComponent'
             },
 
             options: {
@@ -95,6 +97,10 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                         model: this.model
                     });
                     this.unitOutlineView.render();
+
+                    this.selectedLibraryComponents = [];
+                    this.storeSelectedLibraryComponents = [];
+                    this.getSelectedLibraryComponents();
                 }
 
                 this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
@@ -298,6 +304,60 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 XBlockUtils.deleteXBlock(xblockInfo).done(function() {
                     self.onDelete(xblockElement);
                 });
+            },
+
+            getSelectedLibraryComponents: function() {
+              var self = this;
+              var locator = this.$el.find('.studio-xblock-wrapper').data('locator');
+              $.getJSON(
+                  ModuleUtils.getUpdateUrl(locator) + '/handler/get_block_ids',
+                  function(data) {
+                      self.selectedLibraryComponents = Array.from(data.source_block_ids);
+                      self.storeSelectedLibraryComponents = Array.from(data.source_block_ids);
+                  }
+              );
+            },
+
+            saveSelectedLibraryComponents: function(e) {
+              var self = this;
+              var locator = this.$el.find('.studio-xblock-wrapper').data('locator');
+              e.preventDefault();
+              $.postJSON(
+                  ModuleUtils.getUpdateUrl(locator) + '/handler/submit_studio_edits',
+                  {values: {source_block_ids: self.storeSelectedLibraryComponents}},
+                  function() {
+                      self.selectedLibraryComponents = Array.from(self.storeSelectedLibraryComponents);
+                      self.toggleSaveButton();
+                  }
+              );
+            },
+
+            toggleLibraryComponent: function(event) {
+              var componentId = $(event.target).closest('.studio-xblock-wrapper').data('locator');
+              var storeIndex = this.storeSelectedLibraryComponents.indexOf(componentId);
+              if (storeIndex > -1) {
+                this.storeSelectedLibraryComponents.splice(storeIndex, 1);
+                this.toggleSaveButton();
+              } else {
+                this.storeSelectedLibraryComponents.push(componentId);
+                this.toggleSaveButton();
+              }
+            },
+
+            toggleSaveButton: function() {
+              var $saveButton = $('.nav-actions .save-button');
+              if (JSON.stringify(this.selectedLibraryComponents.sort()) === JSON.stringify(this.storeSelectedLibraryComponents.sort())) {
+                $saveButton.addClass('is-hidden');
+                window.removeEventListener('beforeunload', this.onBeforePageUnloadCallback);
+              } else {
+                $saveButton.removeClass('is-hidden');
+                window.addEventListener('beforeunload', this.onBeforePageUnloadCallback);
+              }
+            },
+
+            onBeforePageUnloadCallback: function (event) {
+              event.preventDefault();
+              event.returnValue = '';
             },
 
             onDelete: function(xblockElement) {
