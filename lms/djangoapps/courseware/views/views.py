@@ -37,7 +37,7 @@ from ipware.ip import get_client_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx_filters.learning.filters import CourseAboutRenderStarted
+from openedx_filters.learning.filters import CourseAboutRenderStarted, XBlockRenderStarted
 from pytz import UTC
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from rest_framework import status
@@ -1605,7 +1605,17 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
             **optimization_flags,
         }
-        return render_to_response('courseware/courseware-chromeless.html', context)
+        template_name = 'courseware/courseware-chromeless.html'
+        try:
+            # .. filter_implemented_name: XBlockRenderStarted
+            # .. filter_type: org.openedx.learning.xblock.render.started.v1
+            context, template_name = XBlockRenderStarted.run_filter(context, template_name)
+        except XBlockRenderStarted.RenderCustomReponse as exc:
+            response = exc.response
+        else:
+            response = render_to_response(template_name, context)
+
+        return response
 
 
 @require_http_methods(["GET"])
