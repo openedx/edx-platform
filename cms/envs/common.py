@@ -2663,3 +2663,6 @@ TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
 COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_assets/course_live.html"
+
+# keys for  big blue button live provider
+COURSE_LIVE_GLOBAL_CREDENTIALS = {}

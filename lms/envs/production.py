@@ -1071,3 +1071,10 @@ REST_FRAMEWORK.update(ENV_TOKENS.get('REST_FRAMEWORK', {}))
 
 ############################# CELERY ############################
 CELERY_IMPORTS.extend(ENV_TOKENS.get('CELERY_EXTRA_IMPORTS', []))
+
+# keys for  big blue button live provider
+COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
+    "KEY": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_KEY', None),
+    "SECRET": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_SECRET', None),
+    "URL": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_URL', None),
+}

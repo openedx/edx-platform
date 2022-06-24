@@ -640,3 +640,10 @@ SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'
 #################### Network configuration ####################
 # Tests are not behind any proxies
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
+
+
+COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
+    "KEY": "***",
+    "SECRET": "***",
+    "URL": "***",
+}

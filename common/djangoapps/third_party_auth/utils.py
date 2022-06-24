@@ -172,16 +172,25 @@ def get_user_from_email(details):
 
 def create_or_update_bulk_saml_provider_data(entity_id, public_keys, sso_url, expires_at):
     """
-    Placeholder
+    Method to bulk update or create provider data entries
     """
     fetched_at = now()
     new_records_created = False
     # Create a data record for each of the public keys provided
     for key in public_keys:
-        _, created = SAMLProviderData.objects.update_or_create(
-            public_key=key, entity_id=entity_id,
-            defaults={'sso_url': sso_url, 'expires_at': expires_at, 'fetched_at': fetched_at},
-        )
+        existing_data_objects = SAMLProviderData.objects.filter(public_key=key, entity_id=entity_id)
+        if len(existing_data_objects) > 1:
+            for obj in existing_data_objects:
+                obj.sso_url = sso_url
+                obj.expires_at = expires_at
+                obj.fetched_at = fetched_at
+            SAMLProviderData.objects.bulk_update(existing_data_objects, ['sso_url', 'expires_at', 'fetched_at'])
+            return True
+        else:
+            _, created = SAMLProviderData.objects.update_or_create(
+                public_key=key, entity_id=entity_id,
+                defaults={'sso_url': sso_url, 'expires_at': expires_at, 'fetched_at': fetched_at},
+            )
         if created:
             new_records_created = True
 

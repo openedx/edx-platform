@@ -8,17 +8,6 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
-AVAILABLE_PROVIDERS = {
-    'zoom': {
-        'name': 'Zoom LTI PRO',
-        'features': [],
-        'pii_sharing': {
-            'username': False,
-            'email': False,
-        }
-    }
-}
-
 
 class CourseLiveConfiguration(TimeStampedModel):
     """
@@ -41,6 +30,10 @@ class CourseLiveConfiguration(TimeStampedModel):
         max_length=50,
         verbose_name=_("LTI provider"),
         help_text=_("The LTI provider's id"),
+    )
+    free_tier = models.BooleanField(
+        default=False,
+        help_text=_("True, if LTI credential are provided by Org globally")
     )
     history = HistoricalRecords()
 
