@@ -55,8 +55,8 @@ from six.moves import range
 from six.moves.urllib.parse import urlencode
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
-from organizations.models import UserOrganizationMapping, OrganizationCourse
-from tahoe_sites.api import get_organization_by_site
+from organizations.models import UserOrganizationMapping, OrganizationCourse, Organization
+from tahoe_sites.api import get_organization_by_site, get_organization_for_user
 from openedx.core.djangoapps.theming.helpers import (
     get_current_request,
     get_current_site,
@@ -2358,9 +2358,12 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
 
         if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
             if not is_request_for_new_amc_site(get_current_request()):
-                current_organization = get_current_organization()
+                try:
+                    user_organization = get_organization_for_user(user)
+                except Organization.DoesNotExist:
+                    user_organization = get_current_organization()
                 return queryset.filter(course_id__in=OrganizationCourse.objects.filter(
-                    organization=current_organization,
+                    organization=user_organization,
                     active=True,
                 ).values('course_id'))
 
