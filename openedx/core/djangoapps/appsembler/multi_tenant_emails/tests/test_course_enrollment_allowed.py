@@ -101,6 +101,24 @@ class TestCourseEnrollmentAllowedMultitenant(ModuleStoreTestCase):
         assert list(CourseEnrollment.objects.all()), 'Should be enrolled'
         assert CourseEnrollment.is_enrolled(john_b, course.id), 'Should be enrolled'
 
+    def test_enrollment_allowed_no_current_request(self):
+        """
+        Test CourseEnrollmentAllowed without `request` when the APPSEMBLER_MULTI_TENANT_EMAILS feature is enabled.
+        """
+        with with_organization_context(site_color=self.RED) as org:
+            course = self.create_org_course(org)
+            assert not CourseEnrollmentAllowed.objects.count(), 'No enrollment allowed yet.'
+            self.invite(org, course.id, self.JOHN_EMAIL)
+            john_b = self.register_user(org.name, email='another.email@exmple.com', password=self.PASSWORD)
+
+        assert not CourseEnrollment.is_enrolled(john_b, course.id), 'Should not be enrolled yet'
+
+        john_b.email = self.JOHN_EMAIL  # Change email
+        john_b.save()  # Simulate a command-line save.
+
+        assert list(CourseEnrollment.objects.all()), 'Should be enrolled'
+        assert CourseEnrollment.is_enrolled(john_b, course.id), 'Should be enrolled'
+
     def test_enrollment_allowed_two_sites(self):
         """
         Test CourseEnrollmentAllowed when the APPSEMBLER_MULTI_TENANT_EMAILS feature is enabled.
