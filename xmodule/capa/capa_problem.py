@@ -23,6 +23,7 @@ from datetime import datetime
 from xml.sax.saxutils import unescape
 
 import six
+from django.conf import settings
 
 from lxml import etree
 from pytz import UTC
@@ -107,7 +108,6 @@ class LoncapaSystem(object):
         render_template,
         resources_fs,
         seed,      # Why do we do this if we have self.seed?
-        STATIC_URL,
         xqueue,
         matlab_api_key=None
     ):
@@ -121,7 +121,7 @@ class LoncapaSystem(object):
         self.render_template = render_template
         self.resources_fs = resources_fs
         self.seed = seed                     # Why do we do this if we have self.seed?
-        self.STATIC_URL = STATIC_URL                    # pylint: disable=invalid-name
+        self.STATIC_URL = settings.STATIC_URL           # pylint: disable=invalid-name
         self.xqueue = xqueue
         self.matlab_api_key = matlab_api_key
 

@@ -4,18 +4,16 @@ Code to implement backwards compatibility
 # pylint: disable=no-member
 
 import warnings
-
 from django.conf import settings
 from django.core.cache import cache
 from django.template import TemplateDoesNotExist
 from django.utils.functional import cached_property
 from fs.memoryfs import MemoryFS
 
-from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
-
-from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.edxmako.shortcuts import render_to_string
+from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.student.models import anonymous_id_for_user
+from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
 
 class RuntimeShim:
@@ -235,10 +233,12 @@ class RuntimeShim:
     def STATIC_URL(self):
         """
         Get the django STATIC_URL path.
-
-        Seems only to be used by capa. Remove this if capa can be refactored.
+        Deprecated in favor of the settings.STATIC_URL configuration.
         """
-        # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
+        warnings.warn(
+            'runtime.STATIC_URL is deprecated. Please use settings.STATIC_URL instead.',
+            DeprecationWarning, stacklevel=3,
+        )
         static_url = settings.STATIC_URL
         if static_url.startswith('/') and not static_url.startswith('//'):
             # This is not a full URL - should start with https:// to support loading assets from an iframe sandbox
