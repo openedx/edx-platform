@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-12 20:44+0000\n"
+"POT-Creation-Date: 2022-06-19 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -142,6 +142,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/item.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
+msgstr "Metin"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -155,11 +162,6 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Tartışma"
-
-#: cms/djangoapps/contentstore/views/component.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
-msgstr "Metin"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -3022,24 +3024,6 @@ msgid "Enter the names of the advanced modules to use in your course."
 msgstr "Dersinizde kullanacağınız gelişmiş bileşenlerin adlarını girin."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Home Sidebar Name"
-msgstr "Ders Anasayfa Kenar Çubuğu İsmi"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the heading that you want students to see above your course handouts "
-"on the Course Home page. Your course handouts appear in the right panel of "
-"the page."
-msgstr ""
-"Öğrencilerinizin Ders anasayfasındaki ders notlarının üzerinde görmelerini "
-"istediğiniz başlığı girin. Ders notlarınız sayfanın kısmında görünür."
-
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/templates/courseware/info.html
-msgid "Course Handouts"
-msgstr "Ders Notları"
-
-#: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
@@ -4633,11 +4617,6 @@ msgid "External Discussion"
 msgstr "Harici Tartışma"
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
-#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
-msgid "Home"
-msgstr "Ana Sayfa"
-
-#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py
 #: cms/templates/widgets/header.html
@@ -5474,6 +5453,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Confirm Email"
 msgstr "E-posta'yı Doğrula"
@@ -11231,10 +11211,6 @@ msgid "Upgrade to earn a verified certificate in %(first_course_name)s"
 msgstr ""
 "%(first_course_name)s dersinde onaylı sertifika edinmek için yükseltin"
 
-#: openedx/core/djangoapps/self_paced/models.py
-msgid "Enable course home page improvements."
-msgstr "Ders ana sayfası iyileştirmelerini etkinleştir."
-
 #: openedx/core/djangoapps/theming/views.py
 #, python-brace-format
 msgid "Site theme changed to {site_theme}"
@@ -11346,6 +11322,10 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "The email addresses do not match."
 msgstr "Bu e-posta adresleri uyuşmuyor."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your confirm email"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your country or region of residence."
@@ -12475,6 +12455,10 @@ msgid ""
 msgstr ""
 "Verilerinizin paylaşımıyla ilgili bir endişeniz varsa, lütfen "
 "{enterprise_customer_name} yöneticilerinizle iletişime geçin."
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Home"
+msgstr "Ana Sayfa"
 
 #: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
 msgid "Enterprise Course Enrollments"
@@ -16489,50 +16473,6 @@ msgstr "-nin"
 msgid "next page"
 msgstr "sonraki sayfa"
 
-#: lms/templates/courseware/info.html
-msgid "{course_number} Course Info"
-msgstr "{course_number} Ders Bilgisi"
-
-#: lms/templates/courseware/info.html
-msgid "You are not enrolled yet"
-msgstr "Henüz kayıtlanmadınız"
-
-#: lms/templates/courseware/info.html
-msgid ""
-"You are not currently enrolled in this course. {link_start}Enroll "
-"now!{link_end}"
-msgstr ""
-"Bu derse henüz kayıtlanmadınız. {link_start}Hemen kayıt olun!{link_end}"
-
-#: lms/templates/courseware/info.html
-msgid "Welcome to {org}'s {course_title}!"
-msgstr "{org} {course_title} dersine hoş geldiniz!"
-
-#: lms/templates/courseware/info.html
-msgid "Welcome to {course_title}!"
-msgstr "{course_title} dersine hoş geldiniz!"
-
-#: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "Resume Course"
-msgstr "Derse Devam Et"
-
-#: lms/templates/courseware/info.html
-msgid "View Updates in Studio"
-msgstr "Studio'daki Güncellemeleri İncele"
-
-#: lms/templates/courseware/info.html
-msgid "Course Updates and News"
-msgstr "Ders Güncellemeleri ve Haberleri"
-
-#: lms/templates/courseware/info.html
-msgid "Handout Navigation"
-msgstr "Yardımcı Metinler Navigasyonu"
-
-#: lms/templates/courseware/info.html
-msgid "Course Tools"
-msgstr "Ders Araçları"
-
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "Haberler - MITx 6.002x"
@@ -16672,10 +16612,6 @@ msgstr "Sertifikayı Görüntüle"
 #: lms/templates/courseware/progress.html
 msgid "Opens in a new browser window"
 msgstr "Yeni bir tarayıcı penceresinde açılır"
-
-#: lms/templates/courseware/progress.html
-msgid "Download Your Certificate"
-msgstr "Sertifikanızı İndirin"
 
 #: lms/templates/courseware/progress.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -16946,22 +16882,6 @@ msgid "View my {cert_name_short}"
 msgstr "{cert_name_short} serfifikamı göster"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "This link will open/download a PDF document"
-msgstr "Bu bağlantı bir PDF belgesini açacak/indirecek"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download my {cert_name_short}"
-msgstr "{cert_name_short} sertifikamı indir"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"This link will open/download a PDF document of your verified "
-"{cert_name_long}."
-msgstr ""
-"Bu bağlantı onaylanmış {cert_name_long} sertifikanızı bir PDF belgesi olarak"
-" açacak/indirecek."
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
 msgstr "Ders geri bildirim anketini tamamla"
 
@@ -17115,6 +17035,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
 msgstr "Yükselt"
+
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "Resume Course"
+msgstr "Derse Devam Et"
 
 #. Translators: provider_name is the name of a credit provider or university
 #. (e.g. State University)

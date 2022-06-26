@@ -105,7 +105,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-12 20:44+0000\n"
+"POT-Creation-Date: 2022-06-19 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -115,6 +115,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/item.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
+msgstr "Teks"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -128,11 +135,6 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Diskusi"
-
-#: cms/djangoapps/contentstore/views/component.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
-msgstr "Teks"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -2936,25 +2938,6 @@ msgstr ""
 "Anda."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Home Sidebar Name"
-msgstr "Nama Sidebar Beranda Pelatihan"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the heading that you want students to see above your course handouts "
-"on the Course Home page. Your course handouts appear in the right panel of "
-"the page."
-msgstr ""
-"Masukkan judul yang Anda inginkan agar siswa melihat di atas materi "
-"pelatihan Anda di Halaman Beranda Pelatihan. Materi pelatihan Anda muncul di"
-" panel sebelah kanan halaman."
-
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/templates/courseware/info.html
-msgid "Course Handouts"
-msgstr "Makalah Kursus"
-
-#: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "True if timezones should be shown on dates in the course. Deprecated in "
 "favor of due_date_display_format."
@@ -4514,11 +4497,6 @@ msgid "External Discussion"
 msgstr "Diskusi Eksternal"
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
-#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
-msgid "Home"
-msgstr "Beranda"
-
-#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py
 #: cms/templates/widgets/header.html
@@ -5288,6 +5266,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Confirm Email"
 msgstr "Konfirmasi Email"
@@ -10798,10 +10777,6 @@ msgstr ""
 "Upgrade untuk mendapatkan sertifikat terverifikasi dalam "
 "%(first_course_name)s"
 
-#: openedx/core/djangoapps/self_paced/models.py
-msgid "Enable course home page improvements."
-msgstr ""
-
 #: openedx/core/djangoapps/theming/views.py
 #, python-brace-format
 msgid "Site theme changed to {site_theme}"
@@ -10914,6 +10889,10 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "The email addresses do not match."
 msgstr "Alamat email tidak sesuai."
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your confirm email"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your country or region of residence."
@@ -11973,6 +11952,10 @@ msgid ""
 "If you have concerns about sharing your data, please contact your "
 "administrator at {enterprise_customer_name}."
 msgstr ""
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Home"
+msgstr "Beranda"
 
 #: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
 msgid "Enterprise Course Enrollments"
@@ -16103,51 +16086,6 @@ msgstr "dari"
 msgid "next page"
 msgstr "halaman Selanjutnya"
 
-#: lms/templates/courseware/info.html
-msgid "{course_number} Course Info"
-msgstr "{course_number} Info Kursus"
-
-#: lms/templates/courseware/info.html
-msgid "You are not enrolled yet"
-msgstr "Anda belum terdaftar"
-
-#: lms/templates/courseware/info.html
-msgid ""
-"You are not currently enrolled in this course. {link_start}Enroll "
-"now!{link_end}"
-msgstr ""
-"Anda sekarang tidak terdaftar pada pelatihan ini.\n"
-"{link_start}Daftar sekarang!{link_end}"
-
-#: lms/templates/courseware/info.html
-msgid "Welcome to {org}'s {course_title}!"
-msgstr "Selamat datang di {course_title} {org}!"
-
-#: lms/templates/courseware/info.html
-msgid "Welcome to {course_title}!"
-msgstr "Selamat datang di {course_title}!"
-
-#: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "Resume Course"
-msgstr "Ringkas Pelatihan"
-
-#: lms/templates/courseware/info.html
-msgid "View Updates in Studio"
-msgstr "Lihat Info Terbaru di Studio"
-
-#: lms/templates/courseware/info.html
-msgid "Course Updates and News"
-msgstr "Perbaruan pelatihan dan berita"
-
-#: lms/templates/courseware/info.html
-msgid "Handout Navigation"
-msgstr "Navigasi Makalah"
-
-#: lms/templates/courseware/info.html
-msgid "Course Tools"
-msgstr "Sarana pelatihan"
-
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "Berita - MITx 6.002x"
@@ -16287,10 +16225,6 @@ msgstr "Lihat Sertifikat"
 #: lms/templates/courseware/progress.html
 msgid "Opens in a new browser window"
 msgstr "Buka di jendela peramban yang baru"
-
-#: lms/templates/courseware/progress.html
-msgid "Download Your Certificate"
-msgstr "Unduh Sertifikat Anda"
 
 #: lms/templates/courseware/progress.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -16565,22 +16499,6 @@ msgid "View my {cert_name_short}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "This link will open/download a PDF document"
-msgstr "Tautan ini akan membuka/mengunduh dokumen PDF"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download my {cert_name_short}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"This link will open/download a PDF document of your verified "
-"{cert_name_long}."
-msgstr ""
-"Tautan ini akan membuka/mengunduh dokumen PDF {cert_name_long} Terverifikasi"
-" Anda."
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
 msgstr "Lengkapi survei umpan balik kursus kami"
 
@@ -16730,6 +16648,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
 msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "Resume Course"
+msgstr "Ringkas Pelatihan"
 
 #. Translators: provider_name is the name of a credit provider or university
 #. (e.g. State University)

@@ -40,7 +40,7 @@
 #
 # Translators:
 # Noppachai Eiamwasant <noporo@hotmail.com>, 2019
-# นพดล โชติ <noppadol@thaicyberu.go.th>, 2019
+# Noppadol Choti <noppadol@thaicyberu.go.th>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)
@@ -73,7 +73,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-12 20:43+0000\n"
+"POT-Creation-Date: 2022-06-19 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: edx demo <edx.one2clouds@gmail.com>, 2019\n"
 "Language-Team: Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)\n"
@@ -3595,6 +3595,10 @@ msgstr ""
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Invalid email address: {email}"
+msgstr ""
+
+#: lms/static/js/groups/views/cohort_editor.js
+msgid "Cohort assignment not allowed: {email_or_username}"
 msgstr ""
 
 #: lms/static/js/groups/views/cohort_editor.js
@@ -7171,24 +7175,12 @@ msgid "Status"
 msgstr "สถานะ"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-msgid "Download URL"
-msgstr "URLที่ถูกดาวน์โหลด"
-
-#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Grade"
 msgstr "เกรด"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Last Updated"
 msgstr "แก้ไขครั้งสุดท้าย"
-
-#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-msgid "Download the user's certificate"
-msgstr "ดาวน์โหลดใบรับรอง"
-
-#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-msgid "Not available"
-msgstr "ไม่สามารถใช้งานได้"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Regenerate"
