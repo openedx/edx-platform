@@ -7,10 +7,6 @@ from lti_consumer.models import LtiConfiguration
 from rest_framework import serializers
 
 from .models import CourseLiveConfiguration
-# from .utils import provider_requires_custom_email
-from .providers import ProviderManager
-
-providers = ProviderManager().get_enabled_providers()
 
 
 class LtiSerializer(serializers.ModelSerializer):
