@@ -15,6 +15,7 @@ XBLOCKS = [
     "customtag = xmodule.template_module:CustomTagBlock",
     "custom_tag_template = xmodule.template_module:CustomTagTemplateBlock",
     "discuss = xmodule.template_module:TranslateCustomTagBlock",
+    "discussion = xmodule.discussion_block:DiscussionXBlock",
     "error = xmodule.error_module:ErrorBlock",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "html = xmodule.html_module:HtmlBlock",
