@@ -47,7 +47,8 @@ from ..reading import (
     get_program_course_enrollment,
     get_program_enrollment,
     get_users_by_external_keys,
-    is_course_staff_enrollment
+    is_course_staff_enrollment,
+    get_provider_slug,
 )
 
 User = get_user_model()
@@ -803,3 +804,11 @@ class IsCourseStaffEnrollmentTest(TestCase):
             id=program_course_enrollment_id
         )
         assert is_course_staff == is_course_staff_enrollment(program_course_enrollment)
+
+    def test_get_provider_slug_correctly_strips(self):
+        list_of_providers = []
+        for num_provider in range(1000):
+            list_of_providers.append(SAMLProviderConfigFactory(entity_id=str(num_provider)))
+
+        for provider in list_of_providers:
+            assert provider.slug == get_provider_slug(provider)
