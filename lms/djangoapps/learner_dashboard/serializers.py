@@ -29,11 +29,30 @@ class CourseSerializer(serializers.Serializer):
     courseName = serializers.CharField()
 
 
+class CourseRunSerializer(serializers.Serializer):
+    """Serializer for course run info"""
+
+    isPending = serializers.BooleanField()
+    isStarted = serializers.BooleanField()
+    isFinished = serializers.BooleanField()
+    isArchived = serializers.BooleanField()
+    courseNumber = serializers.CharField()
+    accessExpirationDate = serializers.DateTimeField()
+    minPassingGrade = serializers.DecimalField(max_digits=5, decimal_places=2)
+    endDate = serializers.DateTimeField()
+    homeUrl = serializers.URLField()
+    marketingUrl = serializers.URLField()
+    progressUrl = serializers.URLField()
+    unenrollUrl = serializers.URLField()
+    upgradeUrl = serializers.URLField()
+
+
 class EnrollmentSerializer(serializers.Serializer):
     """Serializer for an enrollment"""
 
     courseProvider = CourseProviderSerializer(allow_null=True)
     course = CourseSerializer()
+    courseRun = CourseRunSerializer()
 
 
 class EntitlementSerializer(serializers.Serializer):

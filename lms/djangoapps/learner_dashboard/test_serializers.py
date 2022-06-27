@@ -1,15 +1,24 @@
 """Tests for serializers for the Learner Dashboard"""
 
+import datetime
+from random import getrandbits, randint
+from time import time
 from unittest import TestCase
 from unittest import mock
 from uuid import uuid4
 
 from lms.djangoapps.learner_dashboard.serializers import (
     CourseProviderSerializer,
+    CourseRunSerializer,
     CourseSerializer,
     PlatformSettingsSerializer,
     LearnerDashboardSerializer,
 )
+
+
+def random_date():
+    d = randint(1, int(time()))
+    return datetime.datetime.fromtimestamp(d)
 
 
 class TestPlatformSettingsSerializer(TestCase):
@@ -63,6 +72,46 @@ class TestCourseSerializer(TestCase):
         assert output_data == {
             "bannerImgSrc": input_data["bannerImgSrc"],
             "courseName": input_data["courseName"],
+        }
+
+
+class TestCourseRunSerializer(TestCase):
+    """Tests for the CourseRunSerializer"""
+
+    def test_happy_path(self):
+        input_data = {
+            "isPending": bool(getrandbits(1)),
+            "isStarted": bool(getrandbits(1)),
+            "isFinished": bool(getrandbits(1)),
+            "isArchived": bool(getrandbits(1)),
+            "courseNumber": f"{uuid4()}-101",
+            "accessExpirationDate": random_date(),
+            "minPassingGrade": randint(0, 10000) / 100,
+            "endDate": random_date(),
+            "homeUrl": f"{uuid4()}.example.com",
+            "marketingUrl": f"{uuid4()}.example.com",
+            "progressUrl": f"{uuid4()}.example.com",
+            "unenrollUrl": f"{uuid4()}.example.com",
+            "upgradeUrl": f"{uuid4()}.example.com",
+        }
+        output_data = CourseRunSerializer(input_data).data
+
+        assert output_data == {
+            "isPending": input_data["isPending"],
+            "isStarted": input_data["isStarted"],
+            "isFinished": input_data["isFinished"],
+            "isArchived": input_data["isArchived"],
+            "courseNumber": input_data["courseNumber"],
+            "accessExpirationDate": input_data["accessExpirationDate"].strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            "minPassingGrade": str(input_data["minPassingGrade"]),
+            "endDate": input_data["endDate"].strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "homeUrl": input_data["homeUrl"],
+            "marketingUrl": input_data["marketingUrl"],
+            "progressUrl": input_data["progressUrl"],
+            "unenrollUrl": input_data["unenrollUrl"],
+            "upgradeUrl": input_data["upgradeUrl"],
         }
 
 
