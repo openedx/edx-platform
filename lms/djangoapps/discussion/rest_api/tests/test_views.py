@@ -1565,7 +1565,7 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "num_pages": 1,
         }
         self.register_user_active_threads(self.user.id, expected_cs_comments_response)
-        self.url += f"?user_id={self.user.id}"
+        self.url += f"?username={self.user.username}"
         response = self.client.get(self.url)
         assert response.status_code == 200
         response_data = json.loads(response.content.decode('utf-8'))
@@ -1582,12 +1582,12 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "num_pages": 1,
         }
 
-    def test_no_user_id_given(self):
+    def test_no_username_given(self):
         """
-        Tests that 400 response is returned when no user_id is passed
+        Tests that 404 response is returned when no username is passed
         """
         response = self.client.get(self.url)
-        assert response.status_code == 400
+        assert response.status_code == 404
 
     def test_not_authenticated(self):
         """
