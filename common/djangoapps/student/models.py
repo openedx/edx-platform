@@ -438,6 +438,14 @@ def get_potentially_retired_user_by_username_and_hash(username, hashed_username)
     return User.objects.get(username__in=locally_hashed_usernames)
 
 
+def is_personalized_recommendation_for_user():
+    """
+    Returns the personalized recommendation value from the cookie.
+    """
+    request = crum.get_current_request()
+    return request.COOKIES.get(settings.PERSONALIZED_RECOMMENDATION_COOKIE_NAME, False) if request else False
+
+
 class UserStanding(models.Model):
     """
     This table contains a student's account's status.
@@ -1557,6 +1565,7 @@ class CourseEnrollment(models.Model):
                                                                                                        self.course_id)
                 segment_properties['course_start'] = self.course.start
                 segment_properties['course_pacing'] = self.course.pacing
+                segment_properties['is_personalized_recommendation'] = is_personalized_recommendation_for_user()
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
                 segment.track(self.user_id, event_name, segment_properties, traits=segment_traits)

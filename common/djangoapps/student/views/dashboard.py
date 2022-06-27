@@ -27,6 +27,7 @@ from lms.djangoapps.bulk_email.models import Optout
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.entitlements.models import CourseEntitlement
+from common.djangoapps.track import segment
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
@@ -42,6 +43,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
+from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -893,5 +895,32 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
             domain=settings.SESSION_COOKIE_DOMAIN,
             path='/',
         )
+
+    ####### START BLOCK #######
+
+    # TODO: Move this block to new Recommendation endpoint.
+    # TODO: Add logic here to get is_control value from recommendations API and set its 'not' value as cookie value.
+
+    is_control = False
+
+    # Emits an event to track student dashboard page visits.
+    segment.track(
+        user.id,
+        'edx.bi.student-dashboard-page.viewed',
+        {
+            'is_personalized_recommendation': not is_control,
+        }
+    )
+
+    amplitude_personalized_recommendation = str(not is_control).lower()
+    is_personalized_recommendation = request.COOKIES.get(settings.PERSONALIZED_RECOMMENDATION_COOKIE_NAME, None)
+    if is_personalized_recommendation != amplitude_personalized_recommendation:
+        response.set_cookie(
+            settings.PERSONALIZED_RECOMMENDATION_COOKIE_NAME,
+            amplitude_personalized_recommendation,
+            **standard_cookie_settings(request)
+        )
+
+    ####### END BLOCK #######
 
     return response
