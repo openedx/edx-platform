@@ -192,7 +192,7 @@ urlpatterns = [
                                namespace='api_admin')),
 
     # Learner Dashboard
-    path('dashboard/', include('lms.djangoapps.learner_dashboard.urls', namespace='dashboard')),
+    path('dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
     path('api/dashboard/', include('lms.djangoapps.learner_dashboard.api.urls', namespace='dashboard_api')),
 
     path(
