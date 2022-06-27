@@ -26,6 +26,6 @@ ENABLE_COURSE_LIVE = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_course_live', 
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2022-06-23
 # .. toggle_target_removal_date: 2022-09-23
-# .. toggle_warning: When the flag is ON, the course live app will be visible in the course authoring mfe
+# .. toggle_warning: When the flag is ON, the big blue button provider will be available in course live
 # .. toggle_tickets: INF-308
 ENABLE_BIG_BLUE_BUTTON = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_big_blue_button', __name__)
