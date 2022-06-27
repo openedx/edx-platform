@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from lms.djangoapps.learner_dashboard.serializers import (
     CourseProviderSerializer,
+    CourseSerializer,
     PlatformSettingsSerializer,
     LearnerDashboardSerializer,
 )
@@ -46,6 +47,22 @@ class TestCourseProviderSerializer(TestCase):
             "name": input_data["name"],
             "website": input_data["website"],
             "email": input_data["email"],
+        }
+
+
+class TestCourseSerializer(TestCase):
+    """Tests for the CourseSerializer"""
+
+    def test_happy_path(self):
+        input_data = {
+            "bannerImgSrc": f"example.com/assets/{uuid4()}",
+            "courseName": f"{uuid4()}",
+        }
+        output_data = CourseSerializer(input_data).data
+
+        assert output_data == {
+            "bannerImgSrc": input_data["bannerImgSrc"],
+            "courseName": input_data["courseName"],
         }
 
 

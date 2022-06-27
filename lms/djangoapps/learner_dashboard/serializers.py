@@ -22,10 +22,18 @@ class CourseProviderSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
 
+class CourseSerializer(serializers.Serializer):
+    """Serializer for course header info"""
+
+    bannerImgSrc = serializers.URLField()
+    courseName = serializers.CharField()
+
+
 class EnrollmentSerializer(serializers.Serializer):
     """Serializer for an enrollment"""
 
     courseProvider = CourseProviderSerializer(allow_null=True)
+    course = CourseSerializer()
 
 
 class EntitlementSerializer(serializers.Serializer):
