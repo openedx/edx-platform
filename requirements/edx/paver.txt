@@ -28,7 +28,7 @@ pbr==5.9.0
     # via stevedore
 psutil==5.9.1
     # via -r requirements/edx/paver.in
-pymongo==3.10.1
+pymongo==3.12.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.in

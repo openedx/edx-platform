@@ -831,9 +831,8 @@ pylatexenc==2.10
     # via olxcleaner
 pylti1p3==1.11.0
     # via -r requirements/edx/base.in
-pymongo==3.10.1
+pymongo==3.12.3
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   -r requirements/edx/paver.txt
     #   edx-opaque-keys
