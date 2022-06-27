@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.test_asides import AsideTestType
 
 from openedx.core.lib.url_utils import quote_slashes
-from openedx.core.lib.xblock_utils import get_css_dependencies, get_js_dependencies
+from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
 from openedx.core.lib.xblock_utils import (
     get_aside_from_xblock,
     is_xblock_aside,

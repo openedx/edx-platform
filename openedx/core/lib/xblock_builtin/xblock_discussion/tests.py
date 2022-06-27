@@ -5,15 +5,16 @@ import itertools
 import random
 import string
 from collections import namedtuple
-from unittest import TestCase, mock
+from unittest import TestCase
+from unittest import mock
 
 import ddt
 from xblock.field_data import DictFieldData
 from xblock.fields import NO_CACHE_VALUE, UNIQUE_ID, ScopeIds
 from xblock.runtime import Runtime
 
+from openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion import DiscussionXBlock
 from openedx.core.lib.safe_lxml import etree
-from xmodule.discussion_block import DiscussionXBlock
 
 
 def attribute_pair_repr(self):
@@ -58,7 +59,7 @@ class DiscussionXBlockImportExportTests(TestCase):
     """
     Import and export tests
     """
-    DISCUSSION_XBLOCK_LOCATION = "xmodule.discussion_block.DiscussionXBlock"
+    DISCUSSION_XBLOCK_LOCATION = "openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion.DiscussionXBlock"
 
     def setUp(self):
         """
