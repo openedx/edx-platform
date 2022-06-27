@@ -14,8 +14,18 @@ class PlatformSettingsSerializer(serializers.Serializer):
     courseSearchUrl = serializers.URLField()
 
 
+class CourseProviderSerializer(serializers.Serializer):
+    """Info about a course provider (institution/business)"""
+
+    name = serializers.CharField()
+    website = serializers.URLField()
+    email = serializers.EmailField()
+
+
 class EnrollmentSerializer(serializers.Serializer):
     """Serializer for an enrollment"""
+
+    courseProvider = CourseProviderSerializer(allow_null=True)
 
 
 class EntitlementSerializer(serializers.Serializer):
@@ -31,5 +41,9 @@ class LearnerDashboardSerializer(serializers.Serializer):
 
     edx = PlatformSettingsSerializer()
     enrollments = serializers.ListField(child=EnrollmentSerializer(), allow_empty=True)
-    unfulfilledEntitlements = serializers.ListField(child=EntitlementSerializer(), allow_empty=True)
-    suggestedCourses = serializers.ListField(child=SuggestedCourseSerializer(), allow_empty=True)
+    unfulfilledEntitlements = serializers.ListField(
+        child=EntitlementSerializer(), allow_empty=True
+    )
+    suggestedCourses = serializers.ListField(
+        child=SuggestedCourseSerializer(), allow_empty=True
+    )
