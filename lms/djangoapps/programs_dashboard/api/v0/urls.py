@@ -1,5 +1,5 @@
 """
-Ptrograms Dashboard API v0 URLs.
+Programs Dashboard API v0 URLs.
 """
 
 from django.urls import re_path
