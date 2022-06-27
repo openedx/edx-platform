@@ -16,7 +16,7 @@ class TestGetPlatformSettings(TestCase):
     }
 
     @patch.multiple("django.conf.settings", **MOCK_SETTINGS)
-    @patch("lms.djangoapps.learner_dashboard.learner_apis.marketing_link")
+    @patch("lms.djangoapps.learner_dashboard.learner_api.marketing_link")
     def test_happy_path(self, mock_marketing_link):
         # Given email/search info exists
         mock_marketing_link.return_value = mock_search_url = f"/{uuid4()}"
