@@ -1139,9 +1139,8 @@ pylint-pytest==0.3.0
     # via -r requirements/edx/testing.txt
 pylti1p3==1.10.0
     # via -r requirements/edx/testing.txt
-pymongo==3.10.1
+pymongo==3.12.3
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-opaque-keys
     #   event-tracking
