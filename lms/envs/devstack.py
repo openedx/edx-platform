@@ -323,6 +323,18 @@ REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (
 
 OPENAPI_CACHE_TIMEOUT = 0
 
+
+#####################################################################
+# set replica set of contentstore to none as we haven't setup any for lms in devstack
+CONTENTSTORE['DOC_STORE_CONFIG']['replicaSet'] = None
+
+#####################################################################
+# set replica sets of moduelstore to none as we haven't setup any for lms in devstack
+for store in MODULESTORE['default']['OPTIONS']['stores']:
+    if 'DOC_STORE_CONFIG' in store and 'replicaSet' in store['DOC_STORE_CONFIG']:
+        store['DOC_STORE_CONFIG']['replicaSet'] = None
+
+
 #####################################################################
 # Lastly, run any migrations, if needed.
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)

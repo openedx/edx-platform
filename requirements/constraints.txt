@@ -49,8 +49,9 @@ matplotlib<3.4.0
 # Constraint from astroid 2.3.3
 wrapt==1.11.*
 
-# tests failing for pymongo==3.11
-pymongo<3.11
+# constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
+# Major upgrade will be done in separate ticket.
+pymongo<4.0.0
 
 # sympy latest version causing test failures.
 # may be related to python35 version drop in 1.7.0. Needs to be tested before removing.
