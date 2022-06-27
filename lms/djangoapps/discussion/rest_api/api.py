@@ -17,7 +17,9 @@ from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
+from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
 from rest_framework.request import Request
 from xmodule.course_module import CourseBlock
 from xmodule.modulestore.django import modulestore
@@ -30,6 +32,7 @@ from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
+from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.course import (
     get_course_commentable_counts,
@@ -90,7 +93,7 @@ from .serializers import (
     UserStatsSerializer,
     get_context,
 )
-from .utils import discussion_open_for_user
+from .utils import discussion_open_for_user, set_attribute
 
 User = get_user_model()
 
@@ -848,6 +851,124 @@ def get_thread_list(
     return paginator.get_paginated_response({
         "results": results,
         "text_search_rewrite": paginated_results.corrected_text,
+    })
+
+
+def get_learner_active_thread_list(request, course_key, query_params):
+    """
+    Returns a list of active threads for a particular user
+
+    Parameters:
+
+    request: The django request objects used for build_absolute_uri
+    course_key: The key of the course
+    query_params: Parameters to fetch data from comments service. It must contain
+                        user_id, course_id, page, per_page, group_id
+
+    Returns:
+
+    A paginated result containing a list of threads.
+
+    ** Sample Response
+    {
+        "results": [
+            {
+                "id": "thread_id",
+                "author": "author_username",
+                "author_label": "Staff",
+                "created_at": "2010-01-01T12:00:00Z",
+                "updated_at": "2010-01-01T12:00:00Z",
+                "raw_body": "<p></p>",
+                "rendered_body": "<p></p>",
+                "abuse_flagged": false,
+                "voted": false,
+                "vote_count": 0,
+                "editable_fields": [
+                    "abuse_flagged", "anonymous", "close_reason_code", "closed",
+                    "edit_reason_code", "following", "pinned", "raw_body", "read",
+                    "title", "topic_id", "type", "voted"
+                ],
+                "can_delete": true,
+                "anonymous": false,
+                "anonymous_to_peers": false,
+                "last_edit": {
+                    "original_body": "<p></p>",
+                    "reason_code": null,
+                    "editor_username": "author_username",
+                    "created_at": "2010-01-01T12:00:00Z"
+                },
+                "course_id": "course-v1:edX+DemoX+Demo_Course",
+                "topic_id": "i4x-edx-eiorguegnru-course-foobarbaz",
+                "group_id": null,
+                "group_name": null,
+                "type": "discussion",
+                "preview_body": "",
+                "abuse_flagged_count": null,
+                "title": "Post Title",
+                "pinned": false,
+                "closed": false,
+                "following": false,
+                "comment_count": 1,
+                "unread_comment_count": 0,
+                "comment_list_url": "http://localhost:18000/api/discussion/v1/comments/?thread_id=thread_id",
+                "endorsed_comment_list_url": null,
+                "non_endorsed_comment_list_url": null,
+                "read": true,
+                "has_endorsed": false,
+                "close_reason": null,
+                "closed_by": null,
+                "users": {
+                    "username": {
+                        "profile": {
+                            "image": {
+                                "has_image": false,
+                                "image_url_full": "http://localhost:18000/static/images/profiles/default_500.png",
+                                "image_url_large": "http://localhost:18000/static/images/profiles/default_120.png",
+                                "image_url_medium": "http://localhost:18000/static/images/profiles/default_50.png",
+                                "image_url_small": "http://localhost:18000/static/images/profiles/default_30.png"
+                            }
+                        }
+                    }
+                }
+            },
+            ...
+        ],
+        "pagination": {
+            "next": None,
+            "previous": None,
+            "count": 10,
+            "num_pages": 1
+        }
+    }
+
+    """
+
+    course = _get_course(course_key, request.user)
+    context = get_context(course, request)
+
+    group_id = query_params.get('group_id', None)
+    user_id = query_params.get('user_id', None)
+    if user_id is None:
+        return Response({'detail': 'Invalid user id'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if group_id is None:
+        comment_client_user = comment_client.User(id=user_id, course_id=course_key)
+    else:
+        comment_client_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
+
+    threads, page, num_pages = comment_client_user.active_threads(query_params)
+    threads = set_attribute(threads, "pinned", False)
+    results = _serialize_discussion_entities(
+        request, context, threads, {'profile_image'}, DiscussionEntity.thread
+    )
+    paginator = DiscussionAPIPagination(
+        request,
+        page,
+        num_pages,
+        len(threads)
+    )
+    return paginator.get_paginated_response({
+        "results": results,
     })
 
 
