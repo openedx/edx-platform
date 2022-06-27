@@ -56,7 +56,6 @@ asgiref==3.5.2
     # via
     #   -r requirements/edx/testing.txt
     #   django
-    #   uvicorn
 asn1crypto==1.5.1
     # via
     #   -r requirements/edx/testing.txt
@@ -149,7 +148,7 @@ cffi==1.15.0
     #   cryptography
     #   pynacl
     #   snowflake-connector-python
-chardet==4.0.0
+chardet==5.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   diff-cover
@@ -259,7 +258,7 @@ deprecated==1.2.13
     #   -r requirements/edx/testing.txt
     #   jwcrypto
     #   redis
-diff-cover==6.5.0
+diff-cover==6.5.1
     # via -r requirements/edx/testing.txt
 dill==0.3.5.1
     # via
@@ -369,7 +368,7 @@ django-crum==0.7.9
     #   edx-rbac
     #   edx-toggles
     #   super-csv
-django-debug-toolbar==3.4.0
+django-debug-toolbar==3.5.0
     # via -r requirements/edx/development.in
 django-environ==0.9.0
     # via
@@ -686,7 +685,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==13.13.0
+faker==13.14.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -754,7 +753,7 @@ idna==3.3
     #   yarl
 imagesize==1.3.0
     # via sphinx
-importlib-metadata==4.11.4
+importlib-metadata==4.12.0
     # via
     #   -r requirements/edx/testing.txt
     #   markdown
@@ -934,7 +933,7 @@ mypy==0.961
     # via -r requirements/edx/development.in
 mypy-extensions==0.4.3
     # via mypy
-mysqlclient==2.1.0
+mysqlclient==2.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
@@ -946,7 +945,7 @@ nltk==3.7
     # via
     #   -r requirements/edx/testing.txt
     #   chem
-nodeenv==1.6.0
+nodeenv==1.7.0
     # via -r requirements/edx/testing.txt
 numpy==1.22.4
     # via
@@ -970,7 +969,7 @@ openedx-filters==0.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-ora2==4.4.0
+ora2==4.4.1
     # via -r requirements/edx/testing.txt
 oscrypto==1.3.0
     # via
@@ -1068,7 +1067,7 @@ pycparser==2.21
     # via
     #   -r requirements/edx/testing.txt
     #   cffi
-pycryptodomex==3.14.1
+pycryptodomex==3.15.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
@@ -1133,6 +1132,7 @@ pylti1p3==1.11.0
     # via -r requirements/edx/testing.txt
 pymongo==3.12.3
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-opaque-keys
     #   event-tracking
@@ -1396,7 +1396,7 @@ sniffio==1.2.0
     #   anyio
 snowballstemmer==2.2.0
     # via sphinx
-snowflake-connector-python==2.7.8
+snowflake-connector-python==2.7.9
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -1520,7 +1520,7 @@ unicodecsv==0.14.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-unidiff==0.7.3
+unidiff==0.7.4
     # via -r requirements/edx/testing.txt
 uritemplate==4.1.1
     # via
@@ -1538,7 +1538,7 @@ urllib3==1.26.9
     #   selenium
 user-util==1.0.0
     # via -r requirements/edx/testing.txt
-uvicorn==0.17.6
+uvicorn==0.18.1
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -1548,7 +1548,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.14.1
+virtualenv==20.15.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox

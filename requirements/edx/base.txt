@@ -111,7 +111,7 @@ cffi==1.15.0
     #   cryptography
     #   pynacl
     #   snowflake-connector-python
-chardet==4.0.0
+chardet==5.0.0
     # via pysrt
 charset-normalizer==2.0.12
     # via
@@ -596,7 +596,7 @@ idna==3.3
     #   requests
     #   snowflake-connector-python
     #   yarl
-importlib-metadata==4.11.4
+importlib-metadata==4.12.0
     # via markdown
 inflection==0.5.1
     # via drf-yasg
@@ -710,7 +710,7 @@ multidict==6.0.2
     # via
     #   aiohttp
     #   yarl
-mysqlclient==2.1.0
+mysqlclient==2.1.1
     # via
     #   -r requirements/edx/base.in
     #   blockstore
@@ -722,7 +722,7 @@ nltk==3.7
     # via
     #   -r requirements/edx/base.in
     #   chem
-nodeenv==1.6.0
+nodeenv==1.7.0
     # via -r requirements/edx/base.in
 numpy==1.22.4
     # via
@@ -745,7 +745,7 @@ openedx-filters==0.7.0
     # via
     #   -r requirements/edx/base.in
     #   lti-consumer-xblock
-ora2==4.4.0
+ora2==4.4.1
     # via -r requirements/edx/base.in
 oscrypto==1.3.0
     # via snowflake-connector-python
@@ -798,7 +798,7 @@ pycountry==22.3.5
     # via -r requirements/edx/base.in
 pycparser==2.21
     # via cffi
-pycryptodomex==3.14.1
+pycryptodomex==3.15.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
@@ -831,6 +831,7 @@ pylti1p3==1.11.0
     # via -r requirements/edx/base.in
 pymongo==3.12.3
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   -r requirements/edx/paver.txt
     #   edx-opaque-keys
@@ -1010,7 +1011,7 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-snowflake-connector-python==2.7.8
+snowflake-connector-python==2.7.9
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via
