@@ -17,8 +17,6 @@ from ..config.waffle import ENABLE_COURSE_LIVE
 from ..models import CourseLiveConfiguration
 from ..providers import ProviderManager
 
-providers = ProviderManager().get_enabled_providers()
-
 
 @ddt.ddt
 class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
@@ -50,6 +48,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         creates a courseLiveConfiguration
         """
+        providers = ProviderManager().get_enabled_providers()
         if providers.get(provider).requires_pii_sharing():
             CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=True)
 
@@ -272,6 +271,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         Create and test POST request response data
         """
+        providers = ProviderManager().get_enabled_providers()
         if providers.get(provider).requires_pii_sharing():
             CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=True)
 
