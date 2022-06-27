@@ -307,6 +307,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(content, expected_data)
 
+
 @override_waffle_flag(ENABLE_BIG_BLUE_BUTTON, True)
 class TestCourseLiveProvidersView(ModuleStoreTestCase, APITestCase):
     """
