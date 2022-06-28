@@ -739,7 +739,7 @@ class SAMLProviderConfig(ProviderConfig):
         # creating configs that share entity ID's with other enterprises
         # One consequence of this is that once a provider configuration is created, the slug is essentially locked in
         # and unchangeable. But I blame that on bad old architecture.
-        existing_provider_configs = SAMLProviderConfig.objects.filter(
+        existing_provider_configs = SAMLProviderConfig.objects.current_set().filter(
             entity_id=self.entity_id,
             archived=False,
         ).exclude(slug=self.slug)

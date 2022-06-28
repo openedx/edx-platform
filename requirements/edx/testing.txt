@@ -20,8 +20,6 @@
     # via -r requirements/edx/base.txt
 -e git+https://github.com/edx/RateXBlock.git@2.0.1#egg=rate-xblock
     # via -r requirements/edx/base.txt
--e openedx/core/lib/xblock_builtin/xblock_discussion
-    # via -r requirements/edx/base.txt
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
     # via -r requirements/edx/base.txt
 acid-xblock==0.2.1
@@ -702,7 +700,7 @@ future==0.18.2
     #   -r requirements/edx/base.txt
     #   edx-celeryutils
     #   pyjwkest
-geoip2==4.5.0
+geoip2==4.6.0
     # via -r requirements/edx/base.txt
 glob2==0.7
     # via -r requirements/edx/base.txt
@@ -1068,9 +1066,8 @@ pylint-pytest==0.3.0
     # via -r requirements/edx/testing.in
 pylti1p3==1.11.0
     # via -r requirements/edx/base.txt
-pymongo==3.10.1
+pymongo==3.12.3
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-opaque-keys
     #   event-tracking
@@ -1489,7 +1486,6 @@ xblock==1.6.1
     #   ora2
     #   rate-xblock
     #   staff-graded-xblock
-    #   xblock-discussion
     #   xblock-drag-and-drop-v2
     #   xblock-google-drive
     #   xblock-poll
