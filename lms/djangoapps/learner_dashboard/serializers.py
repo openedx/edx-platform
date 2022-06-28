@@ -76,6 +76,27 @@ class CertificateSerializer(serializers.Serializer):
     honorCertDownloadUrl = serializers.URLField(allow_null=True)
 
 
+class AvailableEntitlementSessionSerializer(serializers.Serializer):
+    """An available entitlement session"""
+
+    startDate = serializers.DateTimeField()
+    endDate = serializers.DateTimeField()
+    courseNumber = serializers.CharField()
+
+
+class EntitlementSerializer(serializers.Serializer):
+    """Entitlements info"""
+
+    availableSessions = serializers.ListField(
+        child=AvailableEntitlementSessionSerializer(), allow_empty=True
+    )
+    isRefundable = serializers.BooleanField()
+    isFulfilled = serializers.BooleanField()
+    canViewCourse = serializers.BooleanField()
+    changeDeadline = serializers.DateTimeField()
+    isExpired = serializers.BooleanField()
+
+
 class LearnerEnrollmentSerializer(serializers.Serializer):
     """Info for displaying an enrollment on the learner dashboard"""
 
@@ -85,13 +106,15 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     enrollment = EnrollmentSerializer()
     gradeData = GradeDataSerializer()
     certificate = CertificateSerializer()
+    entitlements = EntitlementSerializer()
 
     # certificate,
     # entitlements,
     # programs,
 
 
-class EntitlementSerializer(serializers.Serializer):
+
+class UnfulfilledEntitlementSerializer(serializers.Serializer):
     """Serializer for an unfulfilled entitlement"""
 
 
