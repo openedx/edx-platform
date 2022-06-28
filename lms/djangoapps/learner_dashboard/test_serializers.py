@@ -17,7 +17,13 @@ from lms.djangoapps.learner_dashboard.serializers import (
 )
 
 
+def random_bool():
+    """Test util for generating a random boolean"""
+    return bool(getrandbits(1))
+
+
 def random_date():
+    """Test util for generating a random date"""
     d = randint(1, int(time()))
     return datetime.datetime.fromtimestamp(d)
 
@@ -81,10 +87,10 @@ class TestCourseRunSerializer(TestCase):
 
     def test_happy_path(self):
         input_data = {
-            "isPending": bool(getrandbits(1)),
-            "isStarted": bool(getrandbits(1)),
-            "isFinished": bool(getrandbits(1)),
-            "isArchived": bool(getrandbits(1)),
+            "isPending": random_bool(),
+            "isStarted": random_bool(),
+            "isFinished": random_bool(),
+            "isArchived": random_bool(),
             "courseNumber": f"{uuid4()}-101",
             "accessExpirationDate": random_date(),
             "minPassingGrade": randint(0, 10000) / 100,
@@ -121,11 +127,11 @@ class TestEnrollmentSerializer(TestCase):
 
     def test_happy_path(self):
         input_data = {
-            "isAudit": bool(getrandbits(1)),
-            "isVerified": bool(getrandbits(1)),
-            "canUpgrade": bool(getrandbits(1)),
-            "isAuditAccessExpired": bool(getrandbits(1)),
-            "isEmailEnabled": bool(getrandbits(1)),
+            "isAudit": random_bool(),
+            "isVerified": random_bool(),
+            "canUpgrade": random_bool(),
+            "isAuditAccessExpired": random_bool(),
+            "isEmailEnabled": random_bool(),
         }
         output_data = EnrollmentSerializer(input_data).data
 
