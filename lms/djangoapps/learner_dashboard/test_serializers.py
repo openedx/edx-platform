@@ -217,7 +217,7 @@ class TestEntitlementSerializer(TestCase):
     @classmethod
     def generate_test_session(cls):
         """Generate an test session with random dates and course run numbers"""
-        yield {
+        return {
             "startDate": random_date(),
             "endDate": random_date(),
             "courseNumber": f"{uuid4()}-101",
