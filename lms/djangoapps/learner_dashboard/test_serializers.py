@@ -1,7 +1,7 @@
 """Tests for serializers for the Learner Dashboard"""
 
 import datetime
-from random import getrandbits, randint
+from random import choice, getrandbits, randint
 from time import time
 from unittest import TestCase
 from unittest import mock
@@ -32,6 +32,17 @@ def random_date(allow_null=False):
 
     d = randint(1, int(time()))
     return datetime.datetime.fromtimestamp(d)
+
+
+def random_url(allow_null=False):
+    """Test util for generating a random URL, optionally blank"""
+
+    # If null allowed, return null half the time
+    if allow_null and random_bool():
+        return None
+
+    random_uuid = uuid4()
+    return choice([f"{random_uuid}.example.com", f"example.com/{random_uuid}"])
 
 
 class TestPlatformSettingsSerializer(TestCase):
