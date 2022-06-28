@@ -19,7 +19,7 @@ from collections import defaultdict, namedtuple  # lint-amnesty, pylint: disable
 from datetime import date, datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
 from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
-from urllib.parse import urlencode, urljoin
+from urllib.parse import unquote, urlencode, urljoin
 
 import crum
 from config_models.models import ConfigurationModel
@@ -436,6 +436,21 @@ def get_potentially_retired_user_by_username_and_hash(username, hashed_username)
 
     locally_hashed_usernames.append(username)
     return User.objects.get(username__in=locally_hashed_usernames)
+
+
+def is_personalized_recommendation_for_user(course_id):
+    """
+    Returns the personalized recommendation value from the cookie.
+    """
+    request = crum.get_current_request()
+    recommended_courses = \
+        request.COOKIES.get(settings.PERSONALIZED_RECOMMENDATION_COOKIE_NAME, None) if request else None
+
+    if recommended_courses:
+        recommended_courses = json.loads(unquote(recommended_courses))
+        if course_id in recommended_courses['course_keys']:
+            return recommended_courses['is_personalized_recommendation']
+    return None
 
 
 class UserStanding(models.Model):
@@ -1557,6 +1572,11 @@ class CourseEnrollment(models.Model):
                                                                                                        self.course_id)
                 segment_properties['course_start'] = self.course.start
                 segment_properties['course_pacing'] = self.course.pacing
+
+                is_personalized_recommendation = is_personalized_recommendation_for_user(str(self.course_id))
+                if is_personalized_recommendation is not None:
+                    segment_properties['is_personalized_recommendation'] = is_personalized_recommendation
+
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
                 segment.track(self.user_id, event_name, segment_properties, traits=segment_traits)

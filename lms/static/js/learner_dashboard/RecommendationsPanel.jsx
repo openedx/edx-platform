@@ -1,93 +1,75 @@
 /* global gettext */
 import React from 'react';
+import Cookies from 'js-cookie';
 
 class RecommendationsPanel extends React.Component {
   constructor(props) {
     super(props);
+    this.domainInfo = { domain: props.sharedCookieDomain, expires: 365, path: '/' };
+    this.cookieName = props.cookieName;
     this.onCourseSelect = this.onCourseSelect.bind(this);
+    this.getCourseList = this.getCourseList.bind(this);
+    this.state = {
+      isPersonalizedRecommendation: false,
+      coursesList: [],
+    };
   }
 
   onCourseSelect(courseKey) {
     window.analytics.track('edx.bi.user.recommended.course.click', {
       course_key: courseKey,
-      is_personalized_recommendation: false,  // TODO: Use state here with default false and update its value from API response.
+      is_personalized_recommendation: this.state.isPersonalizedRecommendation,
     });
+
+    let recommendedCourses = Cookies.get(this.cookieName);
+    if (typeof recommendedCourses === 'undefined') {
+      recommendedCourses = { course_keys: [courseKey] };
+    } else {
+      recommendedCourses = JSON.parse(recommendedCourses);
+      if (!recommendedCourses.course_keys.includes(courseKey)) {
+        recommendedCourses.course_keys.push(courseKey);
+      }
+    }
+    recommendedCourses['is_personalized_recommendation'] = this.state.isPersonalizedRecommendation;
+    Cookies.set(this.cookieName, JSON.stringify(recommendedCourses), this.domainInfo);
   };
+
+  getCourseList = async () => {
+    const coursesRecommendationData = await fetch(`${this.props.lmsRootUrl}/api/dashboard/v0/recommendation/courses/`)
+     .then(response => {
+        return response.json();
+      }
+      );
+     this.setState({ coursesList: coursesRecommendationData['courses'], isPersonalizedRecommendation: coursesRecommendationData['is_personalized_recommendation']});
+  };
+
+
+   componentDidMount() {
+     this.getCourseList();
+   };
+
 
   render() {
     return (
       <div className="p-4 panel-background">
         <div className="recommend-heading mb-4">{gettext('Recommendations for you')}</div>
-        <div className="course-card box-shadow-down-1 bg-white mb-3">
-          <div className="box-shadow-down-1 image-box">
+        { this.state.coursesList.map(course => (
+         <a href={course.marketing_url} className="course-link" onClick={() => this.onCourseSelect(course.course_key)}>
+          <div className="course-card box-shadow-down-1 bg-white mb-3">
+            <div className="box-shadow-down-1 image-box">
             <img
               className="panel-course-img"
-              src="https://source.unsplash.com/lQGJCMY5qcM"
+              src={course.logo_image_url}
               alt="course image"
             />
           </div>
           <div className="course-title pl-3">
-            <a href="#" className="course-link" onClick={() => this.onCourseSelect('add-course-key-1')}>
-                The Chemistry of Life
-            </a>
+                {course.title}
           </div>
         </div>
-        <div className="course-card box-shadow-down-1 bg-white mb-3">
-          <div className="box-shadow-down-1 image-box">
-            <img
-              className="panel-course-img"
-              src="https://source.unsplash.com/KltoLK6Mk-g"
-              alt="course image"
-            />
-          </div>
-          <div className="course-title pl-3">
-            <a href="#" className="course-link" onClick={() => this.onCourseSelect('add-course-key-2')}>
-                Drug Discovery & Medicinal Chemistry
-            </a>
-          </div>
-        </div>
-        <div className="course-card box-shadow-down-1 bg-white mb-3">
-          <div className="box-shadow-down-1 image-box">
-            <img
-              className="panel-course-img"
-              src="https://source.unsplash.com/_BJVJ4WcV1M"
-              alt="course image"
-            />
-          </div>
-          <div className="course-title pl-3">
-            <a href="#" className="course-link" onClick={() => this.onCourseSelect('add-course-key-3')}>
-                From Fossil Resources to Biomass: A Chemistry Perspective
-            </a>
-          </div>
-        </div>
-        <div className="course-card box-shadow-down-1 bg-white mb-3">
-          <div className="box-shadow-down-1 image-box">
-            <img
-              className="panel-course-img"
-              src="https://source.unsplash.com/NKhckz9B78c"
-              alt="course image"
-            />
-          </div>
-          <div className="course-title pl-3">
-            <a href="#" className="course-link" onClick={() => this.onCourseSelect('add-course-key-4')}>
-                Digital Biomaterials
-            </a>
-          </div>
-        </div>
-        <div className="course-card box-shadow-down-1 bg-white mb-3">
-          <div className="box-shadow-down-1 image-box">
-            <img
-              className="panel-course-img"
-              src="https://source.unsplash.com/x649mR6yBIs"
-              alt="course image"
-            />
-          </div>
-          <div className="course-title pl-3">
-            <a href="#" className="course-link" onClick={() => this.onCourseSelect('add-course-key-5')}>
-                Basic Steps in Magnetic Resonance
-            </a>
-          </div>
-        </div>
+        </a>
+        ))}
+
         {this.props.exploreCoursesUrl ? (
           <div className="d-flex justify-content-center">
             <a href={this.props.exploreCoursesUrl} className="panel-explore-courses justify-content-center align-items-center">

@@ -5132,3 +5132,5 @@ ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://127.0.0.1:8000/oaut
 
 # keys for  big blue button live provider
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
+
+PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
