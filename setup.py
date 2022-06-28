@@ -1,4 +1,5 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+# lint-amnesty, pylint: disable=django-not-configured
+"""
 Setup script for the Open edX package.
 """
 
