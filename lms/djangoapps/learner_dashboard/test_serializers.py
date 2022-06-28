@@ -16,6 +16,7 @@ from lms.djangoapps.learner_dashboard.serializers import (
     EntitlementSerializer,
     GradeDataSerializer,
     PlatformSettingsSerializer,
+    ProgramsSerializer,
     LearnerDashboardSerializer,
 )
 
@@ -255,6 +256,57 @@ class TestEntitlementSerializer(TestCase):
             "changeDeadline": datetime_to_django_format(input_data["changeDeadline"]),
             "isExpired": input_data["isExpired"],
         }
+
+
+class TestProgramsSerializer(TestCase):
+    """Tests for the ProgramsSerializer and RelatedProgramsSerializer"""
+
+    @classmethod
+    def generate_test_related_program(cls):
+        """Generate a program with random test data"""
+        return {
+            "provider": f"{uuid4()} Inc.",
+            "programUrl": random_url(),
+            "bannerUrl": random_url(),
+            "logoUrl": random_url(),
+            "title": f"{uuid4()}",
+            "programType": f"{uuid4()}",
+            "programTypeUrl": random_url(),
+            "numberOfCourses": randint(0, 100),
+            "estimatedNumberOfWeeks": randint(0, 45),
+        }
+
+    def test_happy_path(self):
+        input_data = {
+            "relatedPrograms": [
+                self.generate_test_related_program() for _ in range(randint(0, 3))
+            ],
+        }
+        output_data = ProgramsSerializer(input_data).data
+
+        related_programs = output_data.pop("relatedPrograms")
+
+        for i, related_program in enumerate(related_programs):
+            input_program = input_data["relatedPrograms"][i]
+            assert related_program == {
+                "provider": input_program["provider"],
+                "programUrl": input_program["programUrl"],
+                "bannerUrl": input_program["bannerUrl"],
+                "logoUrl": input_program["logoUrl"],
+                "title": input_program["title"],
+                "programType": input_program["programType"],
+                "programTypeUrl": input_program["programTypeUrl"],
+                "numberOfCourses": input_program["numberOfCourses"],
+                "estimatedNumberOfWeeks": input_program["estimatedNumberOfWeeks"],
+            }
+
+        assert output_data == {}
+
+    def test_empty_sessions(self):
+        input_data = {"relatedPrograms": []}
+        output_data = ProgramsSerializer(input_data).data
+
+        assert output_data == {"relatedPrograms": []}
 
 
 class TestLearnerDashboardSerializer(TestCase):
