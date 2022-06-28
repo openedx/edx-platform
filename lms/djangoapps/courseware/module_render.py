@@ -689,7 +689,6 @@ def get_module_system_for_user(
     store = modulestore()
 
     system = LmsModuleSystem(
-        track_function=track_function,
         get_module=inner_get_module,
         publish=publish,
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)

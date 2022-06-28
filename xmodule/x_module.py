@@ -1719,7 +1719,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
     def __init__(
         self,
-        track_function,
         get_module,
         descriptor_runtime,
         publish=None,
@@ -1727,11 +1726,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
     ):
         """
         Create a closure around the system environment.
-
-        track_function - function of (event_type, event), intended for logging
-                         or otherwise tracking the event.
-                         TODO: Not used, and has inconsistent args in different
-                         files.  Update or remove.
 
         get_module - function that takes a descriptor and returns a corresponding
                          module instance object.  If the current user does not have
@@ -1746,7 +1740,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
         super().__init__(**kwargs)
 
-        self.track_function = track_function
         self.get_module = get_module
 
         if publish:
