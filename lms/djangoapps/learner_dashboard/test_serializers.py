@@ -12,6 +12,7 @@ from lms.djangoapps.learner_dashboard.serializers import (
     CourseRunSerializer,
     CourseSerializer,
     EnrollmentSerializer,
+    GradeDataSerializer,
     PlatformSettingsSerializer,
     LearnerDashboardSerializer,
 )
@@ -141,6 +142,20 @@ class TestEnrollmentSerializer(TestCase):
             "canUpgrade": input_data["canUpgrade"],
             "isAuditAccessExpired": input_data["isAuditAccessExpired"],
             "isEmailEnabled": input_data["isEmailEnabled"],
+        }
+
+
+class TestGradeDataSerializer(TestCase):
+    """Tests for the GradeDataSerializer"""
+
+    def test_happy_path(self):
+        input_data = {
+            "isPassing": random_bool(),
+        }
+        output_data = GradeDataSerializer(input_data).data
+
+        assert output_data == {
+            "isPassing": input_data["isPassing"],
         }
 
 
