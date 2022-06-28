@@ -11,6 +11,7 @@ from lms.djangoapps.learner_dashboard.serializers import (
     CourseProviderSerializer,
     CourseRunSerializer,
     CourseSerializer,
+    EnrollmentSerializer,
     PlatformSettingsSerializer,
     LearnerDashboardSerializer,
 )
@@ -112,6 +113,28 @@ class TestCourseRunSerializer(TestCase):
             "progressUrl": input_data["progressUrl"],
             "unenrollUrl": input_data["unenrollUrl"],
             "upgradeUrl": input_data["upgradeUrl"],
+        }
+
+
+class TestEnrollmentSerializer(TestCase):
+    """Tests for the EnrollmentSerializer"""
+
+    def test_happy_path(self):
+        input_data = {
+            "isAudit": bool(getrandbits(1)),
+            "isVerified": bool(getrandbits(1)),
+            "canUpgrade": bool(getrandbits(1)),
+            "isAuditAccessExpired": bool(getrandbits(1)),
+            "isEmailEnabled": bool(getrandbits(1)),
+        }
+        output_data = EnrollmentSerializer(input_data).data
+
+        assert output_data == {
+            "isAudit": input_data["isAudit"],
+            "isVerified": input_data["isVerified"],
+            "canUpgrade": input_data["canUpgrade"],
+            "isAuditAccessExpired": input_data["isAuditAccessExpired"],
+            "isEmailEnabled": input_data["isEmailEnabled"],
         }
 
 
