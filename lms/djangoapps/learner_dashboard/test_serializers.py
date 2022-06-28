@@ -23,8 +23,13 @@ def random_bool():
     return bool(getrandbits(1))
 
 
-def random_date():
-    """Test util for generating a random date"""
+def random_date(allow_null=False):
+    """Test util for generating a random date, optionally blank"""
+
+    # If null allowed, return null half the time
+    if allow_null and random_bool():
+        return None
+
     d = randint(1, int(time()))
     return datetime.datetime.fromtimestamp(d)
 
