@@ -1,7 +1,7 @@
 /* global gettext */
 import React from 'react';
 
-const RecommendationsPanel = ({ exploreCoursesUrl, showExploreCourses }) => {
+const RecommendationsPanel = ({ exploreCoursesUrl }) => {
   return (
     <div className="p-4 panel-background">
       <div className="recommend-heading mb-4">{gettext('Recommendations for you')}</div>
@@ -65,7 +65,7 @@ const RecommendationsPanel = ({ exploreCoursesUrl, showExploreCourses }) => {
             <a href="#" className="course-link">Basic Steps in Magnetic Resonance</a>
         </div>
       </div>
-      {showExploreCourses ? (
+      {exploreCoursesUrl ? (
         <div className="d-flex justify-content-center">
           <a href={exploreCoursesUrl} className="panel-explore-courses justify-content-center align-items-center">
             {gettext('Explore courses')}
