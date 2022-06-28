@@ -53,7 +53,7 @@ class CourseTab(metaclass=ABCMeta):
     priority = None
 
     # Class property that specifies whether the tab can be moved within a course's list of tabs
-    is_movable = True
+    is_movable = False
 
     # Class property that specifies whether the tab is a collection of other tabs
     is_collection = False
@@ -301,6 +301,7 @@ class StaticTab(CourseTab):
     """
     type = 'static_tab'
     is_default = False  # A static tab is never added to a course by default
+    is_movable = True
     allow_multiple = True
     priority = 100
 
