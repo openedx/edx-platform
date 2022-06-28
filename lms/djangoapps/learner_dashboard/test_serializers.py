@@ -8,6 +8,7 @@ from unittest import mock
 from uuid import uuid4
 
 from lms.djangoapps.learner_dashboard.serializers import (
+    CertificateSerializer,
     CourseProviderSerializer,
     CourseRunSerializer,
     CourseSerializer,
@@ -172,6 +173,36 @@ class TestGradeDataSerializer(TestCase):
 
         assert output_data == {
             "isPassing": input_data["isPassing"],
+        }
+
+
+class TestCertificateSerializer(TestCase):
+    """Tests for the CertificateSerializer"""
+
+    def test_happy_path(self):
+        input_data = {
+            "availableDate": random_date(allow_null=True),
+            "isRestricted": random_bool(),
+            "isAvailable": random_bool(),
+            "isEarned": random_bool(),
+            "isDownloadable": random_bool(),
+            "certPreviewUrl": random_url(allow_null=True),
+            "certDownloadUrl": random_url(allow_null=True),
+            "honorCertDownloadUrl": random_url(allow_null=True),
+        }
+        output_data = CertificateSerializer(input_data).data
+
+        assert output_data == {
+            "availableDate": input_data["availableDate"].strftime("%Y-%m-%dT%H:%M:%SZ")
+            if input_data["availableDate"]
+            else None,
+            "isRestricted": input_data["isRestricted"],
+            "isAvailable": input_data["isAvailable"],
+            "isEarned": input_data["isEarned"],
+            "isDownloadable": input_data["isDownloadable"],
+            "certPreviewUrl": input_data["certPreviewUrl"],
+            "certDownloadUrl": input_data["certDownloadUrl"],
+            "honorCertDownloadUrl": input_data["honorCertDownloadUrl"],
         }
 
 
