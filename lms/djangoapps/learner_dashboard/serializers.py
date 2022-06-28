@@ -57,6 +57,12 @@ class EnrollmentSerializer(serializers.Serializer):
     isEmailEnabled = serializers.BooleanField()
 
 
+class GradeDataSerializer(serializers.Serializer):
+    """Info about grades for this enrollment"""
+
+    isPassing = serializers.BooleanField()
+
+
 class LearnerEnrollmentSerializer(serializers.Serializer):
     """Info for displaying an enrollment on the learner dashboard"""
 
@@ -64,6 +70,11 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     course = CourseSerializer()
     courseRun = CourseRunSerializer()
     enrollment = EnrollmentSerializer()
+    gradeData = GradeDataSerializer()
+
+    # certificate,
+    # entitlements,
+    # programs,
 
 
 class EntitlementSerializer(serializers.Serializer):
