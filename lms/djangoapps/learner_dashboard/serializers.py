@@ -97,6 +97,29 @@ class EntitlementSerializer(serializers.Serializer):
     isExpired = serializers.BooleanField()
 
 
+class RelatedProgramSerializer(serializers.Serializer):
+    """Related programs information"""
+
+    provider = serializers.CharField()
+    programUrl = serializers.URLField()
+    bannerUrl = serializers.URLField()
+    logoUrl = serializers.URLField()
+    title = serializers.CharField()
+    # Note - this should probably be a choice, eventually
+    programType = serializers.CharField()
+    programTypeUrl = serializers.URLField()
+    numberOfCourses = serializers.IntegerField()
+    estimatedNumberOfWeeks = serializers.IntegerField()
+
+
+class ProgramsSerializer(serializers.Serializer):
+    """Programs information"""
+
+    relatedPrograms = serializers.ListField(
+        child=RelatedProgramSerializer(), allow_empty=True
+    )
+
+
 class LearnerEnrollmentSerializer(serializers.Serializer):
     """Info for displaying an enrollment on the learner dashboard"""
 
@@ -107,11 +130,7 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     gradeData = GradeDataSerializer()
     certificate = CertificateSerializer()
     entitlements = EntitlementSerializer()
-
-    # certificate,
-    # entitlements,
-    # programs,
-
+    programs = ProgramsSerializer()
 
 
 class UnfulfilledEntitlementSerializer(serializers.Serializer):
