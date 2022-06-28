@@ -2,6 +2,13 @@
 import React from 'react';
 
 const RecommendationsPanel = ({ exploreCoursesUrl }) => {
+  const onCourseSelect = (courseKey) => {
+    window.analytics.track('edx.bi.user.recommended.course.click', {
+      course_key: courseKey,
+      is_personalized_recommendation: false,  // TODO: Use state here with default false and update its value from API response.
+    });
+};
+
   return (
     <div className="p-4 panel-background">
       <div className="recommend-heading mb-4">{gettext('Recommendations for you')}</div>
@@ -14,7 +21,7 @@ const RecommendationsPanel = ({ exploreCoursesUrl }) => {
           />
         </div>
         <div className="course-title pl-3">
-            <a href="#" className="course-link">The Chemistry of Life</a>
+            <a href="#" className="course-link" onClick={() => onCourseSelect('add-course-key-1')}>The Chemistry of Life</a>
         </div>
       </div>
       <div className="course-card box-shadow-down-1 bg-white mb-3">
@@ -26,7 +33,7 @@ const RecommendationsPanel = ({ exploreCoursesUrl }) => {
           />
         </div>
         <div className="course-title pl-3">
-            <a href="#" className="course-link">Drug Discovery & Medicinal Chemistry</a>
+            <a href="#" className="course-link" onClick={() => onCourseSelect('add-course-key-2')}>Drug Discovery & Medicinal Chemistry</a>
         </div>
       </div>
       <div className="course-card box-shadow-down-1 bg-white mb-3">
@@ -38,7 +45,7 @@ const RecommendationsPanel = ({ exploreCoursesUrl }) => {
           />
         </div>
         <div className="course-title pl-3">
-            <a href="#" className="course-link">From Fossil Resources to Biomass: A Chemistry Perspective</a>
+            <a href="#" className="course-link" onClick={() => onCourseSelect('add-course-key-3')}>From Fossil Resources to Biomass: A Chemistry Perspective</a>
         </div>
       </div>
       <div className="course-card box-shadow-down-1 bg-white mb-3">
@@ -50,7 +57,7 @@ const RecommendationsPanel = ({ exploreCoursesUrl }) => {
           />
         </div>
         <div className="course-title pl-3">
-            <a href="#" className="course-link">Digital Biomaterials</a>
+            <a href="#" className="course-link" onClick={() => onCourseSelect('add-course-key-4')}>Digital Biomaterials</a>
         </div>
       </div>
       <div className="course-card box-shadow-down-1 bg-white mb-3">
@@ -62,7 +69,7 @@ const RecommendationsPanel = ({ exploreCoursesUrl }) => {
           />
         </div>
         <div className="course-title pl-3">
-            <a href="#" className="course-link">Basic Steps in Magnetic Resonance</a>
+            <a href="#" className="course-link" onClick={() => onCourseSelect('add-course-key-5')}>Basic Steps in Magnetic Resonance</a>
         </div>
       </div>
       {exploreCoursesUrl ? (
