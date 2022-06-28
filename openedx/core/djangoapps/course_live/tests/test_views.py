@@ -13,14 +13,13 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..config.waffle import ENABLE_COURSE_LIVE
+from ..config.waffle import ENABLE_COURSE_LIVE, ENABLE_BIG_BLUE_BUTTON
 from ..models import CourseLiveConfiguration
 from ..providers import ProviderManager
 
-providers = ProviderManager().get_enabled_providers()
-
 
 @ddt.ddt
+@override_waffle_flag(ENABLE_BIG_BLUE_BUTTON, True)
 class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
     """
     Unit tests for the CourseLiveConfigurationView.
@@ -50,6 +49,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         creates a courseLiveConfiguration
         """
+        providers = ProviderManager().get_enabled_providers()
         if providers.get(provider).requires_pii_sharing():
             CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=True)
 
@@ -272,6 +272,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         Create and test POST request response data
         """
+        providers = ProviderManager().get_enabled_providers()
         if providers.get(provider).requires_pii_sharing():
             CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=True)
 
@@ -307,6 +308,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         self.assertEqual(content, expected_data)
 
 
+@override_waffle_flag(ENABLE_BIG_BLUE_BUTTON, True)
 class TestCourseLiveProvidersView(ModuleStoreTestCase, APITestCase):
     """
     Tests for course live provider view
@@ -328,6 +330,7 @@ class TestCourseLiveProvidersView(ModuleStoreTestCase, APITestCase):
         )
 
     def test_response_has_correct_data(self):
+        providers = ProviderManager().get_enabled_providers()
         expected_data = {
             'providers': {
                 'active': '',
