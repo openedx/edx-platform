@@ -1,7 +1,7 @@
 /* global gettext */
 import React from 'react';
 
-const RecommendationsPanel = (props) => {
+const RecommendationsPanel = ({ exploreCoursesUrl, showExploreCourses }) => {
   return (
     <div className="p-4 panel-background">
       <div className="recommend-heading mb-4">{gettext('Recommendations for you')}</div>
@@ -13,7 +13,9 @@ const RecommendationsPanel = (props) => {
             alt="course image"
           />
         </div>
-        <div className="course-title pl-3">The Chemistry of Life</div>
+        <div className="course-title pl-3">
+            <a href="#" className="course-link">The Chemistry of Life</a>
+        </div>
       </div>
       <div className="course-card box-shadow-down-1 bg-white mb-3">
         <div className="box-shadow-down-1 image-box">
@@ -23,7 +25,9 @@ const RecommendationsPanel = (props) => {
             alt="course image"
           />
         </div>
-        <div className="course-title pl-3">Drug Discovery & Medicinal Chemistry</div>
+        <div className="course-title pl-3">
+            <a href="#" className="course-link">Drug Discovery & Medicinal Chemistry</a>
+        </div>
       </div>
       <div className="course-card box-shadow-down-1 bg-white mb-3">
         <div className="box-shadow-down-1 image-box">
@@ -33,7 +37,9 @@ const RecommendationsPanel = (props) => {
             alt="course image"
           />
         </div>
-        <div className="course-title pl-3">From Fossil Resources to Biomass: A Chemistry Perspective</div>
+        <div className="course-title pl-3">
+            <a href="#" className="course-link">From Fossil Resources to Biomass: A Chemistry Perspective</a>
+        </div>
       </div>
       <div className="course-card box-shadow-down-1 bg-white mb-3">
         <div className="box-shadow-down-1 image-box">
@@ -43,7 +49,9 @@ const RecommendationsPanel = (props) => {
             alt="course image"
           />
         </div>
-        <div className="course-title pl-3">Digital Biomaterials</div>
+        <div className="course-title pl-3">
+            <a href="#" className="course-link">Digital Biomaterials</a>
+        </div>
       </div>
       <div className="course-card box-shadow-down-1 bg-white mb-3">
         <div className="box-shadow-down-1 image-box">
@@ -53,15 +61,18 @@ const RecommendationsPanel = (props) => {
             alt="course image"
           />
         </div>
-        <div className="course-title pl-3">Basic Steps in Magnetic Resonance</div>
+        <div className="course-title pl-3">
+            <a href="#" className="course-link">Basic Steps in Magnetic Resonance</a>
+        </div>
       </div>
-      <div className="d-flex justify-content-center">
-        <a href={props.exploreCoursesUrl}
-           className="panel-explore-courses justify-content-center align-items-center">
-          {gettext('Explore courses')}
-          <span className="icon fa fa-search search-icon" aria-hidden="true"/>
-        </a>
-      </div>
+      {showExploreCourses ? (
+        <div className="d-flex justify-content-center">
+          <a href={exploreCoursesUrl} className="panel-explore-courses justify-content-center align-items-center">
+            {gettext('Explore courses')}
+            <span className="icon fa fa-search search-icon" aria-hidden="true"/>
+          </a>
+        </div>
+      ) : null}
     </div>
   );
 }

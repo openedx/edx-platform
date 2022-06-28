@@ -15,7 +15,7 @@ WAFFLE_FLAG_NAMESPACE = 'student'
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2022-06-24
 # .. toggle_target_removal_date: None
-# .. toggle_warning: Also set FEATURES['COURSES_ARE_BROWSABLE'] to False at the time of enabling this waffle.
+# .. toggle_warning: None
 # .. toggle_tickets: VAN-984
 ENABLE_AMPLITUDE_RECOMMENDATIONS = WaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.enable_amplitude_recommendations', __name__)
 
