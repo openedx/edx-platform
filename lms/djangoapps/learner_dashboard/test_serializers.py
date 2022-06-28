@@ -46,6 +46,12 @@ def random_url(allow_null=False):
     return choice([f"{random_uuid}.example.com", f"example.com/{random_uuid}"])
 
 
+def datetime_to_django_format(datetime_obj):
+    """Util for matching serialized Django datetime format for comparison"""
+    if datetime_obj:
+        return datetime_obj.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
 class TestPlatformSettingsSerializer(TestCase):
     """Tests for the PlatformSettingsSerializer"""
 
@@ -127,11 +133,11 @@ class TestCourseRunSerializer(TestCase):
             "isFinished": input_data["isFinished"],
             "isArchived": input_data["isArchived"],
             "courseNumber": input_data["courseNumber"],
-            "accessExpirationDate": input_data["accessExpirationDate"].strftime(
-                "%Y-%m-%dT%H:%M:%SZ"
+            "accessExpirationDate": datetime_to_django_format(
+                input_data["accessExpirationDate"]
             ),
             "minPassingGrade": str(input_data["minPassingGrade"]),
-            "endDate": input_data["endDate"].strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "endDate": datetime_to_django_format(input_data["endDate"]),
             "homeUrl": input_data["homeUrl"],
             "marketingUrl": input_data["marketingUrl"],
             "progressUrl": input_data["progressUrl"],
@@ -193,9 +199,7 @@ class TestCertificateSerializer(TestCase):
         output_data = CertificateSerializer(input_data).data
 
         assert output_data == {
-            "availableDate": input_data["availableDate"].strftime("%Y-%m-%dT%H:%M:%SZ")
-            if input_data["availableDate"]
-            else None,
+            "availableDate": datetime_to_django_format(input_data["availableDate"]),
             "isRestricted": input_data["isRestricted"],
             "isAvailable": input_data["isAvailable"],
             "isEarned": input_data["isEarned"],
