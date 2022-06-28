@@ -48,7 +48,8 @@ class CourseRunSerializer(serializers.Serializer):
 
 
 class EnrollmentSerializer(serializers.Serializer):
-    """Serializer for an enrollment"""
+class LearnerEnrollmentSerializer(serializers.Serializer):
+    """Info for displaying an enrollment on the learner dashboard"""
 
     courseProvider = CourseProviderSerializer(allow_null=True)
     course = CourseSerializer()
@@ -67,7 +68,9 @@ class LearnerDashboardSerializer(serializers.Serializer):
     """Serializer for all info required to render the Learner Dashboard"""
 
     edx = PlatformSettingsSerializer()
-    enrollments = serializers.ListField(child=EnrollmentSerializer(), allow_empty=True)
+    enrollments = serializers.ListField(
+        child=LearnerEnrollmentSerializer(), allow_empty=True
+    )
     unfulfilledEntitlements = serializers.ListField(
         child=EntitlementSerializer(), allow_empty=True
     )
