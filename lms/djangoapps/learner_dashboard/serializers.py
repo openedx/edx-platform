@@ -48,12 +48,22 @@ class CourseRunSerializer(serializers.Serializer):
 
 
 class EnrollmentSerializer(serializers.Serializer):
+    """Info about this particular enrollment"""
+
+    isAudit = serializers.BooleanField()
+    isVerified = serializers.BooleanField()
+    canUpgrade = serializers.BooleanField()
+    isAuditAccessExpired = serializers.BooleanField()
+    isEmailEnabled = serializers.BooleanField()
+
+
 class LearnerEnrollmentSerializer(serializers.Serializer):
     """Info for displaying an enrollment on the learner dashboard"""
 
     courseProvider = CourseProviderSerializer(allow_null=True)
     course = CourseSerializer()
     courseRun = CourseRunSerializer()
+    enrollment = EnrollmentSerializer()
 
 
 class EntitlementSerializer(serializers.Serializer):
