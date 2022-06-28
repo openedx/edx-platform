@@ -64,7 +64,7 @@ beautifulsoup4==4.11.1
     # via pynliner
 billiard==3.6.4.0
     # via celery
-bleach[css]==5.0.0
+bleach[css]==5.0.1
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
@@ -111,7 +111,7 @@ cffi==1.15.0
     #   cryptography
     #   pynacl
     #   snowflake-connector-python
-chardet==4.0.0
+chardet==5.0.0
     # via pysrt
 charset-normalizer==2.0.12
     # via
@@ -520,7 +520,7 @@ edx-search==3.4.0
     # via -r requirements/edx/base.in
 edx-sga==0.18.0
     # via -r requirements/edx/base.in
-edx-submissions==3.5.1
+edx-submissions==3.5.2
     # via
     #   -r requirements/edx/base.in
     #   ora2
@@ -556,7 +556,7 @@ event-tracking==2.1.0
     #   -r requirements/edx/base.in
     #   edx-proctoring
     #   edx-search
-fastavro==1.5.1
+fastavro==1.5.2
     # via openedx-events
 frozenlist==1.3.0
     # via
@@ -596,7 +596,7 @@ idna==3.3
     #   requests
     #   snowflake-connector-python
     #   yarl
-importlib-metadata==4.11.4
+importlib-metadata==4.12.0
     # via markdown
 inflection==0.5.1
     # via drf-yasg
@@ -651,7 +651,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==4.1.1
+lti-consumer-xblock==4.2.1
     # via -r requirements/edx/base.in
 lxml==4.9.0
     # via
@@ -710,7 +710,7 @@ multidict==6.0.2
     # via
     #   aiohttp
     #   yarl
-mysqlclient==2.1.0
+mysqlclient==2.1.1
     # via
     #   -r requirements/edx/base.in
     #   blockstore
@@ -722,7 +722,7 @@ nltk==3.7
     # via
     #   -r requirements/edx/base.in
     #   chem
-nodeenv==1.6.0
+nodeenv==1.7.0
     # via -r requirements/edx/base.in
 numpy==1.22.4
     # via
@@ -745,7 +745,7 @@ openedx-filters==0.7.0
     # via
     #   -r requirements/edx/base.in
     #   lti-consumer-xblock
-ora2==4.4.0
+ora2==4.4.2
     # via -r requirements/edx/base.in
 oscrypto==1.3.0
     # via snowflake-connector-python
@@ -782,7 +782,7 @@ pillow==9.1.1
     #   edx-organizations
 polib==1.1.1
     # via edx-i18n-tools
-prompt-toolkit==3.0.29
+prompt-toolkit==3.0.30
     # via click-repl
 psutil==5.9.1
     # via
@@ -798,7 +798,7 @@ pycountry==22.3.5
     # via -r requirements/edx/base.in
 pycparser==2.21
     # via cffi
-pycryptodomex==3.14.1
+pycryptodomex==3.15.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
@@ -831,6 +831,7 @@ pylti1p3==1.11.0
     # via -r requirements/edx/base.in
 pymongo==3.12.3
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   -r requirements/edx/paver.txt
     #   edx-opaque-keys
@@ -917,7 +918,7 @@ random2==1.0.1
     # via -r requirements/edx/base.in
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
-redis==4.3.3
+redis==4.3.4
     # via -r requirements/edx/base.in
 regex==2022.6.2
     # via nltk
@@ -1010,7 +1011,7 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-snowflake-connector-python==2.7.8
+snowflake-connector-python==2.7.9
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via
