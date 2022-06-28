@@ -73,7 +73,7 @@ class CertificateSerializer(serializers.Serializer):
     isDownloadable = serializers.BooleanField()
     certPreviewUrl = serializers.URLField(allow_null=True)
     certDownloadUrl = serializers.URLField(allow_null=True)
-    honerCertDownloadUrl = serializers.URLField(allow_null=True)
+    honorCertDownloadUrl = serializers.URLField(allow_null=True)
 
 
 class LearnerEnrollmentSerializer(serializers.Serializer):
