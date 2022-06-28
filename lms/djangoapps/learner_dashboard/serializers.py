@@ -63,6 +63,19 @@ class GradeDataSerializer(serializers.Serializer):
     isPassing = serializers.BooleanField()
 
 
+class CertificateSerializer(serializers.Serializer):
+    """Certificate availability info"""
+
+    availableDate = serializers.DateTimeField(allow_null=True)
+    isRestricted = serializers.BooleanField()
+    isAvailable = serializers.BooleanField()
+    isEarned = serializers.BooleanField()
+    isDownloadable = serializers.BooleanField()
+    certPreviewUrl = serializers.URLField(allow_null=True)
+    certDownloadUrl = serializers.URLField(allow_null=True)
+    honerCertDownloadUrl = serializers.URLField(allow_null=True)
+
+
 class LearnerEnrollmentSerializer(serializers.Serializer):
     """Info for displaying an enrollment on the learner dashboard"""
 
@@ -71,6 +84,7 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     courseRun = CourseRunSerializer()
     enrollment = EnrollmentSerializer()
     gradeData = GradeDataSerializer()
+    certificate = CertificateSerializer()
 
     # certificate,
     # entitlements,
