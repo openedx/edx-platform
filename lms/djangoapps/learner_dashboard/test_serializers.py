@@ -1,7 +1,7 @@
 """Tests for serializers for the Learner Dashboard"""
 
 import datetime
-from random import choice, getrandbits, randint
+from random import choice, getrandbits, randint, random
 from time import time
 from unittest import TestCase
 from unittest import mock
@@ -13,6 +13,7 @@ from lms.djangoapps.learner_dashboard.serializers import (
     CourseRunSerializer,
     CourseSerializer,
     EnrollmentSerializer,
+    EntitlementSerializer,
     GradeDataSerializer,
     PlatformSettingsSerializer,
     LearnerDashboardSerializer,
@@ -207,6 +208,52 @@ class TestCertificateSerializer(TestCase):
             "certPreviewUrl": input_data["certPreviewUrl"],
             "certDownloadUrl": input_data["certDownloadUrl"],
             "honorCertDownloadUrl": input_data["honorCertDownloadUrl"],
+        }
+
+
+class TestEntitlementSerializer(TestCase):
+    """Tests for the EntitlementSerializer"""
+
+    @classmethod
+    def generate_test_session(cls):
+        """Generate an test session with random dates and course run numbers"""
+        yield {
+            "startDate": random_date(),
+            "endDate": random_date(),
+            "courseNumber": f"{uuid4()}-101",
+        }
+
+    def test_happy_path(self):
+        input_data = {
+            "availableSessions": [
+                self.generate_test_session() for _ in range(randint(0, 3))
+            ],
+            "isRefundable": random_bool(),
+            "isFulfilled": random_bool(),
+            "canViewCourse": random_bool(),
+            "changeDeadline": random_date(),
+            "isExpired": random_bool(),
+        }
+        output_data = EntitlementSerializer(input_data).data
+
+        # Compare output sessions separately, since they're more complicated
+        output_sessions = output_data.pop("availableSessions")
+        for i, output_session in enumerate(output_sessions):
+            input_session = input_data["availableSessions"][i]
+            input_session["startDate"] = datetime_to_django_format(
+                input_session["startDate"]
+            )
+            input_session["endDate"] = datetime_to_django_format(
+                input_session["endDate"]
+            )
+            assert output_session == input_session
+
+        assert output_data == {
+            "isRefundable": input_data["isRefundable"],
+            "isFulfilled": input_data["isFulfilled"],
+            "canViewCourse": input_data["canViewCourse"],
+            "changeDeadline": datetime_to_django_format(input_data["changeDeadline"]),
+            "isExpired": input_data["isExpired"],
         }
 
 
