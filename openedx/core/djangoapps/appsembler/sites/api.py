@@ -30,11 +30,11 @@ from openedx.core.djangoapps.appsembler.sites.serializers import (
     RegistrationSerializer,
     AlternativeDomainSerializer,
 )
-from openedx.core.djangoapps.appsembler.sites.utils import (
-    delete_site,
+from .utils import (
     get_customer_files_storage,
     to_safe_file_name,
 )
+from .deletion_utils import delete_site
 
 log = logging.Logger(__name__)
 

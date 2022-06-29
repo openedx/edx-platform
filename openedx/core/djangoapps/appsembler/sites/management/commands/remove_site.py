@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.sites.models import Site
 from django.db import transaction
 
-from openedx.core.djangoapps.appsembler.sites.utils import delete_site
+from ...deletion_utils import delete_site
 
 
 class Command(BaseCommand):

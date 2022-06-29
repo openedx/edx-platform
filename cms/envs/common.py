@@ -1461,6 +1461,9 @@ INSTALLED_APPS = [
     # CMS specific user task handling
     'cms_user_tasks.apps.CmsUserTasksConfig',
 
+    # Appsembler customization app for CMS
+    'appsembler.apps.CMSAppsemblerConfig',
+
     # Unusual migrations
     'database_fixups',
 

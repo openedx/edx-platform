@@ -4,7 +4,7 @@ import pytest
 import tahoe_sites.api
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.core.management import call_command
+from django.core.management import call_command, CommandError
 from oauth2_provider.models import Application
 from organizations.models import OrganizationCourse
 from status.models import CourseMessage
@@ -17,21 +17,21 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
-User = get_user_model()
-
-
-from openedx.core.djangoapps.appsembler.sites.utils import (
+from openedx.core.djangoapps.appsembler.sites.deletion_utils import (
+    delete_organization_courses,
     delete_site,
     get_models_using_course_key,
-    delete_organization_courses,
+    remove_stray_courses_from_mysql,
 )
+
+User = get_user_model()
 
 
 def delete_site_with_patched_cms_imports(red_site):
     """
     Delete a site without running the CMS-related code.
     """
-    with patch('openedx.core.djangoapps.appsembler.sites.utils.remove_course_creator_role'):
+    with patch('openedx.core.djangoapps.appsembler.sites.deletion_utils.remove_course_creator_role'):
         delete_site(red_site)
 
 
@@ -137,3 +137,23 @@ def test_delete_course_related_models(make_site):
         # Should delete the course-related models
         with pytest.raises(model_class.DoesNotExist):
             model_class.objects.get()
+
+
+@pytest.mark.django_db
+def test_mysql_remove_stray_courses(capsys):
+    """
+    Tests for the remove_stray_courses_from_mysql with and without courses.
+    """
+    with pytest.raises(CommandError, match='No courses to delete.'):
+        remove_stray_courses_from_mysql(limit=0, commit=False)
+
+    course_key = CourseOverviewFactory.create().id
+    assert course_key in CourseOverview.get_all_course_keys(), 'Stray course has been created'
+
+    remove_stray_courses_from_mysql(limit=0, commit=False)
+    assert course_key in CourseOverview.get_all_course_keys(), 'Commit=False do not delete the course'
+    assert str(course_key) in capsys.readouterr()[0]
+
+    remove_stray_courses_from_mysql(limit=0, commit=True)
+    assert course_key not in CourseOverview.get_all_course_keys(), 'Stray course is removed'
+    assert str(course_key) in capsys.readouterr()[0]
