@@ -16,12 +16,16 @@ var codemirror,  // CodeMirror instance
 	chr = 0,     // Unused utf-8 character, placeholder for cursor
 	isMac = /macintosh|mac os/i.test(navigator.userAgent),
 	CMsettings,  // CodeMirror settings
-    messageHandler,
-    parentOrigin,
-    postToParent;
+	messageHandler,
+	codemirrorPath,
+	parentOrigin,
+	postToParent;
 
 // EDX: Add message handler for listening to events from TinyMCE
 messageHandler = function(event) {
+    if (event.origin != parentOrigin) {
+        return;
+    }
     var cleanup = function () {
         window.removeEventListener("message", messageHandler);
         postToParent({type: "closeWindow"});
@@ -55,24 +59,22 @@ function inArray(key, arr)
 {// Initialise (before load)
 	"use strict";
 
-    var i;
-    var getParamByName = function (name) {
-        var match = new RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
-        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-    };
+	var i;
+	var getParamByName = function (name) {
+		var match = new RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+		return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+	};
 
+	// Getting this as a query parameter is very ugly, but the JS and CSS needs
+	// to be added to the head as the page is being rendered. Therefore it isn't possible
+	// to use postMessage APIs to get the setting value. And we can't hardcode the value in here
+	// because we need the baseURL, which is only added to server-side templated files.
+	codemirrorPath = getParamByName("CodeMirrorPath");
+	parentOrigin = getParamByName("ParentOrigin");
 
-    // Getting this as a query parameter is very ugly, but the JS and CSS needs
-    // to be added to the head as the page is being rendered. Therefore it isn't possible
-    // to use postMessage APIs to get the setting value. And we can't hardcode the value in here
-    // because we need the baseURL, which is only added to server-side templated files.
-    var codemirrorPath = getParamByName("CodeMirrorPath"),
-        parentOrigin = getParamByName("ParentOrigin");
-
-    CMsettings = {
-	    path: codemirrorPath,
-        indentOnInit: false,
-        disableFilesMerge: false,
+	CMsettings = {
+		path: codemirrorPath,
+		indentOnInit: false,
 		config: {// Default config
 			mode: 'htmlmixed',
 			theme: 'default',
@@ -82,11 +84,11 @@ function inArray(key, arr)
 			tabSize: 2,
 			indentWithTabs: true,
 			matchBrackets: true,
-            saveCursorPosition: true,
+			saveCursorPosition: true,
 			styleActiveLine: true
 		},
-        // EDX: File paths are updated based on the directory structure of the JS
-        // files from common/static/js/vendor/CodeMirror/
+		// EDX: File paths are updated based on the directory structure of the JS
+		// files from common/static/js/vendor/CodeMirror/
 		jsFiles: [// Default JS files
 			// 'CodeMirror/codemirror.js',
 			// 'CodeMirror/addons/match-highlighter.js',
@@ -99,9 +101,9 @@ function inArray(key, arr)
 			// 'CodeMirror/addons/search.js',
 			// 'CodeMirror/addons/edx_markdown.js'
 
-            // EDX: Use the codemirror-compressed.js and load everything in a single
-            // request instead of using multiple requests for multiple files
-            'codemirror-compressed.js'
+			// EDX: Use the codemirror-compressed.js and load everything in a single
+			// request instead of using multiple requests for multiple files
+			'codemirror-compressed.js'
 		],
 		cssFiles: [// Default CSS files
 			'CodeMirror/codemirror.css',
@@ -132,13 +134,13 @@ function inArray(key, arr)
     }
 
 	// window.onload = postToParent({type: "init"});
-    // Window Onload seems to fire as soon as the source.html is loaded and doesn't wait for
-    // the injected JS Files are loaded and until the CodeMirror object becomes available.
-    document.addEventListener('readystatechange', function() {
-        if (document.readyState == "complete") {
-            postToParent({type: "init"});
-        }
-    });
+	// Window Onload seems to fire as soon as the source.html is loaded and doesn't wait for
+	// the injected JS Files are loaded and until the CodeMirror object becomes available.
+	document.addEventListener('readystatechange', function() {
+		if (document.readyState == "complete") {
+			postToParent({type: "init"});
+		}
+	});
 }());
 
 function start(html)
@@ -236,7 +238,7 @@ function submit()
 	doc.replaceSelection(cc);
 
 	var pos = codemirror.getCursor(),
-        curLineHTML = doc.getLine(pos.line);
+		curLineHTML = doc.getLine(pos.line);
 
 	if (findDepth(curLineHTML, cc) !== 0) {
 		// Cursor is inside a <tag>, don't set cursor:
