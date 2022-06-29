@@ -57,13 +57,18 @@ def datetime_to_django_format(datetime_obj):
 class TestPlatformSettingsSerializer(TestCase):
     """Tests for the PlatformSettingsSerializer"""
 
-    def test_happy_path(self):
-        input_data = {
+    @classmethod
+    def generate_test_platform_settings(cls):
+        """Util to generate test platform settings data"""
+        return {
             "feedbackEmail": f"{uuid4()}@example.com",
             "supportEmail": f"{uuid4()}@example.com",
             "billingEmail": f"{uuid4()}@example.com",
             "courseSearchUrl": f"{uuid4()}.example.com/search",
         }
+
+    def test_happy_path(self):
+        input_data = self.generate_test_platform_settings()
         output_data = PlatformSettingsSerializer(input_data).data
 
         assert output_data == {
@@ -77,12 +82,17 @@ class TestPlatformSettingsSerializer(TestCase):
 class TestCourseProviderSerializer(TestCase):
     """Tests for the CourseProviderSerializer"""
 
-    def test_happy_path(self):
-        input_data = {
+    @classmethod
+    def generate_test_provider_info(cls):
+        """Util to generate test provider info"""
+        return {
             "name": f"{uuid4()}",
             "website": f"{uuid4()}.example.com",
             "email": f"{uuid4()}@example.com",
         }
+
+    def test_happy_path(self):
+        input_data = self.generate_test_provider_info()
         output_data = CourseProviderSerializer(input_data).data
 
         assert output_data == {
@@ -95,11 +105,16 @@ class TestCourseProviderSerializer(TestCase):
 class TestCourseSerializer(TestCase):
     """Tests for the CourseSerializer"""
 
-    def test_happy_path(self):
-        input_data = {
+    @classmethod
+    def generate_test_course_info(cls):
+        """Util to generate test course info"""
+        return {
             "bannerImgSrc": f"example.com/assets/{uuid4()}",
             "courseName": f"{uuid4()}",
         }
+
+    def test_happy_path(self):
+        input_data = self.generate_test_course_info()
         output_data = CourseSerializer(input_data).data
 
         assert output_data == {
@@ -111,8 +126,10 @@ class TestCourseSerializer(TestCase):
 class TestCourseRunSerializer(TestCase):
     """Tests for the CourseRunSerializer"""
 
-    def test_happy_path(self):
-        input_data = {
+    @classmethod
+    def generate_test_course_run_info(cls):
+        """Util to generate test course run info"""
+        return {
             "isPending": random_bool(),
             "isStarted": random_bool(),
             "isFinished": random_bool(),
@@ -127,6 +144,9 @@ class TestCourseRunSerializer(TestCase):
             "unenrollUrl": f"{uuid4()}.example.com",
             "upgradeUrl": f"{uuid4()}.example.com",
         }
+
+    def test_happy_path(self):
+        input_data = self.generate_test_course_run_info()
         output_data = CourseRunSerializer(input_data).data
 
         assert output_data == {
@@ -151,14 +171,19 @@ class TestCourseRunSerializer(TestCase):
 class TestEnrollmentSerializer(TestCase):
     """Tests for the EnrollmentSerializer"""
 
-    def test_happy_path(self):
-        input_data = {
+    @classmethod
+    def generate_test_enrollment_info(cls):
+        """Util to generate test enrollment info"""
+        return {
             "isAudit": random_bool(),
             "isVerified": random_bool(),
             "canUpgrade": random_bool(),
             "isAuditAccessExpired": random_bool(),
             "isEmailEnabled": random_bool(),
         }
+
+    def test_happy_path(self):
+        input_data = self.generate_test_enrollment_info()
         output_data = EnrollmentSerializer(input_data).data
 
         assert output_data == {
@@ -173,10 +198,15 @@ class TestEnrollmentSerializer(TestCase):
 class TestGradeDataSerializer(TestCase):
     """Tests for the GradeDataSerializer"""
 
-    def test_happy_path(self):
-        input_data = {
+    @classmethod
+    def generate_test_grade_data(cls):
+        """Util to generate test grade data"""
+        return {
             "isPassing": random_bool(),
         }
+
+    def test_happy_path(self):
+        input_data = self.generate_test_grade_data()
         output_data = GradeDataSerializer(input_data).data
 
         assert output_data == {
@@ -187,8 +217,10 @@ class TestGradeDataSerializer(TestCase):
 class TestCertificateSerializer(TestCase):
     """Tests for the CertificateSerializer"""
 
-    def test_happy_path(self):
-        input_data = {
+    @classmethod
+    def generate_test_certificate_info(cls):
+        """Util to generate test certificate info"""
+        return {
             "availableDate": random_date(allow_null=True),
             "isRestricted": random_bool(),
             "isAvailable": random_bool(),
@@ -198,6 +230,9 @@ class TestCertificateSerializer(TestCase):
             "certDownloadUrl": random_url(allow_null=True),
             "honorCertDownloadUrl": random_url(allow_null=True),
         }
+
+    def test_happy_path(self):
+        input_data = self.generate_test_certificate_info()
         output_data = CertificateSerializer(input_data).data
 
         assert output_data == {
@@ -224,10 +259,12 @@ class TestEntitlementSerializer(TestCase):
             "courseNumber": f"{uuid4()}-101",
         }
 
-    def test_happy_path(self):
-        input_data = {
+    @classmethod
+    def generate_test_entitlement_info(cls):
+        """Util to generate test entitlement info"""
+        return {
             "availableSessions": [
-                self.generate_test_session() for _ in range(randint(0, 3))
+                cls.generate_test_session() for _ in range(randint(0, 3))
             ],
             "isRefundable": random_bool(),
             "isFulfilled": random_bool(),
@@ -235,6 +272,9 @@ class TestEntitlementSerializer(TestCase):
             "changeDeadline": random_date(),
             "isExpired": random_bool(),
         }
+
+    def test_happy_path(self):
+        input_data = self.generate_test_entitlement_info()
         output_data = EntitlementSerializer(input_data).data
 
         # Compare output sessions separately, since they're more complicated
@@ -276,12 +316,17 @@ class TestProgramsSerializer(TestCase):
             "estimatedNumberOfWeeks": randint(0, 45),
         }
 
-    def test_happy_path(self):
-        input_data = {
+    @classmethod
+    def generate_test_programs_info(cls):
+        """Util to generate test programs info"""
+        return {
             "relatedPrograms": [
-                self.generate_test_related_program() for _ in range(randint(0, 3))
+                cls.generate_test_related_program() for _ in range(randint(0, 3))
             ],
         }
+
+    def test_happy_path(self):
+        input_data = self.generate_test_programs_info()
         output_data = ProgramsSerializer(input_data).data
 
         related_programs = output_data.pop("relatedPrograms")
