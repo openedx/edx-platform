@@ -437,16 +437,24 @@ class TestLearnerDashboardSerializer(TestCase):
         )
 
     @mock.patch(
+        "lms.djangoapps.learner_dashboard.serializers.LearnerEnrollmentSerializer.to_representation"
+    )
+    @mock.patch(
         "lms.djangoapps.learner_dashboard.serializers.PlatformSettingsSerializer.to_representation"
     )
-    def test_linkage(self, mock_platform_settings_serializer):
+    def test_linkage(
+        self, mock_platform_settings_serializer, mock_learner_enrollment_serializer
+    ):
         mock_platform_settings_serializer.return_value = (
             mock_platform_settings_serializer
+        )
+        mock_learner_enrollment_serializer.return_value = (
+            mock_learner_enrollment_serializer
         )
 
         input_data = {
             "edx": {},
-            "enrollments": [],
+            "enrollments": [{}],
             "unfulfilledEntitlements": [],
             "suggestedCourses": [],
         }
@@ -456,7 +464,7 @@ class TestLearnerDashboardSerializer(TestCase):
             output_data,
             {
                 "edx": mock_platform_settings_serializer,
-                "enrollments": [],
+                "enrollments": [mock_learner_enrollment_serializer],
                 "unfulfilledEntitlements": [],
                 "suggestedCourses": [],
             },
