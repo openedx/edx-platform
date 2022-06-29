@@ -639,7 +639,7 @@ edx-sga==0.18.0
     # via -r requirements/edx/testing.txt
 edx-sphinx-theme==3.0.0
     # via -r requirements/edx/development.in
-edx-submissions==3.5.1
+edx-submissions==3.5.2
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
@@ -970,7 +970,7 @@ openedx-filters==0.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-ora2==4.4.0
+ora2==4.4.2
     # via -r requirements/edx/testing.txt
 oscrypto==1.3.0
     # via
