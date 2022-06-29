@@ -346,7 +346,7 @@ class TestProgramsSerializer(TestCase):
                 "estimatedNumberOfWeeks": input_program["estimatedNumberOfWeeks"],
             }
 
-        assert output_data == {}
+        self.assertDictEqual(output_data, {})
 
     def test_empty_sessions(self):
         input_data = {"relatedPrograms": []}
