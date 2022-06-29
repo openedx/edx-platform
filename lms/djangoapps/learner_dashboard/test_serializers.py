@@ -336,38 +336,10 @@ class TestLearnerDashboardSerializer(TestCase):
             },
         )
 
-    def test_linkage(self):
-        """Test that serializers link to their appropriate outputs"""
-        input_data = {
-            "edx": {},
-            "enrollments": [],
-            "unfulfilledEntitlements": [],
-            "suggestedCourses": [],
-        }
-        serializer = LearnerDashboardSerializer(input_data)
-        with mock.patch(
-            "lms.djangoapps.learner_dashboard.serializers.PlatformSettingsSerializer.to_representation"
-        ) as mock_platform_settings_serializer:
-            mock_platform_settings_serializer.return_value = (
-                mock_platform_settings_serializer
-            )
-            output_data = serializer.data
-
-        self.assertDictEqual(
-            output_data,
-            {
-                "edx": mock_platform_settings_serializer,
-                "enrollments": [],
-                "unfulfilledEntitlements": [],
-                "suggestedCourses": [],
-            },
-        )
-
     @mock.patch(
         "lms.djangoapps.learner_dashboard.serializers.PlatformSettingsSerializer.to_representation"
     )
-    def test_linkage2(self, mock_platform_settings_serializer):
-        """Second example of paradigm using test-level patching"""
+    def test_linkage(self, mock_platform_settings_serializer):
         mock_platform_settings_serializer.return_value = (
             mock_platform_settings_serializer
         )
