@@ -36,6 +36,8 @@ from student.models import UserProfile
 from third_party_auth import pipeline
 from util.date_utils import strftime_localized
 
+from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
+
 log = logging.getLogger(__name__)
 
 
@@ -175,6 +177,12 @@ def account_settings_context(request):
             # We only want to include providers if they are either currently available to be logged
             # in with, or if the user is already authenticated with them.
         } for state in auth_states if state.provider.display_for_login or state.has_account]
+
+        if tahoe_idp_helpers.is_tahoe_idp_enabled():
+            # Allow account deletion while using `tahoe-idp` backend.
+            context['auth']['providers'] = tahoe_idp_helpers.remove_tahoe_idp_from_account_settings(
+                providers=context['auth']['providers'],
+            )
 
     return context
 

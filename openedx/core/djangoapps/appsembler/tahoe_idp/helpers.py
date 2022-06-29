@@ -16,7 +16,11 @@ import third_party_auth
 from third_party_auth.pipeline import running as pipeline_running
 
 
-from .constants import TAHOE_IDP_BACKEND_NAME
+from .constants import (
+    TAHOE_IDP_BACKEND_NAME,
+    TAHOE_IDP_PROVIDER_NAME,
+)
+
 from student.roles import OrgInstructorRole, OrgStaffRole
 
 
@@ -83,6 +87,16 @@ def store_idp_metadata_in_user_profile(user, metadata):
     meta["tahoe_idp_metadata"] = metadata
     user.profile.set_meta(meta)
     user.profile.save()
+
+
+def remove_tahoe_idp_from_account_settings(providers):
+    """
+    Remove the `tahoe-idp` entry from account settings.
+    """
+    return [
+        provider for provider in providers
+        if provider['id'] != TAHOE_IDP_PROVIDER_NAME
+    ]
 
 
 def is_studio_allowed_for_user(user, organization=None):
