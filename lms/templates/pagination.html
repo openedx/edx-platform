@@ -1,0 +1,20 @@
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<div class="sequence-nav-container">
+  <div class="sequence-nav">
+    <a href="${prev_url if prev_url else "#"}" >
+      <button class="sequence-nav-button button-previous progress-check ${"disabled" if not prev_url else ""}">
+        <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
+        <span class="sequence-nav-button-label">${_('Previous')}</span>
+      </button>
+    </a>
+    <a href="${next_url if next_url else "#"}" >
+      <button class="sequence-nav-button button-next progress-check ${"disabled" if not next_url else ""}">
+        <span class="sequence-nav-button-label">${_('Next')}</span>
+        <span class="icon fa fa-chevron-next" aria-hidden="true"></span>
+      </button>
+    </a>
+  </div>
+</div>

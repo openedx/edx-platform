@@ -289,7 +289,10 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 masquerading_as_specific_student = context.get('specific_masquerade', False)
                 banner_text, special_html = special_html_view
                 if special_html and not masquerading_as_specific_student:
-                    return Fragment(special_html)
+                    fragment = Fragment(special_html)
+                    fragment.add_content(self.system.render_template("pagination.html", context))
+                    return fragment
+
         return self._student_or_public_view(context, prereq_met, prereq_meta_info, banner_text)
 
     def public_view(self, context):
