@@ -1,45 +1,111 @@
+import uuid
 from django.db import models
+from django.core.exceptions import ValidationError
 from django_extensions.db.models import TimeStampedModel
+from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
+from simple_history.models import HistoricalRecords
 
-from six import text_type
+from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from opaque_keys.edx.django.models import CourseKeyField
-from xmodule.modulestore.django import modulestore
-from openedx.core.lib.courses import course_image_url
+from .utils import get_section_completion_percentage
+from .constants import ProgramEnrollmentStatuses
+from openedx.features.genplus_features.genplus.models import Student, Class
 
 
-class Skill(TimeStampedModel):
+class YearGroup(models.Model):
     name = models.CharField(max_length=128, unique=True)
+    program_name = models.CharField(max_length=128)
 
     def __str__(self):
         return self.name
 
 
-class YearGroup(TimeStampedModel):
-    name = models.CharField(max_length=128, unique=True)
-    year_of_programme = models.CharField(max_length=128)
-    start_date = models.DateTimeField(null=True)
-    end_date = models.DateTimeField(null=True)
+class Program(TimeStampedModel):
+    uuid = models.UUIDField(default=uuid.uuid4)
+    year_group = models.ForeignKey(
+        YearGroup,
+        on_delete=models.CASCADE,
+        related_name='programs'
+    )
+    start_date = models.DateField()
+    end_date = models.DateField()
+    is_current = models.BooleanField(default=False)
+    units = models.ManyToManyField(
+        CourseOverview,
+        related_name='programs',
+        blank=True
+    )
+    history = HistoricalRecords()
+
+    @classmethod
+    def get_current_programs(cls):
+        return cls.objects.filter(is_current=True)
 
     def __str__(self):
-        return self.name
+        return self.year_group.name
 
 
-class Unit(models.Model):
-    course_key = CourseKeyField(db_index=True, primary_key=True, max_length=255)
-    year_group = models.ForeignKey(YearGroup, null=True, on_delete=models.SET_NULL, related_name='units')
+class ClassEnrollment(models.Model):
+    class Meta:
+        unique_together = ('gen_class', 'program',)
 
-    @property
-    def display_name(self):
-        return CourseOverview.objects.get(id=self.course_key).display_name_with_default
+    gen_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="class_enrollments")
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="class_enrollments")
+    history = HistoricalRecords()
 
-    @property
-    def banner_image(self):
-        return CourseOverview.objects.get(id=self.course_key).banner_image_url
 
-    @property
-    def short_description(self):
-        return CourseOverview.objects.get(id=self.course_key).short_description
+class ProgramEnrollment(TimeStampedModel):
+    STATUS_CHOICES = ProgramEnrollmentStatuses.__MODEL_CHOICES__
 
-    def __str__(self):
-        return text_type(self.course_key)
+    class Meta:
+        unique_together = ('student', 'from_class', 'program',)
+
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="program_enrollments",
+    )
+    from_class = models.ForeignKey(
+        Class,
+        on_delete=models.CASCADE,
+        related_name="program_enrollments",
+    )
+    program = models.ForeignKey(
+        Program,
+        on_delete=models.CASCADE,
+        related_name="program_enrollments",
+    )
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES)
+    history = HistoricalRecords()
+
+
+class ProgramUnitEnrollment(TimeStampedModel):
+    class Meta:
+        unique_together = ('program_enrollment', 'course_key',)
+
+    program_enrollment = models.ForeignKey(
+        ProgramEnrollment,
+        on_delete=models.CASCADE,
+        related_name="program_unit_enrollments",
+    )
+    course_enrollment = models.ForeignKey(
+        CourseEnrollment,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+    course_key = CourseKeyField(max_length=255)
+    is_active = models.BooleanField(default=True)
+    history = HistoricalRecords()
+
+
+class Lesson(models.Model):
+    class Meta:
+        unique_together = ("course_key", "usage_key")
+
+    course_key = CourseKeyField(max_length=255)
+    usage_key = UsageKeyField(max_length=255)
+    is_locked = models.BooleanField(default=True)
+
+    def get_user_progress(self, user):
+        return get_section_completion_percentage(self.usage_key, user)

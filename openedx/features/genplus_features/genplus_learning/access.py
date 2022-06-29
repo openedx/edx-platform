@@ -1,22 +1,22 @@
-from .roles import YearGroupInstructorRole, YearGroupStaffRole
+from .roles import ProgramInstructorRole, ProgramStaffRole
 
 ROLES = {
-    'instructor': YearGroupInstructorRole,
-    'staff': YearGroupStaffRole,
+    'instructor': ProgramInstructorRole,
+    'staff': ProgramStaffRole,
 }
 
 
-def allow_access(year_group, gen_user, level, send_email=False):
-    _change_access(year_group, gen_user, level, 'allow', send_email)
+def allow_access(program, gen_user, level, send_email=False):
+    change_access(program, gen_user, level, 'allow', send_email)
 
 
-def revoke_access(year_group, gen_user, level, send_email=False):
-    _change_access(year_group, gen_user, level, 'revoke', send_email)
+def revoke_access(program, gen_user, level, send_email=False):
+    change_access(program, gen_user, level, 'revoke', send_email)
 
 
-def _change_access(year_group, gen_user, level, action, send_email):
+def change_access(program, gen_user, level, action, send_email=False):
     try:
-        role = ROLES[level](year_group)
+        role = ROLES[level](program)
     except KeyError:
         raise ValueError(f"unrecognized level '{level}'")  # lint-amnesty, pylint: disable=raise-missing-from
 

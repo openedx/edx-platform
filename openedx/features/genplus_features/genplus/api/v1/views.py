@@ -48,7 +48,7 @@ class CharacterViewSet(viewsets.ModelViewSet):
     Viewset for character APIs
     """
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
-    permission_classes = [IsAuthenticated & IsStudent]
+    permission_classes = [IsAuthenticated, IsStudent]
     serializer_class = CharacterSerializer
     queryset = Character.objects.all()
 

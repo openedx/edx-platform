@@ -1,6 +1,7 @@
 from django.contrib import admin
-from openedx.features.genplus_features.genplus.models import GenUser, School, Character, Class, Student, Teacher
-from openedx.features.genplus_features.genplus_learning.models import YearGroup, Skill
+from openedx.features.genplus_features.genplus.models import *
+from openedx.features.genplus_features.genplus_learning.models import Program
+
 
 @admin.register(GenUser)
 class GenUserAdmin(admin.ModelAdmin):
@@ -12,6 +13,11 @@ class GenUserAdmin(admin.ModelAdmin):
         'registration_group'
     )
     search_fields = ('user',)
+
+
+@admin.register(Skill)
+class SkillAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
 
 
 @admin.register(School)
@@ -30,23 +36,13 @@ class CharacterAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
-@admin.register(YearGroup)
-class YearGroupAdmin(admin.ModelAdmin):
-    search_fields = ('name', 'year_of_programme')
-
-
 @admin.register(Class)
 class ClassAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'is_visible'
+        'is_visible',
+        'current_program'
     )
-
-    search_fields = ('name',)
-
-
-@admin.register(Skill)
-class SkillAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 

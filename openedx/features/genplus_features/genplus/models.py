@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from openedx.features.genplus_features.genplus_learning.models import Skill, YearGroup
+
+from .constants import GenUserRoles
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -15,12 +16,8 @@ class School(TimeStampedModel):
         return self.name
 
 
-class Class(TimeStampedModel):
-    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='classes')
-    group_id = models.CharField(primary_key=True, max_length=128)
-    name = models.CharField(max_length=128)
-    year_group = models.ForeignKey(YearGroup, on_delete=models.SET_NULL, null=True, related_name='classes')
-    is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
+class Skill(models.Model):
+    name = models.CharField(max_length=128, unique=True)
 
     def __str__(self):
         return self.name
@@ -45,37 +42,54 @@ class Character(models.Model):
         return self.name
 
 
-class GenUser(models.Model):
-    STUDENT = 'Student'
-    FACULTY = 'Faculty'
-    AFFILIATE = 'Affiliate'
-    EMPLOYEE = 'Employee'
-    TEACHING_STAFF = 'TeachingStaff'
-    NON_TEACHING_STAFF = 'NonTeachingStaff'
+class TempUser(TimeStampedModel):
+    """
+    To store temporary unregister user data
+    """
+    username = models.CharField(max_length=128, unique=True)
+    email = models.EmailField(unique=True)
 
-    user = models.OneToOneField(USER_MODEL, on_delete=models.CASCADE)
-    role = models.CharField(blank=True, null=True, max_length=32, choices=(
-        (STUDENT, 'Student'),
-        (FACULTY, 'Faculty'),
-        (AFFILIATE, 'Affiliate'),
-        (EMPLOYEE, 'Employee'),
-        (TEACHING_STAFF, 'TeachingStaff'),
-        (NON_TEACHING_STAFF, 'NonTeachingStaff'),
-    ))
+    def __str__(self):
+        return self.username
+
+
+class GenUser(models.Model):
+    ROLE_CHOICES = GenUserRoles.__MODEL_CHOICES__
+
+    user = models.OneToOneField(USER_MODEL, on_delete=models.CASCADE, null=True)
+    role = models.CharField(blank=True, null=True, max_length=32, choices=ROLE_CHOICES)
     school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True)
     year_of_entry = models.CharField(max_length=32, null=True, blank=True)
     registration_group = models.CharField(max_length=32, null=True, blank=True)
+    temp_user = models.OneToOneField(TempUser, on_delete=models.SET_NULL, null=True, blank=True)
 
     @property
     def is_student(self):
-        return self.role == self.STUDENT
+        return self.role == GenUserRoles.STUDENT
 
     @property
     def is_teacher(self):
-        return self.role == self.TEACHING_STAFF
+        return self.role == GenUserRoles.TEACHING_STAFF
 
     def __str__(self):
         return self.user.username
+
+
+class Class(TimeStampedModel):
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='classes')
+    group_id = models.CharField(primary_key=True, max_length=128)
+    name = models.CharField(max_length=128)
+    is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
+
+    @property
+    def current_program(self):
+        enrollments = self.class_enrollments.filter(program__is_current=True)
+        if enrollments.count() == 1:
+            return enrollments.first().program
+        return None
+
+    def __str__(self):
+        return self.name
 
 
 class Teacher(models.Model):
@@ -89,17 +103,9 @@ class Teacher(models.Model):
 
 class Student(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='student')
-    character = models.ForeignKey(Character,on_delete=models.SET_NULL, null=True)
+    character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True)
     onboarded = models.BooleanField(default=False)
-    year_groups = models.ManyToManyField(YearGroup, related_name='students')
+    classes = models.ManyToManyField(Class, related_name='students')
 
     def __str__(self):
         return self.gen_user.user.username
-
-
-class TempStudent(TimeStampedModel):
-    username = models.CharField(max_length=128, unique=True)
-    email = models.EmailField(unique=True)
-
-    def __str__(self):
-        return self.username
