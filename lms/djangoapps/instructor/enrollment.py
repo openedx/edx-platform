@@ -168,12 +168,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         if previous_state.enrollment:
             course_mode = previous_state.mode
 
-        # Appsembler Specific: We call our custom method instead the default one
-        if settings.FEATURES.get('TAHOE_MULTITENANT_BULK_ENROLLMENT', False):
-            enrollment_obj = CourseEnrollment.enroll_by_email_in_organization(student_email, course_id, course_mode)
-        else:
-            enrollment_obj = CourseEnrollment.enroll_by_email(student_email, course_id, course_mode)
-
+        enrollment_obj = CourseEnrollment.enroll_by_email(student_email, course_id, course_mode)
         if email_students:
             email_params['message_type'] = 'enrolled_enroll'
             email_params['email_address'] = student_email

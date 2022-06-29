@@ -67,10 +67,7 @@ from tahoe_sites.api import (
     get_organization_user_by_username_or_email,
     is_exist_organization_user_by_email,
 )
-from openedx.core.djangoapps.theming.helpers import (
-    get_current_request,
-    get_current_site,
-)
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
@@ -1590,7 +1587,10 @@ class CourseEnrollment(models.Model):
         verified the user authentication and access.
         """
         try:
-            user = User.objects.get(email=email)
+            if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+                user = CourseEnrollment.get_user_by_email_within_organization(email)
+            else:
+                user = User.objects.get(email=email)
             return cls.enroll(user, course_id, mode)
         except User.DoesNotExist:
             err_msg = u"Tried to enroll email {} into course {}, but user not found"
@@ -1600,51 +1600,21 @@ class CourseEnrollment(models.Model):
             raise
 
     @classmethod
-    def enroll_by_email_in_organization(cls, email, course_id, mode=None, ignore_errors=True):
+    def get_user_by_email_within_organization(cls, email):
         """
-        Appsembler Specific: This method is a copy of enroll_by_email written
-        above. It does mostly the same, with the difference that looks for the
-        user by email, but inside the organization. If the user is registered
-        but in a different organization, it won't be enrolled.
-
-        Enroll a user in a course given their email and looking by the current
-        organization. This saves immediately.
-
-        Note that  enrolling by email is generally done in big batches and the
-        error rate is high. For that reason, we supress User lookup errors by
-        default.
-
-        Returns a CourseEnrollment object. If the User does not exist and
-        `ignore_errors` is set to `True`, it will return None.
+        Gets a user given their email and looking by the current organization.
 
         `email` Email address of the User to add to enroll in the course.
-
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
-
-        `mode` is a string specifying what kind of enrollment this is. The
-               default is the default course mode, 'audit'. Other options
-               include 'professional', 'verified', 'honor',
-               'no-id-professional' and 'credit'.
-               See CourseMode in common/djangoapps/course_modes/models.py.
-
-        `ignore_errors` is a boolean indicating whether we should suppress
-                        `User.DoesNotExist` errors (returning None) or let it
-                        bubble up.
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
         """
-        try:
-            site = get_current_site()
-            site_org = get_organization_by_site(site)
-            user_to_enroll = get_organization_user_by_email(email=email, organization=site_org)
-            return cls.enroll(user_to_enroll, course_id, mode)
-        except User.DoesNotExist:
-            err_msg = u"Tried to enroll email {} into course {}, but user not found"
-            log.error(err_msg.format(email, course_id))
-            if ignore_errors:
-                return None
-            raise
+        site = theming_helpers.get_current_site()
+        if not site:
+            raise User.DoesNotExist('Tahoe: Cannot get a current organization user without a site')
+        site_org = get_organization_by_site(site)
+        user_to_enroll = get_organization_user_by_email(email=email, organization=site_org)
+        return user_to_enroll
 
     @classmethod
     def unenroll(cls, user, course_id, skip_refund=False):
@@ -2364,7 +2334,7 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
         queryset = cls.objects.filter(email=user.email).filter(Q(user__isnull=True) | Q(user=user))
 
         if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
-            if not is_request_for_new_amc_site(get_current_request()):
+            if not is_request_for_new_amc_site(theming_helpers.get_current_request()):
                 try:
                     user_organization = get_organization_for_user(user)
                 except Organization.DoesNotExist:
@@ -2472,7 +2442,12 @@ def get_user_by_username_or_email(username_or_email):
     """
     username_or_email = strip_if_string(username_or_email)
     # there should be one user with either username or email equal to username_or_email
-    user = User.objects.get(Q(email=username_or_email) | Q(username=username_or_email))
+    if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+        # Tahoe: Use custom `get_user_by_username_or_email_inside_organization` helper to only get user in the
+        #        current organization.
+        user = get_user_by_username_or_email_inside_organization(username_or_email)
+    else:
+        user = User.objects.get(Q(email=username_or_email) | Q(username=username_or_email))
     if user.username == username_or_email:
         UserRetirementRequest = apps.get_model('user_api', 'UserRetirementRequest')
         if UserRetirementRequest.has_user_requested_retirement(user):
@@ -2482,11 +2457,6 @@ def get_user_by_username_or_email(username_or_email):
 
 def get_user_by_username_or_email_inside_organization(username_or_email):
     """
-    Appsembler Specific: This funtion is a copy of
-    the get_user_by_username_or_email written above, it basically does the same
-    with the difference that the user search is done inside the organization,
-    making sure to not return users that exists in other organizations.
-
     Return a User object by looking up a user against username_or_email but
     inside a certain organization.
 
@@ -2500,20 +2470,16 @@ def get_user_by_username_or_email_inside_organization(username_or_email):
         MultipleObjectsReturned if more than one user has same email or
         username
     """
-    username_or_email = strip_if_string(username_or_email)
-    # there should be one user with either username or email equal to username_or_email
-    site = get_current_site()
+    site = theming_helpers.get_current_site()
+
+    if not site:
+        raise User.DoesNotExist('Tahoe: Cannot get a current organization user without a site')
+
     organization = get_organization_by_site(site)
-    user = get_organization_user_by_username_or_email(
+    return get_organization_user_by_username_or_email(
         username_or_email=username_or_email,
         organization=organization
     )
-
-    if user.username == username_or_email:
-        UserRetirementRequest = apps.get_model('user_api', 'UserRetirementRequest')
-        if UserRetirementRequest.has_user_requested_retirement(user):
-            raise User.DoesNotExist
-    return user
 
 
 def get_user(email):
