@@ -50,6 +50,5 @@ The following uses the version 5.5.1 as a reference. Change your filenames depen
     cd common/static/js/vendor/tinymce/js/tinymce
     cat tinymce.min.js */*/*.min.js plugins/emoticons/js/emojis.min.js > tinymce.full.min.js
     ```
-    This `find`s all the min.js files in the tinymce folders, sorts them reverse (local file first, folders next), and combines their content into a single file.
 
 **NOTE:** Regenerate the `tinymce.full.min.js` bundle everytime the code-mirror `plugin.min.js` is regenerated to ensure the latest changes are added to the bundle.
