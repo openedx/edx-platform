@@ -6,6 +6,7 @@ Serializer for user API
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
+from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 from lms.djangoapps.certificates.api import certificate_downloadable_status
@@ -91,6 +92,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     course = CourseOverviewField(source="course_overview", read_only=True)
     certificate = serializers.SerializerMethodField()
     audit_access_expires = serializers.SerializerMethodField()
+    course_modes = serializers.SerializerMethodField()
 
     def get_audit_access_expires(self, model):
         """
@@ -110,9 +112,22 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         else:
             return {}
 
+    def get_course_modes(self, obj):
+        """
+        Retrieve course modes associated with the course.
+        """
+        course_modes = CourseMode.modes_for_course(
+            obj.course.id,
+            only_selectable=False
+        )
+        return [
+            ModeSerializer(mode).data
+            for mode in course_modes
+        ]
+
     class Meta:
         model = CourseEnrollment
-        fields = ('audit_access_expires', 'created', 'mode', 'is_active', 'course', 'certificate')
+        fields = ('audit_access_expires', 'created', 'mode', 'is_active', 'course', 'certificate', 'course_modes')
         lookup_field = 'username'
 
 
@@ -150,3 +165,17 @@ class UserSerializer(serializers.ModelSerializer):
         lookup_field = 'username'
         # For disambiguating within the drf-yasg swagger schema
         ref_name = 'mobile_api.User'
+
+
+class ModeSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """Serializes a course's 'Mode' tuples
+
+    Returns a serialized representation of the modes available for course enrollment. The course
+    modes models are designed to return a tuple instead of the model object itself. This serializer
+    does not handle the model object itself, but the tuple.
+
+    """
+    slug = serializers.CharField(max_length=100)
+    sku = serializers.CharField()
+    android_sku = serializers.CharField()
+    ios_sku = serializers.CharField()
