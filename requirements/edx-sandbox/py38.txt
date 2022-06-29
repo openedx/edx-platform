@@ -64,7 +64,11 @@ python-dateutil==2.8.2
     # via matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
+<<<<<<< HEAD
 regex==2022.7.25
+=======
+regex==2022.7.24
+>>>>>>> 35527cebf8 (fix: Install pip and pip-tools in upgrade script)
     # via nltk
 scipy==1.7.3
     # via

@@ -64,7 +64,7 @@ smmap==5.0.0
     # via gitdb
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==5.0.2
+sphinx==5.1.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.in
