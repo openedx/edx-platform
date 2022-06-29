@@ -173,8 +173,6 @@ tinymce.PluginManager.add('codemirror', function (editor, url) {
                 if (isDirty) {
                     editor.nodeChanged();
                 }
-                editor.undoManager.add();
-                win.close();
             }
             else if (event.data.type === "closeWindow") {
                 win.close();
