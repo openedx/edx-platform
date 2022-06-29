@@ -126,6 +126,4 @@ class ModeSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     expiration_datetime = serializers.DateTimeField()
     description = serializers.CharField()
     sku = serializers.CharField()
-    android_sku = serializers.CharField()
-    ios_sku = serializers.CharField()
     bulk_sku = serializers.CharField()
