@@ -1,7 +1,7 @@
 """Tests for serializers for the Learner Dashboard"""
 
 import datetime
-from random import choice, getrandbits, randint, random
+from random import choice, getrandbits, randint
 from time import time
 from unittest import TestCase
 from unittest import mock
