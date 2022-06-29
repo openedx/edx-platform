@@ -6,8 +6,13 @@ consist primarily of authentication, request validation, and serialization.
 
 
 from cgitb import lookup
+# import datetime
+# from datetime import timedelta
+from datetime import datetime, time, timedelta
+from time import strptime
+import pytz
 import logging
-
+from django.db.models.aggregates import Sum
 from django.core.exceptions import (  # lint-amnesty, pylint: disable=wrong-import-order
     ObjectDoesNotExist,
     ValidationError
@@ -18,18 +23,22 @@ from edx_rest_framework_extensions.auth.jwt.authentication import \
 from edx_rest_framework_extensions.auth.session.authentication import \
     SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
-from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
+from opaque_keys.edx.keys import CourseKey
+from requests import request  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.generics import ListAPIView , ListCreateAPIView , RetrieveDestroyAPIView ,RetrieveUpdateDestroyAPIView # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.generics import ListAPIView , ListCreateAPIView , RetrieveAPIView ,RetrieveDestroyAPIView ,RetrieveUpdateDestroyAPIView # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.throttling import UserRateThrottle  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
 from rest_framework import generics
+from yaml import serialize
+from cms.djangoapps.api.v1 import serializers
+from rest_framework.permissions import AllowAny
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import LiveClasses 
 from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment, User ,LiveClassEnrollment
+from common.djangoapps.student.models import CourseEnrollment ,LiveClassEnrollment , UserProfile ,NotifyCallRequest
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
@@ -44,7 +53,8 @@ from openedx.core.djangoapps.enrollments.errors import (
 )
 from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
 from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination
-from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApiListSerializer ,LiveClassesSerializer , UserLiveClassDetailsSerializer #LiveClassUserDetailsSerializer ,
+from openedx.core.djangoapps.enrollments.serializers import  (CourseEnrollmentsApiListSerializer ,LiveClassesSerializer , UserLiveClassDetailsSerializer  ,LiveClassUserTotalAttendanceSerializer , UserAttendanceListSerializer 
+ , UserRequestCallSerializer )#LiveClassUserDetailsSerializer , 
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
@@ -889,6 +899,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
 
 
+
+
+
+
+
+
+
+
 @can_disable_rate_limit
 class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
     """
@@ -984,6 +1002,17 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         return queryset
 
 
+
+
+
+
+
+
+
+
+
+
+
 # class LiveClassesApiListView(DeveloperErrorViewMixin, ListCreateAPIView):
 #     authentication_classes = (
 #         JwtAuthentication,
@@ -1063,6 +1092,9 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
 
 
 
+
+
+
 class LiveClassesListApiListView(DeveloperErrorViewMixin, ListAPIView):
 
 
@@ -1086,19 +1118,6 @@ class LiveClassesListApiListView(DeveloperErrorViewMixin, ListAPIView):
         return queryset
 
 
-    #     course_ids=self.request.query_params.getlist('course_id')
-    #     queryset = LiveClasses.objects.all()
-
-    #     if course_ids:
-    #         queryset = queryset.filter(course_id__in=course_ids)
-
-    #     return queryset
-
-
-
-
-
-
 
 
 class EnrollLiveClassDetailsView(DeveloperErrorViewMixin, ListCreateAPIView):
@@ -1119,6 +1138,251 @@ class EnrollLiveClassDetailsView(DeveloperErrorViewMixin, ListCreateAPIView):
     def get_queryset(self):
 
         return LiveClassEnrollment.objects.filter(user=self.request.user)
+
+
+
+
+
+class LiveClassUserAttendanceDetails(DeveloperErrorViewMixin, RetrieveAPIView):
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    # permission_classes = (permissions.AllowAny)
+
+
+    throttle_classes = (EnrollmentUserThrottle,)
+    model= LiveClassEnrollment
+
+
+    def get(self , request,*args, **kwargs):
+        
+        instance=self.model.objects.get(id=self.kwargs.get('id'))
+        two_instance =  UserProfile.objects.get(user = self.request.user.id)
+
+        start_times = instance.live_class.start_time
+        end_times = instance.live_class.end_time
+
+
+        current_time = datetime.now(pytz.timezone('Asia/Kolkata')).time().strftime('%H:%M')
+        current_time = datetime.strptime(current_time ,'%H:%M').time()
+
+        current_datetime = datetime.now(pytz.timezone('Asia/Kolkata')) 
+        after_one_day = instance.updated_at + timedelta(days=1) if instance.updated_at != None else current_datetime
+
+   
+        if instance.user == self.request.user:
+            if start_times <= current_time and end_times >= current_time :
+                if current_datetime >= after_one_day :
+
+                    attendence =  instance.liveclass_attendance
+                    attendence = attendence + 1
+                    instance.liveclass_attendance = attendence
+                    instance.updated_at = datetime.now(pytz.timezone('Asia/Kolkata'))
+                    instance.save()
+
+                    user_attendance =  two_instance.user_attendance
+                    user_attendance = user_attendance + 1
+                    two_instance.user_attendance = user_attendance
+                    two_instance.save()
+
+                else:
+                    return Response("Your attendence is already saved", status=status.HTTP_400_BAD_REQUEST)
+            else:
+                    return Response("The Meeting not started yet", status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response("You can not access this live class", status=status.HTTP_400_BAD_REQUEST)
+        return Response("live class Joined successfully", status=status.HTTP_200_OK)
+
+
+
+
+class LiveClassUserTotalAttendanceDetails(DeveloperErrorViewMixin, RetrieveAPIView):
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = [AllowAny]
+
+
+
+    throttle_classes = (EnrollmentUserThrottle,)
+
+    serializer_class=LiveClassUserTotalAttendanceSerializer
+    model= LiveClassEnrollment
+
+    def get(self, request, *args, **kwargs):
+        total_attendence = LiveClassEnrollment.objects.filter(user_id=self.request.user)
+
+        data={}
+        total_attendences = total_attendence.aggregate(total_attendance = Sum('liveclass_attendance'))
+        data['total_attendence']=total_attendences
+        instance =  UserProfile.objects.get(user = self.request.user.id)
+        instance.user_attendance = total_attendences.get('total_attendance')
+        instance.save()
+
+        serializer = self.serializer_class(total_attendence, many=True)
+        data['live_Classes_attendance']= serializer.data
+        return Response(data, status=status.HTTP_200_OK)
+
+
+
+
+
+
+class UserAttendancedetails(DeveloperErrorViewMixin, ListAPIView) :
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+
+    throttle_classes = (EnrollmentUserThrottle,)
+    serializer_class = UserAttendanceListSerializer
+    # lookup_field = "username"
+
+    def get_queryset(self):
+
+        return UserProfile.objects.filter(user_id=self.request.user)
+
+
+
+
+class UserCallRequestCreate(DeveloperErrorViewMixin, ListCreateAPIView):
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+
+    serializer_class = UserRequestCallSerializer
+
+
+    def get_queryset(self):
+
+        return NotifyCallRequest.objects.filter(requested_by=self.request.user)
+
+
+    def post(self, request, *args, **kwargs):
+        """Live class attendance calculate"""
+        try:
+            serializer = self.serializer_class(
+                data=request.data, context = {'user':self.request.user}
+            )
+            serializer.is_valid(raise_exception=True)
+            
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class LiveClassUserAttendanceDetails(DeveloperErrorViewMixin, ListCreateAPIView):
+
+#     authentication_classes = (
+#         JwtAuthentication,
+#         BearerAuthenticationAllowInactiveUser,
+#         SessionAuthenticationAllowInactiveUser,
+#     )
+#     permission_classes = (permissions.AllowAny)
+
+
+#     throttle_classes = (EnrollmentUserThrottle,)
+#     serializer_class = LiveClassUserAttendanceSerializer
+#     lookup_field = "liveclass_attendance"
+
+
+#     def get_queryset(self):
+
+#         return LiveClassEnrollment.objects.filter(user=self.request.user)
+
+
+#     def post(self, request, *args, **kwargs):
+#         """Live class attendance calculate"""
+#         try:
+#             serializer = self.serializer_class(
+#                 data=request.data,
+#             )
+#             serializer.is_valid(raise_exception=True)
+            
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

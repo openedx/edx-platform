@@ -1,7 +1,9 @@
 import logging
+from urllib import response
 
-from openedx.core.djangoapps.enrollments.serializers import  LiveClassesSerializer , UserListSerializer ,CourseEnrollmentSerializer ,LiveClassEnrollmentSerializer ,LiveClassUserDetailsSerializer ,UserLiveClassDetailsSerializer, CourseEnrolledUserDetailsSerializer ,LoginStaffCourseDetailsSerializer
-from common.djangoapps.student.models import LiveClassEnrollment
+from openedx.core.djangoapps.enrollments.serializers import  (LiveClassesSerializer , UserListSerializer ,UserAttendanceListSerializer ,CourseEnrollmentSerializer ,LiveClassEnrollmentSerializer ,LiveClassUserDetailsSerializer ,UserLiveClassDetailsSerializer, CourseEnrolledUserDetailsSerializer ,LoginStaffCourseDetailsSerializer
+, StaffNotifyCallSerializer)
+from common.djangoapps.student.models import LiveClassEnrollment, UserProfile , NotifyCallRequest
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.lib.log_utils import audit_log
 from openedx.core.djangoapps.enrollments.views import ApiKeyPermissionMixIn
@@ -63,20 +65,6 @@ from opaque_keys import InvalidKeyError
 from django.contrib.auth.models import User 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {
     "credit": ["credit:provider_id"],
@@ -106,12 +94,6 @@ class LiveClassesApiListView(DeveloperErrorViewMixin, ListCreateAPIView):
     def get_queryset(self):
         return LiveClasses.objects.filter(created_by=self.request.user)
 
-
-
-
-        
-
-
     def post(self, request, *args, **kwargs):
         """Upload documents"""
         try:
@@ -124,6 +106,7 @@ class LiveClassesApiListView(DeveloperErrorViewMixin, ListCreateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class LiveClassesDeleteUpdateApiView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView):
@@ -179,18 +162,31 @@ class UserDetailsListApiView(DeveloperErrorViewMixin, ListAPIView):
     queryset = User.objects.all()
 
 
-    # def get_queryset(self):
-    #     is_active = self.kwargs.get('is_active')
-
-    #     return User.objects.filter(is_active=is_active)
-
-
-
     def get_serializer_class(self):
         """Get Serializer"""
         if self.request.method == 'GET':
             return UserListSerializer
 
+
+
+
+class UserAttendanceDetailsListApiView(DeveloperErrorViewMixin, ListAPIView):
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
+    serializer_class = UserListSerializer
+    queryset = UserProfile.objects.all()
+
+
+    def get_serializer_class(self):
+        """Get Serializer"""
+        if self.request.method == 'GET':
+            return UserAttendanceListSerializer
 
 
 
@@ -760,3 +756,65 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     #     """Get Serializer"""
     #     if self.request.method == 'GET':
     #         return CourseSerializer
+
+
+
+
+
+
+
+
+
+
+class StaffNotifyCallRequestListDetails(DeveloperErrorViewMixin, ListAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
+    serializer_class = StaffNotifyCallSerializer
+
+    lookup_field = "requested_to"
+
+
+    # lookup_field = "username"
+
+    def get_queryset(self):
+
+        return NotifyCallRequest.objects.filter(requested_to=self.request.user)
+
+
+class StaffNotifyCallRequestRetrieveDetails(DeveloperErrorViewMixin, RetrieveDestroyAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    serializer_class = StaffNotifyCallSerializer
+
+    model = NotifyCallRequest
+    lookup_field = "id"
+
+
+
+    def get(self, request, *args, **kwargs):
+        
+
+        instance=self.model.objects.get(id=self.kwargs.get('id'))
+    
+   
+        if instance.requested_to == self.request.user:
+                    instance.active_status = False
+                    instance.save()
+                    serializer = self.serializer_class(instance)
+
+                    # serializers= serializer.data.popitem('active_status')
+        else:
+            return Response("You are not notify with this call request", status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+
+
+

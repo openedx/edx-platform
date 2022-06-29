@@ -19,7 +19,8 @@ import openedx.core.djangoapps.lang_pref.views
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import views as contentstore_views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
-from cms.djangoapps.contentstore.views.live_class import LiveClassesApiListView ,CourseListView,UserCourseUnEnrollment, LiveClassesDeleteUpdateApiView , UserDetailsListApiView ,EnrollLiveClassCreateView,EnrollLiveClassUserDetailsView ,EnrollLiveClassUserDeleteApiView , UserCourseEnrollment ,EnrollCourseUserDetailsView , LoginStaffCourseDetailsList
+from cms.djangoapps.contentstore.views.live_class import (LiveClassesApiListView ,CourseListView,UserCourseUnEnrollment, UserAttendanceDetailsListApiView ,LiveClassesDeleteUpdateApiView , UserDetailsListApiView ,EnrollLiveClassCreateView,EnrollLiveClassUserDetailsView ,EnrollLiveClassUserDeleteApiView , UserCourseEnrollment ,EnrollCourseUserDetailsView , 
+LoginStaffCourseDetailsList, StaffNotifyCallRequestRetrieveDetails , StaffNotifyCallRequestListDetails)
 from cms.djangoapps.contentstore.views.course import doc_upload_view, delete_doc, update_doc # To Import
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
@@ -97,6 +98,8 @@ urlpatterns = oauth2_urlpatterns + [
     path('live_class/details/', LiveClassesApiListView.as_view(), name='user_live_class' ),
     path('live_class/<id>', LiveClassesDeleteUpdateApiView.as_view(), name='live_class_delete_update' ),
     path('accounts/details', UserDetailsListApiView.as_view(), name='all_user_details' ),
+    path('all/users/attendance/details', UserAttendanceDetailsListApiView.as_view(), name='all_user_details' ),
+
     path('live_class/user/enrollment', EnrollLiveClassCreateView.as_view(), name='enroll_live_class_to_user' ),
 
     path('live_class/enroll/detail/<live_class_id>', EnrollLiveClassUserDetailsView.as_view(), name='live_class_user_details' ),
@@ -106,6 +109,13 @@ urlpatterns = oauth2_urlpatterns + [
     path('staff/course/detail/<edited_by_id>', LoginStaffCourseDetailsList.as_view(), name='live_class_user_details' ),
 
     path('home/courses/all/courses', CourseListView.as_view(), name="course-list"),
+
+    path('staff/call/request/notify/details', StaffNotifyCallRequestListDetails.as_view(), name="staff_call_request_notify_details"),
+    path('staff/call/request/data/<id>', StaffNotifyCallRequestRetrieveDetails.as_view(), name="staff_call_request_notify_details"),
+
+
+
+
 
 
 

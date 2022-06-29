@@ -631,7 +631,9 @@ class UserProfile(models.Model):
     phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
     #attendance = models.CharField(max_length=250, null=True, db_index=True)
-    user_attendance = models.CharField(max_length=250, null=True, db_index=True)
+    # user_attendance = models.CharField(max_length=250, null=True, db_index=True)
+    user_attendance = models.PositiveIntegerField(default=0, blank=True, null=True)
+
 
 
     @property
@@ -1245,7 +1247,24 @@ class LiveClassEnrollment(models.Model):
 
     live_class = models.ForeignKey(LiveClasses, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    liveclass_attendance = models.PositiveIntegerField(default=0, blank=True, null=True)
+    updated_at = models.DateTimeField(null=True)
 
+
+
+class NotifyCallRequest(models.Model):
+    requested_by = models.ForeignKey(User, related_name="%(class)s_requested_by" , on_delete=models.CASCADE)
+
+    requested_to = models.ForeignKey(User, related_name="%(class)s_requested_to" , on_delete=models.CASCADE)
+
+    requested_at = models.DateTimeField(null=True)
+    
+    messeage = models.CharField(max_length=300 , null=True)
+
+    active_status = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'notify_call_request_details'
 
 
 class DocumentStorage(models.Model):
