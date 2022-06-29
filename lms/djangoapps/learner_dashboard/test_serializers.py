@@ -15,6 +15,7 @@ from lms.djangoapps.learner_dashboard.serializers import (
     EnrollmentSerializer,
     EntitlementSerializer,
     GradeDataSerializer,
+    LearnerEnrollmentSerializer,
     PlatformSettingsSerializer,
     ProgramsSerializer,
     LearnerDashboardSerializer,
@@ -352,6 +353,60 @@ class TestProgramsSerializer(TestCase):
         output_data = ProgramsSerializer(input_data).data
 
         assert output_data == {"relatedPrograms": []}
+
+
+class TestLearnerEnrollmentsSerializer(TestCase):
+    """High-level tests for LearnerEnrollmentsSerializer"""
+
+    @classmethod
+    def generate_test_enrollments_data(cls):
+        return {
+            "courseProvider": TestCourseProviderSerializer.generate_test_provider_info(),
+            "course": TestCourseSerializer.generate_test_course_info(),
+            "courseRun": TestCourseRunSerializer.generate_test_course_run_info(),
+            "enrollment": TestEnrollmentSerializer.generate_test_enrollment_info(),
+            "gradeData": TestGradeDataSerializer.generate_test_grade_data(),
+            "certificate": TestCertificateSerializer.generate_test_certificate_info(),
+            "entitlements": TestEntitlementSerializer.generate_test_entitlement_info(),
+            "programs": TestProgramsSerializer.generate_test_programs_info(),
+        }
+
+    def test_happy_path(self):
+        """Test that nothing breaks and the output fields look correct"""
+        input_data = self.generate_test_enrollments_data()
+
+        output_data = LearnerEnrollmentSerializer(input_data).data
+
+        expected_keys = [
+            "courseProvider",
+            "course",
+            "courseRun",
+            "enrollment",
+            "gradeData",
+            "certificate",
+            "entitlements",
+            "programs",
+        ]
+        assert output_data.keys() == set(expected_keys)
+
+    def test_allowed_empty(self):
+        """Tests for allowed null fields, mostly that nothing breaks"""
+        input_data = self.generate_test_enrollments_data()
+        input_data["courseProvider"] = None
+
+        output_data = LearnerEnrollmentSerializer(input_data).data
+
+        expected_keys = [
+            "courseProvider",
+            "course",
+            "courseRun",
+            "enrollment",
+            "gradeData",
+            "certificate",
+            "entitlements",
+            "programs",
+        ]
+        assert output_data.keys() == set(expected_keys)
 
 
 class TestLearnerDashboardSerializer(TestCase):
