@@ -230,7 +230,6 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         content = json.loads(response.content.decode('utf-8'))
         expected_data = {
             'provider_type': ['This field is required.'],
-            'lti_configuration': ['This field is required.']
         }
         self.assertEqual(content, expected_data)
         self.assertEqual(response.status_code, 400)
@@ -276,21 +275,10 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         if providers.get(provider).requires_pii_sharing():
             CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=True)
 
-        lti_config = {
-            'lti_1p1_client_key': 'this_is_key',
-            'lti_1p1_client_secret': 'this_is_secret',
-            'lti_1p1_launch_url': 'example.com',
-            'lti_config': {
-                'additional_parameters': {
-                    'custom_instructor_email': "email@example.com"
-                }
-            },
-        }
         course_live_config_data = {
             'free_tier': True,
             'enabled': True,
             'provider_type': provider,
-            'lti_configuration': lti_config
         }
         response = self._post(course_live_config_data)
 
