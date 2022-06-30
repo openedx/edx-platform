@@ -817,7 +817,7 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1880
     'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
 
-    # .. toggle_name: FEATURES['ENABLE_CHANGE_USER_PASSWORD_ADMIN']
+    # .. toggle_name: FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Whether to send an email for failed password reset attempts or not. This happens when a
@@ -3994,6 +3994,21 @@ SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSea
 SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
 # Override to skip enrollment start date filtering in course search
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = False
+# .. toggle_name: SEARCH_SKIP_INVITATION_ONLY_FILTERING
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: If enabled, invitation-only courses will appear in search results.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-08-27
+SEARCH_SKIP_INVITATION_ONLY_FILTERING = True
+# .. toggle_name: SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: If enabled, courses with a catalog_visibility set to "none" will still
+#    appear in search results.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-08-27
+SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING = True
 
 # The configuration visibility of account fields.
 ACCOUNT_VISIBILITY_CONFIGURATION = {
