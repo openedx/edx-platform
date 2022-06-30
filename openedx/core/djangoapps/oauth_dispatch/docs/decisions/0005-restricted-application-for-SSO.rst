@@ -41,7 +41,7 @@ Authorization Code grant protocol, issue them only **expired** access tokens
 so they cannot make unauthorized calls to our API endpoints.
 
 .. note::
-    Although we still use the new model for "Restricted Applications", the decision to use **expired** access tokens has been superseded.
+    Although we still use the new model for "Restricted Applications", the decision to use **expired** access tokens has been superseded by ADR `Enforce Scopes in LMS APIs`_. That ADR specifies a different method to restrict "Restricted Applications" from accessing API endpoints that have not implemented Scopes.
 
 Consequences
 ------------
