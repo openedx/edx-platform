@@ -4,7 +4,9 @@
 Status
 ------
 
-Accepted
+Partially Superseded (see ADR `Enforce Scopes in LMS APIs`_)
+
+.. _Enforce Scopes in LMS APIs: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0006-enforce-scopes-in-LMS-APIs.rst#3-restricted-applications-receive-unexpired-jwts-signed-with-a-new-key
 
 Context
 -------
@@ -37,6 +39,9 @@ with edX as an Identity Provider, configure them as a "Restricted Application".
 Although these applications can still request access tokens via the usual
 Authorization Code grant protocol, issue them only **expired** access tokens
 so they cannot make unauthorized calls to our API endpoints.
+
+.. note::
+    Although we still use the new model for "Restricted Applications", the decision to use **expired** access tokens has been superseded.
 
 Consequences
 ------------
