@@ -9,7 +9,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from .utils import get_section_completion_percentage
 from .constants import ProgramEnrollmentStatuses
-from openedx.features.genplus_features.genplus.models import Student, Class
+from openedx.features.genplus_features.genplus.models import Student, GenUser, Class
 
 
 class YearGroup(models.Model):
@@ -58,10 +58,10 @@ class ProgramEnrollment(TimeStampedModel):
     STATUS_CHOICES = ProgramEnrollmentStatuses.__MODEL_CHOICES__
 
     class Meta:
-        unique_together = ('student', 'from_class', 'program',)
+        unique_together = ('gen_user', 'program',)
 
-    student = models.ForeignKey(
-        Student,
+    gen_user = models.ForeignKey(
+        GenUser,
         on_delete=models.CASCADE,
         related_name="program_enrollments",
     )
@@ -81,7 +81,7 @@ class ProgramEnrollment(TimeStampedModel):
 
 class ProgramUnitEnrollment(TimeStampedModel):
     class Meta:
-        unique_together = ('program_enrollment', 'course_key',)
+        unique_together = ('program_enrollment', 'unit',)
 
     program_enrollment = models.ForeignKey(
         ProgramEnrollment,
@@ -94,7 +94,7 @@ class ProgramUnitEnrollment(TimeStampedModel):
         blank=True,
         on_delete=models.CASCADE,
     )
-    course_key = CourseKeyField(max_length=255)
+    unit = models.ForeignKey(CourseOverview, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
     history = HistoricalRecords()
 
