@@ -59,10 +59,10 @@ class CharacterViewSet(viewsets.ModelViewSet):
         the profile
         """
         character = self.get_object()
-        genuser = GenUser.objects.get(user=self.request.user)
-        genuser.student.character = character
-        if request.data.get("onboarded") and not genuser.student.onboarded:
-            genuser.student.onboarded = True
+        gen_user = GenUser.objects.get(user=self.request.user)
+        gen_user.student.character = character
+        if request.data.get("onboarded") and not gen_user.student.onboarded:
+            gen_user.student.onboarded = True
 
-        genuser.student.save()
+        gen_user.student.save()
         return Response(SuccessMessage.CHARACTER_SELECTED, status=status.HTTP_204_NO_CONTENT)

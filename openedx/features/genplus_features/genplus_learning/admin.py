@@ -30,8 +30,8 @@ class ClassEnrollmentAdmin(admin.ModelAdmin):
 # TODO: Remove this after testing
 @admin.register(ProgramEnrollment)
 class ProgramEnrollmentAdmin(admin.ModelAdmin):
-    list_display = ('student', 'from_class', 'program', 'status')
-    readonly_fields = ('student', 'from_class', 'program')
+    list_display = ('gen_user', 'from_class', 'program', 'status')
+    readonly_fields = ('gen_user', 'from_class', 'program')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "program":
@@ -41,8 +41,8 @@ class ProgramEnrollmentAdmin(admin.ModelAdmin):
 
 @admin.register(ProgramUnitEnrollment)
 class ProgramUnitEnrollmentAdmin(admin.ModelAdmin):
-    list_display = ('program_enrollment', 'course_key')
-    readonly_fields = ('program_enrollment', 'course_key', 'course_enrollment')
+    list_display = ('program_enrollment', 'unit')
+    readonly_fields = ('program_enrollment', 'unit', 'course_enrollment')
 
 
 @admin.register(Program)

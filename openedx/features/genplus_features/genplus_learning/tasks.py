@@ -38,25 +38,28 @@ def enroll_class_students_to_program(self, class_id, program_id, class_student_i
         students = students.filter(pk__in=class_student_ids)
 
     for student in students:
-        program_enrollment, created = ProgramEnrollment.objects.get_or_create(
-            student=student,
-            from_class=gen_class,
-            program=program,
-        )
-
-        if created:
+        try:
+            program_enrollment = ProgramEnrollment.objects.get(
+                gen_user=student.gen_user,
+                program=program
+            )
+        except ProgramEnrollment.DoesNotExist:
+            program_enrollment = ProgramEnrollment.objects.create(
+                gen_user=student.gen_user,
+                program=program,
+                from_class=gen_class,
+                status=ProgramEnrollmentStatuses.ENROLLED
+            )
             log.info(f"Program enrollment created for student: {student}, class: {gen_class}, program: {program}")
-            program_enrollment.status = ProgramEnrollmentStatuses.ENROLLED
-            program_enrollment.save()
 
         for unit in units:
             if CourseEnrollment.is_enrolled(student.gen_user.user, unit.id):
-                log.error(f'Student: {student} is already enrolled to course: {unit.id}!')
+                log.error(f'Student: {student} is already enrolled to course: {unit}!')
                 return
 
             unit_enrollment, created = ProgramUnitEnrollment.objects.get_or_create(
                 program_enrollment=program_enrollment,
-                course_key=unit.id,
+                unit=unit,
             )
 
             if created:

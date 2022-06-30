@@ -7,7 +7,7 @@ class IsGenUser(permissions.BasePermission):
 
     def has_permission(self, request, view):
         try:
-            return request.user and request.user.genuser
+            return request.user and request.user.gen_user
         except GenUser.DoesNotExist:
             return False
 
@@ -16,14 +16,14 @@ class IsStudent(permissions.BasePermission):
     message = 'Current user is not a Genplus Student'
 
     def has_permission(self, request, view):
-        return IsGenUser().has_permission(request, view) and request.user.genuser.is_student
+        return IsGenUser().has_permission(request, view) and request.user.gen_user.is_student
 
 
 class IsTeacher(permissions.BasePermission):
     message = 'Current user is not a Genplus Teacher'
 
     def has_permission(self, request, view):
-        return IsGenUser().has_permission(request, view) and request.user.genuser.is_teacher
+        return IsGenUser().has_permission(request, view) and request.user.gen_user.is_teacher
 
 
 class IsStudentOrTeacher(permissions.BasePermission):

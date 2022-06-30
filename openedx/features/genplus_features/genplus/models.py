@@ -56,7 +56,7 @@ class TempUser(TimeStampedModel):
 class GenUser(models.Model):
     ROLE_CHOICES = GenUserRoles.__MODEL_CHOICES__
 
-    user = models.OneToOneField(USER_MODEL, on_delete=models.CASCADE, null=True)
+    user = models.OneToOneField(USER_MODEL, on_delete=models.CASCADE, null=True, related_name='gen_user')
     role = models.CharField(blank=True, null=True, max_length=32, choices=ROLE_CHOICES)
     school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True)
     year_of_entry = models.CharField(max_length=32, null=True, blank=True)
@@ -86,7 +86,7 @@ class Teacher(models.Model):
 
 class Student(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='student')
-    character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True)
+    character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True, blank=True)
     onboarded = models.BooleanField(default=False)
 
     def __str__(self):

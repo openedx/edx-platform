@@ -34,3 +34,11 @@ def is_unit_locked(course_key):
         return all([lesson.is_locked for lesson in lessons])
 
     return False
+
+
+def get_user_unit_progress(unit, user):
+    from openedx.features.genplus_features.genplus_learning.models import Lesson
+
+    lessons = Lesson.objects.filter(course_key=unit.id)
+    percentages = [lesson.get_user_progress(user) for lesson in lessons.all()]
+    return round(statistics.fmean(percentages), 2) if percentages else 0

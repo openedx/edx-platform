@@ -18,11 +18,16 @@ class LessonViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = Program.get_current_programs()
-        genuser = self.request.user.genuser
-        if genuser.is_student:
+        gen_user = self.request.user.gen_user
+        if gen_user.is_student:
             student_enrolled_programs = ProgramEnrollment.objects.filter(
-                student=genuser.student
+                gen_user=gen_user
             ).values_list('program', flat=True)
             qs = qs.filter(id__in=student_enrolled_programs)
 
         return qs
+
+    def get_serializer_context(self):
+        context = super(LessonViewSet, self).get_serializer_context()
+        context.update({"gen_user": self.request.user.gen_user})
+        return context
