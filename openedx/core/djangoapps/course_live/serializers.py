@@ -100,7 +100,8 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
     """
     Serialize configuration responses
     """
-    lti_configuration = LtiSerializer(many=False, read_only=False)
+
+    lti_configuration = LtiSerializer(many=False, read_only=False, required=False)
     pii_sharing_allowed = serializers.SerializerMethodField()
 
     class Meta:
@@ -134,7 +135,7 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         """
         Create a new CourseLiveConfiguration entry in model
         """
-        lti_config = validated_data.pop('lti_configuration')
+        lti_config = validated_data.pop('lti_configuration', None)
         instance = CourseLiveConfiguration()
         instance = self._update_course_live_instance(instance, validated_data)
         if not validated_data.get('free_tier', False):
@@ -146,7 +147,7 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         """
         Update and save an existing instance
         """
-        lti_config = validated_data.pop('lti_configuration')
+        lti_config = validated_data.pop('lti_configuration', None)
         instance = self._update_course_live_instance(instance, validated_data)
         if not validated_data.get('free_tier', False):
             instance = self._update_lti(instance, lti_config)
