@@ -4,7 +4,7 @@
 Status
 ------
 
-Partially Superseded (see ADR `Enforce Scopes in LMS APIs`_)
+Partially Replaced (see ADR `Enforce Scopes in LMS APIs`_)
 
 .. _Enforce Scopes in LMS APIs: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0006-enforce-scopes-in-LMS-APIs.rst#3-restricted-applications-receive-unexpired-jwts-signed-with-a-new-key
 
