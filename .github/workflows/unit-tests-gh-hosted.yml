@@ -9,7 +9,7 @@ on:
 
 jobs:
   run-test:
-    if: github.repository != 'openedx/edx-platform' && github.repository != 'edx/edx-platform-private'
+    if: (github.repository != 'openedx/edx-platform' && github.repository != 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && github.base_ref == 'open-release/nutmeg.master')
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
