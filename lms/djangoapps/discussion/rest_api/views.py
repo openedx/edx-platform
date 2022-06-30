@@ -560,11 +560,11 @@ class LearnerThreadView(APIView):
 
     **Example Requests**:
 
-        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015/learner/?page=1&page_size=10
+        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015/learner/?username=edx&page=1&page_size=10
 
     **GET Thread List Parameters**:
 
-        * user_id: (Required) (Integer) ID of the user whose active threads are required
+        * username: (Required) Username of the user whose active threads are required
 
         * page: The (1-indexed) page to retrieve (default is 1)
 
@@ -589,11 +589,8 @@ class LearnerThreadView(APIView):
         page_num = request.GET.get('page', 1)
         threads_per_page = request.GET.get('page_size', 10)
         discussion_id = None
-        try:
-            user_id = int(request.GET.get('user_id', None))
-        except (TypeError, ValueError):
-            return Response({'details': 'Invalid user id'}, status=400)
-
+        username = request.GET.get('username', None)
+        user = get_object_or_404(User, username=username)
         group_id = None
         try:
             group_id = get_group_id_for_comments_service(request, course_key, discussion_id)
@@ -604,7 +601,7 @@ class LearnerThreadView(APIView):
             "page": page_num,
             "per_page": threads_per_page,
             "course_id": str(course_key),
-            "user_id": user_id,
+            "user_id": user.id,
             "group_id": group_id
         }
         return get_learner_active_thread_list(request, course_key, query_params)
