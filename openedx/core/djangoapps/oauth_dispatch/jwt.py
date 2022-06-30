@@ -2,14 +2,18 @@
 
 
 import json
+import logging
 from time import time
 
 from django.conf import settings
+from edx_django_utils.monitoring import set_custom_attribute
 from edx_rbac.utils import create_role_auth_claim_for_user
 from jwkest import jwk
 from jwkest.jws import JWS
 
 from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
+
+log = logging.getLogger(__name__)
 
 
 def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None, scopes=None):
@@ -63,6 +67,16 @@ def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
     client = oauth_adapter.get_client_for_token(access_token)
 
     jwt_expires_in = _get_jwt_access_token_expire_seconds()
+    try:
+        grant_type = access_token.application.authorization_grant_type
+    except Exception:  # pylint: disable=broad-except
+        # TODO: Remove this broad except if proven this doesn't happen.
+        grant_type = 'unknown-error'
+        log.exception('Unable to get grant_type from access token.')
+
+    # .. custom_attribute_name: create_jwt_grant_type
+    # .. custom_attribute_description: The grant type of the newly created JWT.
+    set_custom_attribute('create_jwt_grant_type', grant_type)
 
     jwt_access_token = _create_jwt(
         access_token.user,
@@ -71,6 +85,7 @@ def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
         use_asymmetric_key=use_asymmetric_key,
         is_restricted=oauth_adapter.is_client_restricted(client),
         filters=oauth_adapter.get_authorization_filters(client),
+        grant_type=grant_type,
     )
 
     jwt_token_dict = token_dict.copy()
@@ -120,6 +135,7 @@ def _create_jwt(
     additional_claims=None,
     use_asymmetric_key=None,
     secret=None,
+    grant_type=None,
 ):
     """
     Returns an encoded JWT (string).
@@ -132,6 +148,7 @@ def _create_jwt(
         expires_in (int): Optional. Overrides time to token expiry, specified in seconds.
         filters (list): Optional. Filters to include in the JWT.
         is_restricted (Boolean): Whether the client to whom the JWT is issued is restricted.
+        grant_type (str): grant type of the new JWT token.
 
     Deprecated Arguments (to be removed):
         aud (string): Optional. Overrides configured JWT audience claim.
@@ -152,6 +169,7 @@ def _create_jwt(
         # TODO (ARCH-204) Consider getting rid of the 'aud' claim since we don't use it.
         'aud': aud if aud else settings.JWT_AUTH['JWT_AUDIENCE'],
         'exp': exp,
+        'grant_type': grant_type or '',
         'iat': iat,
         'iss': settings.JWT_AUTH['JWT_ISSUER'],
         'preferred_username': user.username,
