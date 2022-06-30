@@ -46,3 +46,32 @@ class TestRateLimiting(TestCase):
         """
         XForwardedForMiddleware().process_request(self.request)
         assert ratelimit.real_ip(None, self.request) == '7.8.9.0'
+
+    def test_request_post_email(self):
+        """
+        Tests post email param.
+        """
+        expected_email = 'test@example.com'
+        self.request.POST = {'email': expected_email}
+        assert ratelimit.request_post_email(None, self.request) == expected_email
+
+    def test_request_data_email(self):
+        """
+        Tests data email param.
+        """
+        expected_email = 'test@example.com'
+        self.request.data = {'email': expected_email}
+        assert ratelimit.request_data_email(None, self.request) == expected_email
+
+    @ddt.data(
+        ('email', 'test@example.com'),
+        ('email_or_username', 'testUsername8967'),
+        ('email_or_username', 'testUsername@example.com')
+    )
+    @ddt.unpack
+    def test_request_post_email_or_username(self, param_name, expected_username_or_email):
+        """
+        Tests post email_or_username param.
+        """
+        self.request.POST = {param_name: expected_username_or_email}
+        assert ratelimit.request_post_email_or_username(None, self.request) == expected_username_or_email
