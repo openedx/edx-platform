@@ -8,7 +8,7 @@ on:
 
 jobs:
   run-tests:
-    if: (github.repository == 'openedx/edx-platform' || github.repository == 'edx/edx-platform-private') && (github.repository == 'openedx/edx-platform' && github.head_ref != 'open-release/nutmeg-master')
+    if: (github.repository == 'openedx/edx-platform' || github.repository == 'edx/edx-platform-private') && (github.repository == 'openedx/edx-platform' && github.base_ref != 'open-release/nutmeg-master')
     runs-on: [ edx-platform-runner ]
     strategy:
       matrix:
@@ -43,8 +43,6 @@ jobs:
 
       - name: checkout repo
         uses: actions/checkout@v2
-        with:
-          branch: open-release/nutmeg.master
 
       # This gives Mongo several chances to start. We started getting flakiness
       # around 2022-02-15 wherein the start command would sometimes exit with:
