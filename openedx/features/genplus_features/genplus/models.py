@@ -26,7 +26,7 @@ class Skill(models.Model):
 class Character(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField()
-    skills = models.ManyToManyField(Skill, related_name='characters')
+    skills = models.ManyToManyField(Skill, related_name='characters', blank=True)
     profile_pic = models.ImageField(upload_to='gen_plus_avatars',
                                     help_text='Upload the image which will be seen by student on their dashboard')
     standing = models.ImageField(upload_to='gen_plus_avatars',
@@ -75,11 +75,30 @@ class GenUser(models.Model):
         return self.user.username
 
 
+class Teacher(models.Model):
+    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
+    profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True)
+    classes = models.ManyToManyField('genplus.Class', related_name='teachers', blank=True)
+
+    def __str__(self):
+        return self.gen_user.user.username
+
+
+class Student(models.Model):
+    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='student')
+    character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True)
+    onboarded = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.gen_user.user.username
+
+
 class Class(TimeStampedModel):
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='classes')
     group_id = models.CharField(primary_key=True, max_length=128)
     name = models.CharField(max_length=128)
     is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
+    students = models.ManyToManyField(Student, related_name='classes', blank=True)
 
     @property
     def current_program(self):
@@ -90,22 +109,3 @@ class Class(TimeStampedModel):
 
     def __str__(self):
         return self.name
-
-
-class Teacher(models.Model):
-    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
-    profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True)
-    classes = models.ManyToManyField(Class, related_name='teachers')
-
-    def __str__(self):
-        return self.gen_user.user.username
-
-
-class Student(models.Model):
-    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='student')
-    character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True)
-    onboarded = models.BooleanField(default=False)
-    classes = models.ManyToManyField(Class, related_name='students')
-
-    def __str__(self):
-        return self.gen_user.user.username

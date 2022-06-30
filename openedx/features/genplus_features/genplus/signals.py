@@ -34,7 +34,7 @@ def teacher_classes_changed(sender, instance, action, **kwargs):
         return
 
     if isinstance(instance, Teacher) and action in ["post_add", "pre_remove"]:
-        classes = instance.classes.filter(group_id__in=pk_set)
+        classes = instance.classes.filter(pk__in=pk_set)
         programs = set()
         for gen_class in classes:
             current_program = gen_class.current_program

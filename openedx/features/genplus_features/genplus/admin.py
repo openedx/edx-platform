@@ -41,9 +41,10 @@ class ClassAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'is_visible',
-        'current_program'
+        'current_program',
     )
     search_fields = ('name',)
+    filter_horizontal = ('students',)
 
 
 # TODO: Remove after testing the login flow
