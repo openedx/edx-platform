@@ -1,5 +1,6 @@
 class SuccessMessage:
     CHARACTER_SELECTED = 'Your character has been selected.'
+    PROFILE_IMAGE_UPDATED = 'Your profile image has been updated successfully.'
 
 
 class ErrorMessages:
