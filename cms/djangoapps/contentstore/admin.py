@@ -10,7 +10,11 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.utils.translation import gettext as _
 from edx_django_utils.admin.mixins import ReadOnlyAdminMixin
 
-from cms.djangoapps.contentstore.models import BackfillCourseTabsConfig, VideoUploadConfig
+from cms.djangoapps.contentstore.models import (
+    BackfillCourseTabsConfig,
+    CleanStaleCertificateAvailabilityDatesConfig,
+    VideoUploadConfig
+)
 from cms.djangoapps.contentstore.outlines_regenerate import CourseOutlineRegenerate
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 
@@ -78,6 +82,11 @@ class CourseOutlineRegenerateAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
         return super().changelist_view(request, extra_context)
 
 
+class CleanStaleCertificateAvailabilityDatesConfigAdmin(ConfigurationModelAdmin):
+    pass
+
+
 admin.site.register(BackfillCourseTabsConfig, ConfigurationModelAdmin)
 admin.site.register(VideoUploadConfig, ConfigurationModelAdmin)
 admin.site.register(CourseOutlineRegenerate, CourseOutlineRegenerateAdmin)
+admin.site.register(CleanStaleCertificateAvailabilityDatesConfig, ConfigurationModelAdmin)
