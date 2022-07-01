@@ -7,7 +7,12 @@ from openedx.features.genplus_features.genplus_learning.models import (
     ProgramEnrollment,
     ProgramUnitEnrollment,
 )
-from openedx.features.genplus_features.genplus_learning.utils import get_lms_link_for_unit, is_unit_locked, get_user_unit_progress
+from openedx.features.genplus_features.genplus_learning.utils import (
+    get_lms_link_for_unit,
+    get_unit_image_url,
+    is_unit_locked,
+    get_user_unit_progress,
+)
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
 
 
@@ -15,18 +20,22 @@ class UnitSerializer(serializers.ModelSerializer):
     is_locked = serializers.SerializerMethodField()
     lms_url = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
+    banner_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseOverview
         fields = ('id', 'display_name', 'short_description',
-                'course_image_url', 'is_locked', 'lms_url',
+                'banner_image_url', 'is_locked', 'lms_url',
                 'progress')
 
     def get_is_locked(self, obj):
-        return is_unit_locked(obj.id)
+        return is_unit_locked(obj)
+
+    def get_banner_image_url(self, obj):
+        return get_unit_image_url(obj)
 
     def get_lms_url(self, obj):
-        return get_lms_link_for_unit(obj.id)
+        return get_lms_link_for_unit(obj)
 
     def get_progress(self, obj):
         gen_user = self.context.get("gen_user")
