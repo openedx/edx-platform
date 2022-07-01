@@ -9,6 +9,7 @@ import ddt
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
@@ -20,6 +21,7 @@ from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import OrgInstructorFactory
 from common.djangoapps.student.tests.factories import OrgStaffFactory
 from common.djangoapps.student.tests.factories import StaffFactory
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -35,13 +37,14 @@ from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITIO
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 # pylint: disable=no-member
 @ddt.ddt
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
     """Tests to verify the get_user_course_expiration_date function is working correctly"""
     def setUp(self):
@@ -157,7 +160,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
         result = get_user_course_expiration_date(
             self.user,
             CourseOverview.get_from_id(future_course.id),
-        )
+        ).replace(microsecond=0)
         content_availability_date = start_date.replace(microsecond=0)
         assert result == (content_availability_date + access_duration)
 

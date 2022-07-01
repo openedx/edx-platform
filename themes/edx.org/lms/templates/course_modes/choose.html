@@ -157,7 +157,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                                             % if course_duration_limit_enabled:
                                                                 <li>${Text(_("{b_start}Unlimited Course Access: {b_end}Learn at your own pace, and access materials anytime to brush up on what you've learned.")).format(**b_tag_kwargs)}</li>
                                                             % endif
-                                                            % if content_gating_enabled:                                                                
+                                                            % if content_gating_enabled:
                                                                 <li>${Text(_("{b_start}Graded Assignments: {b_end}Build your skills through graded assignments and projects.")).format(**b_tag_kwargs)}</li>
                                                             % endif
                                                             <li>${Text(_("{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resumé, or post it directly on LinkedIn.")).format(**b_tag_kwargs)}</li>
@@ -169,7 +169,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                                             <li>${Text(_("{b_start}Official: {b_end}Receive an instructor-signed certificate with the institution's logo")).format(**b_tag_kwargs)}</li>
                                                             <li>${Text(_("{b_start}Easily shareable: {b_end}Add the certificate to your CV or resumé, or post it directly on LinkedIn")).format(**b_tag_kwargs)}</li>
                                                             <li>${Text(_("{b_start}Motivating: {b_end}Give yourself an additional incentive to complete the course")).format(**b_tag_kwargs)}</li>
-                                                            <li>${Text(_("{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified certificates to help fund free education for everyone globally")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Support our Mission: {b_end} EdX, a mission driven initiative, relies on verified certificates to help fund free education for everyone globally")).format(**b_tag_kwargs)}</li>
                                                         </ul>
                                                     % endif
                                                     <ul>

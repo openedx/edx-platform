@@ -18,7 +18,7 @@ import json  # lint-amnesty, pylint: disable=wrong-import-order
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
 import uuid  # lint-amnesty, pylint: disable=wrong-import-order
 from collections import defaultdict, namedtuple  # lint-amnesty, pylint: disable=wrong-import-order
-from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import date, datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
 from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
 from urllib.parse import urlencode  # lint-amnesty, pylint: disable=wrong-import-order
@@ -66,6 +66,7 @@ from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CREATED,
     COURSE_UNENROLLMENT_COMPLETED,
 )
+from openedx_filters.learning.filters import CourseEnrollmentStarted
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from common.djangoapps.student.emails import send_proctoring_requirements_email
@@ -337,7 +338,11 @@ def email_exists_or_retired(email):
     """
     Check an email against the User model for existence.
     """
-    return User.objects.filter(email=email).exists() or is_email_retired(email)
+    return (
+        User.objects.filter(email=email).exists() or
+        is_email_retired(email) or
+        AccountRecovery.objects.filter(secondary_email=email).exists()
+    )
 
 
 def get_retired_username_by_username(username):
@@ -679,11 +684,11 @@ class UserProfile(models.Model):
         self.set_meta(meta)
         self.save()
 
-    def requires_parental_consent(self, date=None, age_limit=None, default_requires_consent=True):
+    def requires_parental_consent(self, year=None, age_limit=None, default_requires_consent=True):
         """Returns true if this user requires parental consent.
 
         Args:
-            date (Date): The date for which consent needs to be tested (defaults to now).
+            year (int): The year for which consent needs to be tested (defaults to now).
             age_limit (int): The age limit at which parental consent is no longer required.
                 This defaults to the value of the setting 'PARENTAL_CONTROL_AGE_LIMIT'.
             default_requires_consent (bool): True if users require parental consent if they
@@ -708,10 +713,10 @@ class UserProfile(models.Model):
         if year_of_birth is None:
             return default_requires_consent
 
-        if date is None:
+        if year is None:
             age = self.age
         else:
-            age = self._calculate_age(date.year, year_of_birth)
+            age = self._calculate_age(year, year_of_birth)
 
         return age < age_limit
 
@@ -1110,6 +1115,10 @@ class CourseFullError(CourseEnrollmentException):
 
 
 class AlreadyEnrolledError(CourseEnrollmentException):
+    pass
+
+
+class EnrollmentNotAllowed(CourseEnrollmentException):
     pass
 
 
@@ -1623,6 +1632,13 @@ class CourseEnrollment(models.Model):
 
         Also emits relevant events for analytics purposes.
         """
+        try:
+            user, course_key, mode = CourseEnrollmentStarted.run_filter(
+                user=user, course_key=course_key, mode=mode,
+            )
+        except CourseEnrollmentStarted.PreventEnrollment as exc:
+            raise EnrollmentNotAllowed(str(exc)) from exc
+
         if mode is None:
             mode = _default_course_mode(str(course_key))
         # All the server-side checks for whether a user is allowed to enroll.
@@ -2620,6 +2636,8 @@ def get_user_by_username_or_email(username_or_email):
             raise User.DoesNotExist
     return user
 
+def get_user_by_id(user_id):
+    return User.objects.get(id=user_id)
 
 def get_user(email):
     user = User.objects.get(email=email)
@@ -3441,20 +3459,57 @@ class CourseEnrollmentCelebration(TimeStampedModel):
     """
     enrollment = models.OneToOneField(CourseEnrollment, models.CASCADE, related_name='celebration')
     celebrate_first_section = models.BooleanField(default=False)
+    celebrate_weekly_goal = models.BooleanField(default=False)
 
     def __str__(self):
         return (
-            '[CourseEnrollmentCelebration] course: {}; user: {}; first_section: {};'
-        ).format(self.enrollment.course.id, self.enrollment.user.username, self.celebrate_first_section)
+            '[CourseEnrollmentCelebration] course: {}; user: {}'
+        ).format(self.enrollment.course.id, self.enrollment.user.username)
 
     @staticmethod
     def should_celebrate_first_section(enrollment):
-        """ Returns the celebration value for first_section with appropriate fallback if it doesn't exist """
+        """
+        Returns the celebration value for first_section with appropriate fallback if it doesn't exist.
+
+        The frontend will use this result and additional information calculated to actually determine
+        if the first section celebration will render. In other words, the value returned here is
+        NOT the final value used.
+        """
         if not enrollment:
             return False
         try:
             return enrollment.celebration.celebrate_first_section
         except CourseEnrollmentCelebration.DoesNotExist:
+            return False
+
+    @staticmethod
+    def should_celebrate_weekly_goal(enrollment):
+        """
+        Returns the celebration value for weekly_goal with appropriate fallback if it doesn't exist.
+
+        The frontend will use this result directly to determine if the weekly goal celebration
+        should be rendered. The value returned here IS the final value used.
+        """
+        # Avoiding circular import
+        from lms.djangoapps.course_goals.models import CourseGoal, UserActivity
+        try:
+            if not enrollment or not enrollment.celebration.celebrate_weekly_goal:
+                return False
+        except CourseEnrollmentCelebration.DoesNotExist:
+            return False
+
+        try:
+            goal = CourseGoal.objects.get(user=enrollment.user, course_key=enrollment.course.id)
+            if not goal.days_per_week:
+                return False
+
+            today = date.today()
+            monday_date = today - timedelta(days=today.weekday())
+            week_activity_count = UserActivity.objects.filter(
+                user=enrollment.user, course_key=enrollment.course.id, date__gte=monday_date,
+            ).count()
+            return week_activity_count == goal.days_per_week
+        except CourseGoal.DoesNotExist:
             return False
 
 

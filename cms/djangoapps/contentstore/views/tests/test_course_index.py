@@ -32,9 +32,9 @@ from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..course import _deprecated_blocks_info, course_outline_initial_state, reindex_course_and_check_access
 from ..item import VisibilityState, create_xblock_info

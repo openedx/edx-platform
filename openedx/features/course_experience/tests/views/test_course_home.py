@@ -55,10 +55,10 @@ from openedx.features.course_experience.tests.views.helpers import add_course_mo
 from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import strftime_localized
-from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_PASSWORD = 'test'
 TEST_CHAPTER_NAME = 'Test Chapter'
@@ -205,12 +205,13 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(73, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(65, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     def test_start_date_handling(self):
         """
         Verify that the course home page handles start dates correctly.
@@ -227,8 +228,18 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
             response = self.client.get(url)
             assert response.status_code == 200
 
+    def test_legacy_redirect(self):
+        """
+        Verify that the legacy course home page redirects to the MFE correctly.
+        """
+        url = course_home_url(self.course) + '?foo=b$r'
+        response = self.client.get(url)
+        assert response.status_code == 302
+        assert response.get('Location') == 'http://learning-mfe/course/course-v1:edX+test+Test_Course/home?foo=b%24r'
+
 
 @ddt.ddt
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class TestCourseHomePageAccess(CourseHomePageTestCase):
     """
     Test access to the course home page.
@@ -276,7 +287,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.GLOBAL_STAFF, True, True],
     )
     @ddt.unpack
-    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     def test_home_page(
             self, enable_unenrolled_access, course_visibility, user_type,
             expected_enroll_message, expected_course_outline,
@@ -812,6 +822,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
 
 @ddt.ddt
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class CourseHomeFragmentViewTests(ModuleStoreTestCase):
     """
     Test Messages Displayed on the Course Home

@@ -38,25 +38,3 @@ lms/djangoapps/learner_dashboard/          @edx/platform-discovery
 openedx/features/content_type_gating/      @edx/rev-team
 openedx/features/course_duration_limits/   @edx/rev-team
 openedx/features/discounts/                @edx/rev-team
-
-# Community Engineering Squad
-# Commented-out sections are officially owned by community-engineering,
-# but reviews aren't expected unless explicitly tagged by users.
-common/djangoapps/edxmako                  @edx/community-engineering
-common/djangoapps/pipeline_mako            @edx/community-engineering
-# common/static                              @edx/community-engineering
-common/templates                           @edx/community-engineering
-lms/djangoapps/ccx                         @edx/community-engineering
-lms/djangoapps/dashboard                   @edx/community-engineering
-lms/djangoapps/lti_provider                @edx/community-engineering
-lms/djangoapps/static_template_view        @edx/community-engineering
-# lms/static                                 @edx/community-engineering
-lms/templates                              @edx/community-engineering
-openedx/core/djangoapps/ccxcon             @edx/community-engineering
-openedx/core/djangoapps/contentserver      @edx/community-engineering
-openedx/core/djangoapps/profile_images     @edx/community-engineering
-openedx/core/djangoapps/theming            @edx/community-engineering
-openedx/features/lti_course_tab            @edx/community-engineering
-openedx/features/learner_profile           @edx/community-engineering
-vendor_extra                               @edx/community-engineering
-webpack-config                             @edx/community-engineering

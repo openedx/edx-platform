@@ -28,7 +28,7 @@ from openedx.core.djangoapps.content.course_overviews.api import get_course_over
 log = logging.getLogger(__name__)
 
 
-def generate_certificate_task(user, course_key, generation_mode=None):
+def generate_certificate_task(user, course_key, generation_mode=None, delay_seconds=CERTIFICATE_DELAY_SECONDS):
     """
     Create a task to generate a certificate for this user in this course run, if the user is eligible and a certificate
     can be generated.
@@ -39,13 +39,16 @@ def generate_certificate_task(user, course_key, generation_mode=None):
     if is_on_certificate_allowlist(user, course_key):
         log.info(f'User {user.id} is on the allowlist for {course_key}. Attempt will be made to generate an allowlist '
                  f'certificate.')
-        return generate_allowlist_certificate_task(user, course_key, generation_mode)
+        return generate_allowlist_certificate_task(user, course_key, generation_mode=generation_mode,
+                                                   delay_seconds=delay_seconds)
 
     log.info(f'Attempt will be made to generate course certificate for user {user.id} : {course_key}')
-    return _generate_regular_certificate_task(user, course_key, generation_mode)
+    return _generate_regular_certificate_task(user, course_key, generation_mode=generation_mode,
+                                              delay_seconds=delay_seconds)
 
 
-def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
+def generate_allowlist_certificate_task(user, course_key, generation_mode=None,
+                                        delay_seconds=CERTIFICATE_DELAY_SECONDS):
     """
     Create a task to generate an allowlist certificate for this user in this course run.
     """
@@ -53,7 +56,8 @@ def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
     course_grade = _get_course_grade(user, course_key)
     if _can_generate_allowlist_certificate(user, course_key, enrollment_mode):
         return _generate_certificate_task(user=user, course_key=course_key, enrollment_mode=enrollment_mode,
-                                          course_grade=course_grade, generation_mode=generation_mode)
+                                          course_grade=course_grade, generation_mode=generation_mode,
+                                          delay_seconds=delay_seconds)
 
     status = _set_allowlist_cert_status(user, course_key, enrollment_mode, course_grade)
     if status is not None:
@@ -62,7 +66,7 @@ def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
     return False
 
 
-def _generate_regular_certificate_task(user, course_key, generation_mode=None):
+def _generate_regular_certificate_task(user, course_key, generation_mode=None, delay_seconds=CERTIFICATE_DELAY_SECONDS):
     """
     Create a task to generate a regular (non-allowlist) certificate for this user in this course run, if the user is
     eligible and a certificate can be generated.
@@ -71,7 +75,8 @@ def _generate_regular_certificate_task(user, course_key, generation_mode=None):
     course_grade = _get_course_grade(user, course_key)
     if _can_generate_regular_certificate(user, course_key, enrollment_mode, course_grade):
         return _generate_certificate_task(user=user, course_key=course_key, enrollment_mode=enrollment_mode,
-                                          course_grade=course_grade, generation_mode=generation_mode)
+                                          course_grade=course_grade, generation_mode=generation_mode,
+                                          delay_seconds=delay_seconds)
 
     status = _set_regular_cert_status(user, course_key, enrollment_mode, course_grade)
     if status is not None:
@@ -80,7 +85,8 @@ def _generate_regular_certificate_task(user, course_key, generation_mode=None):
     return False
 
 
-def _generate_certificate_task(user, course_key, enrollment_mode, course_grade, status=None, generation_mode=None):
+def _generate_certificate_task(user, course_key, enrollment_mode, course_grade, status=None, generation_mode=None,
+                               delay_seconds=CERTIFICATE_DELAY_SECONDS):
     """
     Create a task to generate a certificate
     """
@@ -99,7 +105,7 @@ def _generate_certificate_task(user, course_key, enrollment_mode, course_grade, 
     if generation_mode is not None:
         kwargs['generation_mode'] = generation_mode
 
-    generate_certificate.apply_async(countdown=CERTIFICATE_DELAY_SECONDS, kwargs=kwargs)
+    generate_certificate.apply_async(countdown=delay_seconds, kwargs=kwargs)
     return True
 
 

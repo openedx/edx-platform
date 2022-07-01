@@ -36,7 +36,7 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.util.json_request import JsonResponse
 
-from edx_django_utils.user import generate_password
+from edx_django_utils.user import generate_password  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def auto_auth(request):  # pylint: disable=too-many-statements

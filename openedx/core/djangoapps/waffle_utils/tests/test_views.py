@@ -44,20 +44,38 @@ class ToggleStateViewTests(TestCase):  # lint-amnesty, pylint: disable=missing-c
         assert "on" == response.data["waffle_flags"][0]["course_overrides"][0]["force"]
         assert "both" == response.data["waffle_flags"][0]["computed_status"]
 
-    def test_course_overrides(self):
-        models.WaffleFlagCourseOverrideModel.objects.create(waffle_flag="my.flag", enabled=True)
-        course_overrides = {}
+    def test_response_with_org_override(self):
+        models.WaffleFlagOrgOverrideModel.objects.create(waffle_flag="my.flag", enabled=True)
+        response = get_toggle_state_response()
+        assert response.data["waffle_flags"]
+        assert "my.flag" == response.data["waffle_flags"][0]["name"]
+        assert response.data["waffle_flags"][0]["org_overrides"]
+        assert "" == response.data["waffle_flags"][0]["org_overrides"][0]["org"]
+        assert "on" == response.data["waffle_flags"][0]["org_overrides"][0]["force"]
+        assert "both" == response.data["waffle_flags"][0]["computed_status"]
 
-        report = toggle_state_views.CourseOverrideToggleStateReport()
-        report.add_waffle_flag_instances(course_overrides)
-        report.add_waffle_flag_computed_status(course_overrides)
+    def test_course_and_org_overrides(self):
+        models.WaffleFlagCourseOverrideModel.objects.create(waffle_flag='my.flag', enabled=True)
+        models.WaffleFlagOrgOverrideModel.objects.create(waffle_flag='my.flag', enabled=True)
+        overrides = {}
 
-        assert 'my.flag' in course_overrides
-        assert 'course_overrides' in course_overrides['my.flag']
-        assert 1 == len(course_overrides['my.flag']['course_overrides'])
-        assert 'None' == course_overrides['my.flag']['course_overrides'][0]['course_id']
-        assert 'on' == course_overrides['my.flag']['course_overrides'][0]['force']
-        assert 'both' == course_overrides['my.flag']['computed_status']
+        report = toggle_state_views.OverrideToggleStateReport()
+        report.add_waffle_flag_instances(overrides)
+        report.add_waffle_flag_computed_status(overrides)
+
+        assert 'my.flag' in overrides
+
+        assert 'course_overrides' in overrides['my.flag']
+        assert 1 == len(overrides['my.flag']['course_overrides'])
+        assert 'None' == overrides['my.flag']['course_overrides'][0]['course_id']
+        assert 'on' == overrides['my.flag']['course_overrides'][0]['force']
+        assert 'both' == overrides['my.flag']['computed_status']
+
+        assert 'org_overrides' in overrides['my.flag']
+        assert 1 == len(overrides['my.flag']['org_overrides'])
+        assert '' == overrides['my.flag']['org_overrides'][0]['org']
+        assert 'on' == overrides['my.flag']['org_overrides'][0]['force']
+        assert 'both' == overrides['my.flag']['computed_status']
 
     def test_computed_status(self):
         models.WaffleFlagCourseOverrideModel.objects.create(
@@ -69,21 +87,39 @@ class ToggleStateViewTests(TestCase):  # lint-amnesty, pylint: disable=missing-c
         models.WaffleFlagCourseOverrideModel.objects.create(
             waffle_flag="my.disabledflag1", enabled=False, course_id="org/course/id"
         )
+        models.WaffleFlagOrgOverrideModel.objects.create(
+            waffle_flag="my.overriddenflag3", enabled=True, org="org"
+        )
+        models.WaffleFlagOrgOverrideModel.objects.create(
+            waffle_flag="my.overriddenflag4", enabled=True
+        )
+        models.WaffleFlagOrgOverrideModel.objects.create(
+            waffle_flag="my.disabledflag2", enabled=False, org="org"
+        )
 
-        course_overrides = {}
-        report = toggle_state_views.CourseOverrideToggleStateReport()
-        report.add_waffle_flag_instances(course_overrides)
-        report.add_waffle_flag_computed_status(course_overrides)
+        overrides = {}
+        report = toggle_state_views.OverrideToggleStateReport()
+        report.add_waffle_flag_instances(overrides)
+        report.add_waffle_flag_computed_status(overrides)
 
-        assert "both" == course_overrides["my.overriddenflag1"]["computed_status"]
-        assert "org/course/id" == course_overrides["my.overriddenflag1"]["course_overrides"][0]["course_id"]
-        assert "on" == course_overrides["my.overriddenflag1"]["course_overrides"][0]["force"]
+        assert "both" == overrides["my.overriddenflag1"]["computed_status"]
+        assert "org/course/id" == overrides["my.overriddenflag1"]["course_overrides"][0]["course_id"]
+        assert "on" == overrides["my.overriddenflag1"]["course_overrides"][0]["force"]
 
-        assert "both" == course_overrides["my.overriddenflag2"]["computed_status"]
-        assert "None" == course_overrides["my.overriddenflag2"]["course_overrides"][0]["course_id"]
-        assert "on" == course_overrides["my.overriddenflag2"]["course_overrides"][0]["force"]
+        assert "both" == overrides["my.overriddenflag2"]["computed_status"]
+        assert "None" == overrides["my.overriddenflag2"]["course_overrides"][0]["course_id"]
+        assert "on" == overrides["my.overriddenflag2"]["course_overrides"][0]["force"]
 
-        assert "my.disabledflag1" not in course_overrides
+        assert "both" == overrides["my.overriddenflag3"]["computed_status"]
+        assert "org" == overrides["my.overriddenflag3"]["org_overrides"][0]["org"]
+        assert "on" == overrides["my.overriddenflag3"]["org_overrides"][0]["force"]
+
+        assert "both" == overrides["my.overriddenflag4"]["computed_status"]
+        assert "" == overrides["my.overriddenflag4"]["org_overrides"][0]["org"]
+        assert "on" == overrides["my.overriddenflag4"]["org_overrides"][0]["force"]
+
+        assert "my.disabledflag1" not in overrides
+        assert "my.disabledflag2" not in overrides
 
 
 def get_toggle_state_response(is_staff=True):

@@ -16,9 +16,9 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..api import UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses, get_course_members
 from ..exceptions import OverEnrollmentLimitException
@@ -36,7 +36,7 @@ class CourseApiTestMixin(CourseApiFactoryMixin):
         cls.request_factory = APIRequestFactory()
         CourseOverview.get_all_courses()  # seed the CourseOverview table
 
-    def verify_course(self, course, course_id='edX/toy/2012_Fall'):
+    def verify_course(self, course, course_id='course-v1:edX+toy+2012_Fall'):
         """
         Ensure that the returned course is the course we just created
         """
@@ -88,7 +88,7 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
 
     def test_hidden_course_for_staff(self):
         course = self._make_api_call(self.staff_user, self.staff_user, self.hidden_course.id)
-        self.verify_course(course, course_id='edX/hidden/2012_Fall')
+        self.verify_course(course, course_id='course-v1:edX+hidden+2012_Fall')
 
     def test_hidden_course_for_staff_as_honor(self):
         with pytest.raises(Http404):

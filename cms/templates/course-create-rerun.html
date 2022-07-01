@@ -2,7 +2,7 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "course_rerun" %></%def>
 <%!
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.urls import reverse
 from openedx.core.djangolib.js_utils import js_escaped_string
 %>

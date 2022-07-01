@@ -1,4 +1,4 @@
-name: CI
+name: Quality checks
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ jobs:
       with:
         fetch-depth: 2
 
-    - name: Fetch master for comparison
+    - name: Fetch base branch for comparison
       run: git fetch --depth=1 origin ${{ github.base_ref }}
 
     - name: Install Required System Packages
@@ -70,6 +70,7 @@ jobs:
         ./scripts/all-tests.sh
 
     - name: Save Job Artifacts
+      if: always()
       uses: actions/upload-artifact@v2
       with:
         name: Build-Artifacts

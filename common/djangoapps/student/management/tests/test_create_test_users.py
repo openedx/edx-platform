@@ -13,8 +13,8 @@ from opaque_keys import InvalidKeyError
 from common.djangoapps.student.helpers import AccountValidationError
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -29,10 +29,18 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
         self.user_model = get_user_model()
         self.num_users_start = len(self.user_model.objects.all())
 
-    def call_command(self, users, course=None, mode=None, password=None, domain=None, course_staff=False):
+    def call_command(
+        self,
+        users,
+        course=None,
+        mode=None,
+        password=None,
+        domain=None,
+        course_staff=False,
+        ignore_user_already_exists=False
+    ):
         """ Helper method to call the management command with various arguments """
-        args = ['create_test_users']
-        args.extend(users)
+        args = list(users)
         if course:
             args.extend(['--course', course])
         if mode:
@@ -43,7 +51,10 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
             args.extend(['--domain', domain])
         if course_staff:
             args.append('--course_staff')
-        call_command(*args)
+        if ignore_user_already_exists:
+            args.append('--ignore_user_already_exists')
+
+        call_command('create_test_users', *args)
 
     def test_create_users(self):
         """
@@ -203,3 +214,19 @@ class CreateTestUsersTestCase(SharedModuleStoreTestCase):
         user = self.user_model.objects.get(username=username)
         assert not CourseAccessRole.objects.filter(user=user).exists()
         assert not CourseEnrollment.objects.filter(user=user).exists()
+
+    def test_create_user__ignore_user_already_exists(self):
+        """
+        Test that ignore_user_already_exists will allow us to specify a username
+        that already exists without raising an exception
+        """
+        test_username = 'IgnoreUserAlreadyExistsUser'
+        assert not self.user_model.objects.filter(username=test_username).exists()
+
+        self.call_command([test_username])
+        assert self.user_model.objects.filter(username=test_username).exists()
+
+        with self.assertRaises(ValidationError):
+            self.call_command([test_username], ignore_user_already_exists=False)
+
+        self.call_command([test_username], ignore_user_already_exists=True)

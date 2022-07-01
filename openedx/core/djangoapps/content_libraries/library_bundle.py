@@ -5,7 +5,7 @@ Helper code for working with Blockstore bundles that contain OLX
 import dateutil.parser
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
 
-from functools import lru_cache
+from functools import lru_cache  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
 from xblock.core import XBlock
 from xblock.plugin import PluginMissingError
@@ -179,7 +179,7 @@ class LibraryBundle:
         Get the set of usage keys in this bundle that have no parent.
         """
         own_usage_keys = self.get_all_usages()
-        usage_keys_with_parents = self.get_bundle_includes().keys()  # lint-amnesty, pylint: disable=dict-keys-not-iterating
+        usage_keys_with_parents = self.get_bundle_includes().keys()
         return [usage_key for usage_key in own_usage_keys if usage_key not in usage_keys_with_parents]
 
     def get_bundle_includes(self):

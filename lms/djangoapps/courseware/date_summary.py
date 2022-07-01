@@ -24,6 +24,7 @@ from lms.djangoapps.certificates.api import get_active_web_certificate, can_show
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_experience import RELATIVE_DATES_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
@@ -408,6 +409,9 @@ class CourseAssignmentDate(DateSummary):
         self.complete = None
         self.past_due = None
         self._extra_info = None
+        self.block_key = None
+        self.complete_date = None
+        self.effort_time = None
 
     @property
     def date(self):
@@ -517,7 +521,7 @@ class CertificateAvailableDate(DateSummary):
         Registers an alert close to the certificate delivery date.
         """
         is_enrolled = CourseEnrollment.get_enrollment(request.user, course.id)
-        if not is_enrolled or not self.is_enabled or course.end > self.current_time:
+        if not is_enrolled or not self.is_enabled or (course.end and course.end > self.current_time):
             return
         if self.date > self.current_time:
             CourseHomeMessages.register_info_message(
@@ -719,7 +723,8 @@ class VerificationDeadlineDate(DateSummary):
         return (
             is_active and
             mode == 'verified' and
-            self.verification_status in ('expired', 'none', 'must_reverify')
+            self.verification_status in ('expired', 'none', 'must_reverify') and
+            not is_integrity_signature_enabled(self.course_id)
         )
 
     @lazy
@@ -731,3 +736,54 @@ class VerificationDeadlineDate(DateSummary):
     def must_retry(self):
         """Return True if the user must re-submit verification, False otherwise."""
         return self.verification_status == 'must_reverify'
+
+class FunixCourseStartDate(DateSummary):
+    """
+    Displays the start date of the course.
+    """
+    css_class = 'start-date'
+
+    @property
+    def date(self):
+        return self._init_date
+
+    @property
+    def date_type(self):
+        return 'course-start-date'
+
+    @property
+    def title(self):
+        return gettext_lazy('Enrollment Date')
+
+    def register_alerts(self, request, course):
+        """
+        Registers an alert if the course has not started yet.
+        """
+        is_enrolled = CourseEnrollment.get_enrollment(request.user, course.id)
+        if not course.start or not is_enrolled:
+            return
+        days_until_start = (course.start - self.current_time).days
+        if course.start > self.current_time:
+            if days_until_start > 0:
+                CourseHomeMessages.register_info_message(
+                    request,
+                    Text(_(
+                        "Don't forget to add a calendar reminder!"
+                    )),
+                    title=Text(_("Course starts in {time_remaining_string} on {course_start_date}.")).format(
+                        time_remaining_string=self.time_remaining_string,
+                        course_start_date=self.long_date_html,
+                    )
+                )
+            else:
+                CourseHomeMessages.register_info_message(
+                    request,
+                    Text(_("Course starts in {time_remaining_string} at {course_start_time}.")).format(
+                        time_remaining_string=self.time_remaining_string,
+                        course_start_time=self.short_time_html,
+                    )
+                )
+
+    def __init__(self, course, user, course_id=None, date=None):
+        super().__init__(course, user, course_id=course_id)
+        self._init_date = date

@@ -15,8 +15,8 @@ from rest_framework.response import Response
 
 from lms.djangoapps.course_goals.models import UserActivity
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .api import get_blocks
 from .forms import BlockListGetForm

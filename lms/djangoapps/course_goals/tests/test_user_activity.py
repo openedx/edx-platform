@@ -3,7 +3,7 @@ Unit tests for user activity methods.
 """
 
 from datetime import datetime, timedelta
-
+from unittest.mock import Mock
 
 import ddt
 from django.contrib.auth import get_user_model
@@ -13,29 +13,26 @@ from edx_django_utils.cache import TieredCache
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from mock import patch
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from openedx.features.course_experience import ENABLE_COURSE_GOALS
 
 User = get_user_model()
 
 
 @ddt.ddt
-@override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=True)
+@override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
 class UserActivityTests(UrlResetMixin, ModuleStoreTestCase):
     """
     Testing Course Goals User Activity
     """
-
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
@@ -173,6 +170,7 @@ class UserActivityTests(UrlResetMixin, ModuleStoreTestCase):
         '/api/discussion/v1/courses/{COURSE_ID}/',
         '/api/discussion/v1/course_topics/{COURSE_ID}',
     )
+    @patch('lms.djangoapps.discussion.rest_api.api.get_course_commentable_counts', Mock(return_value={}))
     def test_mobile_app_user_activity_calls(self, url):
         url = url.replace('{COURSE_ID}', str(self.course.id))
         with patch.object(UserActivity, 'record_user_activity') as record_user_activity_mock:

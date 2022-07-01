@@ -13,7 +13,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
 from ..serializers import CourseTabSerializer, CourseTabUpdateSerializer, TabIDLocatorSerializer
-from ....views.tabs import edit_tab_handler, get_course_tabs, reorder_tabs_handler
+from ....views.tabs import edit_tab_handler, get_course_static_tabs, reorder_tabs_handler
 
 
 @view_auth_classes(is_authenticated=True)
@@ -34,7 +34,7 @@ class CourseTabListView(DeveloperErrorViewMixin, APIView):
     @verify_course_exists()
     def get(self, request: Request, course_id: str) -> Response:
         """
-        Get a list of all the tabs in a course including hidden tabs.
+        Get a list of all the static tabs in a course including hidden tabs.
 
         **Example Request**
 
@@ -82,7 +82,7 @@ class CourseTabListView(DeveloperErrorViewMixin, APIView):
             self.permission_denied(request)
 
         course_module = modulestore().get_course(course_key)
-        tabs_to_render = get_course_tabs(course_module, request.user)
+        tabs_to_render = get_course_static_tabs(course_module, request.user)
         return Response(CourseTabSerializer(tabs_to_render, many=True).data)
 
 
@@ -177,7 +177,7 @@ class CourseTabReorderView(DeveloperErrorViewMixin, APIView):
         return super().handle_exception(exc)
 
     @apidocs.schema(
-        body=[TabIDLocatorSerializer],
+        body=TabIDLocatorSerializer(many=True),
         parameters=[
             apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID"),
         ],
@@ -199,23 +199,11 @@ class CourseTabReorderView(DeveloperErrorViewMixin, APIView):
 
             POST /api/contentstore/v0/tabs/{course_id}/reorder [
                 {
-                    "tab_id": "info"
-                },
-                {
-                    "tab_id": "courseware"
-                },
-                {
                     "tab_locator": "block-v1:TstX+DemoX+Demo+type@static_tab+block@d26fcb0e93824fbfa5c9e5f100e2511a"
                 },
                 {
-                    "tab_id": "wiki"
+                    "tab_locator": "block-v1:TstX+DemoX+Demo+type@static_tab+block@a011f1bd05af4578ae397ed8cabccf62"
                 },
-                {
-                    "tab_id": "discussion"
-                },
-                {
-                    "tab_id": "progress"
-                }
             ]
 
 
@@ -233,7 +221,7 @@ class CourseTabReorderView(DeveloperErrorViewMixin, APIView):
         tab_id_locators.is_valid(raise_exception=True)
         reorder_tabs_handler(
             course_module,
-            {"tabs": tab_id_locators.validated_data},
+            tab_id_locators.validated_data,
             request.user,
         )
         return Response(status=status.HTTP_204_NO_CONTENT)

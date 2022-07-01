@@ -1,0 +1,17 @@
+
+===============
+Kafka Consumer
+===============
+
+Purpose
+=======
+
+This is a (likely temporary) app created to test and iterate on event bus consumer patterns. The goal is to eventually
+have a flexible event bus that can be easily brought into other apps and repositories to produce and consume arbitrary
+topics. Ideally, the event bus itself will also be an abstraction behind which platform maintainers can use non-Kafka
+implementations (Redis, Pulsar, etc.). The documentation/ADRs may also be moved to more appropriate places as the
+process matures.
+
+There are a hefty number of "# TODO (EventBus)" annotations left in to help guide further development. This app is intended to be subject to frequent and rapid changes. Outside of testing this app, it is best to leave the
+KAFKA_CONSUMERS_ENABLED setting off.
+

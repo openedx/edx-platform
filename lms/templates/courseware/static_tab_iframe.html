@@ -1,0 +1,48 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="head_extra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+<%static:css group='style-student-notes'/>
+
+<main id="main" aria-label="Content" tabindex="-1">
+	<style>
+		body {
+			background-color: white;
+		}
+	</style>
+
+    <section class="container">
+      <div class="static_tab_wrapper" style="border:none" id="content">
+        ${HTML(fragment.body_html())}
+      </div>
+    </section>
+</main>
+
+
+<script type="text/javascript">
+  (function() {
+	if (window !== window.parent) {
+		const contentElement = document.getElementById('content');
+		const newHeight = contentElement.offsetHeight;
+
+		window.parent.postMessage({
+				type: 'plugin.resize',
+				payload: {
+				height: newHeight,
+				}
+		}, document.referrer);
+	}
+  }());
+</script>

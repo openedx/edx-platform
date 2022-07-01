@@ -10,11 +10,12 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import add_course_mode
 from .test_course_home import course_home_url
@@ -24,6 +25,7 @@ TEST_VERIFICATION_SOCK_LOCATOR = '<div class="verification-sock"'
 
 
 @ddt.ddt
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class TestCourseSockView(SharedModuleStoreTestCase):
     """
     Tests for the course verification sock fragment view.

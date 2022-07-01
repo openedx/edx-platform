@@ -11,7 +11,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 
-from edx_django_utils.user import generate_password
+from edx_django_utils.user import generate_password  # lint-amnesty, pylint: disable=wrong-import-order
 
 LOGGER = logging.getLogger(__name__)
 

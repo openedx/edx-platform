@@ -2,24 +2,37 @@
 Tests for support views.
 """
 
-
 import itertools
 import json
 import re
 from datetime import datetime, timedelta
 from unittest.mock import patch
+from urllib.parse import quote
 from uuid import UUID, uuid4
 
 import ddt
+from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import signals
 from django.http import HttpResponse
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
+from django.utils import timezone
+from edx_proctoring.api import create_exam_attempt, update_attempt_status
+from edx_proctoring.models import ProctoredExam
+from edx_proctoring.runtime import set_runtime_service
+from edx_proctoring.statuses import ProctoredExamStudentAttemptStatus
+from edx_proctoring.tests.test_services import MockLearningSequencesService, MockScheduleItemData
+from edx_proctoring.tests.utils import ProctoredExamTestCase
+from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.tests.factories import OrganizationFactory
 from pytz import UTC
 from rest_framework import status
 from social_django.models import UserSocialAuth
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+)
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -43,8 +56,16 @@ from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from openedx.features.enterprise_support.api import enterprise_is_enabled
+from openedx.features.enterprise_support.tests.factories import (
+    EnterpriseCourseEnrollmentFactory,
+    EnterpriseCustomerUserFactory
+)
+
+try:
+    from consent.models import DataSharingConsent
+except ImportError:  # pragma: no cover
+    pass
 
 
 class SupportViewTestCase(ModuleStoreTestCase):
@@ -196,7 +217,7 @@ class SupportViewAccessTests(SupportViewTestCase):
         # Expect a redirect to the login page
         redirect_url = "{login_url}?next={original_url}".format(
             login_url=reverse("signin_user"),
-            original_url=url,
+            original_url=quote(url),
         )
         self.assertRedirects(response, redirect_url)
 
@@ -229,6 +250,8 @@ class SupportViewCertificatesTests(SupportViewTestCase):
     """
     Tests for the certificates support view.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         """Make the user support staff. """
         super().setUp()
@@ -247,7 +270,7 @@ class SupportViewCertificatesTests(SupportViewTestCase):
 
     def test_certificates_along_with_course_filter(self):
         # Check that an initial filter is passed to the JavaScript client.
-        url = reverse("support:certificates") + "?user=student@example.com&course_id=" + str(self.course.id)
+        url = reverse("support:certificates") + "?user=student@example.com&course_id=" + quote(str(self.course.id))
         response = self.client.get(url)
         self.assertContains(response, "userFilter: 'student@example.com'")
         self.assertContains(response, "courseFilter: '" + str(self.course.id) + "'")
@@ -307,6 +330,54 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         }, data[0])
         assert {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.HONOR, CourseMode.NO_ID_PROFESSIONAL_MODE,
                 CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE} == {mode['slug'] for mode in data[0]['course_modes']}
+        assert 'enterprise_course_enrollments' not in data[0]
+
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
+    @enterprise_is_enabled()
+    def test_get_enrollments_enterprise_enabled(self):
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': self.student.username}
+        )
+
+        enterprise_customer_user = EnterpriseCustomerUserFactory(
+            user_id=self.student.id
+        )
+        enterprise_course_enrollment = EnterpriseCourseEnrollmentFactory(
+            course_id=self.course.id,
+            enterprise_customer_user=enterprise_customer_user
+        )
+        data_sharing_consent = DataSharingConsent(
+            course_id=self.course.id,
+            enterprise_customer=enterprise_customer_user.enterprise_customer,
+            username=self.student.username,
+            granted=True
+        )
+        data_sharing_consent.save()
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+        data = json.loads(response.content.decode('utf-8'))
+        assert len(data) == 1
+
+        enterprise_course_enrollments_data = data[0]['enterprise_course_enrollments']
+        assert len(enterprise_course_enrollments_data) == 1
+        expected = {
+            'course_id': str(enterprise_course_enrollment.course_id),
+            'enterprise_customer_name': enterprise_customer_user.enterprise_customer.name,
+            'enterprise_customer_user_id': enterprise_customer_user.id,
+            'license': None,
+            'saved_for_later': enterprise_course_enrollment.saved_for_later,
+            'data_sharing_consent': {
+                'username': self.student.username,
+                'enterprise_customer_uuid': str(enterprise_customer_user.enterprise_customer_id),
+                'exists': data_sharing_consent.exists,
+                'consent_provided': data_sharing_consent.granted,
+                'consent_required': data_sharing_consent.consent_required(),
+                'course_id': str(enterprise_course_enrollment.course_id),
+            }
+        }
+        assert enterprise_course_enrollments_data[0] == expected
 
     @ddt.data(
         (True, 'Self Paced'),
@@ -384,7 +455,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'mode': '<script>alert("xss")</script>',
             'reason': 'Financial Assistance'
         })
-        test_key_error = b'&lt;script&gt;alert(&#34;xss&#34;)&lt;/script&gt; is not a valid mode for org'
+        test_key_error = b'&lt;script&gt;alert(&#34;xss&#34;)&lt;/script&gt; is not a valid mode for course-v1:org'
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert test_key_error in response.content
 
@@ -687,11 +758,11 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         assert render_call_dict['errors'] == [error]
 
     @ddt.data(
-        '0001,learner-01\n0002,learner-02',                                 # normal
-        '0001,learner-01,apple,orange\n0002,learner-02,purple',             # extra fields
+        '0001,learner-01\n0002,learner-02',  # normal
+        '0001,learner-01,apple,orange\n0002,learner-02,purple',  # extra fields
         '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
     )
-    @patch('lms.djangoapps.support.views.program_enrollments.link_program_enrollments')
+    @patch('lms.djangoapps.support.views.utils.link_program_enrollments')
     def test_text(self, text, mocked_link):
         self.client.post(self.url, data={
             'program_uuid': self.program_uuid,
@@ -878,7 +949,8 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
                         is_active=True
                     )
 
-                program_course_enrollment = ProgramCourseEnrollmentFactory.create(  # lint-amnesty, pylint: disable=unused-variable
+                program_course_enrollment = ProgramCourseEnrollmentFactory.create(
+                    # lint-amnesty, pylint: disable=unused-variable
                     program_enrollment=program_enrollment,
                     course_key=course_id,
                     course_enrollment=course_enrollment,
@@ -1147,6 +1219,286 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
         assert expected_info == render_call_dict['learner_program_enrollments']
 
 
+@ddt.ddt
+class ProgramEnrollmentsInspectorAPIViewTests(SupportViewTestCase):
+    """
+    View tests for Program Enrollments Inspector API
+    """
+    _url = reverse("support:program_enrollments_inspector_details")
+
+    def setUp(self):
+        super().setUp()
+        SupportStaffRole().add_users(self.user)
+        self.program_uuid = str(uuid4())
+        self.external_user_key = 'abcaaa'
+        # Setup three orgs and their SAML providers
+        self.org_key_list = ['test_org', 'donut_org', 'tri_org']
+        for org_key in self.org_key_list:
+            lms_org = OrganizationFactory(
+                short_name=org_key
+            )
+            SAMLProviderConfigFactory(
+                organization=lms_org,
+                slug=org_key,
+                enabled=True,
+            )
+        self.no_saml_org_key = 'no_saml_org'
+        self.no_saml_lms_org = OrganizationFactory(
+            short_name=self.no_saml_org_key
+        )
+
+    def _serialize_datetime(self, dt):
+        return dt.strftime('%Y-%m-%dT%H:%M:%S')
+
+    def test_default_response(self):
+        response = self.client.get(self._url)
+        content = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == 200
+        assert '' == content['org_keys']
+
+    def _construct_user(self, username, org_key=None, external_user_key=None):
+        """
+        Provided the username, create an edx account user. If the org_key is provided,
+        SSO link the user with the IdP associated with org_key. Return the created user and
+        expected user info object from the view
+        """
+        user = UserFactory(username=username)
+        user_info = {
+            'username': user.username,
+            'email': user.email
+        }
+        if org_key and external_user_key:
+            user_social_auth = UserSocialAuth.objects.create(
+                user=user,
+                uid=f'{org_key}:{external_user_key}',
+                provider='tpa-saml'
+            )
+            user_info['sso_list'] = [{
+                'uid': user_social_auth.uid
+            }]
+        return user, user_info
+
+    def _construct_enrollments(self, program_uuids, course_ids, external_user_key, edx_user=None):
+        """
+        A helper function to setup the program enrollments for a given learner.
+        If the edx user is provided, it will try to SSO the user with the enrollments
+        Return the expected info object that should be created based on the model setup
+        """
+        program_enrollments = []
+        for program_uuid in program_uuids:
+            course_enrollment = None
+            program_enrollment = ProgramEnrollmentFactory.create(
+                external_user_key=external_user_key,
+                program_uuid=program_uuid,
+                user=edx_user
+            )
+
+            for course_id in course_ids:
+                if edx_user:
+                    course_enrollment = CourseEnrollmentFactory.create(
+                        course_id=course_id,
+                        user=edx_user,
+                        mode=CourseMode.MASTERS,
+                        is_active=True
+                    )
+
+                program_course_enrollment = ProgramCourseEnrollmentFactory.create(
+                    # lint-amnesty, pylint: disable=unused-variable
+                    program_enrollment=program_enrollment,
+                    course_key=course_id,
+                    course_enrollment=course_enrollment,
+                    status='active',
+                )
+
+            program_enrollments.append(program_enrollment)
+
+        serialized = ProgramEnrollmentSerializer(program_enrollments, many=True)
+        return serialized.data
+
+    def _construct_id_verification(self, user):
+        """
+        Helper function to create the SSO verified record for the user
+        so that the user is ID Verified
+        """
+        SSOVerificationFactory(
+            identity_provider_slug=self.org_key_list[0],
+            user=user,
+        )
+        return IDVerificationService.user_status(user)
+
+    def test_search_username_well_connected_user(self):
+        created_user, expected_user_info = self._construct_user(
+            'test_user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        id_verified = self._construct_id_verification(created_user)
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            self.external_user_key,
+            created_user
+        )
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments,
+            'id_verification': id_verified
+        }
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_username_user_not_connected(self):
+        created_user, expected_user_info = self._construct_user('user_not_connected')
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user)
+        }
+
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_username_user_no_enrollment(self):
+        created_user, expected_user_info = self._construct_user(
+            'user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user),
+        }
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_username_user_no_course_enrollment(self):
+        created_user, expected_user_info = self._construct_user(
+            'user_connected',
+            self.org_key_list[0],
+            self.external_user_key
+        )
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [],
+            self.external_user_key,
+            created_user,
+        )
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments,
+            'id_verification': IDVerificationService.user_status(created_user),
+        }
+
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_username_user_not_connected_with_enrollments(self):
+        created_user, expected_user_info = self._construct_user(
+            'user_not_connected'
+        )
+        self._construct_enrollments(
+            [self.program_uuid],
+            [],
+            self.external_user_key,
+        )
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': IDVerificationService.user_status(created_user),
+        }
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_username_user_id_verified(self):
+        created_user, expected_user_info = self._construct_user(
+            'user_not_connected'
+        )
+        id_verified = self._construct_id_verification(created_user)
+        expected_info = {
+            'user': expected_user_info,
+            'id_verification': id_verified
+        }
+        response = self.client.get(self._url + f'?edx_user={created_user.username}&org_key={self.org_key_list[0]}')
+        response = json.loads(response.content.decode('utf-8'))
+        assert expected_info == response['learner_program_enrollments']
+
+    @ddt.data(
+        ('', 'test_org'),
+        ('bad_key', '')
+    )
+    @ddt.unpack
+    def test_search_no_external_user_key(self, user_key, org_key):
+        response = self.client.get(self._url + f'?external_user_key={user_key}&org_key={org_key}')
+        response = json.loads(response.content.decode('utf-8'))
+        expected_error = (
+            "To perform a search, you must provide either the student's "
+            "(a) edX username, "
+            "(b) email address associated with their edX account, or "
+            "(c) Identity-providing institution and external key!"
+        )
+
+        assert {} == response['learner_program_enrollments']
+        assert expected_error == response['error']
+
+    def test_search_external_user_not_connected(self):
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            self.external_user_key,
+        )
+        response = self.client.get(
+            self._url + f'?external_user_key={self.external_user_key}&org_key={self.org_key_list[0]}'
+        )
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': {
+                'external_user_key': self.external_user_key,
+            },
+            'enrollments': expected_enrollments
+        }
+        assert expected_info == response['learner_program_enrollments']
+
+    def test_search_external_user_not_in_system(self):
+        external_user_key = 'not_in_system'
+        response = self.client.get(
+            self._url + f'?external_user_key={external_user_key}&org_key={self.org_key_list[0]}'
+        )
+        response = json.loads(response.content.decode('utf-8'))
+        expected_error = 'No user found for external key {} for institution {}'.format(
+            external_user_key, self.org_key_list[0]
+        )
+        assert expected_error == response['error']
+
+    def test_search_external_user_case_insensitive(self):
+        external_user_key = 'AbCdEf123'
+        requested_external_user_key = 'aBcDeF123'
+        created_user, expected_user_info = self._construct_user(
+            'test_user_connected',
+            self.org_key_list[0],
+            external_user_key
+        )
+        expected_enrollments = self._construct_enrollments(
+            [self.program_uuid],
+            [self.course.id],
+            external_user_key,
+            created_user
+        )
+        id_verified = self._construct_id_verification(created_user)
+        response = self.client.get(
+            self._url + f'?external_user_key={requested_external_user_key}&org_key={self.org_key_list[0]}'
+        )
+        response = json.loads(response.content.decode('utf-8'))
+        expected_info = {
+            'user': expected_user_info,
+            'enrollments': expected_enrollments,
+            'id_verification': id_verified,
+        }
+        assert expected_info == response['learner_program_enrollments']
+
+
 class SsoRecordsTests(SupportViewTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
@@ -1195,6 +1547,7 @@ class FeatureBasedEnrollmentSupportApiViewTests(SupportViewTestCase):
     """
     Test suite for FBE Support API view.
     """
+
     def setUp(self):
         super().setUp()
         SupportStaffRole().add_users(self.user)
@@ -1232,3 +1585,422 @@ class FeatureBasedEnrollmentSupportApiViewTests(SupportViewTestCase):
         )
         data = json.loads(response.content.decode('utf-8'))
         assert data == {}
+
+
+@ddt.ddt
+class LinkProgramEnrollmentSupportAPIViewTests(SupportViewTestCase):
+    """
+    Tests for the link_program_enrollments support view.
+    """
+    _url = reverse("support:link_program_enrollments_details")
+
+    def setUp(self):
+        """
+        Make the user support staff.
+        """
+        super().setUp()
+        SupportStaffRole().add_users(self.user)
+        self.program_uuid = str(uuid4())
+        self.username_pair_text = '0001,user-0001\n0002,user-02'
+
+    def _setup_user_from_username(self, username):
+        """
+        Setup a user from the passed in username.
+        If username passed in is falsy, return None
+        """
+        created_user = None
+        if username:
+            created_user = UserFactory(username=username, password=self.PASSWORD)
+        return created_user
+
+    def _setup_enrollments(self, external_user_key, linked_user=None):
+        """
+        Create enrollments for testing linking.
+        The enrollments can be created with already linked edX user.
+        """
+        program_enrollment = ProgramEnrollmentFactory.create(
+            external_user_key=external_user_key,
+            program_uuid=self.program_uuid,
+            user=linked_user
+        )
+        course_enrollment = None
+        if linked_user:
+            course_enrollment = CourseEnrollmentFactory.create(
+                course_id=self.course.id,
+                user=linked_user,
+                mode=CourseMode.MASTERS,
+                is_active=True
+            )
+        program_course_enrollment = ProgramCourseEnrollmentFactory.create(
+            program_enrollment=program_enrollment,
+            course_key=self.course.id,
+            course_enrollment=course_enrollment,
+            status='active'
+        )
+        return program_enrollment, program_course_enrollment
+
+    def test_invalid_uuid(self):
+        """
+        Tests if enrollment linkages are refused for an invalid uuid
+        """
+        response = self.client.post(self._url, data={
+            'program_uuid': 'notauuid',
+            'username_pair_text': self.username_pair_text,
+        })
+        msg = "Supplied program UUID 'notauuid' is not a valid UUID."
+        data = json.loads(response.content.decode('utf-8'))
+        assert data['errors'] == [msg]
+
+    @ddt.data(
+        ('program_uuid', ''),
+        ('', 'username_pair_text'),
+        ('', '')
+    )
+    @ddt.unpack
+    def test_missing_parameter(self, program_uuid, username_pair_text):
+        """
+        Tests if enrollment linkages are refused for missing parameters
+        """
+        error = (
+            "You must provide both a program uuid "
+            "and a series of lines with the format "
+            "'external_user_key,lms_username'."
+        )
+        response = self.client.post(self._url, data={
+            'program_uuid': program_uuid,
+            'username_pair_text': username_pair_text
+        })
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert response_data['errors'] == [error]
+
+    @ddt.data(
+        '0001,learner-01\n0002,learner-02',  # normal
+        '0001,learner-01,apple,orange\n0002,learner-02,purple',  # extra fields
+        '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
+    )
+    @patch('lms.djangoapps.support.views.utils.link_program_enrollments')
+    def test_username_pair_text(self, username_pair_text, mocked_link):
+        """
+        Tests if enrollment linkages are created for different types of
+        username_pair_text format
+        """
+        response = self.client.post(self._url, data={
+            'program_uuid': self.program_uuid,
+            'username_pair_text': username_pair_text,
+        })
+        response_data = json.loads(response.content.decode('utf-8'))
+        mocked_link.assert_called_once()
+        mocked_link.assert_called_with(
+            UUID(self.program_uuid),
+            {
+                '0001': 'learner-01',
+                '0002': 'learner-02',
+            }
+        )
+        success = ["('0001', 'learner-01')", "('0002', 'learner-02')"]
+        assert response_data['successes'] == success
+        mocked_link.reset_mock()
+
+    def test_invalid_username_pair_text(self):
+        """
+        Tests if enrollment linkages are refused for invalid types of
+        username_pair_text format
+        """
+        username_pair_text = 'garbage_text'
+        response = self.client.post(self._url, data={
+            'program_uuid': self.program_uuid,
+            'username_pair_text': username_pair_text,
+        })
+        msg = "All linking lines must be in the format 'external_user_key,lms_username'"
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert response_data['errors'] == [msg]
+
+    @ddt.data(
+        ('linked_user', None),
+        ('linked_user', 'original_user')
+    )
+    @ddt.unpack
+    def test_linking_program_enrollment_with_username(self, username, original_username):
+        """
+        Tests if enrollment linkages are created for valid usernames
+        """
+        external_user_key = '0001'
+        linked_user = self._setup_user_from_username(username)
+        original_user = self._setup_user_from_username(original_username)
+        program_enrollment, program_course_enrollment = self._setup_enrollments(
+            external_user_key,
+            original_user
+        )
+        response = self.client.post(self._url, data={
+            'program_uuid': self.program_uuid,
+            'username_pair_text': external_user_key + ',' + username
+        })
+        response_data = json.loads(response.content.decode('utf-8'))
+        expected_success = f"('{external_user_key}', '{username}')"
+        assert response_data['successes'] == [expected_success]
+        program_enrollment.refresh_from_db()
+        assert program_enrollment.user == linked_user
+        program_course_enrollment.refresh_from_db()
+        assert program_course_enrollment.course_enrollment.user == linked_user
+
+    @ddt.data(
+        ('', None),
+    )
+    @ddt.unpack
+    def test_linking_program_enrollment_without_username(self, username, original_username):
+        """
+        Tests if enrollment linkages are refused for invalid usernames
+        """
+        external_user_key = '0001'
+        linked_user = self._setup_user_from_username(username)
+        original_user = self._setup_user_from_username(original_username)
+        program_enrollment, program_course_enrollment = self._setup_enrollments(
+            external_user_key,
+            original_user
+        )
+        response = self.client.post(self._url, data={
+            'program_uuid': self.program_uuid,
+            'username_pair_text': external_user_key + ',' + username
+        })
+        response_data = json.loads(response.content.decode('utf-8'))
+        error = "All linking lines must be in the format 'external_user_key,lms_username'"
+        assert response_data['errors'] == [error]
+
+
+class SAMLProvidersWithOrgTests(SupportViewTestCase):
+    """
+    Tests for the get_saml_providers API View
+    """
+    _url = reverse("support:get_saml_providers")
+
+    def setUp(self):
+        """
+        Make the user support staff.
+        """
+        super().setUp()
+        SupportStaffRole().add_users(self.user)
+
+        self.org_key_list = ['test_org', 'donut_org', 'tri_org']
+        for org_key in self.org_key_list:
+            lms_org = OrganizationFactory(
+                short_name=org_key
+            )
+            SAMLProviderConfigFactory(
+                organization=lms_org,
+                slug=org_key,
+                enabled=True,
+            )
+
+    def test_returning_saml_providers(self):
+        response = self.client.get(self._url)
+        response_data = json.loads(response.content.decode('utf-8'))
+        assert response_data == self.org_key_list
+
+
+class TestOnboardingView(SupportViewTestCase, ProctoredExamTestCase):
+    """
+    Tests for OnboardingView
+    """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
+    def setUp(self):
+        super().setUp()
+        SupportStaffRole().add_users(self.user)
+
+        self.proctored_exam_id = self._create_proctored_exam()
+        self.onboarding_exam_id = self._create_onboarding_exam()
+
+        self.other_user = User.objects.create(username='otheruser', password='test')
+        self.other_course_content = 'block-v1:test+course+2+type@sequential+block@other_onboard'
+
+        self.other_course = CourseFactory.create(
+            org='x',
+            course='y',
+            run='z',
+            enable_proctored_exams=True,
+            proctoring_provider=settings.PROCTORING_BACKENDS['DEFAULT'],
+        )
+
+        yesterday = timezone.now() - timezone.timedelta(days=1)
+        self.course_scheduled_sections = {
+            BlockUsageLocator.from_string(self.content_id_onboarding): MockScheduleItemData(yesterday),
+            BlockUsageLocator.from_string(self.other_course_content): MockScheduleItemData(yesterday),
+        }
+
+        set_runtime_service('learning_sequences', MockLearningSequencesService(
+            list(self.course_scheduled_sections.keys()),
+            self.course_scheduled_sections,
+        ))
+
+        self.onboarding_exam = ProctoredExam.objects.get(id=self.onboarding_exam_id)
+
+    def tearDown(self):  # lint-amnesty, pylint: disable=super-method-not-called
+        """
+        Override deafult implementation to prevent `default` key deletion from TRACKERS in
+        an inherited tearDown() method of ProctoredExamTestCase
+        """
+        return
+
+    def _url(self, username):
+        return reverse("support:onboarding_status", kwargs={'username_or_email': username})
+
+    def _create_enrollment(self):
+        """ Create enrollment in default course """
+        # default course key = 'a/b/c'
+        self.course = CourseFactory.create(
+            org='a',
+            course='b',
+            run='c',
+            enable_proctored_exams=True,
+            proctoring_provider=settings.PROCTORING_BACKENDS['DEFAULT'],
+        )
+        CourseEnrollmentFactory(
+            is_active=True,
+            mode='verified',
+            course_id=self.course.id,
+            user=self.user
+        )
+
+    def test_wrong_username(self):
+        """
+        Test that a request with a username which does not exits returns 404
+        """
+        response = self.client.get(self._url(username='does_not_exist'))
+        self.assertEqual(response.status_code, 404)
+
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response_data['verified_in'], None)
+        self.assertEqual(response_data['current_status'], None)
+
+    def test_no_record(self):
+        """
+        Test that a request with a username which do not have any onboarding exam returns empty data
+        """
+        response = self.client.get(self._url(username=self.other_user.username))
+        self.assertEqual(response.status_code, 200)
+
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response_data['verified_in'], None)
+        self.assertEqual(response_data['current_status'], None)
+
+    def test_no_verified_attempts(self):
+        """
+        Test that if there are no verified attempts, the most recent status is returned
+        """
+
+        self._create_enrollment()
+
+        # create first attempt
+        attempt_id = create_exam_attempt(self.onboarding_exam_id, self.user.id, True)
+        update_attempt_status(attempt_id, ProctoredExamStudentAttemptStatus.submitted)
+
+        response = self.client.get(self._url(username=self.user.username))
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response_data['verified_in'], None)
+        self.assertEqual(
+            response_data['current_status']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.submitted
+        )
+
+        # Create second attempt and assert that most recent attempt is returned
+        create_exam_attempt(self.onboarding_exam_id, self.user.id, True)
+        response = self.client.get(self._url(username=self.user.username))
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response_data['verified_in'], None)
+        self.assertEqual(
+            response_data['current_status']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.created
+        )
+
+    def test_get_verified_attempt(self):
+        """
+        Test that if there is at least one verified attempt, the status returned is always verified
+        """
+
+        self._create_enrollment()
+
+        # Create first attempt
+        attempt_id = create_exam_attempt(self.onboarding_exam_id, self.user.id, True)
+        update_attempt_status(attempt_id, ProctoredExamStudentAttemptStatus.verified)
+        response = self.client.get(self._url(username=self.user.username))
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(
+            response_data['verified_in']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.verified
+        )
+        self.assertEqual(
+            response_data['current_status']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.verified
+        )
+
+        # Create second attempt and assert that verified attempt is still returned
+        create_exam_attempt(self.onboarding_exam_id, self.user.id, True)
+        response = self.client.get(self._url(username=self.user.username))
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(
+            response_data['verified_in']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.verified
+        )
+        self.assertEqual(
+            response_data['current_status']['onboarding_status'],
+            ProctoredExamStudentAttemptStatus.verified
+        )
+
+    def test_verified_in_another_course(self):
+        """
+        Test that, if there is at least one verified attempt in any course for a given user,
+        the current status will return `other_course_approved`
+        """
+
+        # Create a submitted attempt in the current course
+        attempt_id = create_exam_attempt(self.onboarding_exam_id, self.user.id, True)
+        update_attempt_status(attempt_id, ProctoredExamStudentAttemptStatus.submitted)
+
+        # Create an attempt in the other course that has been verified
+        other_course_id = 'x/y/z'
+        other_course_onboarding_exam = ProctoredExam.objects.create(
+            course_id=other_course_id,
+            content_id=self.other_course_content,
+            exam_name='Test Exam',
+            external_id='123aXqe3',
+            time_limit_mins=90,
+            is_active=True,
+            is_proctored=True,
+            is_practice_exam=True,
+            backend='test'
+        )
+
+        self.user_id = self.user.id
+        self._create_exam_attempt(other_course_onboarding_exam.id, ProctoredExamStudentAttemptStatus.verified, True)
+
+        # professional enrollment
+        CourseEnrollmentFactory(
+            is_active=True,
+            mode='professional',
+            course_id=self.other_course.id,
+            user=self.user
+        )
+
+        # default enrollment afterwards with submitted status
+        self._create_enrollment()
+
+        response = self.client.get(self._url(username=self.user.username))
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content.decode('utf-8'))
+
+        # assert that originally verified enrollment is reflected correctly
+        self.assertEqual(response_data['verified_in']['onboarding_status'], 'verified')
+        self.assertEqual(response_data['verified_in']['course_id'], 'x/y/z')
+
+        # assert that most recent enrollment (current status) has other_course_approved status
+        self.assertEqual(response_data['current_status']['onboarding_status'], 'other_course_approved')
+        self.assertEqual(response_data['current_status']['course_id'], 'a/b/c')

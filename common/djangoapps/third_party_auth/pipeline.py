@@ -71,7 +71,7 @@ import six
 import social_django
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.contrib.auth import logout, REDIRECT_FIELD_NAME
+from django.contrib.auth import logout
 from django.core.mail.message import EmailMessage
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
@@ -87,9 +87,9 @@ from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
+from openedx.core.djangoapps.user_api.accounts.utils import username_suffix_generator
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
-from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from common.djangoapps.third_party_auth.utils import (
     get_associated_user_by_email_response,
     get_user_from_email,
@@ -480,7 +480,7 @@ def parse_query_params(strategy, response, *args, **kwargs):
     """Reads whitelisted query params, transforms them into pipeline args."""
     # If auth_entry is not in the session, we got here by a non-standard workflow.
     # We simply assume 'login' in that case.
-    auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY, AUTH_ENTRY_LOGIN)
+    auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY) or AUTH_ENTRY_LOGIN
     if auth_entry not in _AUTH_ENTRY_CHOICES:
         raise AuthEntryError(strategy.request.backend, 'auth_entry invalid')
 
@@ -1008,33 +1008,11 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
         # The final_username may be empty and will skip the loop.
         # We are using our own version of user_exists to avoid possible case sensitivity issues.
         while not final_username or len(final_username) < min_length or user_exists({'username': final_username}):
-            username = short_username + uuid4().hex[:uuid_length]
+            # adding a dash between user-supplied and system-generated values to avoid weird combinations
+            username = short_username + '-' + username_suffix_generator(uuid_length)
             final_username = slug_func(clean_func(username[:max_length]))
             logger.info('[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(
                 username=final_username))
     else:
         final_username = storage.user.get_username(user)
     return {'username': final_username}
-
-
-def ensure_redirect_url_is_safe(strategy, *args, **kwargs):
-    """
-    Ensure that the redirect url is save if a user logs in or registers by
-    directly hitting the TPA url i.e /auth/login/backend_name?next=<redirect_to>
-    Check it against the LOGIN_REDIRECT_WHITELIST. If it is not safe then
-    redirect to SOCIAL_AUTH_LOGIN_REDIRECT_URL (defaults to /dashboard)
-    """
-    redirect_to = strategy.session_get(REDIRECT_FIELD_NAME, None)
-    request = strategy.request
-
-    if redirect_to and request:
-        is_safe = is_safe_login_or_logout_redirect(
-            redirect_to=redirect_to,
-            request_host=request.get_host(),
-            dot_client_id=None,
-            require_https=request.is_secure(),
-        )
-
-        if not is_safe:
-            safe_redirect_url = getattr(settings, 'SOCIAL_AUTH_LOGIN_REDIRECT_URL', '/dashboard')
-            strategy.session_set(REDIRECT_FIELD_NAME, safe_redirect_url)

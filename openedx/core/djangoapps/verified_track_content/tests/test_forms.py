@@ -3,8 +3,8 @@ Test for forms helpers.
 """
 
 from openedx.core.djangoapps.verified_track_content.forms import VerifiedTrackCourseForm
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestVerifiedTrackCourseForm(SharedModuleStoreTestCase):

@@ -5,10 +5,11 @@ Courseware views functions
 
 import json
 import logging
+import urllib
 from collections import OrderedDict, namedtuple
 from datetime import datetime
+from urllib.parse import quote_plus
 
-import urllib
 import bleach
 import requests
 from django.conf import settings
@@ -22,7 +23,6 @@ from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from urllib.parse import quote_plus
 from django.utils.text import slugify
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -45,21 +45,32 @@ from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from web_fragments.fragment import Fragment
+from xmodule.course_module import (
+    COURSE_VISIBILITY_PUBLIC,
+    COURSE_VISIBILITY_PUBLIC_OUTLINE
+)
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import (
+    ItemNotFoundError,
+    NoPathToItem
+)
+from xmodule.tabs import CourseTabList
+from xmodule.x_module import STUDENT_VIEW
 
-from lms.djangoapps.survey import views as survey_views
 from common.djangoapps.course_modes.models import CourseMode, get_course_prices
 from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
-from lms.djangoapps.edxnotes.helpers import is_feature_enabled
+from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
+from common.djangoapps.util.cache import cache, cache_if_anonymous
+from common.djangoapps.util.course import course_location_from_key
+from common.djangoapps.util.db import outer_atomic
+from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
+from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_usage_key
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_home_api.toggles import (
-    course_home_legacy_is_active,
-    course_home_mfe_progress_tab_is_active
-)
-from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url, is_request_from_learning_mfe
+from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active, course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, check_public_access
 from lms.djangoapps.courseware.courses import (
@@ -78,23 +89,24 @@ from lms.djangoapps.courseware.courses import (
 )
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
-from lms.djangoapps.courseware.masquerade import setup_masquerade, is_masquerading_as_specific_student
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student, setup_masquerade
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
-from lms.djangoapps.courseware.permissions import (  # lint-amnesty, pylint: disable=unused-import
+from lms.djangoapps.courseware.permissions import (
     MASQUERADE_AS_STUDENT,
     VIEW_COURSE_HOME,
     VIEW_COURSEWARE,
-    VIEW_XQA_INTERFACE
 )
-
-from lms.djangoapps.courseware.toggles import is_courses_default_invite_only_enabled
+from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
+from lms.djangoapps.survey import views as survey_views
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
@@ -102,7 +114,7 @@ from openedx.core.djangoapps.credit.api import (
     is_credit_course,
     is_user_eligible_for_credit
 )
-from openedx.core.djangoapps.enrollments.api import add_enrollment, get_enrollment  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -117,23 +129,17 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
-from openedx.features.course_experience.url_helpers import get_courseware_url, ExperienceOption
+from openedx.features.course_experience.url_helpers import (
+    ExperienceOption,
+    get_courseware_url,
+    get_learning_mfe_home_url,
+    is_request_from_learning_mfe
+)
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
-from common.djangoapps.util.cache import cache, cache_if_anonymous
-from common.djangoapps.util.course import course_location_from_key
-from common.djangoapps.util.db import outer_atomic
-from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
-from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_usage_key
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from xmodule.tabs import CourseTabList
-from xmodule.x_module import STUDENT_VIEW
 
 from ..context_processor import user_timezone_locale_prefs
 from ..entrance_exams import user_can_skip_entrance_exam
@@ -627,6 +633,46 @@ class StaticCourseTabView(EdxFragmentView):
         })
 
 
+class StaticCourseTabIFrameView(EdxFragmentView):
+    """
+    View that displays a static course tab with a given name in iframe.
+    """
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(ensure_valid_course_key)
+    @method_decorator(xframe_options_exempt)
+    def get(self, request, course_id, tab_slug, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+        """
+        Displays a static course tab page with a given name
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_with_access(request.user, 'load', course_key)
+        tab = CourseTabList.get_tab_by_slug(course.tabs, tab_slug)
+        if tab is None:
+            raise Http404
+
+        # Show warnings if the user has limited access
+        CourseTabView.register_user_access_warning_messages(request, course)
+
+        return super().get(request, course=course, tab=tab, **kwargs)
+
+    def render_to_fragment(self, request, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+        """
+        Renders the static tab to a fragment.
+        """
+        return get_static_tab_fragment(request, course, tab)
+
+    def render_standalone_response(self, request, fragment, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+        """
+        Renders this static tab's fragment to HTML for a standalone page.
+        """
+        return render_to_response('courseware/static_tab_iframe.html', {
+            'course': course,
+            'active_page': 'static_tab_{}'.format(tab['url_slug']),
+            'tab': tab,
+            'fragment': fragment,
+            'disable_courseware_js': True,
+        })
+
 class CourseTabView(EdxFragmentView):
     """
     View that displays a course tab page.
@@ -727,7 +773,7 @@ class CourseTabView(EdxFragmentView):
     @staticmethod
     def course_open_for_learner_enrollment(course):
         return (course_open_for_self_enrollment(course.id)
-                and not course.invitation_only
+                and not course_is_invitation_only(course)
                 and not CourseMode.is_masters_only(course.id))
 
     @staticmethod
@@ -936,7 +982,7 @@ def course_about(request, course_id):
             if course_home_legacy_is_active(course.id):
                 course_target = reverse(course_home_url_name(course.id), args=[str(course.id)])
             else:
-                course_target = get_learning_mfe_home_url(course_key=course.id, view_name='home')
+                course_target = get_learning_mfe_home_url(course_key=course.id, url_fragment='home')
         else:
             course_target = reverse('about_course', args=[str(course.id)])
 
@@ -970,7 +1016,7 @@ def course_about(request, course_id):
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(request.user.has_perm(ENROLL_IN_COURSE, course))
-        invitation_only = is_courses_default_invite_only_enabled() or course.invitation_only
+        invitation_only = course_is_invitation_only(course)
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
         # Register button should be disabled if one of the following is true:
@@ -1060,8 +1106,9 @@ def dates(request, course_id):
 
     course_key = CourseKey.from_string(course_id)
     if not (course_home_legacy_is_active(course_key) or request.user.is_staff):
-        microfrontend_url = get_learning_mfe_home_url(course_key=course_key, view_name=COURSE_DATES_NAME)
-        raise Redirect(microfrontend_url)
+        raise Redirect(get_learning_mfe_home_url(
+            course_key=course_key, url_fragment=COURSE_DATES_NAME, params=request.GET,
+        ))
 
     # Enable NR tracing for this view based on course
     monitoring_utils.set_custom_attribute('course_id', str(course_key))
@@ -1132,13 +1179,13 @@ def dates(request, course_id):
 @data_sharing_consent_required
 def progress(request, course_id, student_id=None):
     """ Display the progress page. """
-    from lms.urls import COURSE_PROGRESS_NAME
-
     course_key = CourseKey.from_string(course_id)
 
     if course_home_mfe_progress_tab_is_active(course_key) and not request.user.is_staff:
-        microfrontend_url = get_learning_mfe_home_url(course_key=course_key, view_name=COURSE_PROGRESS_NAME)
-        raise Redirect(microfrontend_url)
+        end_of_redirect_url = 'progress' if not student_id else f'progress/{student_id}'
+        raise Redirect(get_learning_mfe_home_url(
+            course_key=course_key, url_fragment=end_of_redirect_url, params=request.GET,
+        ))
 
     with modulestore().bulk_operations(course_key):
         return _progress(request, course_key, student_id)
@@ -1247,8 +1294,8 @@ def _downloadable_certificate_message(course, cert_downloadable_status):  # lint
     return _downloadable_cert_data(download_url=cert_downloadable_status['download_url'])
 
 
-def _missing_required_verification(student, enrollment_mode):
-    return (
+def _missing_required_verification(student, enrollment_mode, course_key):
+    return not is_integrity_signature_enabled(course_key) and (
         enrollment_mode in CourseMode.VERIFIED_MODES and not IDVerificationService.user_is_verified(student)
     )
 
@@ -1271,7 +1318,7 @@ def _certificate_message(student, course, enrollment_mode):  # lint-amnesty, pyl
     if cert_downloadable_status['is_downloadable']:
         return _downloadable_certificate_message(course, cert_downloadable_status)
 
-    if _missing_required_verification(student, enrollment_mode):
+    if _missing_required_verification(student, enrollment_mode, course.id):
         return UNVERIFIED_CERT_DATA
 
     return REQUESTING_CERT_DATA
@@ -1758,6 +1805,8 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         # If other use cases appear, consider removing the is_learning_mfe check or switching this
         # to be its own query parameter that can toggle the behavior.
         student_view_context['hide_access_error_blocks'] = is_learning_mfe and recheck_access
+        is_mobile_app = is_request_from_mobile_app(request)
+        student_view_context['is_mobile_app'] = is_mobile_app
 
         enable_completion_on_view_service = False
         completion_service = block.runtime.service(block, 'completion')
@@ -1807,7 +1856,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'on_courseware_page': True,
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'is_learning_mfe': is_learning_mfe,
-            'is_mobile_app': is_request_from_mobile_app(request),
+            'is_mobile_app': is_mobile_app,
             'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
             'render_course_wide_assets': True,
 

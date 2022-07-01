@@ -54,14 +54,14 @@ from common.djangoapps.util.monitoring import monitor_import_failure
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
-from xmodule.contentstore.django import contentstore
-from xmodule.course_module import CourseFields
-from xmodule.exceptions import SerializationError
-from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider, ItemNotFoundError
-from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
-from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_module import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.exceptions import SerializationError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider, ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .outlines import update_outline_from_modulestore
 from .outlines_regenerate import CourseOutlineRegenerate

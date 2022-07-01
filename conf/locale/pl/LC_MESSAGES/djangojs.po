@@ -98,15 +98,16 @@
 # Jakub Kopczyk <kuba5566@gmail.com>, 2014
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2020
 # Kamil Magryta <gryxon@gmail.com>, 2016
+# Magdalena Dulęba <magdalena.duleba@e-science.pl>, 2021
 # Mateusz <blue90pl@gmail.com>, 2014
 # Sebastian <foobarbaz@gazeta.pl>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-21 17:10+0000\n"
-"PO-Revision-Date: 2021-08-01 20:44+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2021-12-19 20:42+0000\n"
+"PO-Revision-Date: 2021-12-21 07:18+0000\n"
+"Last-Translator: Magdalena Dulęba <magdalena.duleba@e-science.pl>\n"
 "Language-Team: Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -4840,7 +4841,7 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
+msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -10976,12 +10977,9 @@ msgstr "Nadzorowany"
 msgid ""
 "Proctored exams are timed and they record video of each learner taking the "
 "exam. The videos are then reviewed to ensure that learners follow all "
-"examination rules."
+"examination rules. Please note that setting this exam as proctored will "
+"change the visibility settings to \"Hide content after due date.\""
 msgstr ""
-"Egzaminy nadzorowane są egzaminami z limitem czasu i obejmują nagrywanie "
-"filmowe każdego studenta w trakcie przebiegu jego egzaminu. Filmy można "
-"następnie sprawdzić i upewnić się, że studenci stosowali się do zasad "
-"egzaminacyjnych."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"

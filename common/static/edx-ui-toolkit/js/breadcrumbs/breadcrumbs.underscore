@@ -1,0 +1,11 @@
+<% if (breadcrumbs !== null && breadcrumbs.length > 0) { %>
+    <nav class="breadcrumbs list-inline" aria-label="<%- label %>">
+        <% _.each(breadcrumbs.slice(0, -1), function (breadcrumb) { %>
+            <span class="nav-item">
+                <a href="<%- breadcrumb.url %>"><%- breadcrumb.title %></a>
+                <span class="fa fa-angle-right" aria-hidden="true"></span>
+            </span>
+        <% }) %>
+        <span class="nav-item"><%- breadcrumbs[breadcrumbs.length - 1].title %></span>
+    </nav>
+<% } %>

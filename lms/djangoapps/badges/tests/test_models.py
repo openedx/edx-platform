@@ -24,8 +24,8 @@ from lms.djangoapps.badges.models import (
 )
 from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
 from lms.djangoapps.certificates.tests.test_models import TEST_DATA_ROOT, TEST_DATA_DIR
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 def get_image(name):
@@ -196,8 +196,8 @@ class BadgeClassTest(ModuleStoreTestCase):
         Verify handing incomplete data for required fields when making a badge class raises an Integrity error.
         """
         image = get_image('good')
-        pytest.raises(IntegrityError, BadgeClass.get_badge_class, slug='new_slug', issuing_component='new_component',
-                      image_file_handle=image)
+        with pytest.raises(IntegrityError), self.allow_transaction_exception():
+            BadgeClass.get_badge_class(slug='new_slug', issuing_component='new_component', image_file_handle=image)
 
     def test_get_for_user(self):
         """

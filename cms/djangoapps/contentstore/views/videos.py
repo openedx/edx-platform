@@ -53,7 +53,7 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.view_utils import view_auth_classes
-from xmodule.video_module.transcripts_utils import Transcript
+from xmodule.video_module.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import VideoUploadConfig
 from ..utils import reverse_course_url
@@ -285,7 +285,7 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
 
     # validate transcription providers
     transcription_plans = get_3rd_party_transcription_plans()
-    if provider in list(transcription_plans.keys()):
+    if provider in list(transcription_plans.keys()):   # lint-amnesty, pylint: disable=consider-iterating-dictionary
 
         # Further validations for providers
         if provider == TranscriptProvider.CIELO24:

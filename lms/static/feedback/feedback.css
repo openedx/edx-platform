@@ -1,0 +1,95 @@
+#funix-feedback .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+#funix-feedback  .dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 160px;
+    overflow: auto;
+    z-index: 1;
+    bottom: -40px;
+    right: 65px;
+}
+
+#funix-feedback  .hover:hover {
+    background-color: #adadad;
+}
+
+#funix-feedback  .show {
+    display: block;
+}
+
+#funix-feedback  .form-container textarea:focus {
+    outline: none;
+}
+
+#funix-feedback  .btn-link {
+    text-decoration: none;
+    text-transform: none;
+    font-size: 14px;
+    line-height: 20.72px;
+}
+
+#funix-feedback  .btn-link {
+    margin: 0;
+    cursor: pointer;
+    border: 1px solid #000663;
+    border-bottom: 1px solid #00003a;
+    display: inline-block;
+    text-align: center;
+    font: normal 1.2rem/1.6rem "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    letter-spacing: 1px;
+    vertical-align: top;
+    border-radius: 0;
+    border-color: transparent;
+    background: transparent;
+    background-image: none;
+    box-shadow: none;
+    text-shadow: none;
+    white-space: nowrap;
+    font-weight: 600;
+    text-transform: none;
+    font-size: 14px;
+    line-height: 20.72px;
+    text-decoration: none;
+    color: rgb(88, 88, 88);
+    padding: 0;
+}
+
+#funix-feedback  .btnSend {
+    -webkit-text-size-adjust: 100%;
+    text-align: center;
+    font: normal 1.2rem/1.6rem "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-family: sans-serif;
+    margin: 0;
+    vertical-align: baseline;
+    line-height: normal;
+    cursor: pointer;
+    -webkit-appearance: button;
+    text-transform: none;
+    letter-spacing: 0;
+    border: 1px solid #d2c9c9;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 0 #fff;
+    color: #333;
+    display: inline-block;
+    font-weight: bold;
+    background-color: #f1f1f1;
+    background-image: linear-gradient(#f1f1f1,#d9d1d1);
+    padding: 7px 18px;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #fcfbfb;
+    background-clip: padding-box;
+    font-size: 0.8125em;
+}
+
+#funix-feedback .btn-link:hover {
+    text-decoration: underline !important;
+    background-image: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    cursor: pointer;
+}

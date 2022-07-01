@@ -7,19 +7,16 @@ https://openedx.atlassian.net/wiki/display/TNL/User+API
 
 import datetime
 import logging
-import uuid
 from functools import wraps
 
 import pytz
-from rest_framework.exceptions import UnsupportedMediaType
-
 from consent.models import DataSharingConsent
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, logout
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.db import models, transaction
+from django.db import transaction
 from django.utils.translation import gettext as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
@@ -30,6 +27,7 @@ from integrated_channels.degreed.models import DegreedLearnerDataTransmissionAud
 from integrated_channels.sap_success_factors.models import SapSuccessFactorsLearnerDataTransmissionAudit
 from rest_framework import permissions, status
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.exceptions import UnsupportedMediaType
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
@@ -40,13 +38,11 @@ from wiki.models.pluginbase import RevisionPluginRevision
 
 from common.djangoapps.entitlements.models import CourseEntitlement
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
-    AccountRecovery,
     CourseEnrollmentAllowed,
     LoginFailures,
     ManualEnrollmentAudit,
     PendingEmailChange,
     PendingNameChange,
-    Registration,
     User,
     UserProfile,
     get_potentially_retired_user_by_username,
@@ -85,7 +81,7 @@ from .serializers import (
     UserSearchEmailSerializer
 )
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
-from .utils import create_retirement_request_and_deactivate_account
+from .utils import create_retirement_request_and_deactivate_account, username_suffix_generator
 
 try:
     from coaching.api import has_ever_consented_to_coaching
@@ -186,6 +182,7 @@ class AccountViewSet(ViewSet):
             * secondary_email: A secondary email address for the user. Unlike
               the email field, GET will reflect the latest update to this field
               even if changes have yet to be confirmed.
+            * verified_name: Approved verified name of the learner present in name affirmation plugin
             * gender: One of the following values:
 
                 * null
@@ -251,9 +248,6 @@ class AccountViewSet(ViewSet):
 
             * pending_name_change: If the user has an active name change request, returns the
               requested name.
-
-            * is_verified_name_enabled: Temporary flag to control verified name field - see
-              https://github.com/edx/edx-name-affirmation/blob/main/edx_name_affirmation/toggles.py
 
             For all text fields, plain text instead of HTML is supported. The
             data is stored exactly as specified. Clients must HTML escape
@@ -331,6 +325,8 @@ class AccountViewSet(ViewSet):
                 user = User.objects.get(id=lms_user_id)
             except (UserNotFound, User.DoesNotExist):
                 return Response(status=status.HTTP_404_NOT_FOUND)
+            except ValueError:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
             search_usernames = [user.username]
         try:
             account_settings = get_account_settings(
@@ -556,7 +552,7 @@ class DeactivateLogoutView(APIView):
                     ace.send(notification)
                 except Exception as exc:
                     log.exception('Error sending out deletion notification email')
-                    raise
+                    raise exc
 
                 # Log the user out.
                 logout(request)
@@ -656,16 +652,6 @@ class AccountRetirementPartnerReportView(ViewSet):
             # Org can conceivably be blank or this bogus default value
             if org and org != 'outdated_entry':
                 orgs.add(org)
-        try:
-            # if the user has ever launched a managed Zoom xblock,
-            # we'll notify Zoom to delete their records.
-            # We use models.Value(1) to make use of the indexing on the field. MySQL does not
-            # support boolean types natively, and checking for False will cause a table scan.
-            if user.launchlog_set.filter(managed=models.Value(1)).count():
-                orgs.add('zoom')
-        except AttributeError:
-            # Zoom XBlock not installed
-            pass
         return orgs
 
     def retirement_partner_report(self, request):  # pylint: disable=unused-argument
@@ -1331,8 +1317,8 @@ class UsernameReplacementView(APIView):
         # Keep checking usernames in case desired_username + random suffix is already taken
         while True:
             if User.objects.filter(username=new_username).exists():
-                unique_suffix = uuid.uuid4().hex[:suffix_length]
-                new_username = desired_username + unique_suffix
+                # adding a dash between user-supplied and system-generated values to avoid weird combinations
+                new_username = desired_username + '-' + username_suffix_generator(suffix_length)
             else:
                 break
         return new_username

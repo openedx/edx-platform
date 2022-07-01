@@ -10,6 +10,7 @@ from django.conf import settings
 from django.urls import reverse
 
 from lms.djangoapps.bulk_email.models_api import (
+    is_bulk_email_disabled_for_course,
     is_bulk_email_enabled_for_course,
     is_bulk_email_feature_enabled,
     is_user_opted_out_for_course
@@ -30,7 +31,7 @@ def get_emails_enabled(user, course_id):
         (bool): True if emails are enabled for the course associated with course_id for the user;
         False otherwise
     """
-    if is_bulk_email_feature_enabled(course_id=course_id):
+    if is_bulk_email_feature_enabled(course_id=course_id) and not is_bulk_email_disabled_for_course(course_id):
         return not is_user_opted_out_for_course(user=user, course_id=course_id)
     return None
 

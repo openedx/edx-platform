@@ -8,18 +8,19 @@ from copy import deepcopy
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.test.utils import XssTestMixin
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTestMixin):
     """
     All tests for the views.py file
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     STUDENT_INFO = [('view@test.com', 'foo')]
 
     @classmethod

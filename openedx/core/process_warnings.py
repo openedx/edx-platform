@@ -91,7 +91,7 @@ def read_warning_data(dir_path):
     # TODO(jinder): currently this is hard-coded in, maybe create a constants file with info
     # THINK(jinder): but creating file for one constant seems overkill
     warnings_file_name_regex = (
-        r"pytest_warnings_?\d*\.json"  # noqa pylint: disable=W1401
+        r"pytest_warnings_?[\w-]*\.json"  # noqa pylint: disable=W1401
     )
 
     # iterate through files_in_dir and see if they match our know file name pattern

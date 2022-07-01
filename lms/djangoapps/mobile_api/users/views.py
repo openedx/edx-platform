@@ -29,8 +29,8 @@ from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.views.index import save_positions_recursively_up
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05
 from openedx.features.course_duration_limits.access import check_course_expired
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .. import errors
 from ..decorators import mobile_course_access, mobile_view

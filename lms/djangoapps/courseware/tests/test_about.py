@@ -26,22 +26,22 @@ from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTE
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.track.tests import EventTrackingTestCase
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
-from xmodule.course_module import (
+from xmodule.course_module import (  # lint-amnesty, pylint: disable=wrong-import-order
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_NONE,
     COURSE_VISIBILITY_PRIVATE,
     COURSE_VISIBILITY_PUBLIC,
     COURSE_VISIBILITY_PUBLIC_OUTLINE
 )
-from xmodule.modulestore.tests.django_utils import (
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     TEST_DATA_MIXED_MODULESTORE,
-    TEST_DATA_SPLIT_MODULESTORE,
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.utils import TEST_DATA_DIR
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import LoginEnrollmentTestCase
 
@@ -55,6 +55,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
     """
     Tests about xblock.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
@@ -291,6 +292,8 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
     """
     This test case will check the About page when a course has a capped enrollment
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -336,6 +339,8 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course is invitation only.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -380,6 +385,8 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
     This test case will check the About page for a course that has enrollment start/end
     set but it is currently outside of that period.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         super().setUp()
 
@@ -462,8 +469,6 @@ class CourseAboutTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
     Test for unenrolled student tries to access ccx.
     Note: Only CCX coach can enroll a student in CCX. In sum self-registration not allowed.
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

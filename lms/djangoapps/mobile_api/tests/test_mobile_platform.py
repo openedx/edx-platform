@@ -22,6 +22,8 @@ class TestMobilePlatform(TestCase):
         ("edX/org.edx.mobile (3.3.3; OS Version 9.2 (Build 13C75))", "iOS", "3.3.3"),
         ("edX/org.edx.mobile (3.3.3.test; OS Version 9.2 (Build 13C75))", "iOS", "3.3.3.test"),
         ("edX/org.test-domain.mobile (0.1.5; OS Version 9.2 (Build 13C75))", "iOS", "0.1.5"),
+        ("edX/org.test-domain.mobile (3172; OS Version 9.2 (Build 13C75))", "iOS", "2.26.3"),
+        ("edX/org.test-domain.mobile (2.26.3; OS Version 9.2 (Build 13C75))", "iOS", "2.26.3"),
         ("Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/1.1.1", "Android", "1.1.1"),
         ("Dalvik/2.1.0 (Linux; U; Android 5.1; Nexus 5 Build/LMY47I) edX/org.edx.mobile/3.3.3.X", "Android", "3.3.3.X"),
         ("Dalvik/2.1.0 (Linux; U; Android 9; MI 6 MIUI/V11.0.3.0.PCAMIXM) edX/org.edx.mobile/2.17.1", "Android", "2.17.1"),  # lint-amnesty, pylint: disable=line-too-long

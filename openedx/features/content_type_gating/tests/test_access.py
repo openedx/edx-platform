@@ -3,6 +3,7 @@ Test audit user's access to various content based on content-gating features.
 """
 import os
 from datetime import datetime, timedelta
+from unittest.mock import patch, Mock
 
 import ddt
 from django.conf import settings
@@ -10,9 +11,13 @@ from django.test.client import RequestFactory, Client
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
-from django.contrib.auth.models import User
-from unittest.mock import patch, Mock
+from django.contrib.auth import get_user_model
 from pyquery import PyQuery as pq
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -42,15 +47,13 @@ from openedx.features.content_type_gating.services import ContentTypeGatingServi
 from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 METADATA = {
     'group_access': {
         CONTENT_GATING_PARTITION_ID: [CONTENT_TYPE_GATE_GROUP_IDS['full_access']]
     }
 }
+User = get_user_model()
 
 
 @patch("crum.get_current_request")
@@ -113,7 +116,7 @@ def _assert_block_is_gated(block, is_gated, user, course, request_factory, has_u
     checkout_link = '#' if has_upgrade_link else None
     for content_getter in (_get_content_from_fragment, _get_content_from_lms_index):
         with patch.object(ContentTypeGatingPartition, '_get_checkout_link', return_value=checkout_link):
-            content = content_getter(block, user.id, course, request_factory)
+            content = content_getter(block, user.id, course, request_factory)  # pylint: disable=no-value-for-parameter
         if is_gated:
             assert 'content-paywall' in content
             if has_upgrade_link:
@@ -160,8 +163,9 @@ def _assert_block_is_empty(block, user_id, course, request_factory):
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
 ))
-class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):
+class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pylint: disable=missing-class-docstring
 
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     PROBLEM_TYPES = ['problem', 'openassessment', 'drag-and-drop-v2', 'done', 'edx_sga']
     # 'html' is a component that just displays html, in these tests it is used to test that users who do not have access
     # to graded problems still have access to non-problems
@@ -782,6 +786,8 @@ class TestConditionalContentAccess(TestConditionalContent):
     Conditional Content allows course authors to run a/b tests on course content.  We want to make sure that
     even if one of these a/b tests are being run, the student still has the correct access to the content.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -800,9 +806,13 @@ class TestConditionalContentAccess(TestConditionalContent):
         self.student_audit_b = self.student_b
 
         # Create verified students
-        self.student_verified_a = UserFactory.create(username='student_verified_a', email='student_verified_a@example.com')
+        self.student_verified_a = UserFactory.create(
+            username='student_verified_a', email='student_verified_a@example.com'
+        )
         CourseEnrollmentFactory.create(user=self.student_verified_a, course_id=self.course.id, mode='verified')
-        self.student_verified_b = UserFactory.create(username='student_verified_b', email='student_verified_b@example.com')
+        self.student_verified_b = UserFactory.create(
+            username='student_verified_b', email='student_verified_b@example.com'
+        )
         CourseEnrollmentFactory.create(user=self.student_verified_b, course_id=self.course.id, mode='verified')
 
         # Put students into content gating groups
@@ -832,7 +842,8 @@ class TestConditionalContentAccess(TestConditionalContent):
 
     def test_access_based_on_conditional_content(self):
         """
-        If a user is enrolled as an audit user they should not have access to graded problems, including conditional content.
+        If a user is enrolled as an audit user they should not have access to graded problems,
+        including conditional content.
         All paid type tracks should have access graded problems including conditional content.
         """
 
@@ -884,6 +895,7 @@ class TestMessageDeduplication(ModuleStoreTestCase):
     how it's currently tested). If that method changes to use something other than the template
     message, this method's checks will need to be updated.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         super().setUp()
@@ -892,7 +904,7 @@ class TestMessageDeduplication(ModuleStoreTestCase):
         self.request_factory = RequestFactory()
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
-    def _create_course(self):
+    def _create_course(self):  # pylint: disable=missing-function-docstring
         course = CourseFactory.create(run='test', display_name='test')
         CourseModeFactory.create(course_id=course.id, mode_slug='audit')
         CourseModeFactory.create(course_id=course.id, mode_slug='verified')
@@ -1093,6 +1105,7 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
     to check whether a sequence contains content type gated blocks
     The content_type_gate_for_block can be used to return the content type gate for a given block
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         super().setUp()
@@ -1101,7 +1114,7 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
         self.request_factory = RequestFactory()
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
-    def _create_course(self):
+    def _create_course(self):  # pylint: disable=missing-function-docstring
         course = CourseFactory.create(run='test', display_name='test')
         CourseModeFactory.create(course_id=course.id, mode_slug='audit')
         CourseModeFactory.create(course_id=course.id, mode_slug='verified')
@@ -1150,10 +1163,14 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
         )
 
         # The method returns a content type gate for blocks that should be gated
-        assert 'content-paywall' in ContentTypeGatingService()._content_type_gate_for_block(self.user, blocks_dict['graded_1'], course['course'].id).content
+        assert 'content-paywall' in ContentTypeGatingService()._content_type_gate_for_block(  # pylint: disable=protected-access
+            self.user, blocks_dict['graded_1'], course['course'].id
+        ).content
 
         # The method returns None for blocks that should not be gated
-        assert ContentTypeGatingService()._content_type_gate_for_block(self.user, blocks_dict['not_graded_1'], course['course'].id) is None
+        assert ContentTypeGatingService()._content_type_gate_for_block(  # pylint: disable=protected-access
+            self.user, blocks_dict['not_graded_1'], course['course'].id
+        ) is None
 
     @patch.object(ContentTypeGatingService, '_get_user', return_value=UserFactory.build())
     def test_check_children_for_content_type_gating_paywall(self, mocked_user):  # pylint: disable=unused-argument
@@ -1173,7 +1190,9 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
         )
 
         # The method returns a content type gate for blocks that should be gated
-        assert ContentTypeGatingService().check_children_for_content_type_gating_paywall(blocks_dict['vertical'], course['course'].id) is None
+        assert ContentTypeGatingService().check_children_for_content_type_gating_paywall(
+            blocks_dict['vertical'], course['course'].id
+        ) is None
 
         blocks_dict['graded_1'] = ItemFactory.create(
             parent=blocks_dict['vertical'],
@@ -1183,4 +1202,6 @@ class TestContentTypeGatingService(ModuleStoreTestCase):
         )
 
         # The method returns None for blocks that should not be gated
-        assert 'content-paywall' in ContentTypeGatingService().check_children_for_content_type_gating_paywall(blocks_dict['vertical'], course['course'].id)
+        assert 'content-paywall' in ContentTypeGatingService().check_children_for_content_type_gating_paywall(
+            blocks_dict['vertical'], course['course'].id
+        )

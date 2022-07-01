@@ -9,8 +9,8 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 
 from cms.djangoapps.contentstore.signals.handlers import handle_item_deleted
 from openedx.core.lib.gating import api as gating_api
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestHandleItemDeleted(ModuleStoreTestCase, MilestonesTestCaseMixin):

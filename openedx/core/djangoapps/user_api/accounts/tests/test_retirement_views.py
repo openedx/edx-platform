@@ -74,8 +74,8 @@ from common.djangoapps.student.tests.factories import (
     SuperuserFactory,
     UserFactory
 )
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ...tests.factories import UserOrgTagFactory
 from ..views import USER_PROFILE_PII, AccountRetirementView
@@ -211,8 +211,8 @@ class TestDeactivateLogout(RetirementTestCase):
         updated_user = User.objects.get(id=self.test_user.id)
         assert get_retired_email_by_email(self.test_user.email) == updated_user.email
         assert not updated_user.has_usable_password()
-        assert list(UserSocialAuth.objects.filter(user=self.test_user)) == []
-        assert list(Registration.objects.filter(user=self.test_user)) == []
+        assert not list(UserSocialAuth.objects.filter(user=self.test_user))
+        assert not list(Registration.objects.filter(user=self.test_user))
         assert len(UserRetirementStatus.objects.filter(user_id=self.test_user.id)) == 1
         # these retirement utils are tested elsewhere; just make sure we called them
         mock_retire_dot.assert_called_with(self.test_user)

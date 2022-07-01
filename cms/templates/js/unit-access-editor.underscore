@@ -3,7 +3,7 @@ var userPartitionInfo = xblockInfo.get('user_partition_info');
 var selectablePartitions = userPartitionInfo['selectable_partitions'];
 %>
 <form>
-<% if (selectablePartitions.length > 0) { %>
+<% if (selectablePartitions && selectablePartitions.length > 0) { %>
     <h3 class="modal-section-title access-change">
         <%- gettext('Unit Access') %>
     </h3>

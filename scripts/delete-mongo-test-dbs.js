@@ -11,7 +11,7 @@ but ignore other databases.
 
 
 String.prototype.startsWith = function(substring) {
-    return (this.indexOf(substring) == 0);
+    return (this.indexOf(substring) === 0);
 };
 
 var dbNameList = db.getMongo().getDBNames();

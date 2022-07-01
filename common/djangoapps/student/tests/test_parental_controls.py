@@ -1,8 +1,6 @@
 """Unit tests for parental controls."""
 
 
-import datetime
-
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
@@ -60,13 +58,13 @@ class ProfileParentalControlsTest(TestCase):
         # Verify for a child born 13 years agp
         self.set_year_of_birth(current_year - 13)
         assert self.profile.requires_parental_consent()
-        assert self.profile.requires_parental_consent(date=datetime.date(current_year, 12, 31))
-        assert not self.profile.requires_parental_consent(date=datetime.date((current_year + 1), 1, 1))
+        assert self.profile.requires_parental_consent(year=current_year)
+        assert not self.profile.requires_parental_consent(year=(current_year + 1))
 
         # Verify for a child born 14 years ago
         self.set_year_of_birth(current_year - 14)
         assert not self.profile.requires_parental_consent()
-        assert not self.profile.requires_parental_consent(date=datetime.date(current_year, 1, 1))
+        assert not self.profile.requires_parental_consent(year=current_year)
 
     def test_profile_image(self):
         """Verify that a profile's image obeys parental controls."""

@@ -27,7 +27,7 @@
 # Jessica Amoruso <jessica.amoruso123@gmail.com>, 2021
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2017
 # LILLITH, 2014
-# Luca Trave <trave5@yahoo.it>, 2015
+# computerluca <trave5@yahoo.it>, 2015
 # ℳarco ℇrmini <marco.ermini@gmail.com>, 2014
 # marcore <mrc.re@tiscali.it>, 2014
 # Matt Tuchfarber <mtuchfarber@edx.org>, 2021
@@ -38,7 +38,7 @@
 # Nicola Moretto <nicolamoretto88@gmail.com>, 2014
 # Paolo Marenghi <paolo.marenghi@polimi.it>, 2015
 # Pietro Lombardo <pietrolombardo1979@gmail.com>, 2014-2015
-# Sarina Canelake <sarina@edx.org>, 2014
+# Sarina Canelake <sarina@tcril.org>, 2014
 # Stefania Carta <info@stefaniacarta.com>, 2015
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2021
 # Thimoty Barbieri <thimoty@thimoty.it>, 2014
@@ -111,8 +111,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-21 17:10+0000\n"
-"PO-Revision-Date: 2021-08-01 20:44+0000\n"
+"POT-Creation-Date: 2021-12-19 20:42+0000\n"
+"PO-Revision-Date: 2021-11-07 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Italian (Italy) (http://www.transifex.com/open-edx/edx-platform/language/it_IT/)\n"
 "Language: it_IT\n"
@@ -4982,8 +4982,8 @@ msgstr ""
 "media{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
-msgstr "Prima di procedere {htmlStart}attivare il tuo account{htmlEnd}."
+msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
+msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -11367,12 +11367,9 @@ msgstr "Con supervisione"
 msgid ""
 "Proctored exams are timed and they record video of each learner taking the "
 "exam. The videos are then reviewed to ensure that learners follow all "
-"examination rules."
+"examination rules. Please note that setting this exam as proctored will "
+"change the visibility settings to \"Hide content after due date.\""
 msgstr ""
-"Gli esami con supervisione sono a tempo e prevedono la registrazione di un "
-"video di ogni studente che sostiene l'esame. I video vengono quindi "
-"esaminati per garantire che gli studenti seguano tutte le regole dell'esame."
-" "
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"

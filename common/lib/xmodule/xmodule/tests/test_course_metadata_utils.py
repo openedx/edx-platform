@@ -34,6 +34,7 @@ _LAST_WEEK = _TODAY - timedelta(days=7)
 _NEXT_WEEK = _TODAY + timedelta(days=7)
 
 
+@pytest.mark.django_db
 class CourseMetadataUtilsTestCase(TestCase):
     """
     Tests for course_metadata_utils.

@@ -120,12 +120,7 @@ class IDVerificationService:
         sso_id_verifications = SSOVerification.objects.filter(**filter_kwargs)
         manual_id_verifications = ManualVerification.objects.filter(**filter_kwargs)
 
-        attempt = most_recent_verification(
-            photo_id_verifications,
-            sso_id_verifications,
-            manual_id_verifications,
-            'updated_at'
-        )
+        attempt = most_recent_verification((photo_id_verifications, sso_id_verifications, manual_id_verifications))
         return attempt and attempt.expiration_datetime
 
     @classmethod

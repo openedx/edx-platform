@@ -223,3 +223,27 @@ def get_cache(name):
     """
     assert name is not None
     return RequestCache(name).data
+
+
+class CacheService:
+    """
+    An XBlock service which provides a cache.
+
+    Args:
+        cache(object): provides get/set functions for retrieving/storing key/value pairs.
+    """
+    def __init__(self, cache, **kwargs):
+        super().__init__(**kwargs)
+        self._cache = cache
+
+    def get(self, key, *args, **kwargs):
+        """
+        Returns the value cached against the given key, or None.
+        """
+        return self._cache.get(key, *args, **kwargs)
+
+    def set(self, key, value, *args, **kwargs):
+        """
+        Caches the value against the given key.
+        """
+        return self._cache.set(key, value, *args, **kwargs)

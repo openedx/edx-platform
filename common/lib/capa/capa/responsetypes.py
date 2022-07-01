@@ -2586,14 +2586,14 @@ class CodeResponse(LoncapaResponse):
     """
     Grade student code using an external queueing server, called 'xqueue'.
 
-    Expects 'xqueue' dict in LoncapaSystem with the following keys that are
+    Expects 'xqueue' dict in LoncapaSystem with the following properties that are
     needed by CodeResponse::
 
-        capa_system.xqueue = {
-            'interface': XQueueInterface object.
-            'construct_callback': Per-StudentModule callback URL constructor,
+        capa_system.xqueue = object with properties:
+            interface: XQueueInterface object.
+            construct_callback: Per-StudentModule callback URL constructor,
                 defaults to using 'score_update' as the correct dispatch (function).
-            'default_queuename': Default queue name to submit request (string).
+            default_queuename: Default queue name to submit request (string).
         }
 
     External requests are only submitted for student submission grading, not
@@ -2623,7 +2623,7 @@ class CodeResponse(LoncapaResponse):
 
         # We do not support xqueue within Studio.
         if self.capa_system.xqueue is not None:
-            default_queuename = self.capa_system.xqueue['default_queuename']
+            default_queuename = self.capa_system.xqueue.default_queuename
         else:
             default_queuename = None
         self.queue_name = xml.get('queuename', default_queuename)
@@ -2684,7 +2684,7 @@ class CodeResponse(LoncapaResponse):
         # Prepare xqueue request
         #------------------------------------------------------------
 
-        qinterface = self.capa_system.xqueue['interface']
+        qinterface = self.capa_system.xqueue.interface
         qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
 
         anonymous_student_id = self.capa_system.anonymous_student_id
@@ -2693,7 +2693,7 @@ class CodeResponse(LoncapaResponse):
         queuekey = xqueue_interface.make_hashkey(
             str(self.capa_system.seed) + qtime + anonymous_student_id + self.answer_id
         )
-        callback_url = self.capa_system.xqueue['construct_callback']()
+        callback_url = self.capa_system.xqueue.construct_callback()
         xheader = xqueue_interface.make_xheader(
             lms_callback_url=callback_url,
             lms_key=queuekey,

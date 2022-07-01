@@ -11,6 +11,7 @@ from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -25,8 +26,9 @@ from common.djangoapps.student.helpers import (
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 
 
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
@@ -318,6 +320,55 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         self.assertContains(response2, attempt2.expiration_datetime.strftime("%m/%d/%Y"))
         self.assertContains(response2, attempt2.expiration_datetime.strftime("%m/%d/%Y"), count=2)
 
+    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, active=True)
+    @ddt.data(
+        None,
+        'past',
+        'future'
+    )
+    def test_verify_message_idv_disabled(self, deadline_key):
+        if deadline_key:
+            self._setup_mode_and_enrollment(self.DATES[deadline_key], "verified")
+        else:
+            self._setup_mode_and_enrollment(None, "verified")
+
+        self._assert_course_verification_status(None, "verified")
+
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        self._assert_course_verification_status(None, "verified")
+        attempt.mark_ready()
+        self._assert_course_verification_status(None, "verified")
+        attempt.submit()
+        self._assert_course_verification_status(None, "verified")
+        attempt.approve()
+        self._assert_course_verification_status(None, "verified")
+        attempt.expiration_date = self.DATES[self.PAST] - timedelta(days=900)
+        attempt.save()
+        self._assert_course_verification_status(None, "verified")
+
+    @ddt.data(True, False)
+    def test_integrity_disables_sidebar(self, integrity_flag):
+        self._setup_mode_and_enrollment(None, "verified")
+
+        #no sidebar when no IDV yet
+        response = self.client.get(self.dashboard_url)
+        self.assertNotContains(response, "profile-sidebar")
+
+        # The student has an approved verification
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+        attempt.approve()
+
+        # sidebar only appears after IDV if integrity is not on
+        with patch('common.djangoapps.student.views.dashboard.is_integrity_signature_enabled',
+                   return_value=integrity_flag):
+            response = self.client.get(self.dashboard_url)
+            if integrity_flag:
+                self.assertNotContains(response, "profile-sidebar")
+            else:
+                self.assertContains(response, "profile-sidebar")
+
     def _setup_mode_and_enrollment(self, deadline, enrollment_mode):
         """Create a course mode and enrollment.
 
@@ -365,7 +416,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         VERIFY_STATUS_RESUBMITTED: "audit"
     }
 
-    def _assert_course_verification_status(self, status):
+    def _assert_course_verification_status(self, status, enrollment_mode=None):
         """Check whether the specified verification status is shown on the dashboard.
 
         Arguments:
@@ -386,10 +437,12 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         if alt_text:
             self.assertContains(response, alt_text)
 
+        mode = enrollment_mode if enrollment_mode else self.MODE_CLASSES[status]
+
         # Verify that the correct banner color is rendered
         self.assertContains(
             response,
-            f"<article class=\"course {self.MODE_CLASSES[status]}\""
+            f"<article class=\"course {mode}\""
         )
 
         # Verify that the correct copy is rendered on the dashboard

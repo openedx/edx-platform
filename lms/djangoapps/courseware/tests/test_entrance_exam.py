@@ -6,10 +6,13 @@ Tests use cases related to LMS Entrance Exam behavior, such as gated content acc
 from unittest.mock import Mock, patch
 from crum import set_current_request
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -35,9 +38,6 @@ from common.djangoapps.util.milestones_helpers import (
     get_milestone_relationship_types,
     get_namespace_choices
 )
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
@@ -48,6 +48,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
     Creates a test course from scratch. The tests below are designed to execute
     workflows regardless of the feature flag settings.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
     def setUp(self):

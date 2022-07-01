@@ -21,8 +21,8 @@ jobs:
 
       - name: collect tests from all modules
         run: |
-          echo "root_cms_unit_tests_count=$(pytest --collect-only --ds=cms.envs.test -p no:warnings cms/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
-          echo "root_lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test -p no:warnings  lms/ openedx/ common/djangoapps/ common/lib/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+          echo "root_cms_unit_tests_count=$(pytest --collect-only --ds=cms.envs.test cms/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+          echo "root_lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ common/lib/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
 
       - name: get GHA unit test paths
         run: |
@@ -32,8 +32,8 @@ jobs:
 
       - name: collect tests from GHA unit test shards
         run: |
-          echo "cms_unit_tests_count=$(pytest --collect-only --ds=cms.envs.test -p no:warnings ${{ env.cms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
-          echo "lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test -p no:warnings ${{ env.lms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+          echo "cms_unit_tests_count=$(pytest --collect-only --ds=cms.envs.test ${{ env.cms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+          echo "lms_unit_tests_count=$(pytest --collect-only --ds=lms.envs.test ${{ env.lms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
 
 
       - name: add unit tests count
@@ -50,8 +50,10 @@ jobs:
           echo All root unit tests count: ${{ env.root_all_unit_tests_count }}
           echo All shards unit tests count: ${{ env.shards_all_unit_tests_count }}
 
-      - name: verify unit tests count
+      - name: fail the check
         if: ${{ env.root_all_unit_tests_count != env.shards_all_unit_tests_count }}
         run: |
-          echo "::error title='Unit test modules in unit-test-shards.json (unit-tests.yml workflow) are outdated'::unit tests running in unit-tests workflow don't match the count for unit tests for entire edx-platform suite, please update the unit-test-shards.json under .github/workflows to add any missing apps and match the count"
+          echo "::error title='Unit test modules in unit-test-shards.json (unit-tests.yml workflow) are outdated'::unit tests running in unit-tests
+          workflow don't match the count for unit tests for entire edx-platform suite, please update the unit-test-shards.json under .github/workflows
+          to add any missing apps and match the count. for more details please take a look at scripts/gha-shards-readme.md"
           exit 1

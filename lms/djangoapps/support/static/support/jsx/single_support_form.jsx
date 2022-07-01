@@ -142,10 +142,16 @@ class RenderForm extends React.Component {
           body: formData.message,
         },
         subject: formData.subject, // Zendesk API requires 'subject'
-        custom_fields: [{
+        custom_fields: [
+        {
           id: this.props.context.customFields.course_id,
           value: formData.course,
-        }],
+        },
+        {
+          id: this.props.context.customFields.referrer,
+          value: document.referrer ? document.referrer : "Direct Contact Us Page Request",
+        }
+        ],
         tags: this.props.context.tags,
       };
     request.open('POST', url, true);

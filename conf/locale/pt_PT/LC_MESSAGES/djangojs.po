@@ -20,6 +20,7 @@
 # Manuela Silva <mmsrs@sky.com>, 2016,2018,2020
 # Manuela Silva <mmsrs@sky.com>, 2018
 # Manuela Silva <mmsrs@sky.com>, 2016
+# Nika Shahidian, 2021
 # Developer QUEO <developer@queo.pt>, 2017
 # Raquelscoelho <Raquelscoelho@gmail.com>, 2014
 # Raquelscoelho <Raquelscoelho@gmail.com>, 2014
@@ -109,9 +110,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-10-03 20:44+0000\n"
-"PO-Revision-Date: 2021-10-01 10:22+0000\n"
-"Last-Translator: Ivo Branco <ivo.branco@fccn.pt>\n"
+"POT-Creation-Date: 2021-12-26 20:42+0000\n"
+"PO-Revision-Date: 2021-11-07 20:44+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/)\n"
 "Language: pt_PT\n"
 "MIME-Version: 1.0\n"
@@ -5003,8 +5004,8 @@ msgstr ""
 " redes sociais{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
-msgstr "Antes de avançar, por favor {htmlStart}active a sua conta{htmlEnd}."
+msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
+msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -11356,11 +11357,9 @@ msgstr "Supervisionado"
 msgid ""
 "Proctored exams are timed and they record video of each learner taking the "
 "exam. The videos are then reviewed to ensure that learners follow all "
-"examination rules."
+"examination rules. Please note that setting this exam as proctored will "
+"change the visibility settings to \"Hide content after due date.\""
 msgstr ""
-"Os exames supervisinados são cronometrados e gravam vídeo de cada estudante "
-"fazendo o exame. Os vídeos são então revistos para garantir que os "
-"estudantes seguem todas as regras do exame."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"

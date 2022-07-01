@@ -17,9 +17,8 @@ from opaque_keys.edx.keys import UsageKey
 
 from common.djangoapps.util.db import outer_atomic
 from lms.djangoapps.courseware.courses import get_problems_in_section
-from lms.djangoapps.courseware.module_render import get_xqueue_callback_url_prefix
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +31,7 @@ class AlreadyRunningError(Exception):
     def __init__(self, message=None):
 
         if not message:
-            message = self.message  # pylint: disable=exception-message-attribute
+            message = self.message
         super().__init__(message)
 
 
@@ -44,7 +43,7 @@ class QueueConnectionError(Exception):
 
     def __init__(self, message=None):
         if not message:
-            message = self.message  # pylint: disable=exception-message-attribute
+            message = self.message
         super().__init__(message)
 
 
@@ -131,8 +130,7 @@ def _get_xmodule_instance_args(request, task_id):
     Calculate parameters needed for instantiating xmodule instances.
 
     The `request_info` will be passed to a tracking log function, to provide information
-    about the source of the task request.   The `xqueue_callback_url_prefix` is used to
-    permit old-style xqueue callbacks directly to the appropriate module in the LMS.
+    about the source of the task request.
     The `task_id` is also passed to the tracking log function.
     """
     request_info = {'username': request.user.username,
@@ -142,8 +140,7 @@ def _get_xmodule_instance_args(request, task_id):
                     'host': request.META['SERVER_NAME'],
                     }
 
-    xmodule_instance_args = {'xqueue_callback_url_prefix': get_xqueue_callback_url_prefix(request),
-                             'request_info': request_info,
+    xmodule_instance_args = {'request_info': request_info,
                              'task_id': task_id,
                              }
     return xmodule_instance_args

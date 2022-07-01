@@ -20,7 +20,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class AutoAuthTestCase(UrlResetMixin, TestCase):

@@ -10,6 +10,8 @@ import pytz
 from ccx_keys.locator import CCXLocator
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.student.tests.factories import AdminFactory
 from lms.djangoapps.ccx.models import CustomCourseForEdX
@@ -19,8 +21,6 @@ from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_overrides
 from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @override_settings(
@@ -31,8 +31,6 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
     """
     Make sure field overrides behave in the expected manner.
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     @classmethod
     def setUpClass(cls):
         """

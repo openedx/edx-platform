@@ -1,10 +1,12 @@
 """
 Mixin to support editing in Studio.
 """
+from xblock.core import XBlock, XBlockMixin
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW, module_attr
 
 
-class StudioEditableBlock:
+@XBlock.needs('mako')
+class StudioEditableBlock(XBlockMixin):
     """
     Helper methods for supporting Studio editing of XBlocks.
 
@@ -31,7 +33,7 @@ class StudioEditableBlock:
                 'content': rendered_child.content
             })
 
-        fragment.add_content(self.system.render_template("studio_render_children_view.html", {  # pylint: disable=no-member
+        fragment.add_content(self.runtime.service(self, 'mako').render_template("studio_render_children_view.html", {  # pylint: disable=no-member
             'items': contents,
             'xblock_context': context,
             'can_add': can_add,

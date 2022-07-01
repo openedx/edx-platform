@@ -40,9 +40,9 @@ from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, ge
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
 from openedx.core.lib.cache_utils import get_cache
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.django import modulestore
-from xmodule.partitions.partitions_service import PartitionService
-from xmodule.split_test_module import get_split_user_partitions
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.split_test_module import get_split_user_partitions  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store

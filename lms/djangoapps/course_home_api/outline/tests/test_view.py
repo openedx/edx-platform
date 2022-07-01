@@ -5,13 +5,13 @@ Tests for Outline Tab API in the Course Home API
 import itertools
 from datetime import datetime, timezone
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
 
-import ddt
-import json
-from django.conf import settings
-from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
+import ddt  # lint-amnesty, pylint: disable=wrong-import-order
+import json  # lint-amnesty, pylint: disable=wrong-import-order
+from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
+from django.urls import reverse  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -19,7 +19,6 @@ from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
-from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, CourseVisibility
 from openedx.core.djangoapps.content.learning_sequences.toggles import USE_FOR_OUTLINES
@@ -33,8 +32,8 @@ from openedx.features.course_experience import (
     ENABLE_COURSE_GOALS
 )
 from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
@@ -53,16 +52,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
         response = self.client.get(self.url)
         assert response.status_code == 200
-
-        course_goals = response.data.get('course_goals')
-        goal_options = course_goals['goal_options']
-        if enrollment_mode == CourseMode.VERIFIED:
-            assert goal_options == []
-        else:
-            assert len(goal_options) > 0
-
-            selected_goal = course_goals['selected_goal']
-            assert selected_goal is None
 
         course_tools = response.data.get('course_tools')
         assert course_tools
@@ -87,9 +76,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             CourseEnrollment.unenroll(self.user, self.course.id)
         response = self.client.get(self.url)
         assert response.status_code == 200
-
-        course_goals = response.data.get('course_goals')
-        assert course_goals['goal_options'] == []
 
         course_tools = response.data.get('course_tools')
         assert len(course_tools) == 0
@@ -189,7 +175,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             user=self.user,
             course_id=self.course.id,
             key='view-welcome-message',
-            value=False if welcome_message_is_dismissed else True
+            value=not welcome_message_is_dismissed
         )
         welcome_message_html = self.client.get(self.url).data['welcome_message_html']
         assert welcome_message_html == (None if welcome_message_is_dismissed else '<p>Welcome</p>')
@@ -221,26 +207,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert response.data['access_expiration']['expiration_date'] == deadline
 
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
-    def test_post_course_goal_deprecated(self):
-        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
-
-        post_data = {
-            'course_id': self.course.id,
-            'goal_key': 'certify'
-        }
-        post_course_goal_response = self.client.post(reverse('course-home:save-course-goal'), post_data)
-        assert post_course_goal_response.status_code == 200
-
-        response = self.client.get(self.url)
-        assert response.status_code == 200
-
-        course_goals = response.data.get('course_goals')
-        selected_goal = course_goals['selected_goal']
-        assert selected_goal is not None
-        assert selected_goal['key'] == 'certify'
-
-    @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
-    @override_waffle_flag(COURSE_GOALS_NUMBER_OF_DAYS_GOALS, active=True)
     def test_post_course_goal(self):
         """ Test that the api returns the correct response when saving a goal """
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
@@ -262,11 +228,11 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
         course_goals = response.json()['course_goals']
         expected_course_goals = {
-            'goal_options': [],
             'selected_goal': {
                 'days_per_week': 1,
-                'subscribed_to_reminders': True
-            }
+                'subscribed_to_reminders': True,
+            },
+            'weekly_learning_goal_enabled': True,
         }
         assert course_goals == expected_course_goals
 
@@ -353,7 +319,9 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             self.course.course_visibility = course_visibility
             self.course = self.update_course(self.course, self.user.id)
 
-        self.store.create_item(self.user.id, self.course.id, 'course_info', 'handouts', fields={'data': '<p>Handouts</p>'})
+        self.store.create_item(
+            self.user.id, self.course.id, 'course_info', 'handouts', fields={'data': '<p>Handouts</p>'}
+        )
         self.store.create_item(self.user.id, self.course.id, 'course_info', 'updates', fields={
             'items': [{
                 'content': '<p>Welcome</p>',
@@ -385,7 +353,14 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
         response = self.client.get(self.url)
-        assert response.data['verified_mode'] == {'access_expiration_date': (enrollment.created + MIN_DURATION), 'currency': 'USD', 'currency_symbol': '$', 'price': 149, 'sku': 'ABCD1234', 'upgrade_url': '/dashboard'}
+        assert response.data['verified_mode'] == {
+            'access_expiration_date': (enrollment.created + MIN_DURATION),
+            'currency': 'USD',
+            'currency_symbol': '$',
+            'price': 149,
+            'sku': 'ABCD1234',
+            'upgrade_url': '/dashboard'
+        }
 
     def test_hide_learning_sequences(self):
         """
@@ -415,7 +390,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
                 days_early_for_beta=None,
                 sections=[],
                 self_paced=False,
-                course_visibility=CourseVisibility.PRIVATE
+                course_visibility=CourseVisibility.PRIVATE  # pylint: disable=protected-access
             )
             replace_course_outline(new_learning_seq_outline)
             response = self.client.get(self.url)
@@ -424,7 +399,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
     def test_user_has_passing_grade(self):
         CourseEnrollment.enroll(self.user, self.course.id)
-        self.course._grading_policy['GRADE_CUTOFFS']['Pass'] = 0
+        self.course._grading_policy['GRADE_CUTOFFS']['Pass'] = 0  # pylint: disable=protected-access
         self.update_course(self.course, self.user.id)
         CourseGradeFactory().update(self.user, self.course)
         response = self.client.get(self.url)

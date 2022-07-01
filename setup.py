@@ -79,6 +79,7 @@ setup(
             "access_denied_message_filter = lms.djangoapps.course_blocks.transformers.access_denied_filter:AccessDeniedMessageFilterTransformer",  # lint-amnesty, pylint: disable=line-too-long
             "open_assessment_transformer = lms.djangoapps.courseware.transformers:OpenAssessmentDateTransformer",
             'effort_estimation = openedx.features.effort_estimation.api:EffortEstimationTransformer',
+            'discussions_link = openedx.core.djangoapps.discussions.transformers:DiscussionsTopicLinkTransformer',
         ],
         "openedx.ace.policy": [
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"
@@ -115,6 +116,7 @@ setup(
             # consolidate the multiple discussions-related Django apps and
             # either put them in the openedx/ dir, or in another repo entirely.
             "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
+            "discussions = openedx.core.djangoapps.discussions.apps:DiscussionsConfig",
             "olx_rest_api = openedx.core.djangoapps.olx_rest_api.apps:OlxRestApiAppConfig",
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",

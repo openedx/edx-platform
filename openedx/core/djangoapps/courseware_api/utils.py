@@ -9,7 +9,6 @@ from common.djangoapps.student.models import CourseEnrollmentCelebration, UserCe
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.discounts.applicability import can_show_streak_discount_coupon
-from common.djangoapps.track import segment
 
 
 def get_celebrations_dict(user, enrollment, course, browser_timezone):
@@ -21,6 +20,7 @@ def get_celebrations_dict(user, enrollment, course, browser_timezone):
             'first_section': False,
             'streak_length_to_celebrate': None,
             'streak_discount_enabled': False,
+            'weekly_goal': False,
         }
 
     streak_length_to_celebrate = UserCelebration.perform_streak_updates(
@@ -30,6 +30,7 @@ def get_celebrations_dict(user, enrollment, course, browser_timezone):
         'first_section': CourseEnrollmentCelebration.should_celebrate_first_section(enrollment),
         'streak_length_to_celebrate': streak_length_to_celebrate,
         'streak_discount_enabled': False,
+        'weekly_goal': CourseEnrollmentCelebration.should_celebrate_weekly_goal(enrollment),
     }
 
     if streak_length_to_celebrate:
@@ -43,14 +44,6 @@ def get_celebrations_dict(user, enrollment, course, browser_timezone):
             verified_mode = modes_dict.get('verified', None)
             if verified_mode:
                 celebrations['streak_discount_enabled'] = True
-                segment.track(
-                    user_id=user.id,
-                    event_name='edx.bi.course.streak_discount_enabled',
-                    properties={
-                        'course_id': str(course_key),
-                        'sku': verified_mode.sku,
-                    }
-                )
 
     return celebrations
 

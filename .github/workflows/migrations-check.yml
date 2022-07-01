@@ -1,4 +1,4 @@
-name: CI
+name: Migrations check
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-18.04 ]
+        os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
 
     steps:
@@ -43,6 +43,21 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
         restore-keys: ${{ runner.os }}-pip-
 
+    - name: Install MySQL 5.7
+      run: |
+        mkdir ${RUNNER_WORKSPACE}/mysql_packages && cd ${RUNNER_WORKSPACE}/mysql_packages
+        sudo apt-get remove --purge *mysql* -y
+        sudo rm -rvf /etc/init.d/mysql* /etc/mysql* /var/lib/mysql*
+        sudo apt-get install libaio1 libnuma1 libtinfo5 -y
+        wget https://cdn.mysql.com/archives/mysql-5.7/mysql-server_5.7.35-1ubuntu18.04_amd64.deb-bundle.tar
+        tar -xf mysql-server_5.7*.tar
+        sudo DEBIAN_FRONTEND=noninteractive dpkg --install mysql-common_5.7*.deb libmysqlclient*.deb mysql-server_5.7*.deb mysql-client_5.7*.deb mysql-community-server_5.7*.deb mysql-community-client_5.7*.deb
+
+    - name: Ubuntu and sql Versions
+      run: |
+        lsb_release -a
+        mysql -V
+
     - name: Install Python dependencies
       run: |
         pip install -r requirements/pip.txt
@@ -59,7 +74,8 @@ jobs:
 
     - name: Reset mysql password
       run: |
-        cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
+        cat <<EOF | sudo mysql -u root
+          UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE user = 'root';
           UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
           FLUSH PRIVILEGES;
         EOF
@@ -68,8 +84,8 @@ jobs:
       env:
         LMS_CFG: lms/envs/bok_choy.yml
       run: |
-        echo "CREATE DATABASE IF NOT EXISTS edxtest;" | mysql -u root
-        echo "CREATE DATABASE IF NOT EXISTS student_module_history_test;" | mysql -u root
+        echo "CREATE DATABASE IF NOT EXISTS edxtest;" | sudo mysql -u root
+        echo "CREATE DATABASE IF NOT EXISTS student_module_history_test;" | sudo mysql -u root
 
         echo "Running the LMS migrations."
         ./manage.py lms --settings bok_choy migrate

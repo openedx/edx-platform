@@ -16,7 +16,7 @@ import pytest
 from openedx.core.pytest_hooks import DeferPlugin
 
 # Patch the xml libs before anything else.
-from safe_lxml import defuse_xml_libs  # isort:skip
+from safe_lxml import defuse_xml_libs  # isort:skip  # lint-amnesty, pylint: disable=wrong-import-order
 defuse_xml_libs()
 
 

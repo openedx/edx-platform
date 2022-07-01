@@ -1,5 +1,5 @@
 {% load i18n %}{% autoescape off %}
-{% blocktrans %}You're almost there! Use the link below to activate your account to access engaging, high-quality {{ platform_name }} courses. Note that you will not be able to log back into your account until you have activated it.{% endblocktrans %}
+{% blocktrans %}You’re almost there! Use the link below to activate your account to access engaging, high-quality {{ platform_name }} courses. Note that you will not be able to log back into your account until you have activated it.{% endblocktrans %}
 
 {{ confirm_activation_link }}
 

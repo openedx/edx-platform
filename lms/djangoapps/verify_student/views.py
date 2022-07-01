@@ -21,7 +21,6 @@ from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
-from edx_name_affirmation.toggles import is_verified_name_enabled
 from edx_rest_api_client.exceptions import SlumberBaseException
 from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
@@ -44,11 +43,8 @@ from lms.djangoapps.verify_student.utils import can_verify_now
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
-from openedx.core.djangoapps.user_api.accounts.api import update_account_settings
-from openedx.core.djangoapps.user_api.errors import AccountValidationError, UserNotFound
 from openedx.core.lib.log_utils import audit_log
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .services import IDVerificationService
 
@@ -832,9 +828,6 @@ class SubmitPhotosView(View):
             face_image (str): base64-encoded image data of the user's face.
             photo_id_image (str): base64-encoded image data of the user's photo ID.
             full_name (str): The user's full name, if the user is requesting a name change as well.
-            experiment_name (str): The name of an A/B experiment associated with this attempt
-            portrait_photo_mode (str): The mode in which the portrait photo was taken
-            id_photo_mode (str): The mode in which the id photo was taken
 
         """
         # If the user already has an initial verification attempt, we can re-use the photo ID
@@ -849,12 +842,6 @@ class SubmitPhotosView(View):
         full_name = None
         if "full_name" in params:
             full_name = params["full_name"]
-
-        # If necessary, update the user's full name
-        if full_name is not None and not is_verified_name_enabled():
-            response = self._update_full_name(request, full_name)
-            if response is not None:
-                return response
 
         # Retrieve the image data
         # Validation ensures that we'll have a face image, but we may not have
@@ -871,22 +858,7 @@ class SubmitPhotosView(View):
             return response
 
         # Submit the attempt
-        attempt = self._submit_attempt(request.user, face_image, photo_id_image, initial_verification, full_name)
-
-        # Send event to segment for analyzing A/B testing data
-        data = {
-            "attempt_id": attempt.id,
-            "experiment_name": params.get("experiment_name", "original")
-        }
-        self._fire_event(request.user, "edx.bi.experiment.verification.attempt", data)
-
-        if params.get("portrait_photo_mode"):
-            mode_data = {
-                "attempt_id": attempt.id,
-                "portrait_photo_mode": params.get("portrait_photo_mode"),
-                "id_photo_mode": params.get("id_photo_mode")
-            }
-            self._fire_event(request.user, "edx.bi.experiment.verification.attempt.photo.mode", mode_data)
+        self._submit_attempt(request.user, face_image, photo_id_image, initial_verification, full_name)
 
         self._fire_event(request.user, "edx.bi.verify.submitted", {"category": "verification"})
         self._send_confirmation_email(request.user)
@@ -911,9 +883,6 @@ class SubmitPhotosView(View):
                 "face_image",
                 "photo_id_image",
                 "full_name",
-                "experiment_name",
-                "portrait_photo_mode",
-                "id_photo_mode"
             ]
             if param_name in request.POST
         }
@@ -943,36 +912,6 @@ class SubmitPhotosView(View):
             return None, HttpResponseBadRequest(msg)
 
         return params, None
-
-    def _update_full_name(self, request, full_name):
-        """
-        Update the user's full name.
-
-        Arguments:
-            user (User): The user to update.
-            full_name (unicode): The user's updated full name.
-
-        Returns:
-            error encoded as an HttpResponse or None indicating success
-
-        """
-        try:
-            update_account_settings(request.user, {"name": full_name})
-        except UserNotFound:
-            log.error(("No profile found for user {user_id}").format(user_id=request.user.id))
-            return HttpResponseBadRequest(_("No profile found for user"))
-        except AccountValidationError:
-            msg = _(
-                "Name must be at least {min_length} character long."
-            ).format(min_length=NAME_MIN_LENGTH)
-            log.error(
-                (
-                    "User {user_id} suffered ID verification error while submitting a full_name change"
-                ).format(
-                    user_id=request.user.id
-                )
-            )
-            return HttpResponseBadRequest(msg)
 
     def _validate_and_decode_image_data(self, request, face_data, photo_id_data=None):
         """
@@ -1201,13 +1140,6 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         return HttpResponseBadRequest(
             f"Result {result} not understood. Known results: PASS, FAIL, SYSTEM FAIL"
         )
-
-    # Send event to segment for analyzing A/B testing data
-    data = {
-        "attempt_id": attempt.id,
-        "result": result
-    }
-    segment.track(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
 
     return HttpResponse("OK!")
 

@@ -3,20 +3,22 @@
 Discussion API URLs
 """
 
-
 from django.conf import settings
 from django.urls import include, path, re_path
 from rest_framework.routers import SimpleRouter
 
 from lms.djangoapps.discussion.rest_api.views import (
     CommentViewSet,
+    CourseActivityStatsView,
     CourseDiscussionRolesAPIView,
     CourseDiscussionSettingsAPIView,
     CourseTopicsView,
+    CourseTopicsViewV2,
     CourseView,
     ReplaceUsernamesView,
     RetireUserView,
-    ThreadViewSet
+    ThreadViewSet,
+    UploadFileView,
 )
 
 ROUTER = SimpleRouter()
@@ -30,6 +32,16 @@ urlpatterns = [
         ),
         CourseDiscussionSettingsAPIView.as_view(),
         name="discussion_course_settings",
+    ),
+    re_path(
+        fr"^v1/courses/{settings.COURSE_KEY_PATTERN}/activity_stats",
+        CourseActivityStatsView.as_view(),
+        name="discussion_course_activity_stats",
+    ),
+    re_path(
+        fr"^v1/courses/{settings.COURSE_ID_PATTERN}/upload$",
+        UploadFileView.as_view(),
+        name="upload_file",
     ),
     re_path(
         r"^v1/courses/{}/roles/(?P<rolename>[A-Za-z0-9+ _-]+)/?$".format(
@@ -49,6 +61,11 @@ urlpatterns = [
         fr"^v1/course_topics/{settings.COURSE_ID_PATTERN}",
         CourseTopicsView.as_view(),
         name="course_topics"
+    ),
+    re_path(
+        fr"^v2/course_topics/{settings.COURSE_ID_PATTERN}",
+        CourseTopicsViewV2.as_view(),
+        name="course_topics_v2"
     ),
     path('v1/', include(ROUTER.urls)),
 ]

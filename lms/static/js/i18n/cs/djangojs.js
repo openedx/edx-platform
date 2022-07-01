@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;
-    if (typeof(v) == 'boolean') {
+    const v = (n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "%(sel)s of %(cnt)s selected": [
       "Vybr\u00e1na je %(sel)s polo\u017eka z celkem %(cnt)s.",
       "Vybr\u00e1ny jsou %(sel)s polo\u017eky z celkem %(cnt)s.",
@@ -56,13 +57,13 @@
     "Note: You are %s hour ahead of server time.": [
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das o %s hodinu p\u0159edstihuje \u010das na serveru.",
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das o %s hodiny p\u0159edstihuje \u010das na serveru.",
-      "Pozn\u00e1mka: V\u00e1\u0161 \u010das o %s hodin p\u0159edstihuje \u010das na serveru.",
+      "Pozn\u00e1mka: V\u00e1\u0161 \u010das o %s hodiny p\u0159edstihuje \u010das na serveru.",
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das o %s hodin p\u0159edstihuje \u010das na serveru."
     ],
     "Note: You are %s hour behind server time.": [
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das se o %s hodinu zpo\u017e\u010fuje za \u010dasem na serveru.",
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das se o %s hodiny zpo\u017e\u010fuje za \u010dasem na serveru.",
-      "Pozn\u00e1mka: V\u00e1\u0161 \u010das se o %s hodin zpo\u017e\u010fuje za \u010dasem na serveru.",
+      "Pozn\u00e1mka: V\u00e1\u0161 \u010das se o %s hodiny zpo\u017e\u010fuje za \u010dasem na serveru.",
       "Pozn\u00e1mka: V\u00e1\u0161 \u010das se o %s hodin zpo\u017e\u010fuje za \u010dasem na serveru."
     ],
     "November": "listopad",
@@ -80,9 +81,21 @@
     "Type into this box to filter down the list of available %s.": "Chcete-li filtrovat ze seznamu dostupn\u00fdch polo\u017eek %s, za\u010dn\u011bte ps\u00e1t do tohoto pole.",
     "Verified": "Verifikovan\u00fd",
     "Yesterday": "V\u010dera",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Byla vybr\u00e1na operace a jednotliv\u00e1 pole nejsou zm\u011bn\u011bn\u00e1. Patrn\u011b hled\u00e1te tla\u010d\u00edtko Prov\u00e9st sp\u00ed\u0161e ne\u017e Ulo\u017eit.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Byla vybr\u00e1na operace, ale dosud nedo\u0161lo k ulo\u017een\u00ed zm\u011bn jednotliv\u00fdch pol\u00ed. Ulo\u017e\u00edte klepnut\u00edm na tla\u010d\u00edtko OK. Pak bude t\u0159eba operaci spustit znovu.",
+    "You have selected an action, and you haven\u2019t made any changes on individual fields. You\u2019re probably looking for the Go button rather than the Save button.": "Byla vybr\u00e1na operace, ale dosud nedo\u0161lo k ulo\u017een\u00ed zm\u011bn jednotliv\u00fdch pol\u00ed. Patrn\u011b vyu\u017eijete tla\u010d\u00edtko Prov\u00e9st sp\u00ed\u0161e ne\u017e tla\u010d\u00edtko Ulo\u017eit.",
+    "You have selected an action, but you haven\u2019t saved your changes to individual fields yet. Please click OK to save. You\u2019ll need to re-run the action.": "Byla vybr\u00e1na operace, ale dosud nedo\u0161lo k ulo\u017een\u00ed zm\u011bn jednotliv\u00fdch pol\u00ed. Ulo\u017e\u00edte klepnut\u00edm na tla\u010d\u00edtko OK. Pak bude t\u0159eba operaci spustit znovu.",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "V jednotliv\u00fdch pol\u00edch jsou neulo\u017een\u00e9 zm\u011bny, kter\u00e9 budou ztraceny, pokud operaci provedete.",
+    "abbrev. month April\u0004Apr": "Dub",
+    "abbrev. month August\u0004Aug": "Srp",
+    "abbrev. month December\u0004Dec": "Pro",
+    "abbrev. month February\u0004Feb": "\u00dano",
+    "abbrev. month January\u0004Jan": "Led",
+    "abbrev. month July\u0004Jul": "\u010cvc",
+    "abbrev. month June\u0004Jun": "\u010cvn",
+    "abbrev. month March\u0004Mar": "B\u0159e",
+    "abbrev. month May\u0004May": "Kv\u011b",
+    "abbrev. month November\u0004Nov": "Lis",
+    "abbrev. month October\u0004Oct": "\u0158\u00edj",
+    "abbrev. month September\u0004Sep": "Z\u00e1\u0159",
     "one letter Friday\u0004F": "P",
     "one letter Monday\u0004M": "P",
     "one letter Saturday\u0004S": "S",
@@ -91,24 +104,24 @@
     "one letter Tuesday\u0004T": "\u00da",
     "one letter Wednesday\u0004W": "S"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -118,16 +131,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -151,12 +164,10 @@
       "%d.%m.%Y %H:%M:%S.%f",
       "%d.%m.%Y %H.%M",
       "%d.%m.%Y %H:%M",
-      "%d.%m.%Y",
       "%d. %m. %Y %H:%M:%S",
       "%d. %m. %Y %H:%M:%S.%f",
       "%d. %m. %Y %H.%M",
       "%d. %m. %Y %H:%M",
-      "%d. %m. %Y",
       "%Y-%m-%d %H.%M",
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
@@ -189,8 +200,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -209,6 +220,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

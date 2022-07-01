@@ -9,7 +9,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class VerifiedTrackCourseForm(forms.ModelForm):

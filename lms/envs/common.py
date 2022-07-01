@@ -570,7 +570,7 @@ FEATURES = {
     # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch. You will
     #   see the search widget on the courseware page only if the DISABLE_COURSE_OUTLINE_PAGE_FLAG is set.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
-    'ENABLE_COURSEWARE_SEARCH': False,
+    'ENABLE_COURSEWARE_SEARCH': True,
 
     # .. toggle_name: FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF']
     # .. toggle_implementation: DjangoSetting
@@ -595,7 +595,7 @@ FEATURES = {
     # .. toggle_creation_date: 2015-01-29
     # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
-    'ENABLE_DASHBOARD_SEARCH': False,
+    'ENABLE_DASHBOARD_SEARCH': True,
 
     # log all information from cybersource callbacks
     'LOG_POSTPAY_CALLBACKS': True,
@@ -717,7 +717,7 @@ FEATURES = {
     # .. toggle_warnings: You should set the languages in the DarkLangConfig table to get this working. If you have
     #   not set any languages in the DarkLangConfig table then the language selector will not be visible in the header.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15133
-    'SHOW_HEADER_LANGUAGE_SELECTOR': False,
+    'SHOW_HEADER_LANGUAGE_SELECTOR': True,
 
     # At edX it's safe to assume that English transcripts are always available
     # This is not the case for all installations.
@@ -817,7 +817,7 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1880
     'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
 
-    # .. toggle_name: FEATURES['ENABLE_CHANGE_USER_PASSWORD_ADMIN']
+    # .. toggle_name: FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Whether to send an email for failed password reset attempts or not. This happens when a
@@ -991,8 +991,18 @@ COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
 
 MARKETING_EMAILS_OPT_IN = False
 
-# VAN-754 - Year of birth field put behind a flag to make it available for OpenedX.
-COLLECT_YEAR_OF_BIRTH = True
+# .. toggle_name: ENABLE_COPPA_COMPLIANCE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When True, inforces COPPA compliance and removes YOB field from registration form and accounnt
+# .. settings page. Also hide YOB banner from profile page.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-10-27
+# .. toggle_tickets: 'https://openedx.atlassian.net/browse/VAN-622'
+ENABLE_COPPA_COMPLIANCE = False
+
+# VAN-741 - save for later api put behind a flag to make it only available for edX
+ENABLE_SAVE_FOR_LATER = False
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
@@ -1443,12 +1453,10 @@ COURSE_LISTINGS = {}
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-# pylint: disable=wrong-import-position
-from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
-from xmodule.x_module import XModuleMixin
-# pylint: enable=wrong-import-position
+from xmodule.modulestore.edit_info import EditInfoMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore.inheritance import InheritanceMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore import prefer_xmodules  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
@@ -1998,10 +2006,10 @@ FOOTER_OPENEDX_URL = "https://open.edx.org"
 # We use logo images served from files.edx.org so we can (roughly) track
 # how many OpenEdX installations are running.
 # Site operators can choose from these logo options:
-# * https://files.edx.org/openedx-logos/open-edx-logo-tag.png
-# * https://files.edx.org/openedx-logos/open-edx-logo-tag-light.png"
-# * https://files.edx.org/openedx-logos/open-edx-logo-tag-dark.png
-FOOTER_OPENEDX_LOGO_IMAGE = "https://files.edx.org/openedx-logos/open-edx-logo-tag.png"
+# * https://logos.openedx.org/open-edx-logo-tag.png
+# * https://logos.openedx.org/open-edx-logo-tag-light.png"
+# * https://logos.openedx.org/open-edx-logo-tag-dark.png
+FOOTER_OPENEDX_LOGO_IMAGE = "https://logos.openedx.org/open-edx-logo-tag.png"
 
 # This is just a placeholder image.
 # Site operators can customize this with their organization's image.
@@ -2035,10 +2043,6 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
-
-    # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
-    # Override was found here https://github.com/django/django/pull/11894
-    'django_cookies_samesite.middleware.CookiesSameSite',
 
     'crum.CurrentRequestUserMiddleware',
 
@@ -2152,13 +2156,6 @@ MIDDLEWARE = [
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
-
-if django.VERSION >= (3, 1):
-    # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
-    # Override was found here https://github.com/django/django/pull/11894
-    MIDDLEWARE.remove(
-        'django_cookies_samesite.middleware.CookiesSameSite'
-    )
 
 # Clickjacking protection can be disbaled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
@@ -2938,6 +2935,7 @@ INSTALLED_APPS = [
     'lms.djangoapps.courseware',
     'lms.djangoapps.coursewarehistoryextended',
     'common.djangoapps.student.apps.StudentConfig',
+    'common.djangoapps.split_modulestore_django.apps.SplitModulestoreDjangoBackendAppConfig',
 
     'lms.djangoapps.static_template_view',
     'lms.djangoapps.staticbook',
@@ -2952,6 +2950,9 @@ INSTALLED_APPS = [
 
     # Course home api
     'lms.djangoapps.course_home_api',
+
+    # User tours
+    'lms.djangoapps.user_tours',
 
     # New (Blockstore-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.LmsXBlockAppConfig',
@@ -3142,6 +3143,8 @@ INSTALLED_APPS = [
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
+    'openedx.features.funix_relative_date',
+    'openedx.features.funix_goal',
     'openedx.features.name_affirmation_api.apps.NameAffirmationApiConfig',
 
     'lms.djangoapps.experiments',
@@ -3191,6 +3194,18 @@ INSTALLED_APPS = [
 
     # Content Library LTI 1.3 Support.
     'pylti1p3.contrib.django.lti1p3_tool_config',
+
+    # For edx ace template tags
+    'edx_ace',
+
+    # For save for later
+    'lms.djangoapps.save_for_later',
+
+    # TODO (EventBus): Make Kafka/event-bus optional
+    'openedx.core.djangoapps.kafka_consumer',
+
+    # FUNiX Feedback
+    'lms.djangoapps.feedback',
 ]
 
 ######################### CSRF #########################################
@@ -3221,11 +3236,26 @@ REST_FRAMEWORK = {
     },
 }
 
+# .. setting_name: REGISTRATION_VALIDATION_RATELIMIT
+# .. setting_default: 30/7d
+# .. setting_description: Whenver a user tries to register on edx, the data entered during registration
+#    is validated via RegistrationValidationView.
+#    It's POST endpoint is rate-limited up to 30 requests per IP Address in a week by default.
+#    It was introduced because an attacker can guess or brute force a series of names to enumerate valid users.
+# .. setting_tickets: https://github.com/edx/edx-platform/pull/24664
 REGISTRATION_VALIDATION_RATELIMIT = '30/7d'
+
+# .. setting_name: REGISTRATION_RATELIMIT
+# .. setting_default: 60/7d
+# .. setting_description: New users are registered on edx via RegistrationView.
+#    It's POST end-point is rate-limited up to 60 requests per IP Address in a week by default.
+#    Purpose of this setting is to restrict an attacker from registering numerous fake accounts.
+# .. setting_tickets: https://github.com/edx/edx-platform/pull/27060
 REGISTRATION_RATELIMIT = '60/7d'
 
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
+    'DEEP_LINKING': True,
 }
 
 # How long to cache OpenAPI schemas and UI, in seconds.
@@ -3873,6 +3903,7 @@ OPTIONAL_APPS = [
     ('openassessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.assessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.fileupload', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('openassessment.staffgrader', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.workflow', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
     ('openassessment.xblock', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
@@ -3884,6 +3915,7 @@ OPTIONAL_APPS = [
     ('consent', None),
     ('integrated_channels.integrated_channel', None),
     ('integrated_channels.degreed', None),
+    ('integrated_channels.degreed2', None),
     ('integrated_channels.sap_success_factors', None),
     ('integrated_channels.cornerstone', None),
     ('integrated_channels.xapi', None),
@@ -4026,6 +4058,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
         "email",
         "id",
+        "verified_name",
         "extended_profile",
         "gender",
         "state",
@@ -4040,7 +4073,6 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "phone_number",
         "activation_key",
         "pending_name_change",
-        "is_verified_name_enabled",
     ]
 )
 
@@ -4531,9 +4563,6 @@ CONTENT_TYPE_GATE_GROUP_IDS = {
 
 COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
-############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
-
 
 # Initialize to 'unknown', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'release'
@@ -4546,7 +4575,26 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 COMPLETION_BY_VIEWING_DELAY_MS = 5000
 
 ############### Settings for Django Rate limit #####################
+
+# .. toggle_name: RATELIMIT_ENABLE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: When enabled, RATELIMIT_RATE is applied.
+#    When disabled, RATELIMIT_RATE is not applied.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2018-01-08
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/16951
 RATELIMIT_ENABLE = True
+
+# .. setting_name: RATELIMIT_RATE
+# .. setting_default: 120/m
+# .. setting_description: Due to some reports about attack on /oauth2/access_token/ which took LMS down,
+#    this setting was introduced to rate-limit all endpoints of AccessTokenView up to
+#    120 requests per IP Address in a minute by default.
+# .. setting_warning: RATELIMIT_ENABLE flag must also be enabled/set to True to use this RATELIMIT_RATE setting.
+# .. setting_use_cases: open_edx
+# .. setting_creation_date: 2018-01-08
+# .. setting_tickets: https://github.com/edx/edx-platform/pull/16951
 RATELIMIT_RATE = '120/m'
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
@@ -4560,6 +4608,13 @@ RESET_PASSWORD_API_RATELIMIT = '30/7d'
 ##### PASSWORD RESET RATE LIMIT SETTINGS #####
 PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
+
+#### SAVE FOR LATER EMAIL RATE LIMIT SETTINGS ####
+SAVE_FOR_LATER_IP_RATE_LIMIT = '100/d'
+SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/h'
+
+EDX_BRAZE_API_KEY = None
+EDX_BRAZE_API_SERVER = None
 
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
@@ -4685,6 +4740,27 @@ PROGRAM_CONSOLE_MICROFRONTEND_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the micro-frontend-based courseware page.
 LEARNING_MICROFRONTEND_URL = None
+# .. setting_name: ORA_GRADING_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based openassessment grading page.
+#     This is will be show in the open response tab list data.
+# .. setting_warning: Also set site's openresponseassessment.enhanced_staff_grader
+#     waffle flag.
+ORA_GRADING_MICROFRONTEND_URL = None
+# .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based discussions page.
+# .. setting_warning: Also set site's courseware.discussions_mfe waffle flag.
+DISCUSSIONS_MICROFRONTEND_URL = None
+# .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When enabled, this toggle activates the use of the password validation
+#   HIBP Policy.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-12-03
+# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-666
+ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
 
 ############### Settings for the ace_common plugin #################
 ACE_ENABLED_CHANNELS = ['django_email']
@@ -4832,10 +4908,6 @@ SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
 # .. toggle_creation_date: 2021-06-10
 SHOW_ACCOUNT_ACTIVATION_CTA = False
 
-################# Settings for Chrome-specific origin trials ########
-# Token for " Disable Different Origin Subframe Dialog Suppression" for http://localhost:18000
-CHROME_DISABLE_SUBFRAME_DIALOG_SUPPRESSION_TOKEN = 'ArNBN7d1AkvMhJTGWXlJ8td/AN4lOokzOnqKRNkTnLqaqx0HpfYvmx8JePPs/emKh6O5fckx14LeZIGJ1AQYjgAAAABzeyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjE4MDAwIiwiZmVhdHVyZSI6IkRpc2FibGVEaWZmZXJlbnRPcmlnaW5TdWJmcmFtZURpYWxvZ1N1cHByZXNzaW9uIiwiZXhwaXJ5IjoxNjM5NTI2Mzk5fQ=='  # pylint: disable=line-too-long
-
 ################# Documentation links for course apps #################
 
 # pylint: disable=line-too-long
@@ -4847,3 +4919,9 @@ TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-runn
 TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
+
+################# Bulk Course Email Settings #################
+# If set, recipients of bulk course email messages will be filtered based on the last_login date of their User account.
+# The expected value is an Integer representing the cutoff point (in months) for inclusion to the message. Example:
+# a value of `3` would include learners who have logged in within the past 3 months.
+BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD = None

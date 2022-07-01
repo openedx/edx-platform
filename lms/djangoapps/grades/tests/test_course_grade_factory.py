@@ -12,8 +12,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle_switch
 from ..course_grade import CourseGrade, ZeroCourseGrade
@@ -95,35 +95,35 @@ class TestCourseGradeFactory(GradeTestBase):
                 self.sequence2.display_name
             ]
 
-        with self.assertNumQueries(5), mock_get_score(1, 2):
+        with self.assertNumQueries(4), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-        num_queries = 43
+        num_queries = 42
         with self.assertNumQueries(num_queries), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of .5
 
-        num_queries = 7
+        num_queries = 6
         with self.assertNumQueries(num_queries), mock_get_score(1, 4):
             grade_factory.update(self.request.user, self.course, force_update_subsections=False)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
 
-        num_queries = 24
+        num_queries = 23
         with self.assertNumQueries(num_queries), mock_get_score(2, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             _assert_read(expected_pass=True, expected_percent=1.0)  # updated to grade of 1.0
 
-        num_queries = 30
+        num_queries = 29
         with self.assertNumQueries(num_queries), mock_get_score(0, 0):  # the subsection now is worth zero
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             _assert_read(expected_pass=False, expected_percent=0.0)  # updated to grade of 0.0
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
@@ -279,7 +279,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         iterator, but it shouldn't error.
         """
         grade_results = list(CourseGradeFactory().iter([], self.course))
-        assert grade_results == []
+        assert not grade_results
 
     def test_all_empty_grades(self):
         """

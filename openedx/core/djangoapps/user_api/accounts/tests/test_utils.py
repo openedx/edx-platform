@@ -11,8 +11,8 @@ from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewi
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import format_social_link, validate_social_link
 
@@ -122,7 +122,8 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
             self.cruft_user
         )
         assert block_url ==\
-               'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
+               'test_url:9999/courses/course-v1:{org}+{course}+{run}/jump_to/'\
+               'block-v1:{org}+{course}+{run}+type@vertical+block@{vertical_id}'.format(
                    org=self.course.location.course_key.org,
                    course=self.course.location.course_key.course,
                    run=self.course.location.course_key.run,

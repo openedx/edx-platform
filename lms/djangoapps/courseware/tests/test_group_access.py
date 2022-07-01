@@ -6,14 +6,14 @@ access control rules.
 
 import ddt
 from stevedore.extension import Extension, ExtensionManager
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import USER_PARTITION_SCHEME_NAMESPACE, Group, UserPartition
 
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 import lms.djangoapps.courseware.access as access
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import USER_PARTITION_SCHEME_NAMESPACE, Group, UserPartition
 
 
 class MemoryUserPartitionScheme:
@@ -57,6 +57,7 @@ class GroupAccessTestCase(ModuleStoreTestCase):
     Tests to ensure that has_access() correctly enforces the visibility
     restrictions specified in the `group_access` field of XBlocks.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def set_user_group(self, user, partition, group):
         """

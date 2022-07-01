@@ -744,7 +744,7 @@ class VideoExportTestCase(VideoBlockTestBase):
 
         xml = self.descriptor.definition_to_xml(self.file_system)
         parser = etree.XMLParser(remove_blank_text=True)
-        xml_string = '<video url_name="SampleProblem"/>'
+        xml_string = '<video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem"/>'
         expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
@@ -784,7 +784,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         """
         xml = self.descriptor.definition_to_xml(self.file_system)
         # Check that download_video field is also set to default (False) in xml for backward compatibility
-        expected = '<video url_name="SampleProblem"/>\n'
+        expected = '<video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem"/>\n'
         assert expected == etree.tostring(xml, pretty_print=True).decode('utf-8')
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
@@ -794,7 +794,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         """
         self.descriptor.transcripts = None
         xml = self.descriptor.definition_to_xml(self.file_system)
-        expected = b'<video url_name="SampleProblem"/>\n'
+        expected = b'<video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem"/>\n'
         assert expected == etree.tostring(xml, pretty_print=True)
 
     @patch('xmodule.video_module.video_module.edxval_api', None)

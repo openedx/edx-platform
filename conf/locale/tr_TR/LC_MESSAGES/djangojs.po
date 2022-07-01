@@ -107,8 +107,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-21 17:10+0000\n"
-"PO-Revision-Date: 2021-08-01 20:44+0000\n"
+"POT-Creation-Date: 2021-12-26 20:42+0000\n"
+"PO-Revision-Date: 2021-11-07 20:44+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
@@ -4853,7 +4853,7 @@ msgstr "{user} için problem puanı başarıyla geçersiz kılındı"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Could not override problem score for {user}."
-msgstr ""
+msgstr "{user} kullanıcısının problem puanı geçersizleştirilemedi."
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Enter and confirm your new password."
@@ -4907,9 +4907,8 @@ msgstr ""
 "kaldırın{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
+msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
 msgstr ""
-"İlerlemeden önce, lütfen {htmlStart}hesabınızı etkinleştirin{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -10219,11 +10218,11 @@ msgstr "Test Sürüşü Sınavı"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
-msgstr "Gözetmenli Sınavı Uygula"
+msgstr "Gözetimli Sınav Alıştırması"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctored Exam"
-msgstr "Gözetmenli Sınav"
+msgstr "Gözetimli Sınav"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Timed Exam"
@@ -10241,7 +10240,7 @@ msgstr "Görünen Ad"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
-msgstr "Gözetmen Ayarları"
+msgstr "Gözetim Ayarları"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
@@ -11156,16 +11155,15 @@ msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Proctored"
-msgstr "Gözetmenli"
+msgstr "Gözetimli"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
 "Proctored exams are timed and they record video of each learner taking the "
 "exam. The videos are then reviewed to ensure that learners follow all "
-"examination rules."
+"examination rules. Please note that setting this exam as proctored will "
+"change the visibility settings to \"Hide content after due date.\""
 msgstr ""
-"Gözetmenli sınavlar zaman sınırlıdır ve sınav süresince öğrencileri videoya "
-"kaydeder. Bu videolar öğrencilerin sınav kurallarına uymalarını belgeler."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"
@@ -11178,21 +11176,21 @@ msgid ""
 "profile step prior to taking a proctored exam. Profile reviews take 2+ "
 "business days."
 msgstr ""
-"Öğrencileri gözetmenli sınavlarla tanıştırmak, kimliklerini doğrulamak ve "
-"bir oryantasyon profili oluşturmak için Oryantasyon'u kullanın. Öğrenciler, "
-"gözetmenli bir sınava girmeden önce, ilk oryantasyon profili adımını "
+"Öğrencileri gözetimli sınavlarla tanıştırmak, kimliklerini doğrulamak ve bir"
+" oryantasyon profili oluşturmak için Oryantasyon'u kullanın. Öğrenciler, "
+"gözetimli bir sınava girmeden önce, ilk oryantasyon profili adımını "
 "tamamlamalıdır. Profil incelemeleri 2+ iş günü sürer. "
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"
-msgstr "Gözetmenli Uygula"
+msgstr "Gözetimli Alıştırma"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
 "Use a practice proctored exam to introduce learners to the proctoring tools "
 "and processes. Results of a practice exam do not affect a learner's grade."
 msgstr ""
-"Öğrencilere gözetmenlik araçlarını ve işleyişini tanıtmak için gözetmenli "
+"Öğrencilere gözetim araçlarını ve işleyişini tanıtmak için gözetimli "
 "alıştırma sınavını kullanın. Alıştırma sınavının sonuçları öğrencinin notuna"
 " etki etmez."
 
@@ -11222,15 +11220,15 @@ msgid ""
 "before the learners start the exam, along with the {linkStart}general "
 "proctored exam rules{linkEnd}."
 msgstr ""
-"Tüm kural ya da kural istisnalarını detaylandır ki, gözetmen inceleme kurulu"
-" videolara göz atarken şüphe bırakmayacak şekilde uygulayabilsin. Örneğin, "
+"Tüm kural ya da kural istisnalarını detaylandır ki, gözetim inceleme kurulu "
+"videolara göz atarken şüphe bırakmayacak şekilde uygulayabilsin. Örneğin, "
 "hesap makinesine izin verildiğini belirtebilirsiniz. Belirlenen bu kurallar "
-"{linkStart}genel gözetmenli sınav kuralları{linkEnd} ile birlikte "
-"öğrencilere sınav başlamadan önce görünür olacak."
+"{linkStart}genel gözetimli sınav kuralları{linkEnd} ile birlikte öğrencilere"
+" sınav başlamadan önce görünür olacak."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "General Proctored Exam Rules"
-msgstr "Genel Gözetmenli Sınav Kuralları"
+msgstr "Genel Gözetimli Sınav Kuralları"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
@@ -11239,8 +11237,8 @@ msgid ""
 "calculators are allowed. These specified rules are visible to learners "
 "before the learners start the exam."
 msgstr ""
-"Tüm kural ya da kural istisnalarını detaylandır ki, gözetmen inceleme kurulu"
-" videolara göz atarken şüphe bırakmayacak şekilde uygulayabilsin. Örneğin, "
+"Tüm kural ya da kural istisnalarını detaylandır ki, gözetim inceleme kurulu "
+"videolara göz atarken şüphe bırakmayacak şekilde uygulayabilsin. Örneğin, "
 "hesap makinesine izin verildiğini belirtebilirsiniz. Belirlenen kurallar "
 "öğrencilere sınav başlamadan önce görünür olacak."
 

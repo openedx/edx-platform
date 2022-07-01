@@ -4,20 +4,22 @@ Discussion XBlock
 
 import logging
 import urllib
+
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from django.utils.translation import get_language_bidi
+from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
-from xblock.fields import Scope, String, UNIQUE_ID
-from web_fragments.fragment import Fragment
+from xblock.fields import UNIQUE_ID, Scope, String
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
-
-from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
 from xmodule.xml_module import XmlParserMixin
 
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_topic_url
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
@@ -32,6 +34,7 @@ def _(text):
 
 @XBlock.needs('user')  # pylint: disable=abstract-method
 @XBlock.needs('i18n')
+@XBlock.needs('mako')
 class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     Provides a discussion forum that is inline with other content in the courseware.
@@ -166,6 +169,21 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         Renders student view for LMS.
         """
         fragment = Fragment()
+        mfe_url = get_discussions_mfe_topic_url(self.course_key, self.discussion_id)
+        if ENABLE_DISCUSSIONS_MFE.is_enabled(self.course_key) and mfe_url:
+            fragment.add_content(HTML(
+                "<iframe id='discussions-mfe-tab-embed' src='{src}' title='{title}'></iframe>"
+            ).format(src=mfe_url, title=_("Discussions")))
+            fragment.add_css(
+                """
+                #discussions-mfe-tab-embed {
+                    width: 100%;
+                    height: 800px;
+                    border: none;
+                }
+                """
+            )
+            return fragment
 
         self.add_resource_urls(fragment)
 
@@ -202,7 +220,8 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
             'login_msg': login_msg,
         }
 
-        fragment.add_content(self.runtime.render_template('discussion/_discussion_inline.html', context))
+        fragment.add_content(self.runtime.service(self, 'mako').render_template('discussion/_discussion_inline.html',
+                                                                                context))
         fragment.initialize_js('DiscussionInlineBlock')
 
         return fragment
@@ -212,7 +231,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         Renders author view for Studio.
         """
         fragment = Fragment()
-        fragment.add_content(self.runtime.render_template(
+        fragment.add_content(self.runtime.service(self, 'mako').render_template(
             'discussion/_discussion_inline_studio.html',
             {'discussion_id': self.discussion_id}
         ))

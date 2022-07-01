@@ -3,14 +3,15 @@ Tests for masquerading functionality on course_experience
 """
 
 from edx_toggles.toggles.testutils import override_waffle_flag
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
-from xmodule.partitions.partitions_service import PartitionService
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import add_course_mode
 from .test_course_home import course_home_url
@@ -66,6 +67,7 @@ class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
     Tests for the course verification upgrade messages while the user is being masqueraded.
     """
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     @override_waffle_flag(SHOW_UPGRADE_MSG_ON_COURSE_HOME, active=True)
     def test_masquerade_as_student(self):
@@ -75,6 +77,7 @@ class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
         self.assertContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
         self.assertContains(response, UPGRADE_MESSAGE_CONTAINER, html=False)
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_masquerade_as_verified_student(self):
         user_group_id = self.get_group_id_by_course_mode_name(
@@ -87,6 +90,7 @@ class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
         self.assertNotContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
         self.assertNotContains(response, UPGRADE_MESSAGE_CONTAINER, html=False)
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_masquerade_as_masters_student(self):
         user_group_id = self.get_group_id_by_course_mode_name(

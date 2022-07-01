@@ -38,7 +38,7 @@
                     />
                     <%- gettext('Proctored') %>
                 </label>
-                <p class='field-message' id='proctored-exam-description'> <%- gettext('Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules.') %> </p>
+                <p class='field-message' id='proctored-exam-description'> <%- gettext('Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules. Please note that setting this exam as proctored will change the visibility settings to "Hide content after due date."') %> </p>
 
                 <% var supports_onboarding = xblockInfo.get('supports_onboarding'); %>
                 <% if (supports_onboarding) { %>

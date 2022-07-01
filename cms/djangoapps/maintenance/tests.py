@@ -12,10 +12,10 @@ from django.urls import reverse
 from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from openedx.features.announcements.models import Announcement
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .views import COURSE_KEY_ERROR_MESSAGES, MAINTENANCE_VIEWS
 

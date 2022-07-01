@@ -21,12 +21,12 @@ from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views import assets
 from common.djangoapps.static_replace import replace_static_urls
-from xmodule.assetstore import AssetMetadata
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.assetstore import AssetMetadata  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 

@@ -12,13 +12,13 @@ import pytz
 from freezegun import freeze_time
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from .. import DEFAULT_FIELDS, OPTIONAL_FIELDS, PathItem
 from ..models import Bookmark, XBlockCache, parse_path_data
@@ -35,6 +35,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
     """
     Test the Bookmark model.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     ALL_FIELDS = DEFAULT_FIELDS + OPTIONAL_FIELDS
     STORE_TYPE = ModuleStoreEnum.Type.mongo
     TEST_PASSWORD = 'test'
@@ -376,11 +377,12 @@ class BookmarkModelTests(BookmarksTestsBase):
         # (ModuleStoreEnum.Type.mongo, 6, 3, 3), Too slow.
         (ModuleStoreEnum.Type.mongo, 2, 4, 4),
         # (ModuleStoreEnum.Type.mongo, 4, 4, 4),
-        (ModuleStoreEnum.Type.split, 2, 2, 2),
-        (ModuleStoreEnum.Type.split, 4, 2, 2),
-        (ModuleStoreEnum.Type.split, 2, 3, 2),
-        # (ModuleStoreEnum.Type.split, 4, 3, 2),
-        (ModuleStoreEnum.Type.split, 2, 4, 2),
+        (ModuleStoreEnum.Type.split, 2, 2, 1),
+        (ModuleStoreEnum.Type.split, 4, 2, 1),
+        (ModuleStoreEnum.Type.split, 2, 3, 1),
+        # (ModuleStoreEnum.Type.split, 4, 3, 1),
+        (ModuleStoreEnum.Type.split, 2, 4, 1),
+
     )
     @ddt.unpack
     def test_get_path_queries(self, store_type, children_per_block, depth, expected_mongo_calls):
@@ -408,7 +410,7 @@ class BookmarkModelTests(BookmarksTestsBase):
         # Block does not exist
         usage_key = UsageKey.from_string('i4x://edX/apis/html/interactive')
         usage_key.replace(course_key=self.course.id)
-        assert Bookmark.get_path(usage_key) == []
+        assert not Bookmark.get_path(usage_key)
 
         # Block is an orphan
         self.other_sequential_1.children = []

@@ -994,9 +994,9 @@ class MatlabInput(CodeInput):
         response = data['submission']
 
         # construct xqueue headers
-        qinterface = self.capa_system.xqueue['interface']
+        qinterface = self.capa_system.xqueue.interface
         qtime = datetime.utcnow().strftime(xqueue_interface.dateformat)
-        callback_url = self.capa_system.xqueue['construct_callback']('ungraded_response')
+        callback_url = self.capa_system.xqueue.construct_callback('ungraded_response')
         anonymous_student_id = self.capa_system.anonymous_student_id
         # TODO: Why is this using self.capa_system.seed when we have self.seed???
         queuekey = xqueue_interface.make_hashkey(str(self.capa_system.seed) + qtime +

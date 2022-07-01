@@ -26,7 +26,7 @@ from common.djangoapps.course_modes.signals import update_masters_access_course
 from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.roles import CourseBetaTesterRole
 from common.djangoapps.student.tests.factories import BetaTesterFactory, UserFactory
-from xmodule.partitions.partitions import (
+from xmodule.partitions.partitions import (  # lint-amnesty, pylint: disable=wrong-import-order
     ENROLLMENT_TRACK_PARTITION_ID,
 )
 

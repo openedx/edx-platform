@@ -1,4 +1,4 @@
-name: CI
+name: Static analysis
 
 on: pull_request
 

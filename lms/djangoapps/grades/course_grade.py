@@ -11,7 +11,7 @@ from django.conf import settings
 from lazy import lazy
 
 from openedx.core.lib.grade_utils import round_away_from_zero
-from xmodule import block_metadata_utils
+from xmodule import block_metadata_utils  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .config import assume_zero_if_absent
 from .scores import compute_percent

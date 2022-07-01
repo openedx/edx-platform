@@ -16,12 +16,12 @@ from rest_framework.test import APIClient
 from common.djangoapps.student.models import CourseAccessRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, UserFactory
 from openedx.core.lib.courses import course_image_url
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
-from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory
+from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ...serializers.course_runs import CourseRunSerializer
 from ..utils import serialize_datetime

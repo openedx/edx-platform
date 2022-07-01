@@ -17,6 +17,7 @@ from path import Path as path
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
+from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import EditingMixin
 from xmodule.edxnotes_utils import edxnotes
@@ -42,6 +43,8 @@ _ = lambda text: text
 
 
 @XBlock.needs("i18n")
+@XBlock.needs("mako")
+@XBlock.needs("user")
 class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     XmlMixin, EditingMixin,
     XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
@@ -117,8 +120,9 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         """ Returns html required for rendering the block. """
         if self.data:
             data = self.data
-            if getattr(self.runtime, 'anonymous_student_id', None):
-                data = data.replace("%%USER_ID%%", self.runtime.anonymous_student_id)
+            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+            if user_id:
+                data = data.replace("%%USER_ID%%", user_id)
             data = data.replace("%%COURSE_ID%%", str(self.scope_ids.usage_id.context_key))
             return data
         return self.data
@@ -128,7 +132,7 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         Return the studio view.
         """
         fragment = Fragment(
-            self.system.render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
         add_webpack_to_fragment(fragment, 'HtmlBlockStudio')
         shim_xmodule_js(fragment, 'HTMLEditingDescriptor')
@@ -481,7 +485,10 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint
                 'visible_updates': course_updates[:3],
                 'hidden_updates': course_updates[3:],
             }
-            return self.system.render_template(f"{self.TEMPLATE_DIR}/course_updates.html", context)
+            return self.runtime.service(self, 'mako').render_template(
+                f"{self.TEMPLATE_DIR}/course_updates.html",
+                context,
+            )
 
     @classmethod
     def order_updates(self, updates):  # lint-amnesty, pylint: disable=bad-classmethod-argument

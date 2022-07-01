@@ -88,4 +88,5 @@ urlpatterns = [
     path('generate_bulk_certificate_exceptions', api.generate_bulk_certificate_exceptions,
          name='generate_bulk_certificate_exceptions'),
     path('certificate_invalidation_view/', api.certificate_invalidation_view, name='certificate_invalidation_view'),
+    path('get_student_dates_url', api.get_student_dates_url, name='get_student_dates_url'),
 ]

@@ -10,6 +10,7 @@ from django.core.files.storage import get_storage_class
 from xblock.fields import List
 
 from edx_django_utils.plugins import PluginError
+from django.conf import settings
 
 log = logging.getLogger("edx.courseware")
 
@@ -302,11 +303,14 @@ class StaticTab(CourseTab):
     type = 'static_tab'
     is_default = False  # A static tab is never added to a course by default
     allow_multiple = True
+    priority = 100
 
     def __init__(self, tab_dict=None, name=None, url_slug=None):
         def link_func(course, reverse_func):
             """ Returns a function that returns the static tab's URL. """
-            return reverse_func(self.type, args=[str(course.id), self.url_slug])
+            # return reverse_func(self.type, args=[str(course.id), self.url_slug])
+            mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{str(course.id)}/static/{self.url_slug}'
+            return mfe_link
 
         self.url_slug = tab_dict.get('url_slug') if tab_dict else url_slug
 
@@ -381,14 +385,14 @@ class CourseTabList(List):
         within the course.
         """
 
-        course.tabs.extend([
+        course_tabs = [
             CourseTab.load('course_info'),
             CourseTab.load('courseware')
-        ])
+        ]
 
         # Presence of syllabus tab is indicated by a course attribute
         if hasattr(course, 'syllabus_present') and course.syllabus_present:
-            course.tabs.append(CourseTab.load('syllabus'))
+            course_tabs.append(CourseTab.load('syllabus'))
 
         # If the course has a discussion link specified, use that even if we feature
         # flag discussions off. Disabling that is mostly a server safety feature
@@ -400,12 +404,16 @@ class CourseTabList(List):
         else:
             discussion_tab = CourseTab.load('discussion')
 
-        course.tabs.extend([
+        course_tabs.extend([
             CourseTab.load('textbooks'),
             discussion_tab,
             CourseTab.load('wiki'),
             CourseTab.load('progress'),
         ])
+        # While you should be able to do `tab.priority`, a lot of tests mock tabs to be a dict
+        # which causes them to throw an error on this line
+        course_tabs.sort(key=lambda tab: getattr(tab, 'priority', None) or float('inf'))
+        course.tabs.extend(course_tabs)
 
     @staticmethod
     def get_discussion(course):
@@ -422,7 +430,7 @@ class CourseTabList(List):
 
         # find one of the discussion tab types in the course tabs
         for tab in course.tabs:
-            if tab.type == 'discussion' or tab.type == 'external_discussion':
+            if tab.type in ('discussion', 'external_discussion'):
                 return tab
         return None
 

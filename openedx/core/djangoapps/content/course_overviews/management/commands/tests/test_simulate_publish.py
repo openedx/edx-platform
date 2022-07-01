@@ -9,10 +9,10 @@ import lms.djangoapps.ccx.tasks
 import openedx.core.djangoapps.content.course_overviews.signals
 from openedx.core.djangoapps.content.course_overviews.management.commands.simulate_publish import Command, name_from_fn
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, SimulateCoursePublishConfig
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import SwitchedSignal
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import SwitchedSignal  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 LOGGER_NAME = 'simulate_publish'
 
@@ -126,7 +126,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         assert self.course_key_1 in self.received_1
         assert self.course_key_2 in self.received_1
         assert self.course_key_3 in self.received_1
-        assert self.received_2 == []
+        assert not self.received_2
 
     def test_course_overviews(self):
         """Integration test with CourseOverviews."""
@@ -140,8 +140,8 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
             )
         )
         assert CourseOverview.objects.all().count() == 3
-        assert self.received_1 == []
-        assert self.received_2 == []
+        assert not self.received_1
+        assert not self.received_2
 
     def sample_receiver_1(self, sender, course_key, **kwargs):  # pylint: disable=unused-argument
         """Custom receiver for testing."""

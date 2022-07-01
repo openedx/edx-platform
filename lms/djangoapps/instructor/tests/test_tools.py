@@ -16,12 +16,14 @@ from edx_when.api import set_dates_for_course
 from edx_when.field_data import DateLookupFieldData
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from xmodule.fields import Date
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.course_date_signals import handlers
-from xmodule.fields import Date
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ..views import tools
 
@@ -99,6 +101,8 @@ class TestFindUnit(SharedModuleStoreTestCase):
     """
     Test the find_unit function.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -128,6 +132,8 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
     """
     Test the get_units_with_due_date function.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         """
         Fixtures.
@@ -193,6 +199,8 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
     """
     Test the set_due_date_extensions function.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         """
         Fixtures.
@@ -252,12 +260,12 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
 
     def test_set_due_date_extension_invalid_date(self):
         extended = datetime.datetime(2009, 1, 1, 0, 0, tzinfo=UTC)
-        with pytest.raises(tools.DashboardError):
+        with pytest.raises(tools.DashboardError), self.allow_transaction_exception():
             tools.set_due_date_extension(self.course, self.week1, self.user, extended)
 
     def test_set_due_date_extension_no_date(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
-        with pytest.raises(tools.DashboardError):
+        with pytest.raises(tools.DashboardError), self.allow_transaction_exception():
             tools.set_due_date_extension(self.course, self.week3, self.user, extended)
 
     def test_reset_due_date_extension(self):
@@ -281,6 +289,7 @@ class TestDataDumps(ModuleStoreTestCase):
     """
     Test data dumps for reporting.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         """

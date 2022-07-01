@@ -19,8 +19,8 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import DEFAULT_VERIFIED_COHORT_NAME, VerifiedTrackCohortedCourse
 from ..tasks import sync_cohort_with_mode

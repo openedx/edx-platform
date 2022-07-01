@@ -11,17 +11,17 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.client import Client
 from opaque_keys.edx.keys import AssetKey, CourseKey
-
-from cms.djangoapps.contentstore.utils import reverse_url
-from common.djangoapps.student.models import Registration
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 from xmodule.modulestore.xml_importer import import_course_from_xml
+
+from cms.djangoapps.contentstore.utils import reverse_url
+from common.djangoapps.student.models import Registration
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -74,6 +74,8 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
     Base class for Studio tests that require a logged in user and a course.
     Also provides helper methods for manipulating and verifying the course.
     """
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+
     def setUp(self):
         """
         These tests need a user in the DB so that the django Test Client can log them in.

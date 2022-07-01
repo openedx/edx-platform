@@ -82,20 +82,29 @@ class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-
 
 class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_cant_do_something_forbidden(self):
+        '''
+        Demonstrates that running unsafe code inside the code jail
+        throws SafeExecException, protecting the calling process.
+        '''
         # Can't test for forbiddenness if CodeJail isn't configured for python.
         if not jail_code.is_configured("python"):
             pytest.skip()
 
         g = {}
         with pytest.raises(SafeExecException) as cm:
-            safe_exec("import os; files = os.listdir('/')", g)
-        assert "OSError" in text_type(cm.exception)
-        assert "Permission denied" in text_type(cm.exception)
+            safe_exec('import sys; sys.exit(1)', g)
+        assert "SystemExit" not in text_type(cm)
+        assert "Couldn't execute jailed code" in text_type(cm)
 
     def test_can_do_something_forbidden_if_run_unsafely(self):
+        '''
+        Demonstrates that running unsafe code outside the code jail
+        can cause issues directly in the calling process.
+        '''
         g = {}
-        safe_exec("import os; files = os.listdir('/')", g, unsafely=True)
-        assert g['files'] == os.listdir('/')
+        with pytest.raises(SystemExit) as cm:
+            safe_exec('import sys; sys.exit(1)', g, unsafely=True)
+        assert "SystemExit" in text_type(cm)
 
 
 class TestLimitConfiguration(unittest.TestCase):

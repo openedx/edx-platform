@@ -3,7 +3,7 @@
 <%!
 from django.urls import reverse
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -34,7 +34,7 @@ elif cert_status['status'] == CertificateStatuses.notpassing:
 else:
     status_css_class = 'course-status-processing'
 %>
-<% 
+<%
   requesting_post_url = reverse('generate_user_cert', args=[str(course_overview.id)])
   progress_page_url = reverse('progress', args=[str(course_overview.id)])
 %>
@@ -169,7 +169,7 @@ else:
   <div class="message message-status ${status_css_class} d-flex justify-content-between align-items-center">
     <div class="message-copy">
       <%
-        container_string = _("You are not eligible for a certificate.")
+        container_string = _("You are not yet eligible for a certificate.")
       %>
       <span class="info-date-block localized-datetime" data-language="${user_language}" data-timezone="${user_timezone}" data-string="${container_string}"></span>
     </div>

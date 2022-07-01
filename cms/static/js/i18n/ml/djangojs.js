@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n != 1);
-    if (typeof(v) == 'boolean') {
+    const v = (n != 1);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     "%(sel)s of %(cnt)s selected": [
       "%(cnt)s\u0d32\u0d4d\u200d %(sel)s \u0d24\u0d46\u0d30\u0d1e\u0d4d\u0d1e\u0d46\u0d1f\u0d41\u0d24\u0d4d\u0d24\u0d41",
       "%(cnt)s\u0d32\u0d4d\u200d %(sel)s \u0d0e\u0d23\u0d4d\u0d23\u0d02 \u0d24\u0d46\u0d30\u0d1e\u0d4d\u0d1e\u0d46\u0d1f\u0d41\u0d24\u0d4d\u0d24\u0d41"
@@ -70,8 +71,6 @@
     "Tomorrow": "\u0d28\u0d3e\u0d33\u0d46",
     "Type into this box to filter down the list of available %s.": "\u0d32\u0d2d\u0d4d\u0d2f\u0d2e\u0d3e\u0d2f %s \u0d2a\u0d1f\u0d4d\u0d1f\u0d3f\u0d15\u0d2f\u0d46 \u0d2b\u0d3f\u0d32\u0d4d\u200d\u0d1f\u0d4d\u0d1f\u0d30\u0d4d\u200d \u0d1a\u0d46\u0d2f\u0d4d\u0d24\u0d46\u0d1f\u0d41\u0d15\u0d4d\u0d15\u0d3e\u0d28\u0d4d\u200d \u0d08 \u0d2c\u0d4b\u0d15\u0d4d\u0d38\u0d3f\u0d32\u0d4d\u200d \u0d1f\u0d48\u0d2a\u0d4d\u0d2a\u0d4d \u0d1a\u0d46\u0d2f\u0d4d\u0d2f\u0d41\u0d15.",
     "Yesterday": "\u0d07\u0d28\u0d4d\u0d28\u0d32\u0d46",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "\u0d28\u0d3f\u0d19\u0d4d\u0d19\u0d33\u0d4d\u200d \u0d12\u0d30\u0d41 \u0d06\u0d15\u0d4d\u0d37\u0d28\u0d4d\u200d \u0d24\u0d46\u0d30\u0d1e\u0d4d\u0d1e\u0d46\u0d1f\u0d41\u0d24\u0d4d\u0d24\u0d3f\u0d1f\u0d4d\u0d1f\u0d41\u0d23\u0d4d\u0d1f\u0d4d. \u0d15\u0d33\u0d19\u0d4d\u0d19\u0d33\u0d3f\u0d32\u0d4d\u200d \u0d38\u0d47\u0d35\u0d4d \u0d1a\u0d46\u0d2f\u0d4d\u0d2f\u0d3e\u0d24\u0d4d\u0d24 \u0d2e\u0d3e\u0d31\u0d4d\u0d31\u0d19\u0d4d\u0d19\u0d33\u0d4d\u200d \u0d07\u0d32\u0d4d\u0d32. \u0d28\u0d3f\u0d19\u0d4d\u0d19\u0d33\u0d4d\u200d\u0d38\u0d47\u0d35\u0d4d \u0d2c\u0d1f\u0d4d\u0d1f\u0d23\u0d4d\u200d \u0d24\u0d28\u0d4d\u0d28\u0d46\u0d2f\u0d3e\u0d23\u0d4b \u0d05\u0d24\u0d4b \u0d17\u0d4b \u0d2c\u0d1f\u0d4d\u0d1f\u0d23\u0d3e\u0d23\u0d4b \u0d09\u0d26\u0d4d\u0d26\u0d47\u0d36\u0d3f\u0d1a\u0d4d\u0d1a\u0d24\u0d4d.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "\u0d28\u0d3f\u0d19\u0d4d\u0d19\u0d33\u0d4d\u200d \u0d12\u0d30\u0d41 \u0d06\u0d15\u0d4d\u0d37\u0d28\u0d4d\u200d \u0d24\u0d46\u0d30\u0d1e\u0d4d\u0d1e\u0d46\u0d1f\u0d41\u0d24\u0d4d\u0d24\u0d3f\u0d1f\u0d4d\u0d1f\u0d41\u0d23\u0d4d\u0d1f\u0d4d. \u0d2a\u0d15\u0d4d\u0d37\u0d47, \u0d15\u0d33\u0d19\u0d4d\u0d19\u0d33\u0d3f\u0d32\u0d46 \u0d2e\u0d3e\u0d31\u0d4d\u0d31\u0d19\u0d4d\u0d19\u0d33\u0d4d\u200d \u0d07\u0d28\u0d3f\u0d2f\u0d41\u0d02 \u0d38\u0d47\u0d35\u0d4d \u0d1a\u0d46\u0d2f\u0d4d\u0d2f\u0d3e\u0d28\u0d41\u0d23\u0d4d\u0d1f\u0d4d. \u0d06\u0d26\u0d4d\u0d2f\u0d02 \u0d38\u0d47\u0d35\u0d4d\u0d1a\u0d46\u0d2f\u0d4d\u0d2f\u0d3e\u0d28\u0d3e\u0d2f\u0d3f OK \u0d15\u0d4d\u0d32\u0d3f\u0d15\u0d4d \u0d1a\u0d46\u0d2f\u0d4d\u0d2f\u0d41\u0d15. \u0d05\u0d24\u0d3f\u0d28\u0d41 \u0d36\u0d47\u0d37\u0d02 \u0d06\u0d15\u0d4d\u0d37\u0d28\u0d4d\u200d \u0d12\u0d28\u0d4d\u0d28\u0d41 \u0d15\u0d42\u0d1f\u0d3f \u0d2a\u0d4d\u0d30\u0d2f\u0d4b\u0d17\u0d3f\u0d15\u0d4d\u0d15\u0d47\u0d23\u0d4d\u0d1f\u0d3f \u0d35\u0d30\u0d41\u0d02.",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "\u0d35\u0d30\u0d41\u0d24\u0d4d\u0d24\u0d3f\u0d2f \u0d2e\u0d3e\u0d31\u0d4d\u0d31\u0d19\u0d4d\u0d19\u0d33\u0d4d\u200d \u0d38\u0d47\u0d35\u0d4d \u0d1a\u0d46\u0d2f\u0d4d\u0d24\u0d3f\u0d1f\u0d4d\u0d1f\u0d3f\u0d32\u0d4d\u0d32. \u0d12\u0d30\u0d41 \u0d06\u0d15\u0d4d\u0d37\u0d28\u0d4d\u200d \u0d2a\u0d4d\u0d30\u0d2f\u0d4b\u0d17\u0d3f\u0d1a\u0d4d\u0d1a\u0d3e\u0d32\u0d4d\u200d \u0d38\u0d47\u0d35\u0d4d \u0d1a\u0d46\u0d2f\u0d4d\u0d2f\u0d3e\u0d24\u0d4d\u0d24 \u0d2e\u0d3e\u0d31\u0d4d\u0d31\u0d19\u0d4d\u0d19\u0d33\u0d46\u0d32\u0d4d\u0d32\u0d3e\u0d02 \u0d28\u0d37\u0d4d\u0d1f\u0d2a\u0d4d\u0d2a\u0d46\u0d1f\u0d41\u0d02.",
     "one letter Friday\u0004F": "\u0d35\u0d46",
     "one letter Monday\u0004M": "\u0d24\u0d3f",
@@ -81,24 +80,24 @@
     "one letter Tuesday\u0004T": "\u0d1a\u0d4a",
     "one letter Wednesday\u0004W": "\u0d2c\u0d41"
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -108,16 +107,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -140,15 +139,13 @@
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
-      "%Y-%m-%d",
       "%m/%d/%Y %H:%M:%S",
       "%m/%d/%Y %H:%M:%S.%f",
       "%m/%d/%Y %H:%M",
-      "%m/%d/%Y",
       "%m/%d/%y %H:%M:%S",
       "%m/%d/%y %H:%M:%S.%f",
       "%m/%d/%y %H:%M",
-      "%m/%d/%y"
+      "%Y-%m-%d"
     ],
     "DATE_FORMAT": "N j, Y",
     "DATE_INPUT_FORMATS": [
@@ -173,8 +170,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -193,6 +190,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

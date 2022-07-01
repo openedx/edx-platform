@@ -5,9 +5,8 @@ Tests for the Studio authoring XBlock mixin.
 
 from django.conf import settings
 from django.test.utils import override_settings
-
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xblock.core import XBlock
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
@@ -16,11 +15,15 @@ from xmodule.partitions.partitions import (
     UserPartition
 )
 
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.lib.xmodule.xmodule.tests.test_export import PureXBlock
+
 
 class AuthoringMixinTestCase(ModuleStoreTestCase):
     """
     Tests the studio authoring XBlock mixin.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     GROUP_NO_LONGER_EXISTS = "This group no longer exists"
     NO_CONTENT_OR_ENROLLMENT_GROUPS = "Access to this component is not restricted"
     NO_CONTENT_ENROLLMENT_TRACK_ENABLED = "You can restrict access to this component to learners in specific enrollment tracks or content groups"  # lint-amnesty, pylint: disable=line-too-long
@@ -32,6 +35,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
     FEATURES_WITH_ENROLLMENT_TRACK_DISABLED = settings.FEATURES.copy()
     FEATURES_WITH_ENROLLMENT_TRACK_DISABLED['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = False
 
+    @XBlock.register_temp_plugin(PureXBlock, 'pure')
     def setUp(self):
         """
         Create a simple course with a video component.
@@ -58,8 +62,14 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
             parent_location=vertical.location,
             display_name='Test Vertical'
         )
+        pure = ItemFactory.create(
+            category='pure',
+            parent_location=vertical.location,
+            display_name='Test Pure'
+        )
         self.vertical_location = vertical.location
         self.video_location = video.location
+        self.pure_location = pure.location
         self.pet_groups = [Group(1, 'Cat Lovers'), Group(2, 'Dog Lovers')]
 
     def create_content_groups(self, content_groups):
@@ -257,4 +267,16 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         self.verify_visibility_view_contains(
             self.video_location,
             [self.ENROLLMENT_GROUPS_TITLE, 'audit course', 'verified course', self.GROUP_NO_LONGER_EXISTS]
+        )
+
+    def test_pure_xblock_visibility(self):
+        self.create_content_groups(self.pet_groups)
+        self.verify_visibility_view_contains(
+            self.pure_location,
+            [self.CONTENT_GROUPS_TITLE, 'Cat Lovers', 'Dog Lovers']
+        )
+
+        self.verify_visibility_view_does_not_contain(
+            self.pure_location,
+            [self.NO_CONTENT_OR_ENROLLMENT_GROUPS, self.ENROLLMENT_GROUPS_TITLE]
         )

@@ -36,7 +36,7 @@ from .signals import (
     SUBSECTION_SCORE_CHANGED,
     COURSE_GRADE_PASSED_FIRST_TIME
 )
-from openedx.core.djangoapps.signals.signals import (
+from openedx.core.djangoapps.signals.signals import (  # lint-amnesty, pylint: disable=wrong-import-order
     COURSE_GRADE_NOW_FAILED,
     COURSE_GRADE_NOW_PASSED
 )

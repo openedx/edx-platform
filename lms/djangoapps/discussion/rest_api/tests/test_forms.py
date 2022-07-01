@@ -11,7 +11,11 @@ import ddt
 from django.http import QueryDict
 from opaque_keys.edx.locator import CourseLocator
 
-from lms.djangoapps.discussion.rest_api.forms import CommentListGetForm, ThreadListGetForm
+from lms.djangoapps.discussion.rest_api.forms import (
+    UserCommentListGetForm,
+    CommentListGetForm,
+    ThreadListGetForm,
+)
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 
 
@@ -192,6 +196,7 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
             "endorsed": "False",
             "page": "2",
             "page_size": "13",
+            "flagged": "False",
         }
 
     def test_basic(self):
@@ -201,6 +206,7 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
             'endorsed': False,
             'page': 2,
             'page_size': 13,
+            'flagged': False,
             'requested_fields': set()
         }
 
@@ -230,3 +236,55 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         self.form_data["requested_fields"] = {"profile_image"}
         form = self.get_form(expected_valid=True)
         assert form.cleaned_data['requested_fields'] == {'profile_image'}
+
+
+@ddt.ddt
+class UserCommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
+    """Tests for UserCommentListGetForm"""
+    FORM_CLASS = UserCommentListGetForm
+
+    def setUp(self):
+        super().setUp()
+        self.form_data = {
+            "course_id": "a/b/c",
+            "flagged": "False",
+            "page": "2",
+            "page_size": "13",
+        }
+
+    def test_basic(self):
+        form = self.get_form(expected_valid=True)
+        assert form.cleaned_data == {
+            'course_id': CourseLocator.from_string('a/b/c'),
+            'flagged': False,
+            'page': 2,
+            'page_size': 13,
+            'requested_fields': set()
+        }
+
+    def test_missing_flagged(self):
+        self.form_data.pop("flagged")
+        self.assert_field_value("flagged", False)
+
+    @ddt.data("False", "false", False, 0)
+    def test_flagged_false(self, value):
+        self.form_data["flagged"] = value
+        self.assert_field_value("flagged", False)
+
+    @ddt.data("True", "true", True, 1)
+    def test_flagged_true(self, value):
+        self.form_data["flagged"] = value
+        self.assert_field_value("flagged", True)
+
+    def test_requested_fields(self):
+        self.form_data["requested_fields"] = {"profile_image"}
+        form = self.get_form(expected_valid=True)
+        assert form.cleaned_data['requested_fields'] == {'profile_image'}
+
+    def test_missing_course_id(self):
+        self.form_data.pop("course_id")
+        self.assert_error("course_id", "This field is required.")
+
+    def test_invalid_course_id(self):
+        self.form_data["course_id"] = "invalid course id"
+        self.assert_error("course_id", "'invalid course id' is not a valid course id")

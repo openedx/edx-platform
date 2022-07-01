@@ -19,9 +19,9 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteFacto
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import Schedule
 from ..tests.factories import ScheduleConfigFactory
@@ -94,7 +94,7 @@ class CreateScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: d
 
 @ddt.ddt
 @skip_unless_lms
-class UpdateScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class UpdateScheduleTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     ENABLED_SIGNALS = ['course_published']
     VERIFICATION_DEADLINE_DAYS = 14
 
@@ -115,7 +115,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: d
         self.assert_schedule_dates(enrollment.schedule, enrollment.course.start)
 
         course.start = course.start + datetime.timedelta(days=3)  # new course start changes to another future date
-        self.store.update_item(course, ModuleStoreEnum.UserID.test)
+        self.update_course(course, ModuleStoreEnum.UserID.test)
         enrollment = CourseEnrollment.objects.get(id=enrollment.id)
         self.assert_schedule_dates(enrollment.schedule, course.start)  # start set to new course start
 
@@ -125,7 +125,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: d
         self.assert_schedule_dates(enrollment.schedule, enrollment.created)
 
         course.start = course.start + datetime.timedelta(days=3)  # new course start changes to another future date
-        self.store.update_item(course, ModuleStoreEnum.UserID.test)
+        self.update_course(course, ModuleStoreEnum.UserID.test)
         enrollment = CourseEnrollment.objects.get(id=enrollment.id)
         self.assert_schedule_dates(enrollment.schedule, course.start)  # start set to new course start
 
@@ -136,7 +136,7 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: d
         self.assert_schedule_dates(enrollment.schedule, previous_start)
 
         course.start = course.start + datetime.timedelta(days=-10)  # new course start changes to a past date
-        self.store.update_item(course, ModuleStoreEnum.UserID.test)
+        self.update_course(course, ModuleStoreEnum.UserID.test)
         enrollment = CourseEnrollment.objects.get(id=enrollment.id)
         self.assert_schedule_dates(enrollment.schedule, course.start)  # start set to new course start
 

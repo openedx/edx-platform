@@ -324,6 +324,7 @@ class RegistrationFormFactory:
         "terms_of_service",
         "profession",
         "specialty",
+        "marketing_emails_opt_in",
     ]
 
     def _is_field_visible(self, field_name):
@@ -340,12 +341,18 @@ class RegistrationFormFactory:
 
     def __init__(self):
 
+        if settings.ENABLE_COPPA_COMPLIANCE and 'year_of_birth' in self.EXTRA_FIELDS:
+            self.EXTRA_FIELDS.remove('year_of_birth')
+
         # Backwards compatibility: Honor code is required by default, unless
         # explicitly set to "optional" in Django settings.
         self._extra_fields_setting = copy.deepcopy(configuration_helpers.get_value('REGISTRATION_EXTRA_FIELDS'))
         if not self._extra_fields_setting:
             self._extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
         self._extra_fields_setting["honor_code"] = self._extra_fields_setting.get("honor_code", "required")
+
+        if settings.MARKETING_EMAILS_OPT_IN:
+            self._extra_fields_setting['marketing_emails_opt_in'] = 'optional'
 
         # Check that the setting is configured correctly
         for field_name in self.EXTRA_FIELDS:
@@ -427,7 +434,7 @@ class RegistrationFormFactory:
                             FormDescription.FIELD_TYPE_MAP.get(field.__class__))
                         if not field_type:
                             raise ImproperlyConfigured(
-                                u"Field type '{}' not recognized for registration extension field '{}'.".format(
+                                "Field type '{}' not recognized for registration extension field '{}'.".format(
                                     field_type,
                                     field_name
                                 )
@@ -597,7 +604,10 @@ class RegistrationFormFactory:
 
         # The labels are marked for translation in UserProfile model definition.
         # pylint: disable=translation-of-non-string
+
         options = [(name, _(label)) for name, label in UserProfile.LEVEL_OF_EDUCATION_CHOICES]
+        if settings.ENABLE_COPPA_COMPLIANCE:
+            options = filter(lambda op: op[0] != 'el', options)
         form_desc.add_field(
             "level_of_education",
             label=education_level_label,
@@ -652,6 +662,27 @@ class RegistrationFormFactory:
             options=options,
             include_default_option=True,
             required=required
+        )
+
+    def _add_marketing_emails_opt_in_field(self, form_desc, required=False):
+        """Add a marketing email checkbox to form description.
+        Arguments:
+            form_desc: A form description
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+        """
+        opt_in_label = _(
+            'I agree that {platform_name} may send me marketing messages.').format(
+                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        )
+
+        form_desc.add_field(
+            'marketing_emails_opt_in',
+            label=opt_in_label,
+            field_type="checkbox",
+            exposed=True,
+            default=True,  # the checkbox will automatically be checked; meaning user has opted in
+            required=required,
         )
 
     def _add_field_with_configurable_select_options(self, field_name, field_label, form_desc, required=False):

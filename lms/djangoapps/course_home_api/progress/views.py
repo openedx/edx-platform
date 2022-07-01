@@ -25,7 +25,7 @@ from lms.djangoapps.courseware.courses import (
     get_course_blocks_completion_summary, get_course_with_access, get_studio_url,
 )
 from lms.djangoapps.courseware.masquerade import setup_masquerade
-from lms.djangoapps.courseware.views.views import get_cert_data
+from lms.djangoapps.courseware.views.views import credit_course_requirements, get_cert_data
 
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -74,6 +74,11 @@ class ProgressTabView(RetrieveAPIView):
             letter_grade: (str) the user's letter grade based on the set grade range.
                                 If user is passing, value may be 'A', 'B', 'C', 'D', 'Pass', otherwise none
             percent: (float) the user's total graded percent in the course
+        credit_course_requirements: Object containing credit course requirements with the following fields:
+            eligibility_status: (str) Indicates if the user is eligible to receive credit. Value may be
+                "eligible", "not_eligible", or "partial_eligible"
+            requirements: List of requirements that must be fulfilled to be eligible to receive credit. See
+                `get_credit_requirement_status` for details on the fields
         end: (date) end date of the course
         enrollment_mode: (str) a str representing the enrollment the user has ('audit', 'verified', ...)
         grading_policy:
@@ -97,6 +102,9 @@ class ProgressTabView(RetrieveAPIView):
                 learner_has_access: (bool) whether the learner has access to the subsection (could be FBE gated)
                 num_points_earned: (int) the amount of points the user has earned for the given subsection
                 num_points_possible: (int) the total amount of points possible for the given subsection
+                override: Optional object if grade has been overridden by proctor or grading change
+                    system: (str) either GRADING or PROCTORING
+                    reason: (str) a comment on the grading override
                 percent_graded: (float) the percentage of total points the user has received a grade for in a given
                                 subsection
                 problem_scores: List of objects that represent individual problem scores with the following fields:
@@ -236,6 +244,7 @@ class ProgressTabView(RetrieveAPIView):
             'certificate_data': get_cert_data(student, course, enrollment_mode, course_grade),
             'completion_summary': get_course_blocks_completion_summary(course_key, student),
             'course_grade': course_grade,
+            'credit_course_requirements': credit_course_requirements(course_key, student),
             'end': course.end,
             'enrollment_mode': enrollment_mode,
             'grading_policy': grading_policy,

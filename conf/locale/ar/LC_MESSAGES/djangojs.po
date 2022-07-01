@@ -4,9 +4,9 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013-2014
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013-2014
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdelmageed <mido.a@hotmail.com>, 2014
 # Abdullatif El Ali <abdullatifalali@gmail.com>, 2014
@@ -28,6 +28,7 @@
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016-2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # faisal wazir <alwazir95business@gmail.com>, 2020
+# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021
 # Hassan Husseini <hassan@constructeducation.com>, 2020
 # br1ng <ibnalawam@gmail.com>, 2014
 # Jad Freij <jkfreij@gmail.com>, 2014
@@ -45,6 +46,7 @@
 # Ned Batchelder <ned@edx.org>, 2015-2016
 # NELC Open edX Translation <openedx@elc.edu.sa>, 2020-2021
 # Omar Al-Ithawi <omar.al.dolaimy@gmail.com>, 2015-2016
+# Roaa Nader <roaanader002005@gmail.com>, 2021
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
@@ -63,9 +65,9 @@
 #
 # Translators:
 # 6e68c7971a89e50e680ae9444d303c8f, 2016
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
-# Abdallah Nassif <abdoosh00@gmail.com>, 2013,2015
+# Abdallah Nassif <a.nassif012@gmail.com>, 2013,2015
 # Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
@@ -89,6 +91,7 @@
 # NELC Open edX Translation <openedx@elc.edu.sa>, 2020
 # RaghadG <raghad_g@yahoo.com>, 2014
 # RaghadG <raghad_g@yahoo.com>, 2014
+# Roaa Nader <roaanader002005@gmail.com>, 2021
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Shadi Naif <shadinaif@gmail.com>, 2019
@@ -112,7 +115,7 @@
 #
 # Translators:
 # 6e68c7971a89e50e680ae9444d303c8f, 2016
-# Abdallah Nassif <abdoosh00@gmail.com>, 2016
+# Abdallah Nassif <a.nassif012@gmail.com>, 2016
 # Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
 # Ali Hasan <ahasan@qrf.org>, 2014,2016
 # Ahmad <reload_cobra2@yahoo.com>, 2015
@@ -137,6 +140,7 @@
 # Ned Batchelder <ned@edx.org>, 2016
 # NELC Open edX Translation <openedx@elc.edu.sa>, 2020
 # Omar Al-Ithawi <omar.al.dolaimy@gmail.com>, 2015-2016
+# Rama Alshebel, 2021
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016-2017
@@ -149,7 +153,7 @@
 #
 # Translators:
 # 6e68c7971a89e50e680ae9444d303c8f, 2016
-# Abdallah Nassif <abdoosh00@gmail.com>, 2014
+# Abdallah Nassif <a.nassif012@gmail.com>, 2014
 # Ali Hasan <ahasan@qrf.org>, 2016
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
@@ -169,6 +173,8 @@
 # Ned Batchelder <ned@edx.org>, 2016-2017
 # NELC Open edX Translation <openedx@elc.edu.sa>, 2020
 # Omar Al-Ithawi <omar.al.dolaimy@gmail.com>, 2015-2016
+# Rama Alshebel, 2021
+# Roaa Nader <roaanader002005@gmail.com>, 2021
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
@@ -181,9 +187,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-21 17:10+0000\n"
-"PO-Revision-Date: 2021-08-01 20:44+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2021-12-19 20:42+0000\n"
+"PO-Revision-Date: 2021-11-17 18:06+0000\n"
+"Last-Translator: Roaa Nader <roaanader002005@gmail.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -5056,8 +5062,8 @@ msgstr ""
 "الاجتماعي {htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
-msgstr "قبل المتابعة ، يرجى {htmlStart} تفعيل حسابك {htmlEnd}."
+msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
+msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -11279,11 +11285,9 @@ msgstr "مُراقب"
 msgid ""
 "Proctored exams are timed and they record video of each learner taking the "
 "exam. The videos are then reviewed to ensure that learners follow all "
-"examination rules."
+"examination rules. Please note that setting this exam as proctored will "
+"change the visibility settings to \"Hide content after due date.\""
 msgstr ""
-"الامتحانات المراقبة محدّدة التوقيت، وسيُسجّل مقطع فيديو لكل متعلّم يُجري "
-"امتحانًا لتُراجع مقاطع الفيديو هذه بعد ذلك بهدف ضمان التزام المتعلّمين بجميع"
-" القواعد الامتحانية."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"

@@ -8,7 +8,7 @@ import ddt
 import pytest
 import pytz
 from django import test
-from django.contrib.auth import models, REDIRECT_FIELD_NAME
+from django.contrib.auth import models
 from django.core import mail
 from social_django import models as social_models
 
@@ -82,7 +82,7 @@ class GetProviderUserStatesTestCase(TestCase):
 
     def test_returns_empty_list_if_no_enabled_providers(self):
         assert not provider.Registry.enabled()
-        assert [] == pipeline.get_provider_user_states(self.user)
+        assert not pipeline.get_provider_user_states(self.user)
 
     def test_state_not_returned_for_disabled_provider(self):
         disabled_provider = self.configure_google_provider(enabled=False)
@@ -130,7 +130,7 @@ class GetProviderUserStatesTestCase(TestCase):
 
         states = pipeline.get_provider_user_states(self.user)
 
-        assert [] == list(social_models.DjangoStorage.user.objects.all())
+        assert not list(social_models.DjangoStorage.user.objects.all())
         assert 2 == len(states)
 
         google_state = [state for state in states if state.provider.provider_id == google_provider.provider_id][0]
@@ -596,50 +596,62 @@ class SetIDVerificationStatusTestCase(TestCase):
         assert mock_signal.call_count == 1
 
 
-class EnsureRedirectUrlIsSafeTestCase(TestCase):
-    """Tests to ensure that the redirect url is safe and user can redirect to it."""
+class ParseQueryParamsPipelineTestCase(TestCase):
+    """Tests to ensure reading queryparams from the auth/login URL works as expected."""
 
     def setUp(self):
         super().setUp()
-
         self.strategy = mock.MagicMock()
-        self.request = self.strategy.request
+        self.response = mock.MagicMock()
 
-        self.request.get_host.return_value = 'localhost:18000'
-        self.request.is_secure.return_value = True
-
-        self.strategy.session_get = self._session_get
-        self.strategy.session_set = self._session_set
-
-    def _session_get(self, key, default=None):
-        if key in self.strategy.session:
-            return self.strategy.session[key]
-
-        return default
-
-    def _session_set(self, key, value):
-        self.strategy.session[key] = value
-
-    @test.override_settings(SOCIAL_AUTH_LOGIN_REDIRECT_URL='dashboard_url')
-    def test_unsafe_redirect_url(self):
+    def test_login_url_with_auth_entry(self):
         """
-        Test that if unsafe url is set as the redirect url then
-        redirect url is updated to SOCIAL_AUTH_LOGIN_REDIRECT_URL
+        Parsing query params with auth entry results in dictionary with the auth entry.
         """
-        self.strategy.session = {
-            REDIRECT_FIELD_NAME: 'https://evil.com',
+        expected_query_params = {
+            "auth_entry": "login",
+        }
+        self.strategy.request.session = expected_query_params
+
+        query_params = pipeline.parse_query_params(self.strategy, self.response)
+
+        self.assertDictEqual(expected_query_params, query_params)
+
+    def test_login_url_with_auth_entry_none(self):
+        """
+        Parsing query params with auth entry equals to None results in dictionary with default auth entry.
+        """
+        expected_query_params = {
+            "auth_entry": "login",
+        }
+        self.strategy.request.session = {
+            "auth_entry": None,
         }
 
-        pipeline.ensure_redirect_url_is_safe(self.strategy)
-        assert self.strategy.session[REDIRECT_FIELD_NAME] == 'dashboard_url'
+        query_params = pipeline.parse_query_params(self.strategy, self.response)
 
-    @test.override_settings(LOGIN_REDIRECT_WHITELIST=['localhost:1991'])
-    def test_whitelisted_redirect_urls(self):
-        """
-        Test that redirect url remains same if its whitelisted
-        """
-        safe_redirect_url = 'https://localhost:1991/course'
-        self.strategy.session = {REDIRECT_FIELD_NAME: safe_redirect_url}
+        self.assertDictEqual(expected_query_params, query_params)
 
-        pipeline.ensure_redirect_url_is_safe(self.strategy)
-        assert self.strategy.session[REDIRECT_FIELD_NAME] == safe_redirect_url
+    def test_login_url_without_auth_entry(self):
+        """
+        Parsing query params without auth entry results in dictionary with default auth entry.
+        """
+        expected_query_params = {
+            "auth_entry": "login",
+        }
+        self.strategy.request.session = {}
+
+        query_params = pipeline.parse_query_params(self.strategy, self.response)
+
+        self.assertDictEqual(expected_query_params, query_params)
+
+    def test_login_url_invalid_auth_entry(self):
+        """
+        Parsing query params with invalid auth entry results in AuthEntryError.
+        """
+        self.strategy.request.session = {
+            "auth_entry": "not-valid",
+        }
+
+        with self.assertRaises(pipeline.AuthEntryError):
+            pipeline.parse_query_params(self.strategy, self.response)

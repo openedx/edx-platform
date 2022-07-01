@@ -113,7 +113,7 @@ from openedx.core.lib.blockstore_api import (
 )
 from openedx.core.djangolib import blockstore_cache
 from openedx.core.djangolib.blockstore_cache import BundleCache
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from . import tasks
 

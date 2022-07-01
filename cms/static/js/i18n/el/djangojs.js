@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n != 1);
-    if (typeof(v) == 'boolean') {
+    const v = (n != 1);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,8 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
+    "\n        Hello %(username)s,\n    ": "\n\u0391\u03b3\u03b1\u03c0\u03b7\u03c4\u03ad/\u03b1\u03b3\u03b1\u03c0\u03b7\u03c4\u03ae %(username)s,",
     "%(field)s can only contain up to %(count)d characters.": "\u03a4\u03bf \u03c0\u03b5\u03b4\u03af\u03bf %(field)s \u03b8\u03b1 \u03c0\u03c1\u03ad\u03c0\u03b5\u03b9 \u03bd\u03b1 \u03ad\u03c7\u03b5\u03b9 \u03bc\u03ad\u03c7\u03c1\u03b9 %(count)d \u03c7\u03b1\u03c1\u03b1\u03ba\u03c4\u03ae\u03c1\u03b5\u03c2.",
     "%(field)s must have at least %(count)d characters.": "\u03a4\u03bf \u03c0\u03b5\u03b4\u03af\u03bf %(field)s \u03b8\u03b1 \u03c0\u03c1\u03ad\u03c0\u03b5\u03b9 \u03bd\u03b1 \u03ad\u03c7\u03b5\u03b9 \u03c4\u03bf\u03c5\u03bb\u03ac\u03c7\u03b9\u03c3\u03c4\u03bf\u03bd %(count)d \u03c7\u03b1\u03c1\u03b1\u03ba\u03c4\u03ae\u03c1\u03b5\u03c2.",
     "%(sel)s of %(cnt)s selected": [
@@ -128,6 +130,7 @@
     "Default (Local Time Zone)": "\u03a0\u03c1\u03bf\u03b5\u03c0\u03b9\u03bb\u03bf\u03b3\u03ae (\u03a4\u03bf\u03c0\u03b9\u03ba\u03ae \u0396\u03ce\u03bd\u03b7 \u038f\u03c1\u03b1\u03c2)",
     "Delete": "\u0394\u03b9\u03b1\u03b3\u03c1\u03b1\u03c6\u03ae",
     "Delete My Account": "\u0394\u03b9\u03b1\u03b3\u03c1\u03b1\u03c6\u03ae \u03c4\u03bf\u03c5 \u039b\u03bf\u03b3\u03b1\u03c1\u03b9\u03b1\u03c3\u03bc\u03bf\u03cd \u03bc\u03bf\u03c5",
+    "Describe ": "\u03a0\u03b5\u03c1\u03b9\u03b3\u03c1\u03ac\u03c8\u03c4\u03b5",
     "Discard Changes": "\u0391\u03c0\u03cc\u03c1\u03c1\u03b9\u03c8\u03b7 \u0391\u03bb\u03bb\u03b1\u03b3\u03ce\u03bd",
     "Discarding Changes": "\u0391\u03c0\u03cc\u03c1\u03c1\u03b9\u03c8\u03b7 \u0391\u03bb\u03bb\u03b1\u03b3\u03ce\u03bd",
     "Discussion Home": "\u0391\u03a1\u03a7\u0399\u039a\u0397 \u03a3\u0395\u039b\u0399\u0394\u0391 \u03a4\u039f\u03a5 \u03a6\u039f\u03a1\u039f\u03a5\u039c \u03a3\u03a5\u0396\u0397\u03a4\u0397\u03a3\u0395\u03a9\u039d",
@@ -463,24 +466,24 @@
       " \u0392\u03c1\u03ad\u03b8\u03b7\u03ba\u03b1\u03bd {total_results} \u03b1\u03c0\u03bf\u03c4\u03b5\u03bb\u03ad\u03c3\u03bc\u03b1\u03c4\u03b1 \u03b3\u03b9\u03b1 \u03c4\u03bf\u03bd \u03cc\u03c1\u03bf \"{search_term}\""
     ]
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -490,16 +493,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -522,11 +525,9 @@
       "%d/%m/%Y %H:%M:%S",
       "%d/%m/%Y %H:%M:%S.%f",
       "%d/%m/%Y %H:%M",
-      "%d/%m/%Y",
       "%d/%m/%y %H:%M:%S",
       "%d/%m/%y %H:%M:%S.%f",
       "%d/%m/%y %H:%M",
-      "%d/%m/%y",
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
@@ -555,8 +556,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -575,6 +576,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 
