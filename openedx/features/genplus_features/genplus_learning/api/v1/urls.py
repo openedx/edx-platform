@@ -16,5 +16,6 @@ lesson_viewset_router.register('lessons', LessonViewSet, basename='lessons')
 app_name = 'genplus_learning_api_v1'
 
 urlpatterns = [
+    url(r'^lessons/unlock/(?P<pk>\d+)/$', LessonViewSet.as_view({"put": "unlock_lesson"})),
     path('', include(lesson_viewset_router.urls)),
 ]

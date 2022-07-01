@@ -7,16 +7,19 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     UserInfo,
-    CharacterViewSet
+    CharacterViewSet,
+    ClassViewSet
 )
 
 app_name = 'genplus_api_v1'
 
-character_viewset_router = DefaultRouter()
-character_viewset_router.register('characters', CharacterViewSet, basename='characters')
+router = DefaultRouter()
+router.register('characters', CharacterViewSet, basename='characters')
+router.register('classes', ClassViewSet, basename='classes')
 
 urlpatterns = [
     url(r'^userinfo/$', UserInfo.as_view()),
-    url(r'^characters/select/(?P<pk>\d+)/$', CharacterViewSet.as_view({"post": "select_character"})),
-    path('', include(character_viewset_router.urls)),
+    url(r'^characters/select/(?P<pk>\d+)/$', CharacterViewSet.as_view({"put": "select_character"})),
+    url(r'^classes/add_class/(?P<group_id>\w+)/$', ClassViewSet.as_view({"put": "add_my_class"})),
+    path('', include(router.urls)),
 ]

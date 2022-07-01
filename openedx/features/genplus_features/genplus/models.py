@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
-from .constants import GenUserRoles
+from .constants import GenUserRoles, ClassColors
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -75,15 +75,6 @@ class GenUser(models.Model):
         return self.user.username
 
 
-class Teacher(models.Model):
-    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
-    profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True)
-    classes = models.ManyToManyField('genplus.Class', related_name='teachers', blank=True)
-
-    def __str__(self):
-        return self.gen_user.user.username
-
-
 class Student(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='student')
     character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True, blank=True)
@@ -93,12 +84,19 @@ class Student(models.Model):
         return self.gen_user.user.username
 
 
+class ClassManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_visible=True)
+
+
 class Class(TimeStampedModel):
+    COLOR_CHOICES = ClassColors.__MODEL_CHOICES__
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='classes')
     group_id = models.CharField(primary_key=True, max_length=128)
+    color = models.CharField(blank=True, null=True, max_length=32, choices=COLOR_CHOICES)
+    image = models.ImageField(upload_to='gen_plus_classes', null=True)
     name = models.CharField(max_length=128)
     is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
-    students = models.ManyToManyField(Student, related_name='classes', blank=True)
 
     @property
     def current_program(self):
@@ -109,3 +107,13 @@ class Class(TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+
+class Teacher(models.Model):
+    gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
+    profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True)
+    classes = models.ManyToManyField(Class, related_name='teachers')
+    favourite_classes = models.ManyToManyField(Class)
+
+    def __str__(self):
+        return self.gen_user.user.username
