@@ -10,6 +10,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+
 @ddt.ddt
 class MFEConfigTestCase(APITestCase):
     """
@@ -28,12 +29,12 @@ class MFEConfigTestCase(APITestCase):
         - The configuration obtained by the api is equal to its site configuration in the
         MFE_CONFIG key.
         """
-        configuration_helpers_mock.get_value.return_value = {"logo":"logo.jpg"}
+        configuration_helpers_mock.get_value.return_value = {"logo": "logo.jpg"}
         response = self.client.get(self.mfe_config_api_url)
 
         configuration_helpers_mock.get_value.assert_called_once_with("MFE_CONFIG", {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json(), {"logo":"logo.jpg"})
+        self.assertEqual(response.json(), {"logo": "logo.jpg"})
 
     @patch("lms.djangoapps.mfe_api.views.configuration_helpers")
     def test_get_mfe_config_with_queryparams(self, configuration_helpers_mock):
@@ -44,22 +45,23 @@ class MFEConfigTestCase(APITestCase):
         - The configuration obtained by the api is equal to its site configuration in the
         MFE_CONFIG and MFE_CONFIG_MYMFE merged on top.
         """
-        configuration_helpers_mock.get_value.side_effect = [{"logo":"logo.jpg", "other": "other"},
-                                                            {"logo":"logo_mymfe.jpg"}]
+        configuration_helpers_mock.get_value.side_effect = [{"logo": "logo.jpg", "other": "other"},
+                                                            {"logo": "logo_mymfe.jpg"}]
 
         response = self.client.get(f"{self.mfe_config_api_url}?mfe=mymfe")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         calls = [call("MFE_CONFIG", {}), call("MFE_CONFIG_MYMFE", {})]
         configuration_helpers_mock.get_value.assert_has_calls(calls)
-        self.assertEqual(response.json(), {"logo":"logo_mymfe.jpg", "other":"other"})
+        self.assertEqual(response.json(), {"logo": "logo_mymfe.jpg", "other": "other"})
 
     @patch("lms.djangoapps.mfe_api.views.configuration_helpers")
     @ddt.data(
         [{}, {}, {}],
-        [{"logo":"logo.jpg"}, {}, {"logo":"logo.jpg"}],
-        [{}, {"logo":"logo_mymfe.jpg"}, {"logo":"logo_mymfe.jpg"}],
-        [{"logo":"logo.jpg"}, {"logo":"logo_mymfe.jpg"}, {"logo":"logo_mymfe.jpg"}],
-        [{"logo":"logo.jpg", "other": "other"}, {"logo":"logo_mymfe.jpg"}, {"logo":"logo_mymfe.jpg", "other":"other"}],
+        [{"logo": "logo.jpg"}, {}, {"logo": "logo.jpg"}],
+        [{}, {"logo": "logo_mymfe.jpg"}, {"logo": "logo_mymfe.jpg"}],
+        [{"logo": "logo.jpg"}, {"logo": "logo_mymfe.jpg"}, {"logo": "logo_mymfe.jpg"}],
+        [{"logo": "logo.jpg", "other": "other"}, {"logo": "logo_mymfe.jpg"},
+            {"logo": "logo_mymfe.jpg", "other": "other"}],
     )
     @ddt.unpack
     def test_get_mfe_config_with_queryparams_other_cases(
@@ -68,7 +70,7 @@ class MFEConfigTestCase(APITestCase):
         mfe_config_mymfe,
         expected_response,
         configuration_helpers_mock
-        ):
+    ):
         """_summary_
 
         Args:
