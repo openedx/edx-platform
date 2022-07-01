@@ -6,6 +6,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from tahoe_sites.api import is_exist_organization_user_by_email
 
 from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
 
@@ -35,7 +36,7 @@ def user_exists(details):
             current_org = get_current_organization()
 
             if email:
-                return current_org.userorganizationmapping_set.filter(user__email=email).exists()
+                return is_exist_organization_user_by_email(email=email, organization=current_org)
             elif username:
                 try:
                     user = User.objects.get(username=username)

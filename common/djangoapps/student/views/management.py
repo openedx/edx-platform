@@ -34,6 +34,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
+from tahoe_sites.api import is_exist_organization_user_by_email
 
 import track.views
 from bulk_email.models import Optout
@@ -753,7 +754,7 @@ def confirm_email_change(request, key):
 
         if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
             current_org = get_current_organization()
-            email_exists = len(current_org.userorganizationmapping_set.filter(user__email=pec.new_email)) != 0
+            email_exists = is_exist_organization_user_by_email(email=pec.new_email, organization=current_org)
         else:
             email_exists = len(User.objects.filter(email=pec.new_email)) != 0
 

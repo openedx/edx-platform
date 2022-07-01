@@ -8,7 +8,6 @@ import operator
 
 import dateutil
 import six
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
 from django.utils.translation import ugettext as _
@@ -18,7 +17,6 @@ from pytz import UTC
 from six import string_types, text_type
 from six.moves import zip
 
-from student.models import get_user_by_username_or_email_inside_organization
 from student.models import get_user_by_username_or_email, CourseEnrollment
 
 
@@ -69,12 +67,7 @@ def get_student_from_identifier(unique_student_identifier):
 
     DEPRECATED: use student.models.get_user_by_username_or_email instead.
     """
-    # Appsembler Specific: We call our custom method insted the default one,
-    # to make sure the user is get inside the org.
-    if settings.FEATURES.get('TAHOE_MULTITENANT_BULK_ENROLLMENT', False):
-        return get_user_by_username_or_email_inside_organization(unique_student_identifier)
-    else:
-        return get_user_by_username_or_email(unique_student_identifier)
+    return get_user_by_username_or_email(unique_student_identifier)
 
 
 def require_student_from_identifier(unique_student_identifier):

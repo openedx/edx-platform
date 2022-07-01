@@ -5,12 +5,10 @@ Test cases to cover CourseEnrollmentAllowed models (and its feature) with APPSEM
 import json
 from mock import patch
 from rest_framework import status
-from unittest import skipIf
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from django.urls import reverse
 from django.contrib.auth.models import User
-from django.conf import settings
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.tests.factories import UserFactory
