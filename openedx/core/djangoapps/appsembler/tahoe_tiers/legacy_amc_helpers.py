@@ -7,6 +7,8 @@ TODO: Remove this module once AMC is shut down.
 import logging
 import beeline
 
+from tahoe_sites.api import get_uuid_by_organization
+
 from django.utils import timezone
 from django.db.models import Q, F
 
@@ -15,8 +17,8 @@ from tiers.models import Tier
 log = logging.getLogger(__name__)
 
 
-@beeline.traced('legacy_amc_helpers.get_amc_tier_info_from_organization')
-def get_amc_tier_info_from_organization(organization):  # pragma: no cover
+@beeline.traced('legacy_amc_helpers.get_amc_tier_info')
+def get_amc_tier_info(site_uuid):  # pragma: no cover
     """
     Get TierInfo for an AMC-enabled (Tahoe 1.0) site.
 
@@ -24,24 +26,20 @@ def get_amc_tier_info_from_organization(organization):  # pragma: no cover
 
     WARNING: !! This function is _not_ covered with tests. Please edit with caution and test manually. !!
     """
-    if not organization:
-        beeline.add_context_field("tiers.no_organization", True)
-        return None
-
-    beeline.add_context_field("tiers.organization", "{}".format(organization))
     try:
         # Query the AMC Postgres database directly
-        tier = Tier.objects.defer('organization').get(organization__edx_uuid=organization.edx_uuid)
-        tier_info = tier.get_tier_info()
-    except Exception:
-        # If the organization for some reason does not have a tier assigned
-        # fail silently. This should not happen. We should always automatically create
-        # a tier for each organization.
+        tier = Tier.objects.defer('organization').get(organization__edx_uuid=site_uuid)
+        return tier.get_tier_info()
+    except Tier.DoesNotExist:
+        # If the organization has no AMC-tier fail silently and log it in honeycomb.
+        # This either happens in the case of a Tahoe 2.0 site or a missing tier
+        # from AMC (although that shouldn't happen).
         beeline.add_context_field("tiers.organization_without_tier", True)
-        log.exception("Organization has a problem with its Tier: {0}".format(organization))
         return None
-
-    return tier_info
+    except Exception:
+        beeline.add_context_field("tiers.exception_with_tier", True)
+        log.exception("Organization has a problem with its Tier: {0}".format(site_uuid))
+        return None
 
 
 def get_active_tiers_uuids_from_amc_postgres():  # pragma: no cover
