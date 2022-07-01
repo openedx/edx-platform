@@ -5179,3 +5179,6 @@ MFE_CONFIG = {}
 # .. setting_description: The MFE Config API response will be cached during the
 #   specified time
 MFE_CONFIG_API_CACHE_TIMEOUT = 60 * 5
+
+######################## Settings for Outcome Surveys plugin ########################
+OUTCOME_SURVEYS_FOLLOW_UP_SIGNAL_ENABLED = False

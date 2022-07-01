@@ -37,7 +37,6 @@ class TestSendSegmentEventsForFailedLearnersCommand(SharedModuleStoreTestCase):
         # we will create enrollments for paid modes plus `audit` mode
         enrollment_modes = PAID_ENROLLMENT_MODES + ['audit']
 
-        # import pdb ; pdb.set_trace()
         cls.course_end = timezone.now() - timedelta(days=31)
         cls.course_overviews = CourseOverviewFactory.create_batch(4, end=cls.course_end)
 
