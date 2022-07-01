@@ -13,6 +13,7 @@ from django.test.utils import override_settings
 
 from rest_framework.permissions import AllowAny
 from rest_framework.test import APIRequestFactory, force_authenticate
+from tahoe_sites.tests.utils import create_organization_mapping
 
 import ddt
 import mock
@@ -28,7 +29,6 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
     CourseOverviewFactory,
     OrganizationFactory,
     OrganizationCourseFactory,
-    UserOrganizationMappingFactory,
 )
 
 
@@ -58,9 +58,7 @@ class CourseApiTest(TestCase):
                                   course_id=str(self.other_course_overviews[0].id))
 
         self.caller = UserFactory()
-        UserOrganizationMappingFactory(user=self.caller,
-                                       organization=self.my_site_org,
-                                       is_amc_admin=True)
+        create_organization_mapping(user=self.caller, organization=self.my_site_org, is_admin=True)
 
     def test_get_list(self):
         url = reverse('tahoe-api:v1:courses-list')

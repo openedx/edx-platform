@@ -10,6 +10,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import override_settings, TestCase
 from tahoe_sites.api import create_tahoe_site_by_link
+from tahoe_sites.tests.utils import create_organization_mapping
 
 from openedx.core.djangoapps.appsembler.sites.management.commands.create_devstack_site import Command
 from openedx.core.djangoapps.appsembler.sites.management.commands.offboard import Command as OffboardSiteCommand
@@ -23,7 +24,6 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
     CourseOverviewFactory,
     OrganizationFactory,
     OrganizationCourseFactory,
-    UserOrganizationMappingFactory,
 )
 from openedx.core.djangoapps.appsembler.sites.tests.factories import (
     AlternativeDomainFactory,
@@ -674,8 +674,11 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
 
     @staticmethod
     def create_org_users(org, new_user_count):
-        return [UserOrganizationMappingFactory(
-            organization=org).user for i in range(new_user_count)]
+        result = []
+        for i in range(new_user_count):
+            result.append(UserFactory())
+            create_organization_mapping(user=result[i], organization=org)
+        return result
 
 
 class DisableCustomDomainCommandTestCase(TestCase):
