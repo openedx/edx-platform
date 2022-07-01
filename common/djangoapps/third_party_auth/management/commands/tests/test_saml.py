@@ -65,14 +65,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         # disabled saml configuration instance, this is done to verify that disabled configurations are
         # not processed.
         SAMLConfigurationFactory.create(enabled=False, site__domain='testserver.fake', site__name='testserver.fake')
-        SAMLProviderConfigFactory.create(
-            site__domain='testserver.fake',
-            site__name='testserver.fake',
-            slug='test-shib',
-            name='TestShib College',
-            entity_id='https://idp.testshib.org/idp/shibboleth',
-            metadata_source='https://www.testshib.org/metadata/testshib-providers.xml',
-        )
+        SAMLProviderConfigFactory.create(site__domain='testserver.fake', site__name='testserver.fake')
 
     def __create_saml_configurations__(self, saml_config=None, saml_provider_config=None):
         """
@@ -81,17 +74,13 @@ class TestSAMLCommand(CacheIsolationTestCase):
         SAMLConfigurationFactory.create(enabled=True, **(
             saml_config or {
                 'site__domain': 'testserver.fake',
-                'site__name': 'testserver.fake',
+                'site__name': 'testserver.fake'
             }
         ))
         SAMLProviderConfigFactory.create(enabled=True, **(
             saml_provider_config or {
                 'site__domain': 'testserver.fake',
-                'site__name': 'testserver.fake',
-                'slug': 'test-shib',
-                'name': 'TestShib College',
-                'entity_id': 'https://idp.testshib.org/idp/shibboleth',
-                'metadata_source': 'https://www.testshib.org/metadata/testshib-providers.xml',
+                'site__name': 'testserver.fake'
             }
         ))
 

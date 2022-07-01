@@ -53,11 +53,7 @@ def send_idv_update(sender, instance, **kwargs):  # pylint: disable=unused-argum
     import the SoftwareSecurePhotoVerification model.
     """
     # Prioritize pending name change over current profile name, if the user has one
-    pending_name_change = get_pending_name_change(instance.user)
-    if pending_name_change:
-        full_name = pending_name_change.new_name
-    else:
-        full_name = get_name(instance.user.id)
+    full_name = get_pending_name_change(instance.user) or get_name(instance.user.id)
 
     log.info(
         'IDV sending name_affirmation task (idv_id={idv_id}, user_id={user_id}) to update status={status}'.format(

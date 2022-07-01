@@ -53,7 +53,7 @@ class FormatHtmlTest(unittest.TestCase):
         template = Template(
             """
                 <%!
-                from django.utils.translation import gettext as _
+                from django.utils.translation import ugettext as _
 
                 from openedx.core.djangolib.markup import HTML, Text
                 %>

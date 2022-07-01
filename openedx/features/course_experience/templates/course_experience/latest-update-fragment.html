@@ -1,0 +1,27 @@
+## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%block name="content">
+<div class="update-message">
+    <div class="dismiss-message">
+        <button type="button" class="btn-link">
+            <span class="sr">${_("Dismiss")}</span>
+            <span class="icon fa fa-times" aria-hidden="true"></span>
+        </button>
+    </div>
+    <h3>${_("Latest Update")}</h3>
+
+    ${HTML(update_html)}
+</div>
+</%block>
+
+<%static:webpack entry="LatestUpdate">
+new LatestUpdate( { messageContainer: '.update-message',  dismissButton: '.dismiss-message button'});
+</%static:webpack>

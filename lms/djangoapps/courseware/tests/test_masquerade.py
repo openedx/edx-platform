@@ -13,6 +13,7 @@ from operator import itemgetter  # lint-amnesty, pylint: disable=wrong-import-or
 from django.conf import settings
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 from xblock.runtime import DictKeyValueStore
 
@@ -25,12 +26,13 @@ from lms.djangoapps.courseware.masquerade import (
     setup_masquerade,
 )
 
-from lms.djangoapps.courseware.tests.helpers import (
-    LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member, set_preview_mode,
-)
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
+from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
@@ -40,6 +42,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # li
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 
+@override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
 class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MasqueradeMixin):
     """
     Base class for masquerade tests that sets up a test course and enrolls a user in the course.
@@ -101,6 +104,18 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
                 'course_id': str(self.course.id),
                 'chapter': self.chapter.location.block_id,
                 'section': self.sequential.location.block_id,
+            }
+        )
+        return self.client.get(url)
+
+    def get_course_info_page(self):
+        """
+        Returns the server response for course info page.
+        """
+        url = reverse(
+            'info',
+            kwargs={
+                'course_id': str(self.course.id),
             }
         )
         return self.client.get(url)
@@ -174,6 +189,32 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         assert 200 == masquerade_as_group_member(self.test_user, self.course, partition_id, group_id)
 
 
+class NormalStudentVisibilityTest(MasqueradeTestCase):
+    """
+    Verify the course displays as expected for a "normal" student (to ensure test setup is correct).
+    """
+
+    def create_user(self):
+        """
+        Creates a normal student user.
+        """
+        return UserFactory()
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_staff_debug_not_visible(self):
+        """
+        Tests that staff debug control is not present for a student.
+        """
+        self.verify_staff_debug_present(False)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_show_answer_not_visible(self):
+        """
+        Tests that "Show Answer" is not visible for a student.
+        """
+        self.verify_show_answer_present(False)
+
+
 class StaffMasqueradeTestCase(MasqueradeTestCase):
     """
     Base class for tests of the masquerade behavior for a staff member.
@@ -244,7 +285,6 @@ class TestMasqueradeOptionsNoContentGroups(StaffMasqueradeTestCase):
         assert is_target_available == expected
 
 
-@set_preview_mode(True)
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as student.
@@ -336,6 +376,27 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         assert get_user_preference(user, LANGUAGE_KEY) == expected_language_code
         assert self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value == expected_language_code
 
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_masquerade_as_specific_user_on_self_paced(self):
+        """
+        Test masquerading as a specific user for course info page when self paced configuration
+        "enable_course_home_improvements" flag is set
+
+        Login as a staff user and visit course info page.
+        set masquerade to view same page as a specific student and revisit the course info page.
+        """
+        # Log in as staff, and check we can see the info page.
+        self.login_staff()
+        response = self.get_course_info_page()
+        self.assertContains(response, "OOGIE BLOOGIE")
+
+        # Masquerade as the student,enable the self paced configuration, and check we can see the info page.
+        SelfPacedConfiguration(enable_course_home_improvements=True).save()
+        self.update_masquerade(role='student', username=self.student_user.username)
+        response = self.get_course_info_page()
+        self.assertContains(response, "OOGIE BLOOGIE")
+
     @ddt.data(
         'john',  # Non-unicode username
         'fôô@bar',  # Unicode username with @, which is what the ENABLE_UNICODE_USERNAME feature allows
@@ -405,6 +466,25 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         # Reload the page and check we have expected language preference in system and in cookies.
         self.get_courseware_page()
         self.assertExpectedLanguageInPreference(self.test_user, english_language_code)
+
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_masquerade_as_specific_student_course_info(self):
+        """
+        Test masquerading as a specific user for course info page.
+
+        We login with login_staff and check course info page content if it's working and then we
+        set masquerade to view same page as a specific student and test if it's working or not.
+        """
+        # Log in as staff, and check we can see the info page.
+        self.login_staff()
+        content = self.get_course_info_page().content.decode('utf-8')
+        assert 'OOGIE BLOOGIE' in content
+
+        # Masquerade as the student, and check we can see the info page.
+        self.update_masquerade(role='student', username=self.student_user.username)
+        content = self.get_course_info_page().content.decode('utf-8')
+        assert 'OOGIE BLOOGIE' in content
 
     def test_masquerade_as_specific_student_progress(self):
         """

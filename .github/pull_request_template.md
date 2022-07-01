@@ -1,10 +1,10 @@
 <!--
 
-🌰🌰
-🌰🌰🌰🌰         🌰 Note: the Nutmeg master branch has been created.  Please consider whether your change
-    🌰🌰🌰🌰     should also be applied to Nutmeg. If so, make another pull request against the
-🌰🌰🌰🌰         open-release/nutmeg.master branch, or ping @nedbat for help or questions.
-🌰🌰
+🍁🍁
+🍁🍁🍁🍁         🍁 Note: the Maple master branch has been created.  Please consider whether your change
+    🍁🍁🍁🍁     should also be applied to Maple. If so, make another pull request against the
+🍁🍁🍁🍁         open-release/maple.master branch, or ping @nedbat for help or questions.
+🍁🍁
 
 Please give your pull request a short but descriptive title.
 Use conventional commits to separate and summarize commits logically:

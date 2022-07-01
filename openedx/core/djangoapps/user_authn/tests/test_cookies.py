@@ -110,7 +110,6 @@ class CookieTests(TestCase):
         expected = {
             'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
             'username': self.user.username,
-            'email': self.user.email,
             'header_urls': self._get_expected_header_urls(),
             'user_image_urls': self._get_expected_image_urls(),
         }

@@ -37,7 +37,7 @@ class GitExportError(Exception):
                       "please create it, or configure a different path with "
                       "GIT_REPO_EXPORT_DIR").format(GIT_REPO_EXPORT_DIR)
     URL_BAD = _('Non writable git url provided. Expecting something like:'
-                ' git@github.com:openedx/openedx-demo-course.git')
+                ' git@github.com:edx/edx4edx_lite.git')
     URL_NO_AUTH = _('If using http urls, you must provide the username '
                     'and password in the url. Similar to '
                     'https://user:pass@github.com/user/course.')

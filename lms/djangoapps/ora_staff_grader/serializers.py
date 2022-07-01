@@ -140,7 +140,7 @@ class SubmissionMetadataSerializer(serializers.Serializer):
     dateSubmitted = serializers.DateTimeField()
     dateGraded = serializers.DateTimeField(allow_null=True)
     gradedBy = serializers.CharField(allow_null=True)
-    gradeStatus = GradeStatusField(source="gradingStatus")
+    gradingStatus = GradeStatusField()
     lockStatus = LockStatusField()
     score = ScoreField()
 
@@ -152,7 +152,7 @@ class SubmissionMetadataSerializer(serializers.Serializer):
             "dateSubmitted",
             "dateGraded",
             "gradedBy",
-            "gradeStatus",
+            "gradingStatus",
             "lockStatus",
             "score",
         ]
@@ -167,23 +167,14 @@ class InitializeSerializer(serializers.Serializer):
     courseMetadata = CourseMetadataSerializer()
     oraMetadata = OpenResponseMetadataSerializer()
     submissions = serializers.DictField(child=SubmissionMetadataSerializer())
-    isEnabled = serializers.SerializerMethodField()
 
     class Meta:
         fields = [
             "courseMetadata",
             "oraMetadata",
             "submissions",
-            "isEnabled"
         ]
         read_only_fields = fields
-
-    def get_isEnabled(self, obj):
-        """
-        Only enable ESG if the flag is enabled and also this is not a Team ORA
-        Revert back to BooleanField in AU-617 when ESG officially supports team ORAs
-        """
-        return obj['isEnabled'] and not obj['oraMetadata'].teams_enabled
 
 
 class UploadedFileSerializer(serializers.Serializer):
@@ -200,12 +191,6 @@ class ResponseSerializer(serializers.Serializer):
 
     files = serializers.ListField(child=UploadedFileSerializer(), allow_empty=True)
     text = serializers.ListField(child=serializers.CharField(), allow_empty=True)
-
-
-class FileListSerializer(serializers.Serializer):
-    """Serializer for a list of files in a submission"""
-
-    files = serializers.ListField(child=UploadedFileSerializer(), allow_empty=True)
 
 
 class AssessmentCriteriaSerializer(serializers.Serializer):

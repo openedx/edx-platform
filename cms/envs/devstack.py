@@ -111,10 +111,12 @@ DEBUG_TOOLBAR_CONFIG = {
 
 def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing-function-docstring
     # We always want the toolbar on devstack unless running tests from another Docker container
-    hostname = request.get_host()
-    if hostname.startswith('edx.devstack.studio:') or hostname.startswith('studio.devstack.edx:'):
-        return False
-    return True
+    # Alway return False
+    return False
+    # hostname = request.get_host()
+    # if hostname.startswith('edx.devstack.studio:') or hostname.startswith('studio.devstack.edx:'):
+    #     return False
+    # return True
 
 
 ################################ MILESTONES ################################
@@ -136,13 +138,24 @@ FEATURES['LICENSING'] = True
 XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 ################################ SEARCH INDEX ################################
-FEATURES['ENABLE_COURSEWARE_INDEX'] = False
-FEATURES['ENABLE_LIBRARY_INDEX'] = False
-FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
+FEATURES['ENABLE_COURSEWARE_INDEX'] = True
+FEATURES['ENABLE_LIBRARY_INDEX'] = True
+FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = True
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
+ELASTIC_SEARCH_CONFIG = [
+    {
+        'use_ssl': False,
+        'host': '13.214.22.79',
+        'port': 9201
+    }
+]
+
+
 ################################ COURSE DISCUSSIONS ###########################
-FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
+FEATURES['ENABLE_DISCUSSION_HOME_PANEL'] = False
+FEATURES['WIKI_ENABLED'] = False
 
 ################################ CREDENTIALS ###########################
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
@@ -164,9 +177,6 @@ COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
-
-################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
-DISCUSSIONS_MFE_FEEDBACK_URL = None
 
 ################################# DJANGO-REQUIRE ###############################
 
@@ -213,8 +223,6 @@ IDA_LOGOUT_URI_LIST = [
     'http://localhost:18150/logout/',  # credentials
 ]
 
-ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://edx.devstack.lms/oauth2"
-
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
@@ -229,17 +237,6 @@ add_plugins(__name__, ProjectType.CMS, SettingsType.DEVSTACK)
 
 
 OPENAPI_CACHE_TIMEOUT = 0
-
-#####################################################################
-# set replica set of contentstore to none as we haven't setup any for cms in devstack
-CONTENTSTORE['DOC_STORE_CONFIG']['replicaSet'] = None
-
-#####################################################################
-# set replica sets of moduelstore to none as we haven't setup any for cms in devstack
-for store in MODULESTORE['default']['OPTIONS']['stores']:
-    if 'DOC_STORE_CONFIG' in store and 'replicaSet' in store['DOC_STORE_CONFIG']:
-        store['DOC_STORE_CONFIG']['replicaSet'] = None
-
 
 #####################################################################
 # Lastly, run any migrations, if needed.
@@ -269,17 +266,6 @@ FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 # (ref MST-637)
 PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
-############## CourseGraph devstack settings ############################
-
-COURSEGRAPH_CONNECTION: dict = {
-    "protocol": "bolt",
-    "secure": False,
-    "host": "edx.devstack.coursegraph",
-    "port": 7687,
-    "user": "neo4j",
-    "password": "edx",
-}
-
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
 
@@ -291,7 +277,3 @@ SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT = 'http://localhost:18000'  # used in bro
 
 # Don't form the return redirect URL with HTTPS on devstack
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
-
-#################### Network configuration ####################
-# Devstack is directly exposed to the caller
-CLOSEST_CLIENT_IP_FROM_HEADERS = []

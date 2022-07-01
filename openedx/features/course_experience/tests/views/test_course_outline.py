@@ -1,0 +1,778 @@
+"""
+Tests for the Course Outline view and supporting views.
+"""
+
+
+import datetime
+import re
+from unittest.mock import Mock, patch
+
+import ddt
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
+from completion.models import BlockCompletion
+from completion.test_utils import CompletionWaffleTestMixin
+from django.contrib.sites.models import Site
+from django.test import RequestFactory, override_settings
+from django.urls import reverse
+from django.utils import timezone
+from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from milestones.tests.utils import MilestonesTestCaseMixin
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from pyquery import PyQuery as pq
+from pytz import UTC
+from waffle.models import Switch
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import StaffFactory
+from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
+from lms.djangoapps.gating import api as lms_gating_api
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
+from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
+from lms.urls import RESET_COURSE_DEADLINES_NAME
+from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
+from openedx.core.djangoapps.schedules.models import Schedule
+from openedx.core.lib.gating import api as gating_api
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from openedx.features.course_experience.views.course_outline import (
+    DEFAULT_COMPLETION_TRACKING_START,
+    CourseOutlineFragmentView
+)
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
+
+from ...utils import get_course_outline_block_tree
+from .test_course_home import course_home_url
+
+TEST_PASSWORD = 'test'
+GATING_NAMESPACE_QUALIFIER = '.gating'
+
+
+@ddt.ddt
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
+class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
+    """
+    Test the course outline view.
+    """
+
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+    ENABLED_SIGNALS = ['course_published']
+
+    @classmethod
+    def setUpClass(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+        """
+        Set up an array of various courses to be tested.
+        """
+        SelfPacedRelativeDatesConfig.objects.create(enabled=True)
+
+        # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
+        # pylint: disable=super-method-not-called
+        with super().setUpClassAndTestData():
+            cls.courses = []
+            course = CourseFactory.create(self_paced=True, start=timezone.now() - datetime.timedelta(days=1))
+            with cls.store.bulk_operations(course.id):
+                chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+                sequential = ItemFactory.create(category='sequential', parent_location=chapter.location, graded=True, format="Homework")  # lint-amnesty, pylint: disable=line-too-long
+                vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
+                problem = ItemFactory.create(category='problem', parent_location=vertical.location)
+            course.children = [chapter]
+            chapter.children = [sequential]
+            sequential.children = [vertical]
+            vertical.children = [problem]
+            cls.courses.append(course)
+
+            course = CourseFactory.create()
+            with cls.store.bulk_operations(course.id):
+                chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+                sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+                sequential2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
+                vertical = ItemFactory.create(
+                    category='vertical',
+                    parent_location=sequential.location,
+                    display_name="Vertical 1"
+                )
+                vertical2 = ItemFactory.create(
+                    category='vertical',
+                    parent_location=sequential2.location,
+                    display_name="Vertical 2"
+                )
+            course.children = [chapter]
+            chapter.children = [sequential, sequential2]
+            sequential.children = [vertical]
+            sequential2.children = [vertical2]
+            cls.courses.append(course)
+
+            course = CourseFactory.create()
+            with cls.store.bulk_operations(course.id):
+                chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+                sequential = ItemFactory.create(
+                    category='sequential',
+                    parent_location=chapter.location,
+                    due=datetime.datetime.now(),
+                    graded=True,
+                    format='Homework',
+                )
+                vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
+            course.children = [chapter]
+            chapter.children = [sequential]
+            sequential.children = [vertical]
+            cls.courses.append(course)
+
+    @classmethod
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+        """Set up and enroll our fake user in the course."""
+        cls.user = UserFactory(password=TEST_PASSWORD)
+        for course in cls.courses:
+            CourseEnrollment.enroll(cls.user, course.id)
+        Schedule.objects.update(start_date=timezone.now() - datetime.timedelta(days=1))
+
+    def setUp(self):
+        """
+        Set up for the tests.
+        """
+        super().setUp()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    def test_outline_details(self):
+        for course in self.courses:
+
+            url = course_home_url(course)
+
+            request_factory = RequestFactory()
+            request = request_factory.get(url)
+            request.user = self.user
+
+            course_block_tree = get_course_outline_block_tree(
+                request, str(course.id), self.user
+            )
+
+            response = self.client.get(url)
+            assert course.children
+            for chapter in course_block_tree['children']:
+                self.assertContains(response, chapter['display_name'])
+                assert chapter['children']
+                for sequential in chapter['children']:
+                    self.assertContains(response, sequential['display_name'])
+                    if sequential['graded']:
+                        print(sequential)
+                        self.assertContains(response, sequential['due'].strftime('%Y-%m-%d %H:%M:%S'))
+                        self.assertContains(response, sequential['format'])
+                    assert sequential['children']
+
+    def test_num_graded_problems(self):
+        course = CourseFactory.create()
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            problem = ItemFactory.create(category='problem', parent_location=sequential.location)
+            sequential2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            problem2 = ItemFactory.create(category='problem', graded=True, has_score=True,
+                                          parent_location=sequential2.location)
+            sequential3 = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            problem3_1 = ItemFactory.create(category='problem', graded=True, has_score=True,
+                                            parent_location=sequential3.location)
+            problem3_2 = ItemFactory.create(category='problem', graded=True, has_score=True,
+                                            parent_location=sequential3.location)
+        course.children = [chapter]
+        chapter.children = [sequential, sequential2, sequential3]
+        sequential.children = [problem]
+        sequential2.children = [problem2]
+        sequential3.children = [problem3_1, problem3_2]
+        CourseEnrollment.enroll(self.user, course.id)
+
+        url = course_home_url(course)
+        response = self.client.get(url)
+        content = response.content.decode('utf8')
+        self.assertRegex(content, sequential.display_name + r'\s*</h4>')
+        self.assertRegex(content, sequential2.display_name + r'\s*\(1 Question\)\s*</h4>')
+        self.assertRegex(content, sequential3.display_name + r'\s*\(2 Questions\)\s*</h4>')
+
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @ddt.data(
+        ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, False, True),
+        ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, False, True),
+        ([CourseMode.MASTERS], CourseMode.MASTERS, False, True),
+        ([CourseMode.PROFESSIONAL], CourseMode.PROFESSIONAL, True, True),  # staff accounts should also see the banner
+    )
+    @ddt.unpack
+    def test_reset_course_deadlines_banner_shows_for_self_paced_course(
+        self,
+        course_modes,
+        enrollment_mode,
+        is_course_staff,
+        should_display
+    ):
+        ContentTypeGatingConfig.objects.create(
+            enabled=True,
+            enabled_as_of=datetime.datetime(2017, 1, 1, tzinfo=UTC),
+        )
+        course = self.courses[0]
+        for mode in course_modes:
+            CourseModeFactory.create(course_id=course.id, mode_slug=mode)
+
+        enrollment = CourseEnrollment.objects.get(course_id=course.id, user=self.user)
+        enrollment.mode = enrollment_mode
+        enrollment.save()
+        enrollment.schedule.start_date = timezone.now() - datetime.timedelta(days=30)
+        enrollment.schedule.save()
+        self.user.is_staff = is_course_staff
+        self.user.save()
+
+        url = course_home_url(course)
+        response = self.client.get(url)
+
+        if should_display:
+            self.assertContains(response, '<div class="banner-cta-text"')
+        else:
+            self.assertNotContains(response, '<div class="banner-cta-text"')
+
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    def test_reset_course_deadlines(self):
+        course = self.courses[0]
+
+        staff = StaffFactory(course_key=course.id)
+        CourseEnrollment.enroll(staff, course.id)
+
+        start_date = timezone.now() - datetime.timedelta(days=30)
+        Schedule.objects.update(start_date=start_date)
+
+        self.client.login(username=staff.username, password=TEST_PASSWORD)
+        self.update_masquerade(course=course, username=self.user.username)
+
+        post_dict = {'course_id': str(course.id)}
+        self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
+        updated_schedule = Schedule.objects.get(enrollment__user=self.user, enrollment__course_id=course.id)
+        assert updated_schedule.start_date.date() == datetime.datetime.today().date()
+        updated_staff_schedule = Schedule.objects.get(enrollment__user=staff, enrollment__course_id=course.id)
+        assert updated_staff_schedule.start_date == start_date
+
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    def test_reset_course_deadlines_masquerade_generic_student(self):
+        course = self.courses[0]
+
+        staff = StaffFactory(course_key=course.id)
+        CourseEnrollment.enroll(staff, course.id)
+
+        start_date = timezone.now() - datetime.timedelta(days=30)
+        Schedule.objects.update(start_date=start_date)
+
+        self.client.login(username=staff.username, password=TEST_PASSWORD)
+        self.update_masquerade(course=course)
+
+        post_dict = {'course_id': str(course.id)}
+        self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
+        updated_student_schedule = Schedule.objects.get(enrollment__user=self.user, enrollment__course_id=course.id)
+        assert updated_student_schedule.start_date == start_date
+        updated_staff_schedule = Schedule.objects.get(enrollment__user=staff, enrollment__course_id=course.id)
+        assert updated_staff_schedule.start_date.date() == datetime.date.today()
+
+
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
+class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
+    """
+    Test the course outline view with prerequisites.
+    """
+    TRANSFORMER_CLASS_TO_TEST = MilestonesAndSpecialExamsTransformer
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Creates a test course that can be used for non-destructive tests
+        """
+        # pylint: disable=super-method-not-called
+
+        cls.PREREQ_REQUIRED = '(Prerequisite required)'
+        cls.UNLOCKED = 'Unlocked'
+
+        with super().setUpClassAndTestData():
+            cls.course, cls.course_blocks = cls.create_test_course()
+
+    @classmethod
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+        """Set up and enroll our fake user in the course."""
+        cls.user = UserFactory(password=TEST_PASSWORD)
+        CourseEnrollment.enroll(cls.user, cls.course.id)
+
+    @classmethod
+    def create_test_course(cls):
+        """Creates a test course."""
+
+        course = CourseFactory.create()
+        course.enable_subsection_gating = True
+        course_blocks = {}
+        with cls.store.bulk_operations(course.id):
+            course_blocks['chapter'] = ItemFactory.create(
+                category='chapter',
+                parent_location=course.location
+            )
+            course_blocks['prerequisite'] = ItemFactory.create(
+                category='sequential',
+                parent_location=course_blocks['chapter'].location,
+                display_name='Prerequisite Exam'
+            )
+            course_blocks['gated_content'] = ItemFactory.create(
+                category='sequential',
+                parent_location=course_blocks['chapter'].location,
+                display_name='Gated Content'
+            )
+            course_blocks['prerequisite_vertical'] = ItemFactory.create(
+                category='vertical',
+                parent_location=course_blocks['prerequisite'].location
+            )
+            course_blocks['gated_content_vertical'] = ItemFactory.create(
+                category='vertical',
+                parent_location=course_blocks['gated_content'].location
+            )
+        course.children = [course_blocks['chapter']]
+        course_blocks['chapter'].children = [course_blocks['prerequisite'], course_blocks['gated_content']]
+        course_blocks['prerequisite'].children = [course_blocks['prerequisite_vertical']]
+        course_blocks['gated_content'].children = [course_blocks['gated_content_vertical']]
+        if hasattr(cls, 'user'):
+            CourseEnrollment.enroll(cls.user, course.id)
+        return course, course_blocks
+
+    def setUp(self):
+        """
+        Set up for the tests.
+        """
+        super().setUp()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+    def setup_gated_section(self, gated_block, gating_block):
+        """
+        Test helper to create a gating requirement
+        Args:
+            gated_block: The block the that learner will not have access to until they complete the gating block
+            gating_block: (The prerequisite) The block that must be completed to get access to the gated block
+        """
+
+        gating_api.add_prerequisite(self.course.id, str(gating_block.location))
+        gating_api.set_required_content(self.course.id, gated_block.location, gating_block.location, 100)
+
+    def test_content_locked(self):
+        """
+        Test that a sequential/subsection with unmet prereqs correctly indicated that its content is locked
+        """
+        course = self.course
+        self.setup_gated_section(self.course_blocks['gated_content'], self.course_blocks['prerequisite'])
+
+        response = self.client.get(course_home_url(course))
+        assert response.status_code == 200
+
+        response_content = pq(response.content)
+
+        # check lock icon is present
+        lock_icon = response_content('.fa-lock')
+        assert lock_icon, 'lock icon is not present, but should be'
+
+        subsection = lock_icon.parents('.subsection-text')
+
+        # check that subsection-title-name is the display name
+        gated_subsection_title = self.course_blocks['gated_content'].display_name
+        assert gated_subsection_title in subsection.children('.subsection-title').html()
+
+        # check that it says prerequisite required
+        assert 'Prerequisite:' in subsection.children('.details').html()
+
+        # check that there is not a screen reader message
+        assert not subsection.children('.sr')
+
+    def test_content_unlocked(self):
+        """
+        Test that a sequential/subsection with met prereqs correctly indicated that its content is unlocked
+        """
+        course = self.course
+        self.setup_gated_section(self.course_blocks['gated_content'], self.course_blocks['prerequisite'])
+
+        # complete the prerequisite to unlock the gated content
+        # this call triggers reevaluation of prerequisites fulfilled by the gating block.
+        with patch('openedx.core.lib.gating.api.get_subsection_completion_percentage', Mock(return_value=100)):
+            lms_gating_api.evaluate_prerequisite(
+                self.course,
+                Mock(location=self.course_blocks['prerequisite'].location, percent_graded=1.0),
+                self.user,
+            )
+
+        response = self.client.get(course_home_url(course))
+        assert response.status_code == 200
+
+        response_content = pq(response.content)
+
+        # check unlock icon is not present
+        unlock_icon = response_content('.fa-unlock')
+        assert not unlock_icon, "unlock icon is present, yet shouldn't be."
+
+        gated_subsection_title = self.course_blocks['gated_content'].display_name
+        every_subsection_on_outline = response_content('.subsection-title')
+
+        subsection_has_gated_text = False
+        says_prerequisite_required = False
+
+        for subsection_contents in every_subsection_on_outline.contents():
+            subsection_has_gated_text = gated_subsection_title in subsection_contents
+            says_prerequisite_required = "Prerequisite:" in subsection_contents
+
+        # check that subsection-title-name is the display name of gated content section
+        assert subsection_has_gated_text
+        assert not says_prerequisite_required
+
+
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
+class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleTestMixin):
+    """
+    Test start course and resume course for the course outline view.
+
+    Technically, this mixes course home and course outline tests, but checking
+    the counts of start/resume course should be done together to avoid false
+    positives.
+
+    """
+    @classmethod
+    def setUpClass(cls):
+        """
+        Creates a test course that can be used for non-destructive tests
+        """
+        # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
+        # pylint: disable=super-method-not-called
+        with super().setUpClassAndTestData():
+            cls.course = cls.create_test_course()
+
+    @classmethod
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+        """Set up and enroll our fake user in the course."""
+        cls.user = UserFactory(password=TEST_PASSWORD)
+        CourseEnrollment.enroll(cls.user, cls.course.id)
+        cls.site = Site.objects.get_current()
+
+    @classmethod
+    def create_test_course(cls):
+        """
+        Creates a test course.
+        """
+        course = CourseFactory.create()
+        with cls.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            chapter2 = ItemFactory.create(category='chapter', parent_location=course.location)
+            sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            sequential2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            sequential3 = ItemFactory.create(category='sequential', parent_location=chapter2.location)
+            sequential4 = ItemFactory.create(category='sequential', parent_location=chapter2.location)
+            vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
+            vertical2 = ItemFactory.create(category='vertical', parent_location=sequential2.location)
+            vertical3 = ItemFactory.create(category='vertical', parent_location=sequential3.location)
+            vertical4 = ItemFactory.create(category='vertical', parent_location=sequential4.location)
+            problem = ItemFactory.create(category='problem', parent_location=vertical.location)
+            problem2 = ItemFactory.create(category='problem', parent_location=vertical2.location)
+            problem3 = ItemFactory.create(category='problem', parent_location=vertical3.location)
+        course.children = [chapter, chapter2]
+        chapter.children = [sequential, sequential2]
+        chapter2.children = [sequential3, sequential4]
+        sequential.children = [vertical]
+        sequential2.children = [vertical2]
+        sequential3.children = [vertical3]
+        sequential4.children = [vertical4]
+        vertical.children = [problem]
+        vertical2.children = [problem2]
+        vertical3.children = [problem3]
+        if hasattr(cls, 'user'):
+            CourseEnrollment.enroll(cls.user, course.id)
+        return course
+
+    def setUp(self):
+        """
+        Set up for the tests.
+        """
+        super().setUp()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+    def visit_sequential(self, course, chapter, sequential):
+        """
+        Navigates to the provided sequential.
+        """
+        last_accessed_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': str(course.id),
+                'chapter': chapter.url_name,
+                'section': sequential.url_name,
+            }
+        )
+        assert 200 == self.client.get(last_accessed_url).status_code
+
+    @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
+    def complete_sequential(self, course, sequential):
+        """
+        Completes provided sequential.
+        """
+        course_key = CourseKey.from_string(str(course.id))
+        # Fake a visit to sequence2/vertical2
+        block_key = UsageKey.from_string(str(sequential.location))
+        if block_key.course_key.run is None:
+            # Old mongo keys must be annotated with course run info before calling submit_completion:
+            block_key = block_key.replace(course_key=course_key)
+        completion = 1.0
+        BlockCompletion.objects.submit_completion(
+            user=self.user,
+            block_key=block_key,
+            completion=completion
+        )
+
+    def visit_course_home(self, course, start_count=0, resume_count=0):
+        """
+        Helper function to navigates to course home page, test for resume buttons
+
+        :param course: course factory object
+        :param start_count: number of times 'Start Course' should appear
+        :param resume_count: number of times 'Resume Course' should appear
+        :return: response object
+        """
+        response = self.client.get(course_home_url(course))
+        assert response.status_code == 200
+        self.assertContains(response, 'Start Course', count=start_count)
+        self.assertContains(response, 'Resume Course', count=resume_count)
+        return response
+
+    def test_course_home_completion(self):
+        """
+        Test that completed blocks appear checked on course home page
+        """
+        self.override_waffle_switch(True)
+
+        course = self.course
+        vertical = course.children[0].children[0].children[0]
+
+        response = self.client.get(course_home_url(course))
+        content = pq(response.content)
+        assert len(content('.fa-check')) == 0
+
+        self.complete_sequential(self.course, vertical)
+
+        response = self.client.get(course_home_url(course))
+        content = pq(response.content)
+
+        # Subsection should be checked. Subsection 4 is also checked because it contains a vertical with no content
+        assert len(content('.fa-check')) == 2
+
+    def test_start_course(self):
+        """
+        Tests that the start course button appears when the course has never been accessed.
+
+        Technically, this is a course home test, and not a course outline test, but checking the counts of
+        start/resume course should be done together to not get a false positive.
+
+        """
+        course = self.course
+
+        response = self.visit_course_home(course, start_count=1, resume_count=0)
+        content = pq(response.content)
+
+        problem = course.children[0].children[0].children[0].children[0]
+        assert content('.action-resume-course').attr('href').endswith('+type@problem+block@' + problem.url_name)
+
+    @override_settings(LMS_BASE='test_url:9999')
+    @override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
+    def test_resume_course_with_completion_api(self):
+        """
+        Tests completion API resume button functionality
+        """
+        self.override_waffle_switch(True)
+
+        # Course tree
+        course = self.course
+        problem1 = course.children[0].children[0].children[0].children[0]
+        problem2 = course.children[0].children[1].children[0].children[0]
+
+        self.complete_sequential(self.course, problem1)
+        # Test for 'resume' link
+        response = self.visit_course_home(course, resume_count=1)
+
+        # Test for 'resume' link URL - should be problem 1
+        content = pq(response.content)
+        assert content('.action-resume-course').attr('href').endswith('+type@problem+block@' + problem1.url_name)
+
+        self.complete_sequential(self.course, problem2)
+        # Test for 'resume' link
+        response = self.visit_course_home(course, resume_count=1)
+
+        # Test for 'resume' link URL - should be problem 2
+        content = pq(response.content)
+        assert content('.action-resume-course').attr('href').endswith('+type@problem+block@' + problem2.url_name)
+
+        # visit sequential 1, make sure 'Resume Course' URL is robust against 'Last Visited'
+        # (even though I visited seq1/vert1, 'Resume Course' still points to seq2/vert2)
+        self.visit_sequential(course, course.children[0], course.children[0].children[0])
+
+        # Test for 'resume' link URL - should be problem 2 (last completed block, NOT last visited)
+        response = self.visit_course_home(course, resume_count=1)
+        content = pq(response.content)
+        assert content('.action-resume-course').attr('href').endswith('+type@problem+block@' + problem2.url_name)
+
+    def test_resume_course_deleted_sequential(self):
+        """
+        Tests resume course when the last completed sequential is deleted and
+        there is another sequential in the vertical.
+
+        """
+        course = self.create_test_course()
+
+        # first navigate to a sequential to make it the last accessed
+        chapter = course.children[0]
+        assert len(chapter.children) >= 2
+        sequential = chapter.children[0]
+        sequential2 = chapter.children[1]
+        self.complete_sequential(course, sequential)
+        self.complete_sequential(course, sequential2)
+
+        # remove one of the sequentials from the chapter
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+            self.store.delete_item(sequential.location, self.user.id)
+
+        # check resume course buttons
+        response = self.visit_course_home(course, resume_count=1)
+
+        content = pq(response.content)
+        assert content('.action-resume-course').attr('href').endswith('+type@sequential+block@' + sequential2.url_name)
+
+    def test_resume_course_deleted_sequentials(self):
+        """
+        Tests resume course when the last completed sequential is deleted and
+        there are no sequentials left in the vertical.
+
+        """
+        course = self.create_test_course()
+
+        # first navigate to a sequential to make it the last accessed
+        chapter = course.children[0]
+        assert len(chapter.children) == 2
+        sequential = chapter.children[0]
+        self.complete_sequential(course, sequential)
+
+        # remove all sequentials from chapter
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+            for sequential in chapter.children:
+                self.store.delete_item(sequential.location, self.user.id)
+
+        # check resume course buttons
+        self.visit_course_home(course, start_count=1, resume_count=0)
+
+    def test_course_home_for_global_staff(self):
+        """
+        Tests that staff user can access the course home without being enrolled
+        in the course.
+        """
+        course = self.course
+        self.user.is_staff = True
+        self.user.save()
+
+        self.override_waffle_switch(True)
+        CourseEnrollment.get_enrollment(self.user, course.id).delete()
+        response = self.visit_course_home(course, start_count=1, resume_count=0)
+        content = pq(response.content)
+        problem = course.children[0].children[0].children[0].children[0]
+        assert content('.action-resume-course').attr('href').endswith('+type@problem+block@' + problem.url_name)
+
+    @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
+    def test_course_outline_auto_open(self):
+        """
+        Tests that the course outline auto-opens to the first subsection
+        in a course if a user has no completion data, and to the
+        last-accessed subsection if a user does have completion data.
+        """
+        def get_sequential_button(url, is_hidden):
+            is_hidden_string = "is-hidden" if is_hidden else ""
+
+            return "<olclass=\"outline-itemaccordion-panel" + is_hidden_string + "\"" \
+                   "id=\"" + url + "_contents\"" \
+                   "aria-labelledby=\"" + url + "\"" \
+                   ">"
+        # Course tree
+        course = self.course
+        chapter1 = course.children[0]
+        chapter2 = course.children[1]
+
+        response_content = self.client.get(course_home_url(course)).content
+        stripped_response = str(re.sub(b"\\s+", b"", response_content), "utf-8")
+
+        assert get_sequential_button(str(chapter1.location), False) in stripped_response
+        assert get_sequential_button(str(chapter2.location), True) in stripped_response
+
+        content = pq(response_content)
+        button = content('#expand-collapse-outline-all-button')
+        assert 'Expand All' == button.children()[0].text
+
+    def test_user_enrolled_after_completion_collection(self):
+        """
+        Tests that the _completion_data_collection_start() method returns the created
+        time of the waffle switch that enables completion data tracking.
+        """
+        view = CourseOutlineFragmentView()
+        switch_name = ENABLE_COMPLETION_TRACKING_SWITCH.name
+        switch, _ = Switch.objects.get_or_create(name=switch_name)
+
+        # pylint: disable=protected-access
+        assert switch.created == view._completion_data_collection_start()
+
+        switch.delete()
+
+    def test_user_enrolled_after_completion_collection_default(self):
+        """
+        Tests that the _completion_data_collection_start() method returns a default constant
+        when no Switch object exists for completion data tracking.
+        """
+        view = CourseOutlineFragmentView()
+
+        # pylint: disable=protected-access
+        assert DEFAULT_COMPLETION_TRACKING_START == view._completion_data_collection_start()
+
+
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
+class TestCourseOutlinePreview(SharedModuleStoreTestCase, MasqueradeMixin):
+    """
+    Unit tests for staff preview of the course outline.
+    """
+    def test_preview(self):
+        """
+        Verify the behavior of preview for the course outline.
+        """
+        course = CourseFactory.create(
+            start=datetime.datetime.now() - datetime.timedelta(days=30)
+        )
+        staff_user = StaffFactory(course_key=course.id, password=TEST_PASSWORD)
+        CourseEnrollment.enroll(staff_user, course.id)
+
+        future_date = datetime.datetime.now() + datetime.timedelta(days=30)
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(
+                category='chapter',
+                parent_location=course.location,
+                display_name='First Chapter',
+            )
+            sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            ItemFactory.create(category='vertical', parent_location=sequential.location)
+            chapter = ItemFactory.create(
+                category='chapter',
+                parent_location=course.location,
+                display_name='Future Chapter',
+                start=future_date,
+            )
+            sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            ItemFactory.create(category='vertical', parent_location=sequential.location)
+
+        # Verify that a staff user sees a chapter with a due date in the future
+        self.client.login(username=staff_user.username, password='test')
+        url = course_home_url(course)
+        response = self.client.get(url)
+        assert response.status_code == 200
+        self.assertContains(response, 'Future Chapter')
+
+        # Verify that staff masquerading as a learner see the future chapter.
+        self.update_masquerade(course=course, role='student')
+        response = self.client.get(url)
+        assert response.status_code == 200
+        self.assertContains(response, 'Future Chapter')

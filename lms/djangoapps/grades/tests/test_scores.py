@@ -58,7 +58,7 @@ class TestScoredBlockTypes(TestCase):
         'course', 'chapter', 'sequential', 'vertical',
         'library_content', 'split_test', 'conditional', 'library', 'randomize',
         'problem', 'drag-and-drop-v2', 'openassessment', 'lti', 'lti_consumer',
-        'acid_parent', 'done', 'wrapper', 'edx_sga',
+        'videosequence', 'problemset', 'acid_parent', 'done', 'wrapper', 'edx_sga',
     }
 
     def test_block_types_possibly_scored(self):

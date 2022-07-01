@@ -5,21 +5,23 @@ Tests for Course API views.
 from datetime import datetime
 from hashlib import md5
 from unittest import TestCase
-
-import ddt
 import pytest
+import ddt
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
-from edx_toggles.toggles.testutils import override_waffle_switch
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from waffle.testutils import override_switch
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase,
+)
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -27,8 +29,6 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.auth import add_users
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
-from lms.djangoapps.course_api import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -140,14 +140,14 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
 
     @ddt.data(('staff', False, 10), ('user', False, 2), ('unknown', True, None))
     @ddt.unpack
-    @override_waffle_switch(USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, active=True)
+    @override_switch('course_list_api_rate_limit.rate_limit_2', active=True)
     def test_throttle_rate_2(self, user_scope, throws_exception, expected_rate):
         """ Make sure throttle rate 2 is set correctly for different user scopes. """
         self.assert_throttle_configured_correctly(user_scope, throws_exception, expected_rate)
 
     @ddt.data(('staff', False, 20), ('user', False, 10), ('unknown', True, None))
     @ddt.unpack
-    @override_waffle_switch(USE_RATE_LIMIT_10_FOR_COURSE_LIST_API, active=True)
+    @override_switch('course_list_api_rate_limit.rate_limit_10', active=True)
     def test_throttle_rate_20(self, user_scope, throws_exception, expected_rate):
         """ Make sure throttle rate 20 is set correctly for different user scopes. """
         self.assert_throttle_configured_correctly(user_scope, throws_exception, expected_rate)
@@ -317,6 +317,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
     Similar to search.tests.test_course_discovery_views but with the course API integration.
     """
 
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
     ENABLED_SIGNALS = ['course_published']
     ENABLED_CACHES = ModuleStoreTestCase.ENABLED_CACHES + ['configuration']
 
@@ -347,7 +348,8 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
             'org': org_code,
             'run': '2010',
             'number': 'DemoZ',
-            'id': f'course-v1:{org_code}+DemoZ+2010',
+            # Using the slash separated course ID bcuz `DemoCourse` isn't updated yet to new locator.
+            'id': f'{org_code}/DemoZ/2010',
             'content': {
                 'short_description': short_description,
             },
@@ -355,13 +357,14 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
 
         DemoCourse.index(self.searcher, [search_course])
 
-        key = CourseKey.from_string(search_course['id'])
+        org, course, run = search_course['id'].split('/')
 
         db_course = self.create_course(
             mobile_available=False,
-            org=key.org,
-            course=key.course,
-            run=key.run,
+            org=org,
+            course=course,
+            run=run,
+            short_description=short_description,
         )
 
         return db_course
@@ -419,14 +422,14 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.setup_user(self.audit_user)
 
         # These query counts were found empirically
-        query_counts = [50, 46, 46, 46, 46, 46, 46, 46, 46, 46, 16]
+        query_counts = [54, 46, 46, 46, 46, 46, 46, 46, 46, 46, 16]
         ordered_course_ids = sorted([str(cid) for cid in (course_ids + [c.id for c in self.courses])])
 
         self.clear_caches()
 
         for page in range(1, 12):
             RequestCache.clear_all_namespaces()
-            with self.assertNumQueries(query_counts[page - 1], table_ignorelist=WAFFLE_TABLES):
+            with self.assertNumQueries(query_counts[page - 1]):
                 response = self.verify_response(params={'page': page, 'page_size': 30})
 
                 assert 'results' in response.data

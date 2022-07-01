@@ -1,0 +1,19 @@
+## mako
+<%page expression_filter="h"/>
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+%>
+
+
+<div class="wrapper wrapper-footer">
+  <footer>
+    <div class="colophon">
+      <div class="colophon-about">
+        <p>This is a Test Site footer</p>
+      </div>
+    </div>
+
+  </footer>
+</div>

@@ -12,7 +12,7 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_experience.tests import BaseCourseUpdatesTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
-QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
+QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 
 def course_updates_url(course):
@@ -49,7 +49,7 @@ class TestCourseUpdatesPage(BaseCourseUpdatesTestCase):
 
         # Fetch the view and verify that the query counts haven't changed
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(51, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
-            with check_mongo_calls(3):
+        with self.assertNumQueries(51, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+            with check_mongo_calls(4):
                 url = course_updates_url(self.course)
                 self.client.get(url)

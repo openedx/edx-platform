@@ -7,7 +7,6 @@ import hashlib
 import json
 from copy import deepcopy
 from unittest import mock
-from urllib.parse import quote
 
 import ddt
 import pytz
@@ -15,20 +14,18 @@ from django.conf import settings
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_name_affirmation.api import create_verified_name
+from edx_name_affirmation.statuses import VerifiedNameStatus
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from common.djangoapps.student.models import PendingEmailChange, UserProfile
-from common.djangoapps.student.models_api import do_name_change_request, get_pending_name_change
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, RegistrationFactory, UserFactory
-from openedx.core.djangoapps.user_api.accounts import RETIRED_EMAIL_MSG
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, FilteredQueryCountMixin, skip_unless_lms
-from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
 from .. import ALL_USERS_VISIBILITY, CUSTOM_VISIBILITY, PRIVATE_VISIBILITY
 
@@ -58,7 +55,6 @@ class UserAPITestCase(APITestCase):
         self.staff_user = UserFactory(is_staff=True, password=TEST_PASSWORD)
         self.staff_client = APIClient()
         self.user = UserFactory.create(password=TEST_PASSWORD)  # will be assigned to self.client by default
-        self.name_affirmation_service = get_name_affirmation_service()
 
     def login_client(self, api_client, user):
         """Helper method for getting the client and user and logging in. Returns client. """
@@ -146,30 +142,15 @@ class UserAPITestCase(APITestCase):
     def create_mock_verified_name(self, user):
         """
         Helper method to create an approved VerifiedName entry in name affirmation.
-        Will not do anything if Name Affirmation is not installed.
         """
-        if self.name_affirmation_service:
-            legacy_profile = UserProfile.objects.get(id=user.id)
-            self.name_affirmation_service.create_verified_name(
-                user,
-                self.VERIFIED_NAME,
-                legacy_profile.name,
-                status='approved'
-            )
+        legacy_profile = UserProfile.objects.get(id=user.id)
+        create_verified_name(user, self.VERIFIED_NAME, legacy_profile.name, status=VerifiedNameStatus.APPROVED)
 
     def create_user_registration(self, user):
         """
         Helper method that creates a registration object for the specified user
         """
         RegistrationFactory(user=user)
-
-    def _get_num_queries(self, num_queries):
-        """
-        If Name Affirmation is installed, it will add an extra query
-        """
-        if self.name_affirmation_service:
-            return num_queries + 1
-        return num_queries
 
     def _verify_profile_image_data(self, data, has_profile_image):
         """
@@ -195,7 +176,7 @@ class UserAPITestCase(APITestCase):
 
 @ddt.ddt
 @skip_unless_lms
-class TestOwnUsernameAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITestCase):
+class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
     """
     Unit tests for the Accounts API.
     """
@@ -211,7 +192,7 @@ class TestOwnUsernameAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAP
         """
         Internal helper to perform the actual assertion
         """
-        with self.assertNumQueries(queries, table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(queries):
             response = self.send_get(self.client, expected_status=expected_status)
         if expected_status == 200:
             data = response.data
@@ -223,7 +204,7 @@ class TestOwnUsernameAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAP
         Test that a client (logged in) can get her own username.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        self._verify_get_own_username(16)
+        self._verify_get_own_username(17)
 
     def test_get_username_inactive(self):
         """
@@ -233,7 +214,7 @@ class TestOwnUsernameAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAP
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.user.is_active = False
         self.user.save()
-        self._verify_get_own_username(16)
+        self._verify_get_own_username(17)
 
     def test_get_username_not_logged_in(self):
         """
@@ -242,7 +223,7 @@ class TestOwnUsernameAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAP
         """
 
         # verify that the endpoint is inaccessible when not logged in
-        self._verify_get_own_username(12, expected_status=401)
+        self._verify_get_own_username(13, expected_status=401)
 
 
 @ddt.ddt
@@ -253,13 +234,13 @@ class TestOwnUsernameAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAP
     {'full': 50, 'small': 10},
     clear=True
 )
-class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITestCase):
+class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     """
     Unit tests for the Accounts API.
     """
 
     ENABLED_CACHES = ['default']
-    TOTAL_QUERY_COUNT = 24
+    TOTAL_QUERY_COUNT = 27
     FULL_RESPONSE_FIELD_COUNT = 30
 
     def setUp(self):
@@ -343,6 +324,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         # additional admin fields (13)
         assert self.user.email == data['email']
         assert self.user.id == data['id']
+        assert self.VERIFIED_NAME == data['verified_name']
         assert data['extended_profile'] is not None
         assert 'MA' == data['state']
         assert 'f' == data['gender']
@@ -353,10 +335,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         assert data['secondary_email'] is None
         assert data['secondary_email_enabled'] is None
         assert year_of_birth == data['year_of_birth']
-        if self.name_affirmation_service:
-            assert self.VERIFIED_NAME == data['verified_name']
-        else:
-            assert data['verified_name'] is None
 
     def test_anonymous_access(self):
         """
@@ -482,17 +460,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         response = client.get(url + f'?lms_user_id={non_integer_id}')
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    @mock.patch('openedx.core.djangoapps.user_api.accounts.views.is_email_retired')
-    def test_get_retired_user_from_email(self, mock_is_email_retired):
-        """
-        Tests that the retired user from email cannot be accessed and shows an error message.
-        """
-        mock_is_email_retired.return_value = True
-        client = self.login_client('staff_client', 'staff_user')
-        url = reverse("accounts_detail_api")
-        response = client.get(url + f'?email={quote(self.user.email)}')
-        assert response.data == {"error_msg": RETIRED_EMAIL_MSG}
-
     def test_search_emails(self):
         client = self.login_client('staff_client', 'staff_user')
         json_data = {'emails': [self.user.email]}
@@ -534,7 +501,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(self._get_num_queries(self.TOTAL_QUERY_COUNT), table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(self.TOTAL_QUERY_COUNT):
             response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
@@ -549,7 +516,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(self._get_num_queries(self.TOTAL_QUERY_COUNT), table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(self.TOTAL_QUERY_COUNT):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response)
 
@@ -674,7 +641,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             """
             Internal helper to perform the actual assertions
             """
-            with self.assertNumQueries(queries, table_ignorelist=WAFFLE_TABLES):
+            with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
             assert self.FULL_RESPONSE_FIELD_COUNT == len(data)
@@ -700,12 +667,12 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             assert data['accomplishments_shared'] is False
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        verify_get_own_information(self._get_num_queries(22))
+        verify_get_own_information(25)
 
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
         self.user.save()
-        verify_get_own_information(self._get_num_queries(16))
+        verify_get_own_information(17)
 
     def test_get_account_empty_string(self):
         """
@@ -720,7 +687,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        with self.assertNumQueries(self._get_num_queries(22), table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(25):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "state", "bio",):
             assert response.data[empty_field] is None
@@ -1141,94 +1108,48 @@ class TestAccountAPITransactions(TransactionTestCase):
 class NameChangeViewTests(UserAPITestCase):
     """ NameChangeView tests """
 
-    def _send_create(self, client, json_data):
-        """
-        Helper method to send a create request to the server, defaulting to application/json
-        content_type and returning the response.
-        """
-        return client.post(
-            reverse('request_name_change'),
-            data=json.dumps(json_data),
-            content_type='application/json'
-        )
+    def setUp(self):
+        super().setUp()
+        self.url = reverse('name_change')
 
-    def _send_confirm(self, client, username):
-        """
-        Helper method to send a confirm request to the server, defaulting to application/json
-        content_type and returning the response.
-        """
-        return client.post(reverse(
-            'confirm_name_change',
-            kwargs={'username': username}
-        ))
-
-    def test_create_request_succeeds(self):
+    def test_request_succeeds(self):
         """
         Test that a valid name change request succeeds.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        response = self._send_create(self.client, {'name': 'New Name'})
-        self.assertEqual(response.status_code, 201)
+        self.send_post(self.client, {'name': 'New Name'})
 
-    def test_create_unauthenticated(self):
+    def test_unauthenticated(self):
         """
         Test that a name change request fails for an unauthenticated user.
         """
-        response = self._send_create(self.client, {'name': 'New Name'})
-        self.assertEqual(response.status_code, 401)
+        self.send_post(self.client, {'name': 'New Name'}, expected_status=401)
 
-    def test_create_empty_request(self):
+    def test_empty_request(self):
         """
         Test that an empty request fails.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        response = self._send_create(self.client, {})
-        self.assertEqual(response.status_code, 400)
+        self.send_post(self.client, {}, expected_status=400)
 
-    def test_create_blank_name(self):
+    def test_blank_name(self):
         """
         Test that a blank name string fails.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        response = self._send_create(self.client, {'name': ''})
-        self.assertEqual(response.status_code, 400)
+        self.send_post(self.client, {'name': ''}, expected_status=400)
 
     @ddt.data('<html>invalid name</html>', 'https://invalid.com')
-    def test_create_fails_validation(self, invalid_name):
+    def test_fails_validation(self, invalid_name):
         """
         Test that an invalid name will return an error.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        response = self._send_create(self.client, {'name': invalid_name})
-        self.assertEqual(response.status_code, 400)
-
-    def test_confirm_succeeds(self):
-        """
-        Test that a staff user can successfully confirm a name change.
-        """
-        self.staff_client.login(username=self.staff_user.username, password=TEST_PASSWORD)
-        do_name_change_request(self.user, 'New Name', 'test')
-        response = self._send_confirm(self.staff_client, self.user.username)
-        self.assertEqual(response.status_code, 204)
-        self.assertIsNone(get_pending_name_change(self.user))
-
-    def test_confirm_non_staff(self):
-        """
-        Test that non-staff users cannot confirm name changes.
-        """
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        do_name_change_request(self.user, 'New Name', 'test')
-        response = self._send_confirm(self.client, self.user.username)
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(get_pending_name_change(self.user).new_name, 'New Name')
-
-    def test_confirm_no_pending_name_change(self):
-        """
-        Test that attempting to confirm a non-existent name change request will result in a 404.
-        """
-        self.staff_client.login(username=self.staff_user.username, password=TEST_PASSWORD)
-        response = self._send_confirm(self.staff_client, self.user.username)
-        self.assertEqual(response.status_code, 404)
+        self.send_post(
+            self.client,
+            {'name': invalid_name},
+            expected_status=400
+        )
 
 
 @ddt.ddt

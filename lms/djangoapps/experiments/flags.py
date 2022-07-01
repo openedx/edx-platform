@@ -64,6 +64,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
     def __init__(
             self,
+            waffle_namespace,
             flag_name,
             module_name,
             num_buckets=2,
@@ -71,11 +72,11 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
             use_course_aware_bucketing=True,
             **kwargs
     ):
-        super().__init__(flag_name, module_name, **kwargs)
+        super().__init__(waffle_namespace, flag_name, module_name, **kwargs)
         self.num_buckets = num_buckets
         self.experiment_id = experiment_id
         self.bucket_flags = [
-            CourseWaffleFlag(f'{flag_name}.{bucket}', module_name)  # lint-amnesty, pylint: disable=toggle-missing-annotation
+            CourseWaffleFlag(waffle_namespace, f'{flag_name}.{bucket}', module_name)  # lint-amnesty, pylint: disable=toggle-missing-annotation
             for bucket in range(num_buckets)
         ]
         self.use_course_aware_bucketing = use_course_aware_bucketing

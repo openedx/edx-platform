@@ -39,7 +39,7 @@ from ..models import (
     PublishReport,
     UserPartitionGroup
 )
-from .permissions import can_see_all_content
+from .permissions import can_call_public_api, can_see_all_content
 from .processors.content_gating import ContentGatingOutlineProcessor
 from .processors.enrollment import EnrollmentOutlineProcessor
 from .processors.enrollment_track_partition_groups import EnrollmentTrackPartitionGroupsOutlineProcessor
@@ -58,6 +58,7 @@ __all__ = [
     'get_user_course_outline',
     'get_user_course_outline_details',
     'key_supports_outlines',
+    'public_api_available',
     'replace_course_outline',
 ]
 
@@ -82,6 +83,21 @@ def key_supports_outlines(opaque_key: OpaqueKey) -> bool:
         return not opaque_key.deprecated
 
     return False
+
+
+def public_api_available(course_key: CourseKey) -> bool:
+    """
+    Is the Public API available for this Course to this User?
+
+    This only really exists while we do the waffle-flag rollout of this feature,
+    so that in-process callers from other apps can determine whether they should
+    trust Learning Sequences API data for a particular user/course.
+    """
+    return (
+        key_supports_outlines(course_key) and
+        LearningContext.objects.filter(context_key=course_key).exists() and
+        can_call_public_api(course_key)
+    )
 
 
 @function_trace('learning_sequences.api.get_course_keys_with_outlines')

@@ -11,7 +11,7 @@ def plugin_settings(settings):
        on the sidebar of the learner dashboard. Announcements can be created by Global Staff
        users on maintenance dashboard of studio. Maintenance dashboard can accessed at
        https://{studio.domain}/maintenance
-    .. toggle_warning: TinyMCE is needed to show an editor in the studio.
+    .. toggle_warnings: TinyMCE is needed to show an editor in the studio.
     .. toggle_use_cases: open_edx
     .. toggle_creation_date: 2017-11-08
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/16496

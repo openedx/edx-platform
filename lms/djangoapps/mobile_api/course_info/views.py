@@ -111,7 +111,9 @@ def apply_wrappers_to_content(content, module, request):
     Returns: A piece of html content containing the original content updated by each wrapper.
 
     """
-    content = module.system.service(module, "replace_urls").replace_urls(content)
+    content = module.system.replace_urls(content)
+    content = module.system.replace_course_urls(content)
+    content = module.system.replace_jump_to_id_urls(content)
 
     return make_static_urls_absolute(request, content)
 

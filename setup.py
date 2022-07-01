@@ -4,46 +4,6 @@ Setup script for the Open edX package.
 
 from setuptools import setup
 
-XBLOCKS = [
-    "about = xmodule.html_module:AboutBlock",
-    "book = xmodule.template_module:TranslateCustomTagBlock",
-    "annotatable = xmodule.annotatable_module:AnnotatableBlock",
-    "chapter = xmodule.seq_module:SectionBlock",
-    "conditional = xmodule.conditional_module:ConditionalBlock",
-    "course = xmodule.course_module:CourseBlock",
-    "course_info = xmodule.html_module:CourseInfoBlock",
-    "customtag = xmodule.template_module:CustomTagBlock",
-    "custom_tag_template = xmodule.template_module:CustomTagTemplateBlock",
-    "discuss = xmodule.template_module:TranslateCustomTagBlock",
-    "discussion = xmodule.discussion_block:DiscussionXBlock",
-    "error = xmodule.error_module:ErrorBlock",
-    "hidden = xmodule.hidden_module:HiddenDescriptor",
-    "html = xmodule.html_module:HtmlBlock",
-    "image = xmodule.template_module:TranslateCustomTagBlock",
-    "library = xmodule.library_root_xblock:LibraryRoot",
-    "library_content = xmodule.library_content_module:LibraryContentBlock",
-    "library_sourced = xmodule.library_sourced_block:LibrarySourcedBlock",
-    "lti = xmodule.lti_module:LTIBlock",
-    "poll_question = xmodule.poll_module:PollBlock",
-    "problem = xmodule.capa_module:ProblemBlock",
-    "randomize = xmodule.randomize_module:RandomizeBlock",
-    "sequential = xmodule.seq_module:SequenceBlock",
-    "slides = xmodule.template_module:TranslateCustomTagBlock",
-    "split_test = xmodule.split_test_module:SplitTestBlock",
-    "static_tab = xmodule.html_module:StaticTabBlock",
-    "unit = xmodule.unit_block:UnitBlock",
-    "vertical = xmodule.vertical_block:VerticalBlock",
-    "video = xmodule.video_module:VideoBlock",
-    "videoalpha = xmodule.video_module:VideoBlock",
-    "videodev = xmodule.template_module:TranslateCustomTagBlock",
-    "word_cloud = xmodule.word_cloud_module:WordCloudBlock",
-    "wrapper = xmodule.wrapper_module:WrapperBlock",
-]
-XBLOCKS_ASIDES = [
-    'tagging_aside = cms.lib.xblock.tagging:StructuredTagsAside',
-]
-
-
 setup(
     name="Open edX",
     version='0.13',
@@ -55,15 +15,12 @@ setup(
         "cms",
         "lms",
         "openedx",
-        "xmodule",
     ],
-    package_data={
-        'xmodule': ['js/module/*'],
-    },
     entry_points={
         "openedx.course_tab": [
             "ccx = lms.djangoapps.ccx.plugins:CcxCourseTab",
             "courseware = lms.djangoapps.courseware.tabs:CoursewareTab",
+            "course_info = lms.djangoapps.courseware.tabs:CourseInfoTab",
             "dates = lms.djangoapps.courseware.tabs:DatesTab",
             "discussion = lms.djangoapps.discussion.plugins:DiscussionTab",
             "edxnotes = lms.djangoapps.edxnotes.plugins:EdxNotesTab",
@@ -72,7 +29,6 @@ setup(
             "html_textbooks = lms.djangoapps.courseware.tabs:HtmlTextbookTabs",
             "instructor = lms.djangoapps.instructor.views.instructor_dashboard:InstructorDashboardTab",
             "lti_discussion = openedx.features.lti_course_tab.tab:DiscussionLtiCourseTab",
-            "lti_live = openedx.core.djangoapps.course_live.tab:CourseLiveTab",
             "lti_tab = openedx.features.lti_course_tab.tab:LtiCourseTab",
             "pdf_textbooks = lms.djangoapps.courseware.tabs:PDFTextbookTabs",
             "progress = lms.djangoapps.courseware.tabs:ProgressTab",
@@ -92,7 +48,6 @@ setup(
             "textbooks = lms.djangoapps.courseware.plugins:TextbooksCourseApp",
             "wiki = lms.djangoapps.course_wiki.plugins.course_app:WikiCourseApp",
             "custom_pages = lms.djangoapps.courseware.plugins:CustomPagesCourseApp",
-            "live = openedx.core.djangoapps.course_live.plugins:LiveCourseApp",
         ],
         "openedx.course_tool": [
             "calendar_sync_toggle = openedx.features.calendar_sync.plugins:CalendarSyncToggleTool",
@@ -136,7 +91,6 @@ setup(
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "credentials = openedx.core.djangoapps.credentials.apps:CredentialsConfig",
-            "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",
             "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
             "discussions = openedx.core.djangoapps.discussions.apps:DiscussionsConfig",
@@ -155,7 +109,6 @@ setup(
         "cms.djangoapp": [
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
-            "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",
             "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             # Importing an LMS app into the Studio process is not a good
             # practice. We're ignoring this for Discussions here because its
@@ -178,13 +131,8 @@ setup(
             'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',
         ],
         'openedx.dynamic_partition_generator': [
-            'enrollment_track = xmodule.partitions.enrollment_track_partition_generator:create_enrollment_track_partition',  # lint-amnesty, pylint: disable=line-too-long
+            'enrollment_track = common.lib.xmodule.xmodule.partitions.enrollment_track_partition_generator:create_enrollment_track_partition',  # lint-amnesty, pylint: disable=line-too-long
             'content_type_gating = openedx.features.content_type_gating.partitions:create_content_gating_partition'
-        ],
-        'xblock.v1': XBLOCKS,
-        'xblock_asides.v1': XBLOCKS_ASIDES,
-        'console_scripts': [
-            'xmodule_assets = xmodule.static_content:main',
         ],
     }
 )

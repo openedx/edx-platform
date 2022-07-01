@@ -22,6 +22,7 @@ from django.utils.translation import get_language, to_locale
 from django.utils.translation import gettext as _
 from django.views.generic.base import View
 from edx_django_utils.monitoring.utils import increment
+from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
 from urllib.parse import urljoin  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -39,7 +40,6 @@ from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_duration_limits.access import get_user_course_duration, get_user_course_expiration_date
-from openedx.features.course_experience import course_home_url
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.db import outer_atomic
@@ -55,7 +55,7 @@ LOG = logging.getLogger(__name__)
 # .. toggle_creation_date: 2021-8-23
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REV-2133
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 VALUE_PROP_TRACK_SELECTION_FLAG = WaffleFlag('course_modes.use_new_track_selection', __name__)
 
 
@@ -102,7 +102,12 @@ class ChooseModeView(View):
 
         # Check whether the user has access to this course
         # based on country access rules.
-        embargo_redirect = embargo_api.redirect_if_blocked(request, course_key)
+        embargo_redirect = embargo_api.redirect_if_blocked(
+            course_key,
+            user=request.user,
+            ip_address=get_client_ip(request)[0],
+            url=request.path
+        )
         if embargo_redirect:
             return redirect(embargo_redirect)
 
@@ -408,7 +413,7 @@ class ChooseModeView(View):
             302 to the course if possible or the dashboard if not.
         """
         if course.has_started() or user.is_staff:
-            return redirect(course_home_url(course_key))
+            return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
         else:
             return redirect(reverse('dashboard'))
 

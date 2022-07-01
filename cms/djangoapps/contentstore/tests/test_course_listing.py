@@ -32,9 +32,6 @@ from common.djangoapps.student.roles import (
     UserBasedRole
 )
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from xmodule.course_module import CourseSummary  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -63,17 +60,17 @@ class TestCourseListing(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password='test')
 
-    def _create_course_with_access_groups(self, course_location, user=None):
+    def _create_course_with_access_groups(self, course_location, user=None, store=ModuleStoreEnum.Type.split):
         """
         Create dummy course with 'CourseFactory' and role (instructor/staff) groups
         """
-        CourseFactory.create(
+        course = CourseFactory.create(
             org=course_location.org,
             number=course_location.course,
-            run=course_location.run
+            run=course_location.run,
+            default_store=store
         )
-        course = CourseOverviewFactory.create(id=course_location, org=course_location.org)
-        self._add_role_access_to_user(user, course_location)
+        self._add_role_access_to_user(user, course.id)
         return course
 
     def _add_role_access_to_user(self, user, course_id):
@@ -127,7 +124,7 @@ class TestCourseListing(ModuleStoreTestCase):
         Tests that CCX courses are filtered in course listing.
         """
         # Create a course and assign access roles to user.
-        course_location = CourseLocator('Org1', 'Course1', 'Course1')
+        course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
         course = self._create_course_with_access_groups(course_location, self.user)
 
         # Create a ccx course key and add assign access roles to user.
@@ -155,16 +152,13 @@ class TestCourseListing(ModuleStoreTestCase):
 
         # Verify that CCX courses are filtered out while iterating over all courses
         mocked_ccx_course = Mock(id=ccx_course_key)
-        with patch(
-            'openedx.core.djangoapps.content.course_overviews.models.CourseOverview.get_all_courses',
-            return_value=[mocked_ccx_course],
-        ):
+        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_course_summaries', return_value=[mocked_ccx_course]):
             courses_iter, __ = _accessible_courses_iter_for_tests(self.request)
             self.assertEqual(len(list(courses_iter)), 0)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2),
-        (ModuleStoreEnum.Type.mongo, 1)
+        (ModuleStoreEnum.Type.split, 3),
+        (ModuleStoreEnum.Type.mongo, 2)
     )
     @ddt.unpack
     def test_staff_course_listing(self, default_store, mongo_calls):
@@ -181,7 +175,7 @@ class TestCourseListing(ModuleStoreTestCase):
             # Create few courses
             for num in range(TOTAL_COURSES_COUNT):
                 course_location = self.store.make_course_key('Org', 'CreatedCourse' + str(num), 'Run')
-                self._create_course_with_access_groups(course_location, self.user)
+                self._create_course_with_access_groups(course_location, self.user, default_store)
 
         # Fetch accessible courses list & verify their count
         courses_list_by_staff, __ = get_courses_accessible_to_user(self.request)
@@ -201,7 +195,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         with self.store.default_store(store):
             course_key = self.store.make_course_key('Org', 'Course', 'Run')
-            course = self._create_course_with_access_groups(course_key, self.user)
+            self._create_course_with_access_groups(course_key, self.user, store)
 
         # get courses through iterating all courses
         courses_iter, __ = _accessible_courses_iter_for_tests(self.request)
@@ -226,7 +220,6 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(course_keys_in_course_list, course_keys_in_courses_list_by_groups)
         # now delete this course and re-add user to instructor group of this course
         delete_course(course_key, self.user.id)
-        course.delete()
 
         CourseInstructorRole(course_key).add_users(self.user)
 
@@ -246,8 +239,8 @@ class TestCourseListing(ModuleStoreTestCase):
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 1, 2),
-        (ModuleStoreEnum.Type.mongo, 1, 2),
+        (ModuleStoreEnum.Type.split, 3, 3),
+        (ModuleStoreEnum.Type.mongo, 2, 2)
     )
     @ddt.unpack
     def test_course_listing_performance(self, store, courses_list_from_group_calls, courses_list_calls):
@@ -267,9 +260,9 @@ class TestCourseListing(ModuleStoreTestCase):
                 run = f'Run{number}'
                 course_location = self.store.make_course_key(org, course, run)
                 if number in user_course_ids:
-                    self._create_course_with_access_groups(course_location, self.user)
+                    self._create_course_with_access_groups(course_location, self.user, store=store)
                 else:
-                    self._create_course_with_access_groups(course_location)
+                    self._create_course_with_access_groups(course_location, store=store)
 
         # get courses by iterating through all courses
         courses_iter, __ = _accessible_courses_iter_for_tests(self.request)
@@ -287,23 +280,30 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list, __ = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list), USER_COURSES_COUNT)
 
-        with self.assertNumQueries(courses_list_from_group_calls, table_ignorelist=WAFFLE_TABLES):
+        # Now count the db queries
+        with check_mongo_calls(courses_list_from_group_calls):
             _accessible_courses_list_from_groups(self.request)
 
-        with self.assertNumQueries(courses_list_calls, table_ignorelist=WAFFLE_TABLES):
-            _accessible_courses_iter_for_tests(self.request)
+        with check_mongo_calls(courses_list_calls):
+            list(_accessible_courses_iter_for_tests(self.request))
+        # Calls:
+        #    1) query old mongo
+        #    2) get_more on old mongo
+        #    3) query split (handled with MySQL only)
 
-    def test_course_listing_errored_deleted_courses(self):
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_course_listing_errored_deleted_courses(self, store):
         """
         Create good courses, courses that won't load, and deleted courses which still have
         roles. Test course listing.
         """
-        course_location = CourseLocator('testOrg', 'testCourse', 'RunBabyRun')
-        self._create_course_with_access_groups(course_location, self.user)
+        with self.store.default_store(store):
+            course_location = self.store.make_course_key('testOrg', 'testCourse', 'RunBabyRun')
+            self._create_course_with_access_groups(course_location, self.user, store)
 
-        course_location = CourseLocator('doomedCourse', 'testCourse', 'RunBabyRun')
-        course = self._create_course_with_access_groups(course_location, self.user)
-        course.delete()
+            course_location = self.store.make_course_key('testOrg', 'doomedCourse', 'RunBabyRun')
+            self._create_course_with_access_groups(course_location, self.user, store)
+            self.store.delete_course(course_location, self.user.id)
 
         courses_list, __ = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list), 1, courses_list)
@@ -315,41 +315,30 @@ class TestCourseListing(ModuleStoreTestCase):
         all of them.
         """
         org_course_one = self.store.make_course_key('AwesomeOrg', 'Course1', 'RunBabyRun')
-        course_1 = CourseFactory.create(
+        CourseFactory.create(
             org=org_course_one.org,
             number=org_course_one.course,
             run=org_course_one.run
         )
-        CourseOverviewFactory.create(id=course_1.id, org='AwesomeOrg')
 
         org_course_two = self.store.make_course_key('AwesomeOrg', 'Course2', 'RunBabyRun')
-        course_2 = CourseFactory.create(
+        CourseFactory.create(
             org=org_course_two.org,
             number=org_course_two.course,
             run=org_course_two.run
         )
-        CourseOverviewFactory.create(id=course_2.id, org='AwesomeOrg')
 
         # Two types of org-wide roles have edit permissions: staff and instructor.  We test both
         role.add_users(self.user)
 
+        with self.assertRaises(AccessListFallback):
+            _accessible_courses_list_from_groups(self.request)
         courses_list, __ = get_courses_accessible_to_user(self.request)
 
         # Verify fetched accessible courses list is a list of CourseSummery instances and test expacted
         # course count is returned
         self.assertEqual(len(list(courses_list)), 2)
-        self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_list))
-
-    @ddt.data(OrgStaffRole(), OrgInstructorRole())
-    def test_course_listing_org_permissions_exception(self, role):
-        """
-        Create roles with no course_id neither org to make sure AccessListFallback is raised for
-        platform-wide permissions
-        """
-        role.add_users(self.user)
-
-        with self.assertRaises(AccessListFallback):
-            _accessible_courses_list_from_groups(self.request)
+        self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_list))
 
     def test_course_listing_with_actions_in_progress(self):
         sourse_course_key = CourseLocator('source-Org', 'source-Course', 'source-Run')

@@ -17,7 +17,7 @@ from ratelimit.decorators import ratelimit
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.dot_overrides import views as dot_overrides_views
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_token_dict
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 
 
 class _DispatchingView(View):
@@ -75,19 +75,6 @@ class _DispatchingView(View):
             return request.POST.get('client_id')
 
 
-def _get_token_type(request):
-    """
-    Get the token_type for the request.
-
-    - Respects the HTTP_X_TOKEN_TYPE header if the token_type parameter is not supplied.
-    - Adds `oauth_token_type` custom attribute for monitoring.
-    """
-    default_token_type = request.META.get('HTTP_X_TOKEN_TYPE', 'no_token_type_supplied')
-    token_type = request.POST.get('token_type', default_token_type).lower()
-    monitoring_utils.set_custom_attribute('oauth_token_type', token_type)
-    return token_type
-
-
 @method_decorator(
     ratelimit(
         key='openedx.core.djangoapps.util.ratelimit.real_ip', rate=settings.RATELIMIT_RATE,
@@ -102,23 +89,26 @@ class AccessTokenView(_DispatchingView):
 
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
-        monitoring_utils.set_custom_attribute('oauth_grant_type', request.POST.get('grant_type', 'not-supplied'))
-        token_type = _get_token_type(request)
+
+        token_type = request.POST.get('token_type',
+                                      request.META.get('HTTP_X_TOKEN_TYPE', 'no_token_type_supplied')).lower()
+        monitoring_utils.set_custom_attribute('oauth_token_type', token_type)
+        monitoring_utils.set_custom_attribute('oauth_grant_type', request.POST.get('grant_type', ''))
 
         if response.status_code == 200 and token_type == 'jwt':
-            response.content = self._get_jwt_content_from_access_token_content(request, response)
+            response.content = self._build_jwt_response_from_access_token_response(request, response)
 
         return response
 
-    def _get_jwt_content_from_access_token_content(self, request, response):
-        """
-        Gets the JWT response content from the original (opaque) token response content.
-
-        Includes the JWT token and token type in the response.
-        """
-        opaque_token_dict = json.loads(response.content.decode('utf-8'))
-        jwt_token_dict = create_jwt_token_dict(opaque_token_dict, self.get_adapter(request))
-        return json.dumps(jwt_token_dict)
+    def _build_jwt_response_from_access_token_response(self, request, response):
+        """ Builds the content of the response, including the JWT token. """
+        token_dict = json.loads(response.content.decode('utf-8'))
+        jwt = create_jwt_from_token(token_dict, self.get_adapter(request))
+        token_dict.update({
+            'access_token': jwt,
+            'token_type': 'JWT',
+        })
+        return json.dumps(token_dict)
 
 
 class AuthorizationView(_DispatchingView):
@@ -134,31 +124,9 @@ class AccessTokenExchangeView(_DispatchingView):
     """
     dot_view = auth_exchange_views.DOTAccessTokenExchangeView
 
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-        token_type = _get_token_type(request)
-
-        if response.status_code == 200 and token_type == 'jwt':
-            response.data = self._get_jwt_data_from_access_token_data(request, response)
-
-        return response
-
-    def _get_jwt_data_from_access_token_data(self, request, response):
-        """
-        Gets the JWT response data from the opaque token response data.
-
-        Includes the JWT token and token type in the response.
-        """
-        opaque_token_dict = response.data
-        jwt_token_dict = create_jwt_token_dict(opaque_token_dict, self.get_adapter(request))
-        return jwt_token_dict
-
 
 class RevokeTokenView(_DispatchingView):
     """
     Dispatch to the RevokeTokenView of django-oauth-toolkit
-
-    Note: JWT access tokens are non-revocable, but you could still revoke
-        its associated refresh_token.
     """
     dot_view = dot_views.RevokeTokenView

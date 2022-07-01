@@ -5,7 +5,6 @@ Signal handler for invalidating cached course overviews
 
 import logging
 
-from django.db import transaction
 from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 
@@ -93,11 +92,8 @@ def _check_for_cert_availability_date_changes(previous_course_overview, updated_
             f"{previous_course_overview.certificate_available_date} to " +
             f"{updated_course_overview.certificate_available_date}. Sending COURSE_CERT_DATE_CHANGE signal."
         )
-
-        def _send_course_cert_date_change_signal():
-            COURSE_CERT_DATE_CHANGE.send_robust(
-                sender=None,
-                course_key=updated_course_overview.id,
-            )
-
-        transaction.on_commit(_send_course_cert_date_change_signal)
+        COURSE_CERT_DATE_CHANGE.send_robust(
+            sender=None,
+            course_key=updated_course_overview.id,
+            available_date=updated_course_overview.certificate_available_date
+        )

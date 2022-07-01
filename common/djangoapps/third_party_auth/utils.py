@@ -3,66 +3,27 @@ Utility functions for third_party_auth
 """
 
 import datetime
-import logging
 from uuid import UUID
 
 import dateutil.parser
 import pytz
-import requests
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.utils.timezone import now
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomerUser
 from lxml import etree
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
-from requests import exceptions
 from social_core.pipeline.social_auth import associate_by_email
 
-from common.djangoapps.third_party_auth.models import OAuth2ProviderConfig, SAMLProviderData
+from common.djangoapps.third_party_auth.models import OAuth2ProviderConfig
 from openedx.core.djangolib.markup import Text
 
 from . import provider
 
 SAML_XML_NS = 'urn:oasis:names:tc:SAML:2.0:metadata'  # The SAML Metadata XML namespace
 
-log = logging.getLogger(__name__)
-
 
 class MetadataParseError(Exception):
     """ An error occurred while parsing the SAML metadata from an IdP """
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
-def fetch_metadata_xml(url):
-    """
-    Fetches IDP metadata from provider url
-    Returns: xml document
-    """
-    try:
-        log.info("Fetching %s", url)
-        if not url.lower().startswith('https'):
-            log.warning("This SAML metadata URL is not secure! It should use HTTPS. (%s)", url)
-        response = requests.get(url, verify=True)  # May raise HTTPError or SSLError or ConnectionError
-        response.raise_for_status()  # May raise an HTTPError
-
-        try:
-            parser = etree.XMLParser(remove_comments=True)
-            xml = etree.fromstring(response.content, parser)
-        except etree.XMLSyntaxError:  # lint-amnesty, pylint: disable=try-except-raise
-            raise
-        # TODO: Can use OneLogin_Saml2_Utils to validate signed XML if anyone is using that
-        return xml
-    except (exceptions.SSLError, exceptions.HTTPError, exceptions.RequestException, MetadataParseError) as error:
-        # Catch and process exception in case of errors during fetching and processing saml metadata.
-        # Here is a description of each exception.
-        # SSLError is raised in case of errors caused by SSL (e.g. SSL cer verification failure etc.)
-        # HTTPError is raised in case of unexpected status code (e.g. 500 error etc.)
-        # RequestException is the base exception for any request related error that "requests" lib raises.
-        # MetadataParseError is raised if there is error in the fetched meta data (e.g. missing @entityID etc.)
-        log.exception(str(error), exc_info=error)
-        raise error
-    except etree.XMLSyntaxError as error:
-        log.exception(str(error), exc_info=error)
-        raise error
 
 
 def parse_metadata_xml(xml, entity_id):
@@ -101,24 +62,18 @@ def parse_metadata_xml(xml, entity_id):
 
     # Now we just need to get the public_key and sso_url
     # We want the use='signing' cert, not the 'encryption' one
-    # There may be multiple signing certs returned by the server so create one record per signing cert found.
-    certs = sso_desc.findall("./{}[@use='signing']//{}".format(
+    public_key = sso_desc.findtext("./{}[@use='signing']//{}".format(
         etree.QName(SAML_XML_NS, "KeyDescriptor"), "{http://www.w3.org/2000/09/xmldsig#}X509Certificate"
     ))
-
-    if not certs:
+    if not public_key:
         # it's possible that there is just one keyDescription with no use attribute
         # that is a shortcut for both signing and encryption combined. So we can use that as fallback.
-        certs = sso_desc.findall("./{}//{}".format(
+        public_key = sso_desc.findtext("./{}//{}".format(
             etree.QName(SAML_XML_NS, "KeyDescriptor"), "{http://www.w3.org/2000/09/xmldsig#}X509Certificate"
         ))
-        if not certs:
+        if not public_key:
             raise MetadataParseError("Public Key missing. Expected an <X509Certificate>")
-
-    public_keys = []
-    for key in certs:
-        public_keys.append(key.text.replace(" ", ""))
-
+    public_key = public_key.replace(" ", "")
     binding_elements = sso_desc.iterfind("./{}".format(etree.QName(SAML_XML_NS, "SingleSignOnService")))
     sso_bindings = {element.get('Binding'): element.get('Location') for element in binding_elements}
     try:
@@ -126,7 +81,7 @@ def parse_metadata_xml(xml, entity_id):
         sso_url = sso_bindings['urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']
     except KeyError:
         raise MetadataParseError("Unable to find SSO URL with HTTP-Redirect binding.")  # lint-amnesty, pylint: disable=raise-missing-from
-    return public_keys, sso_url, expires_at
+    return public_key, sso_url, expires_at
 
 
 def user_exists(details):
@@ -168,33 +123,6 @@ def get_user_from_email(details):
         return User.objects.filter(email=email).first()
 
     return None
-
-
-def create_or_update_bulk_saml_provider_data(entity_id, public_keys, sso_url, expires_at):
-    """
-    Method to bulk update or create provider data entries
-    """
-    fetched_at = now()
-    new_records_created = False
-    # Create a data record for each of the public keys provided
-    for key in public_keys:
-        existing_data_objects = SAMLProviderData.objects.filter(public_key=key, entity_id=entity_id)
-        if len(existing_data_objects) > 1:
-            for obj in existing_data_objects:
-                obj.sso_url = sso_url
-                obj.expires_at = expires_at
-                obj.fetched_at = fetched_at
-            SAMLProviderData.objects.bulk_update(existing_data_objects, ['sso_url', 'expires_at', 'fetched_at'])
-            return True
-        else:
-            _, created = SAMLProviderData.objects.update_or_create(
-                public_key=key, entity_id=entity_id,
-                defaults={'sso_url': sso_url, 'expires_at': expires_at, 'fetched_at': fetched_at},
-            )
-        if created:
-            new_records_created = True
-
-    return new_records_created
 
 
 def convert_saml_slug_provider_id(provider):  # lint-amnesty, pylint: disable=redefined-outer-name

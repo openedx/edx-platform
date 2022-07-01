@@ -14,10 +14,9 @@ from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from edx_toggles.toggles.testutils import override_waffle_flag
-
-from lti_consumer.models import LtiConfiguration
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
+
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.learner_dashboard.config.waffle import ENABLE_PROGRAM_TAB_VIEW
 from lms.djangoapps.program_enrollments.rest_api.v1.tests.test_views import ProgramCacheMixin
@@ -30,7 +29,6 @@ from openedx.core.djangoapps.catalog.tests.factories import (
     ProgramFactory
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.programs.models import ProgramDiscussionsConfiguration
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
@@ -198,7 +196,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
 
 @skip_unless_lms
-@mock.patch(PROGRAMS_UTILS_MODULE + '.get_pathways')
+@mock.patch(PROGRAMS_MODULE + '.get_pathways')
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
 class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""
@@ -332,20 +330,6 @@ class TestProgramDetailsFragmentView(SharedModuleStoreTestCase, ProgramCacheMixi
         """
         Test if programTabViewEnabled and discussionFragment exist in html.
         """
-
-        discussion_config = ProgramDiscussionsConfiguration.objects.create(
-            program_uuid=self.program_uuid,
-            enabled=True,
-            provider_type="piazza",
-        )
-        discussion_config.lti_configuration = LtiConfiguration.objects.create(
-            config_store=LtiConfiguration.CONFIG_ON_DB,
-            lti_1p1_launch_url='http://test.url',
-            lti_1p1_client_key='test_client_key',
-            lti_1p1_client_secret='test_client_secret',
-        )
-        discussion_config.save()
-
         response = self.client.get(self.url)
         self.assertContains(response, 'programTabViewEnabled: true',)
-        self.assertContains(response, 'discussionFragment: {"configured": true, "iframe":')
+        self.assertContains(response, 'discussionFragment: {"configured": false, "iframe": ""')

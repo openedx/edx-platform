@@ -19,5 +19,3 @@ ENROLL_STATUS_CHANGE = Signal()
 
 # providing_args=["course_enrollment"]
 REFUND_ORDER = Signal()
-
-USER_EMAIL_CHANGED = Signal()

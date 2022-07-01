@@ -1,7 +1,6 @@
 """
 Implementation of "credit" XBlock service
 """
-from datetime import datetime, timedelta
 import logging
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -101,30 +100,11 @@ class CreditService:
         }
 
         if return_course_info:
-            try:
-                course_overview = CourseOverview.get_from_id(course_key)
-                result.update({
-                    'course_name': course_overview.display_name,
-                    'course_end_date': course_overview.end,
-                })
-            except CourseOverview.DoesNotExist:
-                # NOTE: Since the caller requested "return_course_info=True" and we don't have course to get that info.
-                # Also, The "get_credit_state" is called from several places directly or indirectly (Mostly from
-                # exams/grades services) which relatively depend upon course end date.
-                # As per the current structure of edX the exam attempts can exist without a course and they can request
-                # credit state so, the safest options would be to send some date/time in the past (One hour in past to
-                # be safe) so that those attempts can be marked or treated as expired/completed instead of any other
-                # status that could be error prone.
-
-                one_hour_past = datetime.now() - timedelta(hours=1)
-                result.update({
-                    'course_end_date': one_hour_past,
-                })
-                log.exception(
-                    "Could not get name and end_date for course %s, This happened because we were unable to "
-                    "get/create CourseOverview object for the course. It's possible that the Course has been deleted.",
-                    str(course_key),
-                )
+            course_overview = CourseOverview.get_from_id(course_key)
+            result.update({
+                'course_name': course_overview.display_name,
+                'course_end_date': course_overview.end,
+            })
         return result
 
     def set_credit_requirement_status(self, user_id, course_key_or_id, req_namespace,

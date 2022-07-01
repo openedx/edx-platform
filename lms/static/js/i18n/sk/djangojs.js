@@ -153,6 +153,7 @@
     "Deleted Group": "Zmazan\u00e1 skupina",
     "Deleting this %(item_display_name)s is permanent and cannot be undone.": "Odstr\u00e1nenie %(item_display_name)s je trval\u00e9 a nie je mo\u017en\u00e9 ho vr\u00e1ti\u0165 sp\u00e4\u0165.",
     "Description": "Popis",
+    "Details": "Podrobnosti",
     "Dimensions": "Rozmery",
     "Disc": "Disk",
     "Discard Changes": "Zahodi\u0165 zmeny",

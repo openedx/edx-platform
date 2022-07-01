@@ -8,7 +8,7 @@ import ddt
 import pytest
 import pytz
 from django import test
-from django.contrib.auth import models, REDIRECT_FIELD_NAME
+from django.contrib.auth import models
 from django.core import mail
 from social_django import models as social_models
 
@@ -655,52 +655,3 @@ class ParseQueryParamsPipelineTestCase(TestCase):
 
         with self.assertRaises(pipeline.AuthEntryError):
             pipeline.parse_query_params(self.strategy, self.response)
-
-
-class EnsureRedirectUrlIsSafeTestCase(TestCase):
-    """Tests to ensure that the redirect url is safe and user can redirect to it."""
-
-    def setUp(self):
-        super().setUp()
-
-        self.strategy = mock.MagicMock()
-        self.request = self.strategy.request
-
-        self.request.get_host.return_value = 'localhost:18000'
-        self.request.is_secure.return_value = True
-
-        self.strategy.session_get = self._session_get
-        self.strategy.session_set = self._session_set
-
-    def _session_get(self, key, default=None):
-        if key in self.strategy.session:
-            return self.strategy.session[key]
-
-        return default
-
-    def _session_set(self, key, value):
-        self.strategy.session[key] = value
-
-    @test.override_settings(SOCIAL_AUTH_LOGIN_REDIRECT_URL='dashboard_url')
-    def test_unsafe_redirect_url(self):
-        """
-        Test that if unsafe url is set as the redirect url then
-        redirect url is updated to SOCIAL_AUTH_LOGIN_REDIRECT_URL
-        """
-        self.strategy.session = {
-            REDIRECT_FIELD_NAME: 'https://evil.com',
-        }
-
-        pipeline.ensure_redirect_url_is_safe(self.strategy)
-        assert self.strategy.session[REDIRECT_FIELD_NAME] == 'dashboard_url'
-
-    @test.override_settings(LOGIN_REDIRECT_WHITELIST=['localhost:1991'])
-    def test_whitelisted_redirect_urls(self):
-        """
-        Test that redirect url remains same if its whitelisted
-        """
-        safe_redirect_url = 'https://localhost:1991/course'
-        self.strategy.session = {REDIRECT_FIELD_NAME: safe_redirect_url}
-
-        pipeline.ensure_redirect_url_is_safe(self.strategy)
-        assert self.strategy.session[REDIRECT_FIELD_NAME] == safe_redirect_url

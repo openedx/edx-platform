@@ -25,9 +25,9 @@ from openedx.core.djangolib.markup import HTML, Text
                             <p>
                                 <span class="bold">
                                     ${Text(_("For detailed information, see {math_link_start}Entering Mathematical and Scientific Expressions{math_link_end} in the {guide_link_start}edX Guide for Students{guide_link_end}.")).format(
-                                        math_link_start=HTML('<a href="https://edx.readthedocs.io/projects/open-edx-learner-guide/en/latest/completing_assignments/SFD_mathformatting.html"  target="_blank" >'),
+                                        math_link_start=HTML('<a href="https://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/completing_assignments/SFD_mathformatting.html#math-formatting">'),
                                         math_link_end=HTML('</a>'),
-                                        guide_link_start=HTML('<a href="https://edx.readthedocs.io/projects/open-edx-learner-guide/en/latest/index.html" target="_blank">'),
+                                        guide_link_start=HTML('<a href="https://edx-guide-for-students.readthedocs.io/en/latest/index.html">'),
                                         guide_link_end=HTML('</a>'),
                                     )}
                                 </span>
@@ -84,18 +84,20 @@ from openedx.core.djangolib.markup import HTML, Text
                                         <tr>
                                             ## Translators: This refers to symbols that are mathematical constants, such as "i" (square root of -1)
                                             <th scope="row">${_("Constants")}</th>
-                                            <td dir="auto">e, pi</td>
+                                            <td dir="auto">c, e, g, i, j, k, pi, q, T</td>
                                             <td dir="auto">
-                                                20*e<br />
-                                                418*pi
+                                                20*c<br />
+                                                418*T
                                             </td>
                                         </tr>
                                         <tr>
-                                            ## Translators: This refers to symbols that appear at the end of a number, such as the percent sign (%)
+                                            ## Translators: This refers to symbols that appear at the end of a number, such as the percent sign (%) and metric affixes
                                             <th scope="row">${_("Affixes")}</th>
-                                            <td dir="auto">${_("Percent sign (%)")}</td>
+                                            <td dir="auto">${_("Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)")}</td>
                                             <td dir="auto">
-                                                20%
+                                                20%<br />
+                                                20c<br />
+                                                418T
                                             </td>
                                         </tr>
                                         <tr>

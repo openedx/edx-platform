@@ -13,6 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.generation_handler import generate_certificate_task
 from lms.djangoapps.certificates.models import GeneratedCertificate
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -105,6 +106,10 @@ def _handle_course(course_key, batch_size, sleep_seconds, count):
     Returns how many certs were originally unverified and regenerated.
     """
 
+    if not is_integrity_signature_enabled(course_key):
+        log.warning(f'Skipping {course_key} which does not have honor code enabled')
+        return 0
+
     certs = GeneratedCertificate.objects.filter(
         course_id=course_key,
         status=CertificateStatuses.unverified,
@@ -112,7 +117,7 @@ def _handle_course(course_key, batch_size, sleep_seconds, count):
 
     log.info(f'Regenerating {len(certs)} unverified certificates for {course_key}')
 
-    return _regenerate_certs(certs, batch_size, sleep_seconds, count)
+    return _regenerate_certs(certs, batch_size, sleep_seconds, count, False)
 
 
 def _handle_all_courses(batch_size, sleep_seconds, excluded_keys):
@@ -125,18 +130,24 @@ def _handle_all_courses(batch_size, sleep_seconds, excluded_keys):
         .exclude(course_id__in=excluded_keys)
     log.info(f'Regenerating {len(certs)} unverified certificates in all courses except for excluded keys')
 
-    return _regenerate_certs(certs, batch_size, sleep_seconds, 0)
+    return _regenerate_certs(certs, batch_size, sleep_seconds, 0, True)
 
 
-def _regenerate_certs(certs, batch_size, sleep_seconds, count):
+def _regenerate_certs(certs, batch_size, sleep_seconds, count, check_integrity_signature_flag):
     """
     Triggers generate certificate task for a given set of certificates
     """
     for cert in certs:
-        user = User.objects.get(id=cert.user_id)
-        generate_certificate_task(user, cert.course_id, generation_mode='batch', delay_seconds=0)
-        count += 1
-        if count % batch_size == 0:
-            log.info(f'Regenerated {count} unverified certificates. Sleeping for {sleep_seconds} seconds.')
-            time.sleep(sleep_seconds)
+        # not ideal to replicate this check, but we have to in the case that we are regenerating certs for all courses.
+        if check_integrity_signature_flag and not is_integrity_signature_enabled(cert.course_id):
+            log.warning(
+                f'Skipping regenerating cert_id={cert.id} because {cert.course_id} does not have honor code enabled'
+            )
+        else:
+            user = User.objects.get(id=cert.user_id)
+            generate_certificate_task(user, cert.course_id, generation_mode='batch', delay_seconds=0)
+            count += 1
+            if count % batch_size == 0:
+                log.info(f'Regenerated {count} unverified certificates. Sleeping for {sleep_seconds} seconds.')
+                time.sleep(sleep_seconds)
     return count

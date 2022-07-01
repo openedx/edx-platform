@@ -239,7 +239,6 @@ class CourseDiscussionSettings(models.Model):
         help_text="Key/value store mapping discussion IDs to discussion XBlock usage keys.",
     )
     always_divide_inline_discussions = models.BooleanField(default=False)
-    reported_content_email_notifications = models.BooleanField(default=False)
     _divided_discussions = models.TextField(db_column='divided_discussions', null=True, blank=True)  # JSON list
 
     COHORT = 'cohort'
@@ -298,7 +297,6 @@ class CourseDiscussionSettings(models.Model):
             'division_scheme': (str,)[0],
             'always_divide_inline_discussions': bool,
             'divided_discussions': list,
-            'reported_content_email_notifications': bool,
         }
         for field, field_type in fields.items():
             if field in validated_data:

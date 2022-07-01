@@ -315,12 +315,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         self._verify_response(response, expect_code, expect_data)
 
     def test_user_mappings_only_return_requested_idp_mapping_by_provider_id(self):
-        testshib2 = self.configure_saml_provider(
-            name='TestShib2',
-            enabled=True,
-            slug='testshib2',
-            entity_id='entity-id-user-mapping'
-        )
+        testshib2 = self.configure_saml_provider(name='TestShib2', enabled=True, slug='testshib2')
         username = 'testshib2user'
         user = UserFactory.create(
             username=username,

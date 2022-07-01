@@ -1,11 +1,14 @@
 """
 Django admin configuration pages for the user_api app
 """
+
+
+from django.conf.urls import url
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import path, reverse
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext as _
 
@@ -86,9 +89,11 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
         """
         urls = super().get_urls()
         custom_urls = [
-            path('<path:retirement_id>/cancel_retirement/', self.admin_site.admin_view(self.cancel_retirement),
-                 name='cancel-retirement',
-                 ),
+            url(
+                r'^(?P<retirement_id>.+)/cancel_retirement/$',
+                self.admin_site.admin_view(self.cancel_retirement),
+                name='cancel-retirement',
+            ),
         ]
         return custom_urls + urls
 

@@ -26,12 +26,7 @@ from rest_framework.serializers import Serializer
 
 from lms.djangoapps.courseware.courses import get_course, get_course_with_access
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.course_groups.models import (
-    CohortAssignmentNotAllowed,
-    CohortChangeNotAllowed,
-    CohortMembership,
-)
-from openedx.core.djangoapps.course_groups.permissions import IsStaffOrAdmin
+from openedx.core.djangoapps.course_groups.models import CohortMembership
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from common.djangoapps.student.auth import has_course_author_access
@@ -325,7 +320,6 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
     unknown = []
     preassigned = []
     invalid = []
-    not_allowed = []
     for username_or_email in split_by_comma_and_whitespace(users):
         if not username_or_email:
             continue
@@ -351,8 +345,6 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
             invalid.append(username_or_email)
         except ValueError:
             present.append(username_or_email)
-        except (CohortAssignmentNotAllowed, CohortChangeNotAllowed):
-            not_allowed.append(username_or_email)
 
     return json_http_response({'success': True,
                                'added': added,
@@ -360,8 +352,7 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
                                'present': present,
                                'unknown': unknown,
                                'preassigned': preassigned,
-                               'invalid': invalid,
-                               'not_allowed': not_allowed})
+                               'invalid': invalid})
 
 
 @ensure_csrf_cookie
@@ -440,7 +431,7 @@ class APIPermissions(GenericAPIView):
         BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = (permissions.IsAuthenticated, IsStaffOrAdmin)
+    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
     serializer_class = Serializer
 
 
@@ -510,13 +501,11 @@ class CohortHandler(DeveloperErrorViewMixin, APIPermissions):
             * user_partition_id: The integer identified of the UserPartition.
             * group_id: The integer identified of the specific group in the partition.
     """
-    queryset = []
-
     def get(self, request, course_key_string, cohort_id=None):
         """
         Endpoint to get either one or all cohorts.
         """
-        course_key, course = _get_course_with_access(request, course_key_string, 'load')
+        course_key, course = _get_course_with_access(request, course_key_string)
         if not cohort_id:
             all_cohorts = cohorts.get_course_cohorts(course)
             paginator = NamespacedPageNumberPagination()

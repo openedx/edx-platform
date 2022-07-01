@@ -21,7 +21,7 @@ from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
-from openedx.core.djangoapps.user_authn.utils import check_pwned_password, is_registration_api_v1 as is_api_v1
+from openedx.core.djangoapps.user_authn.utils import is_registration_api_v1 as is_api_v1
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from common.djangoapps.student.models import (
@@ -238,16 +238,6 @@ class AccountCreationForm(forms.Form):
             email = self.cleaned_data.get('email')
             temp_user = User(username=username, email=email) if username else None
             validate_password(password, temp_user)
-
-            if settings.ENABLE_AUTHN_REGISTER_HIBP_POLICY:
-                # Checks the Pwned Databases for password vulnerability.
-                pwned_response = check_pwned_password(password)
-
-                if (
-                    pwned_response.get('vulnerability', 'no') == 'yes' and
-                    pwned_response.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
-                ):
-                    raise ValidationError(accounts.AUTHN_PASSWORD_COMPROMISED_MSG)
         return password
 
     def clean_email(self):

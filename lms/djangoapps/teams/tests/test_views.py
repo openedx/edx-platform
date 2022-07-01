@@ -2831,7 +2831,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
 
     def test_create_membership_via_upload(self):
         self.create_and_enroll_student(username='a_user')
-        csv_content = 'username,mode,topic_0\n'
+        csv_content = 'user,mode,topic_0\n'
         csv_content += 'a_user,audit,team wind power'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
@@ -2847,7 +2847,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
 
     def test_upload_invalid_teamset(self):
         self.create_and_enroll_student(username='a_user')
-        csv_content = 'username,mode,topic_0_bad\n'
+        csv_content = 'user,mode,topic_0_bad\n'
         csv_content += 'a_user,audit,team wind power'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
@@ -2860,7 +2860,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         )
 
     def test_upload_assign_user_twice_to_same_teamset(self):
-        csv_content = 'username,mode,topic_0\n'
+        csv_content = 'user,mode,topic_0\n'
         csv_content += 'student_enrolled, masters, team wind power'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
@@ -2875,7 +2875,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         self.create_and_enroll_student(username='a_user')
         self.create_and_enroll_student(username='b_user')
         self.create_and_enroll_student(username='c_user')
-        csv_content = 'username,mode,topic_0,topic_1,topic_2\n'
+        csv_content = 'user,mode,topic_0,topic_1,topic_2\n'
         csv_content += 'a_user,audit,team wind power,team 2\n'
         csv_content += 'b_user,audit,,team 2\n'
         csv_content += 'c_user,audit,,,team 3'
@@ -2893,7 +2893,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         assert response_text['message'] == '3 learners were affected.'
 
     def test_upload_non_existing_user(self):
-        csv_content = 'username,mode,topic_0\n'
+        csv_content = 'user,mode,topic_0\n'
         csv_content += 'missing_user, masters, team wind power'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
@@ -2919,7 +2919,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             organization_protected=True
         )
 
-        csv_content = 'username,mode,topic_1,topic_2\n'
+        csv_content = 'user,mode,topic_1,topic_2\n'
         csv_content += 'a_user,masters,{},{}\n'.format(
             existing_team_1.name,
             existing_team_2.name
@@ -2953,7 +2953,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
 
     def test_upload_invalid_more_teams_than_teamsets(self):
         self.create_and_enroll_student(username='a_user')
-        csv_content = 'username,mode,topic_1\n'
+        csv_content = 'user,mode,topic_1\n'
         csv_content += 'a_user, masters, team wind power, extra1, extra2'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
@@ -2967,7 +2967,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
 
     def test_upload_invalid_student_enrollment_mismatch(self):
         self.create_and_enroll_student(username='a_user', mode=CourseMode.AUDIT)
-        csv_content = 'username,mode,topic_1\n'
+        csv_content = 'user,mode,topic_1\n'
         csv_content += 'a_user,masters,team wind power'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
@@ -2986,7 +2986,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         self.create_and_enroll_student(username=masters_username_a, mode=CourseMode.MASTERS)
         self.create_and_enroll_student(username=masters_username_b, mode=CourseMode.MASTERS)
 
-        csv_content = 'username,mode,topic_1\n'
+        csv_content = 'user,mode,topic_1\n'
         csv_content += f'{audit_username},audit,team wind power\n'
         csv_content += f'{masters_username_a},masters,team wind power\n'
         csv_content += f'{masters_username_b},masters,team wind power\n'
@@ -3003,7 +3003,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         assert response_text['errors'][0] == expected_error
 
     def test_upload_learners_exceed_max_team_size(self):
-        csv_content = 'username,mode,topic_0,topic_1\n'
+        csv_content = 'user,mode,topic_0,topic_1\n'
         team1 = 'team wind power'
         team2 = 'team 2'
         for name_enum in enumerate(['a', 'b', 'c', 'd', 'e', 'f', 'g']):
@@ -3029,7 +3029,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         topic_0_id = 'topic_0'
         assert CourseTeamMembership.objects.filter(user_id=self.users[username].id, team__topic_id=topic_0_id).exists()
 
-        csv_content = f'username,mode,{topic_0_id},topic_1\n'
+        csv_content = f'user,mode,{topic_0_id},topic_1\n'
         csv_content += f'{username},audit'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
@@ -3052,7 +3052,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         windpower_team_name = 'team wind power'
         assert CourseTeamMembership.objects \
             .filter(user_id=self.users[username].id, team__topic_id=topic_0_id, team__name=windpower_team_name).exists()
-        csv_content = f'username,mode,{topic_0_id}\n'
+        csv_content = f'user,mode,{topic_0_id}\n'
         csv_content += f'{username},audit,{nuclear_team_name}'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
@@ -3082,7 +3082,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         topic_0_id = 'topic_0'
         nuclear_team_name = 'team wind power'
         assert len(CourseTeamMembership.objects.filter(user_id=self.users[username].id, team__topic_id=topic_0_id)) == 1
-        csv_content = f'username,mode,{topic_0_id}\n'
+        csv_content = f'user,mode,{topic_0_id}\n'
         csv_content += f'{username},audit,{nuclear_team_name}'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(
@@ -3106,8 +3106,8 @@ class TestBulkMembershipManagement(TeamAPITestCase):
 
     def test_create_membership_via_upload_using_external_key(self):
         self.create_and_enroll_student(username='a_user', external_key='a_user_external_key')
-        csv_content = 'username,external_user_id,mode,topic_0\n'
-        csv_content += 'a_user,a_user_external_key,audit,team wind power'
+        csv_content = 'user,mode,topic_0\n'
+        csv_content += 'a_user_external_key,audit,team wind power'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         response = self.make_call(
@@ -3120,11 +3120,10 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         response_text = json.loads(response.content.decode('utf-8'))
         assert response_text['message'] == '1 learners were affected.'
 
-    @unittest.skip("This currently won't fail since we're only using username")
     def test_create_membership_via_upload_using_external_key_invalid(self):
         self.create_and_enroll_student(username='a_user', external_key='a_user_external_key')
-        csv_content = 'username,external_user_id,mode,topic_0\n'
-        csv_content += 'a_user,a_user_external_key_invalid,audit,team wind power'
+        csv_content = 'user,mode,topic_0\n'
+        csv_content += 'a_user_external_key_invalid,audit,team wind power'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         response = self.make_call(
@@ -3138,7 +3137,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         assert response_text['errors'] == ['User name/email/external key: a_user_external_key_invalid does not exist.']
 
     def test_upload_non_ascii(self):
-        csv_content = 'username,mode,topic_0\n'
+        csv_content = 'user,mode,topic_0\n'
         team_name = '著文企臺個'
         user_name = '著著文企臺個文企臺個'
         self.create_and_enroll_student(username=user_name)
@@ -3163,7 +3162,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         masters_a = 'masters_a'
         team = self.wind_team
         self.create_and_enroll_student(username=masters_a, mode=CourseMode.MASTERS)
-        csv_content = f'username,mode,{team.topic_id}\n'
+        csv_content = f'user,mode,{team.topic_id}\n'
         csv_content += f'masters_a, masters,{team.name}'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)

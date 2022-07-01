@@ -8,7 +8,6 @@ from itertools import chain
 from urllib.parse import quote
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 
@@ -236,23 +235,3 @@ class IDVerificationService:
         if course_id:
             location += f'?course_id={quote(str(course_id))}'
         return location
-
-    @classmethod
-    def get_verification_details_by_id(cls, attempt_id):
-        """
-        Returns a verification attempt object by attempt_id
-        If the verification object cannot be found, returns None
-        """
-        verification = None
-        verification_models = [
-            SoftwareSecurePhotoVerification,
-            SSOVerification,
-            ManualVerification,
-        ]
-        for ver_model in verification_models:
-            if not verification:
-                try:
-                    verification = ver_model.objects.get(id=attempt_id)
-                except ObjectDoesNotExist:
-                    pass
-        return verification

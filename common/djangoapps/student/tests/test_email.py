@@ -15,6 +15,7 @@ from django.test import TransactionTestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from common.djangoapps.student.email_helpers import generate_proctoring_requirements_email_context
@@ -29,8 +30,11 @@ from common.djangoapps.student.views import (
 )
 from common.djangoapps.third_party_auth.views import inactive_user_view
 from common.djangoapps.util.testing import EventTestMixin
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
+from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE, is_integrity_signature_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -124,6 +128,12 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
 
     @ddt.data('plain_text', 'html')
     def test_activation_email(self, test_body_type):
+        self._create_account()
+        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS, test_body_type)
+
+    @with_comprehensive_theme("edx.org")
+    @ddt.data('plain_text', 'html')
+    def test_activation_email_edx_domain(self, test_body_type):
         self._create_account()
         self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS, test_body_type)
 
@@ -229,6 +239,7 @@ class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCas
         send_proctoring_requirements_email(context)
         self._assert_email()
 
+    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, active=True)
     def test_send_proctoring_requirements_email_honor(self):
         self.course = CourseFactory(
             display_name='honor code on course',
@@ -250,10 +261,13 @@ class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCas
 
         assert message.subject == f"Proctoring requirements for {self.course.display_name}"
 
-        appears = self._get_fragments()
+        appears, does_not_appear = self._get_fragments()
         for fragment in appears:
             self.assertIn(fragment, text)
             self.assertIn(fragment, html)
+        for fragment in does_not_appear:
+            self.assertNotIn(fragment, text)
+            self.assertNotIn(fragment, html)
 
     def _get_fragments(self):
         """
@@ -261,6 +275,7 @@ class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCas
         """
         course_module = modulestore().get_course(self.course.id)
         proctoring_provider = capwords(course_module.proctoring_provider.replace('_', ' '))
+        id_verification_url = IDVerificationService.get_verify_location()
         fragments = [
             (
                 "You are enrolled in {} at {}. This course contains proctored exams.".format(
@@ -279,7 +294,14 @@ class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCas
             ),
             settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('faq', ''),
         ]
-        return fragments
+        idv_fragments = [
+            escape("Before taking a graded proctored exam, you must have approved ID verification photos."),
+            id_verification_url,
+        ]
+        if not is_integrity_signature_enabled(self.course.id):
+            fragments.extend(idv_fragments)
+            return (fragments, [])
+        return (fragments, idv_fragments)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
@@ -562,7 +584,6 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'CONTACT': '/help/contact-us'})
-    @patch('common.djangoapps.student.signals.signals.USER_EMAIL_CHANGED.send')
     @ddt.data(
         ('plain_text', False),
         ('plain_text', True),
@@ -570,10 +591,9 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         ('html', True)
     )
     @ddt.unpack
-    def test_successful_email_change(self, test_body_type, test_marketing_enabled, mock_email_change_signal):
+    def test_successful_email_change(self, test_body_type, test_marketing_enabled):
         with patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': test_marketing_enabled}):
             self.assertChangeEmailSent(test_body_type)
-            assert mock_email_change_signal.called
 
         meta = json.loads(UserProfile.objects.get(user=self.user).meta)
         assert 'old_emails' in meta

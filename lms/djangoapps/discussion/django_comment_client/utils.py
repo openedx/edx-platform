@@ -35,14 +35,13 @@ from openedx.core.djangoapps.discussions.utils import (
     get_group_names_by_id,
     has_required_keys,
 )
-import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_STUDENT,
     CourseDiscussionSettings,
     DiscussionsIdMapping,
-    Role,
-    FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR)
+    Role
+)
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
@@ -145,40 +144,6 @@ def is_user_community_ta(user, course_id):
     Boolean operation to check whether a user's role is Community TA or not
     """
     return has_forum_access(user, course_id, FORUM_ROLE_COMMUNITY_TA)
-
-
-def get_users_with_roles(roles, course_id):
-    """
-    Get all users with specified roles for a course
-    """
-    users_with_roles = [
-        user
-        for role in Role.objects.filter(
-            name__in=roles,
-            course_id=course_id
-        )
-        for user in role.users.all()
-    ]
-    return users_with_roles
-
-
-def get_users_with_moderator_roles(context):
-    """
-    Get all users within the course with moderator roles
-    """
-    moderators = get_users_with_roles([FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR,
-                                       FORUM_ROLE_COMMUNITY_TA], context['course_id'])
-
-    context_thread = cc.Thread.find(context['thread_id'])
-    if getattr(context_thread, 'group_id', None) is not None:
-        group_moderators = get_users_with_roles([FORUM_ROLE_GROUP_MODERATOR], context['course_id'])
-        course_discussion_settings = CourseDiscussionSettings.get(context['course_id'])
-        moderators_in_group = [user for user in group_moderators if get_group_id_for_user(
-            user, course_discussion_settings) == context_thread.group_id]
-        moderators += moderators_in_group
-
-    moderators = set(moderators)
-    return moderators
 
 
 def get_discussion_id_map_entry(xblock):
@@ -746,10 +711,7 @@ def add_courseware_context(content_list, course, user, id_map=None):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def prepare_content(
-    content, course_key, is_staff=False, is_community_ta=False,
-    discussion_division_enabled=None, group_names_by_id=None
-):
+def prepare_content(content, course_key, is_staff=False, discussion_division_enabled=None, group_names_by_id=None):
     """
     This function is used to pre-process thread and comment models in various
     ways before adding them to the HTTP response.  This includes fixing empty
@@ -763,7 +725,6 @@ def prepare_content(
         content (dict): A thread or comment.
         course_key (CourseKey): The course key of the course.
         is_staff (bool): Whether the user is a staff member.
-        is_community_ta (bool): Whether the user is a TA (community or grpup community TA).
         discussion_division_enabled (bool): Whether division of course discussions is enabled.
            Note that callers of this method do not need to provide this value (it defaults to None)--
            it is calculated and then passed to recursive calls of this method.
@@ -777,17 +738,11 @@ def prepare_content(
         'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers',
         'stats', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
-        'endorsement', 'context', 'last_activity_at', 'username', 'user_id'
+        'endorsement', 'context', 'last_activity_at'
     ]
 
-    is_anonymous = content.get('anonymous')
-    is_anonymous_to_peers = content.get('anonymous_to_peers')
-    # is_staff is true for both staff and TAs, is_user_staff will be true for staff members only
-    is_user_staff = is_staff and not is_community_ta
-
-    if is_anonymous or (is_anonymous_to_peers and not is_user_staff):
-        fields.remove('username')
-        fields.remove('user_id')
+    if (content.get('anonymous') is False) and ((content.get('anonymous_to_peers') is False) or is_staff):
+        fields += ['username', 'user_id']
 
     content = strip_none(extract(content, fields))
 
@@ -827,7 +782,6 @@ def prepare_content(
                     child,
                     course_key,
                     is_staff,
-                    is_community_ta,
                     discussion_division_enabled=discussion_division_enabled,
                     group_names_by_id=group_names_by_id
                 )

@@ -22,7 +22,7 @@ class IndividualStudentOverrideProvider(FieldOverrideProvider):
         return get_override_for_user(self.user, block, name, default)
 
     @classmethod
-    def enabled_for(cls, course):  # pylint: disable=arguments-differ
+    def enabled_for(cls, course):
         """This simple override provider is always enabled"""
         return True
 

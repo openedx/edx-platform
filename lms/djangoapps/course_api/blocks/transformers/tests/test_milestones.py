@@ -177,7 +177,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
             self.user,
         )
 
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(6):
             self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS_EXCEPT_SPECIAL)
 
     def test_staff_access(self):

@@ -1,5 +1,5 @@
 """
-Functions that are used to modify XBlock fragments for use in the LMS and Studio
+Functions that can are used to modify XBlock fragments for use in the LMS and Studio
 """
 
 
@@ -32,10 +32,8 @@ from xmodule.seq_module import SequenceBlock  # lint-amnesty, pylint: disable=wr
 from xmodule.util.xmodule_django import add_webpack_to_fragment  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.vertical_block import VerticalBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import (  # lint-amnesty, pylint: disable=wrong-import-order
-    PREVIEW_VIEWS,
-    STUDENT_VIEW,
-    STUDIO_VIEW,
-    shim_xmodule_js
+    PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW,
+    XModule, XModuleDescriptor, shim_xmodule_js,
 )
 
 log = logging.getLogger(__name__)
@@ -116,7 +114,7 @@ def wrap_xblock(
     if view == STUDENT_VIEW and getattr(block, 'HIDDEN', False):
         css_classes.append('is-hidden')
 
-    if getattr(block, 'uses_xmodule_styles_setup', False):
+    if isinstance(block, (XModule, XModuleDescriptor)) or getattr(block, 'uses_xmodule_styles_setup', False):
         if view in PREVIEW_VIEWS:
             # The block is acting as an XModule
             css_classes.append('xmodule_display')
@@ -125,6 +123,10 @@ def wrap_xblock(
             css_classes.append('xmodule_edit')
 
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
+
+    if isinstance(block, (XModule, XModuleDescriptor)):
+        data['type'] = block.js_module_name
+        shim_xmodule_js(frag, block.js_module_name)
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
@@ -152,6 +154,10 @@ def wrap_xblock(
         template_context['js_init_parameters'] = frag.json_init_args
     else:
         template_context['js_init_parameters'] = ""
+
+    if isinstance(block, (XModule, XModuleDescriptor)):
+        # Add the webpackified asset tags
+        add_webpack_to_fragment(frag, class_name)
 
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
@@ -225,6 +231,48 @@ def wrap_xblock_aside(
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
 
+def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, context):  # pylint: disable=unused-argument
+    """
+    This will replace a link between courseware in the format
+    /jump_to_id/<id> with a URL for a page that will correctly redirect
+    This is similar to replace_course_urls, but much more flexible and
+    durable for Studio authored courses. See more comments in static_replace.replace_jump_to_urls
+
+    course_id: The course_id in which this rewrite happens
+    jump_to_id_base_url:
+        A app-tier (e.g. LMS) absolute path to the base of the handler that will perform the
+        redirect. e.g. /courses/<org>/<course>/<run>/jump_to_id. NOTE the <id> will be appended to
+        the end of this URL at re-write time
+
+    output: a new :class:`~web_fragments.fragment.Fragment` that modifies `frag` with
+        content that has been update with /jump_to_id links replaced
+    """
+    return wrap_fragment(frag, static_replace.replace_jump_to_id_urls(frag.content, course_id, jump_to_id_base_url))
+
+
+def replace_course_urls(course_id, block, view, frag, context):  # pylint: disable=unused-argument
+    """
+    Updates the supplied module with a new get_html function that wraps
+    the old get_html function and substitutes urls of the form /course/...
+    with urls that are /courses/<course_id>/...
+    """
+    return wrap_fragment(frag, static_replace.replace_course_urls(frag.content, course_id))
+
+
+def replace_static_urls(data_dir, block, view, frag, context, course_id=None, static_asset_path=''):  # pylint: disable=unused-argument
+    """
+    Updates the supplied module with a new get_html function that wraps
+    the old get_html function and substitutes urls of the form /static/...
+    with urls that are /static/<prefix>/...
+    """
+    return wrap_fragment(frag, static_replace.replace_static_urls(
+        frag.content,
+        data_dir,
+        course_id,
+        static_asset_path=static_asset_path
+    ))
+
+
 def grade_histogram(module_id):
     '''
     Print out a histogram of grades on a given problem in staff member debug info.
@@ -288,9 +336,9 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
         histogram = None
         render_histogram = False
 
-    if settings.FEATURES.get('ENABLE_LMS_MIGRATION') and hasattr(block.runtime, 'resources_fs'):
+    if settings.FEATURES.get('ENABLE_LMS_MIGRATION') and hasattr(block.runtime, 'filestore'):
         [filepath, filename] = getattr(block, 'xml_attributes', {}).get('filename', ['', None])
-        osfs = block.runtime.resources_fs
+        osfs = block.runtime.filestore
         if filename is not None and osfs.exists(filename):
             # if original, unmangled filename exists then use it (github
             # doesn't like symlinks)
@@ -513,27 +561,3 @@ def get_icon(block):
     It can be overridden by setting `OVERRIDE_GET_UNIT_ICON` to an alternative implementation.
     """
     return block.get_icon_class()
-
-
-def get_css_dependencies(group):
-    """
-    Returns list of CSS dependencies belonging to `group` in settings.PIPELINE['STYLESHEETS'].
-
-    Respects `PIPELINE['PIPELINE_ENABLED']` setting.
-    """
-    if settings.PIPELINE['PIPELINE_ENABLED']:
-        return [settings.PIPELINE['STYLESHEETS'][group]['output_filename']]
-    else:
-        return settings.PIPELINE['STYLESHEETS'][group]['source_filenames']
-
-
-def get_js_dependencies(group):
-    """
-    Returns list of JS dependencies belonging to `group` in settings.PIPELINE['JAVASCRIPT'].
-
-    Respects `PIPELINE['PIPELINE_ENABLED']` setting.
-    """
-    if settings.PIPELINE['PIPELINE_ENABLED']:
-        return [settings.PIPELINE['JAVASCRIPT'][group]['output_filename']]
-    else:
-        return settings.PIPELINE['JAVASCRIPT'][group]['source_filenames']

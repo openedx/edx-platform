@@ -15,94 +15,39 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.urls import reverse
 from django.utils.functional import cached_property
+from edx_rest_api_client.exceptions import SlumberBaseException
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
-from requests.exceptions import RequestException
-from xmodule.modulestore.django import modulestore
+from requests.exceptions import ConnectionError, Timeout  # lint-amnesty, pylint: disable=redefined-builtin
 
 from common.djangoapps.course_modes.api import get_paid_modes_for_course
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.api import get_active_entitlement_list_for_user
 from common.djangoapps.entitlements.models import CourseEntitlement
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.api import get_programs_by_type
-from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import (
     get_fulfillable_course_runs_for_entitlement,
-    get_pathways,
     get_programs,
 )
-from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_records_url
+from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.core.djangoapps.enrollments.api import get_enrollments
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.date_utils import strftime_localized
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
 
 log = logging.getLogger(__name__)
-
-
-def get_program_and_course_data(site, user, program_uuid, mobile_only=False):
-    """Returns program and course data associated with the given user."""
-    course_data = {}
-    meter = ProgramProgressMeter(site, user, uuid=program_uuid)
-    program_data = meter.programs[0]
-    if program_data:
-        program_data = ProgramDataExtender(program_data, user, mobile_only=mobile_only).extend()
-        course_data = meter.progress(programs=[program_data], count_only=False)[0]
-    return program_data, course_data
-
-
-def get_program_urls(program_data):
-    """Returns important urls of program."""
-    from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
-    program_uuid = program_data.get('uuid')
-    skus = program_data.get('skus')
-    ecommerce_service = EcommerceService()
-
-    # TODO: Don't have business logic of course-certificate==record-available here in LMS.
-    # Eventually, the UI should ask Credentials if there is a record available and get a URL from it.
-    # But this is here for now so that we can gate this URL behind both this business logic and
-    # a waffle flag. This feature is in active developoment.
-    program_record_url = get_credentials_records_url(program_uuid=program_uuid)
-    urls = {
-        'program_listing_url': reverse('program_listing_view'),
-        'track_selection_url': strip_course_id(
-            reverse('course_modes_choose', kwargs={'course_id': FAKE_COURSE_KEY})
-        ),
-        'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
-        'buy_button_url': ecommerce_service.get_checkout_page_url(*skus),
-        'program_record_url': program_record_url,
-    }
-    return urls
-
-
-def get_industry_and_credit_pathways(program_data, site):
-    """Returns pathways of a program."""
-    industry_pathways = []
-    credit_pathways = []
-    try:
-        for pathway_id in program_data['pathway_ids']:
-            pathway = get_pathways(site, pathway_id)
-            if pathway and pathway['email']:
-                if pathway['pathway_type'] == PathwayType.CREDIT.value:
-                    credit_pathways.append(pathway)
-                elif pathway['pathway_type'] == PathwayType.INDUSTRY.value:
-                    industry_pathways.append(pathway)
-    # if pathway caching did not complete fully (no pathway_ids)
-    except KeyError:
-        pass
-
-    return industry_pathways, credit_pathways
 
 
 def get_program_marketing_url(programs_config, mobile_only=False):
@@ -151,7 +96,7 @@ class ProgramProgressMeter:
             will only inspect this one program, not all programs the user may be
             engaged with.
     """
-    def __init__(self, site, user, enrollments=None, uuid=None, mobile_only=False, include_course_entitlements=True):
+    def __init__(self, site, user, enrollments=None, uuid=None, mobile_only=False):
         self.site = site
         self.user = user
         self.mobile_only = mobile_only
@@ -171,10 +116,8 @@ class ProgramProgressMeter:
             # We can't use dict.keys() for this because the course run ids need to be ordered
             self.course_run_ids.append(enrollment_id)
 
-        self.course_uuids = []
-        if include_course_entitlements:
-            self.entitlements = list(CourseEntitlement.unexpired_entitlements_for_user(self.user))
-            self.course_uuids = [str(entitlement.course_uuid) for entitlement in self.entitlements]
+        self.entitlements = list(CourseEntitlement.unexpired_entitlements_for_user(self.user))
+        self.course_uuids = [str(entitlement.course_uuid) for entitlement in self.entitlements]
 
         if uuid:
             self.programs = [get_programs(uuid=uuid)]
@@ -755,27 +698,24 @@ class ProgramDataExtender:
                     api_user = service_user
                     is_anonymous = True
 
-                api_client = get_ecommerce_api_client(api_user)
-                api_url = urljoin(f"{get_ecommerce_api_base_url()}/", "baskets/calculate/")
+                api = ecommerce_api_client(api_user)
 
                 # The user specific program price is slow to calculate, so use switch to force the
                 # anonymous price for all users. See LEARNER-5555 for more details.
                 if is_anonymous or ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.is_enabled():
                     # The bundle uuid is necessary to see the program's discounted price
                     if bundle_uuid:
-                        params = dict(sku=skus, is_anonymous=True, bundle=bundle_uuid)
+                        discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True, bundle=bundle_uuid)
                     else:
-                        params = dict(sku=skus, is_anonymous=True)
+                        discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True)
                 else:
                     if bundle_uuid:
-                        params = dict(
+                        discount_data = api.baskets.calculate.get(
                             sku=skus, username=self.user.username, bundle=bundle_uuid
                         )
                     else:
-                        params = dict(sku=skus, username=self.user.username)
-                response = api_client.get(api_url, params=params)
-                response.raise_for_status()
-                discount_data = response.json()
+                        discount_data = api.baskets.calculate.get(sku=skus, username=self.user.username)
+
                 program_discounted_price = discount_data['total_incl_tax']
                 program_full_price = discount_data['total_incl_tax_excl_discounts']
                 discount_data['is_discounted'] = program_discounted_price < program_full_price
@@ -786,7 +726,7 @@ class ProgramDataExtender:
                     'full_program_price': discount_data['total_incl_tax'],
                     'variant': bundle_variant
                 })
-            except RequestException:
+            except (ConnectionError, SlumberBaseException, Timeout):
                 log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
                 self.data.update({
                     'discount_data': {'is_discounted': False}

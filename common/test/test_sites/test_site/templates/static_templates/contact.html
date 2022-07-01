@@ -1,0 +1,67 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.urls import reverse
+
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%block name="title"><title>${_("Contact {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</title></%block>
+
+<section class="container about">
+  <nav>
+    <a href="${reverse('about_edx')}">${_("Vision")}</a>
+    <a href="${reverse('faq_edx')}">${_("Faq")}</a>
+    <a href="${reverse('press')}">${_("Press")}</a>
+    <a href="${reverse('contact')}" class="active">${_("Contact")}</a>
+  </nav>
+
+  <section class="contact">
+    <div class="photo">
+      <img src="${static.url('images/contact-page.jpg')}">
+    </div>
+    <div class="contacts">
+      <h2>${_("Class Feedback")}</h2>
+      <p>${_("We are always seeking feedback to improve our courses. If you are an enrolled student and have any questions, feedback, suggestions, or any other issues specific to a particular class, please post on the discussion forums of that class.")}</p>
+
+      <h2>${_("General Inquiries and Feedback")}</h2>
+      <p>${Text(_('If you have a general question about {platform_name} please email {email}. To see if your question has already been answered, visit our {faq_link_start}FAQ page{faq_link_end}. You can also join the discussion on our {fb_link_start}facebook page{fb_link_end}. Though we may not have a chance to respond to every email, we take all feedback into consideration.')).format(
+          platform_name=settings.PLATFORM_NAME,
+          email=HTML('<a href="mailto:{contact_email}">{contact_email}</a>').format(contact_email=settings.CONTACT_EMAIL),
+          faq_link_start=HTML('<a href="{url}">').format(url=reverse('faq_edx')),
+          faq_link_end=HTML('</a>'),
+          fb_link_start=HTML('<a href="http://www.facebook.com/EdxOnline">'),
+          fb_link_end=HTML('</a>')
+        )}</p>
+
+      <h2>${_("Technical Inquiries and Feedback")}</h2>
+      <p>${Text(_('If you have suggestions/feedback about the overall {platform_name} platform, or are facing general technical issues with the platform (e.g., issues with email addresses and passwords), you can reach us at {tech_email}. For technical questions, please make sure you are using a current version of Firefox or Chrome, and include browser and version in your e-mail, as well as screenshots or other pertinent details. If you find a bug or other issues, you can reach us at the following: {bug_email}.')).format(
+        platform_name=settings.PLATFORM_NAME,
+        tech_email=HTML('<a href="mailto:{tech_support_email}">{tech_support_email}</a>').format(tech_support_email=settings.TECH_SUPPORT_EMAIL),
+        bug_email=HTML('<a href="mailto:{bugs_email}">{bugs_email}</a>').format(bugs_email=settings.BUGS_EMAIL)
+      )}</p>
+
+      <h2>${_("Media")}</h2>
+      <p>${Text(_('Please visit our {link_start}media/press page{link_end} for more information. For any media or press inquiries, please email {email}.')).format(
+        link_start=HTML('<a href="{url}">').format(url=reverse('faq_edx')),
+        link_end=HTML('</a>'),
+        email=HTML('<a href="mailto:{email}">{email}</a>').format(email="press@edx.org"),
+        )}</p>
+
+      <h2>${_("Universities")}</h2>
+      <p>${Text(_('If you are a university wishing to collaborate or you have questions about {platform_name}, please email {email}.')).format(
+          platform_name="edX",
+          email=HTML('<a href="mailto:{email}">{email}</a>').format(
+            email="university@edx.org"
+          )
+        )}</p>
+
+      <h2>${_("Accessibility")}</h2>
+      <p>${Text(_('{platform_name} strives to create an innovative online-learning platform that promotes accessibility for everyone, including students with disabilities. We are dedicated to improving the accessibility of the platform and welcome your comments or questions at {email}.')).format(
+          platform_name="EdX", email=HTML('<a href="mailto:{email}">{email}</a>').format(email="accessibility@edx.org"))}</p>
+    </div>
+  </section>
+</section>
+

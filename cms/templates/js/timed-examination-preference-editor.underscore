@@ -2,19 +2,19 @@
     <h3 class="modal-section-title"><%- gettext('Set as a Special Exam') %></h3>
     <div class="modal-section-content has-actions">
         <div class="list-fields list-input exam-types" role="group" aria-label="<%- gettext('Exam Types') %>">
-            <% if (proctoredExamLockedIn && !isProctoredExam) { %>
+            <% if (specialExamLockedIn && !isSpecialExam) { %>
                 <div class="summary-message summary-message-warning">
                     <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
                     <p class="copy">
-                        <%- gettext("This subsection was released to learners as a proctored exam, but was reverted back to a basic or timed exam. You may not configure it as a proctored exam now. Contact edX Support for assistance.") %>
+                        <%- gettext("This subsection was released to learners as a special exam, but was reverted back to a basic exam. You may not configure it as a special exam now. Contact edX Support for assistance.") %>
                     </p>
                 </div>
             <% } %>
-            <% if (proctoredExamLockedIn && isProctoredExam) { %>
+            <% if (specialExamLockedIn && isSpecialExam) { %>
                 <div class="summary-message summary-message-warning">
                     <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
                     <p class="copy">
-                        <%- gettext("This proctored exam has been released to learners. You may not convert it to another type of special exam. You may revert this subsection back to being a basic exam by selecting 'None', or a timed exam, but you will NOT be able to configure it as a proctored exam in the future.") %>
+                        <%- gettext("This special exam has been released to learners. You may not convert it to another type of special exam. You may revert this subsection back to being a basic exam by selecting 'None', but you will NOT be able to configure it as a special exam in the future.") %>
                     </p>
                 </div>
             <% } %>
@@ -25,6 +25,7 @@
             <label class="label">
                 <input type="radio" name="exam_type" class="input input-radio timed_exam"
                     aria-describedby="timed-exam-description" 
+                    <%- specialExamLockedIn && !isTimedExam ? 'disabled' : '' %>
                 />
                 <%- gettext('Timed') %>
             </label>
@@ -33,7 +34,7 @@
                 <label class="label">
                     <input type="radio" name="exam_type" class="input input-radio proctored_exam"
                         aria-describedby="proctored-exam-description"
-                        <%- proctoredExamLockedIn && (!isProctoredExam || isOnboardingExam) ? 'disabled' : '' %>
+                        <%- specialExamLockedIn && (!isProctoredExam || isOnboardingExam) ? 'disabled' : '' %>
                     />
                     <%- gettext('Proctored') %>
                 </label>
@@ -44,7 +45,7 @@
                     <label class="label">
                         <input type="radio" name="exam_type" class="input input-radio onboarding_exam"
                             aria-describedby="onboarding-exam-description"
-                            <%- proctoredExamLockedIn && !isOnboardingExam ? 'disabled' : '' %>
+                            <%- specialExamLockedIn && !isOnboardingExam ? 'disabled' : '' %>
                         />
                         <%- gettext('Onboarding') %>
                     </label>
@@ -53,7 +54,7 @@
                     <label class="label">
                         <input type="radio" name="exam_type" class="input input-radio practice_exam"
                             aria-describedby="practice-exam-description"
-                            <%- proctoredExamLockedIn && !isPracticeExam ? 'disabled' : '' %>
+                            <%- specialExamLockedIn && !isPracticeExam ? 'disabled' : '' %>
                         />
                         <%- gettext('Practice Proctored') %>
                     </label>

@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -11,7 +11,6 @@
 # baris <brscvs@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
-# Dilek E, 2022
 # Emrah Emirtekin <eemirtekin@gmail.com>, 2014-2015
 # emreusta <emreusta7@gmail.com>, 2014
 # Erdoğan Şahin, 2016
@@ -31,7 +30,7 @@
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -56,9 +55,9 @@
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/).
-# Copyright (C) 2022 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2022.
+# EdX Team <info@edx.org>, 2021.
 #
 # Translators:
 # Pelin Çılgın <pelincilgin@hotmail.com>, 2019
@@ -67,7 +66,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -86,7 +85,7 @@
 # sevde <savda95@hotmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
-# Copyright (C) 2022 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -108,9 +107,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-12 20:43+0000\n"
-"PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2018,2020-2021\n"
+"POT-Creation-Date: 2021-12-26 20:42+0000\n"
+"PO-Revision-Date: 2021-11-07 20:44+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
@@ -368,11 +367,11 @@ msgstr "Son kütüphane içeriğiyle güncelleniyor"
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
 msgid "Loading..."
-msgstr ""
+msgstr "Yüklüyor..."
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
 msgid "Selected blocks"
-msgstr ""
+msgstr "Seçili blocklar"
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Unable to update settings"
@@ -2087,7 +2086,7 @@ msgstr "Yukarı git"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Browsing"
-msgstr ""
+msgstr "Göz atılıyor"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
@@ -2643,19 +2642,19 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
-msgstr ""
+msgstr "Ayrıntılar"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "the more quickly and helpfully we can respond!"
-msgstr ""
+msgstr "o kadar hızlı ve yardımcı bir şekilde yanıt verebiliriz!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
-msgstr ""
+msgstr "Destek Talebi Oluştur"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr ""
+msgstr "Sana nasıl yardımcı olabiliriz, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2665,7 +2664,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Need help logging in?"
-msgstr ""
+msgstr "Oturum açmak için yardıma mı ihtiyacınız var?"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -3158,7 +3157,6 @@ msgid "Markdown Editing Help"
 msgstr "Markdown İşaretleme Dili Yardımı"
 
 #: lms/static/js/Markdown.Editor.js cms/templates/js/asset-library.underscore
-#: cms/templates/js/metadata-option-public-access.underscore
 msgid "URL"
 msgstr "URL"
 
@@ -3559,47 +3557,53 @@ msgstr "edX'i herkes için daha iyi bir hale getirmemize yardım edin!"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Why does edX collect this information?"
-msgstr ""
+msgstr "edX neden bu bilgiyi topluyor?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "An error occurred while attempting to retrieve or save the information "
 "below. Please try again later."
 msgstr ""
+"Aşağıdaki bilgiyi çekmeye ya da kaydetmeye çalışırken bir hata gerçekleşti. "
+"Bir süre sonra lütfen tekrar deneyin."
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What was the total combined income, during the last 12 months, of all "
 "members of your family? "
-msgstr ""
+msgstr "Tüm aile üyelerinizin son 12 aylık toplam geliri, ne kadardı?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
 "National Guard?"
 msgstr ""
+"Bugüne dek ABD Ordusu, Yedek Kuvvetler ya da Ulusal Muhafızlarda hizmet "
+"ettiniz mi?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What is the highest level of education that you have achieved so far?"
-msgstr ""
+msgstr "Şimdiye kadar ulaştığınız en yüksek eğitim seviyesi nedir?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What is the highest level of education that any of your parents or guardians"
 " have achieved?"
 msgstr ""
+"Ebeveyn ya da velilerinizin şimdiye kadar ulaştığı en yüksek eğitim seviyesi"
+" nedir?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select employment status"
-msgstr ""
+msgstr "Meslek durumunu seçin"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you currently work in?"
-msgstr ""
+msgstr "Şu anda hangi sektörde çalışıyorsunuz?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you want to work in?"
-msgstr ""
+msgstr "Gelecekte hangi sektörde çalışmak istiyorsunuz?"
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -3615,19 +3619,19 @@ msgstr "anketi kapat"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "finish later"
-msgstr ""
+msgstr "sonra tamamla"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Return to my dashboard"
-msgstr ""
+msgstr "Panelime geri dön"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Finish later"
-msgstr ""
+msgstr "Sonra tamamla"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "next page"
-msgstr ""
+msgstr "sonraki sayfa"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -3942,6 +3946,38 @@ msgstr "Topluluklar Etkin"
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Disabled"
 msgstr "Topluluklar Devre Dışı"
+
+#: lms/static/js/groups/views/verified_track_settings_notification.js
+msgid ""
+"This course uses automatic cohorting for verified track learners. You cannot"
+" disable cohorts, and you cannot rename the manual cohort named "
+"'{verifiedCohortName}'. To change the configuration for verified track "
+"cohorts, contact your edX partner manager."
+msgstr ""
+"Bu ders, doğrulanmış kayıt yolu öğrencileri için topluluklara otomatik "
+"atamayı kullanır. Toplulukları devre dışı bırakamazsınız ve "
+"'{verifiedCohortName}' adlı elle oluşturulmuş topluluğu yeniden "
+"adlandıramazsınız. Doğrulanmış kayıt yolu topluluklarının yapılandırmasını "
+"değiştirmek için edX iş ortağı yöneticinizle iletişime geçin. "
+
+#: lms/static/js/groups/views/verified_track_settings_notification.js
+msgid ""
+"This course has automatic cohorting enabled for verified track learners, but"
+" the required cohort does not exist. You must create a manually-assigned "
+"cohort named '{verifiedCohortName}' for the feature to work."
+msgstr ""
+"Bu ders, doğrulanmış kayıt yolu öğrencileri için topluluklara otomatik "
+"atamayı kullanır ancak gerekli topluluk tanımlanmış değil. Bu özelliğin "
+"çalışması için '{verifiedCohortName}' adlı topluluğu elle oluşturmalısınız."
+
+#: lms/static/js/groups/views/verified_track_settings_notification.js
+msgid ""
+"This course has automatic cohorting enabled for verified track learners, but"
+" cohorts are disabled. You must enable cohorts for the feature to work."
+msgstr ""
+"Bu ders, doğrulanmış kayıt yolu öğrencileri için topluluklara otomatik "
+"atamayı kullanır ancak topluluk özelliği devre dışı bırakılmış. Bu özelliğin"
+" çalışması için toplulukları etkinleştirmelisiniz."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -5617,6 +5653,38 @@ msgstr "Toplam Skor"
 msgid "Bookmark this page"
 msgstr "Bu sayfaya yer imi koy"
 
+#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
+msgid "Thank you for setting your course goal to {goal}!"
+msgstr "Ders hedefinizi {goal} olarak belirlediğiniz için teşekkür ederiz!"
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "You have successfully updated your goal."
+msgstr "Hedefinizi başarıyla güncellediniz."
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "There was an error updating your goal."
+msgstr "Hedefinizi güncellerken bir hata gerçekleşti."
+
+#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "Tümünü Aç"
+
+#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "Tümünü Kapa"
+
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "Daha Fazla Göster"
+
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "Daha Az Göster"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result found for \"{search_term}\""
 msgid_plural "{total_results} results found for \"{search_term}\""
@@ -5915,24 +5983,25 @@ msgstr "Yüklemede bir sorun oluştu"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr ""
+msgstr "Kurum:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr ""
+msgstr "Ders Numarası:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr ""
+msgstr "Ders Yayını:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr ""
+msgstr "(Salt-okunur)"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
-msgstr ""
+msgstr "Dersi Yeniden Çalıştır"
 
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Canlı Görüntüle"
@@ -7268,11 +7337,6 @@ msgstr "Eylemler"
 msgid "Unscheduled"
 msgstr "Planlanmamış"
 
-#: cms/templates/js/discussion-editor.underscore
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Discussion"
-msgstr "Forum"
-
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -7509,6 +7573,10 @@ msgid "follow this post"
 msgstr "bu iletiyi takip et"
 
 #: common/static/common/templates/discussion/templates.underscore
+msgid "post anonymously"
+msgstr "isimsiz olarak ileti yolla"
+
+#: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously to classmates"
 msgstr "sınıf arkadaşlarına anonim olarak ileti gönder"
 
@@ -7573,6 +7641,10 @@ msgstr ""
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"
 msgstr "Soru"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "Discussion"
+msgstr "Forum"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Endorse"
@@ -7965,14 +8037,6 @@ msgid "This catalog's courses:"
 msgstr "Bu katalogdaki dersler:"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "Tümünü Aç"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "Tümünü Kapa"
-
-#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Başlama Tarihi"
 
@@ -8056,14 +8120,6 @@ msgid ""
 msgstr ""
 "Problemlerden kredi almak için, \"Sınavımı Bitir\"i seçmeden önce her "
 "problem için \"Gönder\"e tıklamalısınız."
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr "Daha Fazla Göster"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr "Daha Az Göster"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
@@ -8705,6 +8761,15 @@ msgstr "Kutlarız!"
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr "Program Yolculuğunuz"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid ""
+"To complete the program, you must earn a verified certificate for each "
+"course."
+msgstr ""
+"Programı tamamlamak için, tüm derslerde onaylı sertifikaya hak "
+"kazanmalısınız."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -10400,10 +10465,6 @@ msgstr "Tarih"
 msgid "Post"
 msgstr "Gönderi"
 
-#: cms/templates/js/discussion-editor.underscore
-msgid "Enable discussion"
-msgstr ""
-
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
 msgstr "Bitiş Tarihi:"
@@ -10631,7 +10692,6 @@ msgstr "Yeni %(item_type)s"
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
-#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear"
 msgstr "Temizle"
@@ -10641,7 +10701,6 @@ msgstr "Temizle"
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
-#: cms/templates/js/metadata-option-public-access.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Değeri Temizle"
@@ -10887,6 +10946,23 @@ msgstr "Değerlendirme sonuçlarını altbölümün son tarihi geçince göster"
 #: cms/templates/js/show-correctness-editor.underscore
 msgid ""
 "Learners do not see whether their answers to assessments were correct or "
+"incorrect, nor the score received, until after the course end date has "
+"passed."
+msgstr ""
+"Öğrenciler değerlendirmedeki cevaplarının doğru ya da yanlış olup "
+"olmadığını, hatta aldıkları notu dersin bitiş tarihine dek göremezler."
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"If the course does not have an end date, learners always see their scores "
+"when they submit answers to assessments."
+msgstr ""
+"Bir dersin son tarihi yoksa, öğrenciler cevaplarını değerlendirmeye "
+"gönderdiğinde notlarını görürler."
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"Learners do not see whether their answers to assessments were correct or "
 "incorrect, nor the score received, until after the due date for the "
 "subsection has passed."
 msgstr ""
@@ -11041,18 +11117,25 @@ msgstr "Sınav Türleri"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This subsection was released to learners as a proctored exam, but was "
-"reverted back to a basic or timed exam. You may not configure it as a "
-"proctored exam now. Contact edX Support for assistance."
+"This subsection was released to learners as a special exam, but was reverted"
+" back to a basic exam. You may not configure it as a special exam now. "
+"Contact edX Support for assistance."
 msgstr ""
+"Bu alt bölüm öğrencilere özel bir sınav olarak yayınlandı, ancak basit sınav"
+" ayarlarına geri döndürüldü. Artık bunu özel bir sınav olarak "
+"yapılandıramazsınız. Yardım için edX Destek ile iletişime geçin. "
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
-"This proctored exam has been released to learners. You may not convert it to"
-" another type of special exam. You may revert this subsection back to being "
-"a basic exam by selecting 'None', or a timed exam, but you will NOT be able "
-"to configure it as a proctored exam in the future."
+"This special exam has been released to learners. You may not convert it to "
+"another type of special exam. You may revert this subsection back to being a"
+" basic exam by selecting 'None', but you will NOT be able to configure it as"
+" a special exam in the future."
 msgstr ""
+"Bu özel sınav öğrencilere sunulmuştur. Başka bir tür özel sınava "
+"dönüştüremezsiniz. \"None\" ayarını seçerek bu alt bölümü basit sınav haline"
+" geri döndürebilirsiniz, ancak ileride bunu özel bir sınav olarak "
+"yapılandıramazsınız. "
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"

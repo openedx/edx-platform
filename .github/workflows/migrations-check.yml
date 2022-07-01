@@ -1,4 +1,4 @@
-name: Migrations check on MySql 57
+name: Migrations check
 
 on:
   workflow_dispatch:

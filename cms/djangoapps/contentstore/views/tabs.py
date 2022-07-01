@@ -19,7 +19,7 @@ from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException, StaticT
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
-from ..utils import get_lms_link_for_item, get_pages_and_resources_url
+from ..utils import get_lms_link_for_item
 
 __all__ = ["tabs_handler", "update_tabs_handler"]
 
@@ -61,10 +61,10 @@ def tabs_handler(request, course_key_string):
             return JsonResponse()
 
     elif request.method == "GET":  # assume html
-        # get all tabs from the tabs list: static tabs (a.k.a. user-created tabs) and built-in tabs
+        # get all tabs from the tabs list and select only static tabs (a.k.a. user-created tabs)
         # present in the same order they are displayed in LMS
 
-        tabs_to_render = list(get_course_tabs(course_item, request.user))
+        tabs_to_render = list(get_course_static_tabs(course_item, request.user))
 
         return render_to_response(
             "edit-tabs.html",
@@ -78,9 +78,9 @@ def tabs_handler(request, course_key_string):
         return HttpResponseNotFound()
 
 
-def get_course_tabs(course_item: CourseBlock, user: User) -> Iterable[CourseTab]:
+def get_course_static_tabs(course_item: CourseBlock, user: User) -> Iterable[CourseTab]:
     """
-    Yields all the course tabs in a course including hidden tabs.
+    Yields all the static tabs in a course including hidden tabs.
 
     Args:
         course_item (CourseBlock): The course object from which to get the tabs
@@ -90,14 +90,12 @@ def get_course_tabs(course_item: CourseBlock, user: User) -> Iterable[CourseTab]
         Iterable[CourseTab]: An iterable containing course tab objects from the
         course
     """
-    pages_and_resources_mfe_enabled = bool(get_pages_and_resources_url(course_item.id))
+
     for tab in CourseTabList.iterate_displayable(course_item, user=user, inline_collections=False, include_hidden=True):
         if isinstance(tab, StaticTab):
             # static tab needs its locator information to render itself as an xmodule
             static_tab_loc = course_item.id.make_usage_key("static_tab", tab.url_slug)
             tab.locator = static_tab_loc
-        # If the course apps MFE is set up and pages and resources is enabled, then only show static tabs
-        if isinstance(tab, StaticTab) or not pages_and_resources_mfe_enabled:
             yield tab
 
 
@@ -121,7 +119,7 @@ def update_tabs_handler(course_item: CourseBlock, tabs_data: Dict, user: User) -
 
 def reorder_tabs_handler(course_item, tabs_data, user):
     """
-    Helper function for handling reorder of tabs request
+    Helper function for handling reorder of static tabs request
     """
 
     # Static tabs are identified by locators (a UsageKey) instead of a tab id like
@@ -154,8 +152,9 @@ def create_new_list(tab_locators, old_tab_list):
         tab = get_tab_by_tab_id_locator(old_tab_list, tab_locator)
         if tab is None:
             raise ValidationError({"error": f"Tab with id_locator '{tab_locator}' does not exist."})
-        if isinstance(tab, StaticTab):
-            new_tab_list.append(tab)
+        if not isinstance(tab, StaticTab):
+            raise ValidationError({"error": f"Cannot reorder tabs of type '{tab.type}'"})
+        new_tab_list.append(tab)
 
     # the old_tab_list may contain additional tabs that were not rendered in the UI because of
     # global or course settings.  so add those to the end of the list.
@@ -221,8 +220,8 @@ def get_tab_by_locator(tab_list: List[CourseTab], tab_location: Union[str, Usage
 
 def validate_args(num, tab_type):
     "Throws for the disallowed cases."
-    if num < 1:
-        raise ValueError('Tab 1 cannot be edited')
+    if num <= 1:
+        raise ValueError('Tabs 1 and 2 cannot be edited')
     if tab_type == 'static_tab':
         raise ValueError('Tabs of type static_tab cannot be edited here (use Studio)')
 

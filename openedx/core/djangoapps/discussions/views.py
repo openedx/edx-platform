@@ -11,7 +11,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lms.djangoapps.discussion.toggles import ENABLE_NEW_STRUCTURE_DISCUSSIONS
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import validate_course_key
@@ -180,8 +180,8 @@ class DiscussionsProvidersView(APIView):
             hidden_providers.append(Provider.LEGACY)
         else:
             # If this is a new course, or some other provider is selected, the new provider
-            # should only show up if the new structure for in context discussions flag is enabled
-            if not ENABLE_NEW_STRUCTURE_DISCUSSIONS.is_enabled(course_key):
+            # should only show up if the MFE is enabled
+            if not ENABLE_DISCUSSIONS_MFE.is_enabled(course_key):
                 hidden_providers.append(Provider.OPEN_EDX)
         serializer = DiscussionsProvidersSerializer(
             {

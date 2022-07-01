@@ -33,7 +33,6 @@ class DeveloperErrorResponseException(Exception):
     it does not need to be recreated when returning a response.
     Intended to be used with and by DeveloperErrorViewMixin.
     """
-
     def __init__(self, response):
         super().__init__()
         self.response = response
@@ -175,7 +174,7 @@ def build_api_error(message, **kwargs):
     Args:
         message (string): The string to use for developer and user messages.
             The user message will be translated, but for this to work message
-            must have already been scraped. gettext_noop is useful for this.
+            must have already been scraped. ugettext_noop is useful for this.
         **kwargs: format parameters for message
     """
     return {
@@ -189,7 +188,6 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
 
     Like DRF's RetrieveUpdateAPIView, but without PUT and with automatic validation errors in the edX format.
     """
-
     def get(self, request, *args, **kwargs):
         """Retrieves the specified resource using the RetrieveModelMixin."""
         return self.retrieve(request, *args, **kwargs)
@@ -247,7 +245,6 @@ class LazySequence(Sequence):
     It is immutable, and accepts an estimated length in order to support __len__
     without exhausting the underlying sequence
     """
-
     def __init__(self, iterable, est_len=None):
         self.iterable = iterable
         self.est_len = est_len

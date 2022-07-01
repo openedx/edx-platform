@@ -24,7 +24,6 @@ from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
-from lms.djangoapps.bulk_email.messages import ACEEmail
 from lms.djangoapps.bulk_email.tasks import _get_course_email_context, _get_source_address
 from lms.djangoapps.instructor_task.subtasks import update_subtask_status
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
@@ -177,57 +176,25 @@ class LocalizedFromAddressPlatformLangTestCase(SendEmailWithMockedUgettextMixin,
     """
     Tests to ensure that the bulk email has the "From" address localized according to LANGUAGE_CODE.
     """
-    @ddt.data(
-        ('en', True, False),
-        ('eo', True, False),
-        ('en', True, True),
-        ('eo', True, True),
-    )
-    @ddt.unpack
-    def test_english_platform(self, language_code, enable_use_corse_id_in_from, ace_enabled):
+    @override_settings(LANGUAGE_CODE='en', EMAIL_USE_COURSE_ID_FROM_FOR_BULK=True)
+    def test_english_platform(self):
         """
         Ensures that the source-code language (English) works well.
         """
         assert self.course.language is None
         # Sanity check
-        with override_settings(
-            LANGUAGE_CODE=language_code,
-            EMAIL_USE_COURSE_ID_FROM_FOR_BULK=enable_use_corse_id_in_from,
-            BULK_EMAIL_SEND_USING_EDX_ACE=ace_enabled
-        ):
-            message = self.send_email()
-            self.assertRegex(message.from_email, f'{language_code.upper()} .* Course Staff')
+        message = self.send_email()
+        self.assertRegex(message.from_email, '.*Course Staff.*')
 
-
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
-@ddt.ddt
-class AceEmailTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardTestCase):
-    """
-    Tests to ensure that the bulk email is sent using edx-ace when BULK_EMAIL_SEND_USING_EDX_ACE toggle is enabled.
-    """
-    @ddt.data(
-        (True, True),
-        (False, False),
-    )
-    @ddt.unpack
-    @patch.object(ACEEmail, 'send')
-    def test_ace_eanbled_toggle(self, ace_enabled, email_sent_with_ace, mock_ace_email_send):
+    @override_settings(LANGUAGE_CODE='eo', EMAIL_USE_COURSE_ID_FROM_FOR_BULK=True)
+    def test_esperanto_platform(self):
         """
-        Ensures that the email message is sent via edx-ace when BULK_EMAIL_SEND_USING_EDX_ACE toggle is enabled.
+        Tests the fake Esperanto language to ensure proper gettext calls.
         """
-        mock_ace_email_send.return_value = None
-        test_email = {
-            'action': 'Send email',
-            'send_to': '["myself"]',
-            'subject': 'test subject for myself',
-            'message': 'test message for myself'
-        }
-
-        with override_settings(
-            BULK_EMAIL_SEND_USING_EDX_ACE=ace_enabled
-        ):
-            response = self.client.post(self.send_mail_url, test_email)
-            self.assertEqual(email_sent_with_ace, mock_ace_email_send.called)
+        assert self.course.language is None
+        # Sanity check
+        message = self.send_email()
+        self.assertRegex(message.from_email, 'EO .* Course Staff')
 
 
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})

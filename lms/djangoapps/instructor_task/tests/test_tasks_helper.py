@@ -371,7 +371,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 4, 47),
-        (ModuleStoreEnum.Type.split, 2, 48),
+        (ModuleStoreEnum.Type.split, 3, 47),
     )
     @ddt.unpack
     def test_query_counts(self, store_type, mongo_count, expected_query_count):
@@ -2080,7 +2080,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 0,
             'skipped': 2
         }
-        with self.assertNumQueries(61):
+        with self.assertNumQueries(83):
             self.assertCertificatesGenerated(task_input, expected_results)
 
     @ddt.data(

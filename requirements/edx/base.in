@@ -36,7 +36,7 @@ botocore==1.8.17                    # via boto3, s3transfer
 bridgekeeper                        # Used for determining permissions for courseware.
 celery                              # Asynchronous task execution library
 chem                                # A helper library for chemistry calculations
-codejail-includes                   # CodeJail manages execution of untrusted code in secure sandboxes.
+confluent_kafka
 contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
 crowdsourcehinter-xblock
 cryptography                        # Implementations of assorted cryptography algorithms
@@ -69,7 +69,6 @@ django-user-tasks
 django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework
-docopt
 done-xblock
 edx-ace
 edx-api-doc-tools
@@ -81,12 +80,11 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
-edx-django-utils>=5.0.0            # Utilities for cache, monitoring, and plugins
+edx-django-utils>=4.0.0            # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
 edx-enterprise
 edx-milestones
 edx-name-affirmation
-edx-opaque-keys
 edx-organizations
 edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
@@ -99,7 +97,8 @@ edx-user-state-client
 edx-when
 edxval
 event-tracking
-fs
+fastavro
+fs==2.0.18
 fs-s3fs==0.1.8
 geoip2                              # Python API for the GeoIP web services and databases
 glob2                               # Enhanced glob module, used in openedx.core.lib.rooted_paths
@@ -111,8 +110,7 @@ ipaddress                           # Ip network support for Embargo feature
 jsonfield                           # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 lxml                                # XML parser
-learner-pathway-progress==1.0.1     # A plugin for lms to track learners progress in pathays
-lti-consumer-xblock>=4.1.1
+lti-consumer-xblock
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
@@ -125,8 +123,7 @@ oauthlib                            # OAuth specification support for authentica
 openedx-calc                        # Library supporting mathematical calculations for Open edX
 openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
-ora2>=4.4.0
-path
+ora2
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
 py2neo                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
@@ -139,6 +136,7 @@ pyjwkest
 PyJWT>=1.6.3
 pylti1p3                            # Required by content_libraries core library to suport LTI 1.3 launches
 pymongo                             # MongoDB driver
+PyNaCl                              # User-friendly cryptography (wrapper and bindings for libsodium)
 pynliner                            # Inlines CSS styles into HTML for email notifications
 python-dateutil
 python-Levenshtein
@@ -166,7 +164,6 @@ staff-graded-xblock                 # An XBlock that allows for off-site bulk sc
 super-csv                           # Generic CSV processor
 unicodecsv                          # Easier support for CSV files with unicode text
 user-util                           # Functionality for retiring users (GDPR compliance)
-webob
 web-fragments                       # Provides the ability to render fragments of web pages
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock

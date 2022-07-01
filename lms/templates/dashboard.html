@@ -209,22 +209,18 @@ from common.djangoapps.student.models import CourseEnrollment
                 cert_status = cert_statuses.get(session_id)
                 can_refund_entitlement = entitlement and entitlement.is_entitlement_refundable()
                 partner_managed_enrollment = enrollment.mode == 'masters'
-                # checks if we can unenroll based on the value of partner_managed_enrollment
-                can_unenroll_partner_managed_enrollment = False if partner_managed_enrollment else (not cert_status)
-                # checks if we can unenroll based on the value of unfulfilled_entitlement
-                can_unenroll_unfulfilled_entitlement = cert_status.get('can_unenroll') if cert_status and not unfulfilled_entitlement else False
-                # compares the three different parameters by which we can unenroll
-                can_unenroll = (can_unenroll_partner_managed_enrollment or can_unenroll_unfulfilled_entitlement) and not disable_unenrollment
+                can_unenroll = False if partner_managed_enrollment else (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
                 credit_status = credit_statuses.get(session_id)
                 course_mode_info = all_course_modes.get(session_id)
                 is_paid_course = True if entitlement else (session_id in enrolled_courses_either_paid)
                 is_course_voucher_refundable = (session_id in enrolled_courses_voucher_refundable)
+                course_verification_status = verification_status_by_course.get(session_id, {})
                 course_requirements = courses_requirements_not_met.get(session_id)
                 related_programs = inverted_programs.get(six.text_type(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
                 show_consent_link = (session_id in consent_required_courses)
                 resume_button_url = resume_button_urls[dashboard_index]
               %>
-              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, enrollments_fbe_is_on=enrollments_fbe_is_on, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_voucher_refundable=is_course_voucher_refundable, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url, partner_managed_enrollment=partner_managed_enrollment' />
+              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_voucher_refundable=is_course_voucher_refundable, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url, partner_managed_enrollment=partner_managed_enrollment' />
             % endfor
             % if show_load_all_courses_link:
                 <br/>
@@ -305,6 +301,20 @@ from common.djangoapps.student.models import CourseEnrollment
           <%include file='dashboard/_dashboard_announcements.html' />
         % endif
 
+        % if display_sidebar_on_dashboard:
+          <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
+            <header class="profile">
+              <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
+            </header>
+            <div class="user-info">
+              <ul>
+
+                <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
+
+              </ul>
+            </div>
+          </div>
+        % endif
       </div>
     </div>
 </main>

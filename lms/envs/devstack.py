@@ -19,6 +19,7 @@ from .production import *  # pylint: disable=wildcard-import, unused-wildcard-im
 
 # Don't use S3 in devstack, fall back to filesystem
 del DEFAULT_FILE_STORAGE
+MEDIA_ROOT = "/edx/var/edxapp/uploads"
 ORA2_FILEUPLOAD_BACKEND = 'django'
 
 
@@ -109,10 +110,12 @@ DEBUG_TOOLBAR_CONFIG = {
 
 def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing-function-docstring
     # We always want the toolbar on devstack unless running tests from another Docker container
-    hostname = request.get_host()
-    if hostname.startswith('edx.devstack.lms:') or hostname.startswith('lms.devstack.edx:'):
-        return False
-    return True
+    # Alway return False
+    return False
+    # hostname = request.get_host()
+    # if hostname.startswith('edx.devstack.lms:') or hostname.startswith('lms.devstack.edx:'):
+    #     return False
+    # return True
 
 ########################### PIPELINE #################################
 
@@ -162,13 +165,21 @@ FEATURES['LICENSING'] = True
 
 
 ########################## Courseware Search #######################
-FEATURES['ENABLE_COURSEWARE_SEARCH'] = False
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF'] = True
 SEARCH_ENGINE = 'search.elastic.ElasticSearchEngine'
+ELASTIC_SEARCH_CONFIG = [
+    {
+        'use_ssl': False,
+        'host': '13.214.22.79',
+        'port': 9201
+    }
+]
+
 
 
 ########################## Dashboard Search #######################
-FEATURES['ENABLE_DASHBOARD_SEARCH'] = False
+FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
 
 
 ########################## Certificates Web/HTML View #######################
@@ -252,12 +263,6 @@ ENTERPRISE_LEARNER_PORTAL_BASE_URL = 'http://' + ENTERPRISE_LEARNER_PORTAL_NETLO
 ENTERPRISE_ADMIN_PORTAL_NETLOC = 'localhost:1991'
 ENTERPRISE_ADMIN_PORTAL_BASE_URL = 'http://' + ENTERPRISE_ADMIN_PORTAL_NETLOC
 
-########################## GRADEBOOK APP ##############################
-WRITABLE_GRADEBOOK_URL = 'http://localhost:1994'
-
-########################## ORA STAFF GRADING APP ##############################
-ORA_GRADING_MICROFRONTEND_URL = 'http://localhost:1993'
-
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
@@ -330,20 +335,8 @@ REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (
 OPENAPI_CACHE_TIMEOUT = 0
 
 #####################################################################
-# set replica set of contentstore to none as we haven't setup any for lms in devstack
-CONTENTSTORE['DOC_STORE_CONFIG']['replicaSet'] = None
-
-#####################################################################
-# set replica sets of moduelstore to none as we haven't setup any for lms in devstack
-for store in MODULESTORE['default']['OPTIONS']['stores']:
-    if 'DOC_STORE_CONFIG' in store and 'replicaSet' in store['DOC_STORE_CONFIG']:
-        store['DOC_STORE_CONFIG']['replicaSet'] = None
-
-
-#####################################################################
 # Lastly, run any migrations, if needed.
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
-
 
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
@@ -353,21 +346,19 @@ EDXNOTES_CLIENT_NAME = 'edx_notes_api-backend-service'
 ############## Settings for Microfrontends  #########################
 LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
 ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
-COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
 
-################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
-DISCUSSIONS_MFE_FEEDBACK_URL = None
-
 ############## Docker based devstack settings #######################
 
 FEATURES.update({
     'AUTOMATIC_AUTH_FOR_TESTING': True,
-    'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_DISCUSSION_SERVICE': False,
+    'ENABLE_DISCUSSION_HOME_PANEL': False,
+    'WIKI_ENABLED': False,
     'SHOW_HEADER_LANGUAGE_SELECTOR': True,
 
     # Enable enterprise integration by default.
@@ -376,6 +367,11 @@ FEATURES.update({
     # Toggle this off if you don't want anything to do with enterprise in devstack.
     'ENABLE_ENTERPRISE_INTEGRATION': True,
 })
+
+HELP_TOKENS_BOOKS = {
+    'course_author': 'https://funix.gitbook.io/funix-documentation/',
+    'learner': 'https://funix.gitbook.io/funix-documentation/',
+}
 
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
 MARKETING_SITE_ROOT = os.environ.get('MARKETING_SITE_ROOT', 'http://localhost:8080')
@@ -407,8 +403,6 @@ MKTG_URLS = {
 }
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
-
-ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://edx.devstack.lms:18000/oauth2"
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
@@ -464,10 +458,6 @@ PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
-
-#################### Network configuration ####################
-# Devstack is directly exposed to the caller
-CLOSEST_CLIENT_IP_FROM_HEADERS = []
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

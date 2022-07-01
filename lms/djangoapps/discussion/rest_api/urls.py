@@ -15,7 +15,6 @@ from lms.djangoapps.discussion.rest_api.views import (
     CourseTopicsView,
     CourseTopicsViewV2,
     CourseView,
-    LearnerThreadView,
     ReplaceUsernamesView,
     RetireUserView,
     ThreadViewSet,
@@ -33,13 +32,6 @@ urlpatterns = [
         ),
         CourseDiscussionSettingsAPIView.as_view(),
         name="discussion_course_settings",
-    ),
-    re_path(
-        r"^v1/courses/{}/learner/$".format(
-            settings.COURSE_ID_PATTERN
-        ),
-        LearnerThreadView.as_view(),
-        name="discussion_learner_threads",
     ),
     re_path(
         fr"^v1/courses/{settings.COURSE_KEY_PATTERN}/activity_stats",

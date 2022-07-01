@@ -238,14 +238,12 @@ class AuthenticationRequiredAccessError(AccessError):
         super().__init__(error_code, developer_message, user_message)
 
 
-class OldMongoAccessError(AccessError):
+class CoursewareMicrofrontendDisabledAccessError(AccessError):
     """
-    Access denied because the course is in Old Mongo and we no longer support them. See DEPR-58.
+    Access denied because the courseware micro-frontend is disabled for this user.
     """
-    def __init__(self, courselike):
-        error_code = 'old_mongo'
-        developer_message = 'Access to Old Mongo courses is unsupported'
-        user_message = _('{course_name} is no longer available.').format(
-            course_name=courselike.display_name_with_default,
-        )
+    def __init__(self):
+        error_code = 'microfrontend_disabled'
+        developer_message = 'Micro-frontend is disabled for this user'
+        user_message = _('Please view your course in the existing experience')
         super().__init__(error_code, developer_message, user_message)

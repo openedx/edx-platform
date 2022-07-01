@@ -11,9 +11,8 @@ from urllib.parse import urlencode
 import ddt
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from lms.djangoapps.courseware.tests.helpers import set_preview_mode
 from lms.djangoapps.courseware.utils import is_mode_upsellable
-from openedx.features.course_experience.url_helpers import get_courseware_url
+from openedx.features.course_experience.url_helpers import get_courseware_url, ExperienceOption
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -117,11 +116,6 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
                 category='problem',
                 display_name='Problem'
             )
-            self.video_block = ItemFactory.create(
-                parent=self.vertical_block,
-                category='video',
-                display_name='Video'
-            )
         CourseOverview.load_from_module_store(self.course.id)
 
         # block_name_to_be_tested can be `html_block` or `vertical_block`.
@@ -167,12 +161,13 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
         return response
 
     @ddt.data(
-        ('vertical_block', 4),
-        ('html_block', 4),
+        ('vertical_block', ModuleStoreEnum.Type.mongo, 13),
+        ('vertical_block', ModuleStoreEnum.Type.split, 5),
+        ('html_block', ModuleStoreEnum.Type.mongo, 14),
+        ('html_block', ModuleStoreEnum.Type.split, 5),
     )
     @ddt.unpack
-    @set_preview_mode(True)
-    def test_courseware_html(self, block_name, mongo_calls):
+    def test_courseware_html(self, block_name, default_store, mongo_calls):
         """
         To verify that the removal of courseware chrome elements is working,
         we include this test here to make sure the chrome elements that should
@@ -180,29 +175,55 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
         If this test fails, it's probably because the HTML template for courseware
         has changed and COURSEWARE_CHROME_HTML_ELEMENTS needs to be updated.
         """
-        with self.store.default_store(ModuleStoreEnum.Type.split):
+        with self.store.default_store(default_store):
             self.block_name_to_be_tested = block_name
-            self.setup_course(ModuleStoreEnum.Type.split)
+            self.setup_course(default_store)
             self.setup_user(admin=True, enroll=True, login=True)
 
             with check_mongo_calls(mongo_calls):
-                url = get_courseware_url(self.block_to_be_tested.location)
+                url = get_courseware_url(
+                    self.block_to_be_tested.location,
+                    experience=ExperienceOption.LEGACY,
+                )
                 response = self.client.get(url)
                 expected_elements = self.block_specific_chrome_html_elements + self.COURSEWARE_CHROME_HTML_ELEMENTS
                 for chrome_element in expected_elements:
                     self.assertContains(response, chrome_element)
 
-    def test_success_enrolled_staff(self):
-        self.setup_course()
-        self.setup_user(admin=True, enroll=True, login=True)
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, 5),
+        (ModuleStoreEnum.Type.split, 5),
+    )
+    @ddt.unpack
+    def test_success_enrolled_staff(self, default_store, mongo_calls):
+        with self.store.default_store(default_store):
+            if default_store is ModuleStoreEnum.Type.mongo:
+                mongo_calls = self.get_success_enrolled_staff_mongo_count()
+            self.setup_course(default_store)
+            self.setup_user(admin=True, enroll=True, login=True)
 
-        # The 5 mongoDB calls include calls for
-        #   (1) structure - get_course_with_access
-        #   (2) definition - get_course_with_access
-        #   (3) definition - HTML block
-        #   (4) definition - edx_notes decorator (original_get_html)
-        with check_mongo_calls(4):
-            self.verify_response()
+            # The 5 mongoDB calls include calls for
+            # Old Mongo:
+            #   (1) fill_in_run
+            #   (2) get_course in get_course_with_access
+            #   (3) get_item for HTML block in get_module_by_usage_id
+            #   (4) get_parent when loading HTML block
+            #   (5) edx_notes descriptor call to get_course
+            # Split:
+            #   (1) course_index - bulk_operation call
+            #   (2) structure - get_course_with_access
+            #   (3) definition - get_course_with_access
+            #   (4) definition - HTML block
+            #   (5) definition - edx_notes decorator (original_get_html)
+            with check_mongo_calls(mongo_calls):
+                self.verify_response()
+
+    def get_success_enrolled_staff_mongo_count(self):
+        """
+        Helper method used by test_success_enrolled_staff because one test
+        class using this mixin has an increased number of mongo (only) queries.
+        """
+        return 9
 
     def test_success_unenrolled_staff(self):
         self.setup_course()

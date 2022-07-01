@@ -84,16 +84,14 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
         )
 
         # changing display name doesn't fire the signal
-        with self.captureOnCommitCallbacks(execute=True) as callbacks:
-            course.display_name = course.display_name + 'changed'
-            self.store.update_item(course, ModuleStoreEnum.UserID.test)
+        course.display_name = course.display_name + 'changed'
+        self.store.update_item(course, ModuleStoreEnum.UserID.test)
         assert not mock_signal.called
 
         # changing the given field fires the signal
-        with self.captureOnCommitCallbacks(execute=True) as callbacks:
-            for change in changes:
-                setattr(course, change.field_name, change.changed_value)
-            self.store.update_item(course, ModuleStoreEnum.UserID.test)
+        for change in changes:
+            setattr(course, change.field_name, change.changed_value)
+        self.store.update_item(course, ModuleStoreEnum.UserID.test)
         assert mock_signal.called
 
     @patch('openedx.core.djangoapps.content.course_overviews.signals.COURSE_START_DATE_CHANGED.send')

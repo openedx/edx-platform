@@ -15,7 +15,7 @@ var filesWithRequireJSBlocks = [
     path.resolve(__dirname, 'common/static/common/js/components/utils/view_utils.js'),
     /descriptors\/js/,
     /modules\/js/,
-    /xmodule\/js\/src\//
+    /common\/lib\/xmodule\/xmodule\/js\/src\//
 ];
 
 var defineHeader = /\(function ?\(((define|require|requirejs|\$)(, )?)+\) ?\{/;
@@ -72,7 +72,7 @@ module.exports = Merge.smart({
             // Studio
             Import: './cms/static/js/features/import/factories/import.js',
             CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
-            LibrarySourcedBlockPicker: './xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx',  // eslint-disable-line max-len
+            LibrarySourcedBlockPicker: './common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx',  // eslint-disable-line max-len
             'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
             'js/factories/container': './cms/static/js/factories/container.js',
             'js/factories/context_course': './cms/static/js/factories/context_course.js',
@@ -97,7 +97,6 @@ module.exports = Merge.smart({
             DemographicsCollectionModal: './lms/static/js/demographics_collection/DemographicsCollectionModal.jsx',
             AxiosJwtTokenService: './lms/static/js/jwt_auth/AxiosJwtTokenService.js',
             EnterpriseLearnerPortalModal: './lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx',
-            RecommendationsPanel: './lms/static/js/learner_dashboard/RecommendationsPanel.jsx',
 
             // Learner Dashboard
             EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',
@@ -108,16 +107,22 @@ module.exports = Merge.smart({
             CompletionOnViewService: './lms/static/completion/js/CompletionOnViewService.js',
 
             // Features
+            CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',
+            CourseHome: './openedx/features/course_experience/static/course_experience/js/CourseHome.js',
+            CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
             CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
             Currency: './openedx/features/course_experience/static/course_experience/js/currency.js',
+            Enrollment: './openedx/features/course_experience/static/course_experience/js/Enrollment.js',
+            LatestUpdate: './openedx/features/course_experience/static/course_experience/js/LatestUpdate.js',
+            WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
 
             AnnouncementsView: './openedx/features/announcements/static/announcements/jsx/Announcements.jsx',
             CookiePolicyBanner: './common/static/js/src/CookiePolicyBanner.jsx',
 
             // Common
             ReactRenderer: './common/static/js/src/ReactRenderer.jsx',
-            XModuleShim: './xmodule/js/src/xmodule.js',
-            VerticalStudentView: './xmodule/assets/vertical/public/js/vertical_student_view.js',
+            XModuleShim: 'xmodule/js/src/xmodule.js',
+            VerticalStudentView: './common/lib/xmodule/xmodule/assets/vertical/public/js/vertical_student_view.js',
             commons: 'babel-polyfill'
         },
 
@@ -392,9 +397,9 @@ module.exports = Merge.smart({
                 'cms/static/cms/js',
                 'cms/templates/js',
                 'lms/static',
-                path.resolve(__dirname),
-                'xmodule/js/src',
-                'xmodule/assets/word_cloud/src/js',
+                'common/lib/xmodule',
+                'common/lib/xmodule/xmodule/js/src',
+                'common/lib/xmodule/xmodule/assets/word_cloud/src/js',
                 'common/static',
                 'common/static/coffee/src',
                 'common/static/common/js',
@@ -438,3 +443,4 @@ module.exports = Merge.smart({
 
     }
 }, {web: xmoduleJS}, workerConfig());
+

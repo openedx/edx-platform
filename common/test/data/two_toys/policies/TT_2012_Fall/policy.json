@@ -7,7 +7,7 @@
     "chapter/Overview": {
         "display_name": "Two Toy Overview"
     },
-    "sequential/Toy_Videos": {
+    "videosequence/Toy_Videos": {
         "display_name": "Toy Videos",
         "format": "Lecture Sequence"
     },

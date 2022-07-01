@@ -40,13 +40,12 @@ from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
 from xmodule.contentstore.django import contentstore
+from xmodule.error_module import ErrorBlock, NonStaffErrorBlock
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.sandboxing import SandboxService
-from xmodule.services import RebindUserService
-from common.djangoapps.static_replace.services import ReplaceURLService
-from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
+from common.djangoapps import static_replace
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID
 from capa.xqueue_interface import XQueueService  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.access import get_user_role, has_access
@@ -63,6 +62,7 @@ from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
 from lms.djangoapps.grades.api import signals as grades_signals
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
@@ -79,7 +79,10 @@ from openedx.core.lib.xblock_utils import (
     add_staff_markup,
     get_aside_from_xblock,
     hash_resource,
-    is_xblock_aside
+    is_xblock_aside,
+    replace_course_urls,
+    replace_jump_to_id_urls,
+    replace_static_urls
 )
 from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import wrap_xblock
@@ -94,7 +97,7 @@ from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core.lib.cache_utils import CacheService
-
+from openedx.features.funix_relative_date.funix_relative_date import FunixRelativeDateLibary
 log = logging.getLogger(__name__)
 
 # TODO: course_id and course_key are used interchangeably in this file, which is wrong.
@@ -482,12 +485,12 @@ def get_module_system_for_user(
             student_data=student_data,
             course_id=course_id,
             track_function=track_function,
-            request_token=request_token,
             position=position,
             wrap_xmodule_display=wrap_xmodule_display,
             grade_bucket_type=grade_bucket_type,
             static_asset_path=static_asset_path,
             user_location=user_location,
+            request_token=request_token,
             course=course,
             will_recheck_access=will_recheck_access,
         )
@@ -562,6 +565,7 @@ def get_module_system_for_user(
                 block_key=block.scope_ids.usage_id,
                 completion=event['completion'],
             )
+            FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
 
     def handle_grade_event(block, event):
         """
@@ -606,21 +610,67 @@ def get_module_system_for_user(
                     block_key=block.scope_ids.usage_id,
                     completion=1.0,
                 )
+                FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
 
-    # Rebind module service to deal with noauth modules getting attached to users
-    rebind_user_service = RebindUserService(
-        user,
-        course_id,
-        get_module_system_for_user,
-        track_function=track_function,
-        position=position,
-        wrap_xmodule_display=wrap_xmodule_display,
-        grade_bucket_type=grade_bucket_type,
-        static_asset_path=static_asset_path,
-        user_location=user_location,
-        request_token=request_token,
-        will_recheck_access=will_recheck_access,
-    )
+    def rebind_noauth_module_to_user(module, real_user):
+        """
+        A function that allows a module to get re-bound to a real user if it was previously bound to an AnonymousUser.
+
+        Will only work within a module bound to an AnonymousUser, e.g. one that's instantiated by the noauth_handler.
+
+        Arguments:
+            module (any xblock type):  the module to rebind
+            real_user (django.contrib.auth.models.User):  the user to bind to
+
+        Returns:
+            nothing (but the side effect is that module is re-bound to real_user)
+        """
+        if user.is_authenticated:
+            err_msg = ("rebind_noauth_module_to_user can only be called from a module bound to "
+                       "an anonymous user")
+            log.error(err_msg)
+            raise LmsModuleRenderError(err_msg)
+
+        field_data_cache_real_user = FieldDataCache.cache_for_descriptor_descendents(
+            course_id,
+            real_user,
+            module,
+            asides=XBlockAsidesConfig.possible_asides(),
+        )
+        student_data_real_user = KvsFieldData(DjangoKeyValueStore(field_data_cache_real_user))
+
+        (inner_system, inner_student_data) = get_module_system_for_user(
+            user=real_user,
+            student_data=student_data_real_user,  # These have implicit user bindings, rest of args considered not to
+            descriptor=module,
+            course_id=course_id,
+            track_function=track_function,
+            position=position,
+            wrap_xmodule_display=wrap_xmodule_display,
+            grade_bucket_type=grade_bucket_type,
+            static_asset_path=static_asset_path,
+            user_location=user_location,
+            request_token=request_token,
+            course=course,
+            will_recheck_access=will_recheck_access,
+        )
+
+        module.bind_for_student(
+            inner_system,
+            real_user.id,
+            [
+                partial(DateLookupFieldData, course_id=course_id, user=user),
+                partial(OverrideFieldData.wrap, real_user, course),
+                partial(LmsFieldData, student_data=inner_student_data),
+            ],
+        )
+
+        module.scope_ids = (
+            module.scope_ids._replace(user_id=real_user.id)
+        )
+        # now bind the module to the new ModuleSystem instance and vice-versa
+        module.runtime = inner_system
+        inner_system.xmodule_instance = module
 
     # Build a list of wrapping functions that will be applied in order
     # to the Fragment content coming out of the xblocks that are about to be rendered.
@@ -644,15 +694,32 @@ def get_module_system_for_user(
             request_token=request_token,
         ))
 
-    replace_url_service = ReplaceURLService(
-        data_directory=getattr(descriptor, 'data_dir', None),
-        course_id=course_id,
-        static_asset_path=static_asset_path or descriptor.static_asset_path,
-        jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''})
-    )
+    # TODO (cpennington): When modules are shared between courses, the static
+    # prefix is going to have to be specific to the module, not the directory
+    # that the xml was loaded from
 
-    # Rewrite static urls with course-specific absolute urls
-    block_wrappers.append(partial(replace_urls_wrapper, replace_url_service=replace_url_service))
+    # Rewrite urls beginning in /static to point to course-specific content
+    block_wrappers.append(partial(
+        replace_static_urls,
+        getattr(descriptor, 'data_dir', None),
+        course_id=course_id,
+        static_asset_path=static_asset_path or descriptor.static_asset_path
+    ))
+
+    # Allow URLs of the form '/course/' refer to the root of multicourse directory
+    #   hierarchy of this course
+    block_wrappers.append(partial(replace_course_urls, course_id))
+
+    # this will rewrite intra-courseware links (/jump_to_id/<id>). This format
+    # is an improvement over the /course/... format for studio authored courses,
+    # because it is agnostic to course-hierarchy.
+    # NOTE: module_id is empty string here. The 'module_id' will get assigned in the replacement
+    # function, we just need to specify something to get the reverse() to work.
+    block_wrappers.append(partial(
+        replace_jump_to_id_urls,
+        course_id,
+        reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''}),
+    ))
 
     block_wrappers.append(partial(display_access_messages, user))
     block_wrappers.append(partial(course_expiration_wrapper, user))
@@ -681,8 +748,31 @@ def get_module_system_for_user(
     system = LmsModuleSystem(
         track_function=track_function,
         static_url=settings.STATIC_URL,
+        # TODO (cpennington): Figure out how to share info between systems
+        filestore=descriptor.runtime.resources_fs,
         get_module=inner_get_module,
         user=user,
+        debug=settings.DEBUG,
+        hostname=settings.SITE_NAME,
+        # TODO (cpennington): This should be removed when all html from
+        # a module is coming through get_html and is therefore covered
+        # by the replace_static_urls code below
+        replace_urls=partial(
+            static_replace.replace_static_urls,
+            data_directory=getattr(descriptor, 'data_dir', None),
+            course_id=course_id,
+            static_asset_path=static_asset_path or descriptor.static_asset_path,
+        ),
+        replace_course_urls=partial(
+            static_replace.replace_course_urls,
+            course_key=course_id
+        ),
+        replace_jump_to_id_urls=partial(
+            static_replace.replace_jump_to_id_urls,
+            course_id=course_id,
+            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''})
+        ),
+        node_path=settings.NODE_PATH,
         publish=publish,
         course_id=course_id,
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
@@ -705,10 +795,9 @@ def get_module_system_for_user(
             'cache': CacheService(cache),
             'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
             'xqueue': xqueue_service,
-            'replace_urls': replace_url_service,
-            'rebind_user': rebind_user_service,
         },
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
+        rebind_noauth_module_to_user=rebind_noauth_module_to_user,
         request_token=request_token,
     )
 
@@ -726,6 +815,12 @@ def get_module_system_for_user(
     system.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
     system.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
     system.set('days_early_for_beta', descriptor.days_early_for_beta)
+
+    # make an ErrorBlock -- assuming that the descriptor's system is ok
+    if has_access(user, 'staff', descriptor.location, course_id):
+        system.error_descriptor_class = ErrorBlock
+    else:
+        system.error_descriptor_class = NonStaffErrorBlock
 
     return system, field_data
 

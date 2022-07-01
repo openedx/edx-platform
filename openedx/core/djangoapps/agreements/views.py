@@ -2,7 +2,6 @@
 Views served by the Agreements app
 """
 
-from django.conf import settings
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import status
 from rest_framework.views import APIView
@@ -18,6 +17,7 @@ from openedx.core.djangoapps.agreements.api import (
     get_integrity_signature,
 )
 from openedx.core.djangoapps.agreements.serializers import IntegritySignatureSerializer
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 
 
 def is_user_course_or_global_staff(user, course_id):
@@ -67,7 +67,8 @@ class IntegritySignatureView(AuthenticatedAPIView):
         If a username is not given, it should default to the requesting user (or masqueraded user).
         Only staff should be able to access this endpoint for other users.
         """
-        if not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'):
+        # check that waffle flag is enabled
+        if not is_integrity_signature_enabled(CourseKey.from_string(course_id)):
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
             )
@@ -110,7 +111,8 @@ class IntegritySignatureView(AuthenticatedAPIView):
                 created_at: "2021-04-23T18:25:43.511Z"
             }
         """
-        if not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'):
+        # check that waffle flag is enabled
+        if not is_integrity_signature_enabled(CourseKey.from_string(course_id)):
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
             )

@@ -63,6 +63,7 @@ class TestHandlerUrl(TestCase):
             static_url='/static',
             track_function=Mock(),
             get_module=Mock(),
+            replace_urls=str,
             course_id=self.course_key,
             user=Mock(),
             descriptor_runtime=Mock(),
@@ -128,6 +129,7 @@ class TestUserServiceAPI(TestCase):
             static_url='/static',
             track_function=Mock(),
             get_module=Mock(),
+            replace_urls=str,
             user=self.user,
             course_id=self.course_id,
             descriptor_runtime=Mock(),
@@ -178,6 +180,7 @@ class TestBadgingService(ModuleStoreTestCase):
             static_url='/static',
             track_function=Mock(),
             get_module=Mock(),
+            replace_urls=str,
             course_id=self.course_id,
             user=self.user,
             descriptor_runtime=Mock(),
@@ -207,11 +210,10 @@ class TestBadgingService(ModuleStoreTestCase):
         premade_badge_class = BadgeClassFactory.create()
         # Ignore additional parameters. This class already exists.
         # We should get back the first class we created, rather than a new one.
-        with get_image('good') as image_handle:
-            badge_class = badge_service.get_badge_class(
-                slug='test_slug', issuing_component='test_component', description='Attempted override',
-                criteria='test', display_name='Testola', image_file_handle=image_handle
-            )
+        badge_class = badge_service.get_badge_class(
+            slug='test_slug', issuing_component='test_component', description='Attempted override',
+            criteria='test', display_name='Testola', image_file_handle=get_image('good')
+        )
         # These defaults are set on the factory.
         assert badge_class.criteria == 'https://example.com/syllabus'
         assert badge_class.display_name == 'Test Badge'
@@ -232,6 +234,7 @@ class TestI18nService(ModuleStoreTestCase):
             static_url='/static',
             track_function=Mock(),
             get_module=Mock(),
+            replace_urls=str,
             course_id=self.course.id,
             user=Mock(),
             descriptor_runtime=Mock(),

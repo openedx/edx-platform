@@ -38,11 +38,13 @@ BETA_TESTER_METHOD = 'lms.djangoapps.certificates.generation_handler.is_beta_tes
 COURSE_OVERVIEW_METHOD = 'lms.djangoapps.certificates.generation_handler.get_course_overview_or_none'
 CCX_COURSE_METHOD = 'lms.djangoapps.certificates.generation_handler._is_ccx_course'
 GET_GRADE_METHOD = 'lms.djangoapps.certificates.generation_handler._get_course_grade'
+INTEGRITY_ENABLED_METHOD = 'lms.djangoapps.certificates.generation_handler.is_integrity_signature_enabled'
 ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
 PASSING_GRADE_METHOD = 'lms.djangoapps.certificates.generation_handler._is_passing_grade'
 WEB_CERTS_METHOD = 'lms.djangoapps.certificates.generation_handler.has_html_certificates_enabled'
 
 
+@mock.patch(INTEGRITY_ENABLED_METHOD, mock.Mock(return_value=False))
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))
 @mock.patch(WEB_CERTS_METHOD, mock.Mock(return_value=True))
 @ddt.ddt
@@ -202,20 +204,18 @@ class AllowlistTests(ModuleStoreTestCase):
         assert generate_certificate_task(self.user, self.course_run_key)
 
     @ddt.data(False, True)
-    def test_can_generate_not_verified(self, enable_idv_requirement):
+    def test_can_generate_not_verified(self, idv_retired):
         """
         Test handling when the user's id is not verified
         """
         with mock.patch(ID_VERIFIED_METHOD, return_value=False), \
-                mock.patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_idv_requirement):
-            self.assertNotEqual(
-                enable_idv_requirement,
-                _can_generate_allowlist_certificate(self.user, self.course_run_key, self.enrollment_mode))
-            self.assertIs(
-                enable_idv_requirement,
-                _set_allowlist_cert_status(
-                    self.user, self.course_run_key,
-                    self.enrollment_mode, self.grade) == CertificateStatuses.unverified)
+                mock.patch(INTEGRITY_ENABLED_METHOD, return_value=idv_retired):
+            self.assertEqual(idv_retired,
+                             _can_generate_allowlist_certificate(self.user, self.course_run_key, self.enrollment_mode))
+            self.assertIsNot(idv_retired,
+                             _set_allowlist_cert_status(
+                                 self.user, self.course_run_key,
+                                 self.enrollment_mode, self.grade) == CertificateStatuses.unverified)
 
     def test_can_generate_not_enrolled(self):
         """
@@ -358,7 +358,7 @@ class AllowlistTests(ModuleStoreTestCase):
             assert not _can_generate_allowlist_certificate(self.user, course_run_key, enrollment_mode)
 
 
-@mock.patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=False)
+@mock.patch(INTEGRITY_ENABLED_METHOD, mock.Mock(return_value=False))
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))
 @mock.patch(CCX_COURSE_METHOD, mock.Mock(return_value=False))
 @mock.patch(PASSING_GRADE_METHOD, mock.Mock(return_value=True))
@@ -516,7 +516,7 @@ class CertificateTests(ModuleStoreTestCase):
         assert _can_generate_certificate_for_status(None, None, None)
 
     @ddt.data(False, True)
-    def test_can_generate_not_verified_cert(self, enable_idv_requirement):
+    def test_can_generate_not_verified_cert(self, idv_retired):
         """
         Test handling when the user's id is not verified and they have a cert
         """
@@ -535,16 +535,14 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         with mock.patch(ID_VERIFIED_METHOD, return_value=False), \
-                mock.patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_idv_requirement):
-            self.assertNotEqual(
-                enable_idv_requirement,
-                _can_generate_regular_certificate(u, self.course_run_key, self.enrollment_mode, self.grade)
-            )
-            regular_cert_status = _set_regular_cert_status(u, self.course_run_key, self.enrollment_mode, self.grade)
-            self.assertIs(enable_idv_requirement, regular_cert_status == CertificateStatuses.unverified)
+                mock.patch(INTEGRITY_ENABLED_METHOD, return_value=idv_retired):
+            self.assertEqual(idv_retired, _can_generate_regular_certificate(u, self.course_run_key,
+                                                                            self.enrollment_mode, self.grade))
+            self.assertIsNot(idv_retired, _set_regular_cert_status(u, self.course_run_key, self.enrollment_mode,
+                                                                   self.grade) == CertificateStatuses.unverified)
 
     @ddt.data(False, True)
-    def test_can_generate_not_verified_no_cert(self, enable_idv_requirement):
+    def test_can_generate_not_verified_no_cert(self, idv_retired):
         """
         Test handling when the user's id is not verified and they don't have a cert
         """
@@ -557,16 +555,14 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         with mock.patch(ID_VERIFIED_METHOD, return_value=False), \
-                mock.patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_idv_requirement):
-            self.assertNotEqual(
-                enable_idv_requirement,
-                _can_generate_regular_certificate(u, self.course_run_key, self.enrollment_mode, self.grade)
-            )
-            regular_cert_status = _set_regular_cert_status(u, self.course_run_key, self.enrollment_mode, self.grade)
-            self.assertIs(enable_idv_requirement, regular_cert_status == CertificateStatuses.unverified)
+                mock.patch(INTEGRITY_ENABLED_METHOD, return_value=idv_retired):
+            self.assertEqual(idv_retired, _can_generate_regular_certificate(u, self.course_run_key,
+                                                                            self.enrollment_mode, self.grade))
+            self.assertIsNot(idv_retired, _set_regular_cert_status(u, self.course_run_key, self.enrollment_mode,
+                                                                   self.grade) == CertificateStatuses.unverified)
 
     @ddt.data(False, True)
-    def test_can_generate_not_verified_not_passing(self, enable_idv_requirement):
+    def test_can_generate_not_verified_not_passing(self, idv_retired):
         """
         Test handling when the user's id is not verified and the user is not passing
         """
@@ -585,17 +581,17 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         with mock.patch(ID_VERIFIED_METHOD, return_value=False), \
-                mock.patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_idv_requirement), \
+                mock.patch(INTEGRITY_ENABLED_METHOD, return_value=idv_retired), \
                 mock.patch(PASSING_GRADE_METHOD, return_value=False):
             assert not _can_generate_regular_certificate(u, self.course_run_key, self.enrollment_mode, self.grade)
-            if enable_idv_requirement:
-                assert _set_regular_cert_status(u, self.course_run_key, self.enrollment_mode, self.grade) is None
-            else:
+            if idv_retired:
                 assert _set_regular_cert_status(u, self.course_run_key, self.enrollment_mode, self.grade) \
                        == CertificateStatuses.notpassing
+            else:
+                assert _set_regular_cert_status(u, self.course_run_key, self.enrollment_mode, self.grade) is None
 
     @ddt.data(False, True)
-    def test_can_generate_not_verified_not_passing_allowlist(self, enable_idv_requirement):
+    def test_can_generate_not_verified_not_passing_allowlist(self, idv_retired):
         """
         Test handling when the user's id is not verified and the user is not passing but is on the allowlist
         """
@@ -615,15 +611,15 @@ class CertificateTests(ModuleStoreTestCase):
         CertificateAllowlistFactory(course_id=self.course_run_key, user=u)
 
         with mock.patch(ID_VERIFIED_METHOD, return_value=False), \
-                mock.patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_idv_requirement), \
+                mock.patch(INTEGRITY_ENABLED_METHOD, return_value=idv_retired), \
                 mock.patch(PASSING_GRADE_METHOD, return_value=False):
             assert not _can_generate_regular_certificate(u, self.course_run_key, self.enrollment_mode, self.grade)
-            if enable_idv_requirement:
-                assert _set_regular_cert_status(u, self.course_run_key, self.enrollment_mode,
-                                                self.grade) == CertificateStatuses.unverified
-            else:
+            if idv_retired:
                 assert _set_regular_cert_status(u, self.course_run_key, self.enrollment_mode,
                                                 self.grade) == CertificateStatuses.notpassing
+            else:
+                assert _set_regular_cert_status(u, self.course_run_key, self.enrollment_mode,
+                                                self.grade) == CertificateStatuses.unverified
 
     def test_can_generate_ccx(self):
         """

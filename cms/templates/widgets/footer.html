@@ -6,7 +6,7 @@ from django.urls import reverse
 from datetime import datetime
 from django.conf import settings
 import pytz
-from cms.djangoapps.contentstore.config.waffle import ENABLE_ACCESSIBILITY_POLICY_PAGE
+from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILITY_POLICY_PAGE
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
@@ -20,17 +20,17 @@ from openedx.core.djangolib.markup import HTML, Text
 
         <nav class="nav-peripheral" aria-label="${_("Policies")}">
           <ol>
-            % if is_marketing_link_set('TOS'):
-              <li class="nav-item nav-peripheral-tos">
-                <a href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
-              </li>
-            % endif
-            % if is_marketing_link_set('PRIVACY'):
-              <li class="nav-item nav-peripheral-pp">
-                <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
-              </li>
-            % endif
-            % if ENABLE_ACCESSIBILITY_POLICY_PAGE.is_enabled():
+            // % if is_marketing_link_set('TOS'):
+            //   <li class="nav-item nav-peripheral-tos">
+            //     <a href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
+            //   </li>
+            // % endif
+            // % if is_marketing_link_set('PRIVACY'):
+            //   <li class="nav-item nav-peripheral-pp">
+            //     <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+            //   </li>
+            // % endif
+            % if waffle().is_enabled(ENABLE_ACCESSIBILITY_POLICY_PAGE):
               <li class="nav-item nav-peripheral-aar">
                 <a href="${reverse('accessibility')}">${_("Accessibility Accommodation Request")}</a>
               </li>
@@ -62,3 +62,4 @@ from openedx.core.djangolib.markup import HTML, Text
     </div>
   </footer>
 </div>
+

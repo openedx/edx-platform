@@ -1,0 +1,17 @@
+<problem>
+  <script type="loncapa/python">
+z = "A*x^2 + sqrt(y)"
+</script>
+  <startouttext/>
+  <p>Some edX courses ask you to enter an algebraic expression as an answer. Try entering the following algebraic expression in the box below. It’s easier than it looks.</p>
+  <p> \(A \cdot x^2 + \sqrt{y}\)  
+    </p>
+  <p>
+The entry is case sensitive. The product must be indicated with an asterisk, and the exponentiation with a caret, so you would write  
+"A*x^2 + sqrt(y)".</p>
+  <endouttext/>
+  <formularesponse type="cs" samples="A,x,y@1,1,1:3,3,3#10" answer="$z">
+    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/>
+    <textline size="40" math="1"/>
+  </formularesponse>
+</problem>

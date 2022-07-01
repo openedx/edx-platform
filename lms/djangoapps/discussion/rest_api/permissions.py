@@ -13,14 +13,10 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
 )
 from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_user_role_names,
     has_discussion_privileges,
 )
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
-from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR
-)
 
 
 def _is_author(cc_content, context):
@@ -106,7 +102,6 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
     editable_fields = {
         "abuse_flagged": True,
         "closed": is_thread and is_privileged,
-        "close_reason_code": is_thread and is_privileged,
         "pinned": is_thread and is_privileged,
         "read": is_thread,
     }
@@ -119,14 +114,13 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
     editable_fields.update({
         "voted": True,
         "raw_body": is_privileged or is_author,
-        "edit_reason_code": is_privileged,
         "following": is_thread,
         "topic_id": is_thread and (is_author or is_privileged),
         "type": is_thread and (is_author or is_privileged),
         "title": is_thread and (is_author or is_privileged),
         "group_id": is_thread and is_privileged and context["discussion_division_enabled"],
         "endorsed": (
-            (is_comment and cc_content.get("parent_id", None) is None) and
+            is_comment and
             (is_privileged or
              (_is_author(context["thread"], context) and context["thread"]["thread_type"] == "question"))
         ),
@@ -159,25 +153,4 @@ class IsStaffOrCourseTeamOrEnrolled(permissions.BasePermission):
             CourseInstructorRole(course_key).has_user(request.user) or
             CourseEnrollment.is_enrolled(request.user, course_key) or
             has_discussion_privileges(request.user, course_key)
-        )
-
-
-class IsStaffOrAdmin(permissions.BasePermission):
-    """
-    Permission that checks if the user is staff or an admin.
-    """
-
-    def has_permission(self, request, view):
-        """Returns true if the user is admin or staff and request method is GET."""
-        course_key = CourseKey.from_string(view.kwargs.get('course_id'))
-        user_roles = get_user_role_names(request.user, course_key)
-        is_user_staff = bool(user_roles & {
-            FORUM_ROLE_ADMINISTRATOR,
-            FORUM_ROLE_MODERATOR,
-            FORUM_ROLE_COMMUNITY_TA,
-        })
-        return (
-            GlobalStaff().has_user(request.user) or
-            request.user.is_staff or
-            is_user_staff and request.method == "GET"
         )

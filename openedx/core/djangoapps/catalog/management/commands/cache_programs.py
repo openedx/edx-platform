@@ -4,7 +4,6 @@
 import logging
 import sys
 from collections import defaultdict
-from urllib.parse import urljoin
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -12,8 +11,8 @@ from django.core.cache import cache
 from django.core.management import BaseCommand
 
 from openedx.core.djangoapps.catalog.cache import (
-    CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
     COURSE_PROGRAMS_CACHE_KEY_TPL,
+    CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
     PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
@@ -26,8 +25,7 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.utils import (
     course_run_keys_for_program,
     course_uuids_for_program,
-    get_catalog_api_base_url,
-    get_catalog_api_client,
+    create_catalog_api_client,
     normalize_program_type
 )
 
@@ -76,11 +74,10 @@ class Command(BaseCommand):
                 cache.set(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
                 continue
 
-            client = get_catalog_api_client(user)
-            api_base_url = get_catalog_api_base_url(site=site)
-            uuids, program_uuids_failed = self.get_site_program_uuids(client, site, api_base_url)
-            new_programs, program_details_failed = self.fetch_program_details(client, uuids, api_base_url)
-            new_pathways, pathways_failed = self.get_pathways(client, site, api_base_url)
+            client = create_catalog_api_client(user, site=site)
+            uuids, program_uuids_failed = self.get_site_program_uuids(client, site)
+            new_programs, program_details_failed = self.fetch_program_details(client, uuids)
+            new_pathways, pathways_failed = self.get_pathways(client, site)
             new_pathways, new_programs, pathway_processing_failed = self.process_pathways(
                 site, new_pathways, new_programs
             )
@@ -137,7 +134,7 @@ class Command(BaseCommand):
         if failure:
             sys.exit(1)
 
-    def get_site_program_uuids(self, client, site, api_base_url):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def get_site_program_uuids(self, client, site):  # lint-amnesty, pylint: disable=missing-function-docstring
         failure = False
         uuids = []
         try:
@@ -146,11 +143,9 @@ class Command(BaseCommand):
                 'status': ('active', 'retired'),
                 'uuids_only': 1,
             }
-            api_url = urljoin(f"{api_base_url}/", "programs/")
+
             logger.info(f'Requesting program UUIDs for {site.domain}.')
-            response = client.get(api_url, params=querystring)
-            response.raise_for_status()
-            uuids = response.json()
+            uuids = client.programs.get(**querystring)
         except:  # pylint: disable=bare-except
             logger.exception(f'Failed to retrieve program UUIDs for site: {site.domain}.')
             failure = True
@@ -161,17 +156,14 @@ class Command(BaseCommand):
         ))
         return uuids, failure
 
-    def fetch_program_details(self, client, uuids, api_base_url):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def fetch_program_details(self, client, uuids):  # lint-amnesty, pylint: disable=missing-function-docstring
         programs = {}
         failure = False
         for uuid in uuids:
             try:
                 cache_key = PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)
                 logger.info(f'Requesting details for program {uuid}.')
-                api_url = urljoin(f"{api_base_url}/", f"programs/{uuid}/")
-                response = client.get(api_url, params={"exclude_utm": 1})
-                response.raise_for_status()
-                program = response.json()
+                program = client.programs(uuid).get(exclude_utm=1)
                 # pathways get added in process_pathways
                 program['pathway_ids'] = []
                 programs[cache_key] = program
@@ -181,22 +173,20 @@ class Command(BaseCommand):
                 continue
         return programs, failure
 
-    def get_pathways(self, client, site, api_base_url):
+    def get_pathways(self, client, site):
         """
-        Get all pathways for the current client.
+        Get all pathways for the current client
         """
         pathways = []
         failure = False
         logger.info(f'Requesting pathways for {site.domain}.')
         try:
-            api_url = urljoin(f"{api_base_url}/", "pathways/")
             next_page = 1
             while next_page:
-                response = client.get(api_url, params=dict(exclude_utm=1, page=next_page))
-                response.raise_for_status()
-                new_pathways = response.json()
+                new_pathways = client.pathways.get(exclude_utm=1, page=next_page)
                 pathways.extend(new_pathways['results'])
                 next_page = next_page + 1 if new_pathways['next'] else None
+
         except:  # pylint: disable=bare-except
             logger.exception(
                 msg=f'Failed to retrieve pathways for site: {site.domain}.',

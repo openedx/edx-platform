@@ -14,7 +14,7 @@ from edx_toggles.toggles import WaffleFlag
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-08-25
 # .. toggle_target_removal_date: 2021-12-31
-# .. toggle_warning: When the flag is ON, the new experience for Program discussions will be enabled.
+# .. toggle_warnings: When the flag is ON, the new experience for Program discussions will be enabled.
 # .. toggle_tickets: TNL-8434
 ENABLE_PROGRAM_TAB_VIEW = WaffleFlag(
     'learner_dashboard.enable_program_tab_view',
@@ -31,7 +31,7 @@ ENABLE_PROGRAM_TAB_VIEW = WaffleFlag(
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-10-19
 # .. toggle_target_removal_date: 2021-12-31
-# .. toggle_warning: When the flag is ON, the new tabbed experience for Master Program Page will be enabled.
+# .. toggle_warnings: When the flag is ON, the new tabbed experience for Master Program Page will be enabled.
 # .. toggle_tickets: TNL-8434
 ENABLE_MASTERS_PROGRAM_TAB_VIEW = WaffleFlag(
     'learner_dashboard.enable_masters_program_tab_view',

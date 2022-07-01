@@ -7,9 +7,8 @@ import ast
 import json
 from collections import OrderedDict
 from datetime import timedelta
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
@@ -19,7 +18,6 @@ from django.utils.timezone import now
 from xblock.field_data import DictFieldData
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from lms.djangoapps.courseware import access_utils
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.masquerade import MasqueradeView
@@ -57,7 +55,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
     USER_COUNT = 2
     COURSE_DATA = {}
 
-    # Data from YAML xmodule/templates/NAME/default.yaml
+    # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
     CATEGORY = "vertical"
     DATA = ''
     # METADATA must be overwritten for every instance that uses it. Otherwise,
@@ -453,11 +451,3 @@ def get_context_dict_from_string(data):
         sorted(json.loads(cleaned_data['metadata']).items(), key=lambda t: t[0])
     )
     return cleaned_data
-
-
-def set_preview_mode(preview_mode: bool):
-    """
-    A decorator to force the preview mode on or off.
-    """
-    hostname = settings.FEATURES.get('PREVIEW_LMS_BASE') if preview_mode else None
-    return patch.object(access_utils, 'get_current_request_hostname', new=lambda: hostname)

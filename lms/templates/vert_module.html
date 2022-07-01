@@ -69,12 +69,6 @@ from openedx.core.djangolib.markup import HTML
 % endfor
 </div>
 
-% if reset_button:
-  <div class="problem-reset-btn-wrapper">
-    <button type="button" class="problem-reset-btn btn-link" data-value="${_('Reset Problems')}"><span aria-hidden="true">${_('Reset Problems')}</span><span class="sr">${_("Reset Problems")}</span></button>
-  </div>
-% endif
-
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform('.localized-datetime');
 </%static:require_module_async>

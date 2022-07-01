@@ -66,7 +66,7 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
             "abuse_flagged", "course_id", "following", "raw_body", "read", "title", "topic_id", "type", "voted"
         }
         if is_privileged:
-            expected |= {"closed", "pinned", "close_reason_code", "edit_reason_code"}
+            expected |= {"closed", "pinned"}
         if is_privileged and is_cohorted:
             expected |= {"group_id"}
         if allow_anonymous:
@@ -87,8 +87,6 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         expected = {
             "anonymous", "abuse_flagged", "parent_id", "raw_body", "thread_id", "voted"
         }
-        if is_privileged:
-            expected |= {"edit_reason_code"}
         if (is_thread_author and thread_type == "question") or is_privileged:
             expected |= {"endorsed"}
         assert actual == expected
@@ -118,7 +116,7 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
         actual = get_editable_fields(thread, context)
         expected = {"abuse_flagged", "following", "read", "voted"}
         if is_privileged:
-            expected |= {"closed", "pinned", "close_reason_code", "edit_reason_code"}
+            expected |= {"closed", "pinned"}
         if is_author or is_privileged:
             expected |= {"topic_id", "type", "title", "raw_body"}
         if is_privileged and is_cohorted:
@@ -129,7 +127,7 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
             expected |= {"anonymous_to_peers"}
         assert actual == expected
 
-    @ddt.data(*itertools.product(*[[True, False] for _ in range(6)], ["question", "discussion"]))
+    @ddt.data(*itertools.product(*[[True, False] for _ in range(5)], ["question", "discussion"]))
     @ddt.unpack
     def test_comment(
         self,
@@ -138,14 +136,9 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
         is_privileged,
         allow_anonymous,
         allow_anonymous_to_peers,
-        has_parent,
         thread_type
     ):
-        comment = Comment(
-            user_id="5" if is_author else "6",
-            type="comment",
-            parent_id="parent-id" if has_parent else None,
-        )
+        comment = Comment(user_id="5" if is_author else "6", type="comment")
         context = _get_context(
             requester_id="5",
             is_requester_privileged=is_privileged,
@@ -155,11 +148,9 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
         )
         actual = get_editable_fields(comment, context)
         expected = {"abuse_flagged", "voted"}
-        if is_privileged:
-            expected |= {"edit_reason_code"}
         if is_author or is_privileged:
             expected |= {"raw_body"}
-        if not has_parent and ((is_thread_author and thread_type == "question") or is_privileged):
+        if (is_thread_author and thread_type == "question") or is_privileged:
             expected |= {"endorsed"}
         if is_author and allow_anonymous:
             expected |= {"anonymous"}

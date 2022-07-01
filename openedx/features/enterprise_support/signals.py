@@ -4,24 +4,23 @@ This module contains signals related to enterprise.
 
 
 import logging
-from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer
+from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser  # lint-amnesty, pylint: disable=unused-import
 from integrated_channels.integrated_channel.tasks import (
     transmit_single_learner_data,
     transmit_single_subsection_learner_data
 )
-from requests.exceptions import HTTPError
+from slumber.exceptions import HttpClientError
 
-from common.djangoapps.student.signals import UNENROLL_DONE
-from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
-from openedx.core.djangoapps.signals.signals import COURSE_ASSESSMENT_GRADE_CHANGED, COURSE_GRADE_NOW_PASSED
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, COURSE_ASSESSMENT_GRADE_CHANGED
 from openedx.features.enterprise_support.tasks import clear_enterprise_customer_data_consent_share_cache
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache, is_enterprise_learner
+from common.djangoapps.student.signals import UNENROLL_DONE
 
 log = logging.getLogger(__name__)
 
@@ -106,17 +105,13 @@ def refund_order_voucher(sender, course_enrollment, skip_refund=False, **kwargs)
         return
 
     service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
-    client = get_ecommerce_api_client(service_user)
-    api_url = urljoin(
-        f"{get_ecommerce_api_base_url()}/", "coupons/create_refunded_voucher/"
-    )
+    client = ecommerce_api_client(service_user)
     order_number = course_enrollment.get_order_attribute_value('order_number')
     if order_number:
         error_message = "Encountered {} from ecommerce while creating refund voucher. Order={}, enrollment={}, user={}"
         try:
-            response = client.post(api_url, data={"order": order_number})
-            response.raise_for_status()
-        except HTTPError as ex:
+            client.enterprise.coupons.create_refunded_voucher.post({"order": order_number})
+        except HttpClientError as ex:
             log.info(
                 error_message.format(type(ex).__name__, order_number, course_enrollment, course_enrollment.user)
             )

@@ -6,7 +6,6 @@ import decimal
 import json
 import logging
 import urllib
-from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -22,11 +21,11 @@ from django.utils.translation import gettext_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
+from edx_rest_api_client.exceptions import SlumberBaseException
+from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
-from requests.exceptions import RequestException
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -41,10 +40,11 @@ from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_d
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
 from lms.djangoapps.verify_student.utils import can_verify_now
-from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.log_utils import audit_log
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .services import IDVerificationService
 
@@ -235,7 +235,12 @@ class PayAndVerifyView(View):
 
         # Check whether the user has access to this course
         # based on country access rules.
-        redirect_url = embargo_api.redirect_if_blocked(request, course_key)
+        redirect_url = embargo_api.redirect_if_blocked(
+            course_key,
+            user=request.user,
+            ip_address=get_client_ip(request)[0],
+            url=request.path
+        )
         if redirect_url:
             return redirect(redirect_url)
 
@@ -387,10 +392,7 @@ class PayAndVerifyView(View):
         verification_good_until = self._verification_valid_until(request.user)
 
         # get available payment processors
-        api_url = urljoin(f"{get_ecommerce_api_base_url()}/", "payment/processors/")
-        response = get_ecommerce_api_client(request.user).get(api_url)
-        response.raise_for_status()
-        processors = response.json()
+        processors = ecommerce_api_client(request.user).payment.processors.get()
 
         # Render the top-level page
         context = {
@@ -710,28 +712,20 @@ class PayAndVerifyView(View):
 
 
 def checkout_with_ecommerce_service(user, course_key, course_mode, processor):
-    """
-    Create a new basket and trigger immediate checkout, using the E-Commerce API.
-    """
+    """ Create a new basket and trigger immediate checkout, using the E-Commerce API. """
     course_id = str(course_key)
     try:
-        api_client = get_ecommerce_api_client(user)
-        api_url = urljoin(f"{get_ecommerce_api_base_url()}/", "baskets/")
+        api = ecommerce_api_client(user)
         # Make an API call to create the order and retrieve the results
-        response = api_client.post(
-            api_url,
-            json={
-                'products': [{'sku': course_mode.sku}],
-                'checkout': True,
-                'payment_processor_name': processor
-            }
-        )
-        response.raise_for_status()
-        result = response.json()
+        result = api.baskets.post({
+            'products': [{'sku': course_mode.sku}],
+            'checkout': True,
+            'payment_processor_name': processor
+        })
 
         # Pass the payment parameters directly from the API response.
         return result.get('payment_data')
-    except RequestException:
+    except SlumberBaseException:
         params = {'username': user.username, 'mode': course_mode.slug, 'course_id': course_id}
         log.exception('Failed to create order for %(username)s %(mode)s mode of %(course_id)s', params)
         raise

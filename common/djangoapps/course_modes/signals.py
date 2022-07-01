@@ -30,7 +30,7 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
         verified_mode = CourseMode.objects.get(course_id=course_key, mode_slug=CourseMode.VERIFIED)
         if _should_update_date(verified_mode):
             course = modulestore().get_course(course_key)
-            if not course or not course.end:
+            if not course:
                 return None
             verification_window = CourseModeExpirationConfig.current().verification_window
             new_expiration_datetime = course.end - verification_window

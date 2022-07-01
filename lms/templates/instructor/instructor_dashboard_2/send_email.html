@@ -4,16 +4,8 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML
 %>
 
-
 <div class="vert-left send-email" id="section-send-email">
     <div class="request-response msg msg-confirm copy" id="request-response"></div>
-    %if 'communications_mfe_url' in section_data:
-    <p>
-        <em>
-            ${_("To use the email tool, visit the")} <a href="${section_data['communications_mfe_url']}" target="_blank" rel="noopener">${_("new experience")}</a>.
-        </em>
-    </p>
-    %else:
     <ul class="list-fields">
         <li class="field">
             <div class="send_to_list">${_("Send to:")}</div>
@@ -142,5 +134,5 @@ from openedx.core.djangolib.markup import HTML
         </div>
     </div>
     %endif
-    %endif
+
 </div> <!-- end section send-email -->

@@ -1,8 +1,7 @@
 <header class="js-program-header program-header full-width-banner"></header>
 <!-- TODO: consider if article is the most appropriate element here -->
 
-<div class="col-md-12 d-md-flex">
-<article class="program-details-content col-md-8">
+<article class="program-details-content">
     <div class="program-heading">
             <% if (completedCount === totalCount) { %>
                 <h3 class="program-heading-title"><%- gettext('Congratulations!') %></h3>
@@ -17,9 +16,10 @@
                 <div class="program-heading-message">
                     <div>
                         <%- interpolate(gettext(
-                        'Track and plan your progress through the %(count)s courses in this program. To complete the program, you must earn a verified certificate for each course.'),
+                        'Track and plan your progress through the %(count)s courses in this program.'),
                         { count: totalCount }, true) %>
                     </div>
+                    <div><%- gettext('To complete the program, you must earn a verified certificate for each course.') %></div>
                 </div>
             <% } %>
             <% if (is_learner_eligible_for_one_click_purchase && (typeof is_mobile_only === 'undefined' || is_mobile_only === false)) { %>
@@ -76,5 +76,5 @@
         </div>
     </div>
 </article>
-<aside class="js-program-sidebar program-sidebar col-md-4"></aside>
-</div>
+<aside class="js-program-sidebar program-sidebar"></aside>
+

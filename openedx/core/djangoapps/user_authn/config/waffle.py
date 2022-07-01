@@ -3,9 +3,10 @@ Waffle flags and switches for user authn.
 """
 
 
-from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
 
 _WAFFLE_NAMESPACE = 'user_authn'
+_WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name=_WAFFLE_NAMESPACE, log_prefix='UserAuthN: ')
 
 # .. toggle_name: user_authn.enable_login_using_thirdparty_auth_only
 # .. toggle_implementation: WaffleSwitch
@@ -15,10 +16,12 @@ _WAFFLE_NAMESPACE = 'user_authn'
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-11-20
 # .. toggle_target_removal_date: 2020-01-31
-# .. toggle_warning: Requires THIRD_PARTY_AUTH_ONLY_DOMAIN to also be set.
+# .. toggle_warnings: Requires THIRD_PARTY_AUTH_ONLY_DOMAIN to also be set.
 # .. toggle_tickets: ENT-2461
-ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY = WaffleSwitch(
-    f'{_WAFFLE_NAMESPACE}.enable_login_using_thirdparty_auth_only', __name__
+ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY = LegacyWaffleSwitch(
+    _WAFFLE_SWITCH_NAMESPACE,
+    'enable_login_using_thirdparty_auth_only',
+    __name__
 )
 
 # .. toggle_name: user_authn.enable_pwned_password_api
@@ -29,6 +32,8 @@ ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY = WaffleSwitch(
 # .. toggle_creation_date: 2021-09-22
 # .. toggle_target_removal_date: 2021-12-31
 # .. toggle_tickets: VAN-664
-ENABLE_PWNED_PASSWORD_API = WaffleSwitch(
-    f'{_WAFFLE_NAMESPACE}.enable_pwned_password_api', __name__
+ENABLE_PWNED_PASSWORD_API = LegacyWaffleSwitch(
+    _WAFFLE_SWITCH_NAMESPACE,
+    'enable_pwned_password_api',
+    __name__
 )

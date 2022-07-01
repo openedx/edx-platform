@@ -663,7 +663,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         assert not api.is_user_eligible_for_credit(user.username, self.course_key)
 
         # Satisfy the other requirement
-        with self.assertNumQueries(22):
+        with self.assertNumQueries(20):
             api.set_credit_requirement_status(
                 user,
                 self.course_key,
@@ -1222,14 +1222,13 @@ class CourseApiTests(CreditApiTestBase):
         response_providers = get_credit_provider_attribute_values(self.course_key, 'display_name')
         self.assertListEqual(self.PROVIDERS_LIST, response_providers)
 
-    @mock.patch('openedx.core.djangoapps.credit.email_utils.get_ecommerce_api_client')
-    def test_get_credit_provider_display_names_method_with_exception(self, mock_get_client):
-        """
-        Verify that in case of any exception it logs the error and return.
-        """
-        mock_get_client.side_effect = Exception
+    @httpretty.activate
+    @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
+    def test_get_credit_provider_display_names_method_with_exception(self, mock_init):
+        """Verify that in case of any exception it logs the error and return."""
+        mock_init.side_effect = Exception
         response = get_credit_provider_attribute_values(self.course_key, 'display_name')
-        assert mock_get_client.called
+        assert mock_init.called
         assert response is None
 
     @httpretty.activate

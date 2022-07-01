@@ -4,9 +4,8 @@ Signal handlers for program enrollments
 
 
 import logging
-from datetime import datetime
 
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from social_django.models import UserSocialAuth
 
@@ -43,25 +42,6 @@ def listen_for_social_auth_creation(sender, instance, created, **kwargs):  # lin
             e,
         )
         raise
-
-
-def generate_default_display_name(self):
-    """
-    Returns a default display name for SamlProviderConfig.
-    """
-    time = datetime.now().strftime('%M%S')
-    return f'{self.slug}-{time}'
-
-
-@receiver(pre_save, sender=SAMLProviderConfig)
-def save_default_display_name(sender, instance, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
-    """
-    Post-save signal that sets default display name if one is not provided
-    """
-    this_display_name = instance.display_name
-    # check if display_name is None, empty, or just spaces
-    if not (this_display_name and this_display_name.strip()):
-        instance.display_name = generate_default_display_name(instance)
 
 
 def matriculate_learner(user, uid):

@@ -179,7 +179,7 @@ class CourseDiscussionSettingsForm(Form):
         course_id = self.cleaned_data['course_id']
         try:
             course_key = CourseKey.from_string(course_id)
-            self.cleaned_data['course'] = get_course_with_access(self.request_user, 'load', course_key)
+            self.cleaned_data['course'] = get_course_with_access(self.request_user, 'staff', course_key)
             self.cleaned_data['course_key'] = course_key
             return course_id
         except InvalidKeyError:
@@ -229,4 +229,3 @@ class TopicListGetForm(Form):
 class CourseActivityStatsForm(_PaginationForm):
     """Form for validating course activity stats API query parameters"""
     order_by = ChoiceField(choices=UserOrdering.choices, required=False)
-    username = CharField(required=False)

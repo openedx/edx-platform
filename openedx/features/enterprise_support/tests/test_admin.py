@@ -93,18 +93,16 @@ class EnrollmentAttributeOverrideViewTest(ModuleStoreTestCase):
         Tests that HTTP POST is working as expected when creating new attributes and updating.
         """
         csv_path = self.create_csv()
-        with open(csv_path) as csv_file:
-            post_data = {'csv_file': csv_file}
-            response = self.client.post(self.view_url, data=post_data)
-            assert response.status_code == 302
+        post_data = {'csv_file': open(csv_path)}
+        response = self.client.post(self.view_url, data=post_data)
+        assert response.status_code == 302
         self.verify_enrollment_attributes()
 
         # override existing
         csv_path = self.create_csv(data=self.csv_data_for_existing_attributes)
-        with open(csv_path) as csv_file:
-            post_data = {'csv_file': csv_file}
-            response = self.client.post(self.view_url, data=post_data)
-            assert response.status_code == 302
+        post_data = {'csv_file': open(csv_path)}
+        response = self.client.post(self.view_url, data=post_data)
+        assert response.status_code == 302
         self.verify_enrollment_attributes(data=self.csv_data_for_existing_attributes)
 
     def test_post_with_no_csv(self):

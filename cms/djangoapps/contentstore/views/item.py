@@ -427,16 +427,13 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
             # Note that the container view recursively adds headers into the preview fragment,
             # so only the "Pages" view requires that this extra wrapper be included.
-            display_label = xblock.display_name or xblock.scope_ids.block_type
-            if not xblock.display_name and xblock.scope_ids.block_type == 'html':
-                display_label = _("Text")
             if is_pages_view:
                 fragment.content = render_to_string('component.html', {
                     'xblock_context': context,
                     'xblock': xblock,
                     'locator': usage_key,
                     'preview': fragment.content,
-                    'label': display_label,
+                    'label': xblock.display_name or xblock.scope_ids.block_type,
                 })
         else:
             raise Http404
@@ -1311,7 +1308,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
                 xblock_info.update({
                     'is_proctored_exam': xblock.is_proctored_exam,
-                    'was_exam_ever_linked_with_external': _was_xblock_ever_exam_linked_with_external(
+                    'was_ever_special_exam': _was_xblock_ever_special_exam(
                         course, xblock
                     ),
                     'online_proctoring_rules': rules_url,
@@ -1367,16 +1364,15 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     return xblock_info
 
 
-def _was_xblock_ever_exam_linked_with_external(course, xblock):
+def _was_xblock_ever_special_exam(course, xblock):
     """
-    Determine whether this XBlock is or was ever configured as an external proctored exam.
+    Determine whether this XBlock is or was ever configured as a special exam.
 
-    If this block is *not* currently an externally linked proctored exam, the best way for us to tell
-    whether it was was *ever* such is by checking whether
-    edx-proctoring has an exam record associated with the block's ID,
-    and the exam record has external_id.
+    If this block is *not* currently a special exam, the best way for us to tell
+    whether it was was *ever* configured as a special exam is by checking whether
+    edx-proctoring has an exam record associated with the block's ID.
     If an exception is not raised, then we know that such a record exists,
-    indicating that this *was* once an externally linked proctored exam.
+    indicating that this *was* once a special exam.
 
     Arguments:
         course (CourseBlock)
@@ -1384,12 +1380,14 @@ def _was_xblock_ever_exam_linked_with_external(course, xblock):
 
     Returns: bool
     """
+    if xblock.is_time_limited:
+        return True
     try:
-        exam = get_exam_by_content_id(course.id, xblock.location)
-        return bool('external_id' in exam and exam['external_id'])
+        get_exam_by_content_id(course.id, xblock.location)
     except ProctoredExamNotFoundException:
-        pass
-    return False
+        return False
+    else:
+        return True
 
 
 def add_container_page_publishing_info(xblock, xblock_info):

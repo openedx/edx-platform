@@ -1,0 +1,57 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.conf import settings
+from django.urls import reverse
+from django.utils.translation import gettext as _
+from lms.djangoapps.verify_student.services import IDVerificationService
+%>
+
+%if verification_display:
+    %if verification_status == 'approved':
+        <li class="status status-verification is-accepted">
+            <span class="title status-title">${_("Current ID Verification Status: Approved")}</span>
+            <p class="status-note">${_("Your {platform_name} ID verification has been approved. Your ID verification is effective for two years after submission.").format(platform_name=settings.PLATFORM_NAME)}</p>
+            %if verification_expiry:
+                <p class="status-note"><span><b>${_("Warning")}: </b></span><i>${_("Your photo ID verification expires on {verification_expiry}. Please be aware photo verification can take up to three days once initiated and you will not be able to earn a certificate or take a proctored exam until approved.").format(verification_expiry=verification_expiry)}</i></p>
+                <div class="btn-reverify">
+                    <a href="${IDVerificationService.get_verify_location()}" class="action action-reverify">${_("Resubmit Verification")}</a>
+                </div>
+            %endif
+        </li>
+    %elif verification_status == 'pending':
+        <li class="status status-verification is-pending">
+            <span class="title status-title">${_("Current ID Verification Status: Pending")}</span>
+            <p class="status-note">${_("Your {platform_name} ID verification is pending. Your ID verification information has been submitted and will be reviewed shortly.").format(platform_name=settings.PLATFORM_NAME)}</p>
+        </li>
+    %elif verification_status in ['denied','must_reverify', 'must_retry']:
+        <li class="status status-verification is-denied">
+            <span class="title status-title">${_("Current ID Verification Status: Denied")}</span>
+            <p class="status-note">
+        ${_("Your ID verification submission was not accepted. To receive a verified certificate, you must submit a new photo of yourself and your government-issued photo ID before the verification deadline for your course.")}
+
+            %if verification_errors:
+                <br><br>
+                ${_("Your ID verification was denied for the following reasons:")}<br>
+                <ul>
+                %for error in verification_errors:
+                    <li>${error}</li>
+                %endfor
+                </ul>
+            %endif
+            </p>
+        <div class="btn-reverify">
+            <a href="${IDVerificationService.get_verify_location()}" class="action action-reverify">${_("Resubmit Verification")}</a>
+        </div>
+        </li>
+    %elif verification_status == 'expired':
+        <li class="status status-verification is-denied">
+            <span class="title status-title">${_("Current ID Verification Status: Expired")}</span>
+            <p class="status-note">${_("Your ID verification has expired. To receive a verified certificate, you must submit a new photo of yourself and your government-issued photo ID before the verification deadline for your course.")}</p>
+            <p class="status-note"><span><b>${_("Warning")}: </b></span>${_(" Please be aware photo verification can take up to three days once initiated and you will not be able to earn a certificate or take a proctored exam until approved.")}</p>
+            <div class="btn-reverify">
+                <a href="${IDVerificationService.get_verify_location()}" class="action action-reverify">${_("Resubmit Verification")}</a>
+            </div>
+        </li>
+    %endif
+%endif

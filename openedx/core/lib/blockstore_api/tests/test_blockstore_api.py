@@ -2,25 +2,22 @@
 Tests for xblock_utils.py
 """
 
+import unittest
 from uuid import UUID
 
 import pytest
-from django.test import TestCase
+from django.conf import settings
 
 from openedx.core.lib import blockstore_api as api
-from openedx.core.djangoapps.content_libraries.tests.base import (
-    BlockstoreAppTestMixin,
-    requires_blockstore,
-    requires_blockstore_app,
-)
 
 # A fake UUID that won't represent any real bundle/draft/collection:
 BAD_UUID = UUID('12345678-0000-0000-0000-000000000000')
 
 
-class BlockstoreApiClientTestMixin:
+@unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+class BlockstoreApiClientTest(unittest.TestCase):
     """
-    Tests for the Blockstore API Client.
+    Test for the Blockstore API Client.
 
     The goal of these tests is not to test that Blockstore works correctly, but
     that the API client can interact with it and all the API client methods
@@ -195,17 +192,3 @@ class BlockstoreApiClientTestMixin:
         # Finally, test deleting a link from course's draft:
         api.set_draft_link(course_draft.uuid, link2_name, None, None)
         assert not api.get_bundle_links(course_bundle.uuid, use_draft=course_draft.name)
-
-
-@requires_blockstore
-class BlockstoreServiceApiClientTest(BlockstoreApiClientTestMixin, TestCase):
-    """
-    Test the Blockstore API Client, using the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
-class BlockstoreAppApiClientTest(BlockstoreApiClientTestMixin, BlockstoreAppTestMixin, TestCase):
-    """
-    Test the Blockstore API Client, using the installed Blockstore app.
-    """

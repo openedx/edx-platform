@@ -15,7 +15,7 @@ import pytz
 from crum import get_current_request, impersonate
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from edx_toggles.toggles import WaffleFlag
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.models import CourseEntitlement
@@ -36,8 +36,12 @@ from common.djangoapps.track import segment
 # .. toggle_creation_date: 2019-4-16
 # .. toggle_target_removal_date: None
 # .. toggle_tickets: REVEM-282
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
-DISCOUNT_APPLICABILITY_FLAG = WaffleFlag('discounts.enable_discounting', __name__)
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+DISCOUNT_APPLICABILITY_FLAG = LegacyWaffleFlag(
+    waffle_namespace=LegacyWaffleFlagNamespace(name='discounts'),
+    flag_name='enable_discounting',
+    module_name=__name__,
+)
 
 DISCOUNT_APPLICABILITY_HOLDBACK = 'first_purchase_discount_holdback'
 REV1008_EXPERIMENT_ID = 16

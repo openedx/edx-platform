@@ -43,16 +43,7 @@ def require_params(param_names):
     return decorator
 
 
-def is_json(input_string):
-    """Quick True/False check to see if a value is JSON"""
-    try:
-        json.loads(input_string)
-    except ValueError:
-        return False
-    return True
-
-
-def call_xblock_json_handler(request, usage_id, handler_name, data, auth=False):
+def call_xblock_json_handler(request, usage_id, handler_name, data):
     """
     WARN: Tested only for use in ESG. Consult before use outside of ESG.
 

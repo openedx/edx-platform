@@ -52,8 +52,8 @@ def evaluate_entrance_exam(course_grade, user):
     if ENTRANCE_EXAMS.is_enabled() and getattr(course, 'entrance_exam_enabled', False):
         if get_entrance_exam_content(user, course):
             exam_chapter_key = get_entrance_exam_usage_key(course)
-            exam_score = get_entrance_exam_score(course_grade, exam_chapter_key)
-            if exam_score >= course.entrance_exam_minimum_score_pct:
+            exam_score_ratio = get_entrance_exam_score_ratio(course_grade, exam_chapter_key)
+            if exam_score_ratio >= course.entrance_exam_minimum_score_pct:
                 relationship_types = milestones_helpers.get_milestone_relationship_types()
                 content_milestones = milestones_helpers.get_course_content_milestones(
                     course.id,
@@ -69,18 +69,18 @@ def get_entrance_exam_usage_key(course):
     """
     Returns the UsageKey of the entrance exam for the course.
     """
-    return course.entrance_exam_id and UsageKey.from_string(course.entrance_exam_id).replace(course_key=course.id)
+    return UsageKey.from_string(course.entrance_exam_id).replace(course_key=course.id)
 
 
-def get_entrance_exam_score(course_grade, exam_chapter_key):
+def get_entrance_exam_score_ratio(course_grade, exam_chapter_key):
     """
     Returns the score for the given chapter as a ratio of the
     aggregated earned over the possible points, resulting in a
     decimal value less than 1.
     """
     try:
-        entrance_exam_score = course_grade.chapter_percentage(exam_chapter_key)
+        entrance_exam_score_ratio = course_grade.chapter_percentage(exam_chapter_key)
     except KeyError:
-        entrance_exam_score = 0.0
+        entrance_exam_score_ratio = 0.0, 0.0
         log.warning('Gating: Unexpectedly failed to find chapter_grade for %s.', exam_chapter_key)
-    return entrance_exam_score
+    return entrance_exam_score_ratio

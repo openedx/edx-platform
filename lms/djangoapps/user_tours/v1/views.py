@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from lms.djangoapps.user_tours.models import UserTour
+from lms.djangoapps.user_tours.toggles import USER_TOURS_ENABLED
 from lms.djangoapps.user_tours.v1.serializers import UserTourSerializer
 
 
@@ -39,6 +40,9 @@ class UserTourView(RetrieveUpdateAPIView):
             403 if waffle flag is not enabled
             404 if the UserTour does not exist (shouldn't happen, but safety first)
         """
+        if not USER_TOURS_ENABLED.is_enabled():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         if request.user.username != username and not request.user.is_staff:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -63,6 +67,9 @@ class UserTourView(RetrieveUpdateAPIView):
             401 if unauthorized request
             403 if waffle flag is not enabled
         """
+        if not USER_TOURS_ENABLED.is_enabled():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         if request.user.username != username:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

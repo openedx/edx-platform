@@ -3268,7 +3268,7 @@ class SchematicResponse(LoncapaResponse):
         answer_src = answer.get('src')
         if answer_src is not None:
             # Untested; never used
-            self.code = self.capa_system.resources_fs.open('src/' + answer_src).read()
+            self.code = self.capa_system.filestore.open('src/' + answer_src).read()
         else:
             self.code = answer.text
 

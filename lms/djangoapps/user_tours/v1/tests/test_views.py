@@ -5,17 +5,20 @@ from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.test import TestCase
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from rest_framework import status
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.user_tours.handlers import init_user_tour
 from lms.djangoapps.user_tours.models import UserTour
+from lms.djangoapps.user_tours.toggles import USER_TOURS_ENABLED
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 
 User = get_user_model()
 
 
 @ddt.ddt
+@override_waffle_flag(USER_TOURS_ENABLED, active=True)
 class TestUserTourView(TestCase):
     """ Tests for the v1 User Tour views. """
     def setUp(self):
@@ -44,6 +47,13 @@ class TestUserTourView(TestCase):
             return self.client.get(url, **headers)
         elif method == 'PATCH':
             return self.client.patch(url, data, content_type='application/json', **headers)
+
+    @ddt.data('GET', 'PATCH')
+    @override_waffle_flag(USER_TOURS_ENABLED, active=False)
+    def test_waffle_flag_off(self, method):
+        """ Test all endpoints if the waffle flag is turned off. """
+        response = self.send_request(self.staff_user, self.user, method)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     @ddt.data('GET', 'PATCH')
     def test_unauthorized_user(self, method):

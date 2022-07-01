@@ -7,15 +7,12 @@ Many of these GETs may become PUTs in the future.
 """
 
 import csv
-import datetime
 import json
 import logging
 import string
 import random
 import re
 
-import dateutil
-import pytz
 import edx_api_doc_tools as apidocs
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -74,7 +71,8 @@ from common.djangoapps.util.file import (
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
 from common.djangoapps.util.views import require_global_staff
-from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled, create_course_email
+from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
+from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateStatuses
@@ -103,8 +101,8 @@ from lms.djangoapps.instructor.views.instructor_task_helpers import extract_emai
 from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic, csvs as instructor_analytics_csvs
 from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
-from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -966,9 +964,9 @@ def bulk_beta_modify_access(request, course_id):
             # Tabulate the action result of this email address
             results.append({
                 'identifier': identifier,
-                'error': error,  # pylint: disable=used-before-assignment
-                'userDoesNotExist': user_does_not_exist,  # pylint: disable=used-before-assignment
-                'is_active': user_active  # pylint: disable=used-before-assignment
+                'error': error,
+                'userDoesNotExist': user_does_not_exist,
+                'is_active': user_active
             })
 
     response_payload = {
@@ -1428,7 +1426,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         query_features = [
             'id', 'username', 'name', 'email', 'language', 'location',
             'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-            'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
+            'goals', 'enrollment_mode', 'verification_status',
+            'last_login', 'date_joined', 'external_user_key'
         ]
 
     # Provide human-friendly and translatable names for these features. These names
@@ -1447,6 +1446,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         'mailing_address': _('Mailing Address'),
         'goals': _('Goals'),
         'enrollment_mode': _('Enrollment Mode'),
+        'verification_status': _('Verification Status'),
         'last_login': _('Last Login'),
         'date_joined': _('Date Joined'),
         'external_user_key': _('External User Key'),
@@ -1460,6 +1460,11 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
     if course.teams_enabled:
         query_features.append('team')
         query_features_names['team'] = _('Team')
+
+    if is_integrity_signature_enabled(course_key):
+        if 'verification_status' in query_features:
+            query_features.remove('verification_status')
+            query_features_names.pop('verification_status')
 
     # For compatibility reasons, city and country should always appear last.
     query_features.append('city')
@@ -2116,7 +2121,7 @@ def list_background_email_tasks(request, course_id):
     List background email tasks.
     """
     course_id = CourseKey.from_string(course_id)
-    task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
+    task_type = 'bulk_course_email'
     # Specifying for the history of a single task type
     tasks = task_api.get_instructor_task_history(
         course_id,
@@ -2138,7 +2143,7 @@ def list_email_content(request, course_id):
     List the content of bulk emails sent
     """
     course_id = CourseKey.from_string(course_id)
-    task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
+    task_type = 'bulk_course_email'
     # First get tasks list of bulk emails sent
     emails = task_api.get_instructor_task_history(course_id, task_type=task_type)
 
@@ -2695,56 +2700,56 @@ def send_email(request, course_id):
     - 'message' specifies email's content
     """
     course_id = CourseKey.from_string(course_id)
-    course_overview = CourseOverview.get_from_id(course_id)
 
     if not is_bulk_email_feature_enabled(course_id):
-        log.warning(f"Email is not enabled for course {course_id}")
+        log.warning('Email is not enabled for course %s', course_id)
         return HttpResponseForbidden("Email is not enabled for this course.")
 
     targets = json.loads(request.POST.get("send_to"))
     subject = request.POST.get("subject")
     message = request.POST.get("message")
-    # optional, this is a date and time in the form of an ISO8601 string
-    schedule = request.POST.get("schedule", "")
 
-    schedule_dt = None
-    if schedule:
-        try:
-            # convert the schedule from a string to a datetime, then check if its a valid future date and time, dateutil
-            # will throw a ValueError if the schedule is no good.
-            schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
-            if schedule_dt < datetime.datetime.now(pytz.utc):
-                raise ValueError("the requested schedule is in the past")
-        except ValueError as value_error:
-            error_message = (
-                f"Error occurred creating a scheduled bulk email task. Schedule provided: '{schedule}'. Error: "
-                f"{value_error}"
-            )
-            log.error(error_message)
-            return HttpResponseBadRequest(error_message)
+    # allow two branding points to come from Site Configuration: which CourseEmailTemplate should be used
+    # and what the 'from' field in the email should be
+    #
+    # If these are None (there is no site configuration enabled for the current site) than
+    # the system will use normal system defaults
+    course_overview = CourseOverview.get_from_id(course_id)
+    from_addr = configuration_helpers.get_value('course_email_from_addr')
+    if isinstance(from_addr, dict):
+        # If course_email_from_addr is a dict, we are customizing
+        # the email template for each organization that has courses
+        # on the site. The dict maps from addresses by org allowing
+        # us to find the correct from address to use here.
+        from_addr = from_addr.get(course_overview.display_org_with_default)
 
-    # Retrieve the customized email "from address" and email template from site configuration for the course/partner. If
-    # there is no site configuration enabled for the current site then we use system defaults for both.
-    from_addr = _get_branded_email_from_address(course_overview)
-    template_name = _get_branded_email_template(course_overview)
+    template_name = configuration_helpers.get_value('course_email_template_name')
+    if isinstance(template_name, dict):
+        # If course_email_template_name is a dict, we are customizing
+        # the email template for each organization that has courses
+        # on the site. The dict maps template names by org allowing
+        # us to find the correct template to use here.
+        template_name = template_name.get(course_overview.display_org_with_default)
 
-    # Create the CourseEmail object. This is saved immediately so that any transaction that has been pending up to this
-    # point will also be committed.
+    # Create the CourseEmail object.  This is saved immediately, so that
+    # any transaction that has been pending up to this point will also be
+    # committed.
     try:
-        email = create_course_email(
+        email = CourseEmail.create(
             course_id,
             request.user,
             targets,
-            subject,
-            message,
+            subject, message,
             template_name=template_name,
-            from_addr=from_addr,
+            from_addr=from_addr
         )
     except ValueError as err:
+        log.exception('Cannot create course email for course %s requested by user %s for targets %s',
+                      course_id, request.user, targets)
         return HttpResponseBadRequest(repr(err))
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    task_api.submit_bulk_course_email(request, course_id, email.id, schedule_dt)
+    task_api.submit_bulk_course_email(request, course_id, email.id)
 
     response_payload = {
         'course_id': str(course_id),
@@ -3561,44 +3566,33 @@ def _get_certificate_for_user(course_key, student):
 
     return certificate
 
-
-def _get_branded_email_from_address(course_overview):
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_course_permission(permissions.ENROLLMENT_REPORT)
+@require_post_params(
+    unique_student_identifier="email or username of student for whom to get progress url"
+)
+@common_exceptions_400
+def get_student_dates_url(request, course_id):
     """
-    Checks and retrieves a customized "from address", if one exists for the course/org. This is the email address that
-    learners will see the message coming from.
+    Get the dates url of a student.
+    Limited to staff access.
 
-    Args:
-        course_overview (CourseOverview): The course overview instance for the course-run.
-
-    Returns:
-        String: The customized "from address" to be used in messages sent by the bulk course email tool for this
-                course or org.
+    Takes query parameter unique_student_identifier and if the student exists
+    returns e.g. {
+        'dates_url': '/../...'
+    }
     """
-    from_addr = configuration_helpers.get_value('course_email_from_addr')
-    if isinstance(from_addr, dict):
-        # If course_email_from_addr is a dict, we are customizing the email template for each organization that has
-        # courses on the site. The dict maps from addresses by org allowing us to find the correct from address to use
-        # here.
-        from_addr = from_addr.get(course_overview.display_org_with_default)
+    course_id = CourseKey.from_string(course_id)
+    user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
 
-    return from_addr
-
-
-def _get_branded_email_template(course_overview):
-    """
-    Checks and retrieves the custom email template, if one exists for the course/org, to style messages sent by the bulk
-    course email tool.
-
-    Args:
-        course_overview (CourseOverview): The course overview instance for the course-run.
-
-    Returns:
-        String: The name of the custom email template to use for this course or org.
-    """
-    template_name = configuration_helpers.get_value('course_email_template_name')
-    if isinstance(template_name, dict):
-        # If course_email_template_name is a dict, we are customizing the email template for each organization that has
-        # courses on the site. The dict maps template names by org allowing us to find the correct template to use here.
-        template_name = template_name.get(course_overview.display_org_with_default)
-
-    return template_name
+    # only use mfe url
+    dates_url = get_learning_mfe_home_url(course_id, url_fragment='dates')
+    if user is not None:
+        dates_url += '/{}/'.format(user.id)
+    response_payload = {
+        'course_id': str(course_id),
+        'dates_url': dates_url,
+    }
+    return JsonResponse(response_payload)

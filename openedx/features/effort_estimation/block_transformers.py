@@ -11,7 +11,9 @@ from django.utils.functional import cached_property
 from edxval.api import get_videos_for_course
 
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
+from openedx.core.djangoapps.content.block_structure.block_structure import BlockStructureModulestoreData
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
+from openedx.features.effort_estimation.estimate_regex.estimate_time_by_regex import estimate_time_by_regex
 
 from .toggles import EFFORT_ESTIMATION_DISABLED_FLAG
 
@@ -42,6 +44,7 @@ class EffortEstimationTransformer(BlockStructureTransformer):
     # Private transformer field names
     DISABLE_ESTIMATION = 'disable_estimation'
     HTML_WORD_COUNT = 'html_word_count'
+    TIME_BY_REGEX = 'time_by_regex'
     VIDEO_CLIP_DURATION = 'video_clip_duration'
     VIDEO_DURATION = 'video_duration'
 
@@ -85,7 +88,10 @@ class EffortEstimationTransformer(BlockStructureTransformer):
             # Some bit of required data is missing. Likely some duration info is missing from the video pipeline.
             # Rather than attempt to work around it, just set a note for ourselves to not show durations for this
             # course at all. Better no estimate than a misleading estimate.
-            block_structure.set_transformer_data(cls, cls.DISABLE_ESTIMATION, True)
+
+            # Funix ==> Disable this code
+            # block_structure.set_transformer_data(cls, cls.DISABLE_ESTIMATION, True)
+            pass
 
     @classmethod
     def _collect_html_effort(cls, block_structure, block_key, xblock, _cache):
@@ -96,6 +102,9 @@ class EffortEstimationTransformer(BlockStructureTransformer):
             raise cls.MissingEstimationData() from exc
 
         block_structure.set_transformer_block_field(block_key, cls, cls.HTML_WORD_COUNT, len(text.split()))
+
+        time_by_regex = estimate_time_by_regex(text)
+        block_structure.set_transformer_block_field(block_key, cls, cls.TIME_BY_REGEX, time_by_regex)
 
     @classmethod
     def _collect_video_effort(cls, block_structure, block_key, xblock, cache):
@@ -135,7 +144,7 @@ class EffortEstimationTransformer(BlockStructureTransformer):
             'chapter': self._estimate_children_effort,
             'course': self._estimate_children_effort,
             'html': self._estimate_html_effort,
-            'sequential': self._estimate_children_effort,
+            'sequential': self._estimate_sequential_effort_by_regex,
             'vertical': self._estimate_vertical_effort,
             'video': self._estimate_video_effort,
         }
@@ -219,3 +228,17 @@ class EffortEstimationTransformer(BlockStructureTransformer):
         # We are intentionally only looking at global_speed, not speed (which is last speed user used on this video)
         # because this estimate is meant to be somewhat static.
         return user_duration / global_speed, 0
+
+    def _estimate_sequential_effort_by_regex(self, _usage_info, block_structure, block_key):
+        """Returns an expected time to view the video, at the user's preferred speed."""
+        time = None
+        cls = EffortEstimationTransformer
+        vertical_childs = block_structure.get_children(block_key)
+        if len(vertical_childs) > 0:
+            first_html = block_structure.get_children(vertical_childs[0])[0]
+            time = block_structure.get_transformer_block_field(first_html, cls, self.TIME_BY_REGEX)
+
+        activities = self._gather_child_values(block_structure, block_key, self.EFFORT_ACTIVITIES, default=1)
+        time = time * 60 if time is not None else None
+
+        return time, activities

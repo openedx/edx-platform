@@ -118,7 +118,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         """
         assert len(api.get_bookmarks(user=self.user, course_key=self.course.id)) == 4
 
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(9):
             bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
 
         self.assert_bookmark_event_emitted(
@@ -139,7 +139,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         """
         assert len(api.get_bookmarks(user=self.user, course_key=self.course.id)) == 4
 
-        with self.assertNumQueries(10):
+        with self.assertNumQueries(9):
             bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
 
         self.assert_bookmark_event_emitted(

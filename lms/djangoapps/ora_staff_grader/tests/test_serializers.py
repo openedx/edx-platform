@@ -11,7 +11,6 @@ from lms.djangoapps.ora_staff_grader.errors import ERR_UNKNOWN, ErrorSerializer
 from lms.djangoapps.ora_staff_grader.serializers import (
     AssessmentCriteriaSerializer,
     CourseMetadataSerializer,
-    FileListSerializer,
     GradeDataSerializer,
     InitializeSerializer,
     LockStatusSerializer,
@@ -261,13 +260,10 @@ class TestSubmissionMetadataSerializer(TestCase):
         for submission_id, submission_data in self.submission_data.items():
             data = SubmissionMetadataSerializer(submission_data).data
 
-            # For each submission, there are only a few transforms:
-            # 1) "submissionUuid" to "submissionUUID"
-            # 2) "gradingStatus" to "gradeStatus"
+            # For each submission, the only transform is to change "submissionUuid" to "submissionUUID"
             # Create that "expected" object here by updating the key name
             expected_data = self.submission_data[submission_id].copy()
             expected_data["submissionUUID"] = expected_data.pop("submissionUuid")
-            expected_data["gradeStatus"] = expected_data.pop("gradingStatus")
 
             assert data == expected_data
 
@@ -293,7 +289,7 @@ class TestSubmissionMetadataSerializer(TestCase):
             "dateSubmitted": "1983-06-03 00:00:00",
             "dateGraded": None,
             "gradedBy": None,
-            "gradeStatus": "ungraded",
+            "gradingStatus": "ungraded",
             "lockStatus": "unlocked",
             "score": None,
         }
@@ -309,7 +305,7 @@ class TestInitializeSerializer(TestCase):
     """
 
     def set_up_ora(self):
-        """Create a mock Open Response Assessment for serialization"""
+        """Create a mock Open Repsponse Assessment for serialization"""
         ora_data = {
             "display_name": "Week 1: Time Travel Paradoxes",
             "prompts": [
@@ -348,7 +344,6 @@ class TestInitializeSerializer(TestCase):
             "courseMetadata": self.mock_course_metadata,
             "oraMetadata": self.mock_ora_instance,
             "submissions": self.mock_submissions_data,
-            "isEnabled": True,
         }
 
         output_data = InitializeSerializer(input_data).data
@@ -366,7 +361,6 @@ class TestInitializeSerializer(TestCase):
         assert output_data["courseMetadata"] == expected_course_data
         assert output_data["oraMetadata"] == expected_ora_data
         assert output_data["submissions"] == expected_submissions_data
-        assert output_data["isEnabled"] is True
 
 
 class TestRubricConfigSerializer(TestCase):
@@ -489,48 +483,6 @@ class TestResponseSerializer(TestCase):
         assert data == expected_value
 
 
-@ddt.ddt
-class TestFileListSerializer(TestCase):
-    """
-    Tests for FileListSerializer - this is basically a stripped down ResponseSerializer
-    """
-
-    def test_file_list_serializer__empty(self):
-        """Empty fields should be allowed"""
-        input_data = {"files": [], "text": []}
-        expected_output = {"files": []}
-        assert FileListSerializer(input_data).data == expected_output
-
-    def test_file_list_serializer(self):
-        """Base serialization behavior"""
-        input_data = {
-            "files": [{
-                "name": Mock(),
-                "description": Mock(),
-                "download_url": Mock(),
-                "size": 12345,
-            }, {
-                "name": Mock(),
-                "description": Mock(),
-                "download_url": Mock(),
-                "size": 54321,
-            }],
-            "text": "",
-        }
-
-        output_data = FileListSerializer(input_data).data
-        assert output_data.keys() == set(["files"])
-
-        for i, input_file in enumerate(input_data["files"]):
-            output_file = output_data["files"][i]
-            assert output_file.keys() == set(["name", "description", "downloadUrl", "size"])
-
-            assert output_file["name"] == str(input_file["name"])
-            assert output_file["description"] == str(input_file["description"])
-            assert output_file["downloadUrl"] == str(input_file["download_url"])
-            assert output_file["size"] == input_file["size"]
-
-
 class TestAssessmentCriteriaSerializer(TestCase):
     """Tests for AssessmentCriteriaSerializer"""
 
@@ -550,7 +502,7 @@ class TestAssessmentCriteriaSerializer(TestCase):
     def test_assessment_criteria_serializer__feedback_only(self):
         """Test for serialization behavior of a feedback-only criterion"""
         input_data = {
-            "name": "SomeCriterion",
+            "name": "SomeCriterioOn",
             "feedback": "Pathetic Effort",
             "points": None,
             "option": None,

@@ -15,6 +15,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODUL
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.data import CertificatesDisplayBehaviors
 
+from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -35,6 +36,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
     MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     USERNAME = "test_user"
     PASSWORD = "password"
+    DOWNLOAD_URL = "http://www.example.com/certificate.pdf"
 
     @classmethod
     def setUpClass(cls):
@@ -61,7 +63,7 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
         else:
             self.assertNotContains(response, 'Add Certificate to LinkedIn Profile')
 
-    def _create_certificate(self, enrollment_mode):
+    def _create_certificate(self, enrollment_mode, download_url=DOWNLOAD_URL):
         """Simulate that the user has a generated certificate. """
         CourseEnrollmentFactory.create(
             user=self.user,
@@ -71,9 +73,37 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
             user=self.user,
             course_id=self.course.id,
             mode=enrollment_mode,
+            download_url=download_url,
             status=CertificateStatuses.downloadable,
             grade=0.98,
         )
+
+    def _check_can_download_certificate(self):
+        """
+        Inspect the dashboard to see if a certificate can be downloaded.
+        """
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, 'Download my')
+        self.assertContains(response, self.DOWNLOAD_URL)
+
+    def _check_can_download_certificate_no_id(self):
+        """
+        Inspects the dashboard to see if a certificate for a non verified course enrollment
+        is present
+        """
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, 'Download')
+        self.assertContains(response, self.DOWNLOAD_URL)
+
+    def _check_can_not_download_certificate(self):
+        """
+        Make sure response does not have any of the download certificate buttons
+        """
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotContains(response, 'View Test_Certificate')
+        self.assertNotContains(response, 'Download my Test_Certificate')
+        self.assertNotContains(response, 'Download my Test_Certificate')
+        self.assertNotContains(response, self.DOWNLOAD_URL)
 
 
 @ddt.ddt
@@ -101,6 +131,7 @@ class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
         if is_past:
             self.assertNotContains(response, test_message)
             self.assertNotContains(response, "View Test_Certificate")
+            self._check_can_download_certificate()
 
         else:
             self.assertContains(response, test_message)
@@ -144,6 +175,27 @@ class CertificateDisplayTest(CertificateDisplayTestBase):
     Tests of certificate display.
     """
 
+    @ddt.data('verified', 'professional')
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
+    def test_display_verified_certificate(self, enrollment_mode):
+        self._create_certificate(enrollment_mode)
+        self._check_can_download_certificate()
+
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
+    def test_no_certificate_status_no_problem(self):
+        with patch('common.djangoapps.student.views.dashboard.cert_info', return_value={}):
+            self._create_certificate('honor')
+            self._check_can_not_download_certificate()
+
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
+    def test_display_verified_certificate_no_id(self):
+        """
+        Confirm that if we get a certificate with a no-id-professional mode
+        we still can download our certificate
+        """
+        self._create_certificate(CourseMode.NO_ID_PROFESSIONAL_MODE)
+        self._check_can_download_certificate_no_id()
+
     @ddt.data('verified', 'honor', 'professional')
     def test_unverified_certificate_message(self, enrollment_mode):
         cert = self._create_certificate(enrollment_mode)
@@ -171,6 +223,34 @@ class CertificateDisplayTest(CertificateDisplayTestBase):
         LinkedInAddToProfileConfigurationFactory()
         # now we should see it
         self._check_linkedin_visibility(True)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CertificateDisplayTestHtmlView(CertificateDisplayTestBase):
+    """
+    Tests of webview certificate display
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course.cert_html_view_enabled = True
+        cls.course.save()
+        cls.store.update_item(cls.course, cls.USERNAME)
+
+    @ddt.data('verified', 'honor')
+    @override_settings(CERT_NAME_SHORT='Test_Certificate')
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    def test_display_download_certificate_button(self, enrollment_mode):
+        """
+        Tests if CERTIFICATES_HTML_VIEW is True
+        and course has enabled web certificates via cert_html_view_enabled setting
+        and no active certificate configuration available
+        then any of the web view certificate Download button should not be visible.
+        """
+        self._create_certificate(enrollment_mode, download_url='')
+        self._check_can_not_download_certificate()
 
 
 @ddt.ddt

@@ -18,7 +18,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login
 from django.contrib.auth.models import Group
-from django.db.transaction import atomic
 from django.http import Http404
 from django.http import HttpResponseBadRequest
 from django.http import JsonResponse
@@ -143,7 +142,6 @@ class LibraryRootView(APIView):
     Views to list, search for, and create content libraries.
     """
 
-    @atomic
     @apidocs.schema(
         parameters=[
             *LibraryApiPagination.apidoc_params,
@@ -186,7 +184,6 @@ class LibraryRootView(APIView):
             return paginator.get_paginated_response(serializer.data)
         return Response(serializer.data)
 
-    @atomic
     def post(self, request):
         """
         Create a new content library.
@@ -226,7 +223,6 @@ class LibraryDetailsView(APIView):
     """
     Views to work with a specific content library
     """
-    @atomic
     @convert_exceptions
     def get(self, request, lib_key_str):
         """
@@ -237,7 +233,6 @@ class LibraryDetailsView(APIView):
         result = api.get_library(key)
         return Response(ContentLibraryMetadataSerializer(result).data)
 
-    @atomic
     @convert_exceptions
     def patch(self, request, lib_key_str):
         """
@@ -260,7 +255,6 @@ class LibraryDetailsView(APIView):
         result = api.get_library(key)
         return Response(ContentLibraryMetadataSerializer(result).data)
 
-    @atomic
     @convert_exceptions
     def delete(self, request, lib_key_str):  # pylint: disable=unused-argument
         """
@@ -281,7 +275,6 @@ class LibraryTeamView(APIView):
     Note also the 'allow_public_' settings which can be edited by PATCHing the
     library itself (LibraryDetailsView.patch).
     """
-    @atomic
     @convert_exceptions
     def post(self, request, lib_key_str):
         """
@@ -309,7 +302,6 @@ class LibraryTeamView(APIView):
         grant = api.get_library_user_permissions(key, user)
         return Response(ContentLibraryPermissionSerializer(grant).data)
 
-    @atomic
     @convert_exceptions
     def get(self, request, lib_key_str):
         """
@@ -328,7 +320,6 @@ class LibraryTeamUserView(APIView):
     View to add/remove/edit an individual user's permissions for a content
     library.
     """
-    @atomic
     @convert_exceptions
     def put(self, request, lib_key_str, username):
         """
@@ -347,7 +338,6 @@ class LibraryTeamUserView(APIView):
         grant = api.get_library_user_permissions(key, user)
         return Response(ContentLibraryPermissionSerializer(grant).data)
 
-    @atomic
     @convert_exceptions
     def get(self, request, lib_key_str, username):
         """
@@ -361,7 +351,6 @@ class LibraryTeamUserView(APIView):
             raise NotFound
         return Response(ContentLibraryPermissionSerializer(grant).data)
 
-    @atomic
     @convert_exceptions
     def delete(self, request, lib_key_str, username):
         """
@@ -383,7 +372,6 @@ class LibraryTeamGroupView(APIView):
     """
     View to add/remove/edit a group's permissions for a content library.
     """
-    @atomic
     @convert_exceptions
     def put(self, request, lib_key_str, group_name):
         """
@@ -398,7 +386,6 @@ class LibraryTeamGroupView(APIView):
         api.set_library_group_permissions(key, group, access_level=serializer.validated_data["access_level"])
         return Response({})
 
-    @atomic
     @convert_exceptions
     def delete(self, request, lib_key_str, username):
         """
@@ -417,7 +404,6 @@ class LibraryBlockTypesView(APIView):
     """
     View to get the list of XBlock types that can be added to this library
     """
-    @atomic
     @convert_exceptions
     def get(self, request, lib_key_str):
         """
@@ -442,7 +428,6 @@ class LibraryLinksView(APIView):
     Links always point to a specific published version of the target bundle.
     Links are identified by a slug-like ID, e.g. "link1"
     """
-    @atomic
     @convert_exceptions
     def get(self, request, lib_key_str):
         """
@@ -453,7 +438,6 @@ class LibraryLinksView(APIView):
         result = api.get_bundle_links(key)
         return Response(LibraryBundleLinkSerializer(result, many=True).data)
 
-    @atomic
     @convert_exceptions
     def post(self, request, lib_key_str):
         """
@@ -478,7 +462,6 @@ class LibraryLinkDetailView(APIView):
     """
     View to update/delete an existing library link
     """
-    @atomic
     @convert_exceptions
     def patch(self, request, lib_key_str, link_id):
         """
@@ -495,7 +478,6 @@ class LibraryLinkDetailView(APIView):
         api.update_bundle_link(key, link_id, version=serializer.validated_data['version'])
         return Response({})
 
-    @atomic
     @convert_exceptions
     def delete(self, request, lib_key_str, link_id):  # pylint: disable=unused-argument
         """
@@ -512,7 +494,6 @@ class LibraryCommitView(APIView):
     """
     Commit/publish or revert all of the draft changes made to the library.
     """
-    @atomic
     @convert_exceptions
     def post(self, request, lib_key_str):
         """
@@ -524,7 +505,6 @@ class LibraryCommitView(APIView):
         api.publish_changes(key)
         return Response({})
 
-    @atomic
     @convert_exceptions
     def delete(self, request, lib_key_str):  # pylint: disable=unused-argument
         """
@@ -542,7 +522,6 @@ class LibraryBlocksView(APIView):
     """
     Views to work with XBlocks in a specific content library.
     """
-    @atomic
     @apidocs.schema(
         parameters=[
             *LibraryApiPagination.apidoc_params,
@@ -581,7 +560,6 @@ class LibraryBlocksView(APIView):
 
         return Response(LibraryXBlockMetadataSerializer(result, many=True).data)
 
-    @atomic
     @convert_exceptions
     def post(self, request, lib_key_str):
         """
@@ -614,7 +592,6 @@ class LibraryBlockView(APIView):
     """
     Views to work with an existing XBlock in a content library.
     """
-    @atomic
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
@@ -625,7 +602,6 @@ class LibraryBlockView(APIView):
         result = api.get_library_block(key)
         return Response(LibraryXBlockMetadataSerializer(result).data)
 
-    @atomic
     @convert_exceptions
     def delete(self, request, usage_key_str):  # pylint: disable=unused-argument
         """
@@ -652,7 +628,6 @@ class LibraryBlockLtiUrlView(APIView):
 
     Returns 404 in case the block not found by the given key.
     """
-    @atomic
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
@@ -672,7 +647,6 @@ class LibraryBlockOlxView(APIView):
     """
     Views to work with an existing XBlock's OLX
     """
-    @atomic
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
@@ -683,7 +657,6 @@ class LibraryBlockOlxView(APIView):
         xml_str = api.get_library_block_olx(key)
         return Response(LibraryXBlockOlxSerializer({"olx": xml_str}).data)
 
-    @atomic
     @convert_exceptions
     def post(self, request, usage_key_str):
         """
@@ -709,7 +682,6 @@ class LibraryBlockAssetListView(APIView):
     """
     Views to list an existing XBlock's static asset files
     """
-    @atomic
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
@@ -728,7 +700,6 @@ class LibraryBlockAssetView(APIView):
     """
     parser_classes = (MultiPartParser, )
 
-    @atomic
     @convert_exceptions
     def get(self, request, usage_key_str, file_path):
         """
@@ -742,7 +713,6 @@ class LibraryBlockAssetView(APIView):
                 return Response(LibraryXBlockStaticFileSerializer(f).data)
         raise NotFound
 
-    @atomic
     @convert_exceptions
     def put(self, request, usage_key_str, file_path):
         """
@@ -765,7 +735,6 @@ class LibraryBlockAssetView(APIView):
             raise ValidationError("Invalid file path")  # lint-amnesty, pylint: disable=raise-missing-from
         return Response(LibraryXBlockStaticFileSerializer(result).data)
 
-    @atomic
     @convert_exceptions
     def delete(self, request, usage_key_str, file_path):
         """
@@ -788,7 +757,6 @@ class LibraryImportTaskViewSet(ViewSet):
     Import blocks from Courseware through modulestore.
     """
 
-    @atomic
     @convert_exceptions
     def list(self, request, lib_key_str):
         """
@@ -807,7 +775,6 @@ class LibraryImportTaskViewSet(ViewSet):
             paginator.paginate_queryset(result, request)
         )
 
-    @atomic
     @convert_exceptions
     def create(self, request, lib_key_str):
         """
@@ -828,7 +795,6 @@ class LibraryImportTaskViewSet(ViewSet):
         import_task = api.import_blocks_create_task(library_key, course_key)
         return Response(ContentLibraryBlockImportTaskSerializer(import_task).data)
 
-    @atomic
     @convert_exceptions
     def retrieve(self, request, lib_key_str, pk=None):
         """

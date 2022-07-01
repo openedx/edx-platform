@@ -2,9 +2,11 @@
 Views that handle course updates.
 """
 
+import six  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth.decorators import login_required
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from opaque_keys.edx.keys import CourseKey
@@ -13,7 +15,7 @@ from web_fragments.fragment import Fragment
 from lms.djangoapps.courseware.courses import get_course_info_section_module, get_course_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.features.course_experience import default_course_url
+from openedx.features.course_experience import default_course_url_name
 from openedx.features.course_experience.course_updates import get_ordered_updates
 
 
@@ -46,7 +48,8 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         """
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-        course_url = default_course_url(course.id)
+        course_url_name = default_course_url_name(course.id)
+        course_url = reverse(course_url_name, kwargs={'course_id': str(course.id)})
 
         ordered_updates = get_ordered_updates(request, course)
         plain_html_updates = ''
@@ -78,6 +81,4 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         """
         info_module = get_course_info_section_module(request, request.user, course, 'updates')
         info_block = getattr(info_module, '_xmodule', info_module)
-        return info_block.system.service(
-            info_block, "replace_urls"
-        ).replace_urls(info_module.data) if info_module else ''
+        return info_block.system.replace_urls(info_module.data) if info_module else ''

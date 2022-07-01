@@ -17,7 +17,7 @@ from lms.djangoapps.learner_dashboard.config.waffle import ENABLE_PROGRAM_TAB_VI
 from lms.djangoapps.program_enrollments.rest_api.v1.tests.test_views import ProgramCacheMixin
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
-from openedx.core.djangoapps.programs.models import ProgramDiscussionsConfiguration
+from openedx.core.djangoapps.discussions.models import ProgramDiscussionsConfiguration
 
 
 @ddt.ddt

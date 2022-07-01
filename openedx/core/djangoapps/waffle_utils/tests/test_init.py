@@ -4,17 +4,17 @@ Tests for waffle utils features.
 # pylint: disable=toggle-missing-annotation
 
 from unittest.mock import patch
-
 import crum
 import ddt
 from django.test.client import RequestFactory
 from edx_django_utils.cache import RequestCache
-from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
+from waffle.testutils import override_flag
 
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel, WaffleFlagOrgOverrideModel
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+
+from .. import CourseWaffleFlag
+from ..models import WaffleFlagCourseOverrideModel, WaffleFlagOrgOverrideModel
 
 
 @ddt.ddt
@@ -33,7 +33,7 @@ class TestCourseWaffleFlag(CacheIsolationTestCase):
     TEST_COURSE_KEY = CourseKey.from_string(f"{TEST_ORG}/DemoX/Demo_Course")
     TEST_COURSE_2_KEY = CourseKey.from_string(f"{TEST_ORG}/DemoX/Demo_Course_2")
     TEST_COURSE_3_KEY = CourseKey.from_string("CollegeX/DemoX/Demo_Course")
-    TEST_COURSE_FLAG = CourseWaffleFlag(NAMESPACED_FLAG_NAME, __name__)
+    TEST_COURSE_FLAG = CourseWaffleFlag(NAMESPACE_NAME, FLAG_NAME, __name__)
 
     def setUp(self):
         super().setUp()
@@ -53,8 +53,8 @@ class TestCourseWaffleFlag(CacheIsolationTestCase):
         """
         Tests various combinations of a flag being set in waffle and overridden for a course.
         """
-        with override_waffle_flag(self.TEST_COURSE_FLAG, active=waffle_enabled):
-            with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=course_override):
+        with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=course_override):
+            with override_flag(self.NAMESPACED_FLAG_NAME, active=waffle_enabled):
                 # check twice to test that the result is properly cached
                 assert self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY) == result
                 assert self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY) == result
@@ -64,11 +64,16 @@ class TestCourseWaffleFlag(CacheIsolationTestCase):
                     self.NAMESPACED_FLAG_NAME,
                     self.TEST_COURSE_KEY
                 )
-            # Check flag for a second course.
-            # This should be the same cached value as for overriden flag.
+
+        # check flag for a second course
+        if course_override == WaffleFlagCourseOverrideModel.ALL_CHOICES.unset:
+            # When course override wasn't set for the first course, the second course will get the same
+            # cached value from waffle.
             assert self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_2_KEY) == waffle_enabled
-        # Check the default value for the second course after the cache was restored
-        assert self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_2_KEY) is False
+        else:
+            # When course override was set for the first course, it should not apply to the second
+            # course which should get the default value of False.
+            assert self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_2_KEY) is False
 
     @ddt.data(
         (False, WaffleFlagOrgOverrideModel.ALL_CHOICES.unset, False),
@@ -98,7 +103,7 @@ class TestCourseWaffleFlag(CacheIsolationTestCase):
             enabled=True
         )
         # Both course keys should match the org-level override.
-        with override_waffle_flag(self.TEST_COURSE_FLAG, active=waffle_enabled):
+        with override_flag(self.NAMESPACED_FLAG_NAME, active=waffle_enabled):
             assert self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY) == is_enabled
             assert self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_2_KEY) == is_enabled
 
@@ -128,7 +133,7 @@ class TestCourseWaffleFlag(CacheIsolationTestCase):
             enabled=True
         )
         # Org doesn't match the course key, so should never be enabled.
-        with override_waffle_flag(self.TEST_COURSE_FLAG, active=waffle_enabled):
+        with override_flag(self.NAMESPACED_FLAG_NAME, active=waffle_enabled):
             assert self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_3_KEY) == is_enabled
 
     @ddt.data(
@@ -184,14 +189,18 @@ class TestCourseWaffleFlag(CacheIsolationTestCase):
             note='',
             enabled=True
         )
-        with override_waffle_flag(self.TEST_COURSE_FLAG, active=waffle_enabled):
+        with override_flag(self.NAMESPACED_FLAG_NAME, active=waffle_enabled):
             assert self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY) == is_enabled
 
     def test_undefined_waffle_flag(self):
         """
         Test flag with undefined waffle flag.
         """
-        test_course_flag = CourseWaffleFlag(self.NAMESPACED_FLAG_NAME, __name__)
+        test_course_flag = CourseWaffleFlag(
+            self.NAMESPACE_NAME,
+            self.FLAG_NAME,
+            __name__,
+        )
 
         with patch.object(
             WaffleFlagCourseOverrideModel,
@@ -213,7 +222,11 @@ class TestCourseWaffleFlag(CacheIsolationTestCase):
         Test the flag behavior when outside a request context and waffle data undefined.
         """
         crum.set_current_request(None)
-        test_course_flag = CourseWaffleFlag(self.NAMESPACED_FLAG_NAME, __name__)
+        test_course_flag = CourseWaffleFlag(
+            self.NAMESPACE_NAME,
+            self.FLAG_NAME,
+            __name__,
+        )
         assert test_course_flag.is_enabled(self.TEST_COURSE_KEY) is False
 
     def test_without_request_and_everyone_active_waffle(self):
@@ -221,7 +234,10 @@ class TestCourseWaffleFlag(CacheIsolationTestCase):
         Test the flag behavior when outside a request context and waffle active for everyone.
         """
         crum.set_current_request(None)
-
-        test_course_flag = CourseWaffleFlag(self.NAMESPACED_FLAG_NAME, __name__)
-        with override_waffle_flag(self.TEST_COURSE_FLAG, active=True):
+        test_course_flag = CourseWaffleFlag(
+            self.NAMESPACE_NAME,
+            self.FLAG_NAME,
+            __name__,
+        )
+        with override_flag(self.NAMESPACED_FLAG_NAME, active=True):
             assert test_course_flag.is_enabled(self.TEST_COURSE_KEY) is True

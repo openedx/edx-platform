@@ -21,7 +21,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_noop
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
-from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles import LegacyWaffleFlagNamespace, LegacyWaffleSwitchNamespace
 from edxval.api import (
     SortDirection,
     VideoSortField,
@@ -49,6 +49,7 @@ from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFl
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
+    waffle_flags
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.view_utils import view_auth_classes
@@ -71,17 +72,18 @@ LOGGER = logging.getLogger(__name__)
 
 # Waffle switches namespace for videos
 WAFFLE_NAMESPACE = 'videos'
+WAFFLE_SWITCHES = LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
 
 # Waffle switch for enabling/disabling video image upload feature
-VIDEO_IMAGE_UPLOAD_ENABLED = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    f'{WAFFLE_NAMESPACE}.video_image_upload_enabled', __name__
-)
+VIDEO_IMAGE_UPLOAD_ENABLED = 'video_image_upload_enabled'
 
 # Waffle flag namespace for studio
-WAFFLE_STUDIO_FLAG_NAMESPACE = 'studio'
+WAFFLE_STUDIO_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='studio')
 
 ENABLE_VIDEO_UPLOAD_PAGINATION = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    f'{WAFFLE_STUDIO_FLAG_NAMESPACE}.enable_video_upload_pagination', __name__
+    waffle_namespace=WAFFLE_STUDIO_FLAG_NAMESPACE,
+    flag_name='enable_video_upload_pagination',
+    module_name=__name__,
 )
 # Default expiration, in seconds, of one-time URLs used for uploading videos.
 KEY_EXPIRATION_IN_SECONDS = 86400
@@ -243,7 +245,7 @@ def video_images_handler(request, course_key_string, edx_video_id=None):
     """Function to handle image files"""
 
     # respond with a 404 if image upload is not enabled.
-    if not VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled():
+    if not WAFFLE_SWITCHES.is_enabled(VIDEO_IMAGE_UPLOAD_ENABLED):
         return HttpResponseNotFound()
 
     if 'file' not in request.FILES:
@@ -632,7 +634,7 @@ def videos_index_html(course, pagination_conf=None):
         'video_supported_file_formats': list(VIDEO_SUPPORTED_FILE_FORMATS.keys()),
         'video_upload_max_file_size': VIDEO_UPLOAD_MAX_FILE_SIZE_GB,
         'video_image_settings': {
-            'video_image_upload_enabled': VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled(),
+            'video_image_upload_enabled': WAFFLE_SWITCHES.is_enabled(VIDEO_IMAGE_UPLOAD_ENABLED),
             'max_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES'],
             'min_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'],
             'max_width': settings.VIDEO_IMAGE_MAX_WIDTH,
@@ -748,11 +750,12 @@ def videos_post(course, request):
             ('course_key', str(course.id)),
         ]
 
+        deprecate_youtube = waffle_flags()[DEPRECATE_YOUTUBE]
         course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
 
         # Only include `course_video_upload_token` if youtube has not been deprecated
         # for this course.
-        if not DEPRECATE_YOUTUBE.is_enabled(course.id) and course_video_upload_token:
+        if not deprecate_youtube.is_enabled(course.id) and course_video_upload_token:
             metadata_list.append(('course_video_upload_token', course_video_upload_token))
 
         is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
@@ -788,7 +791,7 @@ def storage_service_bucket():
     """
     Returns an S3 bucket for video upload.
     """
-    if ENABLE_DEVSTACK_VIDEO_UPLOADS.is_enabled():
+    if waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].is_enabled():
         params = {
             'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
             'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY,

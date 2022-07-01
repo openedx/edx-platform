@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;
+    const v = (n != 1);
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -142,7 +142,6 @@
     " From this point in time, you must follow the <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online proctoring rules</a> to pass the proctoring review for your exam. ": "A partir de este momento, debe seguir las <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">reglas de supervisi\u00f3n online</a> para aprobar la revisi\u00f3n de la supervisi\u00f3n para su examen.",
     " Member": [
       "Miembro",
-      "Miembros",
       "Miembros"
     ],
     " Your Proctoring Session Has Started ": "Su Sesi\u00f3n Supervisada Ha Comenzado",
@@ -170,7 +169,6 @@
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)s comentarios (%(unread_comments_count)s comentarios no le\u00eddos)%(span_close)s",
     "%(errorCount)s error found in form.": [
       "%(errorCount)s error en el formulario.",
-      "%(errorCount)s errores en el formulario.",
       "%(errorCount)s errores en el formulario."
     ],
     "%(field)s can only contain up to %(count)d characters.": "%(field)s solo puede contener hasta %(count)d caracteres.",
@@ -179,43 +177,35 @@
     "%(programName)s Home Page.": "P\u00e1gina de inicio de %(programName)s.",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s de %(cnt)s seleccionado",
-      "%(sel)s de  %(cnt)s seleccionados",
-      ""
+      "%(sel)s de  %(cnt)s seleccionados"
     ],
     "%(type)s Component Template Menu": "Plantilla de men\u00fa de componentes %(type)s",
     "%(value)s hour": [
       "%(value)s hora",
-      "%(value)s horas",
       "%(value)s horas"
     ],
     "%(value)s minute": [
       "%(value)s minuto",
-      "%(value)s minutos",
       "%(value)s minutos"
     ],
     "%(value)s second": [
       "%(value)s segundo",
-      "%(value)s segundos",
       "%(value)s segundos"
     ],
     "%d day": [
       "%d d\u00eda",
-      "%d d\u00edas",
       "%d d\u00edas"
     ],
     "%d minute": [
       "%d minuto",
-      "%d minutos",
       "%d minutos"
     ],
     "%d month": [
       "%d mes",
-      "%d meses",
       "%d meses"
     ],
     "%d year": [
       "%d a\u00f1o",
-      "%d a\u00f1os",
       "%d a\u00f1os"
     ],
     "%s ago": "hace %s",
@@ -224,6 +214,7 @@
     "(Caption will be displayed when you start playing the video.)": "(Los subt\u00edtulos ser\u00e1n mostrados al iniciar la reproducci\u00f3n del video.)",
     "(Community TA)": "(Profesor ayudante de la comunidad)",
     "(Optional)": "(Opcional)",
+    "(Read-only)": "(Solo-lectura)",
     "(Required Field)": "(Campo requerido)",
     "(Self-paced) Ended {end}": "(A ritmo propio) Terminado {end}",
     "(Self-paced) Ends {end}": "(A ritmo propio)Termina{end}",
@@ -232,7 +223,6 @@
     "(Staff)": "(Equipo del curso)",
     "(contains %(student_count)s student)": [
       "(contiene %(student_count)s estudiante)",
-      "(contiene %(student_count)s estudiantes)",
       "(contiene %(student_count)s estudiantes)"
     ],
     "(optional)": "(opcional)",
@@ -374,6 +364,7 @@
     "An error has occurred. Wait a few minutes, and then try again.": "Un error ha ocurrido. Espere unos pocos minutos e intenta de nuevo.",
     "An error occurred retrieving your email. Please try again later, and contact technical support if the problem persists.": "Ocurri\u00f3 un error al recuperar tu correo. Por favor intenta nuevamente m\u00e1s tarde. Si el problema persiste, contacta a soporte t\u00e9cnico.",
     "An error occurred when signing you in to %s.": "Ocurri\u00f3 un error al iniciar tu sesi\u00f3n en %s.",
+    "An error occurred while attempting to retrieve or save the information below. Please try again later.": "Se produjo un error al intentar recuperar recuperar o guardar la informaci\u00f3n a continuaci\u00f3n. Por favor intenta de nuevo mas tarde. ",
     "An error occurred while looking up team membership. Try refreshing the page.": "Ocurrio un error al buscar la membresia del equipo. Intenta refrescar la pagina.",
     "An error occurred while removing the member from the team. Try again.": "Ocurri\u00f3 un error al remover al miembro del equipo. Intenta nuevamente. ",
     "An error occurred.": "Ha ocurrido un error.",
@@ -461,6 +452,7 @@
     "Bottom": "Base",
     "Browse": "Explorar",
     "Browse recently launched courses and see what\\'s new in your favorite subjects": "Echa un vistazo a nuestros cursos lanzados recientemente y qu\u00e9 hay de nuevo en tus temas favoritos.",
+    "Browsing": "Explorando",
     "Bulk Exceptions": "Excepciones en lote",
     "Bullet list": "Lista con vi\u00f1etas",
     "Bulleted List (Ctrl+U)": "Vi\u00f1etas (Ctrl+U)",
@@ -583,10 +575,7 @@
     "Components": "Componentes",
     "Configure": "Configurar",
     "Confirm": "Confirmar",
-    "Confirm Delete Uploaded File": "Confirmar Eliminar Archivos Subidos ",
-    "Confirm Grade Team Submission": "Confirmar el env\u00edo de la calificaci\u00f3n de equipo.",
     "Confirm Password": "Confirmar Contrase\u00f1a",
-    "Confirm Submit Response": "Confirmar Respuesta Enviada",
     "Confirm Timed Transcript": "Confirmar la transcripci\u00f3n",
     "Congratulations!": "\u00a1Felicitaciones!",
     "Congratulations! You are now verified on %(platformName)s!": "Felicitaciones! Ya se encuentra verificado en %(platformName)s!",
@@ -595,7 +584,6 @@
     "Contains staff only content": "Contiene solo contenido del equipo del curso",
     "Contains {count} group": [
       "Contiene {count} grupo",
-      "Contiene {count} grupos",
       "Contiene {count} grupos"
     ],
     "Content Group ID": "ID de Contenido de Grupo",
@@ -631,7 +619,6 @@
     "Country or Region of Residence": "Pa\u00eds o regi\u00f3n de residencia",
     "Course": [
       "Curso",
-      "Cursos",
       "Cursos"
     ],
     "Course Content": "Contenidos del curso",
@@ -644,10 +631,12 @@
     "Course Id": "Id de Curso",
     "Course Index": "Indice de Curso",
     "Course Key": "Llave del curso",
-    "Course Name": "T\u00edtulo del curso",
+    "Course Name": "Nombre del curso",
     "Course Number": "C\u00f3digo del curso",
     "Course Number Override": "Reemplazo para el n\u00famero de curso",
+    "Course Number:": "N\u00famero del curso:",
     "Course Outline": "Estructura del curso",
+    "Course Run:": "Edici\u00f3n del Curso:",
     "Course Start": "Inicio del Curso",
     "Course Title": "T\u00edtulo del curso",
     "Course Title Override": "Reemplazo para el t\u00edtulo del curso",
@@ -659,6 +648,7 @@
     "Create": "Crear",
     "Create Account": "Crear cuenta",
     "Create Re-run": "Crear reapertura",
+    "Create Support Ticket": "Crear caso de soporte",
     "Create a New Team": "Crear un nuevo equipo",
     "Create a content group": "Crear contenido de grupo",
     "Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know.": "Crea un nuevo equipo si no puedes encontrar uno existente para unirte o si deseas aprender con personas que ya conoces.",
@@ -728,6 +718,7 @@
     "Describe ": "Describir",
     "Description": "Descripci\u00f3n",
     "Description of the certificate": "Descripci\u00f3n del certificado",
+    "Details": "Detalles",
     "Device with Camera": "Dispositivo con c\u00e1mara",
     "Dimensions": "Dimensiones",
     "Disc": "Disco",
@@ -807,7 +798,6 @@
     "Enable Cohorts": "Habilitar Cohortes",
     "Enable Course Highlight Emails": "Habilitar correos electr\u00f3nicos destacados del curso ",
     "Enable Now": "Habilitar ahora",
-    "Enable discussion": "Habilitar discusi\u00f3n",
     "Enabled": "Habilitado",
     "Encoding": "Codificaci\u00f3n",
     "End My Exam": "Finalizar mi examen",
@@ -884,7 +874,6 @@
     "Error starting a task to rescore problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct.": "Error al iniciar la tarea para re puntuar el problema '<%- problem_id %>'.  Verifica que el problema est\u00e9 identificado correctamente.",
     "Error starting a task to reset attempts for all students on problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct.": "Error en el proceso de reinicio de env\u00edos para todos los estudiantes para el problema '<%- problem_id %>'.  Verifica que el problema est\u00e9 identificado correctamente.",
     "Error when looking up username": "Error al buscar el nombre de usuario",
-    "Error while fetching student data.": "Ocurri\u00f3 un error mientras se obten\u00edan los datos de los estudiantes.",
     "Error while generating certificates. Please try again.": "Error al generar los certificados. Por favor intenta nuevamente.",
     "Error while regenerating certificates. Please try again.": "Error al regenerar los certificados. Por favor int\u00e9ntalo nuevamente.",
     "Error.": "Error.",
@@ -913,7 +902,6 @@
     "Explore Programs": "Explorar programas",
     "Explore your course!": "Explora tus cursos!",
     "Failed Proctoring": "Supervisi\u00f3n fallida",
-    "Failed to clone rubric": "Fall\u00f3 al duplicar r\u00fabrica",
     "Failed to delete student state for user.": "Fall\u00f3 al borrar el estado de estudiante para el usuario.",
     "Failed to rescore problem for user.": "Fall\u00f3 al re puntuar el problema para el usuario.",
     "Failed to rescore problem to improve score for user.": "Fall\u00f3 al re puntuar el problema para mejorar la calificaci\u00f3n del usuario.",
@@ -924,7 +912,6 @@
     "File Name": "Nombre de archivo",
     "File format not supported. Please upload a file with a {ext} extension.": "Formato de archivo no admitido. Debes cargar un archivo con la extensi\u00f3n {ext}",
     "File types can not be empty.": "Tipo de archivo no puede ser vac\u00edo.",
-    "File upload failed: unsupported file type. Only the supported file types can be uploaded. If you have questions, please reach out to the course team.": "Carga de archivo fallida: tipo de archivo no soportado. Solo los tipos de archivos soportados podr\u00e1n ser cargados. Si presentas dudas, por favor ponte en contacto con el equipo del curso encargado. ",
     "File upload succeeded": "Archivo subido con exito",
     "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB": "El archivo {filename} excede el tama\u00f1o maximo de  {maxFileSizeInMBs} MB",
     "Files must be in JPEG or PNG format.": "Los archivos deben estar en formato JPEG o PNG.",
@@ -940,11 +927,12 @@
     "Find": "Buscar",
     "Find a course": "Busca un curso",
     "Find and replace": "Encontrar y reemplazar",
-    "Find answers to the top questions asked by learners.": "Encuentra respuestas a las consultas m\u00e1s comunes de nuestros estudiantes.",
+    "Find answers to the top questions asked by learners.": "Encuentra respuestas a las preguntas m\u00e1s comunes de nuestros estudiantes.",
     "Find discussions": "Encontrar discusiones",
     "Find next": "Encontrar el siguiente",
     "Find previous": "Encontrar el anterior",
     "Finish": "Finalizar",
+    "Finish later": "Terminar despues",
     "First time here?": "Primera vez aqu\u00ed?",
     "Follow": "Seguir",
     "Follow or unfollow posts": "Seguir o dejar de seguir publicaciones",
@@ -953,7 +941,7 @@
     "Font Sizes": "Tama\u00f1o de fuente",
     "Footer": "Pie de p\u00e1gina",
     "For grading to work, you must change all {oldName} subsections to {newName}.": "Para que el proceso de calificaci\u00f3n funcione, debes cambiar todas las subsecciones {oldName} a {newName}.",
-    "For inquiries regarding assignments, grades, or structure of a specific course, please post in the discussion forums for that course directly.": "Para preguntas sobre ejercicios, calificaciones o estructura de un curso espec\u00edfico, por favor publica tu pregunta en el foro de discusi\u00f3n del curso.",
+    "For inquiries regarding assignments, grades, or structure of a specific course, please post in the discussion forums for that course directly.": "Para preguntas sobre las tareas, notas o estructura de un curso espec\u00edfico, por favor publica tu pregunta directamente en el foro de discusi\u00f3n.",
     "Forgot my password": "Olvid\u00e9 mi contrase\u00f1a",
     "Format": "Formato",
     "Formats": "Formatos",
@@ -980,7 +968,6 @@
     "Government-Issued Photo ID": "Foto de documento oficial de identificaci\u00f3n",
     "Grace period must be specified in HH:MM format.": "El periodo de gracia debe especificarse en el formato HH:MM",
     "Grade": "Calificaci\u00f3n",
-    "Grade Status": "Estado de la calificaci\u00f3n",
     "Grade as:": "Calificar como:",
     "Graded as:": "Calificado como:",
     "Grading": "Calificaciones",
@@ -999,6 +986,7 @@
     "HTML preview of post": "previsiualizaci\u00f3n en HTML",
     "HTML source code": "C\u00f3digo fuente HTML",
     "Have a computer with a functioning webcam": "Contar con un computador con c\u00e1mara web funcionando ",
+    "Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?": "\u00bfAlguna vez has servido en un deber activo en las Fuerzas Armadas de Estados Unidos de America, Reservas, o Guardia Nacional? ",
     "Have your valid photo ID (e.g. driver's license or passport) ready": "Tener una foto de identificaci\u00f3n valida (ejemplo: licencia de conducci\u00f3n o pasaporte) a la mano",
     "Header": "Encabezado",
     "Header 1": "Encabezado 1",
@@ -1045,7 +1033,6 @@
     "Horizontal space": "Espacio horizontal",
     "How to create useful text alternatives.": "C\u00f3mo crear alternativas \u00fatiles al texto.",
     "How to use %(platform_name)s discussions": "C\u00f3mo usar las discusiones de %(platform_name)s",
-    "However, {overwritten_count} of these students have received a grade through the staff grade override tool already.": "Sin embargo, {overwritten_count} de estos estudiantes ya han recibido una calificaci\u00f3n a trav\u00e9s de la herramienta de anulaci\u00f3n de notas del personal. ",
     "Hyperlink (Ctrl+L)": "Hiperv\u00ednculo (Ctrl+L)",
     "I am ready to start this timed exam,": "Estoy listo/a para empezar este examen cronometrado,",
     "I understand and want to reset this onboarding exam.": "Entiendo y quiero reiniciar este examen de inducci\u00f3n.",
@@ -1053,6 +1040,7 @@
     "ID-Verification is not required for this Professional Education course.": "La verification de ID no se requiere para este curso de Educaci\u00f3n Profesional",
     "Identity Verification In Progress": "Verificaci\u00f3n de identidad en progreso",
     "If a learner starts on {startDate}, this subsection will be due on {projectedDueIn}.": "Si un estudiante empieza en {startDate}, esta subsecci\u00f3n ser\u00e1 vencida en {projectedDueIn}.",
+    "If the course does not have an end date, learners always see their scores when they submit answers to assessments.": "Si el curso no tiene fecha de caducidad,  los estudiantes siempre ven sus puntajes cuando env\u00edan las respuestas de las evaluaciones.",
     "If the photos you submit are rejected, try moving the computer or camera orientation to change the lighting angle.  The most common reason for rejection is inability to read the text on the ID card.": "Si las fotos que env\u00eda son rechazadas, intente mover la computadora o la orientaci\u00f3n de la c\u00e1mara para cambiar el \u00e1ngulo de iluminaci\u00f3n. La raz\u00f3n m\u00e1s com\u00fan para el rechazo es la imposibilidad de leer el texto en la tarjeta de identificaci\u00f3n.",
     "If the proctoring software window is still open, close it now and confirm that you want to quit the application.": "Si la ventana del software de supervisi\u00f3n sigue abierta, cierrela ahora y confirme que quiere cerrar la aplicaci\u00f3n.",
     "If the subsection does not have a due date, learners always see their scores when they submit answers to assessments.": "Si la subsecci\u00f3n no tiene fecha de caducidad, los estudiantes siempre pueden ver sus puntajes cuando env\u00edan las respuestas a la evaluaci\u00f3n.",
@@ -1158,6 +1146,7 @@
     "Learners are added to this cohort automatically.": "Los estudiantes son agregados autom\u00e1ticamente a esta cohorte.",
     "Learners are added to this cohort only when you provide their email addresses or usernames on this page.": "Los estudiantes son agregados a esta cohorte solamente cuando se incluye la direcci\u00f3n de correo electr\u00f3nico o el nombre de usuario en esta p\u00e1gina.",
     "Learners do not see the subsection in the course outline. The subsection is not included in grade calculations.": "Los estudiantes no ven la subsecci\u00f3n en el esquema del curso. La subsecci\u00f3n no se incluye en los c\u00e1lculos de calificaciones.",
+    "Learners do not see whether their answers to assessments were correct or incorrect, nor the score received, until after the course end date has passed.": "Tras enviar sus respuestas, los estudiantes no ver\u00e1n si son correctas o incorrectas, ni la puntuaci\u00f3n recibida hasta que haya pasado la fecha l\u00edmite de la evaluaci\u00f3n. En los cursos al ritmo del estudiante la fecha l\u00edmite es la fecha final del curso.\u00a0",
     "Learners do not see whether their answers to assessments were correct or incorrect, nor the score received, until after the due date for the subsection has passed.": "Los estudiantes no ven si sus respuestas a las evaluaciones fueron correctas o incorrectas, ni la puntuaci\u00f3n recibida, hasta despu\u00e9s que la fecha de caducidad del subsecci\u00f3n haya pasado.",
     "Learners never see whether their answers to assessments are correct or incorrect, nor the score received.": "Al haber enviado sus respuestas, los estudiantes nunca ver\u00e1n si esas respuestas son correctas o incorrectas. Tampoco ver\u00e1n la puntuaci\u00f3n correspondiente.",
     "Learners see the published subsection and can access its content.": "Los estudiantes pueden ver la subsecci\u00f3n publicada y acceder a su contenido",
@@ -1195,7 +1184,6 @@
     "Load next {numResponses} responses": "Cargar las siguientes {numResponses} respuestas",
     "Load next {num_items} result": [
       "Cargar el siguiente {num_items} resultado",
-      "Cargar los siguientes {num_items} resultados",
       "Cargar los siguientes {num_items} resultados"
     ],
     "Loading": "Cargando",
@@ -1204,6 +1192,7 @@
     "Loading more threads": "Cargando m\u00e1s discusiones",
     "Loading posts list": "Cargando lista de publicaci\u00f3nes",
     "Loading your courses": "Cargando tus cursos",
+    "Loading...": "Cargando...",
     "Location": "Ubicaci\u00f3n",
     "Location in Course": "Ubicaci\u00f3n en el curso",
     "Lock this asset": "Bloquear este recurso",
@@ -1267,6 +1256,7 @@
     "Name or short description of the configuration": "Nombre o descripci\u00f3n corta de la configuraci\u00f3n",
     "Navigate to onboarding exam": "Navega hacia el examen de inducci\u00f3n",
     "Navigate up": "Navegue hacia arriba",
+    "Need help logging in?": "\u00bfNecesita ayuda para iniciar sesi\u00f3n?",
     "Need help signing in?": "\u00bfNecesita ayuda para iniciar sesi\u00f3n?",
     "Need other help signing in?": "\u00bfNecesita otra ayuda para iniciar sesi\u00f3n?",
     "Needs verified certificate ": "Necesita certificado verificado",
@@ -1323,13 +1313,11 @@
     "Note: Learners can be in only one cohort. Adding learners to this group overrides any previous group assignment.": "Nota: Los estudiantes pueden estar \u00fanicamente en uno solo cohorte. Agregando estudiantes a este grupo sobreescribe cualquier asignaci\u00f3n previa a este grupo.",
     "Note: You are %s hour ahead of server time.": [
       "Nota: Usted esta a %s horas por delante de la hora del servidor.",
-      "Nota: Usted va %s horas por delante de la hora del servidor.",
-      ""
+      "Nota: Usted va %s horas por delante de la hora del servidor."
     ],
     "Note: You are %s hour behind server time.": [
       "Nota: Usted esta a %s hora de retraso de tiempo de servidor.",
-      "Nota: Usted va %s horas por detr\u00e1s de la hora del servidor.",
-      ""
+      "Nota: Usted va %s horas por detr\u00e1s de la hora del servidor."
     ],
     "Noted in:": "Anotado en:",
     "Notes": "Notas",
@@ -1382,7 +1370,8 @@
     "Organization ": "Organizaci\u00f3n",
     "Organization Name": "Nombre de la organizaci\u00f3n",
     "Organization of the signatory": "Organizaci\u00f3n del signatario",
-    "Other": "Otros",
+    "Organization:": "Organizaci\u00f3n:",
+    "Other": "Otro",
     "Other sign-in issues": "Otros problemas para iniciar sesi\u00f3n",
     "Overall Score": "Puntaje general",
     "PDF Chapters": "Cap\u00edtulos de PDF",
@@ -1405,8 +1394,6 @@
     "Path to Signature Image": "Ruta a la imagen de la firma",
     "Pause": "Pausar",
     "Peer": "Par",
-    "Peer Responses Received": "Respuestas de parejas recibidas.",
-    "Peers Assessed": "Parejas evaluadas.",
     "Pending Session Review": "Revisi\u00f3n de sesi\u00f3n pendiente",
     "Photo": "Foto",
     "Photo Captured successfully.": "Foto capturada con \u00e9xito.",
@@ -1492,7 +1479,6 @@
     "Previous Uploads table has been updated.": "La tabla de Cargas previas ha sido actualizada.",
     "Previously published": "Publicado previamente",
     "Print": "Imprimir",
-    "Problem cloning rubric": "Problema al duplicar la r\u00fabrica",
     "Processing Re-run Request": "Procesando petici\u00f3n de reapertura",
     "Proctored": "Supervisado",
     "Proctored Exam": "Examen supervisado",
@@ -1500,7 +1486,7 @@
     "Proctored Option No Longer Available": "La opci\u00f3n supervisado ya no est\u00e1 disponible",
     "Proctored exam {exam_name} in {course_name} for user {username}": "Examen supervisado {exam_name} en {course_name} para {username}",
     "Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules. Please note that setting this exam as proctored will change the visibility settings to \"Hide content after due date.\"": "Los ex\u00e1menes supervisados son cronometrados y se graba en v\u00eddeo a cada estudiante que realiza el examen. Los v\u00eddeos se revisan para garantizar que los estudiantes siguen todas las reglas del examen. Tenga en cuenta que al configurar este examen como supervisado cambiar\u00e1 la configuraci\u00f3n de visibilidad a \"Ocultar contenido despu\u00e9s de la fecha de vencimiento\".",
-    "Proctoring": "Ex\u00e1menes supervisados",
+    "Proctoring": "Supervisi\u00f3n",
     "Proctoring Results For {course_name} {exam_name}": "Resultados de Examen de Supervisi\u00f3n Para {course_name} {exam_name}",
     "Proctoring Review In Progress For {course_name} {exam_name}": "Revisi\u00f3n Supervisada En Progreso Para {course_name} {exam_name}",
     "Proctoring Settings": "Configuraci\u00f3n de supervisi\u00f3n",
@@ -1528,6 +1514,7 @@
     "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "Utiliza Pregunta para plantear temas que necesitan respuestas. Utiliza Discusi\u00f3n para compartir tus ideas y comenzar conversaciones. (Requerido)",
     "Queued": "En cola",
     "REMAINING COURSES": "CURSOS RESTANTES",
+    "Re-run Course": "Relanzar Curso",
     "Read More": "Leer mas",
     "Read more": "Leer m\u00e1s",
     "Ready To Start": "Listo para comenzar",
@@ -1605,6 +1592,7 @@
     "Return to Export": "Regresar a exportar",
     "Return to Your Dashboard": "Volver al panel principal",
     "Return to all posts": "Volver a todas las publicaciones",
+    "Return to my dashboard": "Volver a mi panel de control",
     "Return to team listing": "Volver a la lista del equipo",
     "Review Policy Exception": "Revisar excepci\u00f3n a la pol\u00edtica",
     "Review Rules": "Revisar las reglas",
@@ -1622,7 +1610,6 @@
     "Rows": "Filas",
     "Save": "Guardar",
     "Save Changes": "Guardar cambios",
-    "Save Unsuccessful": "Guardado sin \u00e9xito",
     "Save changes": "Guardar cambios",
     "Saved cohort": "Guardar Cohorte",
     "Saving": "Guardando",
@@ -1645,7 +1632,7 @@
     "Select": "Seleccionar",
     "Select Session": "Seleccione la sesi\u00f3n.",
     "Select a Content Group": "seleccionar contenido de grupo",
-    "Select a category": "Selecciona una categor\u00eda",
+    "Select a category": "Seleccione una categor\u00eda",
     "Select a chapter": "Selecciona un capitulo",
     "Select a cohort": "Seleccione una cohorte",
     "Select a cohort to manage": "Seleccione la cohorte a gestionar",
@@ -1657,12 +1644,14 @@
     "Select a subject for your support request.": "Elige un tema para tu petici\u00f3n de ayuda.",
     "Select a time allotment for the exam. If it is over 24 hours, type in the amount of time. You can grant individual learners extra time to complete the exam through the Instructor Dashboard.": "Seleccione un tiempo disponible para el examen. Si es mayor a 24 horas, escriba la cantidad de tiempo. Puede otorgar a estudiantes individuales un tiempo extra para completar el examen a trav\u00e9s del panel de control de instructor.",
     "Select all": "Selecionar todo",
+    "Select employment status": "Seleccionar estatus laboral",
     "Select fidelity": "Seleccionar fidelidad",
     "Select language": "Seleccionar lenguaje",
     "Select one or more groups:": "Selecciones uno o mas grupos:",
     "Select the course-wide discussion topics that you want to divide.": "Seleccione los temas de discusi\u00f3n del curso que desea dividir.",
     "Select the time zone for displaying course dates. If you do not specify a time zone, course dates, including assignment deadlines, will be displayed in your browser's local time zone.": "Selecciona la zona horaria para exponer las fechas del curso. Si no especificas una zona horaria, las fechas del curso, incluidas las fechas l\u00edmites de tareas, ser\u00e1n expuestas en la zona horaria local de tu navegador.",
     "Select turnaround": "Seleccione tiempo de entrega.",
+    "Selected blocks": "Bloques seleccionados",
     "Selected tab": "Opci\u00f3n seleccionada",
     "Self": "Auto",
     "Send to:": "Enviar a:",
@@ -1690,7 +1679,6 @@
     "Show Annotations": "Mostrar anotaciones",
     "Show Comment (%(num_comments)s)": [
       "Mostrar comentario (%(num_comments)s)",
-      "Mostrar comentarios (%(num_comments)s)",
       "Mostrar comentarios (%(num_comments)s)"
     ],
     "Show Deprecated Settings": "Mostrar configuraciones descartadas",
@@ -1710,7 +1698,6 @@
     "Showing all responses": "Mostrando todas las respuestas",
     "Showing first response": [
       "Mostrando la primera respuesta",
-      "Mostrando las primeras {numResponses} respuestas",
       "Mostrando las primeras {numResponses} respuestas"
     ],
     "Showing results for \"{searchString}\"": "Mostrando resultados para \"{searchString}\"",
@@ -1760,7 +1747,6 @@
     "Staff": "Equipo del curso",
     "Staff Only": "Solo equipo del curso",
     "Staff and Learners": "Funcionarios y estudiantes",
-    "Staff assessment": "Examen de personal",
     "Start Date": "Fecha inicial:",
     "Start Exam": "Empezar Examen",
     "Start System Check": "Empezar chequeo del sistema",
@@ -1868,11 +1854,11 @@
     "Textbook Name": "Nombre",
     "Textbook information": "Informaci\u00f3n del libro de texto",
     "Textbook name is required": "Se requiere el nombre del libro de texto",
+    "Thank you for setting your course goal to {goal}!": "\u00a1 Gracias por establecer su objetivo para este curso en {goal}!",
     "Thank you for submitting a request! We appreciate your patience while we work to review your request.": "\u00a1Gracias por su env\u00edo! Agradecemos su paciencia mientras trabajamos para revisar su solicitud.",
     "Thank you for submitting your financial assistance application for {course_name}! You can expect a response in 2-4 business days.": "Gracias por enviar tu aplicaci\u00f3n de financiamiento para {course_name}!. Espera una respuesta de 2-4 dias h\u00e1biles.",
     "Thank you for submitting your photos. We will review them shortly. You can now sign up for any %(platformName)s course that offers verified certificates. Verification is good for one year. After one year, you must submit photos for verification again.": "Gracias por enviar sus fotos. Las revisaremos pronto. Ahora puede registrarse para cualquier curso de %(platformName)s que ofrezca Certficados Verificados. La verificaci\u00f3n es v\u00e1lida por un a\u00f1o. Despu\u00e9s de este periodo, deber\u00e1 volver a enviar fotograf\u00edas para una nueva verificaci\u00f3n.",
     "Thanks for returning to verify your ID in: {courseName}": "Gracias por regresar a verificar tu ID en: {courseName}",
-    "The \"{name}\" problem is configured to require a minimum of {min_grades} peer grades, and asks to review {min_graded} peers.": "El problema \"{name}\" est\u00e1 configurado con un m\u00ednimo de {min_grades} calificaciones en pareja, y solicita revisar al menos {min_graded} parejas.",
     "The URL you entered seems to be an email address. Do you want to add the required mailto: prefix?": "La URL que introdujiste parece ser una direcci\u00f3n de correo electr\u00f3nico. \u00bfDesea agregarle el prefijo requerido mailto:?",
     "The URL you entered seems to be an external link. Do you want to add the required http:// prefix?": "La URL que introdujiste parece ser un v\u00ednculo externo. \u00bfDesea agregarle el prefijo requerido http://?",
     "The assignment type must have a name.": "El tipo de asignaci\u00f3n debe tener un nombre",
@@ -1938,7 +1924,6 @@
     "The topic \"{topic}\" could not be found.": "El tema \"{topic}\" no pudo ser encontrado.",
     "The weight of all assignments of this type as a percentage of the total grade, for example, 40. Do not include the percent symbol.": "El peso de todas las asignaciones de este tipo como porcentaje de la calificaci\u00f3n total, por ejemplo, 40. No incluya el s\u00edmbolo de porcentaje.",
     "The {cohortGroupName} cohort has been created. You can manually add students to this cohort below.": "El cohorte {cohortGroupName} ha sido creado. Puedes manualmente a\u00f1adir estudiantes a este cohorte.",
-    "There are currently {stuck_learners} learners in the waiting state, meaning they have not yet met all requirements for Peer Assessment. ": "Actualmente se encuentran {stuck_learners} estudiantes en el estado de espera, lo cual significa que ellos a\u00fan no cumplen con todos los requerimientos para el examen en parejas. ",
     "There are invalid keywords in your email. Check the following keywords and try again.": "Hay palabras clave inv\u00e1lidas en tu correo. Por favor, comprueba las siguientes claves e int\u00e9ntalo de nuevo:",
     "There are no posts in this topic yet.": "Todav\u00eda no hay publicaciones en este tema.",
     "There has been a failure to export to XML at least one component. It is recommended that you go to the edit page and repair the error before attempting another export. Please check that all components on the page are valid and do not display any error messages.": "Ha habido una falla para exportar al XML al menos un componente. Se recomienda ir a la p\u00e1gina de edici\u00f3n y reparar el error antes de intentar otra exportaci\u00f3n. Por favor, verifique que todos los componentes en la p\u00e1gina son validos y no exhiben ninguna mensaje de error.   ",
@@ -1959,9 +1944,9 @@
     "There was an error obtaining email content history for this course.": "Ocurri\u00f3 un error obteniendo el historial de correos electr\u00f3nicos para este curso.",
     "There was an error obtaining email task history for this course.": "Ocurri\u00f3 un error obteniendo el historial de tareas de correo para este curso.",
     "There was an error retrieving preview results for this catalog. Please check that your query is correct and try again.": "Ocurri\u00f3 un error recuperando los resultados de vista previa para este cat\u00e1logo. Por favor aseg\u00farate de que tu consulta es correcta e intente nuevamente.",
+    "There was an error updating your goal.": "Hubo un error actualizando su objetivo.",
     "There was an error when trying to add learners:": [
       "Hubo un error al intentar agregar estudiantes:",
-      "{numErrors} estudiantes no pudieron ser agregados a este cohorte:",
       "{numErrors} estudiantes no pudieron ser agregados a este cohorte:"
     ],
     "There was an error while importing the new course to our database.": "Ha habido un error importando el nuevo curso a nuestra base de datos.",
@@ -1995,6 +1980,9 @@
     "This component has validation issues.": "Este componente tiene errores de validaci\u00f3n.",
     "This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.": "Esta configuraci\u00f3n se est\u00e1 usando en contenidos experimentales. Si hace cambios a los grupos, puede que necesite editar tambi\u00e9n dichos experimentos.",
     "This content group is used in one or more units.": "Este contenido de grupo es usado en uno o mas unidades.",
+    "This course has automatic cohorting enabled for verified track learners, but cohorts are disabled. You must enable cohorts for the feature to work.": "Este curso tiene la funci\u00f3n de cohortes habilitada autom\u00e1ticamente para los estudiantes del modo verificado, pero los cohortes est\u00e1n inhabilitados. Tu debes habilitar los cohortes para que esta caracter\u00edstica funcione. ",
+    "This course has automatic cohorting enabled for verified track learners, but the required cohort does not exist. You must create a manually-assigned cohort named '{verifiedCohortName}' for the feature to work.": "Este curso tiene la funci\u00f3n de cohortes habilitada autom\u00e1ticamente para estudiantes en el modo verificado, pero el cohorte requerido no existe. Tu debes crear un cohorte asignado manualmente con el t\u00edtulo '{verifiedCohortName}' para que esta caracter\u00edstica funcione.",
+    "This course uses automatic cohorting for verified track learners. You cannot disable cohorts, and you cannot rename the manual cohort named '{verifiedCohortName}'. To change the configuration for verified track cohorts, contact your edX partner manager.": "Este curso utiliza la funci\u00f3n de cohortes autom\u00e1ticamente para estudiantes en el modo verificado. No se puede desactivar los cohortes, ni se puede cambiarle el nombre al cohorte manual nombrado '{verifiedCohortName}'. Para modificar la configuraci\u00f3n de los cohortes del modo verificado, comun\u00edcate con tu punto de contacto en edX.",
     "This discussion could not be loaded. Refresh the page and try again.": "No se pudo cargar esta discusi\u00f3n. Recarga la p\u00e1gina e intenta nuevamente.",
     "This exam has a time limit associated with it.": "Esta examen tiene un l\u00edmite de tiempo.",
     "This feedback could not be submitted.": "Este comentario no pudo ser enviado.",
@@ -2028,7 +2016,6 @@
     "This post will be visible to everyone.": "Esta publicaci\u00f3n ser\u00e1 visible para todos.",
     "This problem could not be saved.": "Este problema no pudo ser guardado.",
     "This problem has been reset.": "Este problema ha sido restablecido.",
-    "This proctored exam has been released to learners. You may not convert it to another type of special exam. You may revert this subsection back to being a basic exam by selecting 'None', or a timed exam, but you will NOT be able to configure it as a proctored exam in the future.": "Este examen supervisado se ha publicado para los estudiantes. No puede convertirlo en otro tipo de examen especial. Puede revertir esta subsecci\u00f3n a un examen b\u00e1sico seleccionando &#39;Ninguno&#39; o un examen cronometrado, pero NO podr\u00e1 configurarlo como un examen supervisado en el futuro.",
     "This response could not be marked as an answer. Refresh the page and try again.": "No se pudo marcar esta respuesta. Recarga la p\u00e1gina e intenta nuevamente.",
     "This response could not be marked as endorsed. Refresh the page and try again.": "No se pudo marcar esta respuesta como validada. Recarga la p\u00e1gina e intenta nuevamente. ",
     "This response could not be saved.": "Esta respuesta no pudo ser guardada.",
@@ -2040,7 +2027,8 @@
     "This role requires a divided discussions scheme.": "Este rol requiere un esquema de discusiones dividido.",
     "This section could not be loaded.": "Esta secci\u00f3n no pudo ser cargada.",
     "This short name for the assignment type (for example, HW or Midterm) appears next to assignments on a learner's Progress page.": "Estos nombres para los tipos de asignaciones (por ejemplo, Tareas o Examen trimestral) aparecen al lado de las asignaciones en la p\u00e1gina de Progreso del estudiante.",
-    "This subsection was released to learners as a proctored exam, but was reverted back to a basic or timed exam. You may not configure it as a proctored exam now. Contact edX Support for assistance.": "Esta subsecci\u00f3n se lanz\u00f3 a los estudiantes como un examen supervisado, pero se revirti\u00f3 a un examen b\u00e1sico o cronometrado. No puede configurarlo como un examen supervisado ahora. P\u00f3ngase en contacto con el soporte de edX para obtener ayuda.",
+    "This special exam has been released to learners. You may not convert it to another type of special exam. You may revert this subsection back to being a basic exam by selecting 'None', but you will NOT be able to configure it as a special exam in the future.": "Este examen especial ha sido lanzado a los estudiantes. Ahora no puede configurarlo como otro tipo de examen especial. Puedes revertir esta subsecci\u00f3n para que vuelva a hacer un examen b\u00e1sico seleccionado la opci\u00f3n ''Ninguno'', pero NO podr\u00e1s configurar nuevamente este examen como especial en el futuro. ",
+    "This subsection was released to learners as a special exam, but was reverted back to a basic exam. You may not configure it as a special exam now. Contact edX Support for assistance.": "Esta subsecci\u00f3n fue lanzada para los estudiantes como un examen especial, pero fue revertida a un examen b\u00e1sico. Ahora no puede configurarlo como un examen especial. Ponte en contacto con el servicio de asistencia de edX para obtener ayuda.",
     "This team does not have any members.": "Este equipo no tiene todav\u00eda ning\u00fan miembro.",
     "This team is full.": "Este equipo est\u00e1 lleno.",
     "This thread is closed.": "Este hilo est\u00e1 cerrado.",
@@ -2053,7 +2041,6 @@
     "Time Allotted (HH:MM):": "Tiempo permitido (HH:MM):",
     "Time Sent": "Hora de env\u00edo",
     "Time Sent:": "Hora de env\u00edo:",
-    "Time Spent On Current Step": "Tiempo gastado en el paso actual",
     "Time Zone": "Zona horaria",
     "Timed": "Cronometrado",
     "Timed Exam": "Examen cronometrado",
@@ -2070,6 +2057,7 @@
     "To access the course, select a session.": "Para acceder al curso selecciona una edici\u00f3n.",
     "To access the courses available to you through {enterpriseName}, visit the {enterpriseName} dashboard.": "Para acceder a los cursos que tienes disponible en {enterpriseName}, visita el panel de control de {enterpriseName}.",
     "To be sure all students can access the video, we recommend providing both an .mp4 and a .webm version of your video. Click below to add a URL for another version. These URLs cannot be YouTube URLs. The first listed video that's compatible with the student's computer will play.": "Para asegurar que todos los estudiantes puedan ver el video, recomendamos suministrar tanto una versi\u00f3n .mp4 como una versi\u00f3n .webm del recurso. Haga clic a continuaci\u00f3n para a\u00f1adir la URL de una nueva versi\u00f3n. Estas URLs no pueden ser de Youtube. El primer video listado que sea compatible con la terminal del usuario ser\u00e1 el que se reproducir\u00e1.",
+    "To complete the program, you must earn a verified certificate for each course.": "Para completar el programa, deber\u00e1s ganar un certificado verificado en cada curso.",
     "To continue learning with this account, sign in below.": "Para continuar aprendiendo con esta cuenta, reg\u00edstrese a continuaci\u00f3n.",
     "To invalidate a certificate for a particular learner, add the username or email address below.": "Para invalidar el certificado de un estudiante particular, a\u00f1ada el nombre de usuario o correo electr\u00f3nico a continuaci\u00f3n.",
     "To pass this exam, you must complete the problems in the time allowed.": "Para aprobar este examen, hay que completar los problemas durante el tiempo permitido.",
@@ -2209,7 +2197,6 @@
     "Used": "Utilizado",
     "Used in {count} location": [
       "Usado en {count} ubicaci\u00f3n",
-      "Usado en {count} ubicaciones",
       "Usado en {count} ubicaciones"
     ],
     "User Email": "Correo electr\u00f3nico del usuario",
@@ -2262,7 +2249,6 @@
     "View {span_start} {team_name} {span_end}": "Ver {span_start} {team_name} {span_end}",
     "Viewing %s course": [
       "Mostrando %s curso",
-      "Mostrando %s cursos",
       "Mostrando %s cursos"
     ],
     "Visibility": "Visibilidad",
@@ -2288,7 +2274,6 @@
     "We use your verification photos to confirm your identity and ensure the validity of your certificate.": "Utilizamos sus fotos de verificaci\u00f3n para confirmar su identidad y garantizar la validez de su certificado.",
     "We're sorry to see you go! Your account will be deleted shortly.": "\u00a1Sentimos que te vayas! Tu cuenta ser\u00e1 eliminada en breve.",
     "We're sorry, there was an error": "Lo sentimos, ha habido un error",
-    "We've detected errors on the following tabs: ": "Hemos detectado unos errores en las siguientes pesta\u00f1as: ",
     "We've encountered an error. Refresh your browser and then try again.": "Hemos detectado un error. Por favor recarga la p\u00e1gina en el navegador e intenta nuevamente.",
     "We've sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.": "Hemos enviado un mensaje de confirmaci\u00f3n a {new_email_address}. Haz clic en el v\u00ednculo del mensaje para actualizar tu correo electr\u00f3nico.",
     "We've sent a confirmation message to {new_secondary_email_address}. Click the link in the message to update your secondary email address.": "Hemos enviado un mensaje de confirmaci\u00f3n a {new_secondary_email_address}. Hacer clic en el enlace del mensaje para actualizar tu correo electr\u00f3nico.",
@@ -2298,11 +2283,17 @@
     "Weight of Total Grade": "Peso en la calificaci\u00f3n total",
     "We\u2019re sorry to see you go!": "\u00a1Sentimos que te vayas!",
     "What You Need for Verification": "Lo que necesita para la verificaci\u00f3n",
+    "What can we help you with, {username}?": "\u00bfEn qu\u00e9 podemos ayudarte, {username}?",
     "What does %(platformName)s do with this photo?": "\u00bfQu\u00e9 hace %(platformName)s con esta imagen?",
     "What does this mean?": "\u00bfQu\u00e9 significa esto?",
     "What if I can't see the camera image, or if I can't see my photo do determine which side is visible?": "\u00bfQu\u00e9 sucede si no puedo ver la imagen de la c\u00e1mara, o si no puedo ver mi foto para determinar qu\u00e9 lado es visible?",
     "What if I have difficulty holding my ID in position relative to the camera?": "\u00bfQu\u00e9 sucede si tengo dificultades para mantener mi identificaci\u00f3n en posici\u00f3n con respecto a la c\u00e1mara?",
     "What if I have difficulty holding my head in position relative to the camera?": "\u00bfQu\u00e9 sucede si tengo dificultades para mantener la cabeza en posici\u00f3n con respecto a la c\u00e1mara?",
+    "What industry do you currently work in?": "\u00bfEn que industria trabajas actualmente?",
+    "What industry do you want to work in?": "\u00bfEn que industria te gustar\u00eda trabajar?",
+    "What is the highest level of education that any of your parents or guardians have achieved?": "\u00bfCual es el nivel de educaci\u00f3n mas alto que alguno de tus padres o responsables ha adquirido? ",
+    "What is the highest level of education that you have achieved so far?": "\u00bfCual es el nivel mas alto de educaci\u00f3n que has obtenido hasta la fecha?",
+    "What was the total combined income, during the last 12 months, of all members of your family? ": "\u00bfCual fue el ingreso total combinado, durante los ultimo 12 meses, de todos los miembros de tu familia? ",
     "What's Your Next Accomplishment?": "\u00bfQu\u00e9 ser\u00e1 tu pr\u00f3ximo logro?",
     "When learners submit an answer to an assessment, they immediately see whether the answer is correct or incorrect, and the score received.": "Cuando un estudiante ya haya enviado su respuesta en una evaluaci\u00f3n, en seguida ver\u00e1 si esa respuesta es correcta o incorrecta y la puntuaci\u00f3n correspondiente.",
     "When your face is in position, use the Take Photo button {icon} below to take your photo.": "Cuando su cara est\u00e9 en posici\u00f3n, use el bot\u00f3n Tomar foto {icon} a continuaci\u00f3n para tomar su foto.",
@@ -2311,6 +2302,7 @@
     "Whole words": "Palabras completas",
     "Why activate?": "Por qu\u00e9 activar?",
     "Why does %(platformName)s need my photo?": "Por qu\u00e9 %(platformName)s necesita mi foto ?",
+    "Why does edX collect this information?": "\u00bfPor qu\u00e9 edX recoleta esta informaci\u00f3n?",
     "Width": "Anchura",
     "Will Be Visible To:": "Ser\u00e1 visible para:",
     "Words: {0}": "Palabras: {0}",
@@ -2353,7 +2345,6 @@
     "You did not submit the required files: {requiredFiles}.": "No enviaste los archivos requeridos: {requiredFiles}.",
     "You don't seem to have Flash installed. Get Flash to continue your verification.": "Al parecer no tienes el flash instalado. Por favor instala el flash para continuar con tu proceso de verificaci\u00f3n.",
     "You don't seem to have a webcam connected.": "Parece que no hay una webcam conectada.",
-    "You have added a criterion. You will need to select an option for the criterion in the Learner Training step. To do this, click the Assessment Steps tab.": "Has agregado un criterio. Necesitar\u00e1s seleccionar una opci\u00f3n de criterio en el paso de entrenamiento de estudiante. Para hacer esto, presiona clic en la pesta\u00f1a de Pasos de Examen. ",
     "You have already verified your ID!": "Usted ha verificado su ID!",
     "You have been logged out of your account. Click Okay to log in again now. Click Cancel to stay on this page (you must log in again to save your work).": "Se ha cerrado la sesi\u00f3n de tu cuenta. Presiona en Okay para iniciar sesi\u00f3n nuevamente. Presiona Cancelar para permanecer en esta pagina (debes ingresar nuevamente a tu sesi\u00f3n para guardar tu trabajo).",
     "You have deleted a criterion. The criterion has been removed from the example responses in the Learner Training step.": "Ha borrado un criterio. El criterio ha sido removido de los ejemplos de respuesta en el paso de entrenamiento del estudiante.",
@@ -2370,6 +2361,7 @@
     "You have selected \u201cDelete my account.\u201d Deletion of your account and personal data is permanent and cannot be undone. {platformName} will not be able to recover your account or the data that is deleted.": "Ha seleccionado \u201cEliminar mi cuenta\u201d. La eliminaci\u00f3n de su cuenta y datos personales es permanente e irreversible. {platformName} no podr\u00e1 recuperar su cuenta o los datos que se hayan borrado.",
     "You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.": "Ha establecido su idioma en {beta_language}, el cual no est\u00e1 traducido completamente. Puede ayudarnos a traducir este idioma totalmente uni\u00e9ndose la comunidad Transifex y adicionando traducciones desde el Ingl\u00e9s para los estudiantes que hablan {beta_language}.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "Has iniciado sesi\u00f3n exitosamente en %(currentProvider)s, pero tu cuenta de %(currentProvider)s no est\u00e1 vinculada con una cuenta en %(platformName)s. Para vincular tus cuentas, ingresa con tu usuario y contrase\u00f1a de %(platformName)s.",
+    "You have successfully updated your goal.": "Ha actualizado exitosamente su objetivo.",
     "You have unsaved changes are you sure you want to navigate away?": "Tienes cambios sin guardar, \u00bfest\u00e1s seguro que deseas avanzar en el navegador?",
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Tiene cambios sin guardar en campos editables individuales. Si ejecuta una acci\u00f3n, los cambios no guardados se perder\u00e1n.",
     "You have unsaved changes. Do you really want to leave this page?": "Tiene cambios no guardados. \u00bfRealmente desea abandonar esta p\u00e1gina?",
@@ -2471,7 +2463,6 @@
     "abbrev. month September\u0004Sep": "Sep",
     "about %d hour": [
       "cerca de %d hora",
-      "cerca de %d horas",
       "cerca de %d horas"
     ],
     "about a minute": "cerca de un minuto",
@@ -2515,10 +2506,10 @@
     "endorsed %(time_ago)s by %(user)s": "Validado hace %(time_ago)s por %(user)s",
     "enter code here": "ingresa el c\u00f3digo aqu\u00ed",
     "enter link description here": "Ingresa la descripci\u00f3n del v\u00ednculo aqu\u00ed",
+    "finish later": "terminar despues",
     "follow this post": "sigue esta publicaci\u00f3n",
     "for": "para",
     "group configuration": "Configuraci\u00f3n de Grupo",
-    "has ": "tiene",
     "image omitted": "imagen omitida",
     "incorrect": "incorrecto",
     "internally reviewed": "revisado internamente",
@@ -2529,6 +2520,7 @@
     "minute": "minuto",
     "minutes": "minutos",
     "name": "nombre",
+    "next page": "Siguiente p\u00e1gina",
     "off": "Apagar",
     "on": "Encender",
     "one letter Friday\u0004F": "V",
@@ -2543,6 +2535,7 @@
     "or create a new one here": "o crear una nueva aqu\u00ed",
     "or sign in with": "o inicie sesi\u00f3n con",
     "path/to/introductionToCookieBaking-CH{order}.pdf": "path/to/introductionToCookieBaking-CH{order}.pdf",
+    "post anonymously": "Escribe una publicaci\u00f3n de forma an\u00f3nima",
     "post anonymously to classmates": "publica an\u00f3nimamente a tus compa\u00f1eros de curso",
     "posted %(time_ago)s by %(author)s": "publicado %(time_ago)s por %(author)s",
     "price": "precio",
@@ -2560,9 +2553,9 @@
     "team count": "Cantidad de equipos",
     "text_word_{uniqueId}": "text_word_{uniqueId}",
     "text_word_{uniqueId} title_word_{uniqueId}": "text_word_{uniqueId} title_word_{uniqueId}",
+    "the more quickly and helpfully we can respond!": "\u00a1lo m\u00e1s r\u00e1pido y servicial que podemos responder!",
     "there is currently {numVotes} vote": [
       "actualmente hay {numVotes} voto",
-      "actualmente hay {numVotes} votos",
       "actualmente hay {numVotes} votos"
     ],
     "title_word_{uniqueId}": "title_word_{uniqueId}",
@@ -2574,7 +2567,6 @@
     "upload a PDF file or provide the path to a Studio asset file": "Suba un archivo PDF o ingrese la ruta de un recurso en Studio",
     "user_info": "user_info",
     "username or email": "nombre de usuario o correo electr\u00f3nico",
-    "ve detected errors on the following tabs: ${tabNames.join(": "Hemos detectado errores en las siguientes pesta\u00f1as:  ${tabNames.join(",
     "weeks from learner enrollment date": "Semanas para la fecha de inscripci\u00f3n del estudiante ",
     "with %(release_date_from)s": "con %(release_date_from)s",
     "with %(section_or_subsection)s": "con %(section_or_subsection)s",
@@ -2591,12 +2583,10 @@
     "{download_link_start}Download this image (right-click or option-click, save as){link_end} and then {upload_link_start}upload{link_end} it to your backpack.": "{download_link_start}descargar esta imagen (clic derecho, guardar como){link_end} y luego {upload_link_start} carguela {link_end} a su bolsa en Mozilla Backpack.",
     "{earned}/{possible} point (graded)": [
       "{earned}/{possible} punto (calificado)",
-      "{earned}/{possible} puntos (calificado)",
       "{earned}/{possible} puntos (calificado)"
     ],
     "{earned}/{possible} point (ungraded)": [
       "{earned}/{possible} punto (no calificado)",
-      "{earned}/{possible} puntos (no calificado)",
       "{earned}/{possible} puntos (no calificado)"
     ],
     "{email}": "{email}",
@@ -2610,37 +2600,30 @@
     "{minutes} {unit}": "{minutes} {unit}",
     "{numMoved} learner was moved from {prevCohort}": [
       "{numMoved} estudiante fue movido de {prevCohort}",
-      "{numMoved} estudiantes fueron movidos de {prevCohort}",
       "{numMoved} estudiantes fueron movidos de {prevCohort}"
     ],
     "{numPreassigned} learner was pre-assigned for this cohort. This learner will automatically be added to the cohort when they enroll in the course.": [
       "{numPreassigned} estudiante fue asignado previamente a este cohorte. Este estudiante ser\u00e1 agregado autom\u00e1ticamente a este cohorte cuando se inscriban en el curso.",
-      "{numPreassigned} estudiantes fueron asignados previamente a este cohorte. Estos estudiantes ser\u00e1n agregados autom\u00e1ticamente a este cohorte cuando se inscriban en el curso.",
       "{numPreassigned} estudiantes fueron asignados previamente a este cohorte. Estos estudiantes ser\u00e1n agregados autom\u00e1ticamente a este cohorte cuando se inscriban en el curso."
     ],
     "{numPresent} learner was already in the cohort": [
       "{numPresent} estudiante ya estaba en el cohorte.",
-      "{numPresent} estudiantes ya estaban en el cohorte.",
       "{numPresent} estudiantes ya estaban en el cohorte."
     ],
     "{numResponses} other response": [
       "{numResponses} otra respuesta",
-      "{numResponses} otras respuestas",
       "{numResponses} otras respuestas"
     ],
     "{numResponses} response": [
       "{numResponses} respuesta",
-      "{numResponses} respuestas",
       "{numResponses} respuestas"
     ],
     "{numUsersAdded} learner has been added to this cohort. ": [
       "{numUsersAdded} estudiante ha sido agregado a este cohorte.",
-      "{numUsersAdded} estudiantes han sido agregados a este cohorte.",
       "{numUsersAdded} estudiantes han sido agregados a este cohorte."
     ],
     "{numVotes} Vote": [
       "{numVotes} Voto",
-      "{numVotes} Votos",
       "{numVotes} Votos"
     ],
     "{num_of_hours} hour": "{num_of_hours} hora",
@@ -2649,22 +2632,18 @@
     "{num_of_minutes} minutes": "{num_of_minutes} minutos",
     "{num_points} point possible (graded)": [
       "{num_points} punto posible (calificable)",
-      "{num_points} puntos posibles (calificables)",
       "{num_points} puntos posibles (calificables)"
     ],
     "{num_points} point possible (graded, results hidden)": [
       "{num_points} punto posible (calificable, resultado oculto)",
-      "{num_points} puntos posibles (calificables, resultados ocultos)",
       "{num_points} puntos posibles (calificables, resultados ocultos)"
     ],
     "{num_points} point possible (ungraded)": [
       "{num_points} punto posible (no calificable)",
-      "{num_points} puntos posibles (no calificables)",
       "{num_points} puntos posibles (no calificables)"
     ],
     "{num_points} point possible (ungraded, results hidden)": [
       "{num_points} punto posible (no calificable, resultado oculto)",
-      "{num_points} puntos posibles (no calificables, resultados ocultos)",
       "{num_points} puntos posibles (no calificables, resultados ocultos)"
     ],
     "{organization}\\'s logo": "Logo de la {organization}",
@@ -2682,13 +2661,11 @@
     "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on {platformName}.{strongEnd}": "{strongStart}Advertencia: La eliminaci\u00f3n de la cuenta es permanente.{strongEnd} Por favor lea cuidadosamente la informaci\u00f3n en la parte superior antes de proceder. Esta es una acci\u00f3n irreversible, y {strongStart}no podr\u00e1 volver a usar el mismo correo electr\u00f3nico en {platformName}.{strongEnd}",
     "{team_count} Team": [
       "{team_count} equipo",
-      "{team_count} Equipos",
       "{team_count} Equipos"
     ],
     "{totalItems} total": "{totalItems} total",
     "{total_results} result found for \"{search_term}\"": [
       "{total_results} resultado encontrado para \"{search_term}\"",
-      "{total_results} resultados encontrados para \"{search_term}\"",
       "{total_results} resultados encontrados para \"{search_term}\""
     ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",

@@ -349,13 +349,12 @@ class FormDescription:
 
 class LocalizedJSONEncoder(DjangoJSONEncoder):
     """
-    JSON handler that evaluates gettext_lazy promises.
+    JSON handler that evaluates ugettext_lazy promises.
     """
     # pylint: disable=method-hidden
-
     def default(self, obj):  # lint-amnesty, pylint: disable=arguments-differ
         """
-        Forces evaluation of gettext_lazy promises.
+        Forces evaluation of ugettext_lazy promises.
         """
         if isinstance(obj, Promise):
             return force_str(obj)

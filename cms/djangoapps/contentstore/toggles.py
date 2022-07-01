@@ -1,8 +1,7 @@
 """
 CMS feature toggles.
 """
-from edx_toggles.toggles import SettingDictToggle, WaffleFlag
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace, SettingDictToggle, WaffleFlag
 
 # .. toggle_name: FEATURES['ENABLE_EXPORT_GIT']
 # .. toggle_implementation: SettingDictToggle
@@ -11,7 +10,7 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 #   valid "giturl" attribute. Exporting a course to git causes the course to be exported in the directory indicated by
 #   the GIT_REPO_EXPORT_DIR setting. Note that when this feature is disabled, courses can still be exported to git with
 #   the git_export management command.
-# .. toggle_warning: To enable this feature, the GIT_REPO_EXPORT_DIR setting must be properly defined and point to an
+# .. toggle_warnings: To enable this feature, the GIT_REPO_EXPORT_DIR setting must be properly defined and point to an
 #   existing directory.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2014-02-13
@@ -20,23 +19,23 @@ EXPORT_GIT = SettingDictToggle(
 )
 
 # Namespace for studio dashboard waffle flags.
-CONTENTSTORE_NAMESPACE = 'contentstore'
-CONTENTSTORE_LOG_PREFIX = 'Contentstore: '
+WAFFLE_NAMESPACE = 'contentstore'
+WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='Contentstore: ')
 
-# .. toggle_name: contentstore.split_library_on_studio_dashboard
+# .. toggle_name: split_library_on_studio_dashboard
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Enables data new view for library on studio dashboard.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-07-8
 # .. toggle_tickets: TNL-7536
-SPLIT_LIBRARY_ON_DASHBOARD = WaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.split_library_on_studio_dashboard',
-    __name__,
-    CONTENTSTORE_LOG_PREFIX,
+SPLIT_LIBRARY_ON_DASHBOARD = LegacyWaffleFlag(
+    waffle_namespace=LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE),
+    flag_name='split_library_on_studio_dashboard',
+    module_name=__name__
 )
 
-# .. toggle_name: contentstore.bypass_olx_failure
+# .. toggle_name: bypass_olx_failure
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Enables bypassing olx validation failures during course import.
@@ -44,10 +43,10 @@ SPLIT_LIBRARY_ON_DASHBOARD = WaffleFlag(
 # .. toggle_creation_date: 2021-04-15
 # .. toggle_target_removal_date: 2021-05-15
 # .. toggle_tickets: TNL-8214
-BYPASS_OLX_FAILURE = WaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.bypass_olx_failure',
-    __name__,
-    CONTENTSTORE_LOG_PREFIX,
+BYPASS_OLX_FAILURE = LegacyWaffleFlag(
+    waffle_namespace=LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE),
+    flag_name='bypass_olx_failure',
+    module_name=__name__
 )
 
 
@@ -70,7 +69,7 @@ def bypass_olx_failure_enabled():
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
 # .. toggle_description: When enabled, users can access the new course authoring view for proctoring exams
-# .. toggle_warning: None
+# .. toggle_warnings: None
 # .. toggle_creation_date: 2020-07-23
 ENABLE_EXAM_SETTINGS_HTML_VIEW = SettingDictToggle(
     "FEATURES", "ENABLE_EXAM_SETTINGS_HTML_VIEW", default=False, module_name=__name__
@@ -92,7 +91,7 @@ def exam_setting_view_enabled():
 # .. toggle_creation_date: 2021-12-1
 # .. toggle_target_removal_date: 2022-1-30
 # .. toggle_tickets: TNL-9306
-# .. toggle_warning:
+# .. toggle_warnings:
 ENABLE_NEW_TEXT_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_text_editor', __name__)
 
 
@@ -111,7 +110,7 @@ def use_new_text_editor():
 # .. toggle_creation_date: 2021-12-1
 # .. toggle_target_removal_date: 2022-1-30
 # .. toggle_tickets: TNL-9306
-# .. toggle_warning:
+# .. toggle_warnings:
 ENABLE_NEW_VIDEO_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_video_editor', __name__)
 
 
@@ -130,7 +129,7 @@ def use_new_video_editor():
 # .. toggle_creation_date: 2021-12-1
 # .. toggle_target_removal_date: 2022-1-30
 # .. toggle_tickets: TNL-9306
-# .. toggle_warning:
+# .. toggle_warnings:
 ENABLE_NEW_PROBLEM_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_problem_editor', __name__)
 
 
@@ -139,23 +138,3 @@ def use_new_problem_editor():
     Returns a boolean if new problem editor is enabled
     """
     return ENABLE_NEW_PROBLEM_EDITOR_FLAG.is_enabled()
-
-
-# .. toggle_name: contentstore.individualize_anonymous_user_id
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables the use of unique anonymous_user_id during studio preview
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2022-05-04
-# .. toggle_target_removal_date: 2022-05-30
-# .. toggle_tickets: MST-1455
-INDIVIDUALIZE_ANONYMOUS_USER_ID = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.individualize_anonymous_user_id', __name__
-)
-
-
-def individualize_anonymous_user_id(course_id):
-    """
-    Returns a boolean if individualized anonymous_user_id is enabled on the course
-    """
-    return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)

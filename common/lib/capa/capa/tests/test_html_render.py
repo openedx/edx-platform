@@ -300,7 +300,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         self.assertRegex(the_html, r"<div>\s*</div>")
 
     def _create_test_file(self, path, content_str):  # lint-amnesty, pylint: disable=missing-function-docstring
-        test_fp = self.capa_system.resources_fs.open(path, "w")
+        test_fp = self.capa_system.filestore.open(path, "w")
         test_fp.write(content_str)
         test_fp.close()
 

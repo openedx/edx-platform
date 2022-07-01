@@ -43,6 +43,7 @@ from common.djangoapps.student.models import (
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentCelebrationFactory, UserFactory
 from openedx.core.djangoapps.agreements.api import create_integrity_signature
+from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 
 
 User = get_user_model()
@@ -129,7 +130,9 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     )
     @ddt.unpack
     @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    def test_enrolled_course_metadata(self, logged_in, enrollment_mode):
+    @mock.patch('openedx.core.djangoapps.courseware_api.views.CoursewareMeta.is_microfrontend_enabled_for_user')
+    def test_enrolled_course_metadata(self, logged_in, enrollment_mode, is_microfrontend_enabled_for_user):
+        is_microfrontend_enabled_for_user.return_value = True
         check_public_access = mock.Mock()
         check_public_access.return_value = ACCESS_DENIED
         with mock.patch('lms.djangoapps.courseware.access_utils.check_public_access', check_public_access):
@@ -151,6 +154,14 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             enrollment = response.data['enrollment']
             assert enrollment_mode == enrollment['mode']
             assert enrollment['is_active']
+            assert len(response.data['tabs']) == 5
+            found = False
+            for tab in response.data['tabs']:
+                if tab['type'] == 'external_link':
+                    assert tab['url'] != 'http://hidden.com', "Hidden tab is not hidden"
+                    if tab['url'] == 'http://zombo.com':
+                        found = True
+            assert found, 'external link not in course tabs'
 
             assert not response.data['user_has_passing_grade']
             assert response.data['celebrations']['first_section']
@@ -167,7 +178,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
 
             if enrollment_mode == 'audit':
                 assert response.data['verify_identity_url'] is None
-                assert response.data['verification_status'] == 'none'
+                assert response.data['verification_status'] == 'none'  # lint-amnesty, pylint: disable=literal-comparison
                 assert response.data['linkedin_add_to_profile_url'] is None
             else:
                 assert response.data['certificate_data']['cert_status'] == 'earned_but_not_available'
@@ -176,7 +187,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
                 )
                 # The response contains an absolute URL so this is only checking the path of the final
                 assert expected_verify_identity_url in response.data['verify_identity_url']
-                assert response.data['verification_status'] == 'none'
+                assert response.data['verification_status'] == 'none'  # lint-amnesty, pylint: disable=literal-comparison
 
                 request = RequestFactory().request()
                 cert_url = get_certificate_url(course_id=self.course.id, uuid=cert.verify_uuid)
@@ -205,7 +216,9 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     )
     @ddt.unpack
     @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    def test_unenrolled_course_metadata(self, logged_in, enable_anonymous):
+    @mock.patch('openedx.core.djangoapps.courseware_api.views.CoursewareMeta.is_microfrontend_enabled_for_user')
+    def test_unenrolled_course_metadata(self, logged_in, enable_anonymous, is_microfrontend_enabled_for_user):
+        is_microfrontend_enabled_for_user.return_value = True
         check_public_access = mock.Mock()
         check_public_access.return_value = enable_anonymous
         with mock.patch('lms.djangoapps.courseware.access_utils.check_public_access', check_public_access):
@@ -217,9 +230,13 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
 
             if enable_anonymous and not logged_in:
                 # multiple checks use this handler
+                check_public_access.assert_called()
                 assert response.data['enrollment']['mode'] is None
+                assert response.data['course_access']['has_access']
                 assert response.data['course_goals']['selected_goal'] is None
                 assert response.data['course_goals']['weekly_learning_goal_enabled'] is False
+            else:
+                assert not response.data['course_access']['has_access']
 
     @ddt.data(
         # Who has access to MFE courseware?
@@ -229,6 +246,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "student",
             "enroll_user": True,
             "masquerade_role": None,
+            "expect_course_access": True,
         },
         {
             # Un-enrolled learners should NOT have access.
@@ -236,6 +254,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "student",
             "enroll_user": False,
             "masquerade_role": None,
+            "expect_course_access": False,
         },
         {
             # Un-enrolled instructors should have access.
@@ -243,6 +262,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "instructor",
             "enroll_user": False,
             "masquerade_role": None,
+            "expect_course_access": True,
         },
         {
             # Un-enrolled instructors masquerading as students should have access.
@@ -250,6 +270,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "instructor",
             "enroll_user": False,
             "masquerade_role": "student",
+            "expect_course_access": True,
         },
         {
             # If MFE is not visible, enrolled learners shouldn't have access.
@@ -257,6 +278,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "student",
             "enroll_user": True,
             "masquerade_role": None,
+            "expect_course_access": False,
         },
         {
             # If MFE is not visible, instructors shouldn't have access.
@@ -264,6 +286,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "instructor",
             "enroll_user": False,
             "masquerade_role": None,
+            "expect_course_access": False,
         },
         {
             # If MFE is not visible, masquerading instructors shouldn't have access.
@@ -271,6 +294,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             "username": "instructor",
             "enroll_user": False,
             "masquerade_role": "student",
+            "expect_course_access": False,
         },
     )
     @ddt.unpack
@@ -280,6 +304,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
             username: str,
             enroll_user: bool,
             masquerade_role: Optional[str],
+            expect_course_access: bool,
     ):
         """
         Test that course_access is calculated correctly based on
@@ -289,13 +314,22 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         if enroll_user:
             CourseEnrollment.enroll(user, self.course.id, 'audit')
 
+        patch_mfe_visible = mock.patch(
+            'openedx.core.djangoapps.courseware_api.views.courseware_mfe_is_visible',
+            return_value=mfe_is_visible,
+        )
         self.client.login(username=user, password='foo')
         if masquerade_role:
             self.update_masquerade(role=masquerade_role)
-
-        response = self.client.get(self.url)
+        with patch_mfe_visible:
+            response = self.client.get(self.url)
 
         assert response.status_code == 200
+        assert response.data['username'] == masquerade_role or username
+        if expect_course_access:
+            assert response.data['course_access']['has_access']
+        else:
+            assert not response.data['course_access']['has_access']
 
     def test_streak_data_in_response(self):
         """ Test that metadata endpoint returns data for the streak celebration """
@@ -328,7 +362,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         ('audit', True, False, False),
     )
     @ddt.unpack
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': True})
+    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, True)
     def test_user_needs_integrity_signature(
         self, enrollment_mode, is_staff, has_integrity_signature, needs_integrity_signature,
     ):
@@ -364,7 +398,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         (3, True),
     )
     @ddt.unpack
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_INTEGRITY_SIGNATURE': True})
+    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, True)
     def test_course_staff_masquerade(self, masquerade_group_id, needs_signature):
         self.user.is_staff = True
         self.user.save()
@@ -382,49 +416,6 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         assert courseware_data['is_integrity_signature_enabled'] is True
         assert 'user_needs_integrity_signature' in courseware_data
         assert courseware_data['user_needs_integrity_signature'] == needs_signature
-
-    @ddt.data(
-        ('audit', False),
-        ('honor', False),
-        ('verified', True),
-        ('masters', True),
-        ('professional', True),
-        ('no-id-professional', True),
-        ('executive-education', True),
-        ('credit', True),
-    )
-    @ddt.unpack
-    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_HONOR_CERTIFICATES': True})
-    def test_can_access_proctored_exams(self, mode, result):
-        CourseEnrollment.enroll(self.user, self.course.id, mode)
-        response = self.client.get(self.url)
-        assert response.status_code == 200
-        courseware_data = response.json()
-        assert 'can_access_proctored_exams' in courseware_data
-        assert courseware_data['can_access_proctored_exams'] == result
-
-    @ddt.data(
-        (1, False),
-        (2, True),
-        (3, True),
-    )
-    @ddt.unpack
-    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_HONOR_CERTIFICATES': True})
-    def test_can_access_proctored_exams_masquerading(self, masquerade_group_id, result):
-        self.user.is_staff = True
-        self.user.save()
-        CourseEnrollment.enroll(self.user, self.course.id, 'audit')
-        masquerade_config = {
-            'role': 'student',
-            'user_partition_id': ENROLLMENT_TRACK_PARTITION_ID,
-            'group_id': masquerade_group_id
-        }
-        self.update_masquerade(**masquerade_config)
-        response = self.client.get(self.url)
-        assert response.status_code == 200
-        courseware_data = response.json()
-        assert 'can_access_proctored_exams' in courseware_data
-        assert courseware_data['can_access_proctored_exams'] == result
 
 
 @ddt.ddt

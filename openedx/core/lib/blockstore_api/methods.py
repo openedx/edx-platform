@@ -3,7 +3,6 @@ API Client methods for working with Blockstore bundles and drafts
 """
 
 import base64
-from functools import wraps
 from urllib.parse import urlencode
 from uuid import UUID
 
@@ -12,40 +11,23 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 import requests
 
-from blockstore.apps.api.data import (
-    BundleData,
-    CollectionData,
-    DraftData,
-    BundleVersionData,
-    BundleFileData,
-    DraftFileData,
-    BundleLinkData,
-    DraftLinkData,
-    Dependency,
+from .models import (
+    Bundle,
+    Collection,
+    Draft,
+    BundleFile,
+    DraftFile,
+    LinkDetails,
+    LinkReference,
+    DraftLinkDetails,
 )
-from blockstore.apps.api.exceptions import (
+from .exceptions import (
     NotFound,
     CollectionNotFound,
     BundleNotFound,
     DraftNotFound,
     BundleFileNotFound,
 )
-import blockstore.apps.api.methods as blockstore_api_methods
-
-from .config import use_blockstore_app
-
-
-def toggle_blockstore_api(func):
-    """
-    Decorator function to toggle usage of the Blockstore service
-    and the in-built Blockstore app dependency.
-    """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if use_blockstore_app():
-            return getattr(blockstore_api_methods, func.__name__)(*args, **kwargs)
-        return func(*args, **kwargs)
-    return wrapper
 
 
 def api_url(*path_parts):
@@ -73,17 +55,17 @@ def api_request(method, url, **kwargs):
 def _collection_from_response(data):
     """
     Given data about a Collection returned by any blockstore REST API, convert it to
-    a CollectionData instance.
+    a Collection instance.
     """
-    return CollectionData(uuid=UUID(data['uuid']), title=data['title'])
+    return Collection(uuid=UUID(data['uuid']), title=data['title'])
 
 
 def _bundle_from_response(data):
     """
     Given data about a Bundle returned by any blockstore REST API, convert it to
-    a BundleData instance.
+    a Bundle instance.
     """
-    return BundleData(
+    return Bundle(
         uuid=UUID(data['uuid']),
         title=data['title'],
         description=data['description'],
@@ -96,51 +78,25 @@ def _bundle_from_response(data):
     )
 
 
-def _bundle_version_from_response(data):
-    """
-    Given data about a BundleVersion returned by any blockstore REST API, convert it to
-    a BundleVersionData instance.
-    """
-    return BundleVersionData(
-        bundle_uuid=UUID(data['bundle_uuid']),
-        version=data.get('version', 0),
-        change_description=data['change_description'],
-        created_at=dateutil.parser.parse(data['snapshot']['created_at']),
-        files={
-            path: BundleFileData(path=path, **filedata)
-            for path, filedata in data['snapshot']['files'].items()
-        },
-        links={
-            name: BundleLinkData(
-                name=name,
-                direct=Dependency(**link["direct"]),
-                indirect=[Dependency(**ind) for ind in link["indirect"]],
-            )
-            for name, link in data['snapshot']['links'].items()
-        }
-    )
-
-
 def _draft_from_response(data):
     """
     Given data about a Draft returned by any blockstore REST API, convert it to
-    a DraftData instance.
+    a Draft instance.
     """
-    return DraftData(
+    return Draft(
         uuid=UUID(data['uuid']),
         bundle_uuid=UUID(data['bundle_uuid']),
         name=data['name'],
-        created_at=dateutil.parser.parse(data['staged_draft']['created_at']),
         updated_at=dateutil.parser.parse(data['staged_draft']['updated_at']),
         files={
-            path: DraftFileData(path=path, **file)
+            path: DraftFile(path=path, **file)
             for path, file in data['staged_draft']['files'].items()
         },
         links={
-            name: DraftLinkData(
+            name: DraftLinkDetails(
                 name=name,
-                direct=Dependency(**link["direct"]),
-                indirect=[Dependency(**ind) for ind in link["indirect"]],
+                direct=LinkReference(**link["direct"]),
+                indirect=[LinkReference(**ind) for ind in link["indirect"]],
                 modified=link["modified"],
             )
             for name, link in data['staged_draft']['links'].items()
@@ -148,7 +104,6 @@ def _draft_from_response(data):
     )
 
 
-@toggle_blockstore_api
 def get_collection(collection_uuid):
     """
     Retrieve metadata about the specified collection
@@ -163,7 +118,6 @@ def get_collection(collection_uuid):
     return _collection_from_response(data)
 
 
-@toggle_blockstore_api
 def create_collection(title):
     """
     Create a new collection.
@@ -172,7 +126,6 @@ def create_collection(title):
     return _collection_from_response(result)
 
 
-@toggle_blockstore_api
 def update_collection(collection_uuid, title):
     """
     Update a collection's title
@@ -183,7 +136,6 @@ def update_collection(collection_uuid, title):
     return _collection_from_response(result)
 
 
-@toggle_blockstore_api
 def delete_collection(collection_uuid):
     """
     Delete a collection
@@ -192,7 +144,6 @@ def delete_collection(collection_uuid):
     api_request('delete', api_url('collections', str(collection_uuid)))
 
 
-@toggle_blockstore_api
 def get_bundles(uuids=None, text_search=None):
     """
     Get the details of all bundles
@@ -208,7 +159,6 @@ def get_bundles(uuids=None, text_search=None):
     return [_bundle_from_response(item) for item in response]
 
 
-@toggle_blockstore_api
 def get_bundle(bundle_uuid):
     """
     Retrieve metadata about the specified bundle
@@ -223,7 +173,6 @@ def get_bundle(bundle_uuid):
     return _bundle_from_response(data)
 
 
-@toggle_blockstore_api
 def create_bundle(collection_uuid, slug, title="New Bundle", description=""):
     """
     Create a new bundle.
@@ -239,7 +188,6 @@ def create_bundle(collection_uuid, slug, title="New Bundle", description=""):
     return _bundle_from_response(result)
 
 
-@toggle_blockstore_api
 def update_bundle(bundle_uuid, **fields):
     """
     Update a bundle's title, description, slug, or collection.
@@ -259,7 +207,6 @@ def update_bundle(bundle_uuid, **fields):
     return _bundle_from_response(result)
 
 
-@toggle_blockstore_api
 def delete_bundle(bundle_uuid):
     """
     Delete a bundle
@@ -268,7 +215,6 @@ def delete_bundle(bundle_uuid):
     api_request('delete', api_url('bundles', str(bundle_uuid)))
 
 
-@toggle_blockstore_api
 def get_draft(draft_uuid):
     """
     Retrieve metadata about the specified draft.
@@ -282,7 +228,6 @@ def get_draft(draft_uuid):
     return _draft_from_response(data)
 
 
-@toggle_blockstore_api
 def get_or_create_bundle_draft(bundle_uuid, draft_name):
     """
     Retrieve metadata about the specified draft.
@@ -300,7 +245,6 @@ def get_or_create_bundle_draft(bundle_uuid, draft_name):
         return get_draft(UUID(response["uuid"]))
 
 
-@toggle_blockstore_api
 def commit_draft(draft_uuid):
     """
     Commit all of the pending changes in the draft, creating a new version of
@@ -311,7 +255,6 @@ def commit_draft(draft_uuid):
     api_request('post', api_url('drafts', str(draft_uuid), 'commit'))
 
 
-@toggle_blockstore_api
 def delete_draft(draft_uuid):
     """
     Delete the specified draft, removing any staged changes/files/deletes.
@@ -321,7 +264,6 @@ def delete_draft(draft_uuid):
     api_request('delete', api_url('drafts', str(draft_uuid)))
 
 
-@toggle_blockstore_api
 def get_bundle_version(bundle_uuid, version_number):
     """
     Get the details of the specified bundle version
@@ -329,10 +271,9 @@ def get_bundle_version(bundle_uuid, version_number):
     if version_number == 0:
         return None
     version_url = api_url('bundle_versions', str(bundle_uuid) + ',' + str(version_number))
-    return _bundle_version_from_response(api_request('get', version_url))
+    return api_request('get', version_url)
 
 
-@toggle_blockstore_api
 def get_bundle_version_files(bundle_uuid, version_number):
     """
     Get a list of the files in the specified bundle version
@@ -340,10 +281,9 @@ def get_bundle_version_files(bundle_uuid, version_number):
     if version_number == 0:
         return []
     version_info = get_bundle_version(bundle_uuid, version_number)
-    return list(version_info.files.values())
+    return [BundleFile(path=path, **file_metadata) for path, file_metadata in version_info["snapshot"]["files"].items()]
 
 
-@toggle_blockstore_api
 def get_bundle_version_links(bundle_uuid, version_number):
     """
     Get a dictionary of the links in the specified bundle version
@@ -351,16 +291,22 @@ def get_bundle_version_links(bundle_uuid, version_number):
     if version_number == 0:
         return {}
     version_info = get_bundle_version(bundle_uuid, version_number)
-    return version_info.links
+    return {
+        name: LinkDetails(
+            name=name,
+            direct=LinkReference(**link["direct"]),
+            indirect=[LinkReference(**ind) for ind in link["indirect"]],
+        )
+        for name, link in version_info['snapshot']['links'].items()
+    }
 
 
-@toggle_blockstore_api
 def get_bundle_files_dict(bundle_uuid, use_draft=None):
     """
     Get a dict of all the files in the specified bundle.
 
     Returns a dict where the keys are the paths (strings) and the values are
-    BundleFileData or DraftFileData tuples.
+    BundleFile or DraftFile tuples.
     """
     bundle = get_bundle(bundle_uuid)
     if use_draft and use_draft in bundle.drafts:  # pylint: disable=unsupported-membership-test
@@ -373,7 +319,6 @@ def get_bundle_files_dict(bundle_uuid, use_draft=None):
         return {file_meta.path: file_meta for file_meta in get_bundle_version_files(bundle_uuid, bundle.latest_version)}
 
 
-@toggle_blockstore_api
 def get_bundle_files(bundle_uuid, use_draft=None):
     """
     Get an iterator over all the files in the specified bundle or draft.
@@ -381,13 +326,12 @@ def get_bundle_files(bundle_uuid, use_draft=None):
     return get_bundle_files_dict(bundle_uuid, use_draft).values()
 
 
-@toggle_blockstore_api
 def get_bundle_links(bundle_uuid, use_draft=None):
     """
     Get a dict of all the links in the specified bundle.
 
     Returns a dict where the keys are the link names (strings) and the values
-    are BundleLinkData or DraftLinkData tuples.
+    are LinkDetails or DraftLinkDetails tuples.
     """
     bundle = get_bundle(bundle_uuid)
     if use_draft and use_draft in bundle.drafts:  # pylint: disable=unsupported-membership-test
@@ -400,7 +344,6 @@ def get_bundle_links(bundle_uuid, use_draft=None):
         return get_bundle_version_links(bundle_uuid, bundle.latest_version)
 
 
-@toggle_blockstore_api
 def get_bundle_file_metadata(bundle_uuid, path, use_draft=None):
     """
     Get the metadata of the specified file.
@@ -415,7 +358,6 @@ def get_bundle_file_metadata(bundle_uuid, path, use_draft=None):
         )
 
 
-@toggle_blockstore_api
 def get_bundle_file_data(bundle_uuid, path, use_draft=None):
     """
     Read all the data in the given bundle file and return it as a
@@ -428,7 +370,6 @@ def get_bundle_file_data(bundle_uuid, path, use_draft=None):
         return r.content
 
 
-@toggle_blockstore_api
 def write_draft_file(draft_uuid, path, contents):
     """
     Create or overwrite the file at 'path' in the specified draft with the given
@@ -441,12 +382,11 @@ def write_draft_file(draft_uuid, path, contents):
     """
     api_request('patch', api_url('drafts', str(draft_uuid)), json={
         'files': {
-            path: _encode_str_for_draft(contents) if contents is not None else None,
+            path: encode_str_for_draft(contents) if contents is not None else None,
         },
     })
 
 
-@toggle_blockstore_api
 def set_draft_link(draft_uuid, link_name, bundle_uuid, version):
     """
     Create or replace the link with the given name in the specified draft so
@@ -465,7 +405,7 @@ def set_draft_link(draft_uuid, link_name, bundle_uuid, version):
     })
 
 
-def _encode_str_for_draft(input_str):
+def encode_str_for_draft(input_str):
     """
     Given a string, return UTF-8 representation that is then base64 encoded.
     """
@@ -476,10 +416,10 @@ def _encode_str_for_draft(input_str):
     return base64.b64encode(binary)
 
 
-@toggle_blockstore_api
 def force_browser_url(blockstore_file_url):
     """
-    Ensure that the given devstack URL is a URL accessible from the end user's browser.
+    Ensure that the given URL Blockstore is a URL accessible from the end user's
+    browser.
     """
     # Hack: on some devstacks, we must necessarily use different URLs for
     # accessing Blockstore file data from within and outside of docker

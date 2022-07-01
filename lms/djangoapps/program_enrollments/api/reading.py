@@ -564,12 +564,6 @@ def get_saml_providers_for_organization(organization):
     return list(provider_configs)
 
 
-def remove_prefix(text, prefix):
-    if text.startswith(prefix):
-        return text[len(prefix):]
-    return text
-
-
 def get_provider_slug(provider_config):
     """
     Returns slug identifying a SAML provider.
@@ -579,7 +573,7 @@ def get_provider_slug(provider_config):
 
     Returns: str
     """
-    return remove_prefix(provider_config.provider_id, 'saml-')
+    return provider_config.provider_id.strip('saml-')
 
 
 def is_course_staff_enrollment(program_course_enrollment):

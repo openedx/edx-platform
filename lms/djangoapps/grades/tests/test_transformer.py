@@ -9,14 +9,15 @@ from copy import deepcopy
 
 import ddt
 import pytz
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import check_mongo_calls
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..transformer import GradesTransformer
 
@@ -48,7 +49,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         Helper to update a course's grading policy in the modulestore.
         """
         course.set_grading_policy(grading_policy)
-        self.update_course(course, self.user.id)
+        modulestore().update_item(course, self.user.id)
 
     def _validate_grading_policy_hash(self, course_location, grading_policy_hash):
         """
@@ -114,10 +115,10 @@ class GradesTransformerTestCase(CourseStructureTestCase):
                 '#ref': 'course',
                 '#children': [
                     {
+                        'metadata': metadata,
                         '#type': 'problem',
                         '#ref': 'problem',
                         'data': data,
-                        **metadata,
                     }
                 ]
             }
@@ -368,13 +369,13 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         )
 
     def test_course_version_not_collected_in_old_mongo(self):
-        with self.store.default_store(ModuleStoreEnum.Type.mongo):
-            blocks = self.build_course_with_problems()
+        blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
         assert block_structure.get_xblock_field(blocks['course'].location, 'course_version') is None
 
     def test_course_version_collected_in_split(self):
-        blocks = self.build_course_with_problems()
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
         assert block_structure.get_xblock_field(blocks['course'].location, 'course_version') is not None
         assert block_structure.get_xblock_field(
@@ -429,7 +430,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
         self.client.login(username=self.student.username, password=password)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 2),
+        (ModuleStoreEnum.Type.split, 3),
         (ModuleStoreEnum.Type.mongo, 2),
     )
     @ddt.unpack

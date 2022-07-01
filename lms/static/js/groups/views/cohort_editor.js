@@ -260,16 +260,15 @@
 
                     // Show error messages.
                     this.undelegateViewEvents(this.errorNotifications);
-                    numErrors = modifiedUsers.unknown.length + modifiedUsers.invalid.length + modifiedUsers.not_allowed.length;
+                    numErrors = modifiedUsers.unknown.length + modifiedUsers.invalid.length;
                     if (numErrors > 0) {
-                        createErrorDetails = function(unknownUsers, invalidEmails, notAllowed, showAllErrors) {
+                        createErrorDetails = function(unknownUsers, invalidEmails, showAllErrors) {
                             var unknownErrorsShown = showAllErrors ? unknownUsers.length :
                                 Math.min(errorLimit, unknownUsers.length);
                             var invalidErrorsShown = showAllErrors ? invalidEmails.length :
                                 Math.min(errorLimit - unknownUsers.length, invalidEmails.length);
-                            var notAllowedErrorsShown = showAllErrors ? notAllowed.length :
-                                Math.min(errorLimit - notAllowed.length, notAllowed.length);
                             details = [];
+
 
                             for (i = 0; i < unknownErrorsShown; i++) {
                                 details.push(interpolate_text(gettext('Unknown username: {user}'),
@@ -279,10 +278,6 @@
                                 details.push(interpolate_text(gettext('Invalid email address: {email}'),
                                     {email: invalidEmails[i]}));
                             }
-                            for (i = 0; i < notAllowedErrorsShown; i++) {
-                                details.push(interpolate_text(gettext('Cohort assignment not allowed: {email_or_username}'),
-                                    {email_or_username: notAllowed[i]}));
-                            }
                             return details;
                         };
 
@@ -291,12 +286,12 @@
                                 '{numErrors} learners could not be added to this cohort:', numErrors),
                             {numErrors: numErrors}
                         );
-                        details = createErrorDetails(modifiedUsers.unknown, modifiedUsers.invalid, modifiedUsers.not_allowed, false);
+                        details = createErrorDetails(modifiedUsers.unknown, modifiedUsers.invalid, false);
 
                         errorActionCallback = function(view) {
                             view.model.set('actionText', null);
                             view.model.set('details',
-                                createErrorDetails(modifiedUsers.unknown, modifiedUsers.invalid, modifiedUsers.not_allowed, true));
+                                createErrorDetails(modifiedUsers.unknown, modifiedUsers.invalid, true));
                             view.render();
                         };
 

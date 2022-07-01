@@ -83,8 +83,7 @@ def config_course_discussions(
         course,
         discussion_topics={},
         divided_discussions=[],
-        always_divide_inline_discussions=False,
-        reported_content_email_notifications=False,
+        always_divide_inline_discussions=False
 ):
     """
     Set discussions and configure divided discussions for a course.
@@ -97,8 +96,6 @@ def config_course_discussions(
             list to use the same ids as discussion topic names.
         always_divide_inline_discussions (bool): Whether inline discussions
             should be divided by default.
-        reported_content_email_notifications (bool): Whether email notifications
-            are enabled for reported content for moderators.
 
     Returns:
         Nothing -- modifies course in place.
@@ -116,7 +113,6 @@ def config_course_discussions(
         ],
         'always_divide_inline_discussions': always_divide_inline_discussions,
         'division_scheme': CourseDiscussionSettings.COHORT,
-        'reported_content_email_notifications': reported_content_email_notifications,
     })
 
     course.discussion_topics = {name: {"sort_key": "A", "id": to_id(name)}

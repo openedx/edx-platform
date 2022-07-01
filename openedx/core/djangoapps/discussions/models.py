@@ -522,6 +522,50 @@ class DiscussionsConfiguration(TimeStampedModel):
         )
 
 
+class AbstractProgramLTIConfiguration(TimeStampedModel):
+    """
+    Associates a program with a LTI provider and configuration
+    """
+    class Meta:
+        abstract = True
+
+    program_uuid = models.CharField(
+        primary_key=True,
+        db_index=True,
+        max_length=50,
+        verbose_name=_("Program UUID"),
+    )
+    enabled = models.BooleanField(
+        default=True,
+        help_text=_("If disabled, the LTI in the associated program will be disabled.")
+    )
+    lti_configuration = models.ForeignKey(
+        LtiConfiguration,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text=_("The LTI configuration data for this program/provider."),
+    )
+    provider_type = models.CharField(
+        blank=False,
+        max_length=50,
+        verbose_name=_("LTI provider"),
+        help_text=_("The LTI provider's id"),
+    )
+
+    def __str__(self):
+        return f"Configuration(uuid='{self.program_uuid}', provider='{self.provider_type}', enabled={self.enabled})"
+
+    @classmethod
+    def get(cls, program_uuid):
+        """
+        Lookup a program discussion configuration by program uuid.
+        """
+        return cls.objects.filter(
+            program_uuid=program_uuid
+        ).first()
+
+
 class DiscussionTopicLink(models.Model):
     """
     A model linking discussion topics ids to the part of a course they are linked to.
@@ -579,3 +623,11 @@ class DiscussionTopicLink(models.Model):
             f'enabled_in_context={self.enabled_in_context}'
             f')'
         )
+
+
+class ProgramLiveConfiguration(AbstractProgramLTIConfiguration):
+    history = HistoricalRecords()
+
+
+class ProgramDiscussionsConfiguration(AbstractProgramLTIConfiguration):
+    history = HistoricalRecords()

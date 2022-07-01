@@ -8,14 +8,11 @@ on:
 
 jobs:
   run-tests:
-    if: github.repository == 'openedx/edx-platform' || github.repository == 'edx/edx-platform-private'
     runs-on: [ edx-platform-runner ]
     strategy:
       matrix:
         python-version: ['3.8']
-        django-version:
-          - "pinned"
-          #- "4.0"
+        django-version: ["3.2"]
         shard_name: [
             "lms-1",
             "lms-2",
@@ -32,7 +29,6 @@ jobs:
             "common-1",
             "common-2",
             "common-3",
-            "xmodule-1"
         ]
 
 
@@ -40,41 +36,46 @@ jobs:
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
-
-      - name: checkout repo
-        uses: actions/checkout@v2
-
-      # This gives Mongo several chances to start. We started getting flakiness
-      # around 2022-02-15 wherein the start command would sometimes exit with:
-      #
-      #   * Starting database mongodb
-      #     ...fail!
-      #
-      # ...not having produced any logs or other output. We couldn't figure out
-      # what was causing Mongo to fail, so this is a (temporary?) hack to get
-      # PRs unblocked.
-      - name: start mongod server for tests
+      - uses: actions/checkout@v2
+      - name: start mongodb service
         run: |
-          sudo mkdir -p /data/db
-          sudo chmod -R a+rw /data/db
-          mongod &
+          sudo /etc/init.d/mongodb start
+
+      - name: set settings path
+        run: |
+          echo "settings_path=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} --output settings )" >> $GITHUB_ENV
+
+#      - name: set pytest randomly option
+#        run: |
+#          echo "pytest_randomly_option=$(if [ '${{ env.module_name }}' = 'cms' ] || [ '${{ env.module_name }}' = 'common' ]; then echo '-p no:randomly'; else echo '' ; fi)" >> $GITHUB_ENV
 
       - name: install requirements
         run: |
           sudo pip install -r requirements/pip.txt
           sudo pip install -r requirements/edx/testing.txt
-          if [[ "${{ matrix.django-version }}" == "pinned" ]]; then
-            sudo pip install -r requirements/edx/django.txt
-          else
-            sudo pip install "django~=${{ matrix.django-version }}.0"
-          fi
+          sudo pip install "django~=${{ matrix.django-version }}.0"
 
-      - name: list installed package versions
+      - name: get unit tests for shard
         run: |
-          sudo pip freeze
+          echo "unit_test_paths=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} )" >> $GITHUB_ENV
 
-      - name: Setup and run tests
-        uses: ./.github/actions/unit-tests
+      - name: run tests
+        run: |
+          python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }}
+
+      - name: rename warnings json file
+        if: success()
+        run: |
+          cd test_root/log
+          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}.json
+
+      - name: save pytest warnings json file
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: pytest-warnings-json
+          path: |
+            test_root/log/pytest_warnings*.json
 
   compile-warnings-report:
     runs-on: [ edx-platform-runner ]
@@ -103,3 +104,5 @@ jobs:
           name: pytest-warning-report-html
           path: |
             reports/pytest_warnings/warning_report_all.html
+
+

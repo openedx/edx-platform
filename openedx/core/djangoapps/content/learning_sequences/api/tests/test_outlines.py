@@ -16,6 +16,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 import attr
 import ddt
+import django.test
 import pytest
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -39,12 +40,14 @@ from ...data import (
     VisibilityData,
 
 )
+from ...toggles import USE_FOR_OUTLINES
 from ..outlines import (
     get_content_errors,
     get_course_outline,
     get_user_course_outline,
     get_user_course_outline_details,
     key_supports_outlines,
+    public_api_available,
     replace_course_outline,
 )
 from ..processors.enrollment_track_partition_groups import EnrollmentTrackPartitionGroupsOutlineProcessor
@@ -62,6 +65,56 @@ class OutlineSupportTestCase(unittest.TestCase):
     def test_unsupported_types(self):
         assert not key_supports_outlines(CourseKey.from_string("edX/100/2021"))
         assert not key_supports_outlines(LibraryLocator(org="edX", library="100"))
+
+
+class PublicApiAvailableTestCase(django.test.TestCase):
+    """
+    Test API availability checks.
+    """
+    @classmethod
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+        """
+        Create an empty course outline.
+        """
+        cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Learn+Roundtrip")
+        cls.course_outline = CourseOutlineData(
+            course_key=cls.course_key,
+            title="PublicApiAvailableTestCase Test Course!",
+            published_at=datetime(2021, 6, 14, tzinfo=timezone.utc),
+            published_version="5ebece4b69dd593d82fe2021",
+            entrance_exam_id=None,
+            days_early_for_beta=None,
+            sections=[],
+            self_paced=False,
+            course_visibility=CourseVisibility.PRIVATE
+        )
+        replace_course_outline(cls.course_outline)
+
+        cls.global_staff = UserFactory.create(
+            username='global_staff', email='gstaff@example.com', is_staff=True
+        )
+        cls.student = UserFactory.create(
+            username='student', email='student@example.com', is_staff=False
+        )
+        cls.fake_course_1 = CourseKey.from_string("course-v1:Not+Really+Here")
+        cls.fake_course_2 = CourseKey.from_string("Also/Not/Here")
+
+    def test_flag_inactive(self):
+        # Old Mongo and non-existent courses are always unavailable
+        assert not public_api_available(self.fake_course_1)
+        assert not public_api_available(self.fake_course_2)
+
+        # Waffle-flag controlled
+        assert not public_api_available(self.course_key)
+
+    @override_waffle_flag(USE_FOR_OUTLINES, active=True)
+    def test_flag_active(self):
+        # Old Mongo and non-existent courses are always unavailable
+        assert not public_api_available(self.fake_course_1)
+        assert not public_api_available(self.fake_course_2)
+
+        # Waffle-flag controlled
+        assert public_api_available(self.course_key)
 
 
 class CourseOutlineTestCase(CacheIsolationTestCase):

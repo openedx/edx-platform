@@ -13,7 +13,6 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from opaque_keys.edx.django.models import CourseKeyField
-from openedx_filters.learning.filters import CohortAssignmentRequested, CohortChangeRequested
 
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
@@ -21,18 +20,6 @@ from openedx_events.learning.data import CohortData, CourseData, UserData, UserP
 from openedx_events.learning.signals import COHORT_MEMBERSHIP_CHANGED  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
-
-
-class CohortMembershipException(Exception):
-    pass
-
-
-class CohortChangeNotAllowed(CohortMembershipException):
-    pass
-
-
-class CohortAssignmentNotAllowed(CohortMembershipException):
-    pass
 
 
 class CourseUserGroup(models.Model):
@@ -117,13 +104,6 @@ class CohortMembership(models.Model):
         cohort
         Returns CohortMembership, previous_cohort (if any)
         """
-        try:
-            # .. filter_implemented_name: CohortAssignmentRequested
-            # .. filter_type: org.openedx.learning.cohort.assignment.requested.v1
-            user, cohort = CohortAssignmentRequested.run_filter(user=user, target_cohort=cohort)
-        except CohortAssignmentRequested.PreventCohortAssignment as exc:
-            raise CohortAssignmentNotAllowed(str(exc)) from exc
-
         with transaction.atomic():
             membership, created = cls.objects.select_for_update().get_or_create(
                 user__id=user.id,
@@ -142,16 +122,6 @@ class CohortMembership(models.Model):
                     cohort_name=cohort.name))
             else:
                 previous_cohort = membership.course_user_group
-
-                try:
-                    # .. filter_implemented_name: CohortChangeRequested
-                    # .. filter_type: org.openedx.learning.cohort.change.requested.v1
-                    membership, cohort = CohortChangeRequested.run_filter(
-                        current_membership=membership, target_cohort=cohort,
-                    )
-                except CohortChangeRequested.PreventCohortChange as exc:
-                    raise CohortChangeNotAllowed(str(exc)) from exc
-
                 previous_cohort.users.remove(user)
 
                 membership.course_user_group = cohort

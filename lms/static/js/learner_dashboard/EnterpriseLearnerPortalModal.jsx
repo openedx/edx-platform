@@ -12,9 +12,8 @@ class EnterpriseLearnerPortalModal extends React.Component {
 
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
-    this.handleModalBackdropClick = this.handleModalBackdropClick.bind(this);
+    this.handleClick = this.handleClick.bind(this);
     this.handleEsc = this.handleEsc.bind(this);
-    this.handleLearnerPortalDashboardClick = this.handleLearnerPortalDashboardClick.bind(this);
   }
 
   componentDidMount() {
@@ -22,7 +21,7 @@ class EnterpriseLearnerPortalModal extends React.Component {
     const hasViewedModal = window.sessionStorage.getItem(storageKey);
     if (!hasViewedModal) {
       this.openModal();
-      document.addEventListener('mousedown', this.handleModalBackdropClick, false);
+      document.addEventListener('mousedown', this.handleClick, false);
       window.sessionStorage.setItem(storageKey, true);
       document.addEventListener('keydown', this.handleEsc, false);
     }
@@ -43,11 +42,11 @@ class EnterpriseLearnerPortalModal extends React.Component {
   componentWillUnmount() {
     // remove the class to allow the dashboard content to scroll
     document.body.classList.remove('modal-open');
-    document.removeEventListener('mousedown', this.handleModalBackdropClick, false);
+    document.removeEventListener('mousedown', this.handleClick, false);
     document.removeEventListener('keydown', this.handleEsc, false);
   }
 
-  handleModalBackdropClick(e) {
+  handleClick(e) {
     if (this.modalRef && this.modalRef.contains(e.target)) {
       // click is inside modal, don't close it
       return;
@@ -59,10 +58,6 @@ class EnterpriseLearnerPortalModal extends React.Component {
   handleEsc(e) {
     const { key } = e;
     if (key === "Escape") {
-      window.analytics.track('edx.ui.enterprise.lms.dashboard.learner_portal_modal.closed', {
-        enterpriseUUID: this.props.enterpriseCustomerUUID,
-        source: 'Escape',
-      });
       this.closeModal();
     }
   }
@@ -74,9 +69,6 @@ class EnterpriseLearnerPortalModal extends React.Component {
   }
 
   openModal() {
-    window.analytics.track('edx.ui.enterprise.lms.dashboard.learner_portal_modal.opened', {
-      enterpriseUUID: this.props.enterpriseCustomerUUID,
-    });
     this.setState({
       isModalOpen: true,
     });
@@ -85,16 +77,6 @@ class EnterpriseLearnerPortalModal extends React.Component {
   getLearnerPortalUrl() {
     const baseUrlWithSlug = `${this.props.enterpriseLearnerPortalBaseUrl}/${this.props.enterpriseCustomerSlug}`;
     return `${baseUrlWithSlug}?utm_source=lms_dashboard_modal`;
-  }
-
-  handleLearnerPortalDashboardClick(e) {
-    e.preventDefault();
-    window.analytics.track('edx.ui.enterprise.lms.dashboard.learner_portal_modal.dashboard_cta.clicked', {
-      enterpriseUUID: this.props.enterpriseCustomerUUID,
-    });
-    setTimeout(() => {
-      window.location.href = this.getLearnerPortalUrl();
-    }, 300);
   }
 
   render() {
@@ -131,19 +113,12 @@ class EnterpriseLearnerPortalModal extends React.Component {
             <div className="mt-4 d-flex align-content-center justify-content-end">
               <button
                 className="btn-link mr-3"
-                onClick={() => {
-                  window.analytics.track('edx.ui.enterprise.lms.dashboard.learner_portal_modal.closed', {
-                    enterpriseUUID: this.props.enterpriseCustomerUUID,
-                    source: 'Cancel button',
-                  });
-                  this.closeModal();
-                }}
+                onClick={() => this.closeModal()}
               >
                 {gettext('Cancel')}
               </button>
               <AutoFocusInside>
                 <a
-                  onClick={this.handleLearnerPortalDashboardClick}
                   href={this.getLearnerPortalUrl()}
                   className="btn btn-primary"
                 >

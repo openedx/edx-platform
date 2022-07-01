@@ -85,7 +85,7 @@ class Command(BaseCommand):
             dest='show_receivers',
             action='store_true',
             help=('Display the list of possible receiver functions and exit.')
-        )
+        ),  # lint-amnesty, pylint: disable=trailing-comma-tuple
         parser.add_argument(
             '--dry-run',
             dest='dry_run',
@@ -95,7 +95,7 @@ class Command(BaseCommand):
                 "expensive modulestore query to find courses, but it will "
                 "not emit any signals."
             )
-        )
+        ),  # lint-amnesty, pylint: disable=trailing-comma-tuple
         parser.add_argument(
             '--receivers',
             dest='receivers',
@@ -141,7 +141,7 @@ class Command(BaseCommand):
                 "process. However, if you know what you're doing and need to "
                 "override that behavior, use this flag."
             )
-        )
+        ),  # lint-amnesty, pylint: disable=trailing-comma-tuple
         parser.add_argument(
             '--skip-ccx',
             dest='skip_ccx',
@@ -155,12 +155,12 @@ class Command(BaseCommand):
                 "if you know what you're doing, you can disable this behavior "
                 "with this flag, so that CCX receivers are omitted."
             )
-        )
+        ),  # lint-amnesty, pylint: disable=trailing-comma-tuple
         parser.add_argument(
             '--args-from-database',
             action='store_true',
             help='Use arguments from the SimulateCoursePublishConfig model instead of the command line.',
-        )
+        ),  # lint-amnesty, pylint: disable=trailing-comma-tuple
 
     def get_args_from_database(self):
         """ Returns an options dictionary from the current SimulateCoursePublishConfig model. """

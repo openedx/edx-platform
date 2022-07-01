@@ -43,7 +43,7 @@ class TestLTI(BaseTestXmodule):
         context_id = str(self.item_descriptor.course_id)
         user_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'user')
         user_id = str(user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID))
-        hostname = settings.LMS_BASE
+        hostname = self.item_descriptor.xmodule_runtime.hostname
         resource_link_id = str(urllib.parse.quote(f'{hostname}-{self.item_descriptor.location.html_id()}'))
 
         sourcedId = "{context}:{resource_link}:{user_id}".format(

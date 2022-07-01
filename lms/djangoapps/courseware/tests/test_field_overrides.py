@@ -39,7 +39,7 @@ class TestOverrideProvider(FieldOverrideProvider):
         return default
 
     @classmethod
-    def enabled_for(cls, course):  # pylint: disable=arguments-differ
+    def enabled_for(cls, course):
         return True
 
 

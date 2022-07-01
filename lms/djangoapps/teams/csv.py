@@ -9,7 +9,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.db.models import Prefetch
 
 from common.djangoapps.student.models import CourseEnrollment
-from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.teams.api import (
     ORGANIZATION_PROTECTED_MODES,
     OrganizationProtectionStatus,
@@ -41,9 +41,9 @@ def load_team_membership_csv(course, response):
 def _get_team_membership_csv_headers(course):
     """
     Get headers for team membership csv.
-    ['username', 'external_user_id', 'mode', <teamset_id_1>, ..., ,<teamset_id_n>]
+    ['user', 'mode', <teamset_id_1>, ..., ,<teamset_id_n>]
     """
-    headers = ['username', 'external_user_id', 'mode']
+    headers = ['user', 'mode']
     for teamset in sorted(course.teams_configuration.teamsets, key=lambda ts: ts.teamset_id):
         headers.append(teamset.teamset_id)
     return headers
@@ -54,9 +54,8 @@ def _lookup_team_membership_data(course):
     Returns a list of dicts, in the following form:
     [
         {
-            'username': <edX User username>
-            'external_user_id': If the user is enrolled in this course as a part of a program,
-                    this will be <external_user_id> if the user has one, otherwise, blank.
+            'user': If the user is enrolled in this course as a part of a program,
+                    this will be <external_user_key> if the user has one, otherwise <username>,
             'mode': <student enrollment mode for the given course>,
             <teamset id>: <team name> for each teamset in which the given user is on a team
         }
@@ -74,8 +73,7 @@ def _lookup_team_membership_data(course):
     for course_enrollment in course_enrollments:
         # This dict contains all the user's team memberships keyed by teamset
         student_row = teamset_memberships_by_user.get(course_enrollment.user, {})
-        student_row['username'] = course_enrollment.user.username
-        student_row['external_user_id'] = _get_external_user_key(course_enrollment)
+        student_row['user'] = _get_displayed_user_identifier(course_enrollment)
         student_row['mode'] = course_enrollment.mode
         team_membership_data.append(student_row)
     return team_membership_data
@@ -103,11 +101,11 @@ def _fetch_course_enrollments_with_related_models(course_id):
     ).order_by('user__username')
 
 
-def _get_external_user_key(course_enrollment):
+def _get_displayed_user_identifier(course_enrollment):
     """
     If a user is enrolled in the course as a part of a program and the program identifies them
-        with an external_user_key, return that value for the 'external_user_key' column.
-    Otherwise, return None.
+        with an external_user_key, use that as the value of the 'user' column.
+    Otherwise, use the user's username.
     """
     program_course_enrollments = course_enrollment.programcourseenrollment_set
     if program_course_enrollments.exists():
@@ -116,7 +114,7 @@ def _get_external_user_key(course_enrollment):
         external_user_key = program_course_enrollment.program_enrollment.external_user_key
         if external_user_key:
             return external_user_key
-    return None
+    return course_enrollment.user.username
 
 
 def _group_teamset_memberships_by_user(course_team_memberships):
@@ -187,7 +185,7 @@ class TeamMembershipImportManager:
         if not self.validate_teamsets(csv_reader):
             return False
 
-        self.teamset_ids = self.get_teamset_ids_from_reader(csv_reader)
+        self.teamset_ids = csv_reader.fieldnames[2:]
         row_dictionaries = []
         csv_usernames = set()
 
@@ -199,7 +197,7 @@ class TeamMembershipImportManager:
         for row in csv_reader:
             if not self.validate_teams_have_matching_teamsets(row):
                 return False
-            username = row['username']
+            username = row['user']
             if not username:
                 continue
             if not self.is_username_unique(username, csv_usernames):
@@ -209,9 +207,9 @@ class TeamMembershipImportManager:
             if user is None:
                 continue
             if not self.validate_user_enrollment_is_valid(user, row['mode']):
-                row['user_model'] = None
+                row['user'] = None
                 continue
-            row['user_model'] = user
+            row['user'] = user
             if not self.validate_user_assignment_to_team_and_teamset(row):
                 return False
             row_dictionaries.append(row)
@@ -248,24 +246,17 @@ class TeamMembershipImportManager:
 
     def validate_header(self, csv_reader):
         """
-        Validates header row to ensure that it contains at a minimum columns called 'username', 'mode'.
+        Validates header row to ensure that it contains at a minimum columns called 'user', 'mode'.
         Teamset validation is handled separately
         """
         header = csv_reader.fieldnames
-        if 'username' not in header:
-            self.validation_errors.append("Header must contain column 'username'.")
+        if 'user' not in header:
+            self.validation_errors.append("Header must contain column 'user'.")
             return False
         if 'mode' not in header:
             self.validation_errors.append("Header must contain column 'mode'.")
             return False
         return True
-
-    def get_teamset_ids_from_reader(self, csv_reader):
-        """
-        The teamsets currently will be directly after 'mode'
-        """
-        mode_index = csv_reader.fieldnames.index('mode')
-        return csv_reader.fieldnames[mode_index + 1:]
 
     def validate_teamsets(self, csv_reader):
         """
@@ -274,7 +265,7 @@ class TeamMembershipImportManager:
         Teamset does not exist
         Teamset id is duplicated
         """
-        teamset_ids = self.get_teamset_ids_from_reader(csv_reader)
+        teamset_ids = csv_reader.fieldnames[2:]
         valid_teamset_ids = {ts.teamset_id for ts in self.course.teams_configuration.teamsets}
 
         dupe_set = set()
@@ -338,7 +329,7 @@ class TeamMembershipImportManager:
         [andrew],masters,team1,,team3
         [joe],masters,,team2,team3
         """
-        user = row['user_model']
+        user = row['user']
         for teamset_id in self.teamset_ids:
             # See if the user is already on a team in the teamset
             if (user.id, teamset_id) in self.existing_course_team_memberships:
@@ -457,22 +448,21 @@ class TeamMembershipImportManager:
         Also, if there is no change in user's membership, the input row's team name will be nulled out so that no
         action will take place further in the processing chain.
         """
-        user = row['user_model']
         for ts_id in self.teamset_ids:
             if row[ts_id] is None:
                 # remove this student from the teamset
                 try:
-                    self._remove_user_from_teamset_and_emit_signal(user.id, ts_id, self.course.id)
+                    self._remove_user_from_teamset_and_emit_signal(row['user'].id, ts_id, self.course.id)
                 except CourseTeamMembership.DoesNotExist:
                     pass
             else:
                 # reassignment happens only if proposed team membership is different from existing team membership
-                if (user.id, ts_id) in self.existing_course_team_memberships:
-                    current_user_teams_name = self.existing_course_team_memberships[user.id, ts_id].name
+                if (row['user'].id, ts_id) in self.existing_course_team_memberships:
+                    current_user_teams_name = self.existing_course_team_memberships[row['user'].id, ts_id].name
                     if current_user_teams_name != row[ts_id]:
                         try:
-                            self._remove_user_from_teamset_and_emit_signal(user.id, ts_id, self.course.id)
-                            del self.existing_course_team_memberships[user.id, ts_id]
+                            self._remove_user_from_teamset_and_emit_signal(row['user'].id, ts_id, self.course.id)
+                            del self.existing_course_team_memberships[row['user'].id, ts_id]
                         except CourseTeamMembership.DoesNotExist:
                             pass
                     else:
@@ -518,11 +508,11 @@ class TeamMembershipImportManager:
         """
         Creates a CourseTeamMembership entry - i.e: a relationship between a user and a team.
         user_row is a dictionary where key is column name and value is the row value.
-        {'mode': ' masters','topic_0': '','topic_1': 'team 2','topic_2': None,'user_model': <user_obj>}
+        {'mode': ' masters','topic_0': '','topic_1': 'team 2','topic_2': None,'user': <user_obj>}
          andrew,masters,team1,,team3
         joe,masters,,team2,team3
         """
-        user = user_row['user_model']
+        user = user_row['user']
         for teamset_id in self.teamset_ids:
             team_name = user_row[teamset_id]
             if not team_name:
@@ -551,13 +541,22 @@ class TeamMembershipImportManager:
                 }
             )
 
-    def get_user(self, username):
+    def get_user(self, user_name):
         """
         Gets the user object from user_name/email/locator
         user_name: the user_name/email/user locator
         """
         try:
-            return User.objects.get(username=username)
+            return User.objects.get(username=user_name)
         except User.DoesNotExist:
-            self.validation_errors.append('User ' + username + ' does not exist.')
-            return None
+            try:
+                return User.objects.get(email=user_name)
+            except User.DoesNotExist:
+                try:
+                    user = ProgramEnrollment.objects.get(external_user_key=user_name).user
+                    if user is None:
+                        return None
+                    return user
+                except ProgramEnrollment.DoesNotExist:
+                    self.validation_errors.append('User name/email/external key: ' + user_name + ' does not exist.')
+                    return None

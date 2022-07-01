@@ -13,7 +13,6 @@ import six
 from calc import evaluator
 from lxml import etree
 
-from bleach.css_sanitizer import CSSSanitizer
 from openedx.core.djangolib.markup import HTML
 
 #-----------------------------------------------------------------------------
@@ -193,7 +192,7 @@ def sanitize_html(html_code):
         html_code,
         protocols=bleach.ALLOWED_PROTOCOLS + ['data'],
         tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre', 'img', 'span'],
-        css_sanitizer=CSSSanitizer(allowed_css_properties=["white-space"]),
+        styles=['white-space'],
         attributes=attributes
     )
     return output

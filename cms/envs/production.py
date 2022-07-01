@@ -83,7 +83,6 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'CELERY_QUEUES',
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
-        'REST_FRAMEWORK',
     ]
     for key in KEYS_WITH_MERGED_VALUES:
         if key in __config_copy__:
@@ -110,8 +109,8 @@ EDX_PLATFORM_REVISION = REVISION_CONFIG.get('EDX_PLATFORM_REVISION', EDX_PLATFOR
 BROKER_POOL_LIMIT = 0
 BROKER_CONNECTION_TIMEOUT = 1
 
-# Allow env to configure celery result backend with default set to django-cache
-CELERY_RESULT_BACKEND = ENV_TOKENS.get('CELERY_RESULT_BACKEND', 'django-cache')
+# For the Result Store, use the django cache named 'celery'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 # When the broker is behind an ELB, use a heartbeat to refresh the
 # connection and to detect if it has been dropped.
@@ -171,7 +170,7 @@ ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_IN
 # Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = ENV_TOKENS.get('IDA_LOGOUT_URI_LIST', [])
 
-SITE_NAME = ENV_TOKENS.get('SITE_NAME', SITE_NAME)
+SITE_NAME = ENV_TOKENS['SITE_NAME']
 
 ALLOWED_HOSTS = [
     # TODO: bbeggs remove this before prod, temp fix to get load testing running
@@ -179,10 +178,10 @@ ALLOWED_HOSTS = [
     CMS_BASE,
 ]
 
-LOG_DIR = ENV_TOKENS.get('LOG_DIR', LOG_DIR)
+LOG_DIR = ENV_TOKENS['LOG_DIR']
 DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 
-CACHES = ENV_TOKENS.get('CACHES', CACHES)
+CACHES = ENV_TOKENS['CACHES']
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
 if 'loc_cache' not in CACHES:
@@ -248,12 +247,6 @@ COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 #    ],
 COMPREHENSIVE_THEME_LOCALE_PATHS = ENV_TOKENS.get('COMPREHENSIVE_THEME_LOCALE_PATHS', [])
 
-# PREPEND_LOCALE_PATHS contain the paths to locale directories to load first e.g.
-# "PREPEND_LOCALE_PATHS" : [
-#        "/edx/my-locale/"
-#    ],
-PREPEND_LOCALE_PATHS = ENV_TOKENS.get('PREPEND_LOCALE_PATHS', [])
-
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('CELERY_TIMEZONE', CELERY_TIMEZONE)
 
@@ -275,7 +268,7 @@ for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     INSTALLED_APPS.append(app)
 
 LOGGING = get_logger_config(LOG_DIR,
-                            logging_env=ENV_TOKENS.get('LOGGING_ENV', LOGGING_ENV),
+                            logging_env=ENV_TOKENS['LOGGING_ENV'],
                             service_variant=SERVICE_VARIANT)
 
 # The following variables use (or) instead of the default value inside (get). This is to enforce using the Lazy Text
@@ -316,11 +309,11 @@ CMS_SEGMENT_KEY = AUTH_TOKENS.get('SEGMENT_KEY')
 
 SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
 
-AWS_ACCESS_KEY_ID = AUTH_TOKENS.get("AWS_ACCESS_KEY_ID", AWS_ACCESS_KEY_ID)
+AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
 if AWS_ACCESS_KEY_ID == "":
     AWS_ACCESS_KEY_ID = None
 
-AWS_SECRET_ACCESS_KEY = AUTH_TOKENS.get("AWS_SECRET_ACCESS_KEY", AWS_SECRET_ACCESS_KEY)
+AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
 if AWS_SECRET_ACCESS_KEY == "":
     AWS_SECRET_ACCESS_KEY = None
 
@@ -358,7 +351,7 @@ if COURSE_METADATA_EXPORT_BUCKET:
 else:
     COURSE_METADATA_EXPORT_STORAGE = DEFAULT_FILE_STORAGE
 
-DATABASES = AUTH_TOKENS.get('DATABASES', DATABASES)
+DATABASES = AUTH_TOKENS['DATABASES']
 
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
@@ -386,8 +379,8 @@ XBLOCK_FIELD_DATA_WRAPPERS = ENV_TOKENS.get(
     XBLOCK_FIELD_DATA_WRAPPERS
 )
 
-CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
-DOC_STORE_CONFIG = AUTH_TOKENS.get('DOC_STORE_CONFIG', DOC_STORE_CONFIG)
+CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']
+DOC_STORE_CONFIG = AUTH_TOKENS['DOC_STORE_CONFIG']
 
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = ENV_TOKENS.get('BLOCKSTORE_API_URL', None)  # e.g. "https://blockstore.example.com/api/v1/"
@@ -603,7 +596,7 @@ EXPLICIT_QUEUES = {
         'queue': POLICY_CHANGE_GRADES_ROUTING_KEY},
     'cms.djangoapps.contentstore.tasks.update_search_index': {
         'queue': UPDATE_SEARCH_INDEX_JOB_QUEUE},
-    'cms.djangoapps.coursegraph.tasks.dump_course_to_neo4j': {
+    'openedx.core.djangoapps.coursegraph.tasks.dump_course_to_neo4j': {
         'queue': COURSEGRAPH_JOB_QUEUE},
 }
 
@@ -627,16 +620,3 @@ LANGUAGE_COOKIE_NAME = ENV_TOKENS.get('LANGUAGE_COOKIE', None) or ENV_TOKENS.get
 
 ################# Discussions micro frontend URL ########################
 DISCUSSIONS_MICROFRONTEND_URL = ENV_TOKENS.get('DISCUSSIONS_MICROFRONTEND_URL', DISCUSSIONS_MICROFRONTEND_URL)
-
-################### Discussions micro frontend Feedback URL###################
-DISCUSSIONS_MFE_FEEDBACK_URL = ENV_TOKENS.get('DISCUSSIONS_MFE_FEEDBACK_URL', DISCUSSIONS_MFE_FEEDBACK_URL)
-
-############## DRF overrides ##############
-REST_FRAMEWORK.update(ENV_TOKENS.get('REST_FRAMEWORK', {}))
-
-# keys for  big blue button live provider
-COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
-    "KEY": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_KEY', None),
-    "SECRET": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_SECRET', None),
-    "URL": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_URL', None),
-}

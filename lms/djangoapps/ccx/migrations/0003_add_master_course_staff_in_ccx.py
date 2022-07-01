@@ -80,6 +80,7 @@ class Migration(migrations.Migration):
         ('ccx', '0001_initial'),
         ('ccx', '0002_customcourseforedx_structure_json'),
         ('course_overviews','0010_auto_20160329_2317'), # because we use course overview and are in the same release as that table is modified
+        ('verified_track_content','0001_initial'), # because we use enrollement code and are in the same release as an enrollement related table is created
     ]
 
     operations = [

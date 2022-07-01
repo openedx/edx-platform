@@ -1,6 +1,5 @@
 {% extends "admin/base.html" %}
 {% load i18n admin_urls %}
-{% load waffle_tags %}
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 {% block branding %}
 <h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
@@ -16,8 +15,5 @@
             <a href="{{ docsroot }}">{% trans 'Documentation' as tmsg %} {{tmsg|force_escape}}</a> /
         {% endif %}
     {% endif %}
-
-    <a href="/logout/">{% trans 'Log out' as tmsg %} {{tmsg|force_escape}}</a>
-
-
+    <a href="{% url 'admin:logout' %}">{% trans 'Log out' as tmsg %} {{tmsg|force_escape}}</a>
 {% endblock %}

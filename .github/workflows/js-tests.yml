@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-20.04 ]
-        node-version: [ 16 ]
+        node-version: [ 12 ]
         python-version: [ 3.8 ]
 
     steps:
@@ -28,9 +28,6 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-      
-    - name: Setup npm
-      run: npm i -g npm@8.5.x
 
     - name: Install Firefox 61.0
       run: |

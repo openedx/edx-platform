@@ -1,69 +1,68 @@
 [main]
 host = https://www.transifex.com
 
-[o:open-edx:p:edx-platform:r:django-partial]
+[edx-platform.django-partial]
 file_filter = conf/locale/<lang>/LC_MESSAGES/django-partial.po
 source_file = conf/locale/en/LC_MESSAGES/django-partial.po
 source_lang = en
-type        = PO
+type = PO
 
-[o:open-edx:p:edx-platform:r:django-studio]
+[edx-platform.django-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/django-studio.po
 source_file = conf/locale/en/LC_MESSAGES/django-studio.po
 source_lang = en
-type        = PO
+type = PO
 
-[o:open-edx:p:edx-platform:r:djangojs-account-settings-view]
-file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-account-settings-view.po
-source_file = conf/locale/en/LC_MESSAGES/djangojs-account-settings-view.po
-source_lang = en
-type        = PO
-
-[o:open-edx:p:edx-platform:r:djangojs-partial]
+[edx-platform.djangojs-partial]
 file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-partial.po
 source_file = conf/locale/en/LC_MESSAGES/djangojs-partial.po
 source_lang = en
-type        = PO
+type = PO
 
-[o:open-edx:p:edx-platform:r:djangojs-studio]
+[edx-platform.djangojs-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-studio.po
 source_file = conf/locale/en/LC_MESSAGES/djangojs-studio.po
 source_lang = en
-type        = PO
+type = PO
 
-[o:open-edx:p:edx-platform:r:edx_proctoring_proctortrack]
-file_filter = conf/locale/<lang>/LC_MESSAGES/edx_proctoring_proctortrack.po
-source_file = conf/locale/en/LC_MESSAGES/edx_proctoring_proctortrack.po
+[edx-platform.djangojs-account-settings-view]
+file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-account-settings-view.po
+source_file = conf/locale/en/LC_MESSAGES/djangojs-account-settings-view.po
 source_lang = en
-type        = PO
+type = PO
 
-[o:open-edx:p:edx-platform:r:mako]
+[edx-platform.mako]
 file_filter = conf/locale/<lang>/LC_MESSAGES/mako.po
 source_file = conf/locale/en/LC_MESSAGES/mako.po
 source_lang = en
-type        = PO
+type = PO
 
-[o:open-edx:p:edx-platform:r:mako-studio]
+[edx-platform.mako-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/mako-studio.po
 source_file = conf/locale/en/LC_MESSAGES/mako-studio.po
 source_lang = en
-type        = PO
+type = PO
 
-[o:open-edx:p:edx-platform:r:underscore]
+[edx-platform.underscore]
 file_filter = conf/locale/<lang>/LC_MESSAGES/underscore.po
 source_file = conf/locale/en/LC_MESSAGES/underscore.po
 source_lang = en
-type        = PO
+type = PO
 
-[o:open-edx:p:edx-platform:r:underscore-studio]
+[edx-platform.underscore-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/underscore-studio.po
 source_file = conf/locale/en/LC_MESSAGES/underscore-studio.po
 source_lang = en
-type        = PO
+type = PO
 
-[o:open-edx:p:edx-platform:r:wiki]
+[edx-platform.wiki]
 file_filter = conf/locale/<lang>/LC_MESSAGES/wiki.po
 source_file = conf/locale/en/LC_MESSAGES/wiki.po
 source_lang = en
-type        = PO
+type = PO
 
+[edx-platform.edx_proctoring_proctortrack]
+file_filter = conf/locale/<lang>/LC_MESSAGES/edx_proctoring_proctortrack.po
+source_file = conf/locale/en/LC_MESSAGES/edx_proctoring_proctortrack.po
+source_lang = en
+type = PO

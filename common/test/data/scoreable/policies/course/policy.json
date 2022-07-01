@@ -9,6 +9,8 @@
             "randomize",
             "drag-and-drop-v2",
             "library",
+            "videosequence",
+            "problemset",
             "acid_parent",
             "done",
             "wrapper",
@@ -27,6 +29,10 @@
         "minimum_grade_credit": 0.8,
         "start": "2030-01-01T00:00:00Z",
         "tabs": [
+            {
+                "name": "Home",
+                "type": "course_info"
+            },
             {
                 "name": "Course",
                 "type": "courseware"

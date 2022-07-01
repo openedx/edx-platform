@@ -16,9 +16,9 @@ ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 import itertools
 import logging
+import json
 
 from config_models.models import ConfigurationModel
-from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
@@ -136,6 +136,29 @@ class StudentModule(models.Model):
             return queryset.using("read_replica")
         else:
             return queryset
+
+    @classmethod
+    def get_score_done(cls, block_key, user_id):
+        try:
+            obj = cls.objects.filter(
+                student_id=user_id,
+                module_state_key=block_key,
+                module_type="problem"
+            ).last()
+
+            if obj is None:
+                return False
+            
+            if not hasattr(obj, 'state'):
+                return False
+
+            res = json.loads(obj.state)
+            if not 'score' in res:
+                return False
+
+            return res['score']['raw_earned'] >= res['score']['raw_possible']
+        except:
+            return False
 
     def __repr__(self):
         return 'StudentModule<{!r}>'.format(
@@ -501,33 +524,3 @@ class LastSeenCoursewareTimezone(models.Model):
 
     class Meta:
         app_label = "courseware"
-
-
-class FinancialAssistanceConfiguration(ConfigurationModel):
-    """
-    Manages configuration for connecting to Financial Assistance backend service and using its API.
-    """
-
-    api_base_url = models.URLField(
-        verbose_name=_('Internal API Base URL'),
-        help_text=_('Financial Assistance Backend API Base URL.')
-    )
-
-    service_username = models.CharField(
-        max_length=100,
-        default='financial_assistance_service_user',
-        null=False,
-        blank=False,
-        help_text=_('Username created for Financial Assistance Backend, e.g. financial_assistance_service_user.')
-    )
-
-    fa_backend_enabled_courses_percentage = models.IntegerField(
-        default=0,
-        help_text=_('Percentage of courses allowed to use edx-financial-assistance')
-    )
-
-    def get_service_user(self):
-        """
-        Getter function to get service user for Financial Assistance backend.
-        """
-        return get_user_model().objects.get(username=self.service_username)

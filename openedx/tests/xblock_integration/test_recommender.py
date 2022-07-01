@@ -14,7 +14,7 @@ import simplejson as json
 from ddt import data, ddt
 from django.conf import settings
 from django.urls import reverse
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
@@ -26,6 +26,7 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that Recommender state is saved properly
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     STUDENTS = [
         {'email': 'view@test.com', 'password': 'foo'},
         {'email': 'view2@test.com', 'password': 'foo'}
@@ -65,7 +66,14 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 display_name='recommender_second'
             )
 
-        cls.course_url = reverse('render_xblock', args=[str(cls.section.location)])
+        cls.course_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': str(cls.course.id),
+                'chapter': 'Overview',
+                'section': 'Welcome',
+            }
+        )
 
         cls.resource_urls = [
             (

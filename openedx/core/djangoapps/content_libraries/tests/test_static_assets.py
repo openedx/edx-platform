@@ -5,10 +5,7 @@ Tests for static asset files in Blockstore-based Content Libraries
 
 import requests
 
-from openedx.core.djangoapps.content_libraries.tests.base import (
-    ContentLibrariesRestApiBlockstoreServiceTest,
-    ContentLibrariesRestApiTest,
-)
+from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 
 # Binary data representing an SVG image file
 SVG_DATA = """<svg xmlns="http://www.w3.org/2000/svg" height="30" width="100">
@@ -26,7 +23,7 @@ I'm Anant Agarwal, I'm the president of edX,
 """
 
 
-class ContentLibrariesStaticAssetsTestMixin:
+class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
     """
     Tests for static asset files in Blockstore-based Content Libraries
 
@@ -169,21 +166,3 @@ class ContentLibrariesStaticAssetsTestMixin:
         self._commit_library_changes(library["id"])
         check_sjson()
         check_download()
-
-
-class ContentLibrariesStaticAssetsBlockstoreServiceTest(
-    ContentLibrariesStaticAssetsTestMixin,
-    ContentLibrariesRestApiBlockstoreServiceTest,
-):
-    """
-    Tests for static asset files in Blockstore-based Content Libraries, using the standalone Blockstore service.
-    """
-
-
-class ContentLibrariesStaticAssetsTest(
-    ContentLibrariesStaticAssetsTestMixin,
-    ContentLibrariesRestApiTest,
-):
-    """
-    Tests for static asset files in Blockstore-based Content Libraries, using the installed Blockstore app.
-    """

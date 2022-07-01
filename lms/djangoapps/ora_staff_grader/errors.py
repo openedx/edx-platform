@@ -23,9 +23,6 @@ class ExceptionWithContext(Exception):
 class XBlockInternalError(ExceptionWithContext):
     """Errors from XBlock handlers"""
 
-    def __str__(self):
-        return str(self.context)
-
 
 class LockContestedError(ExceptionWithContext):
     """Signal for trying to operate on a lock owned by someone else"""

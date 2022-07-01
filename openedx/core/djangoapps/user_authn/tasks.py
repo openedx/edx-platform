@@ -34,13 +34,12 @@ def check_pwned_password_and_send_track_event(user_id, password, internal_user=F
             pwned_properties['internal_user'] = internal_user
             pwned_properties['new_user'] = is_new_user
             segment.track(user_id, 'edx.bi.user.pwned.password.status', pwned_properties)
-        return pwned_properties
     except Exception:  # pylint: disable=W0703
         log.exception(
             'Unable to get response from pwned password api for user_id: "%s"',
             user_id,
         )
-        return {}  # lint-amnesty, pylint: disable=raise-missing-from
+        return None  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 @shared_task(bind=True)

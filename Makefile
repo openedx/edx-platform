@@ -50,7 +50,7 @@ pull_translations:  ## pull translations from Transifex
 	i18n_tool transifex pull
 	i18n_tool extract
 	i18n_tool dummy
-	i18n_tool generate --verbose 1
+	i18n_tool generate
 	git clean -fdX conf/locale/rtl
 	git clean -fdX conf/locale/eo
 	i18n_tool validate --verbose

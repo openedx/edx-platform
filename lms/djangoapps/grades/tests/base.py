@@ -4,10 +4,10 @@ Base file for Grades tests
 
 
 from crum import set_current_request
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -21,6 +21,8 @@ class GradeTestBase(SharedModuleStoreTestCase):
     """
     Base class for some Grades tests.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -64,7 +66,7 @@ class GradeTestBase(SharedModuleStoreTestCase):
             cls.problem2 = ItemFactory.create(
                 parent=cls.sequence2,
                 category="problem",
-                display_name="Test Problem 2",
+                display_name="Test Problem",
                 data=problem_xml
             )
             # AED 2017-06-19: make cls.sequence belong to multiple parents,

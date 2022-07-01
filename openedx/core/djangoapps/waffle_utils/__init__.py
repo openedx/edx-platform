@@ -3,25 +3,32 @@ Extra utilities for waffle: most classes are defined in edx_toggles.toggles (htt
 we keep here some extra classes for usage within edx-platform. These classes cover course override use cases.
 """
 import logging
+import warnings
+from contextlib import contextmanager
 
-from edx_toggles.toggles import WaffleFlag
+from edx_django_utils.monitoring import set_custom_attribute
+from edx_toggles.toggles import (
+    LegacyWaffleFlag,
+    LegacyWaffleFlagNamespace,
+    LegacyWaffleSwitch,
+    LegacyWaffleSwitchNamespace,
+)
 from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
 
-class CourseWaffleFlag(WaffleFlag):
+class CourseWaffleFlag(LegacyWaffleFlag):
     """
-    Represents a single waffle flag that can be forced on/off for a course.
-
-    This class should be used instead of WaffleFlag when in the context of a course.
-    This class will also respect any org-level overrides, though course-level overrides will take precedence.
+    Represents a single waffle flag that can be forced on/off for a course. This class should be used instead of
+    WaffleFlag when in the context of a course. This class will also respect any org-level overrides, though
+    course-level overrides will take precedence.
 
     Uses a cached waffle namespace.
 
     Usage:
 
-       SOME_COURSE_FLAG = CourseWaffleFlag('my_namespace.some_course_feature', __name__, log_prefix='')
+       SOME_COURSE_FLAG = CourseWaffleFlag('my_namespace', 'some_course_feature', __name__)
 
     And then we can check this flag in code with::
 
@@ -48,13 +55,13 @@ class CourseWaffleFlag(WaffleFlag):
             "Enabled" (see below) to apply.
         Enabled: Must be marked as "enabled" in order for the override to be applied. These settings can't be
             deleted, so instead, you need to add another disabled override entry to disable the override.
+
     """
+
     def _get_course_override_value(self, course_key):
         """
-        Check whether the course flag was overriden.
-
-        Returns True/False if the flag was forced on or off for the provided course.
-        Returns None if the flag was not overridden.
+        Returns True/False if the flag was forced on or off for the provided course. Returns None if the flag was not
+        overridden.
 
         Note: Has side effect of caching the override value.
 

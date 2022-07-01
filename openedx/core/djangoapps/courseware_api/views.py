@@ -3,8 +3,8 @@ Course API Views
 """
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
-from django.conf import settings
-from django.utils.functional import cached_property
+from django.urls import reverse
+from django.utils.translation import gettext as _
 from edx_django_utils.cache import TieredCache
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -17,11 +17,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from xmodule.modulestore.search import path_to_location
-from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
-
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.util.views import expose_header
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
@@ -31,9 +26,11 @@ from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_goals.api import get_course_goal
 from lms.djangoapps.courseware.access import has_access
-
+from lms.djangoapps.courseware.access_response import (
+    CoursewareMicrofrontendDisabledAccessError,
+)
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
-from lms.djangoapps.courseware.entrance_exams import course_has_entrance_exam, user_has_passed_entrance_exam
+from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import (
     is_masquerading_as_specific_student,
     setup_masquerade,
@@ -41,12 +38,17 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
-from lms.djangoapps.courseware.toggles import course_exit_page_is_active
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.toggles import (
+    courseware_legacy_is_visible,
+    courseware_mfe_is_visible,
+    course_exit_page_is_active,
+)
 from lms.djangoapps.courseware.views.views import get_cert_data
-from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.agreements.api import get_integrity_signature
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled as integrity_signature_toggle
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -62,15 +64,19 @@ from common.djangoapps.student.models import (
     CourseEnrollmentCelebration,
     LinkedInAddToProfileConfiguration
 )
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.search import path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .serializers import CourseInfoSerializer
+from .utils import serialize_upgrade_info
 
 
 class CoursewareMeta:
     """
     Encapsulates courseware and enrollment metadata.
     """
-
     def __init__(self, course_key, request, username=''):
         self.request = request
         self.overview = course_detail(
@@ -78,22 +84,46 @@ class CoursewareMeta:
             username or self.request.user.username,
             course_key,
         )
-
-        original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
+        # We must compute course load access *before* setting up masquerading,
+        # else course staff (who are not enrolled) will not be able view
+        # their course from the perspective of a learner.
+        self.load_access = check_course_access(
+            self.overview,
+            self.request.user,
+            'load',
+            check_if_enrolled=True,
+            check_if_authenticated=True,
+        )
+        self.original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
         self.original_user_is_global_staff = self.request.user.is_staff
         self.course_key = course_key
         self.course = get_course_by_id(self.course_key)
         self.course_masquerade, self.effective_user = setup_masquerade(
             self.request,
             course_key,
-            staff_access=original_user_is_staff,
+            staff_access=self.original_user_is_staff,
         )
         self.request.user = self.effective_user
+        self.is_staff = has_access(self.effective_user, 'staff', self.overview).has_access
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
+        self.can_view_legacy_courseware = courseware_legacy_is_visible(
+            course_key=course_key,
+            is_global_staff=self.original_user_is_global_staff,
+        )
 
     def __getattr__(self, name):
         return getattr(self.overview, name)
+
+    def is_microfrontend_enabled_for_user(self):
+        """
+        Can this user see the MFE for this course?
+        """
+        return courseware_mfe_is_visible(
+            course_key=self.course_key,
+            is_global_staff=self.original_user_is_global_staff,
+            is_course_staff=self.original_user_is_staff
+        )
 
     @property
     def enrollment(self):
@@ -130,6 +160,48 @@ class CoursewareMeta:
     @property
     def license(self):
         return self.course.license
+
+    @property
+    def username(self):
+        return self.effective_user.username
+
+    @property
+    def course_access(self) -> dict:
+        """
+        Can the user load this course in the learning micro-frontend?
+
+        Return a JSON-friendly access response.
+        """
+        # Only check whether the MFE is enabled if the user would otherwise be allowed to see it
+        # This means that if the user was denied access, they'll see a meaningful message first if
+        # there is one.
+        if self.load_access and not self.is_microfrontend_enabled_for_user():
+            return CoursewareMicrofrontendDisabledAccessError().to_json()
+        return self.load_access.to_json()
+
+    @property
+    def tabs(self):
+        """
+        Return course tab metadata.
+        """
+        tabs = []
+        for priority, tab in enumerate(get_course_tab_list(self.effective_user, self.overview)):
+            title = tab.title or tab.get('name', '')
+            tabs.append({
+                'title': _(title),  # pylint: disable=translation-of-non-string
+                'slug': tab.tab_id,
+                'priority': priority,
+                'type': tab.type,
+                'url': tab.link_func(self.overview, reverse),
+            })
+        return tabs
+
+    @property
+    def verified_mode(self):
+        """
+        Return verified mode information, or None.
+        """
+        return serialize_upgrade_info(self.effective_user, self.overview, self.enrollment_object)
 
     @property
     def notes(self):
@@ -170,20 +242,11 @@ class CoursewareMeta:
                 }
         return course_goals
 
-    @cached_property
-    def course_grade(self):
-        """
-        Returns the Course Grade for the effective user in the course
-
-        Cached property since we use this twice in the class and don't want to recreate the entire grade.
-        """
-        return CourseGradeFactory().read(self.effective_user, self.course)
-
     @property
     def user_has_passing_grade(self):
         """ Returns a boolean on if the effective_user has a passing grade in the course """
         if not self.effective_user.is_anonymous:
-            user_grade = self.course_grade.percent
+            user_grade = CourseGradeFactory().read(self.effective_user, self.course).percent
             return user_grade >= self.course.lowest_passing_grade
         return False
 
@@ -200,24 +263,6 @@ class CoursewareMeta:
         """
         if self.enrollment_object:
             return get_cert_data(self.effective_user, self.course, self.enrollment_object.mode)
-
-    @property
-    def entrance_exam_data(self):
-        """
-        Returns Entrance Exam data for the course
-
-        Although some of the fields will have values (i.e. entrance_exam_minimum_score_pct and
-        entrance_exam_passed), nothing will be used unless entrance_exam_enabled is True.
-        """
-        return {
-            'entrance_exam_current_score': get_entrance_exam_score(
-                self.course_grade, get_entrance_exam_usage_key(self.overview),
-            ),
-            'entrance_exam_enabled': course_has_entrance_exam(self.overview),
-            'entrance_exam_id': self.overview.entrance_exam_id,
-            'entrance_exam_minimum_score_pct': self.overview.entrance_exam_minimum_score_pct,
-            'entrance_exam_passed': user_has_passed_entrance_exam(self.effective_user, self.overview),
-        }
 
     @property
     def verify_identity_url(self):
@@ -274,18 +319,15 @@ class CoursewareMeta:
     @property
     def is_integrity_signature_enabled(self):
         """
-        Django setting for the integrity signature feature.
+        Course waffle flag for the integrity signature feature.
         """
-        return settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE', False)
+        return integrity_signature_toggle(self.course_key)
 
     @property
     def user_needs_integrity_signature(self):
         """
         Boolean describing whether the user needs to sign the integrity agreement for a course.
         """
-        if not settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'):
-            return False
-
         integrity_signature_required = (
             self.enrollment_object
             # Master's enrollments are excluded here as honor code is handled separately
@@ -300,11 +342,13 @@ class CoursewareMeta:
                 self.course_masquerade
             )
 
-        if integrity_signature_required:
+        if (
+            integrity_signature_toggle(self.course_key)
+            and integrity_signature_required
+        ):
             signature = get_integrity_signature(self.effective_user.username, str(self.course_key))
             if not signature:
                 return True
-
         return False
 
     @property
@@ -343,21 +387,6 @@ class CoursewareMeta:
         """Returns the user's timezone setting (may be None)"""
         user_timezone_locale = user_timezone_locale_prefs(self.request)
         return user_timezone_locale['user_timezone']
-
-    @property
-    def can_access_proctored_exams(self):
-        """Returns if the user is eligible to access proctored exams"""
-        if is_masquerading_as_non_audit_enrollment(
-            self.effective_user,
-            self.course_key,
-            self.course_masquerade
-        ):
-            # Masquerading should mimic the correct enrollment track behavior.
-            return True
-        else:
-            enrollment_mode = self.enrollment['mode']
-            enrollment_active = self.enrollment['is_active']
-            return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
 
 
 class CoursewareInformation(RetrieveAPIView):
@@ -398,13 +427,6 @@ class CoursewareInformation(RetrieveAPIView):
             * is_active: boolean
         * enrollment_end: Date enrollment ends, in ISO 8601 notation
         * enrollment_start: Date enrollment begins, in ISO 8601 notation
-        * entrance_exam_data: An object containing information about the course's entrance exam
-            * entrance_exam_current_score: (float) The users current score on the entrance exam
-            * entrance_exam_enabled: (bool) If the course has an entrance exam
-            * entrance_exam_id: (str) The block id for the entrance exam if enabled. Will be a section (chapter)
-            * entrance_exam_minimum_score_pct: (float) The minimum score a user must receive on the entrance exam
-                to unlock the remainder of the course. Returned as a float (i.e. 0.7 for 70%)
-            * entrance_exam_passed: (bool) Indicates if the entrance exam has been passed
         * id: A unique identifier of the course; a serialized representation
             of the opaque key identifying the course.
         * media: An object that contains named media items.  Included here:
@@ -412,6 +434,7 @@ class CoursewareInformation(RetrieveAPIView):
               as an object with the following fields:
                 * uri: The location of the image
         * name: Name of the course
+        * number: Catalog number of the course
         * offer: An object detailing upgrade discount information
             * code: (str) Checkout code
             * expiration_date: (str) Expiration of offer, in ISO 8601 notation
@@ -439,7 +462,12 @@ class CoursewareInformation(RetrieveAPIView):
             * `"timestamp"`: generated from the `start` timestamp
             * `"empty"`: no start date is specified
         * pacing: Course pacing. Possible values: instructor, self
+        * tabs: Course tabs
         * user_timezone: User's chosen timezone setting (or null for browser default)
+        * can_load_course: Whether the user can view the course (AccessResponse object)
+        * is_staff: Whether the effective user has staff access to the course
+        * original_user_is_staff: Whether the original user has staff access to the course
+        * can_view_legacy_courseware: Indicates whether the user is able to see the legacy courseware view
         * user_has_passing_grade: Whether or not the effective user's grade is equal to or above the courses minimum
             passing grade
         * course_exit_page_is_active: Flag for the learning mfe on whether or not the course exit page should display

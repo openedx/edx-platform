@@ -5,16 +5,15 @@ This API does not do any caching; consider using BundleCache or (in
 openedx.core.djangolib.blockstore_cache) together with these API methods for
 improved performance.
 """
-from blockstore.apps.api.data import (
-    BundleFileData,
-)
-from blockstore.apps.api.exceptions import (
-    CollectionNotFound,
-    BundleNotFound,
-    DraftNotFound,
-    BundleVersionNotFound,
-    BundleFileNotFound,
-    BundleStorageError,
+from .models import (
+    Collection,
+    Bundle,
+    Draft,
+    BundleFile,
+    DraftFile,
+    LinkReference,
+    LinkDetails,
+    DraftLinkDetails,
 )
 from .methods import (
     # Collections:
@@ -47,4 +46,12 @@ from .methods import (
     get_bundle_version_links,
     # Misc:
     force_browser_url,
+)
+from .exceptions import (
+    BlockstoreException,
+    CollectionNotFound,
+    BundleNotFound,
+    DraftNotFound,
+    BundleFileNotFound,
+    BundleStorageError,
 )

@@ -1345,7 +1345,7 @@ paths:
                     percent_graded: (float) the percentage of total points the user has received a grade for in a given subsection
                     show_correctness: (str) a str representing whether to show the problem/practice scores based on due date
                                       ('always', 'never', 'past_due', values defined in
-                                       xmodule/modulestore/inheritance.py)
+                                       common/lib/xmodule/xmodule/modulestore/inheritance.py)
                     show_grades: (bool) a bool for whether to show grades based on the access the user has
                     url: (str) the absolute path url to the Subsection
             enrollment_mode: (str) a str representing the enrollment the user has ('audit', 'verified', ...)
@@ -2527,6 +2527,7 @@ paths:
                   as an object with the following fields:
                     * uri: The location of the image
             * name: Name of the course
+            * number: Catalog number of the course
             * offer: An object detailing upgrade discount information
                 * code: (str) Checkout code
                 * expiration_date: (str) Expiration of offer, in ISO 8601 notation
@@ -2534,6 +2535,7 @@ paths:
                 * discounted_price: (str) Upgrade price with checkout code; includes currency symbol
                 * percentage: (int) Amount of discount
                 * upgrade_url: (str) Checkout URL
+            * org: Name of the organization that owns the course
             * related_programs: A list of objects that contains program data related to the given course including:
                 * progress: An object containing program progress:
                     * complete: (int) Number of complete courses in the program (a course is completed if the user has
@@ -2553,7 +2555,12 @@ paths:
                 * `"timestamp"`: generated from the `start` timestamp
                 * `"empty"`: no start date is specified
             * pacing: Course pacing. Possible values: instructor, self
+            * tabs: Course tabs
             * user_timezone: User's chosen timezone setting (or null for browser default)
+            * can_load_course: Whether the user can view the course (AccessResponse object)
+            * is_staff: Whether the effective user has staff access to the course
+            * original_user_is_staff: Whether the original user has staff access to the course
+            * can_view_legacy_courseware: Indicates whether the user is able to see the legacy courseware view
             * user_has_passing_grade: Whether or not the effective user's grade is equal to or above the courses minimum
                 passing grade
             * course_exit_page_is_active: Flag for the learning mfe on whether or not the course exit page should display
@@ -7431,6 +7438,7 @@ definitions:
       - original_user_is_staff
       - tabs
       - title
+      - can_load_courseware
       - celebrations
     type: object
     properties:
@@ -7478,6 +7486,9 @@ definitions:
         title: Title
         type: string
         minLength: 1
+      can_load_courseware:
+        title: Can load courseware
+        type: boolean
       celebrations:
         title: Celebrations
         type: object

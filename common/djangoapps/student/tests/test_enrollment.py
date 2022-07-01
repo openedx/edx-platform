@@ -11,7 +11,7 @@ import pytest
 from django.conf import settings
 from django.urls import reverse
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -31,11 +31,12 @@ from openedx.core.djangoapps.embargo.test_utils import restrict_course
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin):
+class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase, OpenEdxEventsTestMixin):
     """
     Test student enrollment, especially with different course modes.
     """
 
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     ENABLED_OPENEDX_EVENTS = []
 
     USERNAME = "Bob"
@@ -53,21 +54,23 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         """
         super().setUpClass()
         cls.start_events_isolation()
+        cls.course = CourseFactory.create()
+        cls.course_limited = CourseFactory.create()
+        cls.proctored_course = CourseFactory(
+            enable_proctored_exams=True, enable_timed_exams=True
+        )
+        cls.proctored_course_no_exam = CourseFactory(
+            enable_proctored_exams=True, enable_timed_exams=True
+        )
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
         super().setUp()
-        self.course = CourseFactory.create()
-        self.course_limited = CourseFactory.create(max_student_enrollments_allowed=1)
-        self.proctored_course = CourseFactory(
-            enable_proctored_exams=True, enable_timed_exams=True
-        )
-        self.proctored_course_no_exam = CourseFactory(
-            enable_proctored_exams=True, enable_timed_exams=True
-        )
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        self.course_limited.max_student_enrollments_allowed = 1
+        self.store.update_item(self.course_limited, self.user.id)
         self.urls = [
             reverse('course_modes_choose', kwargs={'course_id': str(self.course.id)})
         ]
@@ -84,7 +87,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         ItemFactory.create(
             parent=chapter, category='sequential', display_name='Test Proctored Exam',
             graded=True, is_time_limited=True, default_time_limit_minutes=10,
-            is_proctored_enabled=True, publish_item=True
+            is_proctored_exam=True, publish_item=True
         )
 
     @ddt.data(
@@ -356,22 +359,6 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase, OpenEdxEventsTestMixin)
         CourseEnrollment.enroll(self.user, self.course.id, mode="honor")
         resp = self._change_enrollment('unenroll', course_id="edx/")
         assert resp.status_code == 400
-
-    @patch.dict(settings.FEATURES, {'DISABLE_UNENROLLMENT': True})
-    def test_unenroll_when_unenrollment_disabled(self):
-        """
-        Tests that a user cannot unenroll when unenrollment has been disabled.
-        """
-        # Enroll the student in the course
-        CourseEnrollment.enroll(self.user, self.course.id, mode="honor")
-
-        # Attempt to unenroll
-        resp = self._change_enrollment('unenroll')
-        assert resp.status_code == 400
-
-        # Verify that user is still enrolled
-        is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)
-        assert is_enrolled
 
     def test_enrollment_limit(self):
         """

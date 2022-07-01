@@ -5,15 +5,16 @@ Utility methods for Enterprise
 
 import json
 
-from completion.exceptions import UnavailableCompletionData
-from completion.utilities import get_key_to_last_completed_block
 from crum import get_current_request
 from django.conf import settings
+from django.contrib.auth import get_backends, login
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.cache import cache
+from django.http import HttpRequest
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
-from edx_toggles.toggles import WaffleFlag
+from edx_toggles.toggles import LegacyWaffleFlag
 from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from social_django.models import UserSocialAuth
@@ -24,8 +25,9 @@ from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.course_experience.utils import get_course_outline_block_tree, get_resume_block
 
-ENTERPRISE_HEADER_LINKS = WaffleFlag('enterprise.enterprise_header_links', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
+ENTERPRISE_HEADER_LINKS = LegacyWaffleFlag('enterprise', 'enterprise_header_links', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
 
 def get_data_consent_share_cache_key(user_id, course_id, enterprise_customer_uuid=None):
@@ -469,6 +471,29 @@ def fetch_enterprise_customer_by_id(enterprise_uuid):
     return EnterpriseCustomer.objects.get(uuid=enterprise_uuid)
 
 
+def _create_placeholder_request(user):
+    """
+    Helper method to create a placeholder request.
+
+    Arguments:
+        user (User): Django User object.
+
+    Returns:
+        request (HttpRequest): A placeholder request object.
+        """
+    request = HttpRequest()
+    middleware = SessionMiddleware()
+    middleware.process_request(request)
+    request.session.save()
+    backend = get_backends()[0]
+    user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
+    login(request, user)
+    request.user = user
+    request.META['SERVER_NAME'] = 'edx.org'
+    request.META['SERVER_PORT'] = '8080'
+    return request
+
+
 def is_course_accessed(user, course_id):
     """
     Check if the learner accessed the course.
@@ -480,8 +505,7 @@ def is_course_accessed(user, course_id):
     Returns:
         (bool): True if course has been accessed by the enterprise learner.
     """
-    try:
-        get_key_to_last_completed_block(user, course_id)
-        return True
-    except UnavailableCompletionData:
-        return False
+    request = _create_placeholder_request(user)
+    course_outline_root_block = get_course_outline_block_tree(request, course_id, user)
+    resume_block = get_resume_block(course_outline_root_block) if course_outline_root_block else None
+    return bool(resume_block)

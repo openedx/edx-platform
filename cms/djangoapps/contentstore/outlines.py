@@ -245,7 +245,9 @@ def _make_section_data(section, unique_sequences):
     if error:
         section_errors.append(error)
 
-    valid_sequence_tags = ['sequential']
+    # We haven't officially killed off problemset and videosequence yet, so
+    # treat them as equivalent to sequential for now.
+    valid_sequence_tags = ['sequential', 'problemset', 'videosequence']
     sequences_data = []
 
     for sequence in section.get_children():

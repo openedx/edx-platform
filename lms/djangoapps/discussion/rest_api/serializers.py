@@ -4,7 +4,6 @@ Discussion API serializers
 from typing import Dict
 from urllib.parse import urlencode, urlunparse
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.models import TextChoices
@@ -41,12 +40,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role,
 )
 from openedx.core.lib.api.serializers import CourseKeyField
-from common.djangoapps.student.roles import (GlobalStaff)
 
 User = get_user_model()
-
-CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
-EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
 
 
 class TopicOrdering(TextChoices):
@@ -81,14 +76,13 @@ def get_context(course, request, thread=None):
     cc_requester = CommentClientUser.from_django_user(requester).retrieve()
     cc_requester["course_id"] = course.id
     course_discussion_settings = CourseDiscussionSettings.get(course.id)
-    is_global_staff = GlobalStaff().has_user(requester)
     return {
         "course": course,
         "request": request,
         "thread": thread,
         "discussion_division_enabled": course_discussion_division_enabled(course_discussion_settings),
         "group_ids_to_names": get_group_names_by_id(course_discussion_settings),
-        "is_requester_privileged": requester.id in staff_user_ids or requester.id in ta_user_ids or is_global_staff,
+        "is_requester_privileged": requester.id in staff_user_ids or requester.id in ta_user_ids,
         "staff_user_ids": staff_user_ids,
         "ta_user_ids": ta_user_ids,
         "cc_requester": cc_requester,
@@ -103,26 +97,6 @@ def validate_not_blank(value):
     """
     if not value.strip():
         raise ValidationError("This field may not be blank.")
-
-
-def validate_edit_reason_code(value):
-    """
-    Validate that the value is a valid edit reason code.
-
-    Raises: ValidationError
-    """
-    if value not in EDIT_REASON_CODES:
-        raise ValidationError("Invalid edit reason code")
-
-
-def validate_close_reason_code(value):
-    """
-    Validate that the value is a valid close reason code.
-
-    Raises: ValidationError
-    """
-    if value not in CLOSE_REASON_CODES:
-        raise ValidationError("Invalid close reason code")
 
 
 def _validate_privileged_access(context: Dict) -> bool:
@@ -162,8 +136,6 @@ class _ContentSerializer(serializers.Serializer):
     can_delete = serializers.SerializerMethodField()
     anonymous = serializers.BooleanField(default=False)
     anonymous_to_peers = serializers.BooleanField(default=False)
-    last_edit = serializers.SerializerMethodField(required=False)
-    edit_reason_code = serializers.CharField(required=False, validators=[validate_edit_reason_code])
 
     non_updatable_fields = set()
 
@@ -192,11 +164,9 @@ class _ContentSerializer(serializers.Serializer):
         Returns a boolean indicating whether the content should be anonymous to
         the requester.
         """
-        user_id = self.context["request"].user.id
-        is_user_staff = user_id in self.context["staff_user_ids"]
         return (
             obj["anonymous"] or
-            obj["anonymous_to_peers"] and not is_user_staff
+            obj["anonymous_to_peers"] and not self.context["is_requester_privileged"]
         )
 
     def get_author(self, obj):
@@ -239,11 +209,7 @@ class _ContentSerializer(serializers.Serializer):
         Returns a boolean indicating whether the requester has flagged the
         content as abusive.
         """
-        total_abuse_flaggers = len(obj.get("abuse_flaggers", []))
-        return (
-            self.context["is_requester_privileged"] and total_abuse_flaggers > 0 or
-            self.context["cc_requester"]["id"] in obj.get("abuse_flaggers", [])
-        )
+        return self.context["cc_requester"]["id"] in obj.get("abuse_flaggers", [])
 
     def get_voted(self, obj):
         """
@@ -269,22 +235,6 @@ class _ContentSerializer(serializers.Serializer):
         Returns if the current user can delete this thread/comment.
         """
         return can_delete(obj, self.context)
-
-    def get_last_edit(self, obj):
-        """
-        Returns information about the last edit for this content for
-        privileged users.
-        """
-        if not _validate_privileged_access(self.context):
-            return None
-        edit_history = obj.get("edit_history")
-        if not edit_history:
-            return None
-        last_edit = edit_history[-1]
-        reason_code = last_edit.get("reason_code")
-        if reason_code:
-            last_edit["reason"] = EDIT_REASON_CODES.get(reason_code)
-        return last_edit
 
 
 class ThreadSerializer(_ContentSerializer):
@@ -317,9 +267,6 @@ class ThreadSerializer(_ContentSerializer):
     read = serializers.BooleanField(required=False)
     has_endorsed = serializers.BooleanField(source="endorsed", read_only=True)
     response_count = serializers.IntegerField(source="resp_total", read_only=True, required=False)
-    close_reason_code = serializers.CharField(required=False, validators=[validate_close_reason_code])
-    close_reason = serializers.SerializerMethodField()
-    closed_by = serializers.SerializerMethodField()
 
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
 
@@ -409,24 +356,7 @@ class ThreadSerializer(_ContentSerializer):
         Returns a cleaned and truncated version of the thread's body to display in a
         preview capacity.
         """
-        return Truncator(strip_tags(self.get_rendered_body(obj))).chars(35, ).replace('\n', ' ')
-
-    def get_close_reason(self, obj):
-        """
-        Returns the reason for which the thread was closed.
-        """
-        if not _validate_privileged_access(self.context):
-            return None
-        reason_code = obj.get("close_reason_code")
-        return CLOSE_REASON_CODES.get(reason_code)
-
-    def get_closed_by(self, obj):
-        """
-        Returns the username of the moderator who closed this thread,
-        only to other privileged users.
-        """
-        if _validate_privileged_access(self.context):
-            return obj.get("closed_by")
+        return Truncator(strip_tags(self.get_rendered_body(obj))).words(10, )
 
     def create(self, validated_data):
         thread = Thread(user_id=self.context["cc_requester"]["id"], **validated_data)
@@ -436,11 +366,6 @@ class ThreadSerializer(_ContentSerializer):
     def update(self, instance, validated_data):
         for key, val in validated_data.items():
             instance[key] = val
-            requesting_user_id = self.context["cc_requester"]["id"]
-            if key == "closed" and val:
-                instance["closing_user_id"] = requesting_user_id
-            if key == "body" and val:
-                instance["editing_user_id"] = requesting_user_id
         instance.save()
         return instance
 
@@ -580,11 +505,8 @@ class CommentSerializer(_ContentSerializer):
             # TODO: The comments service doesn't populate the endorsement
             # field on comment creation, so we only provide
             # endorsement_user_id on update
-            requesting_user_id = self.context["cc_requester"]["id"]
             if key == "endorsed":
-                instance["endorsement_user_id"] = requesting_user_id
-            if key == "body" and val:
-                instance["editing_user_id"] = requesting_user_id
+                instance["endorsement_user_id"] = self.context["cc_requester"]["id"]
 
         instance.save()
         return instance
@@ -797,14 +719,6 @@ class BlackoutDateSerializer(serializers.Serializer):
     end = serializers.DateTimeField(help_text="The ISO 8601 timestamp for the end of the blackout period")
 
 
-class ReasonCodeSeralizer(serializers.Serializer):
-    """
-    Serializer for reason codes.
-    """
-    code = serializers.CharField(help_text="A code for the an edit or close reason")
-    label = serializers.CharField(help_text="A user-friendly name text for the close or edit reason")
-
-
 class CourseMetadataSerailizer(serializers.Serializer):
     """
     Serializer for course metadata.
@@ -823,10 +737,10 @@ class CourseMetadataSerailizer(serializers.Serializer):
     )
     topics_url = serializers.URLField(help_text="The URL of the topic listing for the course.")
     allow_anonymous = serializers.BooleanField(
-        help_text="A boolean indicating whether anonymous posts are allowed or not.",
+        help_text="A boolean which indicating whether anonymous posts are allowed or not.",
     )
     allow_anonymous_to_peers = serializers.BooleanField(
-        help_text="A boolean indicating whether posts anonymous to peers are allowed or not.",
+        help_text="A boolean which indicating whether posts anonymous to peers are allowed or not.",
     )
     user_roles = serializers.ListField(
         child=serializers.CharField(),
@@ -834,21 +748,4 @@ class CourseMetadataSerailizer(serializers.Serializer):
     )
     user_is_privileged = serializers.BooleanField(
         help_text="A boolean indicating if the current user has a privileged role",
-    )
-    provider = serializers.CharField(
-        help_text="The discussion provider used by this course",
-    )
-    enable_in_context = serializers.BooleanField(
-        help_text="A boolean indicating whether in-context discussion is enabled for the course",
-    )
-    group_at_subsection = serializers.BooleanField(
-        help_text="A boolean indicating whether discussions should be grouped at subsection",
-    )
-    post_close_reasons = serializers.ListField(
-        child=ReasonCodeSeralizer(),
-        help_text="A list of reasons that can be specified by moderators for closing a post",
-    )
-    edit_reasons = serializers.ListField(
-        child=ReasonCodeSeralizer(),
-        help_text="A list of reasons that can be specified by moderators for editing a post, response, or comment",
     )

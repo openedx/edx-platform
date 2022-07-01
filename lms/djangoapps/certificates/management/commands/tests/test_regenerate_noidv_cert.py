@@ -5,7 +5,6 @@ Tests for the cert_generation command
 from unittest import mock
 
 import pytest
-from django.conf import settings
 from django.core.management import CommandError, call_command
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -16,15 +15,19 @@ from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFact
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
+COMMAND_INTEGRITY_ENABLED = \
+    'lms.djangoapps.certificates.management.commands.regenerate_noidv_cert.is_integrity_signature_enabled'
+INTEGRITY_ENABLED_METHOD = 'lms.djangoapps.certificates.generation_handler.is_integrity_signature_enabled'
 ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
 PASSING_GRADE_METHOD = 'lms.djangoapps.certificates.generation_handler._is_passing_grade'
 WEB_CERTS_METHOD = 'lms.djangoapps.certificates.generation_handler.has_html_certificates_enabled'
 
 
-# base setup is unverified users, Enable certificates IDV requirements turned off,
+# base setup is unverified users, honor code (integrity) turned on wherever imports it
 # and normal passing grade certificates for convenience
-@mock.patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=False)
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=False))
+@mock.patch(INTEGRITY_ENABLED_METHOD, mock.Mock(return_value=True))
+@mock.patch(COMMAND_INTEGRITY_ENABLED, mock.Mock(return_value=True))
 @mock.patch(PASSING_GRADE_METHOD, mock.Mock(return_value=True))
 @mock.patch(WEB_CERTS_METHOD, mock.Mock(return_value=True))
 class RegenerateNoIDVCertTests(ModuleStoreTestCase):
@@ -100,6 +103,31 @@ class RegenerateNoIDVCertTests(ModuleStoreTestCase):
 
         regenerated = call_command("regenerate_noidv_cert", "-c", course_run_key)
         self.assertEqual('0', regenerated)
+
+    def test_regeneration_honor_off(self):
+        """
+        If a course does not have the honor code enabled, no point regenerating
+        """
+        course_run = CourseFactory()
+        course_run_key = course_run.id
+
+        user = UserFactory()
+        CourseEnrollmentFactory(
+            user=user,
+            course_id=course_run_key,
+            is_active=True,
+            mode=CourseMode.VERIFIED,
+        )
+        GeneratedCertificateFactory(
+            user=user,
+            course_id=course_run_key,
+            mode=GeneratedCertificate.MODES.verified,
+            status=CertificateStatuses.unverified
+        )
+
+        with mock.patch(COMMAND_INTEGRITY_ENABLED, mock.Mock(return_value=False)):
+            regenerated = call_command("regenerate_noidv_cert", "-c", course_run_key)
+            self.assertEqual('0', regenerated)
 
     def _multisetup(self):
         """

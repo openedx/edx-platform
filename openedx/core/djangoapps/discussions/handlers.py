@@ -6,13 +6,13 @@ from uuid import uuid4
 
 from django.db import transaction
 
-from openedx_events.learning.data import CourseDiscussionConfigurationData
-from openedx_events.learning.signals import COURSE_DISCUSSIONS_CHANGED
+from openedx.core.djangoapps.discussions.data import CourseDiscussionConfigurationData
 from openedx.core.djangoapps.discussions.models import (
     DEFAULT_PROVIDER_TYPE,
     DiscussionTopicLink,
     DiscussionsConfiguration,
 )
+from openedx.core.djangoapps.discussions.signals import COURSE_DISCUSSIONS_UPDATED
 
 log = logging.getLogger(__name__)
 
@@ -98,4 +98,4 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
             ).save()
 
 
-COURSE_DISCUSSIONS_CHANGED.connect(handle_course_discussion_config_update)
+COURSE_DISCUSSIONS_UPDATED.connect(handle_course_discussion_config_update)

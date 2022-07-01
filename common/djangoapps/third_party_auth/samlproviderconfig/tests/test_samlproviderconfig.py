@@ -2,7 +2,6 @@
 Tests for SAMLProviderConfig endpoints
 """
 import copy
-import re
 from uuid import uuid4
 from django.urls import reverse
 from django.contrib.sites.models import Site
@@ -33,14 +32,10 @@ SINGLE_PROVIDER_CONFIG = {
 SINGLE_PROVIDER_CONFIG_2 = copy.copy(SINGLE_PROVIDER_CONFIG)
 SINGLE_PROVIDER_CONFIG_2['name'] = 'name-of-config-2'
 SINGLE_PROVIDER_CONFIG_2['slug'] = 'test-slug-2'
-SINGLE_PROVIDER_CONFIG_2['display_name'] = 'display-name'
-SINGLE_PROVIDER_CONFIG_2['entity_id'] = 'id-2'
 
 SINGLE_PROVIDER_CONFIG_3 = copy.copy(SINGLE_PROVIDER_CONFIG)
 SINGLE_PROVIDER_CONFIG_3['name'] = 'name-of-config-3'
 SINGLE_PROVIDER_CONFIG_3['slug'] = 'test-slug-3'
-SINGLE_PROVIDER_CONFIG_3['entity_id'] = 'id-3'
-
 
 ENTERPRISE_ID = str(uuid4())
 ENTERPRISE_ID_NON_EXISTENT = str(uuid4())
@@ -101,7 +96,6 @@ class SAMLProviderConfigTests(APITestCase):
         assert results[0]['entity_id'] == SINGLE_PROVIDER_CONFIG['entity_id']
         assert results[0]['metadata_source'] == SINGLE_PROVIDER_CONFIG['metadata_source']
         assert response.data['results'][0]['country'] == SINGLE_PROVIDER_CONFIG['country']
-        assert re.match(r"test-slug-\d{4}", results[0]['display_name'])
         assert SAMLProviderConfig.objects.count() == 1
 
     def test_get_one_config_by_enterprise_uuid_invalid_uuid(self):
@@ -153,7 +147,6 @@ class SAMLProviderConfigTests(APITestCase):
         assert provider_config.name == 'name-of-config-2'
         assert provider_config.country == SINGLE_PROVIDER_CONFIG_2['country']
         assert provider_config.attr_username == SINGLE_PROVIDER_CONFIG['attr_first_name']
-        assert provider_config.display_name == SINGLE_PROVIDER_CONFIG_2['display_name']
 
         # check association has also been created
         assert EnterpriseCustomerIdentityProvider.objects.filter(
@@ -198,7 +191,7 @@ class SAMLProviderConfigTests(APITestCase):
         """
         url = reverse('saml_provider_config-list')
         provider_config_no_country = {
-            'entity_id': 'id2',
+            'entity_id': 'id',
             'metadata_source': 'http://test.url',
             'name': 'name-of-config-no-country',
             'enabled': 'true',
@@ -217,7 +210,7 @@ class SAMLProviderConfigTests(APITestCase):
         """
         url = reverse('saml_provider_config-list')
         provider_config_blank_country = {
-            'entity_id': 'id-empty-country-urn',
+            'entity_id': 'id',
             'metadata_source': 'http://test.url',
             'name': 'name-of-config-blank-country',
             'enabled': 'true',
@@ -259,120 +252,3 @@ class SAMLProviderConfigTests(APITestCase):
         assert response.status_code == status.HTTP_201_CREATED
         provider_config = SAMLProviderConfig.objects.get(slug=SINGLE_PROVIDER_CONFIG_3['slug'])
         assert provider_config.saml_configuration == self.samlconfiguration
-
-    def test_unique_entity_id_constraint_with_different_slug(self):
-        """
-        Test that a config cannot be created with an entity ID if another config already exists with that entity ID and
-        a different slug
-        """
-        url = reverse('saml_provider_config-list')
-        data = copy.copy(SINGLE_PROVIDER_CONFIG)
-        data['enterprise_customer_uuid'] = ENTERPRISE_ID
-        data['slug'] = 'some-other-slug'
-
-        response = self.client.post(url, data)
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert len(SAMLProviderConfig.objects.all()) == 1
-        assert str(response.data.get('non_field_errors')[0]) == f"Entity ID: {data['entity_id']} already taken"
-
-    def test_unique_entity_id_constraint_with_same_slug(self):
-        """
-        Test that a config can be created/edited using the same entity ID as an existing config as long as it shares an
-        entity ID.
-        """
-        url = reverse('saml_provider_config-list')
-        data = copy.copy(SINGLE_PROVIDER_CONFIG)
-        data['enterprise_customer_uuid'] = ENTERPRISE_ID
-        data['name'] = 'some-other-name'
-
-        response = self.client.post(url, data)
-        assert response.status_code == status.HTTP_201_CREATED
-        assert len(SAMLProviderConfig.objects.all()) == 2
-        assert response.data.get('name') == 'some-other-name'
-
-    def test_api_deleting_provider_configs(self):
-        """
-        Test deleting a provider config.
-        """
-        EnterpriseCustomerIdentityProvider.objects.get_or_create(
-            provider_id=convert_saml_slug_provider_id(self.samlproviderconfig.slug),
-            enterprise_customer_id=ENTERPRISE_ID
-        )
-        url = reverse('saml_provider_config-list')
-        data = {}
-        data['enterprise_customer_uuid'] = ENTERPRISE_ID
-
-        response = self.client.delete(
-            url + f'{str(self.samlproviderconfig.id)}/?enterprise_customer_uuid={ENTERPRISE_ID}'
-        )
-        assert response.status_code == status.HTTP_200_OK
-        assert len(SAMLProviderConfig.objects.all()) == 1
-        assert SAMLProviderConfig.objects.first().archived
-
-    def test_api_deleting_config_then_using_deleted_entity_id(self):
-        """
-        Test deleting a config then creating a new config with the entity ID of the deleted config
-        """
-        EnterpriseCustomerIdentityProvider.objects.get_or_create(
-            provider_id=convert_saml_slug_provider_id(self.samlproviderconfig.slug),
-            enterprise_customer_id=ENTERPRISE_ID
-        )
-        url = reverse('saml_provider_config-list')
-        data = {}
-        data['enterprise_customer_uuid'] = ENTERPRISE_ID
-
-        response = self.client.delete(
-            url + f'{str(self.samlproviderconfig.id)}/?enterprise_customer_uuid={ENTERPRISE_ID}'
-        )
-        assert response.status_code == status.HTTP_200_OK
-        assert len(SAMLProviderConfig.objects.all()) == 1
-        assert SAMLProviderConfig.objects.first().archived
-
-        data = copy.copy(SINGLE_PROVIDER_CONFIG)
-        data['enterprise_customer_uuid'] = ENTERPRISE_ID
-        data['entity_id'] = SINGLE_PROVIDER_CONFIG['entity_id']
-        data['slug'] = 'idk-something-else'
-
-        response = self.client.post(url, data)
-        assert response.status_code == status.HTTP_201_CREATED
-        assert len(SAMLProviderConfig.objects.all()) == 2
-
-    def test_using_an_edited_configs_entity_id_after_deleting(self):
-        """
-        Test that editing an existing config then removing it still allows new configs to use the deleted config's
-        entity ID
-        """
-        EnterpriseCustomerIdentityProvider.objects.get_or_create(
-            provider_id=convert_saml_slug_provider_id(self.samlproviderconfig.slug),
-            enterprise_customer_id=ENTERPRISE_ID
-        )
-        url = reverse('saml_provider_config-list')
-
-        data = copy.copy(SINGLE_PROVIDER_CONFIG)
-        data['saml_config_id'] = self.samlconfiguration.id
-        data['name'] = 'a new name'
-
-        response = self.client.patch(
-            url + f'{str(self.samlproviderconfig.id)}/?enterprise_customer_uuid={ENTERPRISE_ID}',
-            data,
-        )
-        assert response.status_code == status.HTTP_200_OK
-        assert len(SAMLProviderConfig.objects.all()) == 2
-
-        data = {}
-        data['enterprise_customer_uuid'] = ENTERPRISE_ID
-        response = self.client.delete(
-            url + f'{str(response.data.get("id"))}/?enterprise_customer_uuid={ENTERPRISE_ID}'
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert len(SAMLProviderConfig.objects.all()) == 2
-
-        data = copy.copy(SINGLE_PROVIDER_CONFIG_3)
-        data['enterprise_customer_uuid'] = ENTERPRISE_ID
-        data['saml_config_id'] = self.samlconfiguration.id
-
-        response = self.client.post(url, data)
-        assert response.status_code == status.HTTP_201_CREATED
-        assert len(SAMLProviderConfig.objects.all()) == 3

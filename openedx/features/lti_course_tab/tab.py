@@ -7,7 +7,7 @@ from urllib.parse import quote
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpRequest
-from django.utils.translation import get_language, gettext_lazy, to_locale
+from django.utils.translation import get_language, to_locale, gettext_lazy
 from lti_consumer.api import get_lti_pii_sharing_state_for_course
 from lti_consumer.lti_1p1.contrib.django import lti_embed
 from lti_consumer.models import LtiConfiguration
@@ -29,11 +29,11 @@ class LtiCourseLaunchMixin:
     """
 
     ROLE_MAP = {
-        'student': 'Student,Learner',
+        'student': 'Student',
         'staff': 'Administrator',
         'instructor': 'Instructor',
     }
-    DEFAULT_ROLE = 'Student,Learner'
+    DEFAULT_ROLE = 'Student'
 
     def _get_pii_lti_parameters(self, course: CourseBlock, request: HttpRequest) -> Dict[str, str]:
         """

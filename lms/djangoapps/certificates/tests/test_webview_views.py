@@ -2,7 +2,6 @@
 
 
 import datetime
-from unittest import skipUnless
 from unittest.mock import patch
 from urllib.parse import urlencode
 from uuid import uuid4
@@ -12,6 +11,8 @@ from django.conf import settings
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_name_affirmation.api import create_verified_name, create_verified_name_config
+from edx_name_affirmation.statuses import VerifiedNameStatus
 from edx_toggles.toggles.testutils import override_waffle_switch
 from organizations import api as organizations_api
 
@@ -50,7 +51,6 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import (
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -65,8 +65,6 @@ FEATURES_WITH_CERTS_DISABLED['CERTIFICATES_HTML_VIEW'] = False
 
 FEATURES_WITH_CUSTOM_CERTS_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()
 FEATURES_WITH_CUSTOM_CERTS_ENABLED['CUSTOM_CERTIFICATE_TEMPLATES_ENABLED'] = True
-
-name_affirmation_service = get_name_affirmation_service()
 
 
 class CommonCertificatesTestCase(ModuleStoreTestCase):
@@ -242,7 +240,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
     def _create_custom_template_with_verified_description(self, org_id=None, course_key=None, language=None):
         """
         Creates a custom certificate template entry in DB. This custom certificate can be used to test
-        that the correct language is used if the IDV requirement on certificates has been enabled for a course.
+        that the correct language is used if the integrity signature feature has been enabled for a course.
         """
         template_html = """
             <%namespace name='static' file='static_content.html'/>
@@ -253,8 +251,8 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
                 mode: verified
                 ${accomplishment_copy_course_description}
                 ${certificate_type_description}
-                % if not idv_enabled_for_certificates:
-                <p> IDV disabled </p>
+                % if is_integrity_signature_enabled_for_course:
+                <p> Integrity signature enabled </p>
                 %endif
                 ${twitter_url}
                 <img class="custom-logo" src="${static.certificate_asset_url('custom-logo')}" />
@@ -1615,11 +1613,10 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                 )
             )
 
-    @skipUnless(name_affirmation_service is not None, 'Requires Name Affirmation')
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @ddt.data((True, 'approved'),
-              (True, 'denied'),
-              (False, 'pending'))
+    @ddt.data((True, VerifiedNameStatus.APPROVED),
+              (True, VerifiedNameStatus.DENIED),
+              (False, VerifiedNameStatus.PENDING))
     @ddt.unpack
     def test_certificate_view_verified_name(self, should_use_verified_name_for_certs, status):
         """
@@ -1627,16 +1624,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         their verified name will appear on the certificate rather than their profile name.
         """
         verified_name = 'Jonathan Doe'
-        name_affirmation_service.create_verified_name(
-            self.user,
-            verified_name,
-            self.user.profile.name,
-            status=status
-        )
-        name_affirmation_service.create_verified_name_config(
-            self.user,
-            use_verified_name_for_certs=should_use_verified_name_for_certs
-        )
+        create_verified_name(self.user, verified_name, self.user.profile.name, status=status)
+        create_verified_name_config(self.user, use_verified_name_for_certs=should_use_verified_name_for_certs)
 
         self._add_course_certificates(count=1, signatory_count=1)
         test_url = get_certificate_url(
@@ -1646,7 +1635,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
 
         response = self.client.get(test_url, HTTP_HOST='test.localhost')
-        if should_use_verified_name_for_certs and status == 'approved':
+        if should_use_verified_name_for_certs and status == VerifiedNameStatus.APPROVED:
             self.assertContains(response, verified_name)
             self.assertNotContains(response, self.user.profile.name)
         else:
@@ -1654,33 +1643,34 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             self.assertNotContains(response, verified_name)
 
     @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
+    @patch('lms.djangoapps.certificates.views.webview.is_integrity_signature_enabled')
     @ddt.data(
         True,
         False
     )
-    def test_verified_certificate_description(self, enable_cert_idv_requirement):
+    def test_verified_certificate_description(self, integrity_signature_enabled, mock_integrity_signature):
         """
         Test that for a verified cert, the correct language is used when the integrity signature feature is enabled.
         """
-        with patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_cert_idv_requirement):
-            self._add_course_certificates(count=1, signatory_count=2, is_active=True)
-            self._create_custom_template_with_verified_description()
-            self.cert.mode = 'verified'
-            self.cert.save()
-            test_url = get_certificate_url(
-                user_id=self.user.id,
-                course_id=str(self.course.id),
-                uuid=self.cert.verify_uuid
-            )
+        mock_integrity_signature.return_value = integrity_signature_enabled
+        self._add_course_certificates(count=1, signatory_count=2, is_active=True)
+        self._create_custom_template_with_verified_description()
+        self.cert.mode = 'verified'
+        self.cert.save()
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=str(self.course.id),
+            uuid=self.cert.verify_uuid
+        )
 
-            response = self.client.get(test_url)
-            assert response.status_code == 200
-            if enable_cert_idv_requirement:
-                self.assertContains(response, 'identity of the learner has been checked and is valid')
-                self.assertNotContains(response, 'IDV disabled')
-            else:
-                self.assertNotContains(response, 'identity of the learner has been checked and is valid')
-                self.assertContains(response, 'IDV disabled')
+        response = self.client.get(test_url)
+        assert response.status_code == 200
+        if not integrity_signature_enabled:
+            self.assertContains(response, 'identity of the learner has been checked and is valid')
+            self.assertNotContains(response, 'Integrity signature enabled')
+        else:
+            self.assertNotContains(response, 'identity of the learner has been checked and is valid')
+            self.assertContains(response, 'Integrity signature enabled')
 
 
 class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):

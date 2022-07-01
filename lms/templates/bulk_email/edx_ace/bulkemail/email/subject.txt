@@ -1,4 +1,0 @@
-{% load i18n %}
-{% autoescape off %}
-{{ course_email.subject }}
-{% endautoescape %}

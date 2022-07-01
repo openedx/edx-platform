@@ -1,0 +1,38 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _ 
+from django.urls import reverse
+%>
+<%namespace file='../../main.html' import="login_query"/>
+<%namespace name='static' file='../../static_content.html'/>
+
+
+<header>
+  <h3 class="sr">${_("Registration Help")}</h3>
+</header>
+
+<div class="cta">
+  <h3>${_("Already registered?")}</h3>
+  <p class="instructions">
+    <a href="${reverse('signin_user')}${login_query()}">
+      ${_("Click here to log in.")}
+    </a>
+  </p>
+</div>
+
+  <div class="cta cta-welcome">
+    <h3>${_("Welcome to {platform_name}").format(platform_name=platform_name)}</h3>
+    <p>${_("Registering with {platform_name} gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added.").format(platform_name=platform_name)}</p>
+  </div>
+
+<div class="cta cta-nextsteps">
+  <h3>${_("Next Steps")}</h3>
+  <p>${_("As part of joining {platform_name}, you will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark {platform_name} emails as 'not spam'.  At {platform_name}, we communicate mostly through email.").format(platform_name=platform_name)}</p>
+</div>
+
+<div class="cta cta-help">
+  <h3>${_("Need Help?")}</h3>
+  <p>
+  This is custom area
+  </p>
+</div>

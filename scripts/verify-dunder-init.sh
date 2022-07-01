@@ -35,14 +35,10 @@ exclude+='|^common/test/data/?.*$'
 # in each chlid directory).
 # However, we do NOT want to exclude the source directories *within* the sub-projects.
 # Example:
-#  * common/lib/capa -> EXCLUDE from check.
-#  * common/lib/capa/capa/safe_exec -> INCLUDE in check.
+#  * common/lib/xmodule -> EXCLUDE from check.
+#  * common/lib/xmodule/xmodule/modulestore -> INCLUDE in check.
 exclude+='|^common/lib$'
-exclude+='|^common/lib/capa$'
-
-# xmodule data folder
-exclude+='|^xmodule/tests/data/xml-course-root/capa$'
-exclude+='|^xmodule/tests/data/xml-course-root/uploads/python_lib_zip$'
+exclude+='|^common/lib/(capa|safe_lxml|sandbox-packages|symmath|xmodule)$'
 
 # Docs, scripts.
 exclude+='|^docs/.*$'

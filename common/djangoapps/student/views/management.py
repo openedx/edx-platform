@@ -31,6 +31,7 @@ from edx_django_utils import monitoring as monitoring_utils
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
 from eventtracking import tracker
+from ipware.ip import get_client_ip
 # Note that this lives in LMS, so this dependency should be refactored.
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -68,7 +69,6 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     PendingSecondaryEmailChange,
     Registration,
     RegistrationCookieConfiguration,
-    UnenrollmentNotAllowed,
     UserAttribute,
     UserProfile,
     UserSignupSource,
@@ -79,7 +79,6 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
 from common.djangoapps.student.signals import REFUND_ORDER
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
-from common.djangoapps.student.signals import USER_EMAIL_CHANGED
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger("edx.student")
@@ -365,7 +364,10 @@ def change_enrollment(request, check_access=True):
         # This can occur if the user's IP is on a global blacklist
         # or if the user is enrolling in a country in which the course
         # is not available.
-        redirect_url = embargo_api.redirect_if_blocked(request, course_id)
+        redirect_url = embargo_api.redirect_if_blocked(
+            course_id, user=user, ip_address=get_client_ip(request)[0],
+            url=request.path
+        )
         if redirect_url:
             return HttpResponse(redirect_url)
 
@@ -400,12 +402,6 @@ def change_enrollment(request, check_access=True):
         # Otherwise, there is only one mode available (the default)
         return HttpResponse()
     elif action == "unenroll":
-        if configuration_helpers.get_value(
-            "DISABLE_UNENROLLMENT",
-            settings.FEATURES.get("DISABLE_UNENROLLMENT")
-        ):
-            return HttpResponseBadRequest(_("Unenrollment is currently disabled"))
-
         enrollment = CourseEnrollment.get_enrollment(user, course_id)
         if not enrollment:
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
@@ -414,11 +410,7 @@ def change_enrollment(request, check_access=True):
         if certificate_info.get('status') in DISABLE_UNENROLL_CERT_STATES:
             return HttpResponseBadRequest(_("Your certificate prevents you from unenrolling from this course"))
 
-        try:
-            CourseEnrollment.unenroll(user, course_id)
-        except UnenrollmentNotAllowed as exc:
-            return HttpResponseBadRequest(str(exc))
-
+        CourseEnrollment.unenroll(user, course_id)
         REFUND_ORDER.send(sender=None, course_enrollment=enrollment)
         return HttpResponse()
     else:
@@ -903,8 +895,6 @@ def confirm_email_change(request, key):
             return response
 
         response = render_to_response("email_change_successful.html", address_context)
-
-        USER_EMAIL_CHANGED.send(sender=None, user=user)
         return response
 
 

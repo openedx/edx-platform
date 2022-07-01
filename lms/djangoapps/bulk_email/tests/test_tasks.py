@@ -11,7 +11,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import json  # lint-amnesty, pylint: disable=wrong-import-order
 from itertools import chain, cycle, repeat  # lint-amnesty, pylint: disable=wrong-import-order
-from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected, SMTPSenderRefused  # lint-amnesty, pylint: disable=wrong-import-order
+from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected  # lint-amnesty, pylint: disable=wrong-import-order
 from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
 from uuid import uuid4  # lint-amnesty, pylint: disable=wrong-import-order
 import pytest
@@ -410,11 +410,6 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_retry_after_smtp_throttling_error(self):
         self._test_retry_after_unlimited_retry_error(SMTPDataError(455, "Throttling: Sending rate exceeded"))
-
-    def test_retry_after_smtp_sender_refused_error(self):
-        self._test_retry_after_unlimited_retry_error(
-            SMTPSenderRefused(421, "Throttling: Sending rate exceeded", self.instructor.email)
-        )
 
     def test_retry_after_ses_throttling_error(self):
         self._test_retry_after_unlimited_retry_error(

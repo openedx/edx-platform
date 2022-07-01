@@ -2,11 +2,10 @@
 Tests for masquerading functionality on course_experience
 """
 
-from django.urls import reverse
-
 from edx_toggles.toggles.testutils import override_waffle_flag
-from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, set_preview_mode
-from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
+from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
+from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -15,9 +14,11 @@ from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID  # lint-
 from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .helpers import add_course_mode
+from .test_course_home import course_home_url
 from .test_course_sock import TEST_VERIFICATION_SOCK_LOCATOR
 
 TEST_PASSWORD = 'test'
+UPGRADE_MESSAGE_CONTAINER = 'section-upgrade'
 
 
 class MasqueradeTestBase(SharedModuleStoreTestCase, MasqueradeMixin):
@@ -61,19 +62,22 @@ class MasqueradeTestBase(SharedModuleStoreTestCase, MasqueradeMixin):
         return None
 
 
-@set_preview_mode(True)
 class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
     """
     Tests for the course verification upgrade messages while the user is being masqueraded.
     """
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
+    @override_waffle_flag(SHOW_UPGRADE_MSG_ON_COURSE_HOME, active=True)
     def test_masquerade_as_student(self):
         # Elevate the staff user to be student
         self.update_masquerade(course=self.verified_course, user_partition_id=ENROLLMENT_TRACK_PARTITION_ID)
-        response = self.client.get(reverse('courseware', kwargs={'course_id': str(self.verified_course.id)}))
+        response = self.client.get(course_home_url(self.verified_course))
         self.assertContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
+        self.assertContains(response, UPGRADE_MESSAGE_CONTAINER, html=False)
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_masquerade_as_verified_student(self):
         user_group_id = self.get_group_id_by_course_mode_name(
@@ -82,9 +86,11 @@ class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
         )
         self.update_masquerade(course=self.verified_course, group_id=user_group_id,
                                user_partition_id=ENROLLMENT_TRACK_PARTITION_ID)
-        response = self.client.get(reverse('courseware', kwargs={'course_id': str(self.verified_course.id)}))
+        response = self.client.get(course_home_url(self.verified_course))
         self.assertNotContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
+        self.assertNotContains(response, UPGRADE_MESSAGE_CONTAINER, html=False)
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     @override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=True)
     def test_masquerade_as_masters_student(self):
         user_group_id = self.get_group_id_by_course_mode_name(
@@ -93,6 +99,6 @@ class TestVerifiedUpgradesWithMasquerade(MasqueradeTestBase):
         )
         self.update_masquerade(course=self.masters_course, group_id=user_group_id,
                                user_partition_id=ENROLLMENT_TRACK_PARTITION_ID)
-        response = self.client.get(reverse('courseware', kwargs={'course_id': str(self.masters_course.id)}))
-
+        response = self.client.get(course_home_url(self.masters_course))
         self.assertNotContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
+        self.assertNotContains(response, UPGRADE_MESSAGE_CONTAINER, html=False)

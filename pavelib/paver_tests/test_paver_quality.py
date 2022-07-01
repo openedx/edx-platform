@@ -67,7 +67,7 @@ class TestPaverQualityViolations(unittest.TestCase):
 class TestPaverReportViolationsCounts(unittest.TestCase):
     """
     For testing utility functions for getting counts from reports for
-    run_eslint and run_xsslint.
+    run_eslint, run_xsslint, and run_xsscommitlint.
     """
 
     def setUp(self):
@@ -157,6 +157,52 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
             'rules': {},
             'total': None,
         })
+
+    def test_get_xsscommitlint_count_happy(self):
+        """
+        Test happy path getting violation count from xsscommitlint report.
+        """
+        report = textwrap.dedent("""
+            Linting lms/templates/navigation.html:
+
+            2 violations total
+
+            Linting scripts/tests/templates/test.underscore:
+
+            3 violations total
+        """)
+        with open(self.f.name, 'w') as f:
+            f.write(report)
+        count = pavelib.quality._get_xsscommitlint_count(self.f.name)  # pylint: disable=protected-access
+
+        assert count == 5
+
+    def test_get_xsscommitlint_count_bad_counts(self):
+        """
+        Test getting violation count from truncated xsscommitlint report.
+        """
+        report = textwrap.dedent("""
+            Linting lms/templates/navigation.html:
+        """)
+        with open(self.f.name, 'w') as f:
+            f.write(report)
+        count = pavelib.quality._get_xsscommitlint_count(self.f.name)  # pylint: disable=protected-access
+
+        assert count is None
+
+    def test_get_xsscommitlint_count_no_files(self):
+        """
+        Test getting violation count from xsscommitlint report where no files were
+        linted.
+        """
+        report = textwrap.dedent("""
+            No files linted.
+        """)
+        with open(self.f.name, 'w') as f:
+            f.write(report)
+        count = pavelib.quality._get_xsscommitlint_count(self.f.name)  # pylint: disable=protected-access
+
+        assert count == 0
 
 
 class TestPrepareReportDir(unittest.TestCase):

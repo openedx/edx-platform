@@ -5,44 +5,44 @@
         "display_name": "Graded Course",
         "graded": "true"
     },
-
-
+	
+	
     "vertical/Homework1": {
-        "display_name": "Homework 1",
-        "graded": true,
+        "display_name": "Homework 1", 
+        "graded": true, 
         "format": "Homework"
     },
-
-
-    "sequential/Homework2": {
-        "display_name": "Homework 2",
-        "graded": true,
+	
+	
+    "videosequence/Homework2": {
+        "display_name": "Homework 2", 
+        "graded": true, 
         "format": "Homework"
     },
-
+    
     "problem/H2P1": {
         "weight": 4
     },
-
-    "sequential/Homework3": {
-        "display_name": "Homework 3",
-        "graded": true,
+    
+    "videosequence/Homework3": {
+        "display_name": "Homework 3", 
+        "graded": true, 
         "format": "Homework"
     },
 
-
+	
     "vertical/Homework1": {
-        "display_name": "Homework 1",
-        "graded": true,
+        "display_name": "Homework 1", 
+        "graded": true, 
         "format": "Homework"
     },
-
+	
     "problem/FinalQuestion": {
-        "display_name": "Final Question",
-        "graded": true,
+        "display_name": "Final Question", 
+        "graded": true, 
         "format": "Final"
     },
-
+	
     "chapter/Overview": {
         "display_name": "Overview"
     }

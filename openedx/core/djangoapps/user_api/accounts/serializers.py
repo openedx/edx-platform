@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
+from edx_name_affirmation.api import get_verified_name
 from rest_framework import serializers
 
 
@@ -28,7 +29,6 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 from openedx.core.djangoapps.user_authn.views.registration_form import contains_html, contains_url
-from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 
 from . import (
     ACCOUNT_VISIBILITY_PREF_KEY,
@@ -170,10 +170,11 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "extended_profile_fields": None,
             "phone_number": None,
             "pending_name_change": None,
-            "verified_name": None,
         }
 
         if user_profile:
+            verified_name_obj = get_verified_name(user, is_verified=True)
+            verified_name = verified_name_obj.verified_name if verified_name_obj else None
             data.update(
                 {
                     "bio": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.bio),
@@ -186,6 +187,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
                         user_profile.language_proficiencies.all().order_by('code'), many=True
                     ).data,
                     "name": user_profile.name,
+                    "verified_name": verified_name,
                     "gender": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.gender),
                     "goals": user_profile.goals,
                     "year_of_birth": user_profile.year_of_birth,
@@ -208,12 +210,6 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             data.update({"pending_name_change": pending_name_change.new_name})
         except PendingNameChange.DoesNotExist:
             pass
-
-        name_affirmation_service = get_name_affirmation_service()
-        if name_affirmation_service:
-            verified_name_obj = name_affirmation_service.get_verified_name(user, is_verified=True)
-            if verified_name_obj:
-                data.update({"verified_name": verified_name_obj.verified_name})
 
         if is_secondary_email_feature_enabled():
             data.update(

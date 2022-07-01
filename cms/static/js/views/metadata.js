@@ -299,27 +299,6 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
         }
     });
 
-    Metadata.PublicAccess = Metadata.Option.extend({
-
-      templateName: 'metadata-option-public-access',
-
-      initialize: function() {
-        Metadata.Option.prototype.initialize.apply(this, arguments);
-        this.listenTo(this.model, 'change', this.updateUrlFieldVisibility);
-        this.updateUrlFieldVisibility();
-      },
-
-      updateUrlFieldVisibility: function() {
-        const urlContainer = this.$el.find('.public-access-block-url-container');
-
-        if(this.getValueFromEditor()) {
-          urlContainer.removeClass('is-hidden');
-        } else {
-          urlContainer.addClass('is-hidden');
-        }
-      }
-    });
-
     Metadata.List = AbstractEditor.extend({
 
         events: {

@@ -3,7 +3,7 @@
 
 import json
 from unittest.mock import patch
-from unittest import mock, skipUnless
+from unittest import mock
 
 import ddt
 import pytest
@@ -12,6 +12,8 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
+from edx_name_affirmation.api import create_verified_name, create_verified_name_config
+from edx_name_affirmation.statuses import VerifiedNameStatus
 from opaque_keys.edx.locator import CourseKey, CourseLocator
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from path import Path as path
@@ -37,7 +39,6 @@ from lms.djangoapps.certificates.tests.factories import (
 )
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -51,8 +52,6 @@ TEST_DIR = path(__file__).dirname()
 TEST_DATA_DIR = 'common/test/data/'
 PLATFORM_ROOT = TEST_DIR.parent.parent.parent.parent
 TEST_DATA_ROOT = PLATFORM_ROOT / TEST_DATA_DIR
-
-name_affirmation_service = get_name_affirmation_service()
 
 
 class ExampleCertificateTest(TestCase, OpenEdxEventsTestMixin):
@@ -625,10 +624,9 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin
 
         self._assert_event_data(mock_emit_certificate_event, expected_event_data)
 
-    @skipUnless(name_affirmation_service is not None, 'Requires Name Affirmation')
-    @ddt.data((True, 'approved'),
-              (True, 'denied'),
-              (False, 'pending'))
+    @ddt.data((True, VerifiedNameStatus.APPROVED),
+              (True, VerifiedNameStatus.DENIED),
+              (False, VerifiedNameStatus.PENDING))
     @ddt.unpack
     def test_invalidate_with_verified_name(self, should_use_verified_name_for_certs, status):
         """
@@ -636,11 +634,8 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin
         """
         verified_name = 'Jonathan Doe'
         profile = UserProfile.objects.get(user=self.user)
-        name_affirmation_service.create_verified_name(self.user, verified_name, profile.name, status=status)
-        name_affirmation_service.create_verified_name_config(
-            self.user,
-            use_verified_name_for_certs=should_use_verified_name_for_certs
-        )
+        create_verified_name(self.user, verified_name, profile.name, status=status)
+        create_verified_name_config(self.user, use_verified_name_for_certs=should_use_verified_name_for_certs)
 
         cert = GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
@@ -654,7 +649,7 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase, OpenEdxEventsTestMixin
         cert.invalidate(mode=mode, source=source)
 
         cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
-        if should_use_verified_name_for_certs and status == 'approved':
+        if should_use_verified_name_for_certs and status == VerifiedNameStatus.APPROVED:
             assert cert.name == verified_name
         else:
             assert cert.name == profile.name

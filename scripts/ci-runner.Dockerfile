@@ -1,4 +1,4 @@
-FROM summerwind/actions-runner:v2.288.1-ubuntu-20.04-c221b6e as base
+FROM summerwind/actions-runner:v2.278.0-ubuntu-20.04 as base
 
 USER root
 
@@ -11,13 +11,8 @@ RUN apt-get update && \
     # lynx: Required by https://github.com/edx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
     lynx xvfb pkg-config \
     python3-dev python3-venv \
+    mongodb\
     && rm -rf /var/lib/apt/lists/*
-
-# Install Mongodb 4.4
-RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
-RUN echo "deb https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-RUN apt-get update && apt-get install -y mongodb-org=4.4.13
-EXPOSE 27017
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8

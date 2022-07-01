@@ -1,9 +1,9 @@
 """
 Coverage Context Listener URLs.
 """
-from django.urls import path
+from django.conf.urls import url
 from .views import update_context
 
 urlpatterns = [
-    path('update_context', update_context),
+    url(r'update_context', update_context),
 ]

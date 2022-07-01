@@ -1,25 +1,21 @@
 """
 Logistration API View Tests
 """
-import socket
 from unittest.mock import patch
 from urllib.parse import urlencode
-
+import socket
 import ddt
 from django.conf import settings
-from django.test.utils import override_settings
 from django.urls import reverse
-from rest_framework import status
 from rest_framework.test import APITestCase
 
 from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.third_party_auth import pipeline
-from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
-from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
+from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 
 
 @skip_unless_lms
@@ -35,7 +31,6 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         super().setUp()
 
-        self.user = UserFactory.create(username='test_user', password='password123')
         self.url = reverse('mfe_context')
         self.query_params = {'next': '/dashboard'}
 
@@ -92,20 +87,16 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         Returns the MFE context
         """
         return {
-            'context_data': {
-                'currentProvider': current_provider,
-                'platformName': settings.PLATFORM_NAME,
-                'providers': self.get_provider_data(params) if params else [],
-                'secondaryProviders': [],
-                'finishAuthUrl': pipeline.get_complete_url(backend_name) if backend_name else None,
-                'errorMessage': None,
-                'registerFormSubmitButtonText': 'Create Account',
-                'syncLearnerProfileData': False,
-                'pipeline_user_details': {'email': 'test@test.com'} if add_user_details else {},
-                'countryCode': self.country_code
-            },
-            'registration_fields': {},
-            'optional_fields': {},
+            'currentProvider': current_provider,
+            'platformName': settings.PLATFORM_NAME,
+            'providers': self.get_provider_data(params) if params else [],
+            'secondaryProviders': [],
+            'finishAuthUrl': pipeline.get_complete_url(backend_name) if backend_name else None,
+            'errorMessage': None,
+            'registerFormSubmitButtonText': 'Create Account',
+            'syncLearnerProfileData': False,
+            'pipeline_user_details': {'email': 'test@test.com'} if add_user_details else {},
+            'countryCode': self.country_code
         }
 
     @patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_AUTH': False})
@@ -177,7 +168,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         })
 
         response = self.client.get(self.url, self.query_params)
-        assert response.data['context_data']['providers'] == provider_data
+        assert response.data['providers'] == provider_data
 
     def test_user_country_code(self):
         """
@@ -186,135 +177,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         response = self.client.get(self.url, self.query_params)
 
         assert response.status_code == 200
-        assert response.data['context_data']['countryCode'] == self.country_code
-
-    @override_settings(
-        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
-        REGISTRATION_EXTRA_FIELDS={"first_name": "optional", "city": "optional"}
-    )
-    def test_required_fields_not_configured(self):
-        """
-        Test that when no required fields are configured in REGISTRATION_EXTRA_FIELDS
-        settings, then API returns proper response.
-        """
-        self.query_params.update({'is_registered': True})
-        response = self.client.get(self.url, self.query_params)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['registration_fields']['fields'] == {}
-
-    @with_site_configuration(
-        configuration={
-            'extended_profile_fields': ['first_name', 'last_name']
-        }
-    )
-    @override_settings(
-        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
-        REGISTRATION_EXTRA_FIELDS={'state': 'required', 'last_name': 'required', 'first_name': 'required'},
-        REGISTRATION_FIELD_ORDER=['first_name', 'last_name', 'state'],
-    )
-    def test_required_field_order(self):
-        """
-        Test that order of required fields
-        """
-        self.query_params.update({'is_registered': True})
-        response = self.client.get(self.url, self.query_params)
-        assert response.status_code == status.HTTP_200_OK
-        assert list(response.data['registration_fields']['fields'].keys()) == ['first_name', 'last_name', 'state']
-
-    @override_settings(
-        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
-        REGISTRATION_EXTRA_FIELDS={"new_field_with_no_description": "optional", "goals": "optional"}
-    )
-    def test_optional_field_has_no_description(self):
-        """
-        Test that if a new optional field is added to REGISTRATION_EXTRA_FIELDS without
-        adding field description then that field is omitted from the final response.
-        """
-        expected_response = {
-            'goals': {
-                'name': 'goals',
-                'type': 'textarea',
-                'label': "Tell us why you're interested in {platform_name}".format(
-                    platform_name=settings.PLATFORM_NAME
-                ),
-                'error_message': '',
-            }
-        }
-        response = self.client.get(self.url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['optional_fields']['fields'] == expected_response
-
-    @with_site_configuration(
-        configuration={
-            'EXTRA_FIELD_OPTIONS': {'profession': ['Software Engineer', 'Teacher', 'Other']},
-            'extended_profile_fields': ['profession', 'specialty']
-        }
-    )
-    @override_settings(
-        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
-        REGISTRATION_EXTRA_FIELDS={'profession': 'optional', 'specialty': 'optional'}
-    )
-    def test_configurable_select_option_fields(self):
-        """
-        Test that if optional fields have configurable options present in EXTRA_FIELD_OPTIONS,
-        they are returned in response as "select" fields otherwise as "text" field.
-        """
-        expected_response = {
-            'profession': {
-                'name': 'profession',
-                'label': 'Profession',
-                'error_message': '',
-                'type': 'select',
-                'options': [('software engineer', 'Software Engineer'), ('teacher', 'Teacher'), ('other', 'Other')],
-            },
-            'specialty': {
-                'name': 'specialty',
-                'label': 'Specialty',
-                'error_message': '',
-                'type': 'text',
-            }
-        }
-        response = self.client.get(self.url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['optional_fields']['fields'] == expected_response
-
-    @with_site_configuration(
-        configuration={
-            'extended_profile_fields': ['specialty']
-        }
-    )
-    @override_settings(
-        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
-        REGISTRATION_EXTRA_FIELDS={'goals': 'optional', 'specialty': 'optional'},
-        REGISTRATION_FIELD_ORDER=['specialty', 'goals'],
-    )
-    def test_optional_field_order(self):
-        """
-        Test that order of optional fields
-        """
-        response = self.client.get(self.url)
-        assert response.status_code == status.HTTP_200_OK
-        assert list(response.data['optional_fields']['fields'].keys()) == ['specialty', 'goals']
-
-    @with_site_configuration(
-        configuration={
-            'extended_profile_fields': ['specialty']
-        }
-    )
-    @override_settings(
-        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
-        REGISTRATION_EXTRA_FIELDS={'profession': 'required', 'specialty': 'required'},
-        REGISTRATION_FIELD_ORDER=['specialty', 'profession'],
-    )
-    def test_field_not_available_in_extended_profile_config(self):
-        """
-        Test that if the field is not available in extended_profile configuration then the field
-        will not be sent in response.
-        """
-        self.query_params.update({'is_registered': True})
-        response = self.client.get(self.url, self.query_params)
-        assert response.status_code == status.HTTP_200_OK
-        assert list(response.data['registration_fields']['fields'].keys()) == ['specialty']
+        assert response.data['countryCode'] == self.country_code
 
 
 @skip_unless_lms

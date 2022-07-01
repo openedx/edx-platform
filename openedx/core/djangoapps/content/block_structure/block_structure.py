@@ -11,11 +11,8 @@ The following internal data structures are implemented:
 
 
 from copy import deepcopy
-from datetime import datetime
 from functools import partial
 from logging import getLogger
-
-from dateutil.tz import tzlocal
 
 from openedx.core.lib.graph_traversals import traverse_post_order, traverse_topologically
 
@@ -467,8 +464,7 @@ class BlockStructureBlockData(BlockStructure):
                 not found.
         """
         block_data = self._block_data_map.get(usage_key)
-        xblock_field = getattr(block_data, field_name, default) if block_data else default
-        return self._make_datetime_field_compatible(xblock_field)
+        return getattr(block_data, field_name, default) if block_data else default
 
     def override_xblock_field(self, usage_key, field_name, override_data):
         """
@@ -558,8 +554,7 @@ class BlockStructureBlockData(BlockStructure):
             transformer_data = self.get_transformer_block_data(usage_key, transformer)
         except KeyError:
             return default
-        field = getattr(transformer_data, key, default)
-        return self._make_datetime_field_compatible(field)
+        return getattr(transformer_data, key, default)
 
     def set_transformer_block_field(self, usage_key, transformer, key, value):
         """
@@ -767,23 +762,6 @@ class BlockStructureBlockData(BlockStructure):
             block_data = BlockData(usage_key)
             self._block_data_map[usage_key] = block_data
             return block_data
-
-    def _make_datetime_field_compatible(self, field):
-        """
-        Creates a new datetime object to avoid issues occurring due to upgrading
-        python-datetuil version from 2.4.0
-
-        More info: https://openedx.atlassian.net/browse/BOM-2245
-        """
-        if isinstance(field, datetime):
-            if isinstance(field.tzinfo, tzlocal) and not hasattr(field.tzinfo, '_hasdst'):
-
-                return datetime(
-                    year=field.year, month=field.month, day=field.day,
-                    hour=field.hour, minute=field.minute, second=field.second,
-                    tzinfo=tzlocal()
-                )
-        return field
 
 
 class BlockStructureModulestoreData(BlockStructureBlockData):

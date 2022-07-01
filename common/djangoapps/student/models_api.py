@@ -111,11 +111,11 @@ def get_course_access_role(user, org, course_id, role):
 
 def get_pending_name_change(user):
     """
-    Return the user's pending name change, or None if it does not exist.
+    Return a string representing the user's pending name change, or None if it does not exist.
     """
     try:
         pending_name_change = _PendingNameChange.objects.get(user=user)
-        return pending_name_change
+        return pending_name_change.new_name
     except _PendingNameChange.DoesNotExist:
         return None
 

@@ -21,7 +21,9 @@ root = Path('../..').abspath()
 sys.path.insert(0, root)
 sys.path.append(root / "docs/guides")
 sys.path.append(root / "common/lib/capa")
-
+sys.path.append(root / "common/lib/safe_lxml")
+sys.path.append(root / "common/lib/symmath")
+sys.path.append(root / "common/lib/xmodule")
 
 # Use a settings module that allows all LMS and Studio code to be imported
 # without errors.  If running sphinx-apidoc, we already set a different
@@ -222,9 +224,11 @@ autodoc_mock_imports = [
 modules = {
     'cms': 'cms',
     'common/lib/capa/capa': 'common/lib/capa',
+    'common/lib/safe_lxml/safe_lxml': 'common/lib/safe_lxml',
+    'common/lib/symmath/symmath': 'common/lib/symmath',
+    'common/lib/xmodule/xmodule': 'common/lib/xmodule',
     'lms': 'lms',
     'openedx': 'openedx',
-    'xmodule': 'xmodule',
 }
 
 
@@ -233,7 +237,7 @@ def update_settings_module(service='lms'):
     Set the "DJANGO_SETTINGS_MODULE" environment variable appropriately
     for the module sphinx-apidoc is about to be run on.
     """
-    if os.environ.get('EDX_PLATFORM_SETTINGS') == 'devstack_docker':
+    if os.environ['EDX_PLATFORM_SETTINGS'] == 'devstack_docker':
         settings_module = f'{service}.envs.devstack_docker'
     else:
         settings_module = f'{service}.envs.devstack'

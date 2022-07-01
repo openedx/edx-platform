@@ -136,10 +136,6 @@ class CourseMode(models.Model):
     CREDIT_MODE = 'credit'
     MASTERS = 'masters'
     EXECUTIVE_EDUCATION = 'executive-education'
-    PAID_EXECUTIVE_EDUCATION = 'paid-executive-education'
-    UNPAID_EXECUTIVE_EDUCATION = 'unpaid-executive-education'
-    PAID_BOOTCAMP = 'paid-bootcamp'
-    UNPAID_BOOTCAMP = 'unpaid-bootcamp'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],
@@ -162,20 +158,14 @@ class CourseMode(models.Model):
         PROFESSIONAL,
         VERIFIED,
         MASTERS,
-        EXECUTIVE_EDUCATION,
-        PAID_EXECUTIVE_EDUCATION,
-        UNPAID_EXECUTIVE_EDUCATION,
-        PAID_BOOTCAMP,
-        UNPAID_BOOTCAMP
+        EXECUTIVE_EDUCATION
     ]
 
     # Modes utilized for audit/free enrollments
-    AUDIT_MODES = [AUDIT, HONOR, UNPAID_EXECUTIVE_EDUCATION, UNPAID_BOOTCAMP]
+    AUDIT_MODES = [AUDIT, HONOR]
 
     # Modes that allow a student to pursue a verified certificate
-    VERIFIED_MODES = [
-        VERIFIED, PROFESSIONAL, MASTERS, EXECUTIVE_EDUCATION, PAID_EXECUTIVE_EDUCATION, PAID_BOOTCAMP
-    ]
+    VERIFIED_MODES = [VERIFIED, PROFESSIONAL, MASTERS, EXECUTIVE_EDUCATION]
 
     # Modes that allow a student to pursue a non-verified certificate
     NON_VERIFIED_MODES = [HONOR, AUDIT, NO_ID_PROFESSIONAL_MODE]
@@ -184,10 +174,7 @@ class CourseMode(models.Model):
     CREDIT_MODES = [CREDIT_MODE]
 
     # Modes that are eligible to purchase credit
-    CREDIT_ELIGIBLE_MODES = [
-        VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE, EXECUTIVE_EDUCATION, PAID_EXECUTIVE_EDUCATION,
-        PAID_BOOTCAMP
-    ]
+    CREDIT_ELIGIBLE_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE, EXECUTIVE_EDUCATION]
 
     # Modes for which certificates/programs may need to be updated
     CERTIFICATE_RELEVANT_MODES = CREDIT_MODES + CREDIT_ELIGIBLE_MODES + [MASTERS]

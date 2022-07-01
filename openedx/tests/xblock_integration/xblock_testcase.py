@@ -49,7 +49,7 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.urls import reverse
 from xblock.plugin import Plugin
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 import lms.djangoapps.lms_xblock.runtime
@@ -240,7 +240,7 @@ class XBlockScenarioTestCaseMixin:
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             for chapter_config in cls.test_configuration:
                 chapter = ItemFactory.create(
-                    parent_location=cls.course.location,
+                    parent=cls.course,
                     display_name="ch_" + chapter_config['urlname'],
                     category='chapter'
                 )
@@ -271,7 +271,14 @@ class XBlockScenarioTestCaseMixin:
                     )
                     cls.xblocks[xblock_config['urlname']] = xblock
 
-                scenario_url = reverse('render_xblock', args=[str(section.location)])
+                scenario_url = str(reverse(
+                    'courseware_section',
+                    kwargs={
+                        'course_id': str(cls.course.id),
+                        'chapter': "ch_" + chapter_config['urlname'],
+                        'section': "sec_" + chapter_config['urlname']
+                    }
+                ))
 
                 cls.scenario_urls[chapter_config['urlname']] = scenario_url
 
@@ -339,6 +346,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
     Class for all XBlock-internal test cases (as opposed to
     integration tests).
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     test_configuration = None  # Children must override this!
 
     entry_point = 'xblock.test.v0'

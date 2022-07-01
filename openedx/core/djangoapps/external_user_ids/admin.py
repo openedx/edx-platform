@@ -3,11 +3,12 @@ import csv
 from logging import getLogger
 
 from django import forms
+from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import path, reverse
+from django.urls import reverse
 
 from .models import ExternalId, ExternalIdType
 
@@ -33,9 +34,11 @@ class ExternalIdAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable=missin
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            path('bulk_generate_external_ids/', self.admin_site.admin_view(self.generate_ids_form),
-                 name='bulk_generate_external_ids'
-                 ),
+            url(
+                r'^bulk_generate_external_ids/$',
+                self.admin_site.admin_view(self.generate_ids_form),
+                name='bulk_generate_external_ids'
+            ),
         ]
         return custom_urls + urls
 

@@ -2,31 +2,22 @@
 Test for LMS instructor background task queue management
 """
 
-import datetime
-import json
 from unittest.mock import MagicMock, Mock, patch
-from uuid import uuid4
 
 import pytest
-import pytz
 import ddt
-from testfixtures import LogCapture
-from celery.states import FAILURE, SUCCESS
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from celery.states import FAILURE
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import normalize_repr
-from lms.djangoapps.bulk_email.api import create_course_email
-from lms.djangoapps.bulk_email.data import BulkEmailTargetChoices
+from lms.djangoapps.bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
-    generate_anonymous_ids,
     generate_certificates_for_students,
     get_instructor_task_history,
     get_running_instructor_tasks,
-    process_scheduled_instructor_tasks,
     regenerate_certificates,
     submit_bulk_course_email,
     submit_calculate_may_enroll_csv,
@@ -44,16 +35,12 @@ from lms.djangoapps.instructor_task.api import (
     submit_rescore_problem_for_student,
     submit_reset_problem_attempts_for_all_students,
     submit_reset_problem_attempts_in_entrance_exam,
+    generate_anonymous_ids
 )
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
-from lms.djangoapps.instructor_task.data import InstructorTaskTypes
-from lms.djangoapps.instructor_task.models import PROGRESS, SCHEDULED, InstructorTask
-from lms.djangoapps.instructor_task.tasks import (
-    export_ora2_data,
-    export_ora2_submission_files,
-    generate_anonymous_ids_for_course,
-)
-from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory, InstructorTaskScheduleFactory
+from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
+from lms.djangoapps.instructor_task.tasks import export_ora2_data, export_ora2_submission_files, \
+    generate_anonymous_ids_for_course
 from lms.djangoapps.instructor_task.tests.test_base import (
     TEST_COURSE_KEY,
     InstructorTaskCourseTestCase,
@@ -61,8 +48,7 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskTestCase,
     TestReportMixin
 )
-
-LOG_PATH = 'lms.djangoapps.instructor_task.api'
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
@@ -94,7 +80,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
                     in get_instructor_task_history(
                         TEST_COURSE_KEY,
                         usage_key=self.problem_url,
-                        task_type=InstructorTaskTypes.RESCORE_PROBLEM
+                        task_type='rescore_problem'
                     )]
         assert set(task_ids) == set(expected_ids)
         # make the same call using a non-existent task_type:
@@ -143,45 +129,29 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             submit_rescore_problem_for_all_students(request, problem_url)
 
     @ddt.data(
-        (normalize_repr(submit_rescore_problem_for_all_students), InstructorTaskTypes.RESCORE_PROBLEM),
+        (normalize_repr(submit_rescore_problem_for_all_students), 'rescore_problem'),
         (
             normalize_repr(submit_rescore_problem_for_all_students),
-            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
+            'rescore_problem_if_higher',
             {'only_if_higher': True}
         ),
-        (normalize_repr(submit_rescore_problem_for_student), InstructorTaskTypes.RESCORE_PROBLEM, {'student': True}),
+        (normalize_repr(submit_rescore_problem_for_student), 'rescore_problem', {'student': True}),
         (
             normalize_repr(submit_rescore_problem_for_student),
-            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
+            'rescore_problem_if_higher',
             {'student': True, 'only_if_higher': True}
         ),
-        (normalize_repr(submit_reset_problem_attempts_for_all_students), InstructorTaskTypes.RESET_PROBLEM_ATTEMPTS),
-        (normalize_repr(submit_delete_problem_state_for_all_students), InstructorTaskTypes.DELETE_PROBLEM_STATE),
+        (normalize_repr(submit_reset_problem_attempts_for_all_students), 'reset_problem_attempts'),
+        (normalize_repr(submit_delete_problem_state_for_all_students), 'delete_problem_state'),
+        (normalize_repr(submit_rescore_entrance_exam_for_student), 'rescore_problem', {'student': True}),
         (
             normalize_repr(submit_rescore_entrance_exam_for_student),
-            InstructorTaskTypes.RESCORE_PROBLEM,
-            {'student': True}
+            'rescore_problem_if_higher',
+            {'student': True, 'only_if_higher': True},
         ),
-        (
-            normalize_repr(submit_rescore_entrance_exam_for_student),
-            InstructorTaskTypes.RESCORE_PROBLEM_IF_HIGHER,
-            {'student': True, 'only_if_higher': True}
-        ),
-        (
-            normalize_repr(submit_reset_problem_attempts_in_entrance_exam),
-            InstructorTaskTypes.RESET_PROBLEM_ATTEMPTS,
-            {'student': True}
-        ),
-        (
-            normalize_repr(submit_delete_entrance_exam_state_for_student),
-            InstructorTaskTypes.DELETE_PROBLEM_STATE,
-            {'student': True}
-        ),
-        (
-            normalize_repr(submit_override_score),
-            InstructorTaskTypes.OVERRIDE_PROBLEM_SCORE,
-            {'student': True, 'score': 0}
-        )
+        (normalize_repr(submit_reset_problem_attempts_in_entrance_exam), 'reset_problem_attempts', {'student': True}),
+        (normalize_repr(submit_delete_entrance_exam_state_for_student), 'delete_problem_state', {'student': True}),
+        (normalize_repr(submit_override_score), 'override_problem_score', {'student': True, 'score': 0})
     )
     @ddt.unpack
     def test_submit_task(self, task_function, expected_task_type, params=None):
@@ -235,15 +205,10 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
     def _define_course_email(self):
         """Create CourseEmail object for testing."""
-        email_recipient_groups = [
-            BulkEmailTargetChoices.SEND_TO_MYSELF,
-            BulkEmailTargetChoices.SEND_TO_STAFF,
-            BulkEmailTargetChoices.SEND_TO_LEARNERS
-        ]
-        course_email = create_course_email(
+        course_email = CourseEmail.create(
             self.course.id,
             self.instructor,
-            email_recipient_groups,
+            [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS],
             "Test Subject",
             "<p>This is a test message</p>"
         )
@@ -263,41 +228,6 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         instructor_task.save()
         with pytest.raises(AlreadyRunningError):
             api_call()
-
-    def _generate_scheduled_task(self, task_state=None):
-        return InstructorTaskFactory.create(
-            task_type=InstructorTaskTypes.BULK_COURSE_EMAIL,
-            course_id=self.course.id,
-            task_input="{'email_id': 1, 'to_option': ['myself']}",
-            task_key="3416a75f4cea9109507cacd8e2f2aefc",
-            task_id=str(uuid4()),
-            task_state=task_state if task_state else SCHEDULED,
-            task_output=None,
-            requester=self.instructor
-        )
-
-    def _generate_scheduled_task_schedule(self, task, due_date):
-        return InstructorTaskScheduleFactory.create(
-            task=task,
-            task_args=json.dumps(self._generate_task_args()),
-            task_due=due_date
-        )
-
-    def _generate_task_args(self):
-        """
-        Utility function that creates a sample `task_args` value for a scheduled task.
-        """
-        task_args = {
-            "request_info": {
-                "username": self.instructor.username,
-                "user_id": self.instructor.id,
-                "ip": "127.0.0.1",
-                "agent": "Mozilla",
-                "host": "localhost:18000"
-            },
-            "task_id": "622748b3-2831-432e-b519-4fde2706ca59"
-        }
-        return task_args
 
     def test_submit_bulk_email_all(self):
         email_id = self._define_course_email()
@@ -354,7 +284,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             submit_export_ora2_data(request, self.course.id)
 
             mock_submit_task.assert_called_once_with(
-                request, InstructorTaskTypes.EXPORT_ORA2_DATA, export_ora2_data, self.course.id, {}, '')
+                request, 'export_ora2_data', export_ora2_data, self.course.id, {}, '')
 
     def test_submit_export_ora2_submission_files(self):
         request = self.create_task_request(self.instructor)
@@ -365,7 +295,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
             mock_submit_task.assert_called_once_with(
                 request,
-                InstructorTaskTypes.EXPORT_ORA2_SUBMISSION_FILES,
+                'export_ora2_submission_files',
                 export_ora2_submission_files,
                 self.course.id,
                 {},
@@ -451,80 +381,9 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
             mock_submit_task.assert_called_once_with(
                 request,
-                InstructorTaskTypes.GENERATE_ANONYMOUS_IDS_FOR_COURSE,
+                'generate_anonymous_ids_for_course',
                 generate_anonymous_ids_for_course,
                 self.course.id,
                 {},
                 ''
             )
-
-    @patch("lms.djangoapps.instructor_task.api.schedule_task")
-    @patch("lms.djangoapps.instructor_task.api.submit_task")
-    def test_submit_bulk_course_email_with_schedule(self, mock_submit_task, mock_schedule_task):
-        """
-        A test to determine if the right helper function is being called when a scheduled task is being processed.
-        """
-        email_id = self._define_course_email()
-        schedule = datetime.datetime(2030, 8, 15, 8, 15, 12, 0, pytz.utc)
-        submit_bulk_course_email(
-            self.create_task_request(self.instructor),
-            self.course.id,
-            email_id,
-            schedule
-        )
-        mock_schedule_task.assert_called_once()
-        mock_submit_task.assert_not_called()
-
-    @patch("lms.djangoapps.instructor_task.api.submit_scheduled_task")
-    def test_process_scheduled_tasks(self, mock_submit_scheduled_task):
-        """
-        A test to verify the functionality of the `process_scheduled_tasks` function. This function determines which
-        scheduled instructor tasks are due for execution.
-
-        This test generates three scheduled tasks; one that has been processed, one that is due for processing, and one
-        that is due in the future. In this test, one only of these tasks should be eligible for processing.
-        """
-        base_date = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
-        executed_instructor_task = self._generate_scheduled_task(task_state=SUCCESS)
-        executed_instructor_task_due_date = base_date - datetime.timedelta(days=5)
-        self._generate_scheduled_task_schedule(executed_instructor_task, executed_instructor_task_due_date)
-
-        due_instructor_task = self._generate_scheduled_task()
-        due_instructor_task_due_date = base_date - datetime.timedelta(days=1)
-        due_instructor_task_schedule = self._generate_scheduled_task_schedule(
-            due_instructor_task,
-            due_instructor_task_due_date
-        )
-
-        future_instructor_task = self._generate_scheduled_task()
-        future_instructor_task_due_date = base_date + datetime.timedelta(days=15)
-        self._generate_scheduled_task_schedule(future_instructor_task, future_instructor_task_due_date)
-
-        expected_messages = [
-            f"Attempting to queue scheduled task with id '{due_instructor_task.id}'"
-        ]
-
-        with LogCapture() as log:
-            process_scheduled_instructor_tasks()
-
-        mock_submit_scheduled_task.assert_called_once_with(due_instructor_task_schedule)
-        log.check_present((LOG_PATH, "INFO", expected_messages[0]),)
-
-    @patch("lms.djangoapps.instructor_task.api.submit_scheduled_task", side_effect=QueueConnectionError("blammo!"))
-    def test_process_scheduled_tasks_expect_error(self, mock_scheduled_task):
-        """
-        A test that verifies the behavior of the `process_scheduled_tasks` function when there is an error processing
-        the request.
-        """
-        base_date = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
-        due_instructor_task = self._generate_scheduled_task()
-        due_instructor_task_due_date = base_date - datetime.timedelta(days=1)
-        self._generate_scheduled_task_schedule(due_instructor_task, due_instructor_task_due_date)
-        expected_messages = [
-            f"Error processing scheduled task with task id '{due_instructor_task.id}': blammo!",
-        ]
-
-        with LogCapture() as log:
-            process_scheduled_instructor_tasks()
-
-        log.check_present((LOG_PATH, "ERROR", expected_messages[0]),)

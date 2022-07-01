@@ -8,7 +8,7 @@ import ddt
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
-from openedx_events.learning.data import CourseDiscussionConfigurationData, DiscussionTopicContext
+from openedx.core.djangoapps.discussions.data import CourseDiscussionConfigurationData, DiscussionTopicContext
 from openedx.core.djangoapps.discussions.handlers import update_course_discussion_config
 from openedx.core.djangoapps.discussions.models import DiscussionTopicLink, DiscussionsConfiguration
 

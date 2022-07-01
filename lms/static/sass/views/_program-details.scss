@@ -235,11 +235,29 @@ $btn-color-primary: $primary-dark;
   }
 
   .program-details-content {
+    width: 100%;
     margin-bottom: 30px;
-    padding: {
-        left: 40px;
-        right: 40px;
-    };
+    padding: 30px 10px;
+
+    @include media-breakpoint-up(md) {
+      @include float(left);
+      padding: {
+        left: 30px;
+        right: 30px;
+      }
+
+      width: calc(100% - 330px);
+      position: relative;
+    }
+
+    @include media-breakpoint-up(lg) {
+      width: calc(100% - 510px);
+      max-width: 700px;
+    }
+
+    @media (min-width: map-get($container-max-widths, xl)) {
+      @include margin-left(calc((100% - 1180px) / 2));
+    }
   }
   .tab-content{
       .tab-pane {
@@ -301,20 +319,18 @@ $btn-color-primary: $primary-dark;
     display: flex;
     justify-content: flex-start;
     flex-direction: column;
-    margin-right: 48px;
 
     .program-heading-title {
       font-family: $font-family-sans-serif;
-      font-weight: 700;
+      font-weight: 600;
+      font-size: 1.3em;
+      color: $gray-base;
       margin-bottom: 5px;
       line-height: normal;
-      color: theme-color("primary") !important;
     }
 
     .program-heading-message {
-      font-weight: 400;
-      font-size: 18px;
-      line-height: 28px;
+      font-weight: 300;
     }
   }
 
@@ -436,6 +452,10 @@ $btn-color-primary: $primary-dark;
     &.complete-program {
       margin: 10px 15px 10px 5px;
       align-self: flex-start;
+
+      @include media-breakpoint-up(md) {
+        align-self: flex-end;
+      }
 
       .list-price {
         text-decoration: line-through;
@@ -673,11 +693,9 @@ $btn-color-primary: $primary-dark;
 
   .sidebar-button-wrapper {
     text-align: right;
+
     .sidebar-button {
       font-size: 0.9375em;
-      background: transparent;
-      border: 1px solid;
-      padding: 10px 16px;
     }
   }
 

@@ -167,6 +167,11 @@ def calculate(request):
     return HttpResponse(json.dumps({'result': str(result)}))  # lint-amnesty, pylint: disable=http-response-with-json-dumps
 
 
+def info(request):
+    """ Info page (link from main header) """
+    return render_to_response("info.html", {})
+
+
 def add_p3p_header(view_func):
     """
     This decorator should only be used with views which may be displayed through the iframe.

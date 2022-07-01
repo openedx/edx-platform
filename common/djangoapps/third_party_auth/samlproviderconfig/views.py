@@ -2,8 +2,7 @@
 Viewset for auth/saml/v0/samlproviderconfig
 """
 
-from django.shortcuts import get_list_or_404
-from django.db.utils import IntegrityError
+from django.shortcuts import get_object_or_404
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import permissions, viewsets, status
@@ -55,33 +54,12 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         """
         if self.requested_enterprise_uuid is None:
             raise ParseError('Required enterprise_customer_uuid is missing')
-        enterprise_customer_idps = get_list_or_404(
+        enterprise_customer_idp = get_object_or_404(
             EnterpriseCustomerIdentityProvider,
             enterprise_customer__uuid=self.requested_enterprise_uuid
         )
-        slug_list = [idp.provider_id for idp in enterprise_customer_idps]
-        saml_config_ids = [
-            config.id for config in SAMLProviderConfig.objects.current_set() if config.provider_id in slug_list
-        ]
-        return SAMLProviderConfig.objects.filter(id__in=saml_config_ids)
-
-    def destroy(self, request, *args, **kwargs):
-        saml_provider_config = self.get_object()
-        config_id = saml_provider_config.id
-        provider_config_provider_id = saml_provider_config.provider_id
-        customer_uuid = self.requested_enterprise_uuid
-        try:
-            enterprise_customer = EnterpriseCustomer.objects.get(pk=customer_uuid)
-        except EnterpriseCustomer.DoesNotExist:
-            raise ValidationError(f'Enterprise customer not found at uuid: {customer_uuid}')  # lint-amnesty, pylint: disable=raise-missing-from
-
-        enterprise_saml_provider = EnterpriseCustomerIdentityProvider.objects.filter(
-            enterprise_customer=enterprise_customer,
-            provider_id=provider_config_provider_id,
-        )
-        enterprise_saml_provider.delete()
-        SAMLProviderConfig.objects.filter(id=saml_provider_config.id).update(archived=True, enabled=False)
-        return Response(data=config_id, status=status.HTTP_200_OK)
+        return SAMLProviderConfig.objects.current_set().filter(
+            slug=convert_saml_slug_provider_id(enterprise_customer_idp.provider_id))
 
     @property
     def requested_enterprise_uuid(self):
@@ -120,12 +98,9 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
             raise ValidationError(f'Enterprise customer not found at uuid: {customer_uuid}')  # lint-amnesty, pylint: disable=raise-missing-from
 
         # Create the samlproviderconfig model first
-        try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-        except IntegrityError as exc:
-            return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
 
         # Associate the enterprise customer with the provider
         association_obj = EnterpriseCustomerIdentityProvider(

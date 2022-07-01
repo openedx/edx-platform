@@ -1,0 +1,177 @@
+def runBokchoyTests() {
+    // Determine git refspec, branch, and clone type
+    git_shallow_clone = true
+    if (env.ghprbActualCommit) {
+        git_branch = "${ghprbActualCommit}"
+        git_refspec = "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
+    } else {
+        git_branch = "${BRANCH_NAME}"
+        git_refspec = "+refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}"
+    }
+    sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
+            doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
+            noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+            refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
+        sh 'bash scripts/all-tests.sh'
+        stash includes: 'reports/bok_choy/*coverage*', name: "${TEST_SUITE}-reports-${SHARD}", allowEmpty: true
+    }
+}
+
+def bokchoyTestCleanup() {
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/bok_choy/*.coverage*,test_root/log/**/*.log,test_root/log/**/*.png,reports/bok_choy/**/xunit.xml'
+    junit '**/reports/bok_choy/**/xunit.xml'
+    sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
+}
+
+def shardCount = 25
+
+pipeline {
+    agent { label "jenkins-worker" }
+    options {
+        sendSplunkConsoleLog()
+        timestamps()
+        timeout(60)
+    }
+    environment {
+        WTW_CONTEXT = "bokchoy"
+    }
+    stages {
+        stage('Mark build as pending on Github') {
+            when {
+                 // Only run github-build-status for master builds
+                 expression { env.ghprbActualCommit == null }
+            }
+            steps {
+                script {
+                    commit_sha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    build job: 'github-build-status',
+                        parameters: [
+                            string(name: 'GIT_SHA', value: commit_sha),
+                            string(name: 'GITHUB_ORG', value: 'edx'),
+                            string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
+                            string(name: 'TARGET_URL', value: "${BUILD_URL}"),
+                            string(name: 'DESCRIPTION', value: 'Pending'),
+                            string(name: 'CONTEXT', value: "${GITHUB_CONTEXT}"),
+                            string(name: 'CREATE_DEPLOYMENT', value: 'false'),
+                            string(name: 'BUILD_STATUS', value: 'pending')
+                        ],
+                        propagate: false, wait: false
+                }
+            }
+        }
+        stage("Run tests") {
+            steps {
+                script {
+                    def parallel_stages = [:]
+                    for (int i = 1; i <= shardCount; i++) {
+                        int index = i
+                        parallel_stages["${index}"] = {
+                            node('jenkins-worker') {
+                                withEnv(["SHARD=${index}","TEST_SUITE=bok-choy"]) {
+                                    try {
+                                        stage("Bokchoy shard: ${index}") {
+                                            runBokchoyTests()
+                                        }
+                                    } finally {
+                                        bokchoyTestCleanup()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    parallel parallel_stages
+                }
+            }
+        }
+        stage("Combine Coverage") {
+            when {
+                // Only combine coverage during context-collection
+                environment name: 'COLLECT_WHO_TESTS_WHAT', value: 'true'
+            }
+            steps {
+                script {
+                    sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                        try {
+                            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
+                                doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
+                                noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                                refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
+
+                            for (int i = 1; i <= shardCount; i++) {
+                                unstash "bok-choy-reports-${i}"
+                            }
+                            sh """
+                            export TEST_SUITE=bok-choy
+                            source scripts/jenkins-common.sh
+                            paver coverage --rcfile=common/test/acceptance/.coveragerc
+                            paver upload_coverage_to_s3
+                            """
+                        } finally {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
+                            sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                if (env.ghprbPullId != null) {
+                    // For PR jobs, run the edx-platform-test-notifier for PR reporting
+                    build job: 'edx-platform-test-notifier', parameters: [string(name: 'REPO', value: "${REPO_NAME}"), string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
+                } else {
+                    // For master jobs run github-build-status and report to slack when necessary
+                    if (currentBuild.currentResult == "SUCCESS") {
+                        create_deployment = "true"
+                        build_status = "success"
+                        build_description = "Build Passed"
+                    }
+                    else {
+                        create_deployment = "false"
+                        build_status = "failure"
+                        build_description = "Build Failed"
+                    }
+
+                    commit_sha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    build job: 'github-build-status',
+                        parameters: [
+                            string(name: 'GIT_SHA', value: commit_sha),
+                            string(name: 'GITHUB_ORG', value: 'edx'),
+                            string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
+                            string(name: 'TARGET_URL', value: "${BUILD_URL}"),
+                            string(name: 'DESCRIPTION', value: build_description),
+                            string(name: 'CONTEXT', value: "${GITHUB_CONTEXT}"),
+                            string(name: 'CREATE_DEPLOYMENT', value: create_deployment),
+                            string(name: 'BUILD_STATUS', value: build_status)
+                        ],
+                        propagate: false, wait: false
+
+                    if (currentBuild.currentResult != "SUCCESS"){
+                        slackSend botUser: true,
+                            message: "`${JOB_NAME}` #${BUILD_NUMBER}: ${currentBuild.currentResult} after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
+
+                        email_body = "See: <${BUILD_URL}>\n\nChanges:\n"
+                        change_sets = currentBuild.changeSets
+                        for (int j = 0; j < change_sets.size(); j++) {
+                            change_set_items = change_sets[j].items
+                            for (int k = 0; k < change_set_items.length; k++) {
+                                item = change_set_items[k]
+                                email_body = email_body + "\n Commit: ${item.commitId} by ${item.author}: ${item.msg}"
+                            }
+                        }
+                        emailext body: email_body,
+                            subject: "Build failed in Jenkins: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
+                    } else if (currentBuild.currentResult == "SUCCESS" && currentBuild.previousBuild.currentResult != "SUCCESS") {
+                        slackSend botUser: true,
+                            message: "`${JOB_NAME}` #${BUILD_NUMBER}: Back to normal after ${currentBuild.durationString.replace(' and counting', '')}\\n${BUILD_URL}"
+                        emailext body: "See <${BUILD_URL}>",
+                            subject: "Jenkins Build is back to normal: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
+                    }
+                }
+            }
+        }
+    }
+}

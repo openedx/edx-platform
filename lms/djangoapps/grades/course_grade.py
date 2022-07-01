@@ -41,18 +41,6 @@ class CourseGradeBase:
             self.passed,
         )
 
-    def update(self, visible_grades_only=False, has_staff_access=False):
-        """
-        Recalculates the grade for the course, with the given parameters.
-
-        Also updates subsection grades if self.force_update_subsections is true.
-
-        Arguments:
-            visible_grades_only: Only considers grades the user can see (via show_correctness subsection field)
-            has_staff_access: Used to help determine which grades are visible (if visible_grades_only=True)
-        """
-        return self
-
     @property
     def attempted(self):
         """
@@ -83,7 +71,8 @@ class CourseGradeBase:
         )
         return self._get_subsection_grade(subsection)
 
-    def graded_subsections_by_format(self, visible_grades_only=False, has_staff_access=False):
+    @lazy
+    def graded_subsections_by_format(self):
         """
         Returns grades for the subsections in the course in
         a dict keyed by subsection format types.
@@ -91,8 +80,7 @@ class CourseGradeBase:
         subsections_by_format = defaultdict(OrderedDict)
         for chapter in self.chapter_grades.values():
             for subsection_grade in chapter['sections']:
-                is_visible = not visible_grades_only or subsection_grade.show_grades(has_staff_access)
-                if subsection_grade.graded and is_visible:
+                if subsection_grade.graded:
                     graded_total = subsection_grade.graded_total
                     if graded_total.possible > 0:
                         subsections_by_format[subsection_grade.format][subsection_grade.location] = subsection_grade
@@ -168,14 +156,14 @@ class CourseGradeBase:
             possible += child_possible
         return earned, possible
 
-    def grader_result(self, visible_grades_only=False, has_staff_access=False):
+    @lazy
+    def grader_result(self):
         """
         Returns the result from the course grader.
         """
         course = self._prep_course_for_grading(self.course_data.course)
         return course.grader.grade(
-            self.graded_subsections_by_format(visible_grades_only=visible_grades_only,
-                                              has_staff_access=has_staff_access),
+            self.graded_subsections_by_format,
             generate_random_scores=settings.GENERATE_PROFILE_SCORES,
         )
 
@@ -186,7 +174,7 @@ class CourseGradeBase:
         DEPRECATED: To be removed as part of TNL-5291.
         """
         # TODO(TNL-5291) Remove usages of this deprecated property.
-        grade_summary = self.grader_result()
+        grade_summary = self.grader_result
         grade_summary['percent'] = self.percent
         grade_summary['grade'] = self.letter_grade
         return grade_summary
@@ -271,10 +259,11 @@ class CourseGrade(CourseGradeBase):
         super().__init__(user, course_data, *args, **kwargs)
         self._subsection_grade_factory = SubsectionGradeFactory(user, course_data=course_data)
 
-    def update(self, visible_grades_only=False, has_staff_access=False):
+    def update(self):
         """
         Updates the grade for the course. Also updates subsection grades
-        if self.force_update_subsections is true, via the call to self.grader_result.
+        if self.force_update_subsections is true, via the lazy call
+        to self.grader_result.
         """
         # TODO update this code to be more functional and readable.
         # Currently, it is hard to follow since there are plenty of
@@ -282,8 +271,7 @@ class CourseGrade(CourseGradeBase):
         # can be passed through and not confusingly stored and used
         # at a later time.
         grade_cutoffs = self.course_data.course.grade_cutoffs
-        grader_result = self.grader_result(visible_grades_only=visible_grades_only, has_staff_access=has_staff_access)
-        self.percent = self._compute_percent(grader_result)
+        self.percent = self._compute_percent(self.grader_result)
         self.letter_grade = self._compute_letter_grade(grade_cutoffs, self.percent)
         self.passed = self._compute_passed(grade_cutoffs, self.percent)
         return self

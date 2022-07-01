@@ -48,4 +48,4 @@ class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
         content = json.loads(response.content.decode('utf-8'))
         access_token = content['access_token']
         assert content['scope'] == data['scope']
-        self.assert_valid_jwt_access_token(access_token, self.user, scopes, grant_type='client-credentials')
+        self.assert_valid_jwt_access_token(access_token, self.user, scopes)

@@ -2,18 +2,14 @@
 
 
 import json
-import logging
 from time import time
 
 from django.conf import settings
-from edx_django_utils.monitoring import set_custom_attribute
 from edx_rbac.utils import create_role_auth_claim_for_user
 from jwkest import jwk
 from jwkest.jws import JWS
 
 from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
-
-log = logging.getLogger(__name__)
 
 
 def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None, scopes=None):
@@ -47,14 +43,13 @@ def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None, sco
     )
 
 
-def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
+def create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=None):
     """
-    Returns a JWT access token dict based on the provided access token.
+    Returns a JWT created from the given access token.
 
     Arguments:
         token_dict (dict): An access token structure as returned from an
-            underlying OAuth provider. Dict includes "access_token",
-            "expires_in", "token_type", and "scope".
+            underlying OAuth provider.
 
     Deprecated Arguments (to be removed):
         oauth_adapter (DOPAdapter|DOTAdapter): An OAuth adapter that will
@@ -66,63 +61,15 @@ def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
     access_token = oauth_adapter.get_access_token(token_dict['access_token'])
     client = oauth_adapter.get_client_for_token(access_token)
 
-    jwt_expires_in = _get_jwt_access_token_expire_seconds()
-    try:
-        grant_type = access_token.application.authorization_grant_type
-    except Exception:  # pylint: disable=broad-except
-        # TODO: Remove this broad except if proven this doesn't happen.
-        grant_type = 'unknown-error'
-        log.exception('Unable to get grant_type from access token.')
-
-    # .. custom_attribute_name: create_jwt_grant_type
-    # .. custom_attribute_description: The grant type of the newly created JWT.
-    set_custom_attribute('create_jwt_grant_type', grant_type)
-
-    jwt_access_token = _create_jwt(
+    # TODO (ARCH-204) put access_token as a JWT ID claim (jti)
+    return _create_jwt(
         access_token.user,
         scopes=token_dict['scope'].split(' '),
-        expires_in=jwt_expires_in,
+        expires_in=token_dict['expires_in'],
         use_asymmetric_key=use_asymmetric_key,
         is_restricted=oauth_adapter.is_client_restricted(client),
         filters=oauth_adapter.get_authorization_filters(client),
-        grant_type=grant_type,
     )
-
-    jwt_token_dict = token_dict.copy()
-    # Note: only "scope" is not overwritten at this point.
-    jwt_token_dict.update({
-        "access_token": jwt_access_token,
-        "token_type": "JWT",
-        "expires_in": jwt_expires_in,
-    })
-    return jwt_token_dict
-
-
-def create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=None):
-    """
-    Returns a JWT created from the provided access token dict.
-
-    Note: if you need the token dict, and not just the JWT, use
-        create_jwt_token_dict instead. See its docs for more details.
-    """
-    jwt_token_dict = create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key)
-    return jwt_token_dict["access_token"]
-
-
-def _get_jwt_access_token_expire_seconds():
-    """
-    Returns the number of seconds before a JWT access token expires.
-
-    .. setting_name: JWT_ACCESS_TOKEN_EXPIRE_SECONDS
-    .. setting_default: 60 * 60
-    .. setting_description: The number of seconds a JWT access token remains valid. We use this
-        custom setting for JWT formatted access tokens, rather than the django-oauth-toolkit setting
-        ACCESS_TOKEN_EXPIRE_SECONDS, because the JWT is non-revocable and we want it to be shorter
-        lived than the legacy Bearer (opaque) access tokens, and thus to have a smaller default.
-    .. setting_warning: For security purposes, 1 hour (the default) is the maximum recommended setting
-        value. For tighter security, you can use a shorter amount of time.
-    """
-    return getattr(settings, 'JWT_ACCESS_TOKEN_EXPIRE_SECONDS', 60 * 60)
 
 
 def _create_jwt(
@@ -135,7 +82,6 @@ def _create_jwt(
     additional_claims=None,
     use_asymmetric_key=None,
     secret=None,
-    grant_type=None,
 ):
     """
     Returns an encoded JWT (string).
@@ -148,7 +94,6 @@ def _create_jwt(
         expires_in (int): Optional. Overrides time to token expiry, specified in seconds.
         filters (list): Optional. Filters to include in the JWT.
         is_restricted (Boolean): Whether the client to whom the JWT is issued is restricted.
-        grant_type (str): grant type of the new JWT token.
 
     Deprecated Arguments (to be removed):
         aud (string): Optional. Overrides configured JWT audience claim.
@@ -169,7 +114,6 @@ def _create_jwt(
         # TODO (ARCH-204) Consider getting rid of the 'aud' claim since we don't use it.
         'aud': aud if aud else settings.JWT_AUTH['JWT_AUDIENCE'],
         'exp': exp,
-        'grant_type': grant_type or '',
         'iat': iat,
         'iss': settings.JWT_AUTH['JWT_ISSUER'],
         'preferred_username': user.username,

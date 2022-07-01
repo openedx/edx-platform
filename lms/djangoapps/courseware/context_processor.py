@@ -5,11 +5,8 @@ This is meant to simplify the process of sending user preferences (espec. time_z
 to the templates without having to append every view file.
 
 """
-import string
 
-from django.utils.translation import get_language
 from pytz import timezone
-from pytz.exceptions import UnknownTimeZoneError
 
 from edx_django_utils.cache import TieredCache
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
@@ -41,7 +38,7 @@ def user_timezone_locale_prefs(request):
     if not cached_value:
         user_prefs = {
             'user_timezone': None,
-            'user_language': get_language(),
+            'user_language': None,
         }
         if hasattr(request, 'user') and request.user.is_authenticated:
             try:
@@ -84,19 +81,11 @@ def get_user_timezone_or_last_seen_timezone_or_utc(user):
     Helper method for returning a reasonable timezone for a user.
     This method returns the timezone in the user's account if that is set.
     If that is not set, it returns a recent timezone that we have recorded from a user's visit to the courseware.
-    If that is not set or the timezone is unknown, it returns UTC.
+    If that is not set, it returns UTC.
     """
     user_timezone = (
         get_user_preference(user, 'time_zone') or
         get_last_seen_courseware_timezone(user) or
         'UTC'
     )
-    # We have seen non-printable characters (i.e. \x00) showing up in the
-    # user_timezone (I believe via the get_last_seen_courseware_timezone method).
-    # This sanitizes the user_timezone before passing it in.
-    user_timezone = filter(lambda l: l in string.printable, user_timezone)
-    user_timezone = ''.join(user_timezone)
-    try:
-        return timezone(user_timezone)
-    except UnknownTimeZoneError as err:
-        return timezone('UTC')
+    return timezone(user_timezone)

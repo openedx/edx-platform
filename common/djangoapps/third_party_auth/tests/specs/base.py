@@ -789,7 +789,11 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         post_request = self._get_login_post_request(strategy)
         self.assert_json_failure_response_is_missing_social_auth(login_user(post_request))
 
+    @django_utils.override_settings(ENABLE_REQUIRE_THIRD_PARTY_AUTH=True)
     def test_signin_associates_user_if_oauth_provider_and_tpa_is_required(self):
+        """
+        Tests associate user by email with oauth provider and `ENABLE_REQUIRE_THIRD_PARTY_AUTH` enabled
+        """
         username, email, password = self.get_username(), 'user@example.com', 'password'
 
         _, strategy = self.get_request_and_strategy(
@@ -916,12 +920,12 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         strategy.storage.user.create_user(username=self.get_username(), email='user@email.com', password='password')
         backend = strategy.request.backend
         backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        # If learner already has an account then make sure login page is served instead of registration.
         # pylint: disable=protected-access
-        response = actions.do_complete(backend, social_views._do_login, request=request)
-        assert response.status_code == 302
-
-        response = json.loads(create_account(strategy.request).content.decode('utf-8'))
-        assert response['username'] != original_username
+        self.assert_redirect_to_login_looks_correct(actions.do_complete(backend, social_views._do_login,
+                                                                        request=request))
+        distinct_username = pipeline.get(request)['kwargs']['username']
+        assert original_username != distinct_username
 
     def test_new_account_registration_fails_if_email_exists(self):
         request, strategy = self.get_request_and_strategy(

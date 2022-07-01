@@ -1,9 +1,9 @@
 <course>
   <chapter url_name="Overview">
-    <sequential url_name="Toy_Videos">
+    <videosequence url_name="Toy_Videos">
       <html url_name="toylab"/>
       <video url_name="Video_Resources" youtube_id_1_0="1bK-WdDi6Qw"/>
-    </sequential>
+    </videosequence>
     <video url_name="Welcome" youtube_id_1_0="p2Q6BrNhdh8"/>
   </chapter>
   <chapter url_name="Ch2">

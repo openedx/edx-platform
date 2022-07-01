@@ -38,6 +38,6 @@ class ShowAnswerFieldOverride(FieldOverrideProvider):
         return mapping.get(current_show_answer_value, default)
 
     @classmethod
-    def enabled_for(cls, course):  # pylint: disable=arguments-differ
+    def enabled_for(cls, course):
         """ Enabled only for Self-Paced courses using Personalized User Schedules. """
         return course and course.self_paced and RELATIVE_DATES_FLAG.is_enabled(course.id)

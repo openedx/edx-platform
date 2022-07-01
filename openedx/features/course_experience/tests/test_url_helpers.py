@@ -284,4 +284,4 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
         path = url.split('?')[0]
         assert path == expected_path
         course_run = self.items[store_type]['course_run']
-        mock_mfe_is_active.assert_called_once()
+        mock_mfe_is_active.assert_called_once_with(course_run.id)

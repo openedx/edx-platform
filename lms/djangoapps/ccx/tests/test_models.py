@@ -43,7 +43,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_course_caching(self):
         """verify that caching the propery works to limit queries"""
-        with check_mongo_calls(2):
+        with check_mongo_calls(3):
             # these statements are used entirely to demonstrate the
             # instance-level caching of these values on CCX objects. The
             # check_mongo_calls context is the point here.
@@ -69,7 +69,7 @@ class TestCCX(ModuleStoreTestCase):
         """verify that caching the start property works to limit queries"""
         now = datetime.now(utc)
         self.set_ccx_override('start', now)
-        with check_mongo_calls(2):
+        with check_mongo_calls(3):
             # these statements are used entirely to demonstrate the
             # instance-level caching of these values on CCX objects. The
             # check_mongo_calls context is the point here.
@@ -94,7 +94,7 @@ class TestCCX(ModuleStoreTestCase):
         """verify that caching the due property works to limit queries"""
         expected = datetime.now(utc)
         self.set_ccx_override('due', expected)
-        with check_mongo_calls(2):
+        with check_mongo_calls(3):
             # these statements are used entirely to demonstrate the
             # instance-level caching of these values on CCX objects. The
             # check_mongo_calls context is the point here.

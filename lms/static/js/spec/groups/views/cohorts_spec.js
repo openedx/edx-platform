@@ -14,15 +14,14 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
             var catLoversInitialCount = 123,
                 dogLoversInitialCount = 456,
                 unknownUserMessage,
-                notAllowedUserMessage,
                 invalidEmailMessage, createMockCohort, createMockCohorts, createMockContentGroups,
-                createMockCohortSettingsJson,
+                createMockCohortSettingsJson, createMockVerifiedTrackCohortsJson, flushVerifiedTrackCohortRequests,
                 createCohortsView, cohortsView, requests, respondToRefresh, verifyMessage, verifyNoMessage,
-                verifyDetailedMessage, verifyHeader,
+                verifyDetailedMessage, verifyHeader, verifyVerifiedTrackMessage, verifyVerifiedTrackUIUpdates,
                 expectCohortAddRequest, getAddModal, selectContentGroup, clearContentGroup,
                 saveFormAndExpectErrors, createMockCohortSettings, MOCK_COHORTED_USER_PARTITION_ID,
                 MOCK_UPLOAD_COHORTS_CSV_URL, MOCK_STUDIO_ADVANCED_SETTINGS_URL, MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
-                MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT;
+                MOCK_VERIFIED_TRACK_COHORTING_URL, MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT;
 
             MOCK_MANUAL_ASSIGNMENT = 'manual';
             MOCK_RANDOM_ASSIGNMENT = 'random';
@@ -30,6 +29,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
             MOCK_UPLOAD_COHORTS_CSV_URL = 'http://upload-csv-file-url/';
             MOCK_STUDIO_ADVANCED_SETTINGS_URL = 'http://studio/settings/advanced';
             MOCK_STUDIO_GROUP_CONFIGURATIONS_URL = 'http://studio/group_configurations';
+            MOCK_VERIFIED_TRACK_COHORTING_URL = 'http://courses/foo/verified_track_content/settings';
 
             createMockCohort = function(name, id, userCount, groupId, userPartitionId, assignmentType) {
                 return {
@@ -75,6 +75,17 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 );
             };
 
+            createMockVerifiedTrackCohortsJson = function(enabled) {
+                if (enabled) {
+                    return {
+                        enabled: true,
+                        verified_cohort_name: 'Verified Track'
+                    };
+                } else {
+                    return {enabled: false};
+                }
+            };
+
             createCohortsView = function(test, options) {
                 var cohortsJson, cohorts, contentGroups, cohortSettings;
                 options = options || {};
@@ -94,6 +105,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         uploadCohortsCsvUrl: MOCK_UPLOAD_COHORTS_CSV_URL,
                         studioAdvancedSettingsUrl: MOCK_STUDIO_ADVANCED_SETTINGS_URL,
                         studioGroupConfigurationsUrl: MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
+                        verifiedTrackCohortingUrl: MOCK_VERIFIED_TRACK_COHORTING_URL
                     }
                 });
 
@@ -102,6 +114,20 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     cohortsView.$('.cohort-select').val(options.selectCohort.toString()).change();
                 }
 
+                flushVerifiedTrackCohortRequests(options.enableVerifiedTrackCohorting);
+            };
+
+            // Flush out all requests to get verified track cohort information.
+            // The order relative to other requests is not important to encode,
+            // and for pre-existing test cases, we don't care about these additional requests.
+            flushVerifiedTrackCohortRequests = function(enableVerifiedTrackCohorting) {
+                for (var i = requests.length - 1; i >= 0; i--) {
+                    if (requests[i].url === MOCK_VERIFIED_TRACK_COHORTING_URL) {
+                        AjaxHelpers.respondWithJson(
+                            requests, createMockVerifiedTrackCohortsJson(enableVerifiedTrackCohorting), i
+                        );
+                    }
+                }
             };
 
             respondToRefresh = function(catCount, dogCount) {
@@ -153,6 +179,26 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
 
             verifyNoMessage = function() {
                 expect(cohortsView.$('.message').length).toBe(0);
+            };
+
+            verifyVerifiedTrackMessage = function(type, expectedText) {
+                if (type) {
+                    expect($('.message').length).toBe(1);
+                    expect($('.message-' + type).length).toBe(1);
+                    expect($('.message-title').text()).toContain(expectedText);
+                } else {
+                    expect($('.message').length).toBe(0);
+                }
+            };
+
+            verifyVerifiedTrackUIUpdates = function(enableCohortsCheckbox, disableCohortNameField) {
+                expect(cohortsView.$('.cohorts-state').prop('disabled')).toBe(enableCohortsCheckbox);
+                // Select settings tab
+                if (disableCohortNameField !== undefined) {
+                    cohortsView.$('.cohort-select').val('1').change();
+                    cohortsView.$('.tab-settings a').click();
+                    expect(cohortsView.$('.cohort-name').prop('readonly')).toBe(disableCohortNameField);
+                }
             };
 
             verifyDetailedMessage = function(expectedTitle, expectedMessageType, expectedDetails, expectedAction) {
@@ -209,10 +255,6 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
 
             invalidEmailMessage = function(name) {
                 return 'Invalid email address: ' + name;
-            };
-
-            notAllowedUserMessage = function(email) {
-                return 'Cohort assignment not allowed: ' + email;
             };
 
             beforeEach(function() {
@@ -296,6 +338,53 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     createCohortsView(this, {selectCohort: 1});
                     cohortsView.$('.cohort-select').val('2').change();
                     verifyHeader(2, 'Dog Lovers', dogLoversInitialCount);
+                });
+            });
+
+            describe('Verified Track Cohorting Settings View', function() {
+                it('displays no message if the feature is disabled', function() {
+                    createCohortsView(this);
+                    verifyVerifiedTrackMessage(false);
+                    verifyVerifiedTrackUIUpdates(false, false);
+                });
+
+                it('displays a confirmation if the feature is enabled and a verified track cohort exists', function() {
+                    var cohortName = 'Verified Track';
+                    createCohortsView(this, {
+                        cohorts: [
+                            {
+                                id: 1,
+                                name: cohortName,
+                                assignment_type: MOCK_MANUAL_ASSIGNMENT,
+                                group_id: 111,
+                                user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
+                            }
+                        ],
+                        enableVerifiedTrackCohorting: true
+                    });
+                    verifyVerifiedTrackMessage(
+                        'confirmation', 'automatic cohorting for verified track learners. You cannot disable cohorts'
+                    );
+                    verifyVerifiedTrackUIUpdates(true, true);
+                });
+
+                it('displays an error if no verified track cohort exists', function() {
+                    createCohortsView(this, {enableVerifiedTrackCohorting: true});
+                    verifyVerifiedTrackMessage(
+                        'error', 'cohorting enabled for verified track learners, but the required cohort does not exist'
+                    );
+                    verifyVerifiedTrackUIUpdates(true, false);
+                });
+
+                it('displays an error if cohorting is disabled', function() {
+                    createCohortsView(this, {
+                        cohortSettings: createMockCohortSettings(false),
+                        enableVerifiedTrackCohorting: true
+                    });
+                    verifyVerifiedTrackMessage(
+                        'error', 'automatic cohorting enabled for verified track learners, but cohorts are disabled'
+                    );
+                    verifyVerifiedTrackUIUpdates(false);
                 });
             });
 
@@ -607,7 +696,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 respondToAdd = function(result) {
                     AjaxHelpers.respondWithJson(
                         requests,
-                        _.extend({unknown: [], added: [], present: [], changed: [], not_allowed: [],
+                        _.extend({unknown: [], added: [], present: [], changed: [],
                             success: true, preassigned: [], invalid: []}, result)
                     );
                 };
@@ -675,19 +764,6 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     );
                 });
 
-                it('shows an error when user assignment not allowed', function() {
-                    createCohortsView(this, {selectCohort: 1});
-                    addStudents('not_allowed');
-                    AjaxHelpers.expectRequest(
-                        requests, 'POST', '/mock_service/cohorts/1/add', 'users=not_allowed'
-                    );
-                    respondToAdd({not_allowed: ['not_allowed']});
-                    respondToRefresh(catLoversInitialCount, dogLoversInitialCount);
-                    verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
-                    verifyDetailedMessage('There was an error when trying to add learners:', 'error',
-                        [notAllowedUserMessage('not_allowed')]
-                    );
-                });
 
                 it('shows a "view all" button when more than 5 students do not exist', function() {
                     var sixUsers = 'unknown1, unknown2, unknown3, unknown4, unknown5, unknown6';

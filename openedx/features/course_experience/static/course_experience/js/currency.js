@@ -28,18 +28,7 @@ export class Currency {  // eslint-disable-line import/prefer-default-export
   }
 
   getCountry() {
-    try {
-      this.countryL10nData = JSON.parse($.cookie('edx-price-l10n'));
-    } catch (e) {
-      if (e instanceof SyntaxError) {
-        // If cookie isn't proper JSON, log but continue. This will show the purchase experience
-        // in a non-local currency but will not prevent the user from interacting with the page.
-        console.error(e);
-        console.error("Ignoring malformed 'edx-price-l10n' cookie.");
-      } else {
-        throw e;
-      }
-    }
+    this.countryL10nData = JSON.parse($.cookie('edx-price-l10n'));
     if (this.countryL10nData) {
       window.analytics.track('edx.bi.user.track_selection.local_currency_cookie_set');
       this.setPrice();

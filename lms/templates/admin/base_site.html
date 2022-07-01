@@ -15,8 +15,5 @@
             <a href="{{ docsroot }}">{% trans 'Documentation' as tmsg%}{{tmsg|force_escape}}</a> /
         {% endif %}
     {% endif %}
-
-    <a href="{% url 'logout' %}">{% trans 'Log out' as tmsg%}{{tmsg|force_escape}}</a>
-
-
+    <a href="{% url 'admin:logout' %}">{% trans 'Log out' as tmsg%}{{tmsg|force_escape}}</a>
 {% endblock %}

@@ -2,12 +2,11 @@
 APIs providing support for enterprise functionality.
 """
 
+
 import logging
 import traceback
 from functools import wraps
-from urllib.parse import urljoin
 
-import requests
 from crum import get_current_request
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -19,8 +18,8 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
-from edx_rest_api_client.auth import SuppliedJwtAuth
-from requests.exceptions import HTTPError
+from edx_rest_api_client.client import EdxRestApiClient
+from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
 
 from common.djangoapps.third_party_auth.pipeline import get as get_partial_pipeline
 from common.djangoapps.third_party_auth.provider import Registry
@@ -71,12 +70,13 @@ class ConsentApiClient:
         provided user.
         """
         jwt = create_jwt_for_user(user)
-        base_api_url = configuration_helpers.get_value(
-            'ENTERPRISE_CONSENT_API_URL', settings.ENTERPRISE_CONSENT_API_URL
+        url = configuration_helpers.get_value('ENTERPRISE_CONSENT_API_URL', settings.ENTERPRISE_CONSENT_API_URL)
+        self.client = EdxRestApiClient(
+            url,
+            jwt=jwt,
+            append_slash=False,
         )
-        self.client = requests.Session()
-        self.client.auth = SuppliedJwtAuth(jwt)
-        self.consent_endpoint = urljoin(f"{base_api_url}/", "data_sharing_consent")
+        self.consent_endpoint = self.client.data_sharing_consent
 
     def revoke_consent(self, **kwargs):
         """
@@ -85,9 +85,7 @@ class ConsentApiClient:
         This endpoint takes any given kwargs, which are understood as filtering the
         conceptual scope of the consent involved in the request.
         """
-        response = self.client.delete(self.consent_endpoint, json=kwargs)
-        response.raise_for_status()
-        return response.json()
+        return self.consent_endpoint.delete(**kwargs)
 
     def provide_consent(self, **kwargs):
         """
@@ -96,9 +94,7 @@ class ConsentApiClient:
         This endpoint takes any given kwargs, which are understood as filtering the
         conceptual scope of the consent involved in the request.
         """
-        response = self.client.post(self.consent_endpoint, json=kwargs)
-        response.raise_for_status()
-        return response.json()
+        return self.consent_endpoint.post(kwargs)
 
     def consent_required(self, enrollment_exists=False, **kwargs):
         """
@@ -109,9 +105,7 @@ class ConsentApiClient:
         """
 
         # Call the endpoint with the given kwargs, and check the value that it provides.
-        response = self.client.get(self.consent_endpoint, params=kwargs)
-        response.raise_for_status()
-        response = response.json()
+        response = self.consent_endpoint.get(**kwargs)
 
         LOGGER.info(
             '[ENTERPRISE DSC] Consent Requirement Info. APIParams: [%s], APIResponse: [%s], EnrollmentExists: [%s]',
@@ -155,21 +149,19 @@ class EnterpriseApiClient:
 
     def __init__(self, user):
         """
-        Initialize an authenticated Enterprise service API client.
-
-        Authentificate by jwt token using the provided user.
+        Initialize an authenticated Enterprise service API client by using the
+        provided user.
         """
         self.user = user
         jwt = create_jwt_for_user(user)
-        self.base_api_url = configuration_helpers.get_value('ENTERPRISE_API_URL', settings.ENTERPRISE_API_URL)
-        self.client = requests.Session()
-        self.client.auth = SuppliedJwtAuth(jwt)
+        self.client = EdxRestApiClient(
+            configuration_helpers.get_value('ENTERPRISE_API_URL', settings.ENTERPRISE_API_URL),
+            jwt=jwt
+        )
 
     def get_enterprise_customer(self, uuid):
-        api_url = urljoin(f"{self.base_api_url}/", f"enterprise-customer/{uuid}/")
-        response = self.client.get(api_url)
-        response.raise_for_status()
-        return response.json()
+        endpoint = getattr(self.client, 'enterprise-customer')
+        return endpoint(uuid).get()
 
     def post_enterprise_course_enrollment(self, username, course_id):
         """
@@ -179,11 +171,10 @@ class EnterpriseApiClient:
             'username': username,
             'course_id': course_id,
         }
-        api_url = urljoin(f"{self.base_api_url}/", "enterprise-course-enrollment/")
+        endpoint = getattr(self.client, 'enterprise-course-enrollment')
         try:
-            response = self.client.post(api_url, data=data)
-            response.raise_for_status()
-        except HTTPError:
+            endpoint.post(data=data)
+        except (HttpClientError, HttpServerError):
             message = (
                 "An error occured while posting EnterpriseCourseEnrollment for user {username} and "
                 "course run {course_id}."
@@ -260,17 +251,26 @@ class EnterpriseApiClient:
                     }
                 ],
             }
+
+        Raises:
+            ConnectionError: requests exception "ConnectionError", raised if if ecommerce is unable to connect
+                to enterprise api server.
+            SlumberBaseException: base slumber exception "SlumberBaseException", raised if API response contains
+                http error status like 4xx, 5xx etc.
+            Timeout: requests exception "Timeout", raised if enterprise API is taking too long for returning
+                a response. This exception is raised for both connection timeout and read timeout.
+
         """
         if not user.is_authenticated:
             return None
 
-        api_url = urljoin(f"{self.base_api_url}/", "enterprise-learner/")
+        api_resource_name = 'enterprise-learner'
 
         try:
+            endpoint = getattr(self.client, api_resource_name)
             querystring = {'username': user.username}
-            response = self.client.get(api_url, params=querystring)
-            response.raise_for_status()
-        except HTTPError:
+            response = endpoint().get(**querystring)
+        except (HttpClientError, HttpServerError):
             LOGGER.exception(
                 'Failed to get enterprise-learner for user [%s] with client user [%s]. Caller: %s, Request PATH: %s',
                 user.username,
@@ -280,7 +280,7 @@ class EnterpriseApiClient:
             )
             return None
 
-        return response.json()
+        return response
 
 
 class EnterpriseApiServiceClient(EnterpriseServiceClientMixin, EnterpriseApiClient):
@@ -295,10 +295,8 @@ class EnterpriseApiServiceClient(EnterpriseServiceClientMixin, EnterpriseApiClie
         """
         enterprise_customer = enterprise_customer_from_cache(uuid=uuid)
         if enterprise_customer is _CACHE_MISS:
-            api_url = urljoin(f"{self.base_api_url}/", f"enterprise-customer/{uuid}/")
-            response = self.client.get(api_url)
-            response.raise_for_status()
-            enterprise_customer = response.json() if response.content else None
+            endpoint = getattr(self.client, 'enterprise-customer')
+            enterprise_customer = endpoint(uuid).get()
             if enterprise_customer:
                 cache_enterprise(enterprise_customer)
 
@@ -352,8 +350,7 @@ def data_sharing_consent_required(view_func):
         Otherwise, just call the wrapped view function.
         """
         # Redirect to the consent URL, if consent is required.
-        source = getattr(view_func, '__name__', '')
-        consent_url = get_enterprise_consent_url(request, course_id, enrollment_exists=True, source=source)
+        consent_url = get_enterprise_consent_url(request, course_id, enrollment_exists=True)
         if consent_url:
             real_user = getattr(request.user, 'real_user', request.user)
             LOGGER.info(
@@ -479,11 +476,8 @@ def enterprise_customer_from_api(request):
 
         try:
             enterprise_customer = enterprise_api_client.get_enterprise_customer(enterprise_customer_uuid)
-        except HTTPError as err:
-            if err.response.status_code == 404:
-                enterprise_customer = None
-            else:
-                raise
+        except HttpNotFoundError:
+            enterprise_customer = None
     return enterprise_customer
 
 
@@ -722,7 +716,7 @@ def get_consent_required_courses(user, course_ids):
 
 
 @enterprise_is_enabled(otherwise='')
-def get_enterprise_consent_url(request, course_id, user=None, return_to=None, enrollment_exists=False, source='lms'):
+def get_enterprise_consent_url(request, course_id, user=None, return_to=None, enrollment_exists=False):
     """
     Build a URL to redirect the user to the Enterprise app to provide data sharing
     consent for a specific course ID.
@@ -754,7 +748,6 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     url_params = {
         'enterprise_customer_uuid': enterprise_customer_uuid_for_request(request),
         'course_id': course_id,
-        'source': source,
         'next': request.build_absolute_uri(return_path),
         'failure_url': request.build_absolute_uri(
             reverse('dashboard') + '?' + urlencode(

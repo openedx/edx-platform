@@ -8,7 +8,7 @@ from crum import get_current_request
 
 from django.conf import settings
 from django.urls import reverse
-from django.utils.translation import gettext as _, ngettext
+from django.utils.translation import ngettext, gettext as _
 
 from xmodule.util.misc import is_xblock_an_assignment
 from openedx.core.djangolib.markup import HTML, Text

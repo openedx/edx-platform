@@ -75,7 +75,7 @@ class TopicSerializerTestCase(SerializerTestCase):
         Verifies that the `TopicSerializer` correctly displays a topic with a
         team count of 0, and that it takes a known number of SQL queries.
         """
-        with self.assertNumQueries(3):  # 2 split modulestore MySQL queries, 1 for Teams
+        with self.assertNumQueries(1):
             serializer = TopicSerializer(
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
@@ -91,7 +91,7 @@ class TopicSerializerTestCase(SerializerTestCase):
         CourseTeamFactory.create(
             course_id=self.course.id, topic_id=self.course.teamsets[0].teamset_id
         )
-        with self.assertNumQueries(3):  # 2 split modulestore MySQL queries, 1 for Teams
+        with self.assertNumQueries(1):
             serializer = TopicSerializer(
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
@@ -110,7 +110,7 @@ class TopicSerializerTestCase(SerializerTestCase):
         )
         CourseTeamFactory.create(course_id=self.course.id, topic_id=duplicate_topic['id'])
         CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic['id'])
-        with self.assertNumQueries(3):  # 2 split modulestore MySQL queries, 1 for Teams
+        with self.assertNumQueries(1):
             serializer = TopicSerializer(
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
@@ -251,7 +251,7 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         request = RequestFactory().get('/api/team/v0/topics')
         request.user = self.user
 
-        with self.assertNumQueries(num_queries + 2):  # num_queries on teams tables, plus 2 split modulestore queries
+        with self.assertNumQueries(num_queries):
             serializer = self.serializer(
                 topics,
                 context={

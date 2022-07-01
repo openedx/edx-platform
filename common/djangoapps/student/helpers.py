@@ -50,6 +50,7 @@ from lms.djangoapps.instructor import access
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.content.block_structure.exceptions import UsageKeyNotInBlockStructure
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
@@ -116,8 +117,14 @@ def check_verify_status_by_course(user, course_enrollments):
     """
     status_by_course = {}
 
-    # If integrity signature is enabled, this is a no-op because IDV is not required
-    if settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE'):
+    # Before retriving verification data, if the integrity_signature feature is enabled for the course
+    # let's bypass all logic below. Filter down to those course with integrity_signature not enabled.
+    enabled_course_enrollments = []
+    for enrollment in course_enrollments:
+        if not is_integrity_signature_enabled(enrollment.course_id):
+            enabled_course_enrollments.append(enrollment)
+
+    if len(enabled_course_enrollments) == 0:
         return status_by_course
 
     # Retrieve all verifications for the user, sorted in descending
@@ -137,7 +144,7 @@ def check_verify_status_by_course(user, course_enrollments):
     )
     recent_verification_datetime = None
 
-    for enrollment in course_enrollments:
+    for enrollment in enabled_course_enrollments:
 
         # If the user hasn't enrolled as verified, then the course
         # won't display state related to its verification status.

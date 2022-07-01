@@ -393,6 +393,8 @@ MAILCHIMP_NEW_USER_LIST_ID: null
 MAINTENANCE_BANNER_TEXT: Sample banner message
 MEDIA_ROOT: /edx/var/edxapp/media/
 MEDIA_URL: /media/
+MICROSITE_CONFIGURATION: {}
+MICROSITE_ROOT_DIR: /edx/app/edxapp/edx-microsite
 MKTG_URLS: {}
 MKTG_URL_LINK_MAP: {}
 MOBILE_STORE_URLS: {}
@@ -482,7 +484,6 @@ PLATFORM_FACEBOOK_ACCOUNT: http://www.facebook.com/YourPlatformFacebookAccount
 PLATFORM_NAME: Your Platform Name Here
 PLATFORM_TWITTER_ACCOUNT: '@YourPlatformTwitterAccount'
 POLICY_CHANGE_GRADES_ROUTING_KEY: edx.lms.core.default
-PREPEND_LOCALE_PATHS: []
 PRESS_EMAIL: press@example.com
 PROCTORING_BACKENDS:
     DEFAULT: 'null'

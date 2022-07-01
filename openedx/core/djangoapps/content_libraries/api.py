@@ -65,7 +65,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import PermissionDenied
 from django.core.validators import validate_unicode_slug
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError
 from django.utils.translation import gettext as _
 from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from lxml import etree
@@ -426,10 +426,6 @@ def create_library(
     """
     assert isinstance(collection_uuid, UUID)
     assert isinstance(org, Organization)
-    assert not transaction.get_autocommit(), (
-        "Call within a django.db.transaction.atomic block so that all created objects are rolled back on error."
-    )
-
     validate_unicode_slug(slug)
     # First, create the blockstore bundle:
     bundle = create_bundle(
@@ -450,6 +446,7 @@ def create_library(
             license=library_license,
         )
     except IntegrityError:
+        delete_bundle(bundle.uuid)
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
     CONTENT_LIBRARY_CREATED.send(sender=None, library_key=ref.library_key)
     return ContentLibraryMetadata(

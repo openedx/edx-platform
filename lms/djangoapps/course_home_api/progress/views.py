@@ -112,7 +112,7 @@ class ProgressTabView(RetrieveAPIView):
                     possible: (float) number of possible points
                 show_correctness: (str) a str representing whether to show the problem/practice scores based on due date
                                   ('always', 'never', 'past_due', values defined in
-                                   xmodule/modulestore/inheritance.py)
+                                   common/lib/xmodule/xmodule/modulestore/inheritance.py)
                 show_grades: (bool) a bool for whether to show grades based on the access the user has
                 url: (str or None) the absolute path url to the Subsection or None if the Subsection is no longer
                      accessible to the learner due to a hide_after_due course team setting
@@ -203,9 +203,6 @@ class ProgressTabView(RetrieveAPIView):
         # So it is called upfront and reused for optimization purposes
         collected_block_structure = get_block_structure_manager(course_key).get_collected()
         course_grade = CourseGradeFactory().read(student, collected_block_structure=collected_block_structure)
-
-        # recalculate course grade from visible grades (stored grade was calculated over all grades, visible or not)
-        course_grade.update(visible_grades_only=True, has_staff_access=is_staff)
 
         # Get has_scheduled_content data
         transformers = BlockStructureTransformers()

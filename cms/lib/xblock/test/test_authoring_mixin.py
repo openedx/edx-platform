@@ -14,9 +14,9 @@ from xmodule.partitions.partitions import (
     Group,
     UserPartition
 )
-from xmodule.tests.test_export import PureXBlock
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.lib.xmodule.xmodule.tests.test_export import PureXBlock
 
 
 class AuthoringMixinTestCase(ModuleStoreTestCase):

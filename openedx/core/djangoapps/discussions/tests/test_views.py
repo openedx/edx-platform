@@ -19,7 +19,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
-from lms.djangoapps.discussion.toggles import ENABLE_NEW_STRUCTURE_DISCUSSIONS
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 
 from ..models import AVAILABLE_PROVIDER_MAP, DEFAULT_CONFIG_ENABLED, DEFAULT_PROVIDER_TYPE, Provider
 
@@ -47,8 +47,7 @@ DEFAULT_LEGACY_CONFIGURATION = {
     'divided_course_wide_discussions': [],
     'division_scheme': 'none',
     'available_division_schemes': [],
-    'reported_content_email_notifications': False,
-    'reported_content_email_notifications_flag': False,
+
 }
 DEFAULT_LTI_CONFIGURATION = {
     'lti_1p1_client_key': '',
@@ -351,7 +350,6 @@ class DataTest(AuthorizedApiTest):
             'plugin_configuration': {
                 'allow_anonymous': False,
                 'custom_field': 'custom_value',
-                'reported_content_email_notifications': True,
             },
         }
         response = self._post(payload)
@@ -359,7 +357,6 @@ class DataTest(AuthorizedApiTest):
         assert data['plugin_configuration'] == {
             'allow_anonymous': False,
             'custom_field': 'custom_value',
-            'reported_content_email_notifications': True,
         }
 
         course = self.store.get_course(self.course.id)
@@ -382,14 +379,12 @@ class DataTest(AuthorizedApiTest):
         (Provider.PIAZZA, [Provider.OPEN_EDX, Provider.LEGACY], 'dummy', True),
     )
     @ddt.unpack
-    def test_available_providers_legacy(
-        self, current_provider, visible_providers, hidden_provider, new_structure_enabled
-    ):
+    def test_available_providers_legacy(self, current_provider, visible_providers, hidden_provider, mfe_enabled):
         """
         Tests that providers available depending on the course.
         """
         self._configure_lti_discussion_provider(provider=current_provider)
-        with override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, new_structure_enabled):
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, mfe_enabled):
             response = self._get()
             data = response.json()
             for visible_provider in visible_providers:

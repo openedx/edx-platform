@@ -10,7 +10,7 @@ from django.urls import path, re_path
 from django.utils.translation import gettext_lazy as _
 from auth_backends.urls import oauth2_urlpatterns
 from edx_api_doc_tools import make_docs_urls
-from django.contrib import admin
+from ratelimitbackend import admin
 
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
@@ -230,9 +230,6 @@ if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
 if not settings.FEATURES.get('ENABLE_CHANGE_USER_PASSWORD_ADMIN'):
     urlpatterns.append(re_path(r'^admin/auth/user/\d+/password/$', handler404))
 urlpatterns.append(path('admin/password_change/', handler404))
-urlpatterns.append(
-    path('admin/login/', contentstore_views.redirect_to_lms_login_for_admin, name='redirect_to_lms_login_for_admin')
-)
 urlpatterns.append(path('admin/', admin.site.urls))
 
 # enable entrance exams
@@ -270,8 +267,6 @@ if settings.DEBUG:
         urlpatterns += dev_urlpatterns
     except ImportError:
         pass
-
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     urlpatterns += static(
         settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['base_url'],

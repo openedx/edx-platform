@@ -1,0 +1,7 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='../../static_content.html'/>
+<% style_overrides_file = static.get_value('css_overrides_file') %>
+
+% if style_overrides_file:
+  <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
+% endif
