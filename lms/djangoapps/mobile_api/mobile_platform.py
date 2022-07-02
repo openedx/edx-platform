@@ -58,6 +58,29 @@ class IOS(MobilePlatform):
                         r'\(Build [0-9a-zA-Z]*\)\)')
     NAME = "iOS"
 
+    @classmethod
+    def get_user_app_platform(cls, user_agent, user_agent_regex):
+        """
+        Replaces build number(3172) with app version(2.26.3) and
+        Returns platform instance if user_agent matches with USER_AGENT_REGEX
+
+        Arguments:
+            user_agent (str): user-agent for mobile app making the request.
+            user_agent_regex (regex str): Regex for user-agent valid for any type pf mobile platform.
+
+        Returns:
+           An instance of class passed (which would be one of the supported mobile platform
+           classes i.e. PLATFORM_CLASSES) if user_agent matches regex of that class else returns None
+        """
+
+        # Replace Build number 3172 with app version number 2.26.3
+        # so that we can enable upgrade banner and compare this version with other versions
+        # For details visit the ticket https://openedx.atlassian.net/browse/LEARNER-8639
+        sub_regex = r'(3172)(; OS Version [0-9.]+ \(Build [0-9a-zA-Z]*\)\))'
+        user_agent = re.sub(sub_regex, r'2.26.3\2', user_agent)
+
+        return super(IOS, cls).get_user_app_platform(user_agent, user_agent_regex)
+
 
 class Android(MobilePlatform):
     """ Android platform """

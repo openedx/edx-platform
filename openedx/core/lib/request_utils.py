@@ -14,11 +14,12 @@ from edx_toggles.toggles import WaffleFlag
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.views import exception_handler
+from common.djangoapps.util.log_sensitive import encrypt_for_log
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # accommodates course api urls, excluding any course api routes that do not fall under v*/courses, such as v1/blocks.
-COURSE_REGEX = re.compile(fr'^(.*?/courses/)(?!v[0-9]+/[^/]+){settings.COURSE_ID_PATTERN}')
+COURSE_REGEX = re.compile(fr'^(.*?/course(s)?/)(?!v[0-9]+/[^/]+){settings.COURSE_ID_PATTERN}')
 
 # .. toggle_name: request_utils.capture_cookie_sizes
 # .. toggle_implementation: WaffleFlag
@@ -143,11 +144,37 @@ class CookieMonitoringMiddleware(MiddlewareMixin):
         - `request_utils.capture_cookie_sizes`
         - TOP_N_COOKIES_CAPTURED
         - TOP_N_COOKIE_GROUPS_CAPTURED
+        - COOKIE_SIZE_LOGGING_THRESHOLD
+        - COOKIE_HEADER_DEBUG_PUBLIC_KEY
 
         """
 
         raw_header_cookie = request.META.get('HTTP_COOKIE', '')
-        set_custom_attribute('cookies.header.size', len(raw_header_cookie.encode('utf-8')))
+        cookie_header_size = len(raw_header_cookie.encode('utf-8'))
+        set_custom_attribute('cookies.header.size', cookie_header_size)
+
+        # .. setting_name: COOKIE_SIZE_LOGGING_THRESHOLD
+        # .. setting_default: None
+        # .. setting_description: The minimum size for logging the entire (encrypted) cookie header. Should be set
+        # to a relatively high threshold (suggested 9-10K) to avoid flooding the logs.
+        # .. setting_warning: Requires COOKIE_HEADER_DEBUG_PUBLIC_KEY to be set
+        logging_threshold = getattr(settings, "COOKIE_SIZE_LOGGING_THRESHOLD", None)
+
+        # .. setting_name: COOKIE_HEADER_DEBUG_PUBLIC_KEY
+        # .. setting_default: None
+        # .. setting_description: The public key used to encrypt large cookie headers. See See
+        #       https://github.com/edx/edx-platform/blob/master/common/djangoapps/util/log_sensitive.py
+        #       for instructions on decrypting.
+        debug_key = getattr(settings, "COOKIE_HEADER_DEBUG_PUBLIC_KEY", None)
+
+        if logging_threshold and cookie_header_size > logging_threshold:
+            if not debug_key:
+                log.warning("COOKIE_SIZE_LOGGING_THRESHOLD set without COOKIE_HEADER_DEBUG_PUBLIC_KEY")
+            else:
+                encrypted_cookie_header = encrypt_for_log(str(raw_header_cookie),
+                                                          debug_key)
+                log.info(f"Large (> {logging_threshold}) cookie header detected."
+                         f" Encrypted contents: {encrypted_cookie_header}")
 
         if not CAPTURE_COOKIE_SIZES.is_enabled():
             return

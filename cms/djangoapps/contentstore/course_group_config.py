@@ -13,9 +13,9 @@ from cms.djangoapps.contentstore.utils import reverse_usage_url
 from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
-from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, ReadOnlyUserPartitionError, UserPartition
-from xmodule.partitions.partitions_service import get_all_partitions_for_course
-from xmodule.split_test_module import get_split_user_partitions
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, ReadOnlyUserPartitionError, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions_service import get_all_partitions_for_course  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.split_test_module import get_split_user_partitions  # lint-amnesty, pylint: disable=wrong-import-order
 
 MINIMUM_GROUP_ID = MINIMUM_STATIC_PARTITION_ID
 

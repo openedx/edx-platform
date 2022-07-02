@@ -9,7 +9,7 @@ import ddt
 
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 from ..models import CourseOverview
@@ -23,6 +23,7 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
     """
     Tests for CourseOverview signals.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     ENABLED_SIGNALS = ['course_deleted', 'course_published']
     TODAY = datetime.datetime.utcnow()
     NEXT_WEEK = TODAY + datetime.timedelta(days=7)

@@ -1,9 +1,9 @@
+# pylint: disable=missing-module-docstring
 import copy
 import pytz
-from uuid import uuid4
-from datetime import datetime
+from uuid import uuid4  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import datetime  # lint-amnesty, pylint: disable=wrong-import-order
 from django.contrib.sites.models import Site
-from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
@@ -72,7 +72,7 @@ class SAMLProviderDataTests(APITestCase):
             enterprise_customer_id=ENTERPRISE_ID
         )
 
-    def setUp(self):
+    def setUp(self):  # pylint: disable=super-method-not-called
         # a cookie with roles: [{enterprise_admin_role: ent_id}] will be
         # needed to rbac to authorize access for this view
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_ROLE, ENTERPRISE_ID)])
@@ -102,7 +102,9 @@ class SAMLProviderDataTests(APITestCase):
 
         assert response.status_code == status.HTTP_201_CREATED
         assert SAMLProviderData.objects.count() == (orig_count + 1)
-        assert SAMLProviderData.objects.get(entity_id=SINGLE_PROVIDER_DATA_2['entity_id']).sso_url == SINGLE_PROVIDER_DATA_2['sso_url']
+        assert SAMLProviderData.objects.get(
+            entity_id=SINGLE_PROVIDER_DATA_2['entity_id']
+        ).sso_url == SINGLE_PROVIDER_DATA_2['sso_url']
 
     def test_create_one_data_with_absent_enterprise_uuid(self):
         """

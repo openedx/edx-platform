@@ -2,8 +2,6 @@
 Tests the ``notify_credentials`` management command.
 """
 
-
-import django
 from datetime import datetime
 from unittest import mock
 
@@ -287,10 +285,7 @@ class TestNotifyCredentials(TestCase):
 
         # Told to use it, and enabled. Should use config in preference of command line
         self.expected_options['start_date'] = '2017-03-01T00:00:00Z'
-        if django.VERSION >= (3, 0):
-            self.expected_options['skip_checks'] = False
-        else:
-            del self.expected_options['skip_checks']
+        self.expected_options['skip_checks'] = False
         call_command(Command(), '--start-date', '2017-01-01', '--args-from-database')
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options

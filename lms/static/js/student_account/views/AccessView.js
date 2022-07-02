@@ -83,6 +83,7 @@
                     this.isEnterpriseEnable = options.is_enterprise_enable || false;
                     this.isAccountRecoveryFeatureEnabled = options.is_account_recovery_feature_enabled || false;
                     this.is_require_third_party_auth_enabled = options.is_require_third_party_auth_enabled || false;
+                    this.enable_coppa_compliance = options.enable_coppa_compliance;
 
                 // The login view listens for 'sync' events from the reset model
                     this.resetModel = new PasswordResetModel({}, {
@@ -208,7 +209,8 @@
                             thirdPartyAuth: this.thirdPartyAuth,
                             platformName: this.platformName,
                             hideAuthWarnings: this.hideAuthWarnings,
-                            is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled
+                            is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled,
+                            enableCoppaCompliance: this.enable_coppa_compliance,
                         });
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.

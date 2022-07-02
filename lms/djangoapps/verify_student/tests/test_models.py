@@ -23,7 +23,7 @@ from lms.djangoapps.verify_student.models import (
     VerificationException
 )
 from lms.djangoapps.verify_student.tests import TestVerificationBase
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {

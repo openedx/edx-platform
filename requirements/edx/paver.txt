@@ -6,9 +6,9 @@
 #
 certifi==2021.10.8
     # via requests
-charset-normalizer==2.0.7
+charset-normalizer==2.0.11
     # via requests
-edx-opaque-keys==2.2.2
+edx-opaque-keys==2.3.0
     # via -r requirements/edx/paver.in
 idna==3.3
     # via requests
@@ -20,13 +20,13 @@ markupsafe==2.0.1
     # via -r requirements/edx/paver.in
 mock==4.0.3
     # via -r requirements/edx/paver.in
-path==16.2.0
+path==16.3.0
     # via -r requirements/edx/paver.in
 paver==1.3.4
     # via -r requirements/edx/paver.in
-pbr==5.6.0
+pbr==5.8.0
     # via stevedore
-psutil==5.8.0
+psutil==5.9.0
     # via -r requirements/edx/paver.in
 pymongo==3.10.1
     # via
@@ -35,18 +35,18 @@ pymongo==3.10.1
     #   edx-opaque-keys
 python-memcached==1.59
     # via -r requirements/edx/paver.in
-requests==2.26.0
+requests==2.27.1
     # via -r requirements/edx/paver.in
 six==1.16.0
     # via
     #   libsass
     #   paver
     #   python-memcached
-stevedore==3.4.0
+stevedore==3.5.0
     # via
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
-urllib3==1.26.7
+urllib3==1.26.8
     # via requests
 watchdog==2.1.6
     # via -r requirements/edx/paver.in

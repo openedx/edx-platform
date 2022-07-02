@@ -21,17 +21,21 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from pyquery import PyQuery as pq
 from pytz import UTC
 from waffle.models import Switch
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
+from lms.djangoapps.courseware.toggles import COURSEWARE_USE_LEGACY_FRONTEND
 from lms.djangoapps.gating import api as lms_gating_api
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.urls import RESET_COURSE_DEADLINES_NAME
 from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 from openedx.core.djangoapps.schedules.models import Schedule
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory  # pylint: disable=unused-import
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
@@ -41,9 +45,6 @@ from openedx.features.course_experience.views.course_outline import (
 )
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ...utils import get_course_outline_block_tree
 from .test_course_home import course_home_url
@@ -53,11 +54,13 @@ GATING_NAMESPACE_QUALIFIER = '.gating'
 
 
 @ddt.ddt
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     """
     Test the course outline view.
     """
 
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod
@@ -71,7 +74,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         # pylint: disable=super-method-not-called
         with super().setUpClassAndTestData():
             cls.courses = []
-            course = CourseFactory.create(self_paced=True)
+            course = CourseFactory.create(self_paced=True, start=timezone.now() - datetime.timedelta(days=1))
             with cls.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
                 sequential = ItemFactory.create(category='sequential', parent_location=chapter.location, graded=True, format="Homework")  # lint-amnesty, pylint: disable=line-too-long
@@ -270,6 +273,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         assert updated_staff_schedule.start_date.date() == datetime.date.today()
 
 
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Test the course outline view with prerequisites.
@@ -419,6 +423,7 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
         assert not says_prerequisite_required
 
 
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleTestMixin):
     """
     Test start course and resume course for the course outline view.
@@ -568,9 +573,10 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         content = pq(response.content)
 
         problem = course.children[0].children[0].children[0].children[0]
-        assert content('.action-resume-course').attr('href').endswith('/problem/' + problem.url_name)
+        assert content('.action-resume-course').attr('href').endswith('+type@problem+block@' + problem.url_name)
 
     @override_settings(LMS_BASE='test_url:9999')
+    @override_waffle_flag(COURSEWARE_USE_LEGACY_FRONTEND, active=True)
     def test_resume_course_with_completion_api(self):
         """
         Tests completion API resume button functionality
@@ -588,7 +594,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
         # Test for 'resume' link URL - should be problem 1
         content = pq(response.content)
-        assert content('.action-resume-course').attr('href').endswith('/problem/' + problem1.url_name)
+        assert content('.action-resume-course').attr('href').endswith('+type@problem+block@' + problem1.url_name)
 
         self.complete_sequential(self.course, problem2)
         # Test for 'resume' link
@@ -596,7 +602,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
         # Test for 'resume' link URL - should be problem 2
         content = pq(response.content)
-        assert content('.action-resume-course').attr('href').endswith('/problem/' + problem2.url_name)
+        assert content('.action-resume-course').attr('href').endswith('+type@problem+block@' + problem2.url_name)
 
         # visit sequential 1, make sure 'Resume Course' URL is robust against 'Last Visited'
         # (even though I visited seq1/vert1, 'Resume Course' still points to seq2/vert2)
@@ -605,7 +611,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         # Test for 'resume' link URL - should be problem 2 (last completed block, NOT last visited)
         response = self.visit_course_home(course, resume_count=1)
         content = pq(response.content)
-        assert content('.action-resume-course').attr('href').endswith('/problem/' + problem2.url_name)
+        assert content('.action-resume-course').attr('href').endswith('+type@problem+block@' + problem2.url_name)
 
     def test_resume_course_deleted_sequential(self):
         """
@@ -631,7 +637,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response = self.visit_course_home(course, resume_count=1)
 
         content = pq(response.content)
-        assert content('.action-resume-course').attr('href').endswith('/sequential/' + sequential2.url_name)
+        assert content('.action-resume-course').attr('href').endswith('+type@sequential+block@' + sequential2.url_name)
 
     def test_resume_course_deleted_sequentials(self):
         """
@@ -669,7 +675,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
         problem = course.children[0].children[0].children[0].children[0]
-        assert content('.action-resume-course').attr('href').endswith('/problem/' + problem.url_name)
+        assert content('.action-resume-course').attr('href').endswith('+type@problem+block@' + problem.url_name)
 
     @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
     def test_course_outline_auto_open(self):
@@ -725,6 +731,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         assert DEFAULT_COMPLETION_TRACKING_START == view._completion_data_collection_start()
 
 
+@override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
 class TestCourseOutlinePreview(SharedModuleStoreTestCase, MasqueradeMixin):
     """
     Unit tests for staff preview of the course outline.

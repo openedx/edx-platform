@@ -27,18 +27,6 @@ from xblock.fields import Scope, ScopeIds, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 from xblock.validation import ValidationMessage
-
-from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
-from cms.djangoapps.contentstore.views import item as item_module
-from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.xblock_django.models import (
-    XBlockConfiguration,
-    XBlockStudioConfiguration,
-    XBlockStudioConfigurationFlag
-)
-from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
-from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from xmodule.capa_module import ProblemBlock
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum
@@ -54,6 +42,19 @@ from xmodule.partitions.partitions import (
 )
 from xmodule.partitions.tests.test_partitions import MockPartitionService
 from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
+
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
+from cms.djangoapps.contentstore.views import item as item_module
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.xblock_django.models import (
+    XBlockConfiguration,
+    XBlockStudioConfiguration,
+    XBlockStudioConfigurationFlag
+)
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
+from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 
 from ..component import component_handler, get_component_templates
 from ..item import (
@@ -1333,7 +1334,6 @@ class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
     """
     Test the duplicate method for blocks with asides.
     """
-
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
@@ -1898,8 +1898,6 @@ class TestEditItemSplitMongo(TestEditItemSetup):
     """
     Tests for EditItem running on top of the SplitMongoModuleStore.
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     def test_editing_view_wrappers(self):
         """
         Verify that the editing view only generates a single wrapper, no matter how many times it's loaded
@@ -2468,6 +2466,40 @@ class TestComponentTemplates(CourseTestCase):
         XBlockConfiguration.objects.create(name='drag-and-drop-v2', enabled=False)
         self.assertIsNone(get_xblock_problem('Staff Graded Points'))
         self.assertIsNone(get_xblock_problem('Drag and Drop'))
+
+    def test_discussion_button_present_no_provider(self):
+        """
+        Test the Discussion button present when no discussion provider configured for course
+        """
+        templates = get_component_templates(self.course)
+        button_names = [template['display_name'] for template in templates]
+        assert 'Discussion' in button_names
+
+    def test_discussion_button_present_legacy_provider(self):
+        """
+        Test the Discussion button present when legacy discussion provider configured for course
+        """
+        course_key = self.course.location.course_key
+
+        # Create a discussion configuration with discussion provider set as legacy
+        DiscussionsConfiguration.objects.create(context_key=course_key, enabled=True, provider_type='legacy')
+
+        templates = get_component_templates(self.course)
+        button_names = [template['display_name'] for template in templates]
+        assert 'Discussion' in button_names
+
+    def test_discussion_button_absent_non_legacy_provider(self):
+        """
+        Test the Discussion button not present when non-legacy discussion provider configured for course
+        """
+        course_key = self.course.location.course_key
+
+        # Create a discussion configuration with discussion provider set as legacy
+        DiscussionsConfiguration.objects.create(context_key=course_key, enabled=False, provider_type='ed-discuss')
+
+        templates = get_component_templates(self.course)
+        button_names = [template['display_name'] for template in templates]
+        assert 'Discussion' not in button_names
 
     def _verify_advanced_xblocks(self, expected_xblocks, expected_support_levels):
         """

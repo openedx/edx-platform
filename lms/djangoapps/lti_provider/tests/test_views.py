@@ -13,7 +13,7 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.lti_provider import models, views
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 LTI_DEFAULT_PARAMS = {
     'roles': 'Instructor,urn:lti:instrole:ims/lis/Administrator',

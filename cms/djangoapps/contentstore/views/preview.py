@@ -4,6 +4,7 @@ import logging
 from functools import partial
 
 from django.conf import settings
+from django.core.cache import cache
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseBadRequest
 from django.urls import reverse
@@ -15,13 +16,25 @@ from xblock.django.request import django_to_webob_request, webob_to_django_respo
 from xblock.exceptions import NoSuchHandlerError
 from xblock.runtime import KvsFieldData
 
+from xmodule.contentstore.django import contentstore
+from xmodule.error_module import ErrorBlock
+from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.modulestore.django import ModuleI18nService, modulestore
+from xmodule.partitions.partitions_service import PartitionService
+from xmodule.services import SettingsService, TeamsConfigurationService
+from xmodule.studio_editable import has_author_view
+from xmodule.util.sandboxing import SandboxService
+from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem, XModule, XModuleDescriptor
 from cms.djangoapps.xblock_config.models import StudioConfig
 from cms.lib.xblock.field_data import CmsFieldData
 from common.djangoapps import static_replace
 from common.djangoapps.edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.lib.license import wrap_with_license
+from openedx.core.lib.cache_utils import CacheService
 from openedx.core.lib.xblock_utils import (
     replace_static_urls,
     request_token,
@@ -30,20 +43,9 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside,
     xblock_local_resource_url
 )
-from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorBlock
-from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.django import ModuleI18nService, modulestore
-from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService, TeamsConfigurationService
-from xmodule.studio_editable import has_author_view
-from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem, XModule, XModuleDescriptor
 
 from ..utils import get_visibility_partition_info
 from .access import get_user_role
-from .helpers import render_from_lms
 from .session_kv_store import SessionKeyValueStore
 
 __all__ = ['preview_handler']
@@ -185,9 +187,10 @@ def _preview_module_system(request, descriptor, field_data):
         )
     ]
 
+    mako_service = MakoService(namespace_prefix='lms.')
     if settings.FEATURES.get("LICENSING", False):
         # stick the license wrapper in front
-        wrappers.insert(0, wrap_with_license)
+        wrappers.insert(0, partial(wrap_with_license, mako_service=mako_service))
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
@@ -195,30 +198,31 @@ def _preview_module_system(request, descriptor, field_data):
         track_function=lambda event_type, event: None,
         filestore=descriptor.runtime.resources_fs,
         get_module=partial(_load_preview_module, request),
-        render_template=render_from_lms,
         debug=True,
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
-        user=request.user,
-        can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
-        get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, course_id)),
         mixins=settings.XBLOCK_MIXINS,
         course_id=course_id,
-        anonymous_student_id='student',
 
         # Set up functions to modify the fragment produced by student_view
         wrappers=wrappers,
         wrappers_asides=wrappers_asides,
         error_descriptor_class=ErrorBlock,
-        get_user_role=lambda: get_user_role(request.user, course_id),
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
             "field-data": field_data,
             "i18n": ModuleI18nService,
+            'mako': mako_service,
             "settings": SettingsService(),
-            "user": DjangoXBlockUserService(request.user),
+            "user": DjangoXBlockUserService(
+                request.user,
+                anonymous_user_id='student',
+                user_role=get_user_role(request.user, course_id),
+            ),
             "partitions": StudioPartitionService(course_id=course_id),
             "teams_configuration": TeamsConfigurationService(),
+            "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
+            "cache": CacheService(cache),
         },
     )
 

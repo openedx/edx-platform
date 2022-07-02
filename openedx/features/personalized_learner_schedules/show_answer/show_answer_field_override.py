@@ -5,7 +5,7 @@ new Show Answer values that remove the Past Due check (keeping the rest intact)
 
 from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from xmodule.capa_module import SHOWANSWER
+from xmodule.capa_module import SHOWANSWER  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class ShowAnswerFieldOverride(FieldOverrideProvider):

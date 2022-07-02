@@ -68,7 +68,7 @@ def are_logged_in_cookies_set(request):
 
 def delete_logged_in_cookies(response):
     """
-    Delete cookies indicating that the user is logged in.
+    Delete cookies indicating that the user is logged in (except for session cookie.)
     Arguments:
         response (HttpResponse): The response sent to the client.
     Returns:
@@ -81,14 +81,22 @@ def delete_logged_in_cookies(response):
             domain=settings.SHARED_COOKIE_DOMAIN
         )
 
+        # Delete in sub_domain
+        response.delete_cookie(
+            cookie_name,
+            path='/',
+            domain=settings.LMS_BASE
+        )
+
     return response
 
 
-def standard_cookie_settings(request):
+def standard_cookie_settings(request, is_subdomain=False):
     """ Returns the common cookie settings (e.g. expiration time). """
 
+    domain = settings.SHARED_COOKIE_DOMAIN if not is_subdomain else settings.LMS_BASE
     cookie_settings = {
-        'domain': settings.SHARED_COOKIE_DOMAIN,
+        'domain': domain,
         'path': '/',
         'httponly': None,
     }
@@ -152,6 +160,15 @@ def set_logged_in_cookies(request, response, user):
         _set_deprecated_user_info_cookie(response, request, user, cookie_settings)
         _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
         CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
+
+        # For Gooogle Auth, we need to add cookie into subdomain too
+        cookie_settings_subdomain = standard_cookie_settings(request, is_subdomain=True)
+
+        _set_deprecated_logged_in_cookie(response, cookie_settings_subdomain)
+        _set_deprecated_user_info_cookie(response, request, user, cookie_settings_subdomain)
+        _create_and_set_jwt_cookies(response, request, cookie_settings_subdomain, user=user)
+        CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
+
 
     return response
 

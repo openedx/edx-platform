@@ -1,4 +1,4 @@
-(function(define) {
+(function (define){
     'use strict';
 
     define(
@@ -7,10 +7,10 @@
             'common/js/components/views/tabbed_view',
             'learner_profile/js/views/section_two_tab'
         ],
-        function(gettext, $, _, Backbone, HtmlUtils, TabbedView, SectionTwoTab) {
+        function (gettext, $, _, Backbone, HtmlUtils, TabbedView, SectionTwoTab){
             var LearnerProfileView = Backbone.View.extend({
 
-                initialize: function(options) {
+                initialize: function (options){
                     var Router;
                     this.options = _.extend({}, options);
                     _.bindAll(this, 'showFullProfile', 'render', 'renderFields', 'showLoadingError');
@@ -23,7 +23,7 @@
                     this.firstRender = true;
                 },
 
-                showFullProfile: function() {
+                showFullProfile: function () {
                     var isAboveMinimumAge = this.options.accountSettingsModel.isAboveMinimumAge();
                     if (this.options.ownProfile) {
                         return isAboveMinimumAge
@@ -33,14 +33,14 @@
                     }
                 },
 
-                setActiveTab: function(tab) {
+                setActiveTab: function (tab){
                     // This tab may not actually exist.
                     if (this.tabbedView.getTabMeta(tab).tab) {
                         this.tabbedView.setActiveTab(tab);
                     }
                 },
 
-                render: function() {
+                render: function (){
                     var tabs,
                         $tabbedViewElement,
                         $wrapperProfileBioElement = this.$el.find('.wrapper-profile-bio'),
@@ -77,9 +77,9 @@
                         ];
 
                         // Build the accomplishments Tab and fill with data
-                        this.options.badgeListContainer.collection.fetch().done(function() {
+                        this.options.badgeListContainer.collection.fetch().done(function (){
                             self.options.badgeListContainer.render();
-                        }).error(function() {
+                        }).error(function (){
                             self.options.badgeListContainer.renderError();
                         });
 
@@ -107,19 +107,27 @@
                             Backbone.history.start();
                         }
                     } else {
-                        // xss-lint: disable=javascript-jquery-html
-                        $wrapperProfileBioElement.html(this.sectionTwoView.render().el);
+                        if (this.isCoppaCompliant()) {
+                            // xss-lint: disable=javascript-jquery-html
+                            $wrapperProfileBioElement.html(this.sectionTwoView.render().el);
+                        }
                     }
                     return this;
                 },
 
-                renderFields: function() {
+                isCoppaCompliant: function (){
+                    var enableCoppaCompliance = this.options.accountSettingsModel.get('enable_coppa_compliance'),
+                        isAboveAge = this.options.accountSettingsModel.isAboveMinimumAge();
+                    return !enableCoppaCompliance || (enableCoppaCompliance && isAboveAge);
+                },
+
+                renderFields: function (){
                     var view = this,
                         fieldView,
                         imageView,
                         settings;
 
-                    if (this.options.ownProfile) {
+                    if (this.options.ownProfile && this.isCoppaCompliant()) {
                         fieldView = this.options.accountPrivacyFieldView;
                         settings = this.options.accountSettingsModel;
                         fieldView.profileIsPrivate = !settings.get('year_of_birth');
@@ -142,14 +150,14 @@
                     imageView = this.options.profileImageFieldView;
                     this.$('.profile-image-field').append(imageView.render().el);
 
-                    if (this.showFullProfile()) {
-                        _.each(this.options.sectionOneFieldViews, function(childFieldView) {
+                    if (this.showFullProfile()){
+                        _.each(this.options.sectionOneFieldViews, function (childFieldView) {
                             view.$('.profile-section-one-fields').append(childFieldView.render().el);
                         });
                     }
                 },
 
-                showLoadingError: function() {
+                showLoadingError: function (){
                     this.$('.ui-loading-indicator').addClass('is-hidden');
                     this.$('.ui-loading-error').removeClass('is-hidden');
                 }

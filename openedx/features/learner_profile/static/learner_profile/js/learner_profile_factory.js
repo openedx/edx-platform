@@ -1,4 +1,4 @@
-(function(define) {
+(function (define){
     'use strict';
 
     define([
@@ -19,16 +19,20 @@
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner',
         'string_utils'
-    ], function(gettext, $, _, Backbone, Logger, StringUtils, PagingCollection, AccountSettingsModel,
-                AccountPreferencesModel, FieldsView, LearnerProfileFieldsView, LearnerProfileView, BadgeModel,
-                BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
-        return function(options) {
+    ], function (gettext, $, _, Backbone, Logger, StringUtils, PagingCollection, AccountSettingsModel,
+        AccountPreferencesModel, FieldsView, LearnerProfileFieldsView, LearnerProfileView, BadgeModel,
+        BadgeListContainer, AccountSettingsFieldViews, MessageBannerView){
+        return function (options) {
             var $learnerProfileElement = $('.wrapper-profile');
 
             var accountSettingsModel = new AccountSettingsModel(
                 _.extend(
                     options.account_settings_data,
-                    {default_public_account_fields: options.default_public_account_fields}
+                    {
+                        default_public_account_fields: options.default_public_account_fields,
+                        parental_consent_age_limit: options.parental_consent_age_limit,
+                        enable_coppa_compliance: options.enable_coppa_compliance
+                    }
                 ),
                 {parse: true}
             );
@@ -204,7 +208,7 @@
                 platformName: options.platform_name
             });
 
-            getProfileVisibility = function() {
+            getProfileVisibility = function (){
                 if (options.has_preferences_access) {
                     return accountPreferencesModel.get('account_privacy');
                 } else {
@@ -212,7 +216,7 @@
                 }
             };
 
-            showLearnerProfileView = function() {
+            showLearnerProfileView = function (){
                 // Record that the profile page was viewed
                 Logger.log('edx.user.settings.viewed', {
                     page: 'profile',

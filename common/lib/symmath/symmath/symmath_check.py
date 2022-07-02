@@ -229,7 +229,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     # if expected answer is a number, try parsing provided answer as a number also
     try:
         fans = my_sympify(str(ans), matrix=do_matrix, do_qubit=do_qubit)
-    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+    except Exception as err:  # lint-amnesty, pylint: disable=broad-except, unused-variable
         fans = None
 
     # do a numerical comparison if both expected and answer are numbers

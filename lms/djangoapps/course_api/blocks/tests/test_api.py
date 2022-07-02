@@ -13,10 +13,10 @@ from edx_toggles.toggles.testutils import override_waffle_switch
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls
-from xmodule.modulestore.tests.sample_courses import BlockInfo
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.sample_courses import BlockInfo  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..api import get_blocks
 
@@ -220,26 +220,20 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=14 if with_storage_backing else 13,
+                expected_sql_queries=15 if with_storage_backing else 14,
             )
 
     @ddt.data(
-        *product(
-            ((ModuleStoreEnum.Type.mongo, 5), (ModuleStoreEnum.Type.split, 3)),
-            (True, False),
-        )
+        (ModuleStoreEnum.Type.mongo, 5, True, 25),
+        (ModuleStoreEnum.Type.mongo, 5, False, 15),
+        (ModuleStoreEnum.Type.split, 2, True, 25),
+        (ModuleStoreEnum.Type.split, 2, False, 15),
     )
     @ddt.unpack
-    def test_query_counts_uncached(self, store_type_tuple, with_storage_backing):
-        store_type, expected_mongo_queries = store_type_tuple
+    def test_query_counts_uncached(self, store_type, expected_mongo_queries, with_storage_backing, num_sql_queries):
         with override_waffle_switch(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
             course = self._create_course(store_type)
             clear_course_from_cache(course.id)
-
-            if with_storage_backing:
-                num_sql_queries = 24
-            else:
-                num_sql_queries = 14
 
             self._get_blocks(
                 course,

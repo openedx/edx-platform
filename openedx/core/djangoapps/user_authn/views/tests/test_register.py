@@ -53,7 +53,7 @@ from openedx.core.djangoapps.user_authn.views.register import REGISTRATION_FAILU
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
 from common.djangoapps.student.helpers import authenticate_new_user
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import AccountRecoveryFactory, UserFactory
 from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from common.djangoapps.third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin,
@@ -247,6 +247,48 @@ class RegistrationViewValidationErrorTest(
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
+                    )
+                }],
+                "error_code": "duplicate-email"
+            }
+        )
+
+    def test_register_duplicate_email_validation_error_with_recovery(self):
+        # Register the user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Create recovery object
+        user = User.objects.get(email=self.EMAIL)
+        account_recovery = AccountRecoveryFactory(user=user)
+
+        # Try to create a user with the recovery email address
+        response = self.client.post(self.url, {
+            "email": account_recovery.secondary_email,
+            "name": "Someone Else",
+            "username": "someone_else",
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+
+        assert response.status_code == 409
+
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "email": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different email address."
+                    ).format(
+                        account_recovery.secondary_email
                     )
                 }],
                 "error_code": "duplicate-email"
@@ -660,12 +702,12 @@ class RegistrationViewTestV1(
         self._assert_reg_absent_field(
             no_extra_fields_setting,
             {
-                "name": u"favorite_editor",
-                "type": u"select",
+                "name": "favorite_editor",
+                "type": "select",
                 "required": False,
-                "label": u"Favorite Editor",
-                "placeholder": u"cat",
-                "defaultValue": u"vim",
+                "label": "Favorite Editor",
+                "placeholder": "cat",
+                "defaultValue": "vim",
                 "errorMessages": {
                     'required': 'This field is required.',
                     'invalid_choice': 'Select a valid choice. %(value)s is not one of the available choices.',
@@ -917,6 +959,21 @@ class RegistrationViewTestV1(
                 "required": False,
                 "label": "Year of birth",
                 "options": year_options,
+            }
+        )
+
+    def test_register_form_marketing_emails_opt_in_field(self):
+        self._assert_reg_field(
+            {"marketing_emails_opt_in": "optional"},
+            {
+                "name": "marketing_emails_opt_in",
+                "type": "checkbox",
+                "required": False,
+                "label": 'I agree that {platform_name} may send me marketing messages.'.format(
+                    platform_name=settings.PLATFORM_NAME,
+                ),
+                "exposed": True,
+                "defaultValue": True,
             }
         )
 
@@ -1894,7 +1951,6 @@ class RegistrationViewTestV1(
 class RegistrationViewTestV2(RegistrationViewTestV1):
     """
     Test for registration api V2
-
     """
 
     # pylint: disable=test-inherits-tests
@@ -2055,6 +2111,51 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             "country",
             "gender",
             "year_of_birth",
+            "level_of_education",
+            "mailing_address",
+            "goals",
+            "honor_code",
+            "favorite_movie",
+        ]
+
+    @override_settings(
+        ENABLE_COPPA_COMPLIANCE=True,
+        REGISTRATION_EXTRA_FIELDS={
+            "level_of_education": "optional",
+            "gender": "optional",
+            "year_of_birth": "optional",
+            "mailing_address": "optional",
+            "goals": "optional",
+            "city": "optional",
+            "state": "optional",
+            "country": "required",
+            "honor_code": "required",
+            "confirm_email": "required",
+        },
+        REGISTRATION_FIELD_ORDER=None,
+        REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm',
+    )
+    def test_year_of_birth_field_with_feature_flag(self):
+        """
+        Test that year of birth is not returned when ENABLE_COPPA_COMPLIANCE is
+        set to True.
+        """
+        response = self.client.get(self.url)
+        self.assertHttpOK(response)
+
+        # Verify that all fields render in the correct order
+        form_desc = json.loads(response.content.decode('utf-8'))
+        field_names = [field["name"] for field in form_desc["fields"]]
+        assert field_names == [
+            "email",
+            "name",
+            "username",
+            "password",
+            "confirm_email",
+            "city",
+            "state",
+            "country",
+            "gender",
             "level_of_education",
             "mailing_address",
             "goals",

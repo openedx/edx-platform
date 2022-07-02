@@ -51,6 +51,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
     """
     Test django management command for fetching saml metadata.
     """
+
     def setUp(self):
         """
         Setup operations for saml configurations. these operations contain

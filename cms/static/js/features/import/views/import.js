@@ -28,7 +28,7 @@ define(
         var current = {stage: 0, state: STATE.READY};
         var deferred = null;
         var file = {name: null, url: null};
-        var timeout = {id: null, delay: 1000};
+        var timeout = {id: null, delay: 3000};
         var $dom = {
             stages: $('ol.status-progress').children(),
             successStage: $('.item-progresspoint-success'),

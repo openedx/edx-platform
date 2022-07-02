@@ -1,23 +1,25 @@
 """
 Serializers for Discussion views.
 """
-
+from django.core.exceptions import ValidationError
 from lti_consumer.api import get_lti_pii_sharing_state_for_course
 from lti_consumer.models import LtiConfiguration
-from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
-from xmodule.modulestore.django import modulestore
 
-from lms.djangoapps.discussion.rest_api.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.courses import get_course_by_id
-from .models import AVAILABLE_PROVIDER_MAP, DEFAULT_PROVIDER_TYPE, DiscussionsConfiguration, Features
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from .models import DiscussionsConfiguration, Provider
+from .utils import available_division_schemes, get_divided_discussions
 
 
 class LtiSerializer(serializers.ModelSerializer):
     """
     Serialize LtiConfiguration responses
     """
+    pii_share_email = serializers.BooleanField(required=False)
+    pii_share_username = serializers.BooleanField(required=False)
+
     class Meta:
         model = LtiConfiguration
         fields = [
@@ -40,13 +42,6 @@ class LtiSerializer(serializers.ModelSerializer):
             if key in self.Meta.fields
         }
         return payload
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        if not self.context.get('pii_sharing_allowed'):
-            representation.pop('pii_share_username')
-            representation.pop('pii_share_email')
-        return representation
 
     def update(self, instance: LtiConfiguration, validated_data: dict) -> LtiConfiguration:
         """
@@ -71,6 +66,7 @@ class LegacySettingsSerializer(serializers.BaseSerializer):
     """
     Serialize legacy discussions settings
     """
+
     class Meta:
         fields = [
             'allow_anonymous',
@@ -172,10 +168,23 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DiscussionsConfiguration
+        course_fields = [
+            'provider_type',
+            'enable_in_context',
+            'enable_graded_units',
+            'unit_level_visibility',
+        ]
         fields = [
             'enabled',
-            'provider_type',
-        ]
+        ] + course_fields
+
+    def _get_course(self):
+        """
+        Get course and save it in the context, so it doesn't need to be reloaded.
+        """
+        if self.context.get('course') is None:
+            self.context['course'] = get_course_by_id(self.instance.context_key)
+        return self.context['course']
 
     def create(self, validated_data):
         """
@@ -187,13 +196,11 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         Transform the *incoming* primitive data into a native value.
         """
-        payload = {
-            'context_key': data.get('course_key', ''),
-            'enabled': data.get('enabled', False),
+        payload = super().to_internal_value(data)
+        payload.update({
             'lti_configuration': data.get('lti_configuration', {}),
             'plugin_configuration': data.get('plugin_configuration', {}),
-            'provider_type': data.get('provider_type', DEFAULT_PROVIDER_TYPE),
-        }
+        })
         return payload
 
     def to_representation(self, instance: DiscussionsConfiguration) -> dict:
@@ -201,36 +208,34 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         Serialize data into a dictionary, to be used as a response
         """
         course_key = instance.context_key
+        active_provider = instance.provider_type
+        provider_type = self.context.get('provider_type') or active_provider
         payload = super().to_representation(instance)
-        lti_configuration_data = {}
-        supports_lti = instance.supports(Features.LTI_BASIC_CONFIGURATION.value.id)
-        if supports_lti:
-            lti_configuration = LtiSerializer(instance.lti_configuration, context={
-                'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key),
-            })
+        course_pii_sharing_allowed = get_lti_pii_sharing_state_for_course(course_key)
+
+        # LTI configuration is only stored for the active provider.
+        if provider_type == active_provider:
+            lti_configuration = LtiSerializer(instance=instance.lti_configuration)
             lti_configuration_data = lti_configuration.data
-        provider_type = instance.provider_type or DEFAULT_PROVIDER_TYPE
-        plugin_configuration = instance.plugin_configuration
-        if provider_type == 'legacy':
-            course = get_course_by_id(course_key)
-            legacy_settings = LegacySettingsSerializer(
-                course,
-                data=plugin_configuration,
-            )
+            plugin_configuration = instance.plugin_configuration
+        else:
+            lti_configuration_data = {}
+            plugin_configuration = {}
+
+        course = get_course_by_id(course_key)
+        if provider_type in [Provider.LEGACY, Provider.OPEN_EDX]:
+            legacy_settings = LegacySettingsSerializer(course, data=plugin_configuration)
             if legacy_settings.is_valid(raise_exception=True):
                 plugin_configuration = legacy_settings.data
-        features_list = [
-            {'id': feature.value.id, 'feature_support_type': feature.value.feature_support_type}
-            for feature in Features
-        ]
+            if provider_type == Provider.OPEN_EDX:
+                plugin_configuration.update({
+                    "group_at_subsection": instance.plugin_configuration.get("group_at_subsection", False)
+                })
+        lti_configuration_data.update({'pii_sharing_allowed': course_pii_sharing_allowed})
         payload.update({
-            'features': features_list,
+            'provider_type': provider_type,
             'lti_configuration': lti_configuration_data,
             'plugin_configuration': plugin_configuration,
-            'providers': {
-                'active': provider_type or DEFAULT_PROVIDER_TYPE,
-                'available': AVAILABLE_PROVIDER_MAP,
-            },
         })
         return payload
 
@@ -238,14 +243,17 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         Update and save an existing instance
         """
+        # This needs to check which fields have changed, so do it before
+        # fields are copied over.
+        instance = self._update_course_configuration(instance, validated_data)
+        instance = self._update_plugin_configuration(instance, validated_data)
         for key in self.Meta.fields:
             value = validated_data.get(key)
             if value is not None:
                 setattr(instance, key, value)
         # _update_* helpers assume `enabled` and `provider_type`
         # have already been set
-        instance = self._update_lti(instance, validated_data, instance.context_key)
-        instance = self._update_plugin_configuration(instance, validated_data)
+        instance = self._update_lti(instance, validated_data)
         instance.save()
         return instance
 
@@ -253,14 +261,13 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         self,
         instance: DiscussionsConfiguration,
         validated_data: dict,
-        course_key: CourseKey
     ) -> DiscussionsConfiguration:
         """
         Update LtiConfiguration
         """
         lti_configuration_data = validated_data.get('lti_configuration')
-        supports_lti = instance.supports(Features.LTI_BASIC_CONFIGURATION.value.id)
-        if not supports_lti:
+
+        if not instance.supports_lti():
             instance.lti_configuration = None
         elif lti_configuration_data:
             lti_configuration = instance.lti_configuration or LtiConfiguration()
@@ -269,7 +276,7 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
                 data=lti_configuration_data,
                 partial=True,
                 context={
-                    'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(course_key),
+                    'pii_sharing_allowed': get_lti_pii_sharing_state_for_course(instance.context_key),
                 }
             )
             if lti_serializer.is_valid(raise_exception=True):
@@ -285,23 +292,175 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         """
         Create/update legacy provider settings
         """
+        plugin_configuration = validated_data.pop('plugin_configuration', {})
         updated_provider_type = validated_data.get('provider_type') or instance.provider_type
-        will_support_legacy = bool(
-            updated_provider_type == 'legacy'
-        )
-        if will_support_legacy:
-            course_key = instance.context_key
-            course = get_course_by_id(course_key)
+
+        if updated_provider_type == Provider.LEGACY:
             legacy_settings = LegacySettingsSerializer(
-                course,
+                self._get_course(),
                 context={
                     'user_id': self.context['user_id'],
                 },
-                data=validated_data.get('plugin_configuration', {}),
+                data=plugin_configuration,
             )
             if legacy_settings.is_valid(raise_exception=True):
                 legacy_settings.save()
-            instance.plugin_configuration = {}
+            instance.plugin_configuration = {
+                "group_at_subsection": plugin_configuration.get("group_at_subsection", False)
+            }
         else:
-            instance.plugin_configuration = validated_data.get('plugin_configuration') or {}
+            instance.plugin_configuration = plugin_configuration
         return instance
+
+    def _update_course_configuration(
+        self,
+        instance: DiscussionsConfiguration,
+        validated_data: dict,
+    ) -> DiscussionsConfiguration:
+        """
+        Update configuration settings that are stored in the course.
+        """
+        save = False
+        updated_provider_type = validated_data.get('provider_type') or instance.provider_type
+        for key in self.Meta.course_fields:
+            value = validated_data.get(key)
+            # Delay loading course till we know something has actually been updated
+            if value is not None and value != getattr(instance, key):
+                self._get_course().discussions_settings[key] = value
+                save = True
+        new_plugin_config = validated_data.get('plugin_configuration', None)
+        if new_plugin_config and new_plugin_config != instance.plugin_configuration:
+            save = True
+            # Any fields here that aren't already stored in the course structure
+            # or in other models should be stored here.
+            self._get_course().discussions_settings[updated_provider_type] = {
+                key: value
+                for key, value in new_plugin_config.items()
+                if (
+                    key not in LegacySettingsSerializer.Meta.fields and
+                    key not in LegacySettingsSerializer.Meta.fields_cohorts
+                )
+            }
+        if save:
+            modulestore().update_item(self._get_course(), self.context['user_id'])
+        return instance
+
+
+class DiscussionSettingsSerializer(serializers.Serializer):
+    """
+    Serializer for course discussion settings.
+    """
+    divided_discussions = serializers.ListField(
+        child=serializers.CharField(),
+        write_only=True,
+    )
+    divided_course_wide_discussions = serializers.ListField(
+        child=serializers.CharField(),
+        read_only=True,
+    )
+    divided_inline_discussions = serializers.ListField(
+        child=serializers.CharField(),
+        read_only=True,
+    )
+    always_divide_inline_discussions = serializers.BooleanField()
+    division_scheme = serializers.CharField()
+
+    def to_internal_value(self, data: dict) -> dict:
+        """
+        Transform the *incoming* primitive data into a native value.
+        """
+        payload = super().to_internal_value(data) or {}
+        course = self.context['course']
+        instance = self.context['settings']
+        if any(item in data for item in ('divided_course_wide_discussions', 'divided_inline_discussions')):
+            divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
+                course, instance
+            )
+            divided_course_wide_discussions = data.get(
+                'divided_course_wide_discussions',
+                divided_course_wide_discussions
+            )
+            divided_inline_discussions = data.get('divided_inline_discussions', divided_inline_discussions)
+            try:
+                payload['divided_discussions'] = divided_course_wide_discussions + divided_inline_discussions
+            except TypeError as error:
+                raise ValidationError(str(error)) from error
+        for item in ('always_divide_inline_discussions', 'division_scheme'):
+            if item in data:
+                payload[item] = data[item]
+        return payload
+
+    def to_representation(self, instance: CourseDiscussionSettings) -> dict:
+        """
+        Return a serialized representation of the course discussion settings.
+        """
+        course = self.context['course']
+        instance = self.context['settings']
+        course_key = course.id
+        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
+            course, instance
+        )
+        payload = {
+            'id': instance.id,
+            'divided_inline_discussions': divided_inline_discussions,
+            'divided_course_wide_discussions': divided_course_wide_discussions,
+            'always_divide_inline_discussions': instance.always_divide_inline_discussions,
+            'division_scheme': instance.division_scheme,
+            'available_division_schemes': available_division_schemes(course_key)
+        }
+        return payload
+
+    def create(self, validated_data):
+        """
+        This method intentionally left empty
+        """
+
+    def update(self, instance: CourseDiscussionSettings, validated_data: dict) -> CourseDiscussionSettings:
+        """
+        Update and save an existing instance
+        """
+        if not any(field in validated_data for field in self.fields):
+            raise ValidationError('Bad request')
+        try:
+            instance.update(validated_data)
+        except ValueError as e:
+            raise ValidationError(str(e)) from e
+        return instance
+
+
+class DiscussionsProviderSerializer(serializers.Serializer):
+    """
+    Serializer for a discussion provider
+    """
+    features = serializers.ListField(child=serializers.CharField(), help_text="Features supported by the provider")
+    supports_lti = serializers.BooleanField(default=False, help_text="Whether the provider supports LTI")
+    external_links = serializers.DictField(help_text="External documentation and links for provider")
+    messages = serializers.ListField(child=serializers.CharField(), help_text="Custom messaging for provider")
+    has_full_support = serializers.BooleanField(help_text="Whether the provider is fully supported")
+    admin_only_config = serializers.BooleanField(help_text="Whether the provider can only be configured by admins")
+
+
+class DiscussionsFeatureSerializer(serializers.Serializer):
+    """
+    Serializer for discussions features
+    """
+    id = serializers.CharField(help_text="Feature ID")
+    feature_support_type = serializers.CharField(help_text="Feature support level classification")
+
+
+class DiscussionsProvidersSerializer(serializers.Serializer):
+    """
+    Serializer for discussion providers.
+    """
+    active = serializers.CharField(
+        read_only=True,
+        help_text="The current active provider",
+    )
+    features = serializers.ListField(
+        child=DiscussionsFeatureSerializer(read_only=True),
+        help_text="Features support classification levels",
+    )
+    available = serializers.DictField(
+        child=DiscussionsProviderSerializer(read_only=True),
+        help_text="List of available providers",
+    )

@@ -16,14 +16,13 @@ from django.conf import settings
 from django.test import RequestFactory
 from django.test.client import Client
 from django.test.utils import override_settings
-
+from opaque_keys import InvalidKeyError
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, VERSIONED_ASSETS_PREFIX
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.assetstore.assetmgr import AssetManager
-from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from common.djangoapps.student.models import CourseEnrollment
@@ -74,6 +73,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
     """
     Tests that use the toy course.
     """
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
 
     @classmethod
     def setUpClass(cls):

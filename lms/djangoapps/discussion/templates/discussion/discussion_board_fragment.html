@@ -6,7 +6,7 @@
 
 <%!
 import json
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.template.defaultfilters import escapejs
 from django.urls import reverse
 
@@ -23,6 +23,7 @@ from openedx.core.djangolib.markup import HTML
          data-sort-preference="${sort_preference}"
          data-flag-moderator="${json.dumps(flag_moderator)}"
          data-user-group-id="${user_group_id}">
+    <%include file="_switch_experience_fragment.html" />
     <header class="page-header has-secondary">
         ## Breadcrumb navigation
         <div class="page-header-main">

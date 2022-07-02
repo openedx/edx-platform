@@ -21,13 +21,19 @@
             <%- gettext('Show assessment results when subsection is past due') %>
         </label>
         <p class='field-message' id='show_correctness_past_due_description'>
+            <%- gettext('Learners do not see whether their answers to assessments were correct or incorrect, nor the score received, until after the due date for the subsection has passed.') %>
             <% if (self_paced) { %>
-                <%- gettext('Learners do not see whether their answers to assessments were correct or incorrect, nor the score received, until after the course end date has passed.') %>
-                <%- gettext('If the course does not have an end date, learners always see their scores when they submit answers to assessments.') %>
-            <% } else { %>
-                <%- gettext('Learners do not see whether their answers to assessments were correct or incorrect, nor the score received, until after the due date for the subsection has passed.') %>
-                <%- gettext('If the subsection does not have a due date, learners always see their scores when they submit answers to assessments.') %>
+                <%= edx.HtmlUtils.interpolateHtml(
+                    gettext(
+                        'In a self paced course, graded subsections are assigned due dates based on each learner\'s {linkStart}Personalized Learner Schedule{linkEnd}.'
+                    ),
+                    {
+                        linkStart: edx.HtmlUtils.HTML('<a href="https://support.edx.org/hc/en-us/articles/206503568-How-do-self-paced-courses-work-" rel="noopener" target="_blank">'),
+                        linkEnd: edx.HtmlUtils.HTML('</a>')
+                    }
+                ) %>
             <% } %>
+            <%- gettext('If the subsection does not have a due date, learners always see their scores when they submit answers to assessments.') %>
         </p>
     </div>
 </div>

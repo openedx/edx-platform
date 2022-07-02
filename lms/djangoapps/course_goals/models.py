@@ -4,7 +4,6 @@ Course Goals Models
 
 import uuid
 import logging
-import pytz
 from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
@@ -17,9 +16,9 @@ from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
 from lms.djangoapps.courseware.masquerade import is_masquerading
-from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
+from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
+from openedx.features.course_experience import ENABLE_COURSE_GOALS
 
 # Each goal is represented by a goal key and a string description.
 GOAL_KEY_CHOICES = Choices(
@@ -127,7 +126,7 @@ class UserActivity(models.Model):
         The return value is the id of the object that was created, or retrieved.
         A return value of None signifies that a user activity record was not stored or retrieved
         '''
-        if not COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled(course_key):
+        if not ENABLE_COURSE_GOALS.is_enabled(course_key):
             return None
 
         if not (user and user.id) or not course_key:
@@ -139,8 +138,7 @@ class UserActivity(models.Model):
         if is_masquerading(user, course_key):
             return None
 
-        user_preferences = get_user_preferences(user)
-        timezone = pytz.timezone(user_preferences.get('time_zone', 'UTC'))
+        timezone = get_user_timezone_or_last_seen_timezone_or_utc(user)
         now = datetime.now(timezone)
         date = now.date()
 
@@ -148,13 +146,6 @@ class UserActivity(models.Model):
 
         cached_value = TieredCache.get_cached_response(cache_key)
         if cached_value.is_found:
-            # Temporary debugging log for testing mobile app connection
-            if request:
-                log.info(
-                    'Retrieved cached value with request {} for user and course combination {} {}'.format(
-                        str(request.build_absolute_uri()), str(user.id), str(course_key)
-                    )
-                )
             return cached_value.value, False
 
         activity_object, __ = cls.objects.get_or_create(user=user, course_key=course_key, date=date)

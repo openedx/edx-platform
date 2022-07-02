@@ -17,6 +17,7 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
+@XBlock.needs('mako')
 class LibraryRoot(XBlock):
     """
     The LibraryRoot is the root XBlock of a content library. All other blocks in
@@ -103,7 +104,7 @@ class LibraryRoot(XBlock):
             })
 
         fragment.add_content(
-            self.runtime.render_template("studio_render_paged_children_view.html", {
+            self.runtime.service(self, 'mako').render_template("studio_render_paged_children_view.html", {
                 'items': contents,
                 'xblock_context': context,
                 'can_add': can_add,

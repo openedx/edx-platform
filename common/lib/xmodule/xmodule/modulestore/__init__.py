@@ -328,7 +328,7 @@ class BulkOperationsMixin:
             bulk_ops_record.has_library_updated_item = False
 
 
-class EditInfo:  # pylint: disable=eq-without-hash
+class EditInfo:
     """
     Encapsulates the editing info of a block.
     """
@@ -407,7 +407,7 @@ class EditInfo:  # pylint: disable=eq-without-hash
         return not self == edit_info
 
 
-class BlockData:  # pylint: disable=eq-without-hash
+class BlockData:
     """
     Wrap the block data in an object instead of using a straight Python dictionary.
     Allows the storing of meta-information about a structure that doesn't persist along with

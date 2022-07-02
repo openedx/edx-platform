@@ -20,9 +20,9 @@ from django.http import HttpResponseBadRequest
 from django.utils.translation import gettext as _
 
 from openedx.core.lib.xblock_utils import get_course_update_items
-from xmodule.html_module import CourseInfoBlock
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.html_module import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 # # This should be in a class which inherits from XmlDescriptor
 log = logging.getLogger(__name__)

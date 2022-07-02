@@ -138,6 +138,7 @@ LMS_ROOT_URL = f"http://{LMS_BASE}"
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 
 COURSE_AUTHORING_MICROFRONTEND_URL = "http://course-authoring-mfe"
+DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
@@ -265,6 +266,12 @@ TEST_ELASTICSEARCH_USE_SSL = os.environ.get(
     'EDXAPP_TEST_ELASTICSEARCH_USE_SSL', 'no').lower() in ('true', 'yes', '1')
 TEST_ELASTICSEARCH_HOST = os.environ.get('EDXAPP_TEST_ELASTICSEARCH_HOST', 'edx.devstack.elasticsearch710')
 TEST_ELASTICSEARCH_PORT = int(os.environ.get('EDXAPP_TEST_ELASTICSEARCH_PORT', '9200'))
+
+############################# TEMPLATE CONFIGURATION #############################
+# Adds mako template dirs for content_libraries tests
+MAKO_TEMPLATE_DIRS_BASE.append(
+    COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates'
+)
 
 ########################## AUTHOR PERMISSION #######################
 FEATURES['ENABLE_CREATOR_GROUP'] = False

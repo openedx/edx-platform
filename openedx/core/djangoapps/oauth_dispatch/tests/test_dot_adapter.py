@@ -9,6 +9,7 @@ import pytest
 import ddt
 from django.conf import settings
 from django.test import TestCase
+from django.urls import reverse
 from django.utils.timezone import now
 from oauth2_provider import models
 
@@ -106,6 +107,10 @@ class DOTAdapterTestCase(TestCase):
         Make sure when generating an access_token for a restricted client
         that the token is immediately expired
         """
+
+        # for this test it requires to call AccessTokenView(_DispatchingView) otherwise it fails
+        # to set the expiry.
+        self.client.post(reverse('access_token'), {})
         self.adapter.create_access_token_for_test(
             'expired-token-id',
             client=self.restricted_client,

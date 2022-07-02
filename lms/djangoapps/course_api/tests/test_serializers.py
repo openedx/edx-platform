@@ -11,12 +11,12 @@ from opaque_keys.edx.locator import CourseLocator
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
+from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import check_mongo_calls
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from xmodule.course_module import DEFAULT_START_DATE
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import check_mongo_calls
 
 from ..serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
 from .mixins import CourseApiFactoryMixin
@@ -31,6 +31,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     maxDiff = 5000  # long enough to show mismatched dicts, in case of error
     serializer_class = CourseSerializer
 
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -65,7 +66,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
                     'raw': image_url,
                     'small': image_url,
                     'large': image_url,
-                }
+                },
             },
             'start': '2015-07-17T12:00:00Z',
             'start_type': 'timestamp',

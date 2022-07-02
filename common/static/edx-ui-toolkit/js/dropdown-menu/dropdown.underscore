@@ -1,0 +1,22 @@
+<a href="<%- main.url %>" class="menu-title">
+    <% if (main.screenreader_label) { %>
+        <span class="sr-only"><%- main.screenreader_label %> </span>
+    <% } %>
+    <% if (main.image) { %>
+        <img class="menu-image" src="<%- main.image %>" alt="">
+    <% } %>
+    <%- main.text %>
+</a>
+<button type="button" class="menu-button button-more has-dropdown js-dropdown-button <% if (!button.icon) { %>default-icon<% } %>" aria-haspopup="true" aria-expanded="false" aria-controls="<%- menuId %>">
+    <% if (button.icon) { %>
+        <span class="icon <%- button.icon %>" aria-hidden="true"></span>
+    <% } %>
+    <span class="sr-only"><%- button.label %></span>
+</button>
+<ul class="dropdown-menu list-divided is-hidden" id="<%- menuId %>" tabindex="-1">
+    <% _.each(items, function(item, index) { %>
+        <li class="dropdown-item item has-block-link">
+            <a href="<%- item.url %>" class="action"><%- item.text %></a>
+        </li>
+    <% }); %>
+</ul>

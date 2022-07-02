@@ -22,6 +22,8 @@ from django.urls import reverse
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student import auth
 from common.djangoapps.student.models import CourseEnrollment
@@ -30,8 +32,6 @@ from lms.djangoapps.courseware.access_response import MobileAvailabilityError, S
 from lms.djangoapps.mobile_api.models import IgnoreMobileAvailableFlagConfig
 from lms.djangoapps.mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
 from lms.djangoapps.mobile_api.utils import API_V1
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
@@ -41,6 +41,8 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
        REVERSE_INFO = {'name': <django reverse name>, 'params': [<list of params in the URL>]}
     They may also override any of the methods defined in this class to control the behavior of the TestMixins.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(
@@ -172,7 +174,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         self.verify_success(response)  # allow subclasses to override verification
 
     def test_course_not_found(self):
-        non_existent_course_id = CourseKey.from_string('a/b/c')
+        non_existent_course_id = CourseKey.from_string('course-v1:a+b+c')
         self.init_course_access(course_id=non_existent_course_id)
 
         response = self.api_response(expected_response_code=None, course_id=non_existent_course_id)
@@ -205,7 +207,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         self.init_course_access()
         # set mobile_available to False for the test course
         self.course.mobile_available = False
-        self.store.update_item(self.course, self.user.id)
+        self.course = self.update_course(self.course, self.user.id)
         self._verify_response(should_succeed, MobileAvailabilityError(), role)
 
         IgnoreMobileAvailableFlagConfig(enabled=True).save()
@@ -226,7 +228,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
     def test_visible_to_staff_only_course(self, role, should_succeed):
         self.init_course_access()
         self.course.visible_to_staff_only = True
-        self.store.update_item(self.course, self.user.id)
+        self.course = self.update_course(self.course, self.user.id)
         if self.ALLOW_ACCESS_TO_NON_VISIBLE_COURSE:
             should_succeed = True
         self._verify_response(should_succeed, VisibilityError(), role)

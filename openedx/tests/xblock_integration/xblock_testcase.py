@@ -49,11 +49,11 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.urls import reverse
 from xblock.plugin import Plugin
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 import lms.djangoapps.lms_xblock.runtime
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class XBlockEventTestMixin:
@@ -346,6 +346,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
     Class for all XBlock-internal test cases (as opposed to
     integration tests).
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     test_configuration = None  # Children must override this!
 
     entry_point = 'xblock.test.v0'

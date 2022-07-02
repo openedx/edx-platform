@@ -48,6 +48,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
         extendedProfileFields = ${ extended_profile_fields | n, dump_js_escaped_json },
         displayAccountDeletion = ${ enable_account_deletion | n, dump_js_escaped_json};
         isSecondaryEmailFeatureEnabled = ${ bool(is_secondary_email_feature_enabled()) | n, dump_js_escaped_json },
+        enableCoppaCompliance = ${ bool(enable_coppa_compliance) | n, dump_js_escaped_json },
 
     AccountSettingsFactory(
         fieldsData,
@@ -61,6 +62,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
         platformName,
         contactEmail,
         allowEmailChange,
+        enableCoppaCompliance,
         socialPlatforms,
 
         syncLearnerProfileData,
@@ -81,6 +83,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
      window.mktgRootLink = "${ static.marketing_link('ROOT') | n, js_escaped_string }";
      window.platformName = "${ platform_name | n, js_escaped_string }";
      window.siteName = "${ static.get_value('SITE_NAME', settings.SITE_NAME) | n, js_escaped_string }";
+     window.mktgEmailOptIn = ${ settings.MARKETING_EMAILS_OPT_IN | n, dump_js_escaped_json };;
 
 </script>
 <%static:webpack entry="StudentAccountDeletionInitializer">

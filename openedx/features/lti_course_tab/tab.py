@@ -19,8 +19,8 @@ from lms.djangoapps.courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangolib.markup import HTML
 from common.djangoapps.student.models import anonymous_id_for_user
-from xmodule.course_module import CourseBlock
-from xmodule.tabs import TabFragmentViewMixin, key_checker
+from xmodule.course_module import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tabs import TabFragmentViewMixin, key_checker  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class LtiCourseLaunchMixin:
@@ -195,6 +195,7 @@ class LtiCourseTab(LtiCourseLaunchMixin, EnrolledTab):
     A tab to add custom LTI components to a course in a tab.
     """
     type = 'lti_tab'
+    priority = 120
     is_default = False
     allow_multiple = True
 
@@ -266,6 +267,7 @@ class DiscussionLtiCourseTab(LtiCourseLaunchMixin, TabFragmentViewMixin, Enrolle
     Course tab that loads the associated LTI-based discussion provider in a tab.
     """
     type = 'lti_discussion'
+    priority = 41
     allow_multiple = False
     is_dynamic = True
     title = gettext_lazy("Discussion")
@@ -276,11 +278,7 @@ class DiscussionLtiCourseTab(LtiCourseLaunchMixin, TabFragmentViewMixin, Enrolle
 
     @classmethod
     def is_enabled(cls, course, user=None):
+        """Check if the tab is enabled."""
         if super().is_enabled(course, user):
-            config = DiscussionsConfiguration.get(course.id)
-            return (
-                config.enabled and
-                config.lti_configuration is not None
-            )
-        else:
-            return False
+            return DiscussionsConfiguration.lti_discussion_enabled(course.id)
+        return False

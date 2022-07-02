@@ -12,7 +12,7 @@ import ddt
 from bson.objectid import ObjectId
 from opaque_keys.edx.locator import CourseLocator
 
-from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
+from xmodule.modulestore.split_mongo.mongo_connection import MongoPersistenceBackend
 from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
 
 VERSION_GUID_DICT = {
@@ -30,7 +30,7 @@ class TestBulkWriteMixin(unittest.TestCase):  # lint-amnesty, pylint: disable=mi
         self.bulk = SplitBulkWriteMixin()
         self.bulk.SCHEMA_VERSION = 1
         self.clear_cache = self.bulk._clear_cache = Mock(name='_clear_cache')
-        self.conn = self.bulk.db_connection = MagicMock(name='db_connection', spec=MongoConnection)
+        self.conn = self.bulk.db_connection = MagicMock(name='db_connection', spec=MongoPersistenceBackend)
         self.conn.get_course_index.return_value = {'initial': 'index'}
 
         self.course_key = CourseLocator('org', 'course', 'run-a', branch='test')

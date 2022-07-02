@@ -4,26 +4,34 @@ Tests for Discussion API views
 
 
 import json
+import random
 from datetime import datetime
 from unittest import mock
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse, urlencode
 
 import ddt
 import httpretty
 from django.urls import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
+from rest_framework import status
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import get_retired_username_by_username
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
+from common.djangoapps.student.tests.factories import (
+    CourseEnrollmentFactory,
+    SuperuserFactory,
+    UserFactory,
+)
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
 from common.test.utils import disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
@@ -55,6 +63,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
     in the test client, utility functions, and a test case for unauthenticated
     requests. Subclasses must set self.url in their setUp methods.
     """
+
     client_class = APIClient
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -134,8 +143,349 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class UploadFileViewTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin, ModuleStoreTestCase):
+    """
+    Tests for UploadFileView.
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super().setUp()
+        self.valid_file = {
+            "uploaded_file": SimpleUploadedFile(
+                "test.jpg",
+                b"test content",
+                content_type="image/jpeg",
+            ),
+        }
+        self.user = UserFactory.create(password="password")
+        self.course = CourseFactory.create(org='a', course='b', run='c', start=datetime.now(UTC))
+        self.url = reverse("upload_file", kwargs={"course_id": str(self.course.id)})
+
+    def user_login(self):
+        """
+        Authenticates the test client with the example user.
+        """
+        self.client.login(username=self.user.username, password="password")
+
+    def enroll_user_in_course(self):
+        """
+        Makes the example user enrolled to the course.
+        """
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+    def assert_upload_success(self, response):
+        """
+        Asserts that the upload response was successful and returned the
+        expected contents.
+        """
+        assert response.status_code == status.HTTP_200_OK
+        assert response.content_type == "application/json"
+        response_data = json.loads(response.content)
+        assert "location" in response_data
+
+    def test_file_upload_by_unauthenticated_user(self):
+        """
+        Should fail if an unauthenticated user tries to upload a file.
+        """
+        response = self.client.post(self.url, self.valid_file)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_file_upload_by_unauthorized_user(self):
+        """
+        Should fail if the user is not either staff or a student
+        enrolled in the course.
+        """
+        self.user_login()
+        response = self.client.post(self.url, self.valid_file)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_file_upload_by_enrolled_user(self):
+        """
+        Should succeed when a valid file is uploaded by an authenticated
+        user who's enrolled in the course.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_by_global_staff(self):
+        """
+        Should succeed when a valid file is uploaded by a global staff
+        member.
+        """
+        self.user_login()
+        GlobalStaff().add_users(self.user)
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_by_instructor(self):
+        """
+        Should succeed when a valid file is uploaded by a course instructor.
+        """
+        self.user_login()
+        CourseInstructorRole(course_key=self.course.id).add_users(self.user)
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_by_course_staff(self):
+        """
+        Should succeed when a valid file is uploaded by a course staff
+        member.
+        """
+        self.user_login()
+        CourseStaffRole(course_key=self.course.id).add_users(self.user)
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_with_thread_key(self):
+        """
+        Should contain the given thread_key in the uploaded file name.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        response = self.client.post(self.url, {
+            **self.valid_file,
+            "thread_key": "somethread",
+        })
+        response_data = json.loads(response.content)
+        assert "/somethread/" in response_data["location"]
+
+    def test_file_upload_with_invalid_file(self):
+        """
+        Should fail if the uploaded file format is not allowed.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        invalid_file = {
+            "uploaded_file": SimpleUploadedFile(
+                "test.txt",
+                b"test content",
+                content_type="text/plain",
+            ),
+        }
+        response = self.client.post(self.url, invalid_file)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_file_upload_with_invalid_course_id(self):
+        """
+        Should fail if the course does not exist.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        url = reverse("upload_file", kwargs={"course_id": "d/e/f"})
+        response = self.client.post(url, self.valid_file)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_file_upload_with_no_data(self):
+        """
+        Should fail when the user sends a request missing an
+        `uploaded_file` field.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        response = self.client.post(self.url, data={})
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@ddt.ddt
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class CommentViewSetListByUserTest(
+    ForumsEnableMixin,
+    CommentsServiceMockMixin,
+    UrlResetMixin,
+    ModuleStoreTestCase,
+):
+    """
+    Common test cases for views retrieving user-published content.
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super().setUp()
+
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.reset)
+        self.addCleanup(httpretty.disable)
+
+        self.user = UserFactory.create(password="password")
+        self.register_get_user_response(self.user)
+
+        self.other_user = UserFactory.create(password="password")
+        self.register_get_user_response(self.other_user)
+
+        self.course = CourseFactory.create(org="a", course="b", run="c", start=datetime.now(UTC))
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+        self.url = self.build_url(self.user.username, self.course.id)
+
+    def register_mock_endpoints(self):
+        """
+        Register cs_comments_service mocks for sample threads and comments.
+        """
+        self.register_get_threads_response(
+            threads=[
+                make_minimal_cs_thread({
+                    "id": f"test_thread_{index}",
+                    "course_id": str(self.course.id),
+                    "commentable_id": f"test_topic_{index}",
+                    "username": self.user.username,
+                    "user_id": str(self.user.id),
+                    "thread_type": "discussion",
+                    "title": f"Test Title #{index}",
+                    "body": f"Test body #{index}",
+                })
+                for index in range(30)
+            ],
+            page=1,
+            num_pages=1,
+        )
+        self.register_get_comments_response(
+            comments=[
+                make_minimal_cs_comment({
+                    "id": f"test_comment_{index}",
+                    "thread_id": "test_thread",
+                    "user_id": str(self.user.id),
+                    "username": self.user.username,
+                    "created_at": "2015-05-11T00:00:00Z",
+                    "updated_at": "2015-05-11T11:11:11Z",
+                    "body": f"Test body #{index}",
+                    "votes": {"up_count": 4},
+                })
+                for index in range(30)
+            ],
+            page=1,
+            num_pages=1,
+        )
+
+    def build_url(self, username, course_id, **kwargs):
+        """
+        Builds an URL to access content from an user on a specific course.
+        """
+        base = reverse("comment-list")
+        query = urlencode({
+            "username": username,
+            "course_id": str(course_id),
+            **kwargs,
+        })
+        return f"{base}?{query}"
+
+    def assert_successful_response(self, response):
+        """
+        Check that the response was successful and contains the expected fields.
+        """
+        assert response.status_code == status.HTTP_200_OK
+        response_data = json.loads(response.content)
+        assert "results" in response_data
+        assert "pagination" in response_data
+
+    def test_request_by_unauthenticated_user(self):
+        """
+        Unauthenticated users are not allowed to request users content.
+        """
+        self.register_mock_endpoints()
+        response = self.client.get(self.url)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_request_by_unauthorized_user(self):
+        """
+        Users are not allowed to request content from courses in which
+        they're not either enrolled or staff members.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        response = self.client.get(self.url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert json.loads(response.content)["developer_message"] == "Course not found."
+
+    def test_request_by_enrolled_user(self):
+        """
+        Users that are enrolled in a course are allowed to get users'
+        comments in that course.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        CourseEnrollmentFactory.create(user=self.other_user, course_id=self.course.id)
+        self.assert_successful_response(self.client.get(self.url))
+
+    def test_request_by_global_staff(self):
+        """
+        Staff users are allowed to get any user's comments.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        GlobalStaff().add_users(self.other_user)
+        self.assert_successful_response(self.client.get(self.url))
+
+    @ddt.data(CourseStaffRole, CourseInstructorRole)
+    def test_request_by_course_staff(self, role):
+        """
+        Course staff users are allowed to get an user's comments in that
+        course.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        role(course_key=self.course.id).add_users(self.other_user)
+        self.assert_successful_response(self.client.get(self.url))
+
+    def test_request_with_non_existent_user(self):
+        """
+        Requests for users that don't exist result in a 404 response.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        GlobalStaff().add_users(self.other_user)
+        url = self.build_url("non_existent", self.course.id)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_request_with_non_existent_course(self):
+        """
+        Requests for courses that don't exist result in a 404 response.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        GlobalStaff().add_users(self.other_user)
+        url = self.build_url(self.user.username, "x/y/z")
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_request_with_invalid_course_id(self):
+        """
+        Requests with invalid course ID should fail form validation.
+        """
+        self.register_mock_endpoints()
+        self.client.login(username=self.other_user.username, password="password")
+        GlobalStaff().add_users(self.other_user)
+        url = self.build_url(self.user.username, "an invalid course")
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        parsed_response = json.loads(response.content)
+        assert parsed_response["field_errors"]["course_id"]["developer_message"] == \
+            "'an invalid course' is not a valid course id"
+
+    def test_request_with_empty_results_page(self):
+        """
+        Requests for pages that exceed the available number of pages
+        result in a 404 response.
+        """
+        self.register_get_threads_response(threads=[], page=1, num_pages=1)
+        self.register_get_comments_response(comments=[], page=1, num_pages=1)
+
+        self.client.login(username=self.other_user.username, password="password")
+        GlobalStaff().add_users(self.other_user)
+        url = self.build_url(self.user.username, self.course.id, page=2)
+        response = self.client.get(url)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         super().setUp()
         self.url = reverse("discussion_course", kwargs={"course_id": str(self.course.id)})
@@ -163,6 +513,10 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                     "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&following=True"
                 ),
                 "topics_url": "http://testserver/api/discussion/v1/course_topics/x/y/z",
+                "allow_anonymous": True,
+                "allow_anonymous_to_peers": False,
+                'user_is_privileged': False,
+                'user_roles': ['Student'],
             }
         )
 
@@ -181,6 +535,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.retirement.save()
 
         self.superuser = SuperuserFactory()
+        self.superuser_client = APIClient()
         self.retired_username = get_retired_username_by_username(self.user.username)
         self.url = reverse("retire_discussion_user")
 
@@ -208,7 +563,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_user_retire_response(self.user)
         headers = self.build_jwt_headers(self.superuser)
         data = {'username': self.user.username}
-        response = self.client.post(self.url, data, **headers)
+        response = self.superuser_client.post(self.url, data, **headers)
         self.assert_response_correct(response, 204, b"")
 
     def test_downstream_forums_error(self):
@@ -218,7 +573,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_user_retire_response(self.user, status=500, body="Server error")
         headers = self.build_jwt_headers(self.superuser)
         data = {'username': self.user.username}
-        response = self.client.post(self.url, data, **headers)
+        response = self.superuser_client.post(self.url, data, **headers)
         self.assert_response_correct(response, 500, '"Server error"')
 
     def test_nonexistent_user(self):
@@ -229,7 +584,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.retired_username = get_retired_username_by_username(nonexistent_username)
         data = {'username': nonexistent_username}
         headers = self.build_jwt_headers(self.superuser)
-        response = self.client.post(self.url, data, **headers)
+        response = self.superuser_client.post(self.url, data, **headers)
         self.assert_response_correct(response, 404, None)
 
     def test_not_authenticated(self):
@@ -247,8 +602,9 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ReplaceUsernamesView"""
     def setUp(self):
         super().setUp()
-        self.client_user = UserFactory()
-        self.client_user.username = "test_replace_username_service_worker"
+        self.worker = UserFactory()
+        self.worker.username = "test_replace_username_service_worker"
+        self.worker_client = APIClient()
         self.new_username = "test_username_replacement"
         self.url = reverse("replace_discussion_username")
 
@@ -269,11 +625,11 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
         return headers
 
-    def call_api(self, user, data):
+    def call_api(self, user, client, data):
         """ Helper function to call API with data """
         data = json.dumps(data)
         headers = self.build_jwt_headers(user)
-        return self.client.post(self.url, data, content_type='application/json', **headers)
+        return client.post(self.url, data, content_type='application/json', **headers)
 
     @ddt.data(
         [{}, {}],
@@ -285,7 +641,7 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         data = {
             "username_mappings": mapping_data
         }
-        response = self.call_api(self.client_user, data)
+        response = self.call_api(self.worker, self.worker_client, data)
         assert response.status_code == 400
 
     def test_auth(self):
@@ -303,11 +659,11 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
         # Test non-service worker
         random_user = UserFactory()
-        response = self.call_api(random_user, data)
+        response = self.call_api(random_user, APIClient(), data)
         assert response.status_code == 403
 
         # Test service worker
-        response = self.call_api(self.client_user, data)
+        response = self.call_api(self.worker, self.worker_client, data)
         assert response.status_code == 200
 
     def test_basic(self):
@@ -322,7 +678,7 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             'successful_replacements': data["username_mappings"]
         }
         self.register_get_username_replacement_response(self.user)
-        response = self.call_api(self.client_user, data)
+        response = self.call_api(self.worker, self.worker_client, data)
         assert response.status_code == 200
         assert response.data == expected_response
 
@@ -335,13 +691,25 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin, ModuleStoreTestCase):
     """
     Tests for CourseTopicsView
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
+        httpretty.reset()
+        httpretty.enable()
+        self.addCleanup(httpretty.reset)
+        self.addCleanup(httpretty.disable)
         super().setUp()
         self.url = reverse("course_topics", kwargs={"course_id": str(self.course.id)})
+        self.thread_counts_map = {
+            "courseware-1": {"discussion": 2, "question": 3},
+            "courseware-2": {"discussion": 4, "question": 5},
+            "courseware-3": {"discussion": 7, "question": 2},
+        }
+        self.register_get_course_commentable_counts_response(self.course.id, self.thread_counts_map)
 
     def create_course(self, modules_count, module_store, topics):
         """
@@ -367,7 +735,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 discussion_target=f'Discussion {i}',
                 publish_item=False,
             )
-        return course_url
+        return course_url, course.id
 
     def make_discussion_xblock(self, topic_id, category, subcategory, **kwargs):
         """
@@ -405,6 +773,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                     "children": [],
                     "thread_list_url":
                         "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&topic_id=test_topic",
+                    "thread_counts": {"discussion": 0, "question": 0},
                 }],
             }
         )
@@ -420,7 +789,8 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_bulk_response(self, modules_count, module_store, mongo_calls, topics):
-        course_url = self.create_course(modules_count, module_store, topics)
+        course_url, course_id = self.create_course(modules_count, module_store, topics)
+        self.register_get_course_commentable_counts_response(course_id, {})
         with check_mongo_calls(mongo_calls):
             with modulestore().default_store(module_store):
                 self.client.get(course_url)
@@ -461,12 +831,14 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                             "id": "topic_id_1",
                             "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
                                                "course_id=x%2Fy%2Fz&topic_id=topic_id_1",
-                            "name": "test_target_1"
+                            "name": "test_target_1",
+                            "thread_counts": {"discussion": 0, "question": 0},
                         }],
                         "id": None,
                         "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
                                            "course_id=x%2Fy%2Fz&topic_id=topic_id_1",
-                        "name": "test_category_1"
+                        "name": "test_category_1",
+                        "thread_counts": None,
                     },
                     {
                         "children":
@@ -475,12 +847,14 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                                 "id": "topic_id_2",
                                 "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
                                                    "course_id=x%2Fy%2Fz&topic_id=topic_id_2",
-                                "name": "test_target_2"
+                                "name": "test_target_2",
+                                "thread_counts": {"discussion": 0, "question": 0},
                             }],
                         "id": None,
                         "thread_list_url": "http://testserver/api/discussion/v1/threads/?"
                                            "course_id=x%2Fy%2Fz&topic_id=topic_id_2",
-                        "name": "test_category_2"
+                        "name": "test_category_2",
+                        "thread_counts": None,
                     }
                 ]
             }
@@ -492,6 +866,8 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
     """Tests for ThreadViewSet list"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         super().setUp()
         self.author = UserFactory.create()
@@ -833,6 +1209,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for ThreadViewSet create"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         super().setUp()
         self.url = reverse("thread-list")
@@ -870,8 +1248,10 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             'commentable_id': ['test_topic'],
             'thread_type': ['discussion'],
             'title': ['Test Title'],
-            "body": ["# Test \n This is a very long body that will be truncated for the preview."],
-            'user_id': [str(self.user.id)]
+            'body': ['# Test \n This is a very long body that will be truncated for the preview.'],
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
         }
 
     def test_error(self):
@@ -900,6 +1280,8 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin):
     """Tests for ThreadViewSet partial_update"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         self.unsupported_media_type = JSONParser.media_type
         super().setUp()
@@ -921,7 +1303,10 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
             'raw_body': 'Edited body',
             'rendered_body': '<p>Edited body</p>',
             'preview_body': 'Edited body',
-            'editable_fields': ['abuse_flagged', 'following', 'raw_body', 'read', 'title', 'topic_id', 'type', 'voted'],
+            'editable_fields': [
+                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'title', 'topic_id', 'type', 'voted'
+            ],
             'created_at': 'Test Created Date',
             'updated_at': 'Test Updated Date',
             'comment_count': 1,
@@ -1001,7 +1386,10 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         assert response_data == self.expected_thread_data({
             'comment_count': 1,
             'read': True,
-            'editable_fields': ['abuse_flagged', 'following', 'raw_body', 'read', 'title', 'topic_id', 'type', 'voted'],
+            'editable_fields': [
+                'abuse_flagged', 'anonymous', 'following', 'raw_body', 'read',
+                'title', 'topic_id', 'type', 'voted'
+            ],
             'response_count': 2
         })
 
@@ -1128,6 +1516,8 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "editable_fields": ["abuse_flagged", "voted"],
             "child_count": 0,
             "can_delete": True,
+            "anonymous": False,
+            "anonymous_to_peers": False,
         }
         response_data.update(overrides or {})
         return response_data
@@ -1484,6 +1874,8 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CommentViewSet create"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         super().setUp()
         self.url = reverse("comment-list")
@@ -1515,9 +1907,11 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["abuse_flagged", "raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "anonymous", "raw_body", "voted"],
             "child_count": 0,
             "can_delete": True,
+            "anonymous": False,
+            "anonymous_to_peers": False,
         }
         response = self.client.post(
             self.url,
@@ -1531,7 +1925,9 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
             'course_id': [str(self.course.id)],
             'body': ['Test body'],
-            'user_id': [str(self.user.id)]
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
         }
 
     def test_error(self):
@@ -1568,6 +1964,8 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, PatchMediaTypeMixin):
     """Tests for CommentViewSet partial_update"""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     def setUp(self):
         self.unsupported_media_type = JSONParser.media_type
         super().setUp()
@@ -1604,6 +2002,8 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "editable_fields": [],
             "child_count": 0,
             "can_delete": True,
+            "anonymous": False,
+            "anonymous_to_peers": False,
         }
         response_data.update(overrides or {})
         return response_data
@@ -1618,7 +2018,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         assert response_data == self.expected_response_data({
             'raw_body': 'Edited body',
             'rendered_body': '<p>Edited body</p>',
-            'editable_fields': ['abuse_flagged', 'raw_body', 'voted'],
+            'editable_fields': ['abuse_flagged', 'anonymous', 'raw_body', 'voted'],
             'created_at': 'Test Created Date',
             'updated_at': 'Test Updated Date'
         })
@@ -1786,9 +2186,11 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "vote_count": 0,
             "abuse_flagged": False,
             "abuse_flagged_any_user": None,
-            "editable_fields": ["abuse_flagged", "raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "anonymous", "raw_body", "voted"],
             "child_count": 0,
             "can_delete": True,
+            "anonymous": False,
+            "anonymous_to_peers": False,
         }
 
         response = self.client.get(self.url)
@@ -1857,6 +2259,8 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
     """
     Test the course discussion settings handler API endpoint.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
@@ -2100,6 +2504,8 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
     """
     Test the course discussion roles management endpoint.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
@@ -2280,3 +2686,90 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
         content = json.loads(response.content.decode('utf-8'))
         assertion = self.assertTrue if action == 'allow' else self.assertFalse
         assertion(any(user.username in x['username'] for x in content['results']))
+
+
+@ddt.ddt
+@httpretty.activate
+class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase):
+    """
+    Tests for the course stats endpoint
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self) -> None:
+        super().setUp()
+        self.course_key = 'course-v1:test+test+test'
+        seed_permissions_roles(self.course_key)
+        self.user = UserFactory(username='user')
+        self.moderator = UserFactory(username='moderator')
+        moderator_role = Role.objects.get(name="Moderator", course_id=self.course_key)
+        moderator_role.users.add(self.moderator)
+        self.stats = [
+            {
+                "active_flags": random.randint(0, 3),
+                "inactive_flags": random.randint(0, 2),
+                "replies": random.randint(0, 30),
+                "responses": random.randint(0, 100),
+                "threads": random.randint(0, 10),
+                "username": f"user-{idx}"
+            }
+            for idx in range(10)
+        ]
+        self.stats_without_flags = [{**stat, "active_flags": None, "inactive_flags": None} for stat in self.stats]
+        self.register_course_stats_response(self.course_key, self.stats, 1, 3)
+        self.url = reverse("discussion_course_activity_stats", kwargs={"course_key_string": self.course_key})
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_regular_user(self):
+        """
+        Tests that for a regular user stats are returned without flag counts
+        """
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.get(self.url)
+        data = response.json()
+        assert data["results"] == self.stats_without_flags
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_moderator_user(self):
+        """
+        Tests that for a moderator user stats are returned with flag counts
+        """
+        self.client.login(username=self.moderator.username, password='test')
+        response = self.client.get(self.url)
+        data = response.json()
+        assert data["results"] == self.stats
+
+    @ddt.data(
+        ("moderator", "flagged", "flagged"),
+        ("moderator", "activity", "activity"),
+        ("moderator", None, "flagged"),
+        ("user", None, "activity"),
+        ("user", "activity", "activity"),
+    )
+    @ddt.unpack
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_sorting(self, username, ordering_requested, ordering_performed):
+        """
+        Test valid sorting options and defaults
+        """
+        self.client.login(username=username, password='test')
+        params = {}
+        if ordering_requested:
+            params = {"order_by": ordering_requested}
+        self.client.get(self.url, params)
+        assert urlparse(
+            httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
+        ).path == f"/api/v1/users/{self.course_key}/stats"
+        assert parse_qs(
+            urlparse(httpretty.last_request().path).query  # lint-amnesty, pylint: disable=no-member
+        ).get("sort_key", None) == [ordering_performed]
+
+    @ddt.data("flagged", "xyz")
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_sorting_error_regular_user(self, order_by):
+        """
+        Test for invalid sorting options for regular users.
+        """
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.get(self.url, {"order_by": order_by})
+        assert "order_by" in response.json()["field_errors"]

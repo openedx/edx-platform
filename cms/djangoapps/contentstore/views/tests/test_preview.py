@@ -8,16 +8,21 @@ from unittest import mock
 
 import ddt
 from django.test.client import Client, RequestFactory
+from django.test.utils import override_settings
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockAside
 
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase, upload_file_to_course,
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.test_asides import AsideTestType
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from cms.djangoapps.xblock_config.models import StudioConfig
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.test_asides import AsideTestType
 
 from ..preview import _preview_module_system, get_preview_fragment
 
@@ -168,13 +173,20 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
 
 @XBlock.needs("field-data")
 @XBlock.needs("i18n")
+@XBlock.needs("mako")
 @XBlock.needs("user")
 @XBlock.needs("teams_configuration")
 class PureXBlock(XBlock):
     """
     Pure XBlock to use in tests.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    def student_view(self, context):
+        """
+        Renders the output that a student will see.
+        """
+        fragment = Fragment()
+        fragment.add_content(self.runtime.service(self, 'mako').render_template('edxmako.html', context))
+        return fragment
 
 
 @ddt.ddt
@@ -206,3 +218,72 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         )
         service = runtime.service(descriptor, expected_service)
         self.assertIsNotNone(service)
+
+
+class CmsModuleSystemShimTest(ModuleStoreTestCase):
+    """
+    Tests that the deprecated attributes in the Module System (XBlock Runtime) return the expected values.
+    """
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+    COURSE_ID = 'edX/CmsModuleShimTest/2021_Fall'
+    PYTHON_LIB_FILENAME = 'test_python_lib.zip'
+    PYTHON_LIB_SOURCE_FILE = './common/test/data/uploads/python_lib.zip'
+
+    def setUp(self):
+        """
+        Set up the user, course and other fields that will be used to instantiate the runtime.
+        """
+        super().setUp()
+        org, number, run = self.COURSE_ID.split('/')
+        self.course = CourseFactory.create(org=org, number=number, run=run)
+        self.user = UserFactory()
+        self.request = RequestFactory().get('/dummy-url')
+        self.request.user = self.user
+        self.request.session = {}
+        self.descriptor = ItemFactory(category="video", parent=self.course)
+        self.field_data = mock.Mock()
+        self.contentstore = contentstore()
+        self.runtime = _preview_module_system(
+            self.request,
+            descriptor=ItemFactory(category="problem", parent=self.course),
+            field_data=mock.Mock(),
+        )
+
+    def test_get_user_role(self):
+        assert self.runtime.get_user_role() == 'staff'
+
+    @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
+    def test_render_template(self):
+        descriptor = ItemFactory(category="pure", parent=self.course)
+        html = get_preview_fragment(self.request, descriptor, {'element_id': 142}).content
+        assert '<div id="142" ns="main">Testing the MakoService</div>' in html
+
+    @override_settings(COURSES_WITH_UNSAFE_CODE=[COURSE_ID])
+    def test_can_execute_unsafe_code(self):
+        assert self.runtime.can_execute_unsafe_code()
+
+    def test_cannot_execute_unsafe_code(self):
+        assert not self.runtime.can_execute_unsafe_code()
+
+    @override_settings(PYTHON_LIB_FILENAME=PYTHON_LIB_FILENAME)
+    def test_get_python_lib_zip(self):
+        zipfile = upload_file_to_course(
+            course_key=self.course.id,
+            contentstore=self.contentstore,
+            source_file=self.PYTHON_LIB_SOURCE_FILE,
+            target_filename=self.PYTHON_LIB_FILENAME,
+        )
+        assert self.runtime.get_python_lib_zip() == zipfile
+
+    def test_no_get_python_lib_zip(self):
+        zipfile = upload_file_to_course(
+            course_key=self.course.id,
+            contentstore=self.contentstore,
+            source_file=self.PYTHON_LIB_SOURCE_FILE,
+            target_filename=self.PYTHON_LIB_FILENAME,
+        )
+        assert self.runtime.get_python_lib_zip() is None
+
+    def test_cache(self):
+        assert hasattr(self.runtime.cache, 'get')
+        assert hasattr(self.runtime.cache, 'set')

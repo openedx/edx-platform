@@ -85,6 +85,17 @@ class CommentsServiceMockMixin:
             status=200
         )
 
+    def register_get_course_commentable_counts_response(self, course_id, thread_counts):
+        """Register a mock response for GET on the CS thread list endpoint"""
+        assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
+
+        httpretty.register_uri(
+            httpretty.GET,
+            f"http://localhost:4567/api/v1/commentables/{course_id}/counts",
+            body=json.dumps(thread_counts),
+            status=200
+        )
+
     def register_get_threads_search_response(self, threads, rewrite, num_pages=1):
         """Register a mock response for GET on the CS thread search endpoint"""
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
@@ -141,6 +152,22 @@ class CommentsServiceMockMixin:
             httpretty.GET,
             "http://localhost:4567/api/v1/threads/{id}".format(id=thread["id"]),
             body=json.dumps(thread),
+            status=200
+        )
+
+    def register_get_comments_response(self, comments, page, num_pages):
+        """Register a mock response for GET on the CS comments list endpoint"""
+        assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
+
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://localhost:4567/api/v1/comments",
+            body=json.dumps({
+                "collection": comments,
+                "page": page,
+                "num_pages": num_pages,
+                "comment_count": len(comments),
+            }),
             status=200
         )
 
@@ -246,6 +273,21 @@ class CommentsServiceMockMixin:
                 "page": page,
                 "num_pages": num_pages,
                 "thread_count": len(threads),
+            }),
+            status=200
+        )
+
+    def register_course_stats_response(self, course_key, stats, page, num_pages):
+        """Register a mock response for GET on the CS user course stats instance endpoint"""
+        assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
+        httpretty.register_uri(
+            httpretty.GET,
+            f"http://localhost:4567/api/v1/users/{course_key}/stats",
+            body=json.dumps({
+                "user_stats": stats,
+                "page": page,
+                "num_pages": num_pages,
+                "count": len(stats),
             }),
             status=200
         )
@@ -381,6 +423,8 @@ class CommentsServiceMockMixin:
         Returns expected thread data in API response
         """
         response_data = {
+            "anonymous": False,
+            "anonymous_to_peers": False,
             "author": self.user.username,
             "author_label": None,
             "created_at": "1970-01-01T00:00:00Z",
@@ -392,7 +436,10 @@ class CommentsServiceMockMixin:
             "abuse_flagged_count": None,
             "voted": False,
             "vote_count": 0,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
+            "editable_fields": [
+                "abuse_flagged", "anonymous", "following", "raw_body", "read",
+                "title", "topic_id", "type", "voted"
+            ],
             "course_id": str(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,

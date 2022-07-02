@@ -18,7 +18,6 @@ from slumber.exceptions import HttpClientError
 
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, COURSE_ASSESSMENT_GRADE_CHANGED
-from openedx.features.enterprise_support.api import enterprise_enabled
 from openedx.features.enterprise_support.tasks import clear_enterprise_customer_data_consent_share_cache
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache, is_enterprise_learner
 from common.djangoapps.student.signals import UNENROLL_DONE
@@ -62,7 +61,7 @@ def handle_enterprise_learner_passing_grade(sender, user, course_id, **kwargs): 
     """
     Listen for a learner passing a course, transmit data to relevant integrated channel
     """
-    if enterprise_enabled() and is_enterprise_learner(user):
+    if is_enterprise_learner(user):
         kwargs = {
             'username': str(user.username),
             'course_run_id': str(course_id)
@@ -76,7 +75,7 @@ def handle_enterprise_learner_subsection(sender, user, course_id, subsection_id,
     """
     Listen for an enterprise learner completing a subsection, transmit data to relevant integrated channel.
     """
-    if enterprise_enabled() and is_enterprise_learner(user):
+    if is_enterprise_learner(user):
         kwargs = {
             'username': str(user.username),
             'course_run_id': str(course_id),

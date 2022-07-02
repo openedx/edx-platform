@@ -26,7 +26,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
-from xmodule.partitions.partitions import UserPartition
+from xmodule.partitions.partitions import UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 
 MAX_EVENTS_IN_FAILURE_OUTPUT = 20
 

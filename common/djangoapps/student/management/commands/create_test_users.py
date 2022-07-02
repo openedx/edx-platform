@@ -64,6 +64,11 @@ class Command(BaseCommand):
             ),
             action='store_true'
         )
+        parser.add_argument(
+            '--ignore_user_already_exists',
+            help="Don't fail if a user already exists. Log the error and attempt to enroll them in the course.",
+            action='store_true'
+        )
 
     def handle(self, *args, **options):
         course_key = options['course']
@@ -78,5 +83,6 @@ class Command(BaseCommand):
             ),
             enrollment_mode=enrollment_mode,
             course_staff=course_staff,
-            activate=True
+            activate=True,
+            ignore_user_already_exists=options['ignore_user_already_exists']
         )

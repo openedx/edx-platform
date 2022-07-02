@@ -12,7 +12,7 @@ from edx_user_state_client.tests import UserStateClientTestBase
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):

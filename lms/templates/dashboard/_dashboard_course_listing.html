@@ -6,7 +6,7 @@ import six
 
 from django.conf import settings
 from django.utils.http import urlencode, urlquote_plus
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.translation import ungettext
 from django.urls import reverse
 from common.djangoapps.course_modes.models import CourseMode
@@ -42,6 +42,14 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
     cert_name_long = settings.CERT_NAME_LONG
 
   is_course_expired = hasattr(show_courseware_link, 'error_code') and show_courseware_link.error_code == 'audit_expired'
+
+  display_course_upgrade = (
+      use_ecommerce_payment_flow
+      and course_mode_info
+      and course_mode_info['show_upsell']
+      and not entitlement
+      and course_mode_info['verified_sku']
+  )
 %>
 
 <%
@@ -75,7 +83,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
         % endif
       >
 <article class="course${mode_class}" aria-labelledby="course-title-${enrollment.course_id}" id="course-card-${course_card_index}">
-  <% course_target = reverse(course_home_url_name(course_overview.id), args=[str(course_overview.id)]) if course_home_legacy_is_active(course_overview.id) else get_learning_mfe_home_url(course_key=course_overview.id, view_name="home") %>
+  <% course_target = reverse(course_home_url_name(course_overview.id), args=[str(course_overview.id)]) if course_home_legacy_is_active(course_overview.id) else get_learning_mfe_home_url(course_key=course_overview.id, url_fragment="home") %>
   <section class="details" aria-labelledby="details-heading-${enrollment.course_id}">
       <h2 class="hd hd-2 sr" id="details-heading-${enrollment.course_id}">${_('Course details')}</h2>
     <div class="wrapper-course-image" aria-hidden="true">
@@ -345,9 +353,10 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
       % if related_programs:
         <div class="message message-related-programs is-shown">
           <span class="related-programs-preface" tabindex="0">${_('Related Programs')}:</span>
-          <ul>
+          <ul class="related-program-container" >
             % for program in related_programs:
-            <li>
+              ## intentionally using multiple classnames here to bump up specificity
+            <li class="related-program-element important-element">
               <span class="category-icon ${program['type'].lower()}-icon" aria-hidden="true"></span>
               <span><a href="${program['detail_url']}">${u'{title} {type}'.format(title=program['title'], type=program['type'])}</a></span>
             </li>
@@ -412,7 +421,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
           </div>
         % endif
 
-        % if course_mode_info and course_mode_info['show_upsell'] and not entitlement:
+        % if display_course_upgrade:
           <div class="message message-upsell has-actions is-shown">
             <div class="wrapper-extended">
               <div class="wrapper-icon-message">
@@ -433,11 +442,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 </div>
               </div>
               <div class="action-upgrade-container">
-                % if use_ecommerce_payment_flow and course_mode_info['verified_sku']:
-                  <a class="action action-upgrade track_course_dashboard_green_button" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
-                % else:
-                  <a class="action action-upgrade track_course_dashboard_green_button" href="${IDVerificationService.get_verify_location(course_id=course_overview.id)}" data-course-id="${course_overview.id}" data-user="${user.username}">
-                % endif
+                <a class="action action-upgrade track_course_dashboard_green_button" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
                   <span class="wrapper-copy">
                     <span class="copy" id="upgrade-to-verified">${_("Upgrade")}</span>
                       <span class="sr">&nbsp;${_(course_overview.display_name_with_default)}</span>

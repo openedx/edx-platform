@@ -16,6 +16,9 @@ from django.conf import settings
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from edx_toggles.toggles.testutils import override_waffle_flag
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
 from common.djangoapps.student.tests.factories import UserFactory
@@ -36,10 +39,6 @@ from lms.djangoapps.grades.tasks import (
     recalculate_subsection_grade_v3
 )
 from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from .utils import mock_get_score
 
@@ -162,10 +161,11 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             assert mock_block_structure_create.call_count == 1
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 40, True),
-        (ModuleStoreEnum.Type.mongo, 1, 40, False),
-        (ModuleStoreEnum.Type.split, 3, 40, True),
-        (ModuleStoreEnum.Type.split, 3, 40, False),
+        (ModuleStoreEnum.Type.mongo, 1, 42, True),
+        (ModuleStoreEnum.Type.mongo, 1, 42, False),
+        (ModuleStoreEnum.Type.split, 2, 42, True),
+        (ModuleStoreEnum.Type.split, 2, 42, False),
+
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -177,8 +177,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 40),
-        (ModuleStoreEnum.Type.split, 3, 40),
+        (ModuleStoreEnum.Type.mongo, 1, 42),
+        (ModuleStoreEnum.Type.split, 2, 42),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -208,7 +208,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         # So in total, 3 sequential parents, with one inaccessible.
         for sequential in (accessible_seq, inaccessible_seq):
             sequential.children = [self.problem.location]
-            modulestore().update_item(sequential, self.user.id)
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+                self.store.update_item(sequential, self.user.id)
 
         # Make sure the signal is sent for only the 2 accessible sequentials.
         self._apply_recalculate_subsection_grade()
@@ -223,8 +224,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 23),
-        (ModuleStoreEnum.Type.split, 3, 23),
+        (ModuleStoreEnum.Type.mongo, 1, 25),
+        (ModuleStoreEnum.Type.split, 2, 25),
     )
     @ddt.unpack
     def test_persistent_grades_not_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -238,8 +239,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             assert len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)) == 0
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 41),
-        (ModuleStoreEnum.Type.split, 3, 41),
+        (ModuleStoreEnum.Type.mongo, 1, 43),
+        (ModuleStoreEnum.Type.split, 2, 43),
     )
     @ddt.unpack
     def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):

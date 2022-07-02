@@ -74,6 +74,7 @@ def create_course_enrollment_celebration(sender, instance, created, **kwargs):
         CourseEnrollmentCelebration.objects.create(
             enrollment=instance,
             celebrate_first_section=True,
+            celebrate_weekly_goal=True,
         )
     except IntegrityError:
         # A celebration object was already created. Shouldn't happen, but ignore it if it does.

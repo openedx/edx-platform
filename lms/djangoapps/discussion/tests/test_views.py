@@ -1,8 +1,7 @@
 """
 Tests the forum notification views.
 """
-
-
+import itertools
 import json
 import logging
 from datetime import datetime
@@ -16,11 +15,25 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import translation
 from edx_django_utils.cache import RequestCache
+from edx_toggles.toggles.testutils import override_waffle_flag
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_MODULESTORE,
+    TEST_DATA_MONGO_AMNESTY_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import (
+    CourseFactory,
+    ItemFactory,
+    check_mongo_calls
+)
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.roles import CourseStaffRole, UserBasedRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import EventTestMixin, UrlResetMixin
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion import views
@@ -39,6 +52,7 @@ from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     topic_name_to_id
 )
 from lms.djangoapps.discussion.django_comment_client.utils import strip_none
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.views import _get_discussion_default_topic_id, course_discussions_settings_handler
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -56,14 +70,6 @@ from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_MODULESTORE,
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase
-)
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 log = logging.getLogger(__name__)
 
@@ -280,7 +286,7 @@ def make_mock_request_impl(  # lint-amnesty, pylint: disable=missing-function-do
     return mock_request_impl
 
 
-class StringEndsWithMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring,eq-without-hash
+class StringEndsWithMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, suffix):
         self.suffix = suffix
 
@@ -288,7 +294,7 @@ class StringEndsWithMatcher:  # lint-amnesty, pylint: disable=missing-class-docs
         return other.endswith(self.suffix)
 
 
-class PartialDictMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring,eq-without-hash
+class PartialDictMatcher:  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, expected_values):
         self.expected_values = expected_values
 
@@ -445,7 +451,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):  # lint-amne
             assert 'This is a private discussion. You do not have permissions to view this discussion' in html
 
 
-class AllowPlusOrMinusOneInt(int):  # pylint: disable=eq-without-hash
+class AllowPlusOrMinusOneInt(int):
     """
     A workaround for the fact that assertNumQueries doesn't let you
     specify a range or any tolerance. An 'int' that is 'equal to' its value,
@@ -483,15 +489,15 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 21, 7),
         (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 21, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 21, 8),
-        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 21, 8),
+        (ModuleStoreEnum.Type.split, False, 1, 2, 2, 21, 8),
+        (ModuleStoreEnum.Type.split, False, 50, 2, 2, 21, 8),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
         (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 21, 7),
         (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 21, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 21, 8),
-        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 21, 8),
+        (ModuleStoreEnum.Type.split, True, 1, 2, 2, 21, 8),
+        (ModuleStoreEnum.Type.split, True, 50, 2, 2, 21, 8),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -1898,6 +1904,7 @@ class CourseDiscussionTopicsTestCase(DividedDiscussionsTestCase):
     """
     Tests the `divide_discussion_topics` view.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def test_non_staff(self):
         """
@@ -1953,6 +1960,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
     """
     Tests the course_discussion_settings_handler
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def get_expected_response(self):
         """
@@ -2225,3 +2233,71 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
         _, event = self.get_latest_call_args()
         event_items = list(event.items())
         assert ((kv_pair in event_items) for kv_pair in expected_event_items)
+
+
+@ddt.ddt
+@patch(
+    'openedx.core.djangoapps.django_comment_common.comment_client.utils.perform_request',
+    Mock(
+        return_value={
+            "default_sort_key": "date",
+            "upvoted_ids": [],
+            "downvoted_ids": [],
+            "subscribed_thread_ids": [],
+        }
+    )
+)
+class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
+    """
+    Tests that the MFE upgrade banner and MFE is shown in the correct situation with the correct UI
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create()
+        self.staff_user = AdminFactory.create()
+
+    @ddt.data(*itertools.product(("http://test.url", None), (True, False), (True, False)))
+    @ddt.unpack
+    def test_staff_user(self, mfe_url, toggle_enabled, is_staff):
+        """
+        Verify that the banner is shown with the correct links if the user is staff and the
+        mfe url is configured.
+        """
+        with override_settings(DISCUSSIONS_MICROFRONTEND_URL=mfe_url):
+            with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, toggle_enabled):
+                username = self.staff_user.username if is_staff else self.user.username
+                self.client.login(username=username, password='test')
+                response = self.client.get(reverse("forum_form_discussion", args=[self.course.id]))
+                content = response.content.decode('utf8')
+        if mfe_url and is_staff:
+            assert "made some changes to this experience!" in content
+            if toggle_enabled:
+                assert "legacy experience" in content
+                assert "new experience" not in content
+            else:
+                assert "legacy experience" not in content
+                assert "new experience" in content
+        else:
+            assert "made some changes to this experience!" not in content
+
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    @ddt.data(*itertools.product((True, False), ("legacy", "new", None)))
+    @ddt.unpack
+    def test_correct_experience_is_shown(self, toggle_enabled, experience):
+        """
+        Verify that the correct experience is shown based on the MFE toggle flag and the query param.
+        """
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, toggle_enabled):
+            self.client.login(username=self.staff_user.username, password='test')
+            url = reverse("forum_form_discussion", args=[self.course.id])
+            experience_in_url = ""
+            if experience is not None:
+                experience_in_url = f"discussions_experience={experience}"
+            response = self.client.get(f"{url}?{experience_in_url}")
+            content = response.content.decode('utf8')
+        if (toggle_enabled and experience != "legacy") or experience == "new":
+            assert "discussions-mfe-tab-embed" in content
+        else:
+            assert "discussions-mfe-tab-embed" not in content

@@ -165,6 +165,31 @@ class EnrollmentTest(CacheIsolationTestCase):
         for result_enrollment in result:
             assert result_enrollment['course']['course_id'] in [enrollment['course_id'] for enrollment in enrollments]
 
+    @ddt.data(
+        # Simple test of honor and verified.
+        ([
+            {'course_id': 'the/first/course', 'course_modes': [], 'mode': 'honor'},
+            {'course_id': 'the/second/course', 'course_modes': ['honor', 'verified'], 'mode': 'verified'}
+        ], 1),
+
+        # No enrollments
+        ([], 0),
+
+        # One Enrollment
+        ([
+            {'course_id': 'the/third/course', 'course_modes': ['honor', 'verified', 'audit'], 'mode': 'audit'}
+        ], 0),
+    )
+    @ddt.unpack
+    def test_get_verified_enrollments(self, enrollments, num_verified_enrollments):
+        for enrollment in enrollments:
+            fake_data_api.add_course(enrollment['course_id'], course_modes=enrollment['course_modes'])
+            api.add_enrollment(self.USERNAME, enrollment['course_id'], enrollment['mode'])
+        result = api.get_verified_enrollments(self.USERNAME)
+        assert num_verified_enrollments == len(result)
+        for result_enrollment in result:
+            assert result_enrollment['course']['course_id'] in [enrollment['course_id'] for enrollment in enrollments]
+
     def test_update_enrollment(self):
         # Add fake course enrollment information to the fake data API
         fake_data_api.add_course(self.COURSE_ID, course_modes=['honor', 'verified', 'audit'])

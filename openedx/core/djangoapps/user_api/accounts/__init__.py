@@ -61,7 +61,11 @@ EMAIL_CONFLICT_MSG = _(
     "It looks like {email_address} belongs to an existing account. "
     "Try again with a different email address."
 )
-AUTHN_EMAIL_CONFLICT_MSG = _("It looks like this email address is already registered")
+AUTHN_EMAIL_CONFLICT_MSG = _(  # pylint: disable=translation-of-non-string
+    f'This email is already associated with an existing or previous {settings.PLATFORM_NAME} account')
+AUTHN_PASSWORD_COMPROMISED_MSG = _(
+    "The password you entered is on a list of known compromised passwords. Please choose a different one."
+)
 USERNAME_CONFLICT_MSG = _(
     "It looks like {username} belongs to an existing account. "
     "Try again with a different username."

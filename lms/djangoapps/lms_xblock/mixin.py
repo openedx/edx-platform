@@ -2,7 +2,7 @@
 Namespace that defines fields common to all blocks used in the LMS
 """
 
-#from django.utils.translation import ugettext_noop as _
+#from django.utils.translation import gettext_noop as _
 
 
 from lazy import lazy
@@ -12,8 +12,8 @@ from xblock.fields import Boolean, Dict, Scope, String
 from xblock.validation import ValidationMessage
 
 from lms.lib.utils import is_unit
-from xmodule.modulestore.inheritance import UserPartitionList
-from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
+from xmodule.modulestore.inheritance import UserPartitionList  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 
 # Please do not remove, this is a workaround for Django 1.8.
 # more information can be found here: https://openedx.atlassian.net/browse/PLAT-902
@@ -196,7 +196,7 @@ class LmsBlockMixin(XBlockMixin):
         """
         Validates the state of this xblock instance.
         """
-        _ = self.runtime.service(self, "i18n").ugettext
+        _ = self.runtime.service(self, "i18n").gettext
         validation = super().validate()
         has_invalid_user_partitions = False
         has_invalid_groups = False

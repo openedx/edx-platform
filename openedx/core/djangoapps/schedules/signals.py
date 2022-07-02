@@ -82,8 +82,8 @@ def reset_schedule_on_mode_change(sender, user, course_key, mode, **kwargs):  # 
     # If switching to audit, reset to when the user got access to course. This is for the case where a user
     # upgrades to verified (resetting their date), then later refunds the order and goes back to audit. We want
     # to make sure that audit users go back to their normal audit schedule access.
-    use_availability_date = mode in CourseMode.AUDIT_MODES
-    reset_self_paced_schedule(user, course_key, use_availability_date=use_availability_date)
+    use_enrollment_date = mode in CourseMode.AUDIT_MODES
+    reset_self_paced_schedule(user, course_key, use_enrollment_date=use_enrollment_date)
 
 
 def _calculate_upgrade_deadline(course_id, content_availability_date):  # lint-amnesty, pylint: disable=missing-function-docstring

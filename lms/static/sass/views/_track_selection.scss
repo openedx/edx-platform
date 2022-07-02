@@ -225,6 +225,32 @@
         content: '';
     }
 
+    section.error-container {
+        height: 42rem;
+    }
+
+    .error-button {
+        margin-top: 2.8rem;
+        margin-bottom: 1.5rem;
+        padding: 10px 16px;
+        box-shadow: none;
+        border-radius: 0px;
+        position: relative;
+    }
+
+    .error-button span {
+        font-weight: 500;
+        font-size: 18px;
+        color: #fff;
+    }
+
+    .error-button:hover {
+        background: #2D494E;
+        border-color: transparent;
+        color: #fff;
+        text-decoration: none;
+    }
+
     @media (max-width: map-get($grid-breakpoints, 'sm')) {
         .collapsible {
             margin-bottom: 1.3rem;

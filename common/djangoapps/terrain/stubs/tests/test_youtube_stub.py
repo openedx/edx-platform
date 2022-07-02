@@ -68,4 +68,4 @@ class StubYouTubeServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disabl
         assert response.status_code == 200
 
         # ensure that server config dict is empty after successful reset
-        assert self.server.config == {}
+        assert not self.server.config

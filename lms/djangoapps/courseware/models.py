@@ -16,6 +16,7 @@ ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 import itertools
 import logging
+import json
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -135,6 +136,29 @@ class StudentModule(models.Model):
             return queryset.using("read_replica")
         else:
             return queryset
+
+    @classmethod
+    def get_score_done(cls, block_key, user_id):
+        try:
+            obj = cls.objects.filter(
+                student_id=user_id,
+                module_state_key=block_key,
+                module_type="problem"
+            ).last()
+
+            if obj is None:
+                return False
+            
+            if not hasattr(obj, 'state'):
+                return False
+
+            res = json.loads(obj.state)
+            if not 'score' in res:
+                return False
+
+            return res['score']['raw_earned'] >= res['score']['raw_possible']
+        except:
+            return False
 
     def __repr__(self):
         return 'StudentModule<{!r}>'.format(

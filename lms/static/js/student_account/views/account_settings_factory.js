@@ -22,6 +22,7 @@
             platformName,
             contactEmail,
             allowEmailChange,
+            enableCoppaCompliance,
             socialPlatforms,
             syncLearnerProfileData,
             enterpriseName,
@@ -38,7 +39,7 @@
                 emailFieldView, secondaryEmailFieldView, socialFields, accountDeletionFields, platformData,
                 aboutSectionMessageType, aboutSectionMessage, fullnameFieldView, countryFieldView,
                 fullNameFieldData, emailFieldData, secondaryEmailFieldData, countryFieldData, additionalFields,
-                fieldItem, emailFieldViewIndex, focusId,
+                fieldItem, emailFieldViewIndex, focusId, yearOfBirthViewIndex, levelOfEducationFieldData,
                 tabIndex = 0;
 
             $accountSettingsElement = $('.wrapper-account-settings');
@@ -134,6 +135,11 @@
                 };
             }
 
+            levelOfEducationFieldData = fieldsData.level_of_education.options;
+            if (enableCoppaCompliance) {
+                levelOfEducationFieldData = levelOfEducationFieldData.filter(option => option[0] !== 'el');
+            }
+
             aboutSectionsData = [
                 {
                     title: gettext('Basic Account Information'),
@@ -211,7 +217,7 @@
                                 model: userAccountModel,
                                 title: gettext('Education Completed'),
                                 valueAttribute: 'level_of_education',
-                                options: fieldsData.level_of_education.options,
+                                options: levelOfEducationFieldData,
                                 persistChanges: true
                             })
                         },
@@ -245,6 +251,13 @@
                     ]
                 }
             ];
+
+            if (enableCoppaCompliance){
+              yearOfBirthViewIndex = aboutSectionsData[1]['fields'].findIndex(function (field) {
+	              return field['view']['options']['valueAttribute']=== 'year_of_birth';
+                });
+              aboutSectionsData[1]['fields'].splice(yearOfBirthViewIndex,1)
+}
 
 			// Secondary email address
             if (isSecondaryEmailFeatureEnabled) {

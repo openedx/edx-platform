@@ -19,11 +19,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    TEST_DATA_MONGO_MODULESTORE,
-    TEST_DATA_SPLIT_MODULESTORE,
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MONGO_MODULESTORE
 
 DETACHED_BLOCK_TYPES = dict(XBlock.load_tagged_classes('detached'))
 
@@ -421,7 +417,6 @@ class TestSplitDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the SplitMongoModulestore.
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     __test__ = True
 
     @ddt.data(*TESTABLE_BLOCK_TYPES)

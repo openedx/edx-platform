@@ -2,7 +2,7 @@
 <%page expression_filter="h"/>
 <%inherit file="../main.html"/>
 <%!
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangolib.markup import HTML, Text
@@ -43,7 +43,7 @@ ${_("API Access Request Status")}
       </div>
 
       <p>${_('If you would like to regenerate your API client information, please use the form below.')}</p>
-      
+
       % endif
       <div class="catalog-body">
         <div class="api-form-container">
