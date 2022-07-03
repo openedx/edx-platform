@@ -1852,7 +1852,9 @@ STATICI18N_OUTPUT_DIR = "js/i18n"
 
 # Localization strings (e.g. django.po) are under these directories
 def _make_locale_paths(settings):  # pylint: disable=missing-function-docstring
-    locale_paths = [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/
+    locale_paths = list(settings.PREPEND_LOCALE_PATHS)
+    locale_paths += [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/
+
     if settings.ENABLE_COMPREHENSIVE_THEMING:
         # Add locale paths to settings for comprehensive theming.
         for locale_path in settings.COMPREHENSIVE_THEME_LOCALE_PATHS:
@@ -4349,6 +4351,13 @@ COMPREHENSIVE_THEME_DIRS = []
 # .. setting_description: A list of the paths to themes locale directories e.g.
 #   "COMPREHENSIVE_THEME_LOCALE_PATHS" : ["/edx/src/edx-themes/conf/locale"].
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
+
+
+# .. setting_name: PREPEND_LOCALE_PATHS
+# .. setting_default: []
+# .. setting_description: A list of the paths to locale directories to load first e.g.
+#   "PREPEND_LOCALE_PATHS" : ["/edx/my-locales/"].
+PREPEND_LOCALE_PATHS = []
 
 # .. setting_name: DEFAULT_SITE_THEME
 # .. setting_default: None

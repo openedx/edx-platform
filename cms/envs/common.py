@@ -2007,6 +2007,12 @@ COMPREHENSIVE_THEME_DIRS = []
 #   "COMPREHENSIVE_THEME_LOCALE_PATHS" : ["/edx/src/edx-themes/conf/locale"].
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
 
+# .. setting_name: PREPEND_LOCALE_PATHS
+# .. setting_default: []
+# .. setting_description: A list of the paths to locale directories to load first e.g.
+#   "PREPEND_LOCALE_PATHS" : ["/edx/my-locales/"].
+PREPEND_LOCALE_PATHS = []
+
 # .. setting_name: DEFAULT_SITE_THEME
 # .. setting_default: None
 # .. setting_description: See LMS annotation.
