@@ -86,7 +86,7 @@ def delete_logged_in_cookies(response):
 
 def standard_cookie_settings(request):
     """ Returns the common cookie settings (e.g. expiration time). """
-
+    #test
     cookie_settings = {
         'domain': settings.SHARED_COOKIE_DOMAIN,
         'path': '/',
