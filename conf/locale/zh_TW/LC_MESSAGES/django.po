@@ -177,7 +177,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-12 20:44+0000\n"
+"POT-Creation-Date: 2022-06-26 20:47+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/open-edx/teams/6205/zh_TW/)\n"
@@ -187,6 +187,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/item.py xmodule/html_module.py
+msgid "Text"
+msgstr "文本"
 
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
@@ -199,11 +205,6 @@ msgid "Discussion"
 msgstr "討論區"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
-msgstr "文本"
-
-#: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr ""
@@ -213,7 +214,7 @@ msgid "Video"
 msgstr "影片"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: common/lib/xmodule/xmodule/video_module/video_module.py
+#: xmodule/video_module/video_module.py
 msgid "Advanced"
 msgstr "進階"
 
@@ -223,40 +224,39 @@ msgid "Entrance Exam"
 msgstr "資格考試"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: common/lib/xmodule/xmodule/unit_block.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
-#: lms/templates/seq_module.html
+#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
+#: lms/templates/ccx/schedule.html lms/templates/seq_module.html
 msgid "Unit"
 msgstr "單元"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: xmodule/library_content_module.py
 msgid "Empty"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#: xmodule/video_module/video_handlers.py
 #, python-brace-format
 msgid "The following parameters are required: {missing}."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#: xmodule/video_module/video_handlers.py
 msgid ""
 "There is a problem with this transcript file. Try to upload a different "
 "file."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#: xmodule/video_module/video_handlers.py
 #, python-brace-format
 msgid "A transcript with the \"{language_code}\" language code already exists."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#: xmodule/video_module/video_handlers.py
 msgid "A transcript file is required."
 msgstr ""
 
@@ -267,7 +267,7 @@ msgid "Name"
 msgstr "名稱"
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: xmodule/video_module/video_xfields.py
 msgid "Video ID"
 msgstr "影片ID"
 
@@ -301,8 +301,7 @@ msgid "Log out"
 msgstr ""
 
 #: common/djangoapps/course_modes/admin.py
-#: common/djangoapps/course_modes/models.py
-#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/djangoapps/course_modes/models.py xmodule/library_content_module.py
 msgid "Mode"
 msgstr "模式"
 
@@ -351,18 +350,12 @@ msgid "Professional Ed"
 msgstr "專業的 Ed"
 
 #: common/djangoapps/course_modes/models.py
-#: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/conditional_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-#: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/library_sourced_block.py
-#: common/lib/xmodule/xmodule/lti_module.py
-#: common/lib/xmodule/xmodule/split_test_module.py
-#: common/lib/xmodule/xmodule/unit_block.py
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-#: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+#: xmodule/annotatable_module.py xmodule/capa_module.py
+#: xmodule/conditional_module.py xmodule/html_module.py
+#: xmodule/library_content_module.py xmodule/library_sourced_block.py
+#: xmodule/lti_module.py xmodule/split_test_module.py xmodule/unit_block.py
+#: xmodule/word_cloud_module.py xmodule/x_module.py
 msgid "Display Name"
 msgstr "顯示名稱"
 
@@ -1544,13 +1537,11 @@ msgstr "對於可能的提交文件無法重新計分"
 msgid "Question {}"
 msgstr ""
 
-#: common/lib/capa/capa/capa_problem.py
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
 msgid "Incorrect"
 msgstr "不正確"
 
-#: common/lib/capa/capa/capa_problem.py
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
 msgid "Correct"
 msgstr "正確"
 
@@ -1707,8 +1698,7 @@ msgstr "正確:"
 msgid "Incorrect:"
 msgstr "不正確:"
 
-#: common/lib/capa/capa/responsetypes.py
-#: common/lib/xmodule/xmodule/capa_module.py
+#: common/lib/capa/capa/responsetypes.py xmodule/capa_module.py
 msgid "Answer"
 msgstr "答案"
 
@@ -1966,2611 +1956,6 @@ msgstr ""
 
 #: common/lib/capa/capa/safe_exec/remote_exec.py
 msgid "Invalid JSON response received from codejail api service."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/annotatable_module.py
-msgid "XML data for the annotation"
-msgstr "XML 數據註解"
-
-#: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/conditional_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-#: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/library_root_xblock.py
-#: common/lib/xmodule/xmodule/library_sourced_block.py
-#: common/lib/xmodule/xmodule/poll_module.py
-#: common/lib/xmodule/xmodule/unit_block.py
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-#: common/lib/xmodule/xmodule/x_module.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid "The display name for this component."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/annotatable_module.py
-msgid "Annotation"
-msgstr "註解"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Blank Advanced Problem"
-msgstr "空白進階問題"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Number of attempts taken by the student on this problem"
-msgstr "學生在這個問題的嘗試次數"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Maximum Attempts"
-msgstr "最大嘗試次數"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"Defines the number of times a student can try to answer this problem. If the"
-" value is not set, infinite attempts are allowed."
-msgstr "定義學生可以嘗試回答這個問題的數量。如果該值沒有被設置，就可以無限的嘗試。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Date that this problem is due by"
-msgstr "此問題的截止日期"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Amount of time after the due date that submissions will be accepted"
-msgstr "在截止日期之後，提交還可以被接受的時間長度。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Show Results"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"Defines when to show whether a learner's answer to the problem is correct. "
-"Configured on the subsection."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Always"
-msgstr "總是"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Never"
-msgstr "從不"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Past Due"
-msgstr "已到期"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Show Answer"
-msgstr "顯示答案"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"Defines when to show the answer to the problem. A default value can be set "
-"in Advanced Settings."
-msgstr "定義何時顯示這個問題的答案。預設值可以在高級設置中設置。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Answered"
-msgstr "已回答"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Attempted or Past Due"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Closed"
-msgstr "已關閉"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Finished"
-msgstr "已完成"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Correct or Past Due"
-msgstr "正確或已過期"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "After Some Number of Attempts"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "After All Attempts"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "After All Attempts or Correct"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Attempted"
-msgstr "已嘗試"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Show Answer: Number of Attempts"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"Number of times the student must attempt to answer the question before the "
-"Show Answer button appears."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Whether to force the save button to appear on the page"
-msgstr "是否強制 儲存按鈕 顯示在這個頁面上"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Show Reset Button"
-msgstr "顯示重新設定按鈕"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"Determines whether a 'Reset' button is shown so the user may reset their "
-"answer. A default value can be set in Advanced Settings."
-msgstr "是否顯示’重設’按鈕以便學生可以重設它們的答案。預設值可以在進階設定裡設定。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Randomization"
-msgstr "隨機化"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"Defines when to randomize the variables specified in the associated Python "
-"script. For problems that do not randomize values, specify \"Never\". "
-msgstr "定義何時隨機的在相關的Python腳本指定的變數。對於問題不隨機值，指定“從不”。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "On Reset"
-msgstr "在 重設"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Per Student"
-msgstr "每個學生"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "XML data for the problem"
-msgstr "這個問題的XML數據"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Dictionary with the correctness of current student answers"
-msgstr "目前學生答案的正確性的辭典"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Dictionary for maintaining the state of inputtypes"
-msgstr "維護輸入種類狀態的辭典"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Dictionary with the current student responses"
-msgstr "對於目前學生的回應的辭典"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Dictionary with the current student score"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Whether or not the answers have been saved since last submit"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Whether the student has answered the problem"
-msgstr "學生是否已經回答問題"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Random seed for this student"
-msgstr "Random Seed 對這名學生"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Last submission time"
-msgstr "最後提交時間"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Timer Between Attempts"
-msgstr "嘗試之間的時間"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"Seconds a student must wait between submissions for a problem with multiple "
-"attempts."
-msgstr "學生在多次嘗試提交問題之間的等待秒數"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Problem Weight"
-msgstr "問題權重"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"Defines the number of points each problem is worth. If the value is not set,"
-" each response field in the problem is worth one point."
-msgstr "定義每個問題的點數價值。如果沒有設定值，每個在問題中的回應欄位都值一點。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Markdown source of this module"
-msgstr "此模塊的Markdown資源"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"Source code for LaTeX and Word problems. This feature is not well-supported."
-msgstr "原始碼 LaTeX 和 Word 問題。此功能沒有得到很好的支援。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Enable LaTeX templates?"
-msgstr "啟用LaTeX 模板？"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Matlab API key"
-msgstr "Matlab API 密鑰"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
-"Service. This key is granted for exclusive use by this course for the "
-"specified duration. Please do not share the API key with other courses and "
-"notify MathWorks immediately if you believe the key is exposed or "
-"compromised. To obtain a key for your course, or to report an issue, please "
-"contact moocsupport@mathworks.com"
-msgstr ""
-"輸入 "
-"MATLAB託管服務提供MathWorks公司的API密鑰。這個密鑰被授予通過本課程的指定時間獨家使用。請不要共享的API密鑰與其他課程，並立即通知MathWorks公司，如果你認為密鑰被暴露或損害。為了獲得一個關鍵的課程，或報告的問題，請聯繫moocsupport@mathworks.com"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"We're sorry, there was an error with processing your request. Please try "
-"reloading your page and trying again."
-msgstr "很抱歉，處理您的請求時出現有一個錯誤。請重新載入頁面，並再次嘗試。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"The state of this problem has changed since you loaded this page. Please "
-"refresh your page."
-msgstr "這個問題的狀態，因為您載入這個頁面已經改變。請重新整理您的頁面。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Answer ID"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Question"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Correct Answer"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
-#: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-#: lms/templates/manage_user_standing.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-#: lms/templates/survey/survey.html
-#: lms/templates/widgets/footer-language-selector.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
-#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Submit"
-msgstr "提交"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Submitting"
-msgstr "提交中"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Warning: The problem has been reset to its initial state!"
-msgstr "警告：該問題已被重置為初始狀態！"
-
-#. Translators: Following this message, there will be a bulleted list of
-#. items.
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid ""
-"The problem's state was corrupted by an invalid submission. The submission "
-"consisted of:"
-msgstr "由於一個無效的提交，該問題的狀態已損壞。提交包括："
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "If this error persists, please contact the course staff."
-msgstr "如果此錯誤仍然存在，請聯繫課程的工作人員。"
-
-#. Translators: {previous_hints} is the HTML of hints that have already been
-#. generated, {hint_number_prefix}
-#. is a header for this hint, and {hint_text} is the text of the hint itself.
-#. This string is being passed to translation only for possible reordering of
-#. the placeholders.
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
-msgstr ""
-
-#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
-#. hints.
-#. This text is shown in bold before the accompanying hint text.
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid "Hint ({hint_num} of {hints_count}): "
-msgstr "提示 ({hint_num}, 共 {hints_count}):"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid ""
-"Your answers were previously saved. Click '{button_name}' to grade them."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid "Incorrect ({progress} point)"
-msgid_plural "Incorrect ({progress} points)"
-msgstr[0] "不正確({progress} points)"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid "Correct ({progress} point)"
-msgid_plural "Correct ({progress} points)"
-msgstr[0] "正確({progress} points)"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid "Partially correct ({progress} point)"
-msgid_plural "Partially correct ({progress} points)"
-msgstr[0] "部分正確({progress} points)"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Partially Correct"
-msgstr "部分正確"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Answer submitted."
-msgstr ""
-
-#. Translators: 'closed' means the problem's due date has passed. You may no
-#. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Problem is closed."
-msgstr "問題已經關閉"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Problem must be reset before it can be submitted again."
-msgstr "問題再次送出前必須先重置。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid "You must wait at least {wait} seconds between submissions."
-msgstr "您必須等待至少{wait} 秒於提交之間"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid ""
-"You must wait at least {wait_secs} between submissions. {remaining_secs} "
-"remaining."
-msgstr "在兩次提交之間需要等待 {wait_secs}，尚需等待 {remaining_secs}。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid "{num_hour} hour"
-msgid_plural "{num_hour} hours"
-msgstr[0] "{num_hour} 小時"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid "{num_minute} minute"
-msgid_plural "{num_minute} minutes"
-msgstr[0] "{num_minute} 分鐘"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid "{num_second} second"
-msgid_plural "{num_second} seconds"
-msgstr[0] "{num_second} 秒"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Problem needs to be reset prior to save."
-msgstr "問題需要在保存之前進行重設。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Your answers have been saved."
-msgstr "您的答案已經儲存"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-#, python-brace-format
-msgid ""
-"Your answers have been saved but not graded. Click '{button_name}' to grade "
-"them."
-msgstr "您的答案已儲存但不計分，您可點按'{button_name}'以評分並觀看詳解。"
-
-#. Translators: 'closed' means the problem's due date has passed. You may no
-#. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "You cannot select Reset for a problem that is closed."
-msgstr "對於已關閉的問題，您無法選擇重置。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "You must submit an answer before you can select Reset."
-msgstr "您必須先送出答案才能選擇重置。"
-
-#. Translators: 'rescoring' refers to the act of re-submitting a student's
-#. solution so it can get a new score.
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Problem's definition does not support rescoring."
-msgstr "問題的定義不支持成績複查。"
-
-#: common/lib/xmodule/xmodule/capa_module.py
-msgid "Problem must be answered before it can be graded again."
-msgstr "問題必須回答，才可以再次分級。"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-msgid "Conditional"
-msgstr "附條件的"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-msgid "List of urls of children that are references to external modules"
-msgstr "引用外部模組的子節點的網址列表"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-msgid "Source Components"
-msgstr "源組件"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-msgid ""
-"The component location IDs of all source components that are used to "
-"determine whether a learner is shown the content of this conditional module."
-" Copy the component location ID of a component from its Settings dialog in "
-"Studio."
-msgstr "所有源組件的組件帳號位置，被用來決定學習者是否被顯示於此條件模組內容中。 從Studio設置對話框中複製組件帳號位置。"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-msgid "Conditional Attribute"
-msgstr "附條件的屬性"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-msgid ""
-"The attribute of the source components that determines whether a learner is "
-"shown the content of this conditional module."
-msgstr "源組件的屬性決定是否顯示學習者在此條件模組中。"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-msgid "Conditional Value"
-msgstr "附條件的值"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-msgid ""
-"The value that the conditional attribute of the source components must match"
-" before a learner is shown the content of this conditional module."
-msgstr "在顯示學習者在此條件模組的內容之前，源組件的條件屬性必須匹配的值。"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-msgid "Blocked Content Message"
-msgstr "被封鎖的內容訊息"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-#, python-brace-format
-msgid ""
-"The message that is shown to learners when not all conditions are met to "
-"show the content of this conditional module. Include {link} in the text of "
-"your message to give learners a direct link to required units. For example, "
-"'You must complete {link} before you can access this unit'."
-msgstr ""
-"當未滿足所有條件時顯示給學習者的訊息，是顯示此條件模組的內容。包含\n"
-"在訊息文字中加入{link}，讓學習者可以直接連結所需單元。例如“您必須先結束{link}才能進入此單元”。"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-#, python-brace-format
-msgid "You must complete {link} before you can access this unit."
-msgstr "在您進入本單元前，您必須結束{link}。 "
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-msgid "This component has no source components configured yet."
-msgstr "此元件尚未設定源組件。"
-
-#: common/lib/xmodule/xmodule/conditional_module.py
-msgid "Configure list of sources"
-msgstr "來源設定列表"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "LTI Passports"
-msgstr "LTI 帳戶"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the passports for course LTI tools in the following format: "
-"\"id:client_key:client_secret\"."
-msgstr "請依照下列格式：\"id:client_key:client_secret\"為課程LTI工具輸入帳戶。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"List of Textbook objects with (title, url) for textbooks used in this course"
-msgstr "已使用 (書名，URL) 的 Textbook 物件清單做為本課程的課本"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Slug that points to the wiki for this course"
-msgstr "指向課程的維基"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Date that enrollment for this class is opened"
-msgstr "課程的開始註冊時間"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Date that enrollment for this class is closed"
-msgstr "這課程的註冊關閉時間"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Start time when this module is visible"
-msgstr "這模組可見的開始時間"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Date that this class ends"
-msgstr "這課程結束的日期"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Date that certificates become available to learners"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Cosmetic Course Display Price"
-msgstr "Cosmetic Course Display Price"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"The cost displayed to students for enrolling in the course. If a paid course"
-" registration price is set by an administrator in the database, that price "
-"will be displayed instead of this one."
-msgstr "顯示給註冊這門課程的學生的價格。如果付費課程註冊價格是由管理員在資料庫中設定，那價格就會由此價格取代。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Advertised Start"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the text that you want to use as the advertised starting time frame "
-"for the course, such as \"Winter 2018\". If you enter null for this value, "
-"the start date that you have set for this course is used."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Pre-Requisite Courses"
-msgstr "先修課程"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Pre-Requisite Course key if this course has a pre-requisite course"
-msgstr "如果本課程有先修課程，則指定先修課程的課程key。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Grading policy definition for this class"
-msgstr "此課程評分策略"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Show Calculator"
-msgstr "顯示計算器"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. When true, students can see the calculator in the "
-"course."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生可以在課程上看到計算器。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enter the name of the course as it should appear in the course list."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Display Name"
-msgstr "課程顯示名稱"
-
-#: common/lib/xmodule/xmodule/course_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Course Editor"
-msgstr "課程編輯"
-
-#: common/lib/xmodule/xmodule/course_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
-msgstr "輸入課程被編輯的方法  (\"XML\" or \"Studio\")"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Survey URL"
-msgstr "課程問卷網址"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the URL for the end-of-course survey. If your course does not have a "
-"survey, enter null."
-msgstr "請輸入課程結束問卷的網址。如果您的課程並未問卷，則輸入空白。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Discussion Blackout Dates"
-msgstr "Discussion Blackout Dates"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter pairs of dates between which students cannot post to discussion "
-"forums. Inside the provided brackets, enter an additional set of square "
-"brackets surrounding each pair of dates you add. Format each pair of dates "
-"as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, "
-"format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]. Be sure to"
-" include the \"T\" between the date and time. For example, an entry defining"
-" two blackout periods looks like this, including the outer pair of square "
-"brackets: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
-"\"2015-10-08\"]] "
-msgstr ""
-"輸入一對日期，在此期間內不允許學生在討論區上發文。請在所提供的括號之內輸入日期，每一對日期應由一組方括號包圍，其格式為[\"YYYY-MM-DD\", "
-"\"YYYY-MM-DD\"]。如果還需要指定時間，請使用格式 [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-"
-"DDTHH:MM\"]。請確保在日期和時間的中間一定要有 \"T\" "
-"。例如，一項定義了兩段禁用時段的項應該是如下列格式所示（包括了最外層的一對方括號）：[[\"2015-09-15\", \"2015-09-21\"],"
-" [\"2015-10-01\", \"2015-10-08\"]]"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Discussion Topic Mapping"
-msgstr "討論主題圖"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter discussion categories in the following format: \"CategoryName\": "
-"{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
-"category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "討論排序字母"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，討論類別和子類別會依字母排序。否則按時間順序排序。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Discussions Plugin Settings"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Settings for discussions plugins."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Announcement Date"
-msgstr "課程公佈日期"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enter the date to announce your course."
-msgstr "輸入您的課程公佈日期。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Cohort Configuration"
-msgstr "學習夥伴功能設定"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter policy keys and values to enable the cohort feature, define automated "
-"student assignment to groups, or identify any course-wide discussion topics "
-"as private to cohort members."
-msgstr "輸入政策keys and values以啟用學習夥伴功能，可以是自動分配學生到群組，或以課程討論主題來設定學習夥伴成員。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Is New"
-msgstr "新的課程"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, the course appears in the list of new courses,"
-" and a New! badge temporarily appears next to the course image."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Mobile Course Available"
-msgstr "可使用行動課程"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, the course will be available to mobile "
-"devices."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，課程將能在行動裝置上使用。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Video Upload Credentials"
-msgstr "Video Upload Credentials"
-
-#: common/lib/xmodule/xmodule/course_module.py
-#, python-brace-format
-msgid ""
-"Enter the unique identifier for your course's video files provided by "
-"{platform_name}."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Not Graded"
-msgstr "課程不被評分"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enter true or false. If true, the course will not be graded."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，課程不會被評分。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Disable Progress Graph"
-msgstr "不啟用進度圖表"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enter true or false. If true, students cannot view the progress graph."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生們不可視察進度圖表。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "PDF Textbooks"
-msgstr "PDF教材"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "List of dictionaries containing pdf_textbook configuration"
-msgstr "列表出包含pdf_textbook的字典設定"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "HTML Textbooks"
-msgstr "HTML教材"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"For HTML textbooks that appear as separate tabs in the course, enter the "
-"name of the tab (usually the title of the book) as well as the URLs and "
-"titles of each chapter in the book."
-msgstr "對於課程中做為其他標籤顯示的 HTML 課本，輸入標籤名稱 (通常是書名) 以及 URL 和書中每一章的標題。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Remote Gradebook"
-msgstr "遠端成績單"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the remote gradebook mapping. Only use this setting when "
-"REMOTE_GRADEBOOK_URL has been specified."
-msgstr "輸入遠端成績單對應。當只有指定REMOTE_GRADEBOOK_URL才可以使用此設定。"
-
-#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
-#. course content. CCX Coach is
-#. a role created by a course Instructor to enable a person (the "Coach") to
-#. manage the custom course for
-#. his students.
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enable CCX"
-msgstr "啟用自訂課程"
-
-#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
-#. course content. CCX Coach is
-#. a role created by a course Instructor to enable a person (the "Coach") to
-#. manage the custom course for
-#. his students.
-#: common/lib/xmodule/xmodule/course_module.py
-#, python-brace-format
-msgid ""
-"Allow course instructors to assign CCX Coach roles, and allow coaches to "
-"manage Custom Courses on {platform_name}. When false, Custom Courses cannot "
-"be created, but existing Custom Courses will be preserved."
-msgstr ""
-
-#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
-#. course content.
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "CCX Connector URL"
-msgstr "CCX Connector URL"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"URL for CCX Connector application for managing creation of CCXs. (optional)."
-" Ignored unless 'Enable CCX' is set to 'true'."
-msgstr ""
-"URL for CCX Connector application for managing creation of CCXs. (optional)."
-" Ignored unless 'Enable CCX' is set to 'true'."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Allow Anonymous Discussion Posts"
-msgstr "允許張貼匿名討論"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, students can create discussion posts that are "
-"anonymous to all users."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生可以建立對大家是匿名的討論貼文。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Allow Anonymous Discussion Posts to Peers"
-msgstr "允許張貼同伴間的匿名討論"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, students can create discussion posts that are "
-"anonymous to other students. This setting does not make posts anonymous to "
-"course staff."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生可以對其他學生建立出匿名的討論。但是此設定對課程工作人員並不匿名。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-#: common/lib/xmodule/xmodule/library_root_xblock.py
-msgid "Advanced Module List"
-msgstr "進階模組列表"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enter the names of the advanced modules to use in your course."
-msgstr "輸入您在課程中使用的進階模組名稱。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Home Sidebar Name"
-msgstr "課程主頁的邊欄名稱"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the heading that you want students to see above your course handouts "
-"on the Course Home page. Your course handouts appear in the right panel of "
-"the page."
-msgstr "輸入您想要學生可以在課程首頁看到此課程講義的標題。您的講義會出現在頁面的右邊。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-#: lms/templates/courseware/info.html
-msgid "Course Handouts"
-msgstr "課程講義"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"True if timezones should be shown on dates in the course. Deprecated in "
-"favor of due_date_display_format."
-msgstr "True 表示應在課程的日期上顯示時區。已過時，改為支援 due_date_display_format。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Due Date Display Format"
-msgstr "到期日期顯示設定"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the format for due dates. The default is Mon DD, YYYY. Enter "
-"\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
-"YYYY-MM-DD, or \"%Y-%d-%m\" for YYYY-DD-MM."
-msgstr ""
-"輸入截止日期的格式。預設值是 Mon DD, YYYY 。輸入\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for"
-" DD-MM-YYYY, \"%Y-%m-%d\" for YYYY-MM-DD，或 \"%Y-%d-%m\" for YYYY-DD-MM 。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "External Login Domain"
-msgstr "外部登錄區"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enter the external login method students can use for the course."
-msgstr "輸入學生可以使用這課程的外部登錄的方法。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Certificates Downloadable Before End"
-msgstr "結束前可下載證書"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, students can download certificates before the "
-"course ends, if they've met certificate requirements."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生可以在課程結束前下載證書，如果他們已滿足證書的要求。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Certificates Display Behavior"
-msgstr "證書展示行為"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"This field, together with certificate_available_date will determine when a "
-"user can see their certificate for the course"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course About Page Image"
-msgstr "課程介紹頁面圖片"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Edit the name of the course image file. You must upload this file on the "
-"Files & Uploads page. You can also set the course image on the Settings & "
-"Details page."
-msgstr "編輯課程圖像檔名稱。您必須上傳檔案在Files & Uploads 頁面。您也可以設定課程圖片在Settings & Details頁面。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Banner Image"
-msgstr "課程橫幅圖片"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Edit the name of the banner image file. You can set the banner image on the "
-"Settings & Details page."
-msgstr "編輯橫幅影圖片的名稱。您可以在 [設定和詳細資訊] 頁面上設定橫幅圖片。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Video Thumbnail Image"
-msgstr "課程影片縮圖圖片"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Edit the name of the video thumbnail image file. You can set the video "
-"thumbnail image on the Settings & Details page."
-msgstr "編輯影片縮圖圖片檔的名稱。您可以在 [設定和詳細資訊] 頁面上設定影片縮圖圖片。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Issue Open Badges"
-msgstr "Issue Open Badges"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr "為此課程頒發徽章。建立證書時會產生徽章。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Use this setting only when generating PDF certificates. Between quotation "
-"marks, enter the short name of the type of certificate that students receive"
-" when they complete the course. For instance, \"Certificate\"."
-msgstr ""
-"只有在要產生證書的PDF檔時，才使用這項設定。當學生完成課程所獲得的證書，在引文標號中間輸入 證書類型簡稱於學生證書上。例如，“修課證明”。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Certificate Name (Short)"
-msgstr "證書名稱 (簡稱)"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Use this setting only when generating PDF certificates. Between quotation "
-"marks, enter the long name of the type of certificate that students receive "
-"when they complete the course. For instance, \"Certificate of Achievement\"."
-msgstr ""
-"只有在要產生證書的PDF檔時，才使用這項設定。當學生完成課程所獲得的證書，在引文標號中間輸入 證書類型全名於學生證書上。例如，“成績證書”。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Certificate Name (Long)"
-msgstr "證書名稱 (完整)"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Certificate Web/HTML View Enabled"
-msgstr "證書的網頁瀏覽模式啟用"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "If true, certificate Web/HTML views are enabled for the course."
-msgstr "當輸入true時，這門課程的證書，其網頁瀏覽模式啟用。"
-
-#. Translators: This field is the container for course-specific certificate
-#. configuration values
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Certificate Web/HTML View Overrides"
-msgstr "證書 Web/HTML View Overrides"
-
-#. Translators: These overrides allow for an alternative configuration of the
-#. certificate web view
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter course-specific overrides for the Web/HTML template parameters here "
-"(JSON format)"
-msgstr ""
-"Enter course-specific overrides for the Web/HTML template parameters here "
-"(JSON format)"
-
-#. Translators: This field is the container for course-specific certificate
-#. configuration values
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Certificate Configuration"
-msgstr "證書設定"
-
-#. Translators: These overrides allow for an alternative configuration of the
-#. certificate web view
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enter course-specific configuration information here (JSON format)"
-msgstr "在此輸入課程指定的設定資訊 (JSON格式)"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "CSS Class for Course Reruns"
-msgstr "CSS Class for Course Reruns"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Allows courses to share the same css class across runs even if they have "
-"different numbers."
-msgstr ""
-"Allows courses to share the same css class across runs even if they have "
-"different numbers."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Discussion Forum External Link"
-msgstr "討論區外部連結"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Allows specification of an external link to replace discussion forums."
-msgstr "允許指定的外部連結取代討論區。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Hide Progress Tab"
-msgstr "隱藏進度頁面"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Allows hiding of the progress tab."
-msgstr "允許隱藏進度頁面。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Organization Display String"
-msgstr "課程組織的顯示字串"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the course organization that you want to appear in the course. This "
-"setting overrides the organization that you entered when you created the "
-"course. To use the organization that you entered when you created the "
-"course, enter null."
-msgstr "輸入要在課程中顯示的課程組織。此設定會覆寫您建立課程時輸入的組織。若要使用您建立課程時輸入的組織，請輸入 null。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Number Display String"
-msgstr "課程編碼顯示字串"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the course number that you want to appear in the course. This setting "
-"overrides the course number that you entered when you created the course. To"
-" use the course number that you entered when you created the course, enter "
-"null."
-msgstr "輸入要在課程中顯示的課程編號。此設定會覆寫您建立課程時輸入的課程編號。若要使用您建立課程時輸入的課程編號，請輸入 null。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Maximum Student Enrollment"
-msgstr "課程學生註冊上限。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the maximum number of students that can enroll in the course. To allow"
-" an unlimited number of students, enter null."
-msgstr "輸入可以註冊這課程的最大學生數量。輸入空，允許無上限學生數量。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Allow Public Wiki Access"
-msgstr "允許公開Wiki存取"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, students can view the course wiki even if "
-"they're not enrolled in the course."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Invitation Only"
-msgstr "僅限受邀者"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Whether to restrict enrollment to invitation by the course staff."
-msgstr "是否限制註冊僅能透過課程工作人員邀請。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Pre-Course Survey Name"
-msgstr "課程前的問卷名稱"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Name of SurveyForm to display as a pre-course survey to the user."
-msgstr "SurveyForm的名稱，以顯示課前問卷給用戶。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Pre-Course Survey Required"
-msgstr "需要課前問卷"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Specify whether students must complete a survey before they can view your "
-"course content. If you set this value to true, you must add a name for the "
-"survey to the Course Survey Name setting above."
-msgstr "指定學生是否必須完成的一項問卷，才可以查看您的課程內容。如果將該值設置為true，你必須加上問卷名稱。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Visibility In Catalog"
-msgstr "在目錄的課程能見度"
-
-#. Translators: the quoted words 'both', 'about', and 'none' must be
-#. left untranslated.  Leave them as English words.
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Defines the access permissions for showing the course in the course catalog."
-" This can be set to one of three values: 'both' (show in catalog and allow "
-"access to about page), 'about' (only allow access to about page), 'none' (do"
-" not show in catalog and do not allow access to an about page)."
-msgstr ""
-"定義在課程目錄中顯是課程的存取權限。這可以被設置為三個值中的一個：'兩者'(顯示在目錄中，並允許訪問頁面)，'關於'(只允許訪問頁面)，'無'(沒有在目錄中顯示，且不允許訪問頁面)。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Entrance Exam Enabled"
-msgstr "資格考試已啟用"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Specify whether students must complete an entrance exam before they can view"
-" your course content. Note, you must enable Entrance Exams for this course "
-"setting to take effect."
-msgstr "指定學生是否必須完成資格考試，才可以查看您的課程內容。請注意，您必須啟用這門課的資格考試，設置才會生效。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Entrance Exam Minimum Score (%)"
-msgstr "資格考試最低分數(%)"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Specify a minimum percentage score for an entrance exam before students can "
-"view your course content. Note, you must enable Entrance Exams for this "
-"course setting to take effect."
-msgstr "在學生可以查看您的課程內容前，指定資格考試的最低百分比分數。請注意，您必須啟用這門課的資格考試，設置才會生效。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Entrance Exam ID"
-msgstr "資格考試ID"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Content module identifier (location) of entrance exam."
-msgstr "資格考試的內容模組標識符 (ID)"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Social Media Sharing URL"
-msgstr "社交媒體分享網址"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"If dashboard social sharing and custom course URLs are enabled, you can "
-"provide a URL (such as the URL to a course About page) that social media "
-"sites can link to. URLs must be fully qualified. For example: "
-"http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
-msgstr ""
-"如果課程面板的社交分享和自訂課程網址被啟用，您就可以提供一個網址(像是在課程關於頁面的網址)讓社交媒體可以連結到它。網址必須完全合格。例如：http://www.edx.org/course/Introduction-"
-"to-MOOCs-ITM001"
-
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
-msgid "Course Language"
-msgstr "課程語言"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Specify the language of your course."
-msgstr "指定您的課程的語言。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Teams Configuration"
-msgstr "團隊設定"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Configure team sets, limit team sizes, and set visibility settings using "
-"JSON. See <a target=\"&#95;blank\" "
-"href=\"https://edx.readthedocs.io/projects/edx-partner-course-"
-"staff/en/latest/course_features/teams/teams_setup.html#enable-and-configure-"
-"teams\">teams configuration documentation</a> for help and examples."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enable Proctored Exams"
-msgstr "啟用監考考試"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If this value is true, proctored exams are enabled in "
-"your course. Note that enabling proctored exams will also enable timed "
-"exams."
-msgstr "輸入 true 或 false。如果該值為true，監考的考試是在你的課程啟用。請注意，使監考考試也將啟動 限時考試。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Proctoring Provider"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-#, python-brace-format
-msgid ""
-"Enter the proctoring provider you want to use for this course run. Choose "
-"from the following options: {available_providers}."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Proctortrack Exam Escalation Contact"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Required if 'proctortrack' is selected as your proctoring provider. Enter an"
-" email address to be contacted by the support team whenever there are "
-"escalations (e.g. appeals, delayed reviews, etc.)."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Allow Opting Out of Proctored Exams"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If this value is true, learners can choose to take "
-"proctored exams without proctoring. If this value is false, all learners "
-"must take the exam with proctoring. This setting only applies if proctored "
-"exams are enabled for the course."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
-msgstr "為試圖防止作弊之線上監考，創建Zendesk Tickets"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If this value is true, a Zendesk ticket will be created"
-" for suspicious attempts."
-msgstr "輸入true或false。如果該值為true，將會因為試圖作弊而產生Zendesk ticket"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enable Timed Exams"
-msgstr "啟用限時考試"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If this value is true, timed exams are enabled in your "
-"course. Regardless of this setting, timed exams are enabled if Enable "
-"Proctored Exams is set to true."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Minimum Grade for Credit"
-msgstr "取得學分的最小等級"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"The minimum grade that a learner must earn to receive credit in the course, "
-"as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
-msgstr "學習者得到學分的最低標準，在0.0 和1.0之間。例如，75％，輸入0.75。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Self Paced"
-msgstr "自定進度"
-
-#: common/lib/xmodule/xmodule/course_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Set this to \"true\" to mark this course as self-paced. Self-paced courses "
-"do not have due dates for assignments, and students can progress through the"
-" course at any rate before the course ends."
-msgstr "將其設置為“true”，以設定這門課程為自學課程，沒有截止日期的作業，學生可以在任何速度在課程結束之前進行學習。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enable Subsection Prerequisites"
-msgstr "可分段先修之要求"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If this value is true, you can hide a subsection until "
-"learners earn a minimum score in another, prerequisite subsection."
-msgstr "輸入 true 或 false。如果該值為 true，你可以隱藏某分段，直到學習者獲得最低分數為止。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Learning Information"
-msgstr "課程學習資訊"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Specify what student can learn from the course."
-msgstr "指定學生可在課程中學到的內容。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Visibility For Unenrolled Learners"
-msgstr ""
-
-#. Translators: the quoted words 'private', 'public_outline', and 'public'
-#. must be left untranslated.  Leave them as English words.
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Defines the access permissions for unenrolled learners. This can be set to "
-"one of three values: 'private' (default visibility, only allowed for "
-"enrolled students), 'public_outline' (allow access to course outline) and "
-"'public' (allow access to both outline and course content)."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Instructor"
-msgstr "課程講師"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enter the details for Course Instructor"
-msgstr "輸入課程講師的詳細資訊"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Add Unsupported Problems and Tools"
-msgstr "新增不支援的問題和工具"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, you can add unsupported problems and tools to "
-"your course in Studio. Unsupported problems and tools are not recommended "
-"for use in courses due to non-compliance with one or more of the base "
-"requirements, such as testing, accessibility, internationalization, and "
-"documentation."
-msgstr ""
-"輸入true或false。 "
-"如果為true，則可以在Studio課程中新增不支援的問題和工具。不支援的問題和工具不建議使用於課程，是因為不符合一個或多個基本要求，如測試、輔助功能、國際化和文檔。"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Highlights Enabled for Messaging"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, any highlights associated with content in the "
-"course will be messaged to learners at their scheduled time."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course-wide Custom JS"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter Javascript resource URLs you want to be loaded globally throughout the"
-" course pages."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Course-wide Custom CSS"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter CSS resource URLs you want to be loaded globally throughout the course"
-" pages."
-msgstr ""
-
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
-msgid "Other Course Settings"
-msgstr "其他課程設定"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Any additional information about the course that the platform needs or that "
-"allows integration with external systems such as CRM software. Enter a "
-"dictionary of values in JSON format, such as { \"my_custom_setting\": "
-"\"value\", \"other_setting\": \"value\" }"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "General"
-msgstr "一般"
-
-#: common/lib/xmodule/xmodule/graders.py
-#, python-brace-format
-msgid "{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/graders.py
-msgid "Generated"
-msgstr ""
-
-#. Translators: "Homework 1 - Unreleased - 0% (?/?)" The section has not been
-#. released for viewing.
-#: common/lib/xmodule/xmodule/graders.py
-#, python-brace-format
-msgid "{section_type} {index} Unreleased - 0% (?/?)"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/graders.py
-#, python-brace-format
-msgid "The lowest {drop_count} {section_type} scores are dropped."
-msgstr ""
-
-#. Translators: "Homework Average = 0%"
-#: common/lib/xmodule/xmodule/graders.py
-#, python-brace-format
-msgid "{section_type} Average = {percent:.0%}"
-msgstr ""
-
-#. Translators: Avg is short for Average
-#: common/lib/xmodule/xmodule/graders.py
-#, python-brace-format
-msgid "{short_label} Avg"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/hidden_module.py
-#, python-brace-format
-msgid ""
-"ERROR: \"{block_type}\" is an unknown component type. This component will be"
-" hidden in LMS."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Html contents to display for this module"
-msgstr "使用HTML的內容來顯示該模塊。"
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Source code for LaTeX documents. This feature is not well-supported."
-msgstr "LaTeX 文件原始碼，此功能尚未完整支援。"
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid ""
-"Select Visual to enter content and have the editor automatically create the "
-"HTML. Select Raw to edit HTML directly. If you change this setting, you must"
-" save the component and then re-open it for editing."
-msgstr ""
-"選擇視覺化的方式輸入內容，編輯器會自動建立HTML。選擇原始的方式直接編輯HTML。如果您更改此設置，您必須儲存組件並且重新開啟以進行編輯。"
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Editor"
-msgstr "編輯器"
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Visual"
-msgstr "視覺化的"
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Raw"
-msgstr "原始格式"
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Hide Page From Learners"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid ""
-"If you select this option, only course team members with the Staff or Admin "
-"role see this page."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "HTML for the additional pages"
-msgstr "其他頁面的HTML"
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "List of course update items"
-msgstr "課程更新項目清單"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Any Type"
-msgstr "任何形式"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Library"
-msgstr "課程組件庫"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Select the library from which you want to draw content."
-msgstr "選擇您要丟棄內容的課程組件庫。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Library Version"
-msgstr "課程組件庫版本"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Determines how content is drawn from the library"
-msgstr "決定從課程組件庫中如何取得內容"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Choose n at random"
-msgstr "隨機選個 n"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Count"
-msgstr "計算"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Enter the number of components to display to each student."
-msgstr "進入組件的數量，以顯示給每個學生。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Problem Type"
-msgstr "問題形式"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Choose a problem type to fetch from the library. If \"Any Type\" is selected"
-" no filtering is applied."
-msgstr "從課程組件庫中選擇一個問題類型，如果選擇“任何類型”則不進行過濾。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Determines whether a 'Reset Problems' button is shown, so users may reset "
-"their answers and reshuffle selected items."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "This component is out of date. The library has new content."
-msgstr "此組件已過期，課程組件庫中有新的內容。"
-
-#. Translators: {refresh_icon} placeholder is substituted to "↻" (without
-#. double quotes)
-#: common/lib/xmodule/xmodule/library_content_module.py
-#, python-brace-format
-msgid "{refresh_icon} Update now."
-msgstr "{refresh_icon} 立即更新。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Library is invalid, corrupt, or has been deleted."
-msgstr "課程組件庫是無效的、已損壞或是已被刪除。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Edit Library List."
-msgstr "編輯課程組件庫列表。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"This course does not support content libraries. Contact your system "
-"administrator for more information."
-msgstr "這課程不支持的內容庫。請聯繫您的系統管理員了解更多訊息。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "A library has not yet been selected."
-msgstr "尚未選取課程組件庫。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Select a Library."
-msgstr "選擇一個課程組件庫。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "There are no matching problem types in the specified libraries."
-msgstr "在指定庫找不到對應的問題型態。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Select another problem type."
-msgstr "選擇其他問題的類型。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-#, python-brace-format
-msgid "The specified library is configured to fetch {count} problem, "
-msgid_plural "The specified library is configured to fetch {count} problems, "
-msgstr[0] "特定的課程組件庫被設定用來擷取 {count} 個問題，"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-#, python-brace-format
-msgid "but there is only {actual} matching problem."
-msgid_plural "but there are only {actual} matching problems."
-msgstr[0] "但是只有 {actual} 符合的問題。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Edit the library configuration."
-msgstr "編輯課程組件庫設定。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "Invalid Library"
-msgstr "無效的課程組件庫"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid "No Library Selected"
-msgstr "尚未選擇課程組件庫"
-
-#: common/lib/xmodule/xmodule/library_root_xblock.py
-msgid "Library Display Name"
-msgstr "課程組件庫顯示名稱"
-
-#: common/lib/xmodule/xmodule/library_root_xblock.py
-msgid "Enter the names of the advanced components to use in your library."
-msgstr "輸入在課程組件庫中使用的進階組件名稱。"
-
-#: common/lib/xmodule/xmodule/library_sourced_block.py
-msgid "Library Blocks List"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlocks that you wish to use."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_sourced_block.py
-#, python-brace-format
-msgid "A maximum of {0} components may be added."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_sourced_block.py
-msgid ""
-"No XBlock has been configured for this component. Use the editor to select "
-"the target blocks."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_sourced_block.py
-msgid "Open Editor"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_sourced_block.py
-msgid "Importing Library Block failed - are the IDs valid and readable?"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"The display name for this component. Analytics reports may also use the "
-"display name to identify this component."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "LTI ID"
-msgstr "LTI ID"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-#, python-brace-format
-msgid ""
-"Enter the LTI ID for the external LTI provider.  This value must be the same"
-" LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
-"documentation{anchor_close} for more details on this setting."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "LTI URL"
-msgstr "LTI URL"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-#, python-brace-format
-msgid ""
-"Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.{break_tag}See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Custom Parameters"
-msgstr "自定義參數"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-#, python-brace-format
-msgid ""
-"Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this "
-"component.{break_tag}See {docs_anchor_open}the edX LTI "
-"documentation{anchor_close} for more details on this setting."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Open in New Page"
-msgstr "在新頁面開啟"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True if you want students to click a link that opens the LTI tool in "
-"a new window. Select False if you want the LTI content to open in an IFrame "
-"in the current page. This setting is only used when Hide External Tool is "
-"set to False.  "
-msgstr ""
-"如果您想要學生點擊連結時在新視窗開啟LTI工具則選擇Ture。選擇False則是在當前頁面的IFrame開啟。此設置只能夠在隱藏外部工具被設置為False時使用。"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr "得分"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True if this component will receive a numerical score from the "
-"external LTI system."
-msgstr "如果這個組件將會從外部LIT系統接收數值評分則選擇True。"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Weight"
-msgstr "權重"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Enter the number of points possible for this component.  The default value "
-"is 1.0.  This setting is only used when Scored is set to True."
-msgstr "輸入此組件的可能的點數。預設值為1.0。此設置只能在當Scored被設置為True時使用。"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"The score kept in the xblock KVS -- duplicate of the published score in "
-"django DB"
-msgstr "這個分數保持在xblock KVS 中 -- 刊登的得分在Django數據庫的副本中"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Comment as returned from grader, LTI2.0 spec"
-msgstr "Comment as returned from grader, LTI2.0 spec"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Hide External Tool"
-msgstr "隱藏外部工具"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True if you want to use this component as a placeholder for syncing "
-"with an external grading  system rather than launch an external tool.  This "
-"setting hides the Launch button and any IFrames for this component."
-msgstr ""
-"如果您想要使用此組件做為一個預留位置給外部評分系統同步，而非執行一個外部工具，則選擇True。此設置隱藏執行按鈕及任何IFrames給此組件。"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Request user's username"
-msgstr "需要使用者的使用者帳號"
-
-#. Translators: This is used to request the user's username for a third party
-#. service.
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Select True to request the user's username."
-msgstr "選擇True 以要求用戶的用戶名 username。"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Request user's email"
-msgstr "需要使用者的電子郵件"
-
-#. Translators: This is used to request the user's email for a third party
-#. service.
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Select True to request the user's email address."
-msgstr "選擇True 以要求用戶的電子郵件地址。"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "LTI Application Information"
-msgstr "LTI 應用資訊"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Enter a description of the third party application. If requesting username "
-"and/or email, use this text box to inform users why their username and/or "
-"email will be forwarded to a third party application."
-msgstr ""
-"請輸入第三方應用程式的描述。如果需要使用者帳號或電子郵件，使用此文字方塊來通知使用者為何他們的使用者帳號或電子郵件將會被轉發到第三方應用程式。"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Button Text"
-msgstr "按鈕文字"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Enter the text on the button used to launch the third party application."
-msgstr "請輸入用於啟動第三方應用程序的按鈕上的文字。"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Accept grades past deadline"
-msgstr "接受超過限期的成績"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Select True to allow third party systems to post grades past the deadline."
-msgstr "選擇 true 來允許第三方系統可在超過期限後張貼分數。"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-#, python-brace-format
-msgid ""
-"Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
-"string."
-msgstr "無法解析自定義參數：{custom_parameter}。參數格式必須類似於\"x=y\"。"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-#, python-brace-format
-msgid ""
-"Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
-"string."
-msgstr "無法解析LTI通行證：{lti_passport}。其格式應當是由“身份標識:鍵:密碼“構成的字符串。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: common/lib/xmodule/xmodule/seq_module.py lms/templates/ccx/schedule.html
-msgid "Due Date"
-msgstr "截止日期"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter the default date by which problems are due."
-msgstr "輸入問題的預設截止日期。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Number of Relative Weeks Due By"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"Enter the number of weeks the problems are due by relative to the learner's "
-"enrollment date"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: lms/djangoapps/lms_xblock/mixin.py
-msgid "If true, can be seen only by course staff, regardless of start date."
-msgstr "如果 true，則只能被課程工作人員看見，並忽略開始日期。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "GIT URL"
-msgstr "GIT 網址"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter the URL for the course data GIT repository."
-msgstr "輸入課程資料GIT庫的網址。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "XQA Key"
-msgstr "XQA Key"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "This setting is not currently supported."
-msgstr "現在不支援此設定。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter the ids for the content groups this problem belongs to."
-msgstr "輸入對於這個問題屬於的內容組的 ID。"
-
-#. Translators: DO NOT translate the words in quotes here, they are
-#. specific words for the acceptable values.
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Specify when the Show Answer button appears for each problem. Valid values "
-"are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
-"\"past_due\", \"correct_or_past_due\", \"after_all_attempts\", "
-"\"after_all_attempts_or_correct\", \"attempted_no_past_due\", and \"never\"."
-msgstr ""
-
-#. Translators: DO NOT translate the words in quotes here, they are
-#. specific words for the acceptable values.
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Specify when to show answer correctness and score to learners. Valid values "
-"are \"always\", \"never\", and \"past_due\"."
-msgstr ""
-
-#. Translators: DO NOT translate the words in quotes here, they are
-#. specific words for the acceptable values.
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Specify the default for how often variable values in a problem are "
-"randomized. This setting should be set to \"never\" unless you plan to "
-"provide a Python script to identify and randomize values in most of the "
-"problems in your course. Valid values are \"always\", \"onreset\", "
-"\"never\", and \"per_student\"."
-msgstr ""
-"指定隱含變量值多久會發生問題是採隨機系統預設。此設定應設為“從不”，除非你打算提供一個Python script "
-"來隨機辨識您的課程中大部分問題。有效欄位為“永遠”，“當reset 時”，“從不”，以及“每名學生”。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Days Early for Beta Users"
-msgstr "Beta使用者提前使用的天數"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the number of days before the start date that beta users can access "
-"the course."
-msgstr "輸入 beta 使用者可以開始使用課程前的天數。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Static Asset Path"
-msgstr "靜態資源路徑"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the path to use for files on the Files & Uploads page. This value "
-"overrides the Studio default, c4x://."
-msgstr "輸入在Files & Uploads頁面使用檔案的路徑。此值會覆寫到 Studio default, c4x://。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enable LaTeX Compiler"
-msgstr "啟用LaTeX編譯器"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter true or false. If true, you can use the LaTeX templates for HTML "
-"components and advanced Problem components."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，您可為HTML組件和進階問題組件使用LaTeX模板。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the maximum number of times a student can try to answer problems. By "
-"default, Maximum Attempts is set to null, meaning that students have an "
-"unlimited number of attempts for problems. You can override this course-wide"
-" setting for individual problems. However, if the course-wide setting is a "
-"specific number, you cannot set the Maximum Attempts for individual problems"
-" to unlimited."
-msgstr "請輸入學生可嘗試回答問題之上限。預設情況下，嘗試上限為空，意指學生可無限嘗試回答問題。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
-"Service. This key is granted for exclusive use in this course for the "
-"specified duration. Do not share the API key with other courses. Notify "
-"MathWorks immediately if you believe the key is exposed or compromised. To "
-"obtain a key for your course, or to report an issue, please contact "
-"moocsupport@mathworks.com"
-msgstr ""
-"輸入MathWorks所提供的API 金鑰來存取 "
-"MATLAB主要服務。這個金鑰僅僅准許使用在這課程指定的時間。請務必不能在其他課程分享此金鑰。如果您發現此金鑰曝光或是違背原則，請立即通知MathWorks。請聯繫moocsupport@mathworks.com來得到課程的金鑰或是發表問題。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Group Configurations"
-msgstr "群組設定"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the configurations that govern how students are grouped together."
-msgstr "輸入管理學生如何分群的設定。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enable video caching system"
-msgstr "啟用的影片快取系統"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter true or false. If true, video caching will be used for HTML5 videos."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，影片快取將會被使用在HTML5影片上。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enable video auto-advance"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Specify whether to show an auto-advance button in videos. If the student "
-"clicks it, when the last video in a unit finishes it will automatically move"
-" to the next unit and autoplay the first video."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Video Pre-Roll"
-msgstr "Video Pre-Roll"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#, python-brace-format
-msgid ""
-"Identify a video, 5-10 seconds in length, to play before course videos. "
-"Enter the video ID from the Video Uploads page and one or more transcript "
-"files in the following format: {format}. For example, an entry for a video "
-"with two transcripts looks like this: {example}"
-msgstr ""
-"課程影片前指定一個 5-10 秒的影片。從 Video Uploads 中輸入 Video "
-"ID，以及一個或多個字幕檔，以下面的格式：{format}。例如，使用兩個字幕檔的一段影片如同： {example}"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Show Reset Button for Problems"
-msgstr "在問題下顯示「重設」按鈕"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter true or false. If true, problems in the course default to always "
-"displaying a 'Reset' button. You can override this in each problem's "
-"settings. All existing problems are affected when this course-wide setting "
-"is changed."
-msgstr ""
-"請輸入\"true\"或\"false\"。當輸入\"true\"時，在課程的問題會預設成總是顯示'重設'按鈕。您可以覆蓋此問題設定。所有存在的問題都會被影響當此設置被改變。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enable Student Notes"
-msgstr "啟用學生筆記"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter true or false. If true, students can use the Student Notes feature."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生可以使用學生比較功能。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Indicates whether Student Notes are visible in the course. Students can also"
-" show or hide their notes in the courseware."
-msgstr "說明是否學生筆記在課程中可見。學生還可以顯示或隱藏自己的筆記中的教材。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Tag this module as part of an Entrance Exam section"
-msgstr "標記此模組成為資格考試的一部份"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter true or false. If true, answer submissions for problem modules will be"
-" considered in the Entrance Exam scoring/gating algorithm."
-msgstr "輸入 true 或者 false。如果是 true，提交的問題模組將會被列入資格學考試的演算法中。"
-
-#: common/lib/xmodule/xmodule/modulestore/xml_importer.py
-msgid "Error while reading {}. Check file for XML errors."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/xml_importer.py
-msgid "Failed to import module: {} at location: {}"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
-#: cms/templates/group_configurations.html
-msgid "Enrollment Track Groups"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
-msgid "Partition for segmenting users by enrollment track"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/poll_module.py
-msgid "Whether this student has voted on the poll"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/poll_module.py
-msgid "Student answer"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/poll_module.py
-msgid "Poll answers from all students"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/poll_module.py
-msgid "Poll answers from xml"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/poll_module.py
-msgid "Poll question"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Enter the date by which problems are due."
-msgstr "輸入問題的截止日期"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Hide sequence content After Due Date"
-msgstr "在截止日期過後隱藏內容結果"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"If set, the sequence content is hidden for non-staff users after the due "
-"date has passed."
-msgstr "如果設定為，當截止日期過後，對非工作人員使用者結果內容將被隱藏。"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Is Entrance Exam"
-msgstr "是資格考試"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
-"Exams for this course setting to take effect."
-msgstr "標記課程模組作為資格考試。請注意，您必須啟用資格考試課程設定才可生效。"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Is Time Limited"
-msgstr "時間有限的"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"This setting indicates whether students have a limited time to view or "
-"interact with this courseware component."
-msgstr "此設置說明學生是否只能在有限時間內瀏覽或與這份教材組件互動。"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Time Limit in Minutes"
-msgstr "時間限制以分鐘為單位"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"The number of minutes available to students for viewing or interacting with "
-"this courseware component."
-msgstr "學生可以瀏覽或與教材組件互動的時間（分鐘）。"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Is Proctoring Enabled"
-msgstr "監考已啟用"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "This setting indicates whether this exam is a proctored exam."
-msgstr "此設定表示該考試是否為一場有監考的考試。"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Software Secure Review Rules"
-msgstr "軟體安全審查規則"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"This setting indicates what rules the proctoring team should follow when "
-"viewing the videos."
-msgstr "此設定表示在瀏覽影片時，團隊必須遵循監考的規則。"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Is Practice Exam"
-msgstr "是練習考試"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"This setting indicates whether this exam is for testing purposes only. "
-"Practice exams are not verified."
-msgstr "此設定表示本次考試是否僅適用於測試。練習式的考試是無證明的。"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Is Onboarding Exam"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "This setting indicates whether this exam is an onboarding exam."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"This subsection is unlocked for learners when they meet the prerequisite "
-"requirements."
-msgstr "當學習者滿足先決條件要求，此小節便會開放。"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "This exam is hidden from the learner."
-msgstr "學習者看不到此考試。"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"Because the course has ended, this assignment is hidden from the learner."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"Because the due date has passed, this assignment is hidden from the learner."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"This section is a prerequisite. You must complete this section in order to "
-"unlock additional content."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"A list summarizing what students should look forward to in this section."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-#, python-brace-format
-msgid "Group ID {group_id}"
-msgstr "群組 ID {group_id}"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Not Selected"
-msgstr "未選取"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "The display name for this component. (Not shown to learners)"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Content Experiment"
-msgstr "內容實驗"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-#: lms/djangoapps/lms_xblock/mixin.py
-msgid ""
-"The list of group configurations for partitioning students in content "
-"experiments."
-msgstr "內容實驗中學生的分組名單設定。"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"The configuration defines how users are grouped for this content experiment."
-" Caution: Changing the group configuration of a student-visible experiment "
-"will impact the experiment data."
-msgstr "此設定定義了使用者如何在內容實驗中被分組。注意：改變學生可見的群組的設定將會影響實驗數據。"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Group Configuration"
-msgstr "群組設定"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Which child module students in a particular group_id should see"
-msgstr "哪個子模組學生將會被特別的gouup_id所檢視"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-#, python-brace-format
-msgid "{group_name} (inactive)"
-msgstr "{group_name} (inactive)"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "The experiment is not associated with a group configuration."
-msgstr "實驗未與任何群組設定關聯。"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Select a Group Configuration"
-msgstr "選擇一個群組設定"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"The experiment uses a deleted group configuration. Select a valid group "
-"configuration or delete this experiment."
-msgstr "本實驗使用了一個已刪除的群組設定，請重新選擇一個正確的設定或是刪除本實驗。"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"The experiment uses a group configuration that is not supported for "
-"experiments. Select a valid group configuration or delete this experiment."
-msgstr "此實驗使用了不支持實驗的群組設定。選擇一個有效的群組設定或刪除這個實驗。"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"The experiment does not contain all of the groups in the configuration."
-msgstr "本實驗並未包含設定中所有的群組。"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Add Missing Groups"
-msgstr "新增消失的群組"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"The experiment has an inactive group. Move content into active groups, then "
-"delete the inactive group."
-msgstr "本實驗有個不活動的群組，移動內容到其他活動中的群組並且刪除此不活動的群組。"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "This content experiment has issues that affect content visibility."
-msgstr "這個內容實驗已經被標記為影響內容可見度。"
-
-#: common/lib/xmodule/xmodule/tabs.py
-msgid "External Discussion"
-msgstr "外部討論"
-
-#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
-#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
-msgid "Home"
-msgstr "首頁"
-
-#: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
-#: lms/djangoapps/courseware/views/views.py
-#: openedx/features/course_experience/__init__.py
-#: cms/templates/widgets/header.html
-#: lms/templates/courseware/course_navigation.html
-#: lms/templates/courseware/courseware.html
-#: lms/templates/ux/reference/bootstrap/course-skeleton.html
-msgid "Course"
-msgstr "課程"
-
-#: common/lib/xmodule/xmodule/templates/library-sourced-block-studio-view.html
-msgid "Save and Import"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/templates/library-sourced-block-studio-view.html
-#: lms/templates/oauth2_provider/authorize.html
-#: openedx/core/djangoapps/user_api/admin.py
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: cms/templates/videos_index_pagination.html
-msgid "Cancel"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/vertical_block.py
-msgid "Enable in-context discussions for the Unit"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/vertical_block.py
-msgid "Add discussion for the Unit."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-#, python-brace-format
-msgid ""
-"Can't receive transcripts from Youtube for {youtube_id}. Status code: "
-"{status_code}."
-msgstr "無法從 Youtube 收到 {youtube_id} 的字幕。狀態代碼: {status_code}。"
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-msgid "We support only SubRip (*.srt) transcripts format."
-msgstr "我們只支持 SubRip (*.srt) 副本的格式。"
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-#, python-brace-format
-msgid ""
-"Something wrong with SubRip transcripts file during parsing. Inner message "
-"is {error_message}"
-msgstr "在分析 SubRip 副本檔案過程中發生錯誤。進一步消息是{error_message}"
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-msgid "Something wrong with SubRip transcripts file during parsing."
-msgstr "在分析SubRip 副本檔案過程中發生錯誤。"
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-#, python-brace-format
-msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
-msgstr "{exception_message}： 找不到上傳的成績單: {user_filename}"
-
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
-msgid "Language is required."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "Basic"
-msgstr "基本"
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
-#, python-brace-format
-msgid "There is no transcript file associated with the {lang} language."
-msgid_plural ""
-"There are no transcript files associated with the {lang} languages."
-msgstr[0] "沒有有關{lang} 語言的字幕檔案。"
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid ""
-"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
-".ogg, or .webm video file hosted elsewhere on the Internet."
-msgstr "您的影片網址。可以是一個YouTube的網址或者連結至一個儲存.mp4, .ogg, 或者.webm 格式影片的網路伺服器網址。"
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "Default Video URL"
-msgstr "預設的影片網址"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Component Display Name"
-msgstr "組件顯示名稱"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Current position in the video."
-msgstr "影片當前位置。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Optional, for older browsers: the YouTube ID for the normal speed video."
-msgstr "非必選，針對較早的瀏覽器：正常速度影片的YouTube ID。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "YouTube ID"
-msgstr "YouTube ID"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Optional, for older browsers: the YouTube ID for the .75x speed video."
-msgstr "非必選，針對較早的瀏覽器：0.75 倍速影片的YouTube ID。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "YouTube ID for .75x speed"
-msgstr "YouTube ID（0.75 倍速）"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Optional, for older browsers: the YouTube ID for the 1.25x speed video."
-msgstr "可選，針對較早的瀏覽器：1.25 倍速影片的YouTube ID。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "YouTube ID for 1.25x speed"
-msgstr "YouTube ID（1.25 倍速）"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Optional, for older browsers: the YouTube ID for the 1.5x speed video."
-msgstr "非必選，針對較早的瀏覽器：1.5 倍速影片的YouTube ID。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "YouTube ID for 1.5x speed"
-msgstr "YouTube ID（1.5 倍速）"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Time you want the video to start if you don't want the entire video to play."
-" Not supported in the native mobile app: the full video file will play. "
-"Formatted as HH:MM:SS. The maximum value is 23:59:59."
-msgstr ""
-"如果不希望播放整部影片，則在此提供影片播放的開始時間。不支持原生行動app：整部影片將被播放。格式為 HH:MM:SS，最大值為 23:59:59。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Video Start Time"
-msgstr "影片開始時間"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Time you want the video to stop if you don't want the entire video to play. "
-"Not supported in the native mobile app: the full video file will play. "
-"Formatted as HH:MM:SS. The maximum value is 23:59:59."
-msgstr ""
-"如果不希望播放整部影片，則在此提供影片播放的結束時間。不支持原生行動app：整部影片將被播放。格式為 HH:MM:SS，最大值為 23:59:59。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Video Stop Time"
-msgstr "影片結束時間"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Allow students to download versions of this video in different formats if "
-"they cannot use the edX video player or do not have access to YouTube. You "
-"must add at least one non-YouTube URL in the Video File URLs field."
-msgstr ""
-"如果學生無法使用edX "
-"影片播放器，或者不能進入YouTube，則可以允許學生以不同的格式下載該影片。因此，必須在“影片文件URL”欄位中添加至少一個非YouTube "
-"的影片URL。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Video Download Allowed"
-msgstr "允許下載影片"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The URL or URLs where you've posted non-YouTube versions of the video. Each "
-"URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
-"(For browser compatibility, we strongly recommend .mp4 and .webm format.) "
-"Students will be able to view the first listed video that's compatible with "
-"the student's computer. To allow students to download these videos, set "
-"Video Download Allowed to True."
-msgstr ""
-"非 YouTube 的影片 URL。每個URL 應當以.mpeg、.mp4、.ogg 或者.webm 結尾，並且不得為YouTube "
-"URL(考量到瀏覽器的相容性問題，我們強烈建議使用.mp4或是.webm格式)。學生將看到列表中第一個與其電腦相容的影片格式。若想讓學生下載這些影片，請將“允許下載影片”設定為“是”。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Video File URLs"
-msgstr "影片檔案網址"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"By default, students can download an .srt or .txt transcript when you set "
-"Download Transcript Allowed to True. If you want to provide a downloadable "
-"transcript in a different format, we recommend that you upload a handout by "
-"using the Upload a Handout field. If this isn't possible, you can post a "
-"transcript file on the Files & Uploads page or on the Internet, and then add"
-" the URL for the transcript here. Students see a link to download that "
-"transcript below the video."
-msgstr ""
-"預設情況下，當“允許下載字幕”設置為“是”時，學生可以下載.srt 或者.txt "
-"格式的字幕。如果您需要提供不同文件格式的字幕供學生下載，我們建議您首先考慮使用“上傳講義”欄位上傳您的講義；其次您可以將字幕文件上傳至“文件& "
-"上傳”頁面或者Internet，並在這裡新增下載字幕的URL。學生們會在影片的下方看到一個下載字幕的連結。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Downloadable Transcript URL"
-msgstr "字幕下載 URL"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Allow students to download the timed transcript. A link to download the file"
-" appears below the video. By default, the transcript is an .srt or .txt "
-"file. If you want to provide the transcript for download in a different "
-"format, upload a file by using the Upload Handout field."
-msgstr ""
-"允許學生下載字幕。下載連結會出現在影片的下方。預設情況下，下載的字幕是一個.srt 或者.txt "
-"文件。如果您需要提供不同文件格式的字幕下載，使用“上傳講義”欄位上傳該文件。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Download Transcript Allowed"
-msgstr "允許下載字幕"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The default transcript for the video, from the Default Timed Transcript "
-"field on the Basic tab. This transcript should be in English. You don't have"
-" to change this setting."
-msgstr "影片的預設字幕，來自於“基本”面板的“預設字幕”欄位。該字幕應當是英語字幕。您不必修改這個設置。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Default Timed Transcript"
-msgstr "預設字幕"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Specify whether the transcripts appear with the video by default."
-msgstr "指定是否預設就顯示字幕。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Show Transcript"
-msgstr "顯示字幕"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Add transcripts in different languages. Click below to specify a language "
-"and upload an .srt transcript file for that language."
-msgstr "添加不同語言的字幕。點擊下方依指定語言並上傳該語言對應的.srt 字幕文件。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Transcript Languages"
-msgstr "字幕語言"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Preferred language for transcript."
-msgstr "喜好的字幕語言。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Preferred language for transcript"
-msgstr "喜好的字幕語言。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Transcript file format to download by user."
-msgstr "用戶下載的字幕文件格式。"
-
-#. Translators: This is a type of file used for captioning in the video
-#. player.
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "SubRip (.srt) file"
-msgstr "SubRip (.srt) 檔"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Text (.txt) file"
-msgstr "Text (.txt) 檔"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "The last speed that the user specified for the video."
-msgstr "該影片上一次用戶指定的速度。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "The default speed for the video."
-msgstr "該影片的預設速度。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Specify whether to advance automatically to the next unit when the video "
-"ends."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Specify whether YouTube is available for the user."
-msgstr "指定 YouTube 是否對用戶可用。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Upload a handout to accompany this video. Students can download the handout "
-"by clicking Download Handout under the video."
-msgstr "上傳與該影片相關的講義。學生可以單擊影片下方的“下載講義”按鈕來下載該講義。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Upload Handout"
-msgstr "上傳講義"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Specify whether access to this video is limited to browsers only, or if it "
-"can be accessed from other applications including mobile apps."
-msgstr "指定該影片是否限定瀏覽器，或者如果它可以從其它應用程式觀看，包括行動app。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Video Available on Web Only"
-msgstr "影片只在網頁板提供"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"If you were assigned a Video ID by edX for the video to play in this "
-"component, enter the ID here. In this case, do not enter values in the "
-"Default Video URL, the Video File URLs, and the YouTube ID fields. If you "
-"were not assigned a Video ID, enter values in those other fields and ignore "
-"this field."
-msgstr ""
-"如果您要在此組件中利用edX來分配要播放的影片ID。請在這輸入ID。在此情況下，不要在預設的影片網址、影片檔案網址、YouTube "
-"ID欄位中輸入數值。如果您沒有分配影片ID，就請在其他欄位輸入其他值或忽略此欄位。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Date of the last view of the bumper"
-msgstr "最近瀏覽片頭的日期"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Do not show bumper again"
-msgstr "不重複顯示片頭"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Specify whether the video can be accessed publicly by learners."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Public Access"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-#: lms/templates/annotatable.html lms/templates/peer_grading/peer_grading.html
-msgid "Instructions"
-msgstr "說明"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid ""
-"Add instructions to help learners understand how to use the word cloud. "
-"Clear instructions are important, especially for learners who have "
-"accessibility requirements."
-msgstr "新增說明幫助學習者了解如何使用關鍵字雲。清楚地說明是很重要的，特別是對輔助功能有需求的學習者。"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Inputs"
-msgstr "輸入"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid ""
-"The number of text boxes available for learners to add words and sentences."
-msgstr "學習者新增文字和句子，可用的文字方塊數量。"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Maximum Words"
-msgstr "字數上限"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "The maximum number of words displayed in the generated word cloud."
-msgstr "顯示在生成文字雲文字的最大數量。"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Show Percents"
-msgstr "顯示百分比"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Statistics are shown for entered words near that word."
-msgstr "統計顯示輸入文字所相近的文字。"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Whether this learner has posted words to the cloud."
-msgstr "此學習者是否已經張貼文字到雲中。"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Student answer."
-msgstr "學生答案"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "All possible words from all learners."
-msgstr "所有學習者使用的所有可能文字。"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Top num_top_words words for word cloud."
-msgstr "從文字雲中最熱門的詞彙 num_top_words"
-
-#: common/lib/xmodule/xmodule/x_module.py
-#, python-brace-format
-msgid ""
-"{display_name} is only accessible to enrolled learners. Sign in or register,"
-" and enroll in this course to view it."
 msgstr ""
 
 #: common/templates/admin/student/loginfailures/change_form_template.html
@@ -4898,6 +2283,7 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Confirm Email"
 msgstr ""
@@ -6043,6 +3429,15 @@ msgstr ""
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide additional course content and resources with custom pages"
 msgstr ""
+
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
+#: openedx/features/course_experience/__init__.py xmodule/tabs.py
+#: cms/templates/widgets/header.html
+#: lms/templates/courseware/course_navigation.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/ux/reference/bootstrap/course-skeleton.html
+msgid "Course"
+msgstr "課程"
 
 #: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
 msgid "Syllabus"
@@ -7512,6 +4907,10 @@ msgstr "LaTeX 源文件名"
 msgid "Enter the source file name for LaTeX."
 msgstr "輸入LaTeX源文件名。"
 
+#: lms/djangoapps/lms_xblock/mixin.py xmodule/modulestore/inheritance.py
+msgid "If true, can be seen only by course staff, regardless of start date."
+msgstr "如果 true，則只能被課程工作人員看見，並忽略開始日期。"
+
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
 "A dictionary that maps which groups can be shown this block. The keys are "
@@ -7522,6 +4921,12 @@ msgid ""
 msgstr ""
 "被字典對映到的群組可以被顯示在此區塊中。關鍵字是群組設定id和數值是群組 ID的列表。假如沒有關鍵字給群組設定或者群組 "
 "ID的集合是空的那麼區塊就會對所有公開。如果該區塊是visible_to_staff_only則欄位會被忽略。"
+
+#: lms/djangoapps/lms_xblock/mixin.py xmodule/split_test_module.py
+msgid ""
+"The list of group configurations for partitioning students in content "
+"experiments."
+msgstr "內容實驗中學生的分組名單設定。"
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -7824,6 +5229,21 @@ msgstr ""
 #, python-format
 msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr ""
+
+#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
+#: xmodule/capa_module.py cms/templates/index.html
+#: cms/templates/videos_index_pagination.html
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+#: lms/templates/dashboard/_reason_survey.html
+#: lms/templates/manage_user_standing.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+#: lms/templates/survey/survey.html
+#: lms/templates/widgets/footer-language-selector.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
+#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Submit"
+msgstr "提交"
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 #, python-format
@@ -8273,6 +5693,15 @@ msgid ""
 "Please click the 'Allow' button to grant these permissions to the above "
 "application. Otherwise, to withhold these permissions, please click the "
 "'Cancel' button."
+msgstr ""
+
+#: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/user_api/admin.py
+#: xmodule/templates/library-sourced-block-studio-view.html
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: cms/templates/videos_index_pagination.html
+msgid "Cancel"
 msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
@@ -9397,6 +6826,10 @@ msgstr ""
 msgid "The LTI provider's id"
 msgstr ""
 
+#: openedx/core/djangoapps/course_live/models.py
+msgid "True, if LTI credential are provided by Org globally"
+msgstr ""
+
 #: openedx/core/djangoapps/course_live/plugins.py
 #: openedx/core/djangoapps/course_live/tab.py
 msgid "Live"
@@ -10147,10 +7580,6 @@ msgstr ""
 msgid "Upgrade to earn a verified certificate in %(first_course_name)s"
 msgstr ""
 
-#: openedx/core/djangoapps/self_paced/models.py
-msgid "Enable course home page improvements."
-msgstr "啟用課程首頁改進。"
-
 #: openedx/core/djangoapps/theming/views.py
 #, python-brace-format
 msgid "Site theme changed to {site_theme}"
@@ -10254,6 +7683,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "The email addresses do not match."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your confirm email"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -11012,6 +8445,16 @@ msgid ""
 msgstr "授權定義此內容如何被分享和再利用。"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+#: xmodule/annotatable_module.py xmodule/capa_module.py
+#: xmodule/conditional_module.py xmodule/html_module.py
+#: xmodule/library_content_module.py xmodule/library_root_xblock.py
+#: xmodule/library_sourced_block.py xmodule/poll_module.py
+#: xmodule/unit_block.py xmodule/video_module/video_xfields.py
+#: xmodule/word_cloud_module.py xmodule/x_module.py
+msgid "The display name for this component."
+msgstr ""
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Category"
 msgstr "種類"
 
@@ -11273,6 +8716,10 @@ msgid ""
 msgstr ""
 
 #: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Home"
+msgstr "首頁"
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
 msgid "Enterprise Course Enrollments"
 msgstr ""
 
@@ -11349,6 +8796,2514 @@ msgstr ""
 
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
+msgstr ""
+
+#: xmodule/annotatable_module.py
+msgid "XML data for the annotation"
+msgstr "XML 數據註解"
+
+#: xmodule/annotatable_module.py
+msgid "Annotation"
+msgstr "註解"
+
+#: xmodule/capa_module.py
+msgid "Blank Advanced Problem"
+msgstr "空白進階問題"
+
+#: xmodule/capa_module.py
+msgid "Number of attempts taken by the student on this problem"
+msgstr "學生在這個問題的嘗試次數"
+
+#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+msgid "Maximum Attempts"
+msgstr "最大嘗試次數"
+
+#: xmodule/capa_module.py
+msgid ""
+"Defines the number of times a student can try to answer this problem. If the"
+" value is not set, infinite attempts are allowed."
+msgstr "定義學生可以嘗試回答這個問題的數量。如果該值沒有被設置，就可以無限的嘗試。"
+
+#: xmodule/capa_module.py
+msgid "Date that this problem is due by"
+msgstr "此問題的截止日期"
+
+#: xmodule/capa_module.py
+msgid "Amount of time after the due date that submissions will be accepted"
+msgstr "在截止日期之後，提交還可以被接受的時間長度。"
+
+#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+msgid "Show Results"
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid ""
+"Defines when to show whether a learner's answer to the problem is correct. "
+"Configured on the subsection."
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid "Always"
+msgstr "總是"
+
+#: xmodule/capa_module.py
+msgid "Never"
+msgstr "從不"
+
+#: xmodule/capa_module.py
+msgid "Past Due"
+msgstr "已到期"
+
+#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+msgid "Show Answer"
+msgstr "顯示答案"
+
+#: xmodule/capa_module.py
+msgid ""
+"Defines when to show the answer to the problem. A default value can be set "
+"in Advanced Settings."
+msgstr "定義何時顯示這個問題的答案。預設值可以在高級設置中設置。"
+
+#: xmodule/capa_module.py
+msgid "Answered"
+msgstr "已回答"
+
+#: xmodule/capa_module.py
+msgid "Attempted or Past Due"
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid "Closed"
+msgstr "已關閉"
+
+#: xmodule/capa_module.py
+msgid "Finished"
+msgstr "已完成"
+
+#: xmodule/capa_module.py
+msgid "Correct or Past Due"
+msgstr "正確或已過期"
+
+#: xmodule/capa_module.py
+msgid "After Some Number of Attempts"
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid "After All Attempts"
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid "After All Attempts or Correct"
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid "Attempted"
+msgstr "已嘗試"
+
+#: xmodule/capa_module.py
+msgid "Show Answer: Number of Attempts"
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid ""
+"Number of times the student must attempt to answer the question before the "
+"Show Answer button appears."
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid "Whether to force the save button to appear on the page"
+msgstr "是否強制 儲存按鈕 顯示在這個頁面上"
+
+#: xmodule/capa_module.py xmodule/library_content_module.py
+msgid "Show Reset Button"
+msgstr "顯示重新設定按鈕"
+
+#: xmodule/capa_module.py
+msgid ""
+"Determines whether a 'Reset' button is shown so the user may reset their "
+"answer. A default value can be set in Advanced Settings."
+msgstr "是否顯示’重設’按鈕以便學生可以重設它們的答案。預設值可以在進階設定裡設定。"
+
+#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+msgid "Randomization"
+msgstr "隨機化"
+
+#: xmodule/capa_module.py
+msgid ""
+"Defines when to randomize the variables specified in the associated Python "
+"script. For problems that do not randomize values, specify \"Never\". "
+msgstr "定義何時隨機的在相關的Python腳本指定的變數。對於問題不隨機值，指定“從不”。"
+
+#: xmodule/capa_module.py
+msgid "On Reset"
+msgstr "在 重設"
+
+#: xmodule/capa_module.py
+msgid "Per Student"
+msgstr "每個學生"
+
+#: xmodule/capa_module.py
+msgid "XML data for the problem"
+msgstr "這個問題的XML數據"
+
+#: xmodule/capa_module.py
+msgid "Dictionary with the correctness of current student answers"
+msgstr "目前學生答案的正確性的辭典"
+
+#: xmodule/capa_module.py
+msgid "Dictionary for maintaining the state of inputtypes"
+msgstr "維護輸入種類狀態的辭典"
+
+#: xmodule/capa_module.py
+msgid "Dictionary with the current student responses"
+msgstr "對於目前學生的回應的辭典"
+
+#: xmodule/capa_module.py
+msgid "Dictionary with the current student score"
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid "Whether or not the answers have been saved since last submit"
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid "Whether the student has answered the problem"
+msgstr "學生是否已經回答問題"
+
+#: xmodule/capa_module.py
+msgid "Random seed for this student"
+msgstr "Random Seed 對這名學生"
+
+#: xmodule/capa_module.py
+msgid "Last submission time"
+msgstr "最後提交時間"
+
+#: xmodule/capa_module.py
+msgid "Timer Between Attempts"
+msgstr "嘗試之間的時間"
+
+#: xmodule/capa_module.py
+msgid ""
+"Seconds a student must wait between submissions for a problem with multiple "
+"attempts."
+msgstr "學生在多次嘗試提交問題之間的等待秒數"
+
+#: xmodule/capa_module.py
+msgid "Problem Weight"
+msgstr "問題權重"
+
+#: xmodule/capa_module.py
+msgid ""
+"Defines the number of points each problem is worth. If the value is not set,"
+" each response field in the problem is worth one point."
+msgstr "定義每個問題的點數價值。如果沒有設定值，每個在問題中的回應欄位都值一點。"
+
+#: xmodule/capa_module.py
+msgid "Markdown source of this module"
+msgstr "此模塊的Markdown資源"
+
+#: xmodule/capa_module.py
+msgid ""
+"Source code for LaTeX and Word problems. This feature is not well-supported."
+msgstr "原始碼 LaTeX 和 Word 問題。此功能沒有得到很好的支援。"
+
+#: xmodule/capa_module.py xmodule/html_module.py
+msgid "Enable LaTeX templates?"
+msgstr "啟用LaTeX 模板？"
+
+#: xmodule/capa_module.py xmodule/modulestore/inheritance.py
+msgid "Matlab API key"
+msgstr "Matlab API 密鑰"
+
+#: xmodule/capa_module.py
+msgid ""
+"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
+"Service. This key is granted for exclusive use by this course for the "
+"specified duration. Please do not share the API key with other courses and "
+"notify MathWorks immediately if you believe the key is exposed or "
+"compromised. To obtain a key for your course, or to report an issue, please "
+"contact moocsupport@mathworks.com"
+msgstr ""
+"輸入 "
+"MATLAB託管服務提供MathWorks公司的API密鑰。這個密鑰被授予通過本課程的指定時間獨家使用。請不要共享的API密鑰與其他課程，並立即通知MathWorks公司，如果你認為密鑰被暴露或損害。為了獲得一個關鍵的課程，或報告的問題，請聯繫moocsupport@mathworks.com"
+
+#: xmodule/capa_module.py
+msgid ""
+"We're sorry, there was an error with processing your request. Please try "
+"reloading your page and trying again."
+msgstr "很抱歉，處理您的請求時出現有一個錯誤。請重新載入頁面，並再次嘗試。"
+
+#: xmodule/capa_module.py
+msgid ""
+"The state of this problem has changed since you loaded this page. Please "
+"refresh your page."
+msgstr "這個問題的狀態，因為您載入這個頁面已經改變。請重新整理您的頁面。"
+
+#: xmodule/capa_module.py
+msgid "Answer ID"
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid "Question"
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid "Correct Answer"
+msgstr ""
+
+#: xmodule/capa_module.py
+msgid "Submitting"
+msgstr "提交中"
+
+#: xmodule/capa_module.py
+msgid "Warning: The problem has been reset to its initial state!"
+msgstr "警告：該問題已被重置為初始狀態！"
+
+#. Translators: Following this message, there will be a bulleted list of
+#. items.
+#: xmodule/capa_module.py
+msgid ""
+"The problem's state was corrupted by an invalid submission. The submission "
+"consisted of:"
+msgstr "由於一個無效的提交，該問題的狀態已損壞。提交包括："
+
+#: xmodule/capa_module.py
+msgid "If this error persists, please contact the course staff."
+msgstr "如果此錯誤仍然存在，請聯繫課程的工作人員。"
+
+#. Translators: {previous_hints} is the HTML of hints that have already been
+#. generated, {hint_number_prefix}
+#. is a header for this hint, and {hint_text} is the text of the hint itself.
+#. This string is being passed to translation only for possible reordering of
+#. the placeholders.
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
+msgstr ""
+
+#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
+#. hints.
+#. This text is shown in bold before the accompanying hint text.
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid "Hint ({hint_num} of {hints_count}): "
+msgstr "提示 ({hint_num}, 共 {hints_count}):"
+
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"Your answers were previously saved. Click '{button_name}' to grade them."
+msgstr ""
+
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid "Incorrect ({progress} point)"
+msgid_plural "Incorrect ({progress} points)"
+msgstr[0] "不正確({progress} points)"
+
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid "Correct ({progress} point)"
+msgid_plural "Correct ({progress} points)"
+msgstr[0] "正確({progress} points)"
+
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid "Partially correct ({progress} point)"
+msgid_plural "Partially correct ({progress} points)"
+msgstr[0] "部分正確({progress} points)"
+
+#: xmodule/capa_module.py
+msgid "Partially Correct"
+msgstr "部分正確"
+
+#: xmodule/capa_module.py
+msgid "Answer submitted."
+msgstr ""
+
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
+#: xmodule/capa_module.py
+msgid "Problem is closed."
+msgstr "問題已經關閉"
+
+#: xmodule/capa_module.py
+msgid "Problem must be reset before it can be submitted again."
+msgstr "問題再次送出前必須先重置。"
+
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid "You must wait at least {wait} seconds between submissions."
+msgstr "您必須等待至少{wait} 秒於提交之間"
+
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"You must wait at least {wait_secs} between submissions. {remaining_secs} "
+"remaining."
+msgstr "在兩次提交之間需要等待 {wait_secs}，尚需等待 {remaining_secs}。"
+
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_hour} hour"
+msgid_plural "{num_hour} hours"
+msgstr[0] "{num_hour} 小時"
+
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_minute} minute"
+msgid_plural "{num_minute} minutes"
+msgstr[0] "{num_minute} 分鐘"
+
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_second} second"
+msgid_plural "{num_second} seconds"
+msgstr[0] "{num_second} 秒"
+
+#: xmodule/capa_module.py
+msgid "Problem needs to be reset prior to save."
+msgstr "問題需要在保存之前進行重設。"
+
+#: xmodule/capa_module.py
+msgid "Your answers have been saved."
+msgstr "您的答案已經儲存"
+
+#: xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"Your answers have been saved but not graded. Click '{button_name}' to grade "
+"them."
+msgstr "您的答案已儲存但不計分，您可點按'{button_name}'以評分並觀看詳解。"
+
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
+#: xmodule/capa_module.py
+msgid "You cannot select Reset for a problem that is closed."
+msgstr "對於已關閉的問題，您無法選擇重置。"
+
+#: xmodule/capa_module.py
+msgid "You must submit an answer before you can select Reset."
+msgstr "您必須先送出答案才能選擇重置。"
+
+#. Translators: 'rescoring' refers to the act of re-submitting a student's
+#. solution so it can get a new score.
+#: xmodule/capa_module.py
+msgid "Problem's definition does not support rescoring."
+msgstr "問題的定義不支持成績複查。"
+
+#: xmodule/capa_module.py
+msgid "Problem must be answered before it can be graded again."
+msgstr "問題必須回答，才可以再次分級。"
+
+#: xmodule/conditional_module.py
+msgid "Conditional"
+msgstr "附條件的"
+
+#: xmodule/conditional_module.py
+msgid "List of urls of children that are references to external modules"
+msgstr "引用外部模組的子節點的網址列表"
+
+#: xmodule/conditional_module.py
+msgid "Source Components"
+msgstr "源組件"
+
+#: xmodule/conditional_module.py
+msgid ""
+"The component location IDs of all source components that are used to "
+"determine whether a learner is shown the content of this conditional module."
+" Copy the component location ID of a component from its Settings dialog in "
+"Studio."
+msgstr "所有源組件的組件帳號位置，被用來決定學習者是否被顯示於此條件模組內容中。 從Studio設置對話框中複製組件帳號位置。"
+
+#: xmodule/conditional_module.py
+msgid "Conditional Attribute"
+msgstr "附條件的屬性"
+
+#: xmodule/conditional_module.py
+msgid ""
+"The attribute of the source components that determines whether a learner is "
+"shown the content of this conditional module."
+msgstr "源組件的屬性決定是否顯示學習者在此條件模組中。"
+
+#: xmodule/conditional_module.py
+msgid "Conditional Value"
+msgstr "附條件的值"
+
+#: xmodule/conditional_module.py
+msgid ""
+"The value that the conditional attribute of the source components must match"
+" before a learner is shown the content of this conditional module."
+msgstr "在顯示學習者在此條件模組的內容之前，源組件的條件屬性必須匹配的值。"
+
+#: xmodule/conditional_module.py
+msgid "Blocked Content Message"
+msgstr "被封鎖的內容訊息"
+
+#: xmodule/conditional_module.py
+#, python-brace-format
+msgid ""
+"The message that is shown to learners when not all conditions are met to "
+"show the content of this conditional module. Include {link} in the text of "
+"your message to give learners a direct link to required units. For example, "
+"'You must complete {link} before you can access this unit'."
+msgstr ""
+"當未滿足所有條件時顯示給學習者的訊息，是顯示此條件模組的內容。包含\n"
+"在訊息文字中加入{link}，讓學習者可以直接連結所需單元。例如“您必須先結束{link}才能進入此單元”。"
+
+#: xmodule/conditional_module.py
+#, python-brace-format
+msgid "You must complete {link} before you can access this unit."
+msgstr "在您進入本單元前，您必須結束{link}。 "
+
+#: xmodule/conditional_module.py
+msgid "This component has no source components configured yet."
+msgstr "此元件尚未設定源組件。"
+
+#: xmodule/conditional_module.py
+msgid "Configure list of sources"
+msgstr "來源設定列表"
+
+#: xmodule/course_module.py
+msgid "LTI Passports"
+msgstr "LTI 帳戶"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter the passports for course LTI tools in the following format: "
+"\"id:client_key:client_secret\"."
+msgstr "請依照下列格式：\"id:client_key:client_secret\"為課程LTI工具輸入帳戶。"
+
+#: xmodule/course_module.py
+msgid ""
+"List of Textbook objects with (title, url) for textbooks used in this course"
+msgstr "已使用 (書名，URL) 的 Textbook 物件清單做為本課程的課本"
+
+#: xmodule/course_module.py
+msgid "Slug that points to the wiki for this course"
+msgstr "指向課程的維基"
+
+#: xmodule/course_module.py
+msgid "Date that enrollment for this class is opened"
+msgstr "課程的開始註冊時間"
+
+#: xmodule/course_module.py
+msgid "Date that enrollment for this class is closed"
+msgstr "這課程的註冊關閉時間"
+
+#: xmodule/course_module.py
+msgid "Start time when this module is visible"
+msgstr "這模組可見的開始時間"
+
+#: xmodule/course_module.py
+msgid "Date that this class ends"
+msgstr "這課程結束的日期"
+
+#: xmodule/course_module.py
+msgid "Date that certificates become available to learners"
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Cosmetic Course Display Price"
+msgstr "Cosmetic Course Display Price"
+
+#: xmodule/course_module.py
+msgid ""
+"The cost displayed to students for enrolling in the course. If a paid course"
+" registration price is set by an administrator in the database, that price "
+"will be displayed instead of this one."
+msgstr "顯示給註冊這門課程的學生的價格。如果付費課程註冊價格是由管理員在資料庫中設定，那價格就會由此價格取代。"
+
+#: xmodule/course_module.py
+msgid "Course Advertised Start"
+msgstr ""
+
+#: xmodule/course_module.py
+msgid ""
+"Enter the text that you want to use as the advertised starting time frame "
+"for the course, such as \"Winter 2018\". If you enter null for this value, "
+"the start date that you have set for this course is used."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Pre-Requisite Courses"
+msgstr "先修課程"
+
+#: xmodule/course_module.py
+msgid "Pre-Requisite Course key if this course has a pre-requisite course"
+msgstr "如果本課程有先修課程，則指定先修課程的課程key。"
+
+#: xmodule/course_module.py
+msgid "Grading policy definition for this class"
+msgstr "此課程評分策略"
+
+#: xmodule/course_module.py
+msgid "Show Calculator"
+msgstr "顯示計算器"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. When true, students can see the calculator in the "
+"course."
+msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生可以在課程上看到計算器。"
+
+#: xmodule/course_module.py
+msgid "Enter the name of the course as it should appear in the course list."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Course Display Name"
+msgstr "課程顯示名稱"
+
+#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+msgid "Course Editor"
+msgstr "課程編輯"
+
+#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
+msgstr "輸入課程被編輯的方法  (\"XML\" or \"Studio\")"
+
+#: xmodule/course_module.py
+msgid "Course Survey URL"
+msgstr "課程問卷網址"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter the URL for the end-of-course survey. If your course does not have a "
+"survey, enter null."
+msgstr "請輸入課程結束問卷的網址。如果您的課程並未問卷，則輸入空白。"
+
+#: xmodule/course_module.py
+msgid "Discussion Blackout Dates"
+msgstr "Discussion Blackout Dates"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter pairs of dates between which students cannot post to discussion "
+"forums. Inside the provided brackets, enter an additional set of square "
+"brackets surrounding each pair of dates you add. Format each pair of dates "
+"as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, "
+"format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]. Be sure to"
+" include the \"T\" between the date and time. For example, an entry defining"
+" two blackout periods looks like this, including the outer pair of square "
+"brackets: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
+"\"2015-10-08\"]] "
+msgstr ""
+"輸入一對日期，在此期間內不允許學生在討論區上發文。請在所提供的括號之內輸入日期，每一對日期應由一組方括號包圍，其格式為[\"YYYY-MM-DD\", "
+"\"YYYY-MM-DD\"]。如果還需要指定時間，請使用格式 [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-"
+"DDTHH:MM\"]。請確保在日期和時間的中間一定要有 \"T\" "
+"。例如，一項定義了兩段禁用時段的項應該是如下列格式所示（包括了最外層的一對方括號）：[[\"2015-09-15\", \"2015-09-21\"],"
+" [\"2015-10-01\", \"2015-10-08\"]]"
+
+#: xmodule/course_module.py
+msgid "Discussion Topic Mapping"
+msgstr "討論主題圖"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter discussion categories in the following format: \"CategoryName\": "
+"{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
+"category as the default for new posts in the Discussion page by setting its "
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Discussion Sorting Alphabetical"
+msgstr "討論排序字母"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, discussion categories and subcategories are "
+"sorted alphabetically. If false, they are sorted chronologically by creation"
+" date and time."
+msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，討論類別和子類別會依字母排序。否則按時間順序排序。"
+
+#: xmodule/course_module.py
+msgid "Discussions Plugin Settings"
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Settings for discussions plugins."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Course Announcement Date"
+msgstr "課程公佈日期"
+
+#: xmodule/course_module.py
+msgid "Enter the date to announce your course."
+msgstr "輸入您的課程公佈日期。"
+
+#: xmodule/course_module.py
+msgid "Cohort Configuration"
+msgstr "學習夥伴功能設定"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter policy keys and values to enable the cohort feature, define automated "
+"student assignment to groups, or identify any course-wide discussion topics "
+"as private to cohort members."
+msgstr "輸入政策keys and values以啟用學習夥伴功能，可以是自動分配學生到群組，或以課程討論主題來設定學習夥伴成員。"
+
+#: xmodule/course_module.py
+msgid "Course Is New"
+msgstr "新的課程"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, the course appears in the list of new courses,"
+" and a New! badge temporarily appears next to the course image."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Mobile Course Available"
+msgstr "可使用行動課程"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, the course will be available to mobile "
+"devices."
+msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，課程將能在行動裝置上使用。"
+
+#: xmodule/course_module.py
+msgid "Video Upload Credentials"
+msgstr "Video Upload Credentials"
+
+#: xmodule/course_module.py
+#, python-brace-format
+msgid ""
+"Enter the unique identifier for your course's video files provided by "
+"{platform_name}."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Course Not Graded"
+msgstr "課程不被評分"
+
+#: xmodule/course_module.py
+msgid "Enter true or false. If true, the course will not be graded."
+msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，課程不會被評分。"
+
+#: xmodule/course_module.py
+msgid "Disable Progress Graph"
+msgstr "不啟用進度圖表"
+
+#: xmodule/course_module.py
+msgid "Enter true or false. If true, students cannot view the progress graph."
+msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生們不可視察進度圖表。"
+
+#: xmodule/course_module.py
+msgid "PDF Textbooks"
+msgstr "PDF教材"
+
+#: xmodule/course_module.py
+msgid "List of dictionaries containing pdf_textbook configuration"
+msgstr "列表出包含pdf_textbook的字典設定"
+
+#: xmodule/course_module.py
+msgid "HTML Textbooks"
+msgstr "HTML教材"
+
+#: xmodule/course_module.py
+msgid ""
+"For HTML textbooks that appear as separate tabs in the course, enter the "
+"name of the tab (usually the title of the book) as well as the URLs and "
+"titles of each chapter in the book."
+msgstr "對於課程中做為其他標籤顯示的 HTML 課本，輸入標籤名稱 (通常是書名) 以及 URL 和書中每一章的標題。"
+
+#: xmodule/course_module.py
+msgid "Remote Gradebook"
+msgstr "遠端成績單"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter the remote gradebook mapping. Only use this setting when "
+"REMOTE_GRADEBOOK_URL has been specified."
+msgstr "輸入遠端成績單對應。當只有指定REMOTE_GRADEBOOK_URL才可以使用此設定。"
+
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content. CCX Coach is
+#. a role created by a course Instructor to enable a person (the "Coach") to
+#. manage the custom course for
+#. his students.
+#: xmodule/course_module.py
+msgid "Enable CCX"
+msgstr "啟用自訂課程"
+
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content. CCX Coach is
+#. a role created by a course Instructor to enable a person (the "Coach") to
+#. manage the custom course for
+#. his students.
+#: xmodule/course_module.py
+#, python-brace-format
+msgid ""
+"Allow course instructors to assign CCX Coach roles, and allow coaches to "
+"manage Custom Courses on {platform_name}. When false, Custom Courses cannot "
+"be created, but existing Custom Courses will be preserved."
+msgstr ""
+
+#. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
+#. course content.
+#: xmodule/course_module.py
+msgid "CCX Connector URL"
+msgstr "CCX Connector URL"
+
+#: xmodule/course_module.py
+msgid ""
+"URL for CCX Connector application for managing creation of CCXs. (optional)."
+" Ignored unless 'Enable CCX' is set to 'true'."
+msgstr ""
+"URL for CCX Connector application for managing creation of CCXs. (optional)."
+" Ignored unless 'Enable CCX' is set to 'true'."
+
+#: xmodule/course_module.py
+msgid "Allow Anonymous Discussion Posts"
+msgstr "允許張貼匿名討論"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to all users."
+msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生可以建立對大家是匿名的討論貼文。"
+
+#: xmodule/course_module.py
+msgid "Allow Anonymous Discussion Posts to Peers"
+msgstr "允許張貼同伴間的匿名討論"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to other students. This setting does not make posts anonymous to "
+"course staff."
+msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生可以對其他學生建立出匿名的討論。但是此設定對課程工作人員並不匿名。"
+
+#: xmodule/course_module.py xmodule/library_root_xblock.py
+msgid "Advanced Module List"
+msgstr "進階模組列表"
+
+#: xmodule/course_module.py
+msgid "Enter the names of the advanced modules to use in your course."
+msgstr "輸入您在課程中使用的進階模組名稱。"
+
+#: xmodule/course_module.py
+msgid ""
+"True if timezones should be shown on dates in the course. Deprecated in "
+"favor of due_date_display_format."
+msgstr "True 表示應在課程的日期上顯示時區。已過時，改為支援 due_date_display_format。"
+
+#: xmodule/course_module.py
+msgid "Due Date Display Format"
+msgstr "到期日期顯示設定"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter the format for due dates. The default is Mon DD, YYYY. Enter "
+"\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
+"YYYY-MM-DD, or \"%Y-%d-%m\" for YYYY-DD-MM."
+msgstr ""
+"輸入截止日期的格式。預設值是 Mon DD, YYYY 。輸入\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for"
+" DD-MM-YYYY, \"%Y-%m-%d\" for YYYY-MM-DD，或 \"%Y-%d-%m\" for YYYY-DD-MM 。"
+
+#: xmodule/course_module.py
+msgid "External Login Domain"
+msgstr "外部登錄區"
+
+#: xmodule/course_module.py
+msgid "Enter the external login method students can use for the course."
+msgstr "輸入學生可以使用這課程的外部登錄的方法。"
+
+#: xmodule/course_module.py
+msgid "Certificates Downloadable Before End"
+msgstr "結束前可下載證書"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can download certificates before the "
+"course ends, if they've met certificate requirements."
+msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生可以在課程結束前下載證書，如果他們已滿足證書的要求。"
+
+#: xmodule/course_module.py
+msgid "Certificates Display Behavior"
+msgstr "證書展示行為"
+
+#: xmodule/course_module.py
+msgid ""
+"This field, together with certificate_available_date will determine when a "
+"user can see their certificate for the course"
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Course About Page Image"
+msgstr "課程介紹頁面圖片"
+
+#: xmodule/course_module.py
+msgid ""
+"Edit the name of the course image file. You must upload this file on the "
+"Files & Uploads page. You can also set the course image on the Settings & "
+"Details page."
+msgstr "編輯課程圖像檔名稱。您必須上傳檔案在Files & Uploads 頁面。您也可以設定課程圖片在Settings & Details頁面。"
+
+#: xmodule/course_module.py
+msgid "Course Banner Image"
+msgstr "課程橫幅圖片"
+
+#: xmodule/course_module.py
+msgid ""
+"Edit the name of the banner image file. You can set the banner image on the "
+"Settings & Details page."
+msgstr "編輯橫幅影圖片的名稱。您可以在 [設定和詳細資訊] 頁面上設定橫幅圖片。"
+
+#: xmodule/course_module.py
+msgid "Course Video Thumbnail Image"
+msgstr "課程影片縮圖圖片"
+
+#: xmodule/course_module.py
+msgid ""
+"Edit the name of the video thumbnail image file. You can set the video "
+"thumbnail image on the Settings & Details page."
+msgstr "編輯影片縮圖圖片檔的名稱。您可以在 [設定和詳細資訊] 頁面上設定影片縮圖圖片。"
+
+#: xmodule/course_module.py
+msgid "Issue Open Badges"
+msgstr "Issue Open Badges"
+
+#: xmodule/course_module.py
+msgid ""
+"Issue Open Badges badges for this course. Badges are generated when "
+"certificates are created."
+msgstr "為此課程頒發徽章。建立證書時會產生徽章。"
+
+#: xmodule/course_module.py
+msgid ""
+"Use this setting only when generating PDF certificates. Between quotation "
+"marks, enter the short name of the type of certificate that students receive"
+" when they complete the course. For instance, \"Certificate\"."
+msgstr ""
+"只有在要產生證書的PDF檔時，才使用這項設定。當學生完成課程所獲得的證書，在引文標號中間輸入 證書類型簡稱於學生證書上。例如，“修課證明”。"
+
+#: xmodule/course_module.py
+msgid "Certificate Name (Short)"
+msgstr "證書名稱 (簡稱)"
+
+#: xmodule/course_module.py
+msgid ""
+"Use this setting only when generating PDF certificates. Between quotation "
+"marks, enter the long name of the type of certificate that students receive "
+"when they complete the course. For instance, \"Certificate of Achievement\"."
+msgstr ""
+"只有在要產生證書的PDF檔時，才使用這項設定。當學生完成課程所獲得的證書，在引文標號中間輸入 證書類型全名於學生證書上。例如，“成績證書”。"
+
+#: xmodule/course_module.py
+msgid "Certificate Name (Long)"
+msgstr "證書名稱 (完整)"
+
+#: xmodule/course_module.py
+msgid "Certificate Web/HTML View Enabled"
+msgstr "證書的網頁瀏覽模式啟用"
+
+#: xmodule/course_module.py
+msgid "If true, certificate Web/HTML views are enabled for the course."
+msgstr "當輸入true時，這門課程的證書，其網頁瀏覽模式啟用。"
+
+#. Translators: This field is the container for course-specific certificate
+#. configuration values
+#: xmodule/course_module.py
+msgid "Certificate Web/HTML View Overrides"
+msgstr "證書 Web/HTML View Overrides"
+
+#. Translators: These overrides allow for an alternative configuration of the
+#. certificate web view
+#: xmodule/course_module.py
+msgid ""
+"Enter course-specific overrides for the Web/HTML template parameters here "
+"(JSON format)"
+msgstr ""
+"Enter course-specific overrides for the Web/HTML template parameters here "
+"(JSON format)"
+
+#. Translators: This field is the container for course-specific certificate
+#. configuration values
+#: xmodule/course_module.py
+msgid "Certificate Configuration"
+msgstr "證書設定"
+
+#. Translators: These overrides allow for an alternative configuration of the
+#. certificate web view
+#: xmodule/course_module.py
+msgid "Enter course-specific configuration information here (JSON format)"
+msgstr "在此輸入課程指定的設定資訊 (JSON格式)"
+
+#: xmodule/course_module.py
+msgid "CSS Class for Course Reruns"
+msgstr "CSS Class for Course Reruns"
+
+#: xmodule/course_module.py
+msgid ""
+"Allows courses to share the same css class across runs even if they have "
+"different numbers."
+msgstr ""
+"Allows courses to share the same css class across runs even if they have "
+"different numbers."
+
+#: xmodule/course_module.py
+msgid "Discussion Forum External Link"
+msgstr "討論區外部連結"
+
+#: xmodule/course_module.py
+msgid "Allows specification of an external link to replace discussion forums."
+msgstr "允許指定的外部連結取代討論區。"
+
+#: xmodule/course_module.py
+msgid "Hide Progress Tab"
+msgstr "隱藏進度頁面"
+
+#: xmodule/course_module.py
+msgid "Allows hiding of the progress tab."
+msgstr "允許隱藏進度頁面。"
+
+#: xmodule/course_module.py
+msgid "Course Organization Display String"
+msgstr "課程組織的顯示字串"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter the course organization that you want to appear in the course. This "
+"setting overrides the organization that you entered when you created the "
+"course. To use the organization that you entered when you created the "
+"course, enter null."
+msgstr "輸入要在課程中顯示的課程組織。此設定會覆寫您建立課程時輸入的組織。若要使用您建立課程時輸入的組織，請輸入 null。"
+
+#: xmodule/course_module.py
+msgid "Course Number Display String"
+msgstr "課程編碼顯示字串"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter the course number that you want to appear in the course. This setting "
+"overrides the course number that you entered when you created the course. To"
+" use the course number that you entered when you created the course, enter "
+"null."
+msgstr "輸入要在課程中顯示的課程編號。此設定會覆寫您建立課程時輸入的課程編號。若要使用您建立課程時輸入的課程編號，請輸入 null。"
+
+#: xmodule/course_module.py
+msgid "Course Maximum Student Enrollment"
+msgstr "課程學生註冊上限。"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter the maximum number of students that can enroll in the course. To allow"
+" an unlimited number of students, enter null."
+msgstr "輸入可以註冊這課程的最大學生數量。輸入空，允許無上限學生數量。"
+
+#: xmodule/course_module.py
+msgid "Allow Public Wiki Access"
+msgstr "允許公開Wiki存取"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can view the course wiki even if "
+"they're not enrolled in the course."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Invitation Only"
+msgstr "僅限受邀者"
+
+#: xmodule/course_module.py
+msgid "Whether to restrict enrollment to invitation by the course staff."
+msgstr "是否限制註冊僅能透過課程工作人員邀請。"
+
+#: xmodule/course_module.py
+msgid "Pre-Course Survey Name"
+msgstr "課程前的問卷名稱"
+
+#: xmodule/course_module.py
+msgid "Name of SurveyForm to display as a pre-course survey to the user."
+msgstr "SurveyForm的名稱，以顯示課前問卷給用戶。"
+
+#: xmodule/course_module.py
+msgid "Pre-Course Survey Required"
+msgstr "需要課前問卷"
+
+#: xmodule/course_module.py
+msgid ""
+"Specify whether students must complete a survey before they can view your "
+"course content. If you set this value to true, you must add a name for the "
+"survey to the Course Survey Name setting above."
+msgstr "指定學生是否必須完成的一項問卷，才可以查看您的課程內容。如果將該值設置為true，你必須加上問卷名稱。"
+
+#: xmodule/course_module.py
+msgid "Course Visibility In Catalog"
+msgstr "在目錄的課程能見度"
+
+#. Translators: the quoted words 'both', 'about', and 'none' must be
+#. left untranslated.  Leave them as English words.
+#: xmodule/course_module.py
+msgid ""
+"Defines the access permissions for showing the course in the course catalog."
+" This can be set to one of three values: 'both' (show in catalog and allow "
+"access to about page), 'about' (only allow access to about page), 'none' (do"
+" not show in catalog and do not allow access to an about page)."
+msgstr ""
+"定義在課程目錄中顯是課程的存取權限。這可以被設置為三個值中的一個：'兩者'(顯示在目錄中，並允許訪問頁面)，'關於'(只允許訪問頁面)，'無'(沒有在目錄中顯示，且不允許訪問頁面)。"
+
+#: xmodule/course_module.py
+msgid "Entrance Exam Enabled"
+msgstr "資格考試已啟用"
+
+#: xmodule/course_module.py
+msgid ""
+"Specify whether students must complete an entrance exam before they can view"
+" your course content. Note, you must enable Entrance Exams for this course "
+"setting to take effect."
+msgstr "指定學生是否必須完成資格考試，才可以查看您的課程內容。請注意，您必須啟用這門課的資格考試，設置才會生效。"
+
+#: xmodule/course_module.py
+msgid "Entrance Exam Minimum Score (%)"
+msgstr "資格考試最低分數(%)"
+
+#: xmodule/course_module.py
+msgid ""
+"Specify a minimum percentage score for an entrance exam before students can "
+"view your course content. Note, you must enable Entrance Exams for this "
+"course setting to take effect."
+msgstr "在學生可以查看您的課程內容前，指定資格考試的最低百分比分數。請注意，您必須啟用這門課的資格考試，設置才會生效。"
+
+#: xmodule/course_module.py
+msgid "Entrance Exam ID"
+msgstr "資格考試ID"
+
+#: xmodule/course_module.py
+msgid "Content module identifier (location) of entrance exam."
+msgstr "資格考試的內容模組標識符 (ID)"
+
+#: xmodule/course_module.py
+msgid "Social Media Sharing URL"
+msgstr "社交媒體分享網址"
+
+#: xmodule/course_module.py
+msgid ""
+"If dashboard social sharing and custom course URLs are enabled, you can "
+"provide a URL (such as the URL to a course About page) that social media "
+"sites can link to. URLs must be fully qualified. For example: "
+"http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
+msgstr ""
+"如果課程面板的社交分享和自訂課程網址被啟用，您就可以提供一個網址(像是在課程關於頁面的網址)讓社交媒體可以連結到它。網址必須完全合格。例如：http://www.edx.org/course/Introduction-"
+"to-MOOCs-ITM001"
+
+#: xmodule/course_module.py cms/templates/settings.html
+msgid "Course Language"
+msgstr "課程語言"
+
+#: xmodule/course_module.py
+msgid "Specify the language of your course."
+msgstr "指定您的課程的語言。"
+
+#: xmodule/course_module.py
+msgid "Teams Configuration"
+msgstr "團隊設定"
+
+#: xmodule/course_module.py
+msgid ""
+"Configure team sets, limit team sizes, and set visibility settings using "
+"JSON. See <a target=\"&#95;blank\" "
+"href=\"https://edx.readthedocs.io/projects/edx-partner-course-"
+"staff/en/latest/course_features/teams/teams_setup.html#enable-and-configure-"
+"teams\">teams configuration documentation</a> for help and examples."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Enable Proctored Exams"
+msgstr "啟用監考考試"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, proctored exams are enabled in "
+"your course. Note that enabling proctored exams will also enable timed "
+"exams."
+msgstr "輸入 true 或 false。如果該值為true，監考的考試是在你的課程啟用。請注意，使監考考試也將啟動 限時考試。"
+
+#: xmodule/course_module.py
+msgid "Proctoring Provider"
+msgstr ""
+
+#: xmodule/course_module.py
+#, python-brace-format
+msgid ""
+"Enter the proctoring provider you want to use for this course run. Choose "
+"from the following options: {available_providers}."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Proctortrack Exam Escalation Contact"
+msgstr ""
+
+#: xmodule/course_module.py
+msgid ""
+"Required if 'proctortrack' is selected as your proctoring provider. Enter an"
+" email address to be contacted by the support team whenever there are "
+"escalations (e.g. appeals, delayed reviews, etc.)."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Allow Opting Out of Proctored Exams"
+msgstr ""
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, learners can choose to take "
+"proctored exams without proctoring. If this value is false, all learners "
+"must take the exam with proctoring. This setting only applies if proctored "
+"exams are enabled for the course."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
+msgstr "為試圖防止作弊之線上監考，創建Zendesk Tickets"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, a Zendesk ticket will be created"
+" for suspicious attempts."
+msgstr "輸入true或false。如果該值為true，將會因為試圖作弊而產生Zendesk ticket"
+
+#: xmodule/course_module.py
+msgid "Enable Timed Exams"
+msgstr "啟用限時考試"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, timed exams are enabled in your "
+"course. Regardless of this setting, timed exams are enabled if Enable "
+"Proctored Exams is set to true."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Minimum Grade for Credit"
+msgstr "取得學分的最小等級"
+
+#: xmodule/course_module.py
+msgid ""
+"The minimum grade that a learner must earn to receive credit in the course, "
+"as a decimal between 0.0 and 1.0. For example, for 75%, enter 0.75."
+msgstr "學習者得到學分的最低標準，在0.0 和1.0之間。例如，75％，輸入0.75。"
+
+#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+msgid "Self Paced"
+msgstr "自定進度"
+
+#: xmodule/course_module.py xmodule/modulestore/inheritance.py
+msgid ""
+"Set this to \"true\" to mark this course as self-paced. Self-paced courses "
+"do not have due dates for assignments, and students can progress through the"
+" course at any rate before the course ends."
+msgstr "將其設置為“true”，以設定這門課程為自學課程，沒有截止日期的作業，學生可以在任何速度在課程結束之前進行學習。"
+
+#: xmodule/course_module.py
+msgid "Enable Subsection Prerequisites"
+msgstr "可分段先修之要求"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, you can hide a subsection until "
+"learners earn a minimum score in another, prerequisite subsection."
+msgstr "輸入 true 或 false。如果該值為 true，你可以隱藏某分段，直到學習者獲得最低分數為止。"
+
+#: xmodule/course_module.py
+msgid "Course Learning Information"
+msgstr "課程學習資訊"
+
+#: xmodule/course_module.py
+msgid "Specify what student can learn from the course."
+msgstr "指定學生可在課程中學到的內容。"
+
+#: xmodule/course_module.py
+msgid "Course Visibility For Unenrolled Learners"
+msgstr ""
+
+#. Translators: the quoted words 'private', 'public_outline', and 'public'
+#. must be left untranslated.  Leave them as English words.
+#: xmodule/course_module.py
+msgid ""
+"Defines the access permissions for unenrolled learners. This can be set to "
+"one of three values: 'private' (default visibility, only allowed for "
+"enrolled students), 'public_outline' (allow access to course outline) and "
+"'public' (allow access to both outline and course content)."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Course Instructor"
+msgstr "課程講師"
+
+#: xmodule/course_module.py
+msgid "Enter the details for Course Instructor"
+msgstr "輸入課程講師的詳細資訊"
+
+#: xmodule/course_module.py
+msgid "Add Unsupported Problems and Tools"
+msgstr "新增不支援的問題和工具"
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, you can add unsupported problems and tools to "
+"your course in Studio. Unsupported problems and tools are not recommended "
+"for use in courses due to non-compliance with one or more of the base "
+"requirements, such as testing, accessibility, internationalization, and "
+"documentation."
+msgstr ""
+"輸入true或false。 "
+"如果為true，則可以在Studio課程中新增不支援的問題和工具。不支援的問題和工具不建議使用於課程，是因為不符合一個或多個基本要求，如測試、輔助功能、國際化和文檔。"
+
+#: xmodule/course_module.py
+msgid "Highlights Enabled for Messaging"
+msgstr ""
+
+#: xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, any highlights associated with content in the "
+"course will be messaged to learners at their scheduled time."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Course-wide Custom JS"
+msgstr ""
+
+#: xmodule/course_module.py
+msgid ""
+"Enter Javascript resource URLs you want to be loaded globally throughout the"
+" course pages."
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "Course-wide Custom CSS"
+msgstr ""
+
+#: xmodule/course_module.py
+msgid ""
+"Enter CSS resource URLs you want to be loaded globally throughout the course"
+" pages."
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html
+msgid "Other Course Settings"
+msgstr "其他課程設定"
+
+#: xmodule/course_module.py
+msgid ""
+"Any additional information about the course that the platform needs or that "
+"allows integration with external systems such as CRM software. Enter a "
+"dictionary of values in JSON format, such as { \"my_custom_setting\": "
+"\"value\", \"other_setting\": \"value\" }"
+msgstr ""
+
+#: xmodule/course_module.py
+msgid "General"
+msgstr "一般"
+
+#: xmodule/graders.py
+#, python-brace-format
+msgid "{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}"
+msgstr ""
+
+#: xmodule/graders.py
+msgid "Generated"
+msgstr ""
+
+#. Translators: "Homework 1 - Unreleased - 0% (?/?)" The section has not been
+#. released for viewing.
+#: xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} {index} Unreleased - 0% (?/?)"
+msgstr ""
+
+#: xmodule/graders.py
+#, python-brace-format
+msgid "The lowest {drop_count} {section_type} scores are dropped."
+msgstr ""
+
+#. Translators: "Homework Average = 0%"
+#: xmodule/graders.py
+#, python-brace-format
+msgid "{section_type} Average = {percent:.0%}"
+msgstr ""
+
+#. Translators: Avg is short for Average
+#: xmodule/graders.py
+#, python-brace-format
+msgid "{short_label} Avg"
+msgstr ""
+
+#: xmodule/hidden_module.py
+#, python-brace-format
+msgid ""
+"ERROR: \"{block_type}\" is an unknown component type. This component will be"
+" hidden in LMS."
+msgstr ""
+
+#: xmodule/html_module.py
+msgid "Html contents to display for this module"
+msgstr "使用HTML的內容來顯示該模塊。"
+
+#: xmodule/html_module.py
+msgid "Source code for LaTeX documents. This feature is not well-supported."
+msgstr "LaTeX 文件原始碼，此功能尚未完整支援。"
+
+#: xmodule/html_module.py
+msgid ""
+"Select Visual to enter content and have the editor automatically create the "
+"HTML. Select Raw to edit HTML directly. If you change this setting, you must"
+" save the component and then re-open it for editing."
+msgstr ""
+"選擇視覺化的方式輸入內容，編輯器會自動建立HTML。選擇原始的方式直接編輯HTML。如果您更改此設置，您必須儲存組件並且重新開啟以進行編輯。"
+
+#: xmodule/html_module.py
+msgid "Editor"
+msgstr "編輯器"
+
+#: xmodule/html_module.py
+msgid "Visual"
+msgstr "視覺化的"
+
+#: xmodule/html_module.py
+msgid "Raw"
+msgstr "原始格式"
+
+#: xmodule/html_module.py
+msgid "Hide Page From Learners"
+msgstr ""
+
+#: xmodule/html_module.py
+msgid ""
+"If you select this option, only course team members with the Staff or Admin "
+"role see this page."
+msgstr ""
+
+#: xmodule/html_module.py
+msgid "HTML for the additional pages"
+msgstr "其他頁面的HTML"
+
+#: xmodule/html_module.py
+msgid "List of course update items"
+msgstr "課程更新項目清單"
+
+#: xmodule/library_content_module.py
+msgid "Any Type"
+msgstr "任何形式"
+
+#: xmodule/library_content_module.py
+msgid "Library"
+msgstr "課程組件庫"
+
+#: xmodule/library_content_module.py
+msgid "Select the library from which you want to draw content."
+msgstr "選擇您要丟棄內容的課程組件庫。"
+
+#: xmodule/library_content_module.py
+msgid "Library Version"
+msgstr "課程組件庫版本"
+
+#: xmodule/library_content_module.py
+msgid "Determines how content is drawn from the library"
+msgstr "決定從課程組件庫中如何取得內容"
+
+#: xmodule/library_content_module.py
+msgid "Choose n at random"
+msgstr "隨機選個 n"
+
+#: xmodule/library_content_module.py
+msgid "Count"
+msgstr "計算"
+
+#: xmodule/library_content_module.py
+msgid "Enter the number of components to display to each student."
+msgstr "進入組件的數量，以顯示給每個學生。"
+
+#: xmodule/library_content_module.py
+msgid "Problem Type"
+msgstr "問題形式"
+
+#: xmodule/library_content_module.py
+msgid ""
+"Choose a problem type to fetch from the library. If \"Any Type\" is selected"
+" no filtering is applied."
+msgstr "從課程組件庫中選擇一個問題類型，如果選擇“任何類型”則不進行過濾。"
+
+#: xmodule/library_content_module.py
+msgid ""
+"Determines whether a 'Reset Problems' button is shown, so users may reset "
+"their answers and reshuffle selected items."
+msgstr ""
+
+#: xmodule/library_content_module.py
+msgid "This component is out of date. The library has new content."
+msgstr "此組件已過期，課程組件庫中有新的內容。"
+
+#. Translators: {refresh_icon} placeholder is substituted to "↻" (without
+#. double quotes)
+#: xmodule/library_content_module.py
+#, python-brace-format
+msgid "{refresh_icon} Update now."
+msgstr "{refresh_icon} 立即更新。"
+
+#: xmodule/library_content_module.py
+msgid "Library is invalid, corrupt, or has been deleted."
+msgstr "課程組件庫是無效的、已損壞或是已被刪除。"
+
+#: xmodule/library_content_module.py
+msgid "Edit Library List."
+msgstr "編輯課程組件庫列表。"
+
+#: xmodule/library_content_module.py
+msgid ""
+"This course does not support content libraries. Contact your system "
+"administrator for more information."
+msgstr "這課程不支持的內容庫。請聯繫您的系統管理員了解更多訊息。"
+
+#: xmodule/library_content_module.py
+msgid "A library has not yet been selected."
+msgstr "尚未選取課程組件庫。"
+
+#: xmodule/library_content_module.py
+msgid "Select a Library."
+msgstr "選擇一個課程組件庫。"
+
+#: xmodule/library_content_module.py
+msgid "There are no matching problem types in the specified libraries."
+msgstr "在指定庫找不到對應的問題型態。"
+
+#: xmodule/library_content_module.py
+msgid "Select another problem type."
+msgstr "選擇其他問題的類型。"
+
+#: xmodule/library_content_module.py
+#, python-brace-format
+msgid "The specified library is configured to fetch {count} problem, "
+msgid_plural "The specified library is configured to fetch {count} problems, "
+msgstr[0] "特定的課程組件庫被設定用來擷取 {count} 個問題，"
+
+#: xmodule/library_content_module.py
+#, python-brace-format
+msgid "but there is only {actual} matching problem."
+msgid_plural "but there are only {actual} matching problems."
+msgstr[0] "但是只有 {actual} 符合的問題。"
+
+#: xmodule/library_content_module.py
+msgid "Edit the library configuration."
+msgstr "編輯課程組件庫設定。"
+
+#: xmodule/library_content_module.py
+msgid "Invalid Library"
+msgstr "無效的課程組件庫"
+
+#: xmodule/library_content_module.py
+msgid "No Library Selected"
+msgstr "尚未選擇課程組件庫"
+
+#: xmodule/library_root_xblock.py
+msgid "Library Display Name"
+msgstr "課程組件庫顯示名稱"
+
+#: xmodule/library_root_xblock.py
+msgid "Enter the names of the advanced components to use in your library."
+msgstr "輸入在課程組件庫中使用的進階組件名稱。"
+
+#: xmodule/library_sourced_block.py
+msgid "Library Blocks List"
+msgstr ""
+
+#: xmodule/library_sourced_block.py
+msgid "Enter the IDs of the library XBlocks that you wish to use."
+msgstr ""
+
+#: xmodule/library_sourced_block.py
+#, python-brace-format
+msgid "A maximum of {0} components may be added."
+msgstr ""
+
+#: xmodule/library_sourced_block.py
+msgid ""
+"No XBlock has been configured for this component. Use the editor to select "
+"the target blocks."
+msgstr ""
+
+#: xmodule/library_sourced_block.py
+msgid "Open Editor"
+msgstr ""
+
+#: xmodule/library_sourced_block.py
+msgid "Importing Library Block failed - are the IDs valid and readable?"
+msgstr ""
+
+#: xmodule/lti_module.py
+msgid ""
+"The display name for this component. Analytics reports may also use the "
+"display name to identify this component."
+msgstr ""
+
+#: xmodule/lti_module.py
+msgid "LTI ID"
+msgstr "LTI ID"
+
+#: xmodule/lti_module.py
+#, python-brace-format
+msgid ""
+"Enter the LTI ID for the external LTI provider.  This value must be the same"
+" LTI ID that you entered in the LTI Passports setting on the Advanced "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
+msgstr ""
+
+#: xmodule/lti_module.py
+msgid "LTI URL"
+msgstr "LTI URL"
+
+#: xmodule/lti_module.py
+#, python-brace-format
+msgid ""
+"Enter the URL of the external tool that this component launches. This "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
+"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
+"on this setting."
+msgstr ""
+
+#: xmodule/lti_module.py
+msgid "Custom Parameters"
+msgstr "自定義參數"
+
+#: xmodule/lti_module.py
+#, python-brace-format
+msgid ""
+"Add the key/value pair for any custom parameters, such as the page your "
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
+msgstr ""
+
+#: xmodule/lti_module.py
+msgid "Open in New Page"
+msgstr "在新頁面開啟"
+
+#: xmodule/lti_module.py
+msgid ""
+"Select True if you want students to click a link that opens the LTI tool in "
+"a new window. Select False if you want the LTI content to open in an IFrame "
+"in the current page. This setting is only used when Hide External Tool is "
+"set to False.  "
+msgstr ""
+"如果您想要學生點擊連結時在新視窗開啟LTI工具則選擇Ture。選擇False則是在當前頁面的IFrame開啟。此設置只能夠在隱藏外部工具被設置為False時使用。"
+
+#: xmodule/lti_module.py
+msgid "Scored"
+msgstr "得分"
+
+#: xmodule/lti_module.py
+msgid ""
+"Select True if this component will receive a numerical score from the "
+"external LTI system."
+msgstr "如果這個組件將會從外部LIT系統接收數值評分則選擇True。"
+
+#: xmodule/lti_module.py
+msgid "Weight"
+msgstr "權重"
+
+#: xmodule/lti_module.py
+msgid ""
+"Enter the number of points possible for this component.  The default value "
+"is 1.0.  This setting is only used when Scored is set to True."
+msgstr "輸入此組件的可能的點數。預設值為1.0。此設置只能在當Scored被設置為True時使用。"
+
+#: xmodule/lti_module.py
+msgid ""
+"The score kept in the xblock KVS -- duplicate of the published score in "
+"django DB"
+msgstr "這個分數保持在xblock KVS 中 -- 刊登的得分在Django數據庫的副本中"
+
+#: xmodule/lti_module.py
+msgid "Comment as returned from grader, LTI2.0 spec"
+msgstr "Comment as returned from grader, LTI2.0 spec"
+
+#: xmodule/lti_module.py
+msgid "Hide External Tool"
+msgstr "隱藏外部工具"
+
+#: xmodule/lti_module.py
+msgid ""
+"Select True if you want to use this component as a placeholder for syncing "
+"with an external grading  system rather than launch an external tool.  This "
+"setting hides the Launch button and any IFrames for this component."
+msgstr ""
+"如果您想要使用此組件做為一個預留位置給外部評分系統同步，而非執行一個外部工具，則選擇True。此設置隱藏執行按鈕及任何IFrames給此組件。"
+
+#: xmodule/lti_module.py
+msgid "Request user's username"
+msgstr "需要使用者的使用者帳號"
+
+#. Translators: This is used to request the user's username for a third party
+#. service.
+#: xmodule/lti_module.py
+msgid "Select True to request the user's username."
+msgstr "選擇True 以要求用戶的用戶名 username。"
+
+#: xmodule/lti_module.py
+msgid "Request user's email"
+msgstr "需要使用者的電子郵件"
+
+#. Translators: This is used to request the user's email for a third party
+#. service.
+#: xmodule/lti_module.py
+msgid "Select True to request the user's email address."
+msgstr "選擇True 以要求用戶的電子郵件地址。"
+
+#: xmodule/lti_module.py
+msgid "LTI Application Information"
+msgstr "LTI 應用資訊"
+
+#: xmodule/lti_module.py
+msgid ""
+"Enter a description of the third party application. If requesting username "
+"and/or email, use this text box to inform users why their username and/or "
+"email will be forwarded to a third party application."
+msgstr ""
+"請輸入第三方應用程式的描述。如果需要使用者帳號或電子郵件，使用此文字方塊來通知使用者為何他們的使用者帳號或電子郵件將會被轉發到第三方應用程式。"
+
+#: xmodule/lti_module.py
+msgid "Button Text"
+msgstr "按鈕文字"
+
+#: xmodule/lti_module.py
+msgid ""
+"Enter the text on the button used to launch the third party application."
+msgstr "請輸入用於啟動第三方應用程序的按鈕上的文字。"
+
+#: xmodule/lti_module.py
+msgid "Accept grades past deadline"
+msgstr "接受超過限期的成績"
+
+#: xmodule/lti_module.py
+msgid ""
+"Select True to allow third party systems to post grades past the deadline."
+msgstr "選擇 true 來允許第三方系統可在超過期限後張貼分數。"
+
+#: xmodule/lti_module.py
+#, python-brace-format
+msgid ""
+"Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
+"string."
+msgstr "無法解析自定義參數：{custom_parameter}。參數格式必須類似於\"x=y\"。"
+
+#: xmodule/lti_module.py
+#, python-brace-format
+msgid ""
+"Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
+"string."
+msgstr "無法解析LTI通行證：{lti_passport}。其格式應當是由“身份標識:鍵:密碼“構成的字符串。"
+
+#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+#: lms/templates/ccx/schedule.html
+msgid "Due Date"
+msgstr "截止日期"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Enter the default date by which problems are due."
+msgstr "輸入問題的預設截止日期。"
+
+#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+msgid "Number of Relative Weeks Due By"
+msgstr ""
+
+#: xmodule/modulestore/inheritance.py xmodule/seq_module.py
+msgid ""
+"Enter the number of weeks the problems are due by relative to the learner's "
+"enrollment date"
+msgstr ""
+
+#: xmodule/modulestore/inheritance.py
+msgid "GIT URL"
+msgstr "GIT 網址"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Enter the URL for the course data GIT repository."
+msgstr "輸入課程資料GIT庫的網址。"
+
+#: xmodule/modulestore/inheritance.py
+msgid "XQA Key"
+msgstr "XQA Key"
+
+#: xmodule/modulestore/inheritance.py
+msgid "This setting is not currently supported."
+msgstr "現在不支援此設定。"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Enter the ids for the content groups this problem belongs to."
+msgstr "輸入對於這個問題屬於的內容組的 ID。"
+
+#. Translators: DO NOT translate the words in quotes here, they are
+#. specific words for the acceptable values.
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Specify when the Show Answer button appears for each problem. Valid values "
+"are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
+"\"past_due\", \"correct_or_past_due\", \"after_all_attempts\", "
+"\"after_all_attempts_or_correct\", \"attempted_no_past_due\", and \"never\"."
+msgstr ""
+
+#. Translators: DO NOT translate the words in quotes here, they are
+#. specific words for the acceptable values.
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Specify when to show answer correctness and score to learners. Valid values "
+"are \"always\", \"never\", and \"past_due\"."
+msgstr ""
+
+#. Translators: DO NOT translate the words in quotes here, they are
+#. specific words for the acceptable values.
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Specify the default for how often variable values in a problem are "
+"randomized. This setting should be set to \"never\" unless you plan to "
+"provide a Python script to identify and randomize values in most of the "
+"problems in your course. Valid values are \"always\", \"onreset\", "
+"\"never\", and \"per_student\"."
+msgstr ""
+"指定隱含變量值多久會發生問題是採隨機系統預設。此設定應設為“從不”，除非你打算提供一個Python script "
+"來隨機辨識您的課程中大部分問題。有效欄位為“永遠”，“當reset 時”，“從不”，以及“每名學生”。"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Days Early for Beta Users"
+msgstr "Beta使用者提前使用的天數"
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the number of days before the start date that beta users can access "
+"the course."
+msgstr "輸入 beta 使用者可以開始使用課程前的天數。"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Static Asset Path"
+msgstr "靜態資源路徑"
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the path to use for files on the Files & Uploads page. This value "
+"overrides the Studio default, c4x://."
+msgstr "輸入在Files & Uploads頁面使用檔案的路徑。此值會覆寫到 Studio default, c4x://。"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Enable LaTeX Compiler"
+msgstr "啟用LaTeX編譯器"
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, you can use the LaTeX templates for HTML "
+"components and advanced Problem components."
+msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，您可為HTML組件和進階問題組件使用LaTeX模板。"
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the maximum number of times a student can try to answer problems. By "
+"default, Maximum Attempts is set to null, meaning that students have an "
+"unlimited number of attempts for problems. You can override this course-wide"
+" setting for individual problems. However, if the course-wide setting is a "
+"specific number, you cannot set the Maximum Attempts for individual problems"
+" to unlimited."
+msgstr "請輸入學生可嘗試回答問題之上限。預設情況下，嘗試上限為空，意指學生可無限嘗試回答問題。"
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
+"Service. This key is granted for exclusive use in this course for the "
+"specified duration. Do not share the API key with other courses. Notify "
+"MathWorks immediately if you believe the key is exposed or compromised. To "
+"obtain a key for your course, or to report an issue, please contact "
+"moocsupport@mathworks.com"
+msgstr ""
+"輸入MathWorks所提供的API 金鑰來存取 "
+"MATLAB主要服務。這個金鑰僅僅准許使用在這課程指定的時間。請務必不能在其他課程分享此金鑰。如果您發現此金鑰曝光或是違背原則，請立即通知MathWorks。請聯繫moocsupport@mathworks.com來得到課程的金鑰或是發表問題。"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Group Configurations"
+msgstr "群組設定"
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the configurations that govern how students are grouped together."
+msgstr "輸入管理學生如何分群的設定。"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Enable video caching system"
+msgstr "啟用的影片快取系統"
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, video caching will be used for HTML5 videos."
+msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，影片快取將會被使用在HTML5影片上。"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Enable video auto-advance"
+msgstr ""
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Specify whether to show an auto-advance button in videos. If the student "
+"clicks it, when the last video in a unit finishes it will automatically move"
+" to the next unit and autoplay the first video."
+msgstr ""
+
+#: xmodule/modulestore/inheritance.py
+msgid "Video Pre-Roll"
+msgstr "Video Pre-Roll"
+
+#: xmodule/modulestore/inheritance.py
+#, python-brace-format
+msgid ""
+"Identify a video, 5-10 seconds in length, to play before course videos. "
+"Enter the video ID from the Video Uploads page and one or more transcript "
+"files in the following format: {format}. For example, an entry for a video "
+"with two transcripts looks like this: {example}"
+msgstr ""
+"課程影片前指定一個 5-10 秒的影片。從 Video Uploads 中輸入 Video "
+"ID，以及一個或多個字幕檔，以下面的格式：{format}。例如，使用兩個字幕檔的一段影片如同： {example}"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Show Reset Button for Problems"
+msgstr "在問題下顯示「重設」按鈕"
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, problems in the course default to always "
+"displaying a 'Reset' button. You can override this in each problem's "
+"settings. All existing problems are affected when this course-wide setting "
+"is changed."
+msgstr ""
+"請輸入\"true\"或\"false\"。當輸入\"true\"時，在課程的問題會預設成總是顯示'重設'按鈕。您可以覆蓋此問題設定。所有存在的問題都會被影響當此設置被改變。"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Enable Student Notes"
+msgstr "啟用學生筆記"
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, students can use the Student Notes feature."
+msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，學生可以使用學生比較功能。"
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Indicates whether Student Notes are visible in the course. Students can also"
+" show or hide their notes in the courseware."
+msgstr "說明是否學生筆記在課程中可見。學生還可以顯示或隱藏自己的筆記中的教材。"
+
+#: xmodule/modulestore/inheritance.py
+msgid "Tag this module as part of an Entrance Exam section"
+msgstr "標記此模組成為資格考試的一部份"
+
+#: xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, answer submissions for problem modules will be"
+" considered in the Entrance Exam scoring/gating algorithm."
+msgstr "輸入 true 或者 false。如果是 true，提交的問題模組將會被列入資格學考試的演算法中。"
+
+#: xmodule/modulestore/xml_importer.py
+msgid "Error while reading {}. Check file for XML errors."
+msgstr ""
+
+#: xmodule/modulestore/xml_importer.py
+msgid "Failed to import module: {} at location: {}"
+msgstr ""
+
+#: xmodule/partitions/enrollment_track_partition_generator.py
+#: cms/templates/group_configurations.html
+msgid "Enrollment Track Groups"
+msgstr ""
+
+#: xmodule/partitions/enrollment_track_partition_generator.py
+msgid "Partition for segmenting users by enrollment track"
+msgstr ""
+
+#: xmodule/poll_module.py
+msgid "Whether this student has voted on the poll"
+msgstr ""
+
+#: xmodule/poll_module.py
+msgid "Student answer"
+msgstr ""
+
+#: xmodule/poll_module.py
+msgid "Poll answers from all students"
+msgstr ""
+
+#: xmodule/poll_module.py
+msgid "Poll answers from xml"
+msgstr ""
+
+#: xmodule/poll_module.py
+msgid "Poll question"
+msgstr ""
+
+#: xmodule/seq_module.py
+msgid "Enter the date by which problems are due."
+msgstr "輸入問題的截止日期"
+
+#: xmodule/seq_module.py
+msgid "Hide sequence content After Due Date"
+msgstr "在截止日期過後隱藏內容結果"
+
+#: xmodule/seq_module.py
+msgid ""
+"If set, the sequence content is hidden for non-staff users after the due "
+"date has passed."
+msgstr "如果設定為，當截止日期過後，對非工作人員使用者結果內容將被隱藏。"
+
+#: xmodule/seq_module.py
+msgid "Is Entrance Exam"
+msgstr "是資格考試"
+
+#: xmodule/seq_module.py
+msgid ""
+"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Exams for this course setting to take effect."
+msgstr "標記課程模組作為資格考試。請注意，您必須啟用資格考試課程設定才可生效。"
+
+#: xmodule/seq_module.py
+msgid "Is Time Limited"
+msgstr "時間有限的"
+
+#: xmodule/seq_module.py
+msgid ""
+"This setting indicates whether students have a limited time to view or "
+"interact with this courseware component."
+msgstr "此設置說明學生是否只能在有限時間內瀏覽或與這份教材組件互動。"
+
+#: xmodule/seq_module.py
+msgid "Time Limit in Minutes"
+msgstr "時間限制以分鐘為單位"
+
+#: xmodule/seq_module.py
+msgid ""
+"The number of minutes available to students for viewing or interacting with "
+"this courseware component."
+msgstr "學生可以瀏覽或與教材組件互動的時間（分鐘）。"
+
+#: xmodule/seq_module.py
+msgid "Is Proctoring Enabled"
+msgstr "監考已啟用"
+
+#: xmodule/seq_module.py
+msgid "This setting indicates whether this exam is a proctored exam."
+msgstr "此設定表示該考試是否為一場有監考的考試。"
+
+#: xmodule/seq_module.py
+msgid "Software Secure Review Rules"
+msgstr "軟體安全審查規則"
+
+#: xmodule/seq_module.py
+msgid ""
+"This setting indicates what rules the proctoring team should follow when "
+"viewing the videos."
+msgstr "此設定表示在瀏覽影片時，團隊必須遵循監考的規則。"
+
+#: xmodule/seq_module.py
+msgid "Is Practice Exam"
+msgstr "是練習考試"
+
+#: xmodule/seq_module.py
+msgid ""
+"This setting indicates whether this exam is for testing purposes only. "
+"Practice exams are not verified."
+msgstr "此設定表示本次考試是否僅適用於測試。練習式的考試是無證明的。"
+
+#: xmodule/seq_module.py
+msgid "Is Onboarding Exam"
+msgstr ""
+
+#: xmodule/seq_module.py
+msgid "This setting indicates whether this exam is an onboarding exam."
+msgstr ""
+
+#: xmodule/seq_module.py
+msgid ""
+"This subsection is unlocked for learners when they meet the prerequisite "
+"requirements."
+msgstr "當學習者滿足先決條件要求，此小節便會開放。"
+
+#: xmodule/seq_module.py
+msgid "This exam is hidden from the learner."
+msgstr "學習者看不到此考試。"
+
+#: xmodule/seq_module.py
+msgid ""
+"Because the course has ended, this assignment is hidden from the learner."
+msgstr ""
+
+#: xmodule/seq_module.py
+msgid ""
+"Because the due date has passed, this assignment is hidden from the learner."
+msgstr ""
+
+#: xmodule/seq_module.py
+msgid ""
+"This section is a prerequisite. You must complete this section in order to "
+"unlock additional content."
+msgstr ""
+
+#: xmodule/seq_module.py
+msgid ""
+"A list summarizing what students should look forward to in this section."
+msgstr ""
+
+#: xmodule/split_test_module.py
+#, python-brace-format
+msgid "Group ID {group_id}"
+msgstr "群組 ID {group_id}"
+
+#: xmodule/split_test_module.py
+msgid "Not Selected"
+msgstr "未選取"
+
+#: xmodule/split_test_module.py
+msgid "The display name for this component. (Not shown to learners)"
+msgstr ""
+
+#: xmodule/split_test_module.py
+msgid "Content Experiment"
+msgstr "內容實驗"
+
+#: xmodule/split_test_module.py
+msgid ""
+"The configuration defines how users are grouped for this content experiment."
+" Caution: Changing the group configuration of a student-visible experiment "
+"will impact the experiment data."
+msgstr "此設定定義了使用者如何在內容實驗中被分組。注意：改變學生可見的群組的設定將會影響實驗數據。"
+
+#: xmodule/split_test_module.py
+msgid "Group Configuration"
+msgstr "群組設定"
+
+#: xmodule/split_test_module.py
+msgid "Which child module students in a particular group_id should see"
+msgstr "哪個子模組學生將會被特別的gouup_id所檢視"
+
+#: xmodule/split_test_module.py
+#, python-brace-format
+msgid "{group_name} (inactive)"
+msgstr "{group_name} (inactive)"
+
+#: xmodule/split_test_module.py
+msgid "The experiment is not associated with a group configuration."
+msgstr "實驗未與任何群組設定關聯。"
+
+#: xmodule/split_test_module.py
+msgid "Select a Group Configuration"
+msgstr "選擇一個群組設定"
+
+#: xmodule/split_test_module.py
+msgid ""
+"The experiment uses a deleted group configuration. Select a valid group "
+"configuration or delete this experiment."
+msgstr "本實驗使用了一個已刪除的群組設定，請重新選擇一個正確的設定或是刪除本實驗。"
+
+#: xmodule/split_test_module.py
+msgid ""
+"The experiment uses a group configuration that is not supported for "
+"experiments. Select a valid group configuration or delete this experiment."
+msgstr "此實驗使用了不支持實驗的群組設定。選擇一個有效的群組設定或刪除這個實驗。"
+
+#: xmodule/split_test_module.py
+msgid ""
+"The experiment does not contain all of the groups in the configuration."
+msgstr "本實驗並未包含設定中所有的群組。"
+
+#: xmodule/split_test_module.py
+msgid "Add Missing Groups"
+msgstr "新增消失的群組"
+
+#: xmodule/split_test_module.py
+msgid ""
+"The experiment has an inactive group. Move content into active groups, then "
+"delete the inactive group."
+msgstr "本實驗有個不活動的群組，移動內容到其他活動中的群組並且刪除此不活動的群組。"
+
+#: xmodule/split_test_module.py
+msgid "This content experiment has issues that affect content visibility."
+msgstr "這個內容實驗已經被標記為影響內容可見度。"
+
+#: xmodule/tabs.py
+msgid "External Discussion"
+msgstr "外部討論"
+
+#: xmodule/templates/library-sourced-block-studio-view.html
+msgid "Save and Import"
+msgstr ""
+
+#: xmodule/vertical_block.py
+msgid "Enable in-context discussions for the Unit"
+msgstr ""
+
+#: xmodule/vertical_block.py
+msgid "Add discussion for the Unit."
+msgstr ""
+
+#: xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid ""
+"Can't receive transcripts from Youtube for {youtube_id}. Status code: "
+"{status_code}."
+msgstr "無法從 Youtube 收到 {youtube_id} 的字幕。狀態代碼: {status_code}。"
+
+#: xmodule/video_module/transcripts_utils.py
+msgid "We support only SubRip (*.srt) transcripts format."
+msgstr "我們只支持 SubRip (*.srt) 副本的格式。"
+
+#: xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid ""
+"Something wrong with SubRip transcripts file during parsing. Inner message "
+"is {error_message}"
+msgstr "在分析 SubRip 副本檔案過程中發生錯誤。進一步消息是{error_message}"
+
+#: xmodule/video_module/transcripts_utils.py
+msgid "Something wrong with SubRip transcripts file during parsing."
+msgstr "在分析SubRip 副本檔案過程中發生錯誤。"
+
+#: xmodule/video_module/transcripts_utils.py
+#, python-brace-format
+msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
+msgstr "{exception_message}： 找不到上傳的成績單: {user_filename}"
+
+#: xmodule/video_module/video_handlers.py
+msgid "Language is required."
+msgstr ""
+
+#: xmodule/video_module/video_module.py
+msgid "Basic"
+msgstr "基本"
+
+#: xmodule/video_module/video_module.py
+#, python-brace-format
+msgid "There is no transcript file associated with the {lang} language."
+msgid_plural ""
+"There are no transcript files associated with the {lang} languages."
+msgstr[0] "沒有有關{lang} 語言的字幕檔案。"
+
+#: xmodule/video_module/video_module.py
+msgid ""
+"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
+".ogg, or .webm video file hosted elsewhere on the Internet."
+msgstr "您的影片網址。可以是一個YouTube的網址或者連結至一個儲存.mp4, .ogg, 或者.webm 格式影片的網路伺服器網址。"
+
+#: xmodule/video_module/video_module.py
+msgid "Default Video URL"
+msgstr "預設的影片網址"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Component Display Name"
+msgstr "組件顯示名稱"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Current position in the video."
+msgstr "影片當前位置。"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"Optional, for older browsers: the YouTube ID for the normal speed video."
+msgstr "非必選，針對較早的瀏覽器：正常速度影片的YouTube ID。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "YouTube ID"
+msgstr "YouTube ID"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Optional, for older browsers: the YouTube ID for the .75x speed video."
+msgstr "非必選，針對較早的瀏覽器：0.75 倍速影片的YouTube ID。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "YouTube ID for .75x speed"
+msgstr "YouTube ID（0.75 倍速）"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"Optional, for older browsers: the YouTube ID for the 1.25x speed video."
+msgstr "可選，針對較早的瀏覽器：1.25 倍速影片的YouTube ID。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "YouTube ID for 1.25x speed"
+msgstr "YouTube ID（1.25 倍速）"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Optional, for older browsers: the YouTube ID for the 1.5x speed video."
+msgstr "非必選，針對較早的瀏覽器：1.5 倍速影片的YouTube ID。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "YouTube ID for 1.5x speed"
+msgstr "YouTube ID（1.5 倍速）"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"Time you want the video to start if you don't want the entire video to play."
+" Not supported in the native mobile app: the full video file will play. "
+"Formatted as HH:MM:SS. The maximum value is 23:59:59."
+msgstr ""
+"如果不希望播放整部影片，則在此提供影片播放的開始時間。不支持原生行動app：整部影片將被播放。格式為 HH:MM:SS，最大值為 23:59:59。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Video Start Time"
+msgstr "影片開始時間"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"Time you want the video to stop if you don't want the entire video to play. "
+"Not supported in the native mobile app: the full video file will play. "
+"Formatted as HH:MM:SS. The maximum value is 23:59:59."
+msgstr ""
+"如果不希望播放整部影片，則在此提供影片播放的結束時間。不支持原生行動app：整部影片將被播放。格式為 HH:MM:SS，最大值為 23:59:59。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Video Stop Time"
+msgstr "影片結束時間"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"Allow students to download versions of this video in different formats if "
+"they cannot use the edX video player or do not have access to YouTube. You "
+"must add at least one non-YouTube URL in the Video File URLs field."
+msgstr ""
+"如果學生無法使用edX "
+"影片播放器，或者不能進入YouTube，則可以允許學生以不同的格式下載該影片。因此，必須在“影片文件URL”欄位中添加至少一個非YouTube "
+"的影片URL。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Video Download Allowed"
+msgstr "允許下載影片"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"The URL or URLs where you've posted non-YouTube versions of the video. Each "
+"URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
+"(For browser compatibility, we strongly recommend .mp4 and .webm format.) "
+"Students will be able to view the first listed video that's compatible with "
+"the student's computer. To allow students to download these videos, set "
+"Video Download Allowed to True."
+msgstr ""
+"非 YouTube 的影片 URL。每個URL 應當以.mpeg、.mp4、.ogg 或者.webm 結尾，並且不得為YouTube "
+"URL(考量到瀏覽器的相容性問題，我們強烈建議使用.mp4或是.webm格式)。學生將看到列表中第一個與其電腦相容的影片格式。若想讓學生下載這些影片，請將“允許下載影片”設定為“是”。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Video File URLs"
+msgstr "影片檔案網址"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"By default, students can download an .srt or .txt transcript when you set "
+"Download Transcript Allowed to True. If you want to provide a downloadable "
+"transcript in a different format, we recommend that you upload a handout by "
+"using the Upload a Handout field. If this isn't possible, you can post a "
+"transcript file on the Files & Uploads page or on the Internet, and then add"
+" the URL for the transcript here. Students see a link to download that "
+"transcript below the video."
+msgstr ""
+"預設情況下，當“允許下載字幕”設置為“是”時，學生可以下載.srt 或者.txt "
+"格式的字幕。如果您需要提供不同文件格式的字幕供學生下載，我們建議您首先考慮使用“上傳講義”欄位上傳您的講義；其次您可以將字幕文件上傳至“文件& "
+"上傳”頁面或者Internet，並在這裡新增下載字幕的URL。學生們會在影片的下方看到一個下載字幕的連結。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Downloadable Transcript URL"
+msgstr "字幕下載 URL"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"Allow students to download the timed transcript. A link to download the file"
+" appears below the video. By default, the transcript is an .srt or .txt "
+"file. If you want to provide the transcript for download in a different "
+"format, upload a file by using the Upload Handout field."
+msgstr ""
+"允許學生下載字幕。下載連結會出現在影片的下方。預設情況下，下載的字幕是一個.srt 或者.txt "
+"文件。如果您需要提供不同文件格式的字幕下載，使用“上傳講義”欄位上傳該文件。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Download Transcript Allowed"
+msgstr "允許下載字幕"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"The default transcript for the video, from the Default Timed Transcript "
+"field on the Basic tab. This transcript should be in English. You don't have"
+" to change this setting."
+msgstr "影片的預設字幕，來自於“基本”面板的“預設字幕”欄位。該字幕應當是英語字幕。您不必修改這個設置。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Default Timed Transcript"
+msgstr "預設字幕"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Specify whether the transcripts appear with the video by default."
+msgstr "指定是否預設就顯示字幕。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Show Transcript"
+msgstr "顯示字幕"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"Add transcripts in different languages. Click below to specify a language "
+"and upload an .srt transcript file for that language."
+msgstr "添加不同語言的字幕。點擊下方依指定語言並上傳該語言對應的.srt 字幕文件。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Transcript Languages"
+msgstr "字幕語言"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Preferred language for transcript."
+msgstr "喜好的字幕語言。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Preferred language for transcript"
+msgstr "喜好的字幕語言。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Transcript file format to download by user."
+msgstr "用戶下載的字幕文件格式。"
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: xmodule/video_module/video_xfields.py
+msgid "SubRip (.srt) file"
+msgstr "SubRip (.srt) 檔"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Text (.txt) file"
+msgstr "Text (.txt) 檔"
+
+#: xmodule/video_module/video_xfields.py
+msgid "The last speed that the user specified for the video."
+msgstr "該影片上一次用戶指定的速度。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "The default speed for the video."
+msgstr "該影片的預設速度。"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"Specify whether to advance automatically to the next unit when the video "
+"ends."
+msgstr ""
+
+#: xmodule/video_module/video_xfields.py
+msgid "Specify whether YouTube is available for the user."
+msgstr "指定 YouTube 是否對用戶可用。"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"Upload a handout to accompany this video. Students can download the handout "
+"by clicking Download Handout under the video."
+msgstr "上傳與該影片相關的講義。學生可以單擊影片下方的“下載講義”按鈕來下載該講義。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Upload Handout"
+msgstr "上傳講義"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"Specify whether access to this video is limited to browsers only, or if it "
+"can be accessed from other applications including mobile apps."
+msgstr "指定該影片是否限定瀏覽器，或者如果它可以從其它應用程式觀看，包括行動app。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Video Available on Web Only"
+msgstr "影片只在網頁板提供"
+
+#: xmodule/video_module/video_xfields.py
+msgid ""
+"If you were assigned a Video ID by edX for the video to play in this "
+"component, enter the ID here. In this case, do not enter values in the "
+"Default Video URL, the Video File URLs, and the YouTube ID fields. If you "
+"were not assigned a Video ID, enter values in those other fields and ignore "
+"this field."
+msgstr ""
+"如果您要在此組件中利用edX來分配要播放的影片ID。請在這輸入ID。在此情況下，不要在預設的影片網址、影片檔案網址、YouTube "
+"ID欄位中輸入數值。如果您沒有分配影片ID，就請在其他欄位輸入其他值或忽略此欄位。"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Date of the last view of the bumper"
+msgstr "最近瀏覽片頭的日期"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Do not show bumper again"
+msgstr "不重複顯示片頭"
+
+#: xmodule/video_module/video_xfields.py
+msgid "Specify whether the video can be accessed publicly by learners."
+msgstr ""
+
+#: xmodule/video_module/video_xfields.py
+msgid "Public Access"
+msgstr ""
+
+#: xmodule/word_cloud_module.py lms/templates/annotatable.html
+#: lms/templates/peer_grading/peer_grading.html
+msgid "Instructions"
+msgstr "說明"
+
+#: xmodule/word_cloud_module.py
+msgid ""
+"Add instructions to help learners understand how to use the word cloud. "
+"Clear instructions are important, especially for learners who have "
+"accessibility requirements."
+msgstr "新增說明幫助學習者了解如何使用關鍵字雲。清楚地說明是很重要的，特別是對輔助功能有需求的學習者。"
+
+#: xmodule/word_cloud_module.py
+msgid "Inputs"
+msgstr "輸入"
+
+#: xmodule/word_cloud_module.py
+msgid ""
+"The number of text boxes available for learners to add words and sentences."
+msgstr "學習者新增文字和句子，可用的文字方塊數量。"
+
+#: xmodule/word_cloud_module.py
+msgid "Maximum Words"
+msgstr "字數上限"
+
+#: xmodule/word_cloud_module.py
+msgid "The maximum number of words displayed in the generated word cloud."
+msgstr "顯示在生成文字雲文字的最大數量。"
+
+#: xmodule/word_cloud_module.py
+msgid "Show Percents"
+msgstr "顯示百分比"
+
+#: xmodule/word_cloud_module.py
+msgid "Statistics are shown for entered words near that word."
+msgstr "統計顯示輸入文字所相近的文字。"
+
+#: xmodule/word_cloud_module.py
+msgid "Whether this learner has posted words to the cloud."
+msgstr "此學習者是否已經張貼文字到雲中。"
+
+#: xmodule/word_cloud_module.py
+msgid "Student answer."
+msgstr "學生答案"
+
+#: xmodule/word_cloud_module.py
+msgid "All possible words from all learners."
+msgstr "所有學習者使用的所有可能文字。"
+
+#: xmodule/word_cloud_module.py
+msgid "Top num_top_words words for word cloud."
+msgstr "從文字雲中最熱門的詞彙 num_top_words"
+
+#: xmodule/x_module.py
+#, python-brace-format
+msgid ""
+"{display_name} is only accessible to enrolled learners. Sign in or register,"
+" and enroll in this course to view it."
 msgstr ""
 
 #: cms/djangoapps/api/v1/serializers/course_runs.py
@@ -14962,49 +14917,6 @@ msgstr "的"
 msgid "next page"
 msgstr "下一頁"
 
-#: lms/templates/courseware/info.html
-msgid "{course_number} Course Info"
-msgstr "{course_number} 課程資訊"
-
-#: lms/templates/courseware/info.html
-msgid "You are not enrolled yet"
-msgstr "您尚未註冊此課程。"
-
-#: lms/templates/courseware/info.html
-msgid ""
-"You are not currently enrolled in this course. {link_start}Enroll "
-"now!{link_end}"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Welcome to {org}'s {course_title}!"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Welcome to {course_title}!"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "Resume Course"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "View Updates in Studio"
-msgstr "在Studio中檢視更新"
-
-#: lms/templates/courseware/info.html
-msgid "Course Updates and News"
-msgstr ""
-
-#: lms/templates/courseware/info.html
-msgid "Handout Navigation"
-msgstr "講義導覽"
-
-#: lms/templates/courseware/info.html
-msgid "Course Tools"
-msgstr ""
-
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "新聞 - MITx 6.002x"
@@ -15142,10 +15054,6 @@ msgstr "查看證書"
 #: lms/templates/courseware/progress.html
 msgid "Opens in a new browser window"
 msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Download Your Certificate"
-msgstr "下載您的證書"
 
 #: lms/templates/courseware/progress.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -15379,20 +15287,6 @@ msgid "View my {cert_name_short}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "This link will open/download a PDF document"
-msgstr "這個連結會打開或下載一個PDF文件"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download my {cert_name_short}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid ""
-"This link will open/download a PDF document of your verified "
-"{cert_name_long}."
-msgstr "這個連結會打開或下載一個驗證過的證書{cert_name_long}PDF文件。"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
 msgstr "完成我們的課程回饋調查"
 
@@ -15536,6 +15430,10 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "Resume Course"
 msgstr ""
 
 #. Translators: provider_name is the name of a credit provider or university
