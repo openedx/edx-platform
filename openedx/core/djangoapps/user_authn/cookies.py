@@ -83,7 +83,7 @@ def delete_logged_in_cookies(response):
 
     return response
 
-#tessssssssssssssssssssssssssssssssss
+#tesssssssssssssssssssssssssssssssssssssssssssssssss
 def standard_cookie_settings(request):
     """ Returns the common cookie settings (e.g. expiration time). """
     #test
