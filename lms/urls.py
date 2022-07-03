@@ -6,6 +6,8 @@ from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
 from django.urls import include, re_path
 from django.conf.urls.static import static
+from django.conf.urls import url
+
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
@@ -25,7 +27,7 @@ from lms.djangoapps.courseware.module_render import (
 )
 from lms.djangoapps.courseware.views import views as courseware_views
 from lms.djangoapps.courseware.views.index import CoursewareIndex
-from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
+from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView, StaticCourseTabIFrameView
 from lms.djangoapps.discussion import views as discussion_views
 from lms.djangoapps.discussion.config.settings import is_forum_daily_digest_enabled
 from lms.djangoapps.discussion.notification_prefs import views as notification_prefs_views
@@ -53,6 +55,7 @@ from openedx.core.djangoapps.verified_track_content import views as verified_tra
 from openedx.features.enterprise_support.api import enterprise_enabled
 from common.djangoapps.student import views as student_views
 from common.djangoapps.util import views as util_views
+from lms.djangoapps.feedback import views as feedback_views
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
@@ -771,6 +774,17 @@ urlpatterns += [
         name='static_tab',
     ),
 ]
+urlpatterns += [
+    # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
+    re_path(
+        r'^iframe/{}/(?P<tab_slug>[^/]+)/$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        StaticCourseTabIFrameView.as_view(),
+        name='static_tab_iframe',
+    ),
+]
+
 
 if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
     urlpatterns += [
@@ -994,6 +1008,11 @@ urlpatterns += [
     path('api/course_home/v1/', include(('lms.djangoapps.course_home_api.urls', 'course-home-v1'))),
 ]
 
+# User Tour API urls
+urlpatterns += [
+    path('api/user_tours/', include('lms.djangoapps.user_tours.urls')),
+]
+
 # Course Experience API urls
 urlpatterns += [
     path('api/course_experience/', include('openedx.features.course_experience.api.v1.urls')),
@@ -1015,3 +1034,19 @@ if getattr(settings, 'PROVIDER_STATES_URL', None):
             name='courseware_xblock_handler_provider_state',
         )
     ]
+
+# save_for_later API urls
+if settings.ENABLE_SAVE_FOR_LATER:
+    urlpatterns += [
+        path('', include('lms.djangoapps.save_for_later.urls')),
+    ]
+
+# Enhanced Staff Grader (ESG) URLs
+urlpatterns += [
+    path('api/ora_staff_grader/', include('lms.djangoapps.ora_staff_grader.urls', 'ora-staff-grader')),
+]
+
+# FUNiX Feedback
+urlpatterns += [
+    url(r'^feedback/$', feedback_views.index, name='feedback_index')
+]

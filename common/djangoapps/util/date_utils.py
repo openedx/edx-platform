@@ -7,7 +7,7 @@ import re
 from datetime import datetime, timedelta
 
 import crum
-from django.utils.translation import get_language, pgettext, gettext
+from django.utils.translation import get_language, gettext, pgettext
 from pytz import UnknownTimeZoneError, timezone, utc
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
@@ -236,7 +236,7 @@ def strftime_localized_html(dtime, fmt):
     format_mapping = {
         'SHORT_DATE': 'shortDate',
     }
-    assert fmt in format_mapping.keys(), 'format "%s" not yet supported in strftime_localized_html' % fmt
+    assert fmt in format_mapping.keys(), 'format "%s" not yet supported in strftime_localized_html' % fmt  # pylint: disable=consider-iterating-dictionary
 
     date_html = '<span class="localized-datetime" data-format="{format}" data-timezone="{user_timezone}" \
                        data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'

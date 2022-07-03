@@ -158,16 +158,27 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
                 xml_data.set('url_name', url_name)
 
             try:
+                if str(target_course_id) == "course-v1:ArbiX+CS101+2014_T3":
+                    logging.info(f"Investigation Log: {target_course_id} : Building xml_data from xml")
                 xml_data = etree.fromstring(xml)
-
+                if str(target_course_id) == "course-v1:ArbiX+CS101+2014_T3":
+                    logging.info(f"Investigation Log: {target_course_id} : Building xml_data completed")
                 make_name_unique(xml_data)
-
+                if str(target_course_id) == "course-v1:ArbiX+CS101+2014_T3":
+                    logging.info(f"Investigation Log: {target_course_id} : Fetching descriptor from xml_data. "
+                                 f"url_name is {xml_data.get('url_name')} and tag is {xml_data.tag}")
                 descriptor = self.xblock_from_node(
                     xml_data,
                     None,  # parent_id
                     id_manager,
                 )
+                if str(target_course_id) == "course-v1:ArbiX+CS101+2014_T3":
+                    logging.info(f"Investigation Log: {target_course_id} : Completed Fetch descriptor from xml_data. "
+                                 f"url_name is {xml_data.get('url_name')} and tag is {xml_data.tag}")
             except Exception as err:  # pylint: disable=broad-except
+                if str(target_course_id) == "course-v1:ArbiX+CS101+2014_T3":
+                    logging.info(f"Investigation Log: {target_course_id} : Failed Fetching descriptor from xml_data "
+                                 f"with error {err}. url_name is {xml_data.get('url_name')} and tag is {xml_data.tag}")
                 if not self.load_error_modules:
                     raise
 
@@ -198,6 +209,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
             descriptor.data_dir = course_dir
 
             if descriptor.scope_ids.usage_id in xmlstore.modules[course_id]:
+                if str(target_course_id) == "course-v1:ArbiX+CS101+2014_T3":
+                    logging.info(f"Investigation Log: {target_course_id} : Descriptor.scope_ids.usage_id "
+                                 f"in xmlstore.modules[{target_course_id}]")
                 # keep the parent pointer if any but allow everything else to overwrite
                 other_copy = xmlstore.modules[course_id][descriptor.scope_ids.usage_id]
                 descriptor.parent = other_copy.parent
@@ -206,6 +220,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
             xmlstore.modules[course_id][descriptor.scope_ids.usage_id] = descriptor
 
             if descriptor.has_children:
+                if str(target_course_id) == "course-v1:ArbiX+CS101+2014_T3":
+                    logging.info(f"Investigation Log: {target_course_id} : Descriptor with display_name "
+                                 f"{descriptor.display_name} has children")
                 for child in descriptor.get_children():
                     # parent is alphabetically least
                     if child.parent is None or child.parent > descriptor.scope_ids.usage_id:
@@ -214,7 +231,13 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
 
             # After setting up the descriptor, save any changes that we have
             # made to attributes on the descriptor to the underlying KeyValueStore.
+            if str(target_course_id) == "course-v1:ArbiX+CS101+2014_T3":
+                logging.info(f"Investigation Log: {target_course_id} : Saving Descriptor "
+                             f"with display_name {descriptor.display_name}")
             descriptor.save()
+            if str(target_course_id) == "course-v1:ArbiX+CS101+2014_T3":
+                logging.info(f"Investigation Log: {target_course_id} : Descriptor Saved "
+                             f"with display_name {descriptor.display_name}")
             return descriptor
 
         render_template = lambda template, context: ''
@@ -380,6 +403,8 @@ class XMLModuleStore(ModuleStoreReadBase):
             monitor_import_failure(target_course_id, 'Updating', exception=exc)
             raise exc
         finally:
+            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                logging.info(f'Investigation Log: {target_course_id} : {course_descriptor}')
             if course_descriptor is None:
                 pass
             elif isinstance(course_descriptor, ErrorBlock):
@@ -505,6 +530,9 @@ class XMLModuleStore(ModuleStoreReadBase):
             if self.user_service:
                 services['user'] = self.user_service
 
+            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                logging.info(f'Investigation Log: {target_course_id} : Building Import System')
+
             system = ImportSystem(
                 xmlstore=self,
                 course_id=course_id,
@@ -519,9 +547,16 @@ class XMLModuleStore(ModuleStoreReadBase):
                 services=services,
                 target_course_id=target_course_id,
             )
+            if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                logging.info(f'Investigation Log: {target_course_id} : Building Import System Completed')
             course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
+            if str(target_course_id) == "course-v1:ArbiX+CS101+2014_T3":
+                logging.info(f"Investigation Log: {target_course_id} : XML Processed. "
+                             f"Course Descriptor {course_descriptor}")
             # If we fail to load the course, then skip the rest of the loading steps
             if isinstance(course_descriptor, ErrorBlock):
+                if str(target_course_id) == 'course-v1:ArbiX+CS101+2014_T3':
+                    logging.info(f'Investigation Log: {target_course_id} : Course Descriptor is instance of ErrorBlock')
                 return course_descriptor
 
             self.content_importers(system, course_descriptor, course_dir, url_name)

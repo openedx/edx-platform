@@ -273,7 +273,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
             'test_block_type', 'test_block_id'
         ).for_branch(
             'test_branch'
-        ).for_version('test_version')
+        ).for_version(b'test_version')
 
         assert location.branch is not None
         assert location.version_guid is not None

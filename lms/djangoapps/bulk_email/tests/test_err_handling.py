@@ -30,8 +30,8 @@ from lms.djangoapps.instructor_task.subtasks import (
     initialize_subtask_info,
     update_subtask_status
 )
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class EmailTestException(Exception):

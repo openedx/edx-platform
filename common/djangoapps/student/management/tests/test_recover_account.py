@@ -13,14 +13,12 @@ from django.core.management import call_command, CommandError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, RequestFactory, override_settings
 
-from edx_toggles.toggles.testutils import override_waffle_flag
 
 from testfixtures import LogCapture
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.models import AccountRecoveryConfiguration
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 
 LOGGER_NAME = 'common.djangoapps.student.management.commands.recover_account'
 FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
@@ -73,7 +71,6 @@ class RecoverAccountTests(TestCase):
         assert not self.client.login(username=self.user.username, password='password')
 
     @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @skip_unless_lms
     def test_authn_mfe_url_in_reset_link(self):
         """

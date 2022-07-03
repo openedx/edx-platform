@@ -18,8 +18,13 @@
 
 
 # using LTS django version
-
+Django<4.0
 
 # elasticsearch>=7.14.0 includes breaking changes in it which caused issues in discovery upgrade process.
 # elastic search changelog: https://www.elastic.co/guide/en/enterprise-search/master/release-notes-7.14.0.html
 elasticsearch<7.14.0
+
+setuptools<60
+
+# redis 4 client doesn't play nicely with redis 3 server
+redis<4

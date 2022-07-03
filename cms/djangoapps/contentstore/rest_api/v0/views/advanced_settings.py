@@ -24,7 +24,7 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
 
     class FilterQuery(forms.Form):
         """
-        Form for validating query marameters passed to advanced course settings view
+        Form for validating query parameters passed to advanced course settings view
         to filter the data it returns.
         """
         filter_fields = forms.CharField(strip=True, empty_value=None, required=False)

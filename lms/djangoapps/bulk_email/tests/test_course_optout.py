@@ -19,8 +19,8 @@ from common.djangoapps.student.tests.factories import AdminFactory, CourseEnroll
 from lms.djangoapps.bulk_email.api import get_unsubscribed_link
 from lms.djangoapps.bulk_email.models import BulkEmailFlag
 from lms.djangoapps.bulk_email.policies import CourseEmailOptout
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long

@@ -14,6 +14,7 @@ from edx_ace.channel import ChannelType, get_channel_for_message
 from edx_ace.recipient import Recipient
 from edx_ace.renderers import EmailRenderer
 from edx_ace.utils import date
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -25,7 +26,6 @@ from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.django_comment_common.signals import comment_created
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.lib.celery.task_utils import emulate_http_request
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 NOW = datetime.utcnow()
 ONE_HOUR_AGO = NOW - timedelta(hours=1)
@@ -73,6 +73,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
     def setUpClass(cls):
         super().setUpClass()
         cls.discussion_id = 'dummy_discussion_id'
+        cls.question_id = 'dummy_question_id'
         cls.course = CourseOverviewFactory.create(language='fr')
 
         # Patch the comment client user save method so it does not try
@@ -102,56 +103,110 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         config.enabled = True
         config.save()
 
-        cls.create_thread_and_comments()
+        cls.create_threads_and_comments()
 
     @classmethod
-    def create_thread_and_comments(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
-        cls.thread = {
+    def create_threads_and_comments(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
+        # Regular discussion threads and comments.
+        cls.discussion_thread = {
             'id': cls.discussion_id,
             'course_id': str(cls.course.id),
             'created_at': date.serialize(TWO_HOURS_AGO),
-            'title': 'thread-title',
+            'title': 'discussion-thread-title',
             'user_id': cls.thread_author.id,
             'username': cls.thread_author.username,
-            'commentable_id': 'thread-commentable-id',
+            'commentable_id': 'discussion-thread-commentable-id',
+            'thread_type': 'discussion',
         }
-        cls.comment = {
-            'id': 'comment',
-            'body': 'comment-body',
+        cls.discussion_comment = {
+            'id': 'discussion-comment',
+            'body': 'discussion-comment-body',
             'created_at': date.serialize(ONE_HOUR_AGO),
-            'thread_id': cls.thread['id'],
+            'thread_id': cls.discussion_thread['id'],
             'parent_id': None,
             'user_id': cls.comment_author.id,
             'username': cls.comment_author.username,
         }
-        cls.comment2 = {
-            'id': 'comment2',
-            'body': 'comment2-body',
+        cls.discussion_comment2 = {
+            'id': 'discussion-comment2',
+            'body': 'discussion-comment2-body',
             'created_at': date.serialize(NOW),
-            'thread_id': cls.thread['id'],
+            'thread_id': cls.discussion_thread['id'],
             'parent_id': None,
             'user_id': cls.comment_author.id,
             'username': cls.comment_author.username
         }
-        cls.subcomment = {
-            'id': 'subcomment',
-            'body': 'subcomment-body',
+        cls.discussion_subcomment = {
+            'id': 'discussion-subcomment',
+            'body': 'discussion-subcomment-body',
             'created_at': date.serialize(NOW),
-            'thread_id': cls.thread['id'],
-            'parent_id': cls.comment['id'],
+            'thread_id': cls.discussion_thread['id'],
+            'parent_id': cls.discussion_comment['id'],
             'user_id': cls.comment_author.id,
             'username': cls.comment_author.username,
         }
-        cls.thread['children'] = [cls.comment, cls.comment2]
-        cls.comment['child_count'] = 1
-        cls.thread2 = {
+        cls.discussion_thread['children'] = [cls.discussion_comment, cls.discussion_comment2]
+        cls.discussion_comment['child_count'] = 1
+        cls.discussion_thread2 = {
             'id': cls.discussion_id,
             'course_id': str(cls.course.id),
             'created_at': date.serialize(TWO_HOURS_AGO),
-            'title': 'thread-title',
+            'title': 'discussion-thread-2-title',
             'user_id': cls.thread_author.id,
             'username': cls.thread_author.username,
-            'commentable_id': 'thread-commentable-id-2',
+            'commentable_id': 'discussion-thread-commentable-id-2',
+            'thread_type': 'discussion',
+        }
+        # Qeustion threads and comments.
+        cls.question_thread = {
+            'id': cls.question_id,
+            'course_id': str(cls.course.id),
+            'created_at': date.serialize(TWO_HOURS_AGO),
+            'title': 'question-thread-title',
+            'user_id': cls.thread_author.id,
+            'username': cls.thread_author.username,
+            'commentable_id': 'question-thread-commentable-id-3',
+            'thread_type': 'question',
+        }
+        cls.question_comment = {
+            'id': 'question-comment',
+            'body': 'question-comment-body',
+            'created_at': date.serialize(ONE_HOUR_AGO),
+            'thread_id': cls.question_thread['id'],
+            'parent_id': None,
+            'user_id': cls.comment_author.id,
+            'username': cls.comment_author.username,
+        }
+        cls.question_comment2 = {
+            'id': 'question-comment2',
+            'body': 'question-comment2-body',
+            'created_at': date.serialize(NOW),
+            'thread_id': cls.question_thread['id'],
+            'parent_id': None,
+            'user_id': cls.comment_author.id,
+            'username': cls.comment_author.username
+        }
+        cls.question_subcomment = {
+            'id': 'question-subcomment',
+            'body': 'question-subcomment-body',
+            'created_at': date.serialize(NOW),
+            'thread_id': cls.question_thread['id'],
+            'parent_id': cls.question_comment['id'],
+            'user_id': cls.comment_author.id,
+            'username': cls.comment_author.username,
+        }
+        cls.question_thread['endorsed_responses'] = [cls.question_comment]
+        cls.question_thread['non_endorsed_responses'] = [cls.question_comment2]
+        cls.question_comment['child_count'] = 1
+        cls.question_thread2 = {
+            'id': cls.question_id,
+            'course_id': str(cls.course.id),
+            'created_at': date.serialize(TWO_HOURS_AGO),
+            'title': 'question-thread-2-title',
+            'user_id': cls.thread_author.id,
+            'username': cls.thread_author.username,
+            'commentable_id': 'question-thread-commentable-id-2',
+            'thread_type': 'question',
         }
 
     def setUp(self):
@@ -179,60 +234,67 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             # with per_page left with a default value of 1, this ensures
             # that we test a multiple page result when calling
             # comment_client.User.subscribed_threads()
-            subscribed_thread_ids = [non_matching_id, self.discussion_id]
+            subscribed_thread_ids = [non_matching_id, self.discussion_id, self.question_id]
         else:
             subscribed_thread_ids = []
 
-        self.mock_request.side_effect = make_mock_responder(
-            subscribed_thread_ids=subscribed_thread_ids,
-            comment_data=self.comment,
-            thread_data=self.thread,
-        )
-        user = mock.Mock()
-        comment = cc.Comment.find(id=self.comment['id']).retrieve()
         site = Site.objects.get_current()
         site_config = SiteConfigurationFactory.create(site=site)
         site_config.site_values[ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY] = True
         site_config.save()
-        with mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=site):
-            comment_created.send(sender=None, user=user, post=comment)
 
-        if user_subscribed:
-            expected_message_context = get_base_template_context(site)
-            expected_message_context.update({
-                'comment_author_id': self.comment_author.id,
-                'comment_body': self.comment['body'],
-                'comment_created_at': ONE_HOUR_AGO,
-                'comment_id': self.comment['id'],
-                'comment_username': self.comment_author.username,
-                'course_id': self.course.id,
-                'thread_author_id': self.thread_author.id,
-                'thread_created_at': TWO_HOURS_AGO,
-                'thread_id': self.discussion_id,
-                'thread_title': 'thread-title',
-                'thread_username': self.thread_author.username,
-                'thread_commentable_id': self.thread['commentable_id'],
-                'post_link': f'https://{site.domain}{self.mock_permalink.return_value}',
-                'site': site,
-                'site_id': site.id
-            })
-            expected_recipient = Recipient(self.thread_author.id, self.thread_author.email)
-            actual_message = self.mock_ace_send.call_args_list[0][0][0]
-            assert expected_message_context == actual_message.context
-            assert expected_recipient == actual_message.recipient
-            assert self.course.language == actual_message.language
-            self._assert_rendered_email(actual_message)
+        examples = [
+            (self.discussion_thread, self.discussion_comment),
+            (self.question_thread, self.question_comment),
+        ]
+        for thread, comment in examples:
+            self.mock_ace_send.reset_mock()
+            self.mock_request.side_effect = make_mock_responder(
+                subscribed_thread_ids=subscribed_thread_ids,
+                comment_data=comment,
+                thread_data=thread,
+            )
+            user = mock.Mock()
+            comment = cc.Comment.find(id=comment['id']).retrieve()
+            with mock.patch('lms.djangoapps.discussion.signals.handlers.get_current_site', return_value=site):
+                comment_created.send(sender=None, user=user, post=comment)
 
-        else:
-            assert not self.mock_ace_send.called
+            if user_subscribed:
+                expected_message_context = get_base_template_context(site)
+                expected_message_context.update({
+                    'comment_author_id': self.comment_author.id,
+                    'comment_body': comment['body'],
+                    'comment_created_at': ONE_HOUR_AGO,
+                    'comment_id': comment['id'],
+                    'comment_username': self.comment_author.username,
+                    'course_id': self.course.id,
+                    'thread_author_id': self.thread_author.id,
+                    'thread_created_at': TWO_HOURS_AGO,
+                    'thread_id': thread['id'],
+                    'thread_title': thread['title'],
+                    'thread_username': self.thread_author.username,
+                    'thread_commentable_id': thread['commentable_id'],
+                    'post_link': f'https://{site.domain}{self.mock_permalink.return_value}',
+                    'site': site,
+                    'site_id': site.id
+                })
+                expected_recipient = Recipient(self.thread_author.id, self.thread_author.email)
+                actual_message = self.mock_ace_send.call_args_list[0][0][0]
+                assert expected_message_context == actual_message.context
+                assert expected_recipient == actual_message.recipient
+                assert self.course.language == actual_message.language
+                self._assert_rendered_email(actual_message, comment)
 
-    def _assert_rendered_email(self, message):  # lint-amnesty, pylint: disable=missing-function-docstring
+            else:
+                assert not self.mock_ace_send.called
+
+    def _assert_rendered_email(self, message, comment):  # lint-amnesty, pylint: disable=missing-function-docstring
         # check that we can actually render the message
         with emulate_http_request(
             site=message.context['site'], user=self.thread_author
         ):
             rendered_email = EmailRenderer().render(get_channel_for_message(ChannelType.EMAIL, message), message)
-            assert self.comment['body'] in rendered_email.body_html
+            assert comment['body'] in rendered_email.body_html
             assert self.comment_author.username in rendered_email.body_html
             assert self.mock_permalink.return_value in rendered_email.body_html
             assert message.context['site'].domain in rendered_email.body_html
@@ -242,7 +304,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         assert email is not sent
         """
         self.mock_request.side_effect = make_mock_responder(
-            subscribed_thread_ids=[self.discussion_id],
+            subscribed_thread_ids=[self.discussion_id, self.question_id],
             comment_data=comment_dict,
             thread_data=thread,
         )
@@ -260,17 +322,20 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         assert not self.mock_ace_send.called
 
     def test_subcomment_should_not_send_email(self):
-        self.run_should_not_send_email_test(self.thread, self.subcomment)
+        self.run_should_not_send_email_test(self.discussion_thread, self.discussion_subcomment)
+        self.run_should_not_send_email_test(self.question_subcomment, self.question_subcomment)
 
     def test_second_comment_should_not_send_email(self):
-        self.run_should_not_send_email_test(self.thread, self.comment2)
+        self.run_should_not_send_email_test(self.discussion_thread, self.discussion_comment2)
+        self.run_should_not_send_email_test(self.question_thread, self.question_comment2)
 
     def test_thread_without_children_should_not_send_email(self):
         """
         test that email notification will not be sent for the thread
         that doesn't have attribute 'children'
         """
-        self.run_should_not_send_email_test(self.thread2, self.comment)
+        self.run_should_not_send_email_test(self.discussion_thread2, self.discussion_comment)
+        self.run_should_not_send_email_test(self.question_thread2, self.question_comment)
 
     @ddt.data((
         {

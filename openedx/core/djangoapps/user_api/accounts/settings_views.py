@@ -144,6 +144,7 @@ def account_settings_context(request):
         ),
         'extended_profile_fields': _get_extended_profile_fields(),
         'beta_language': beta_language,
+        'enable_coppa_compliance': settings.ENABLE_COPPA_COMPLIANCE,
     }
 
     enterprise_customer = enterprise_customer_for_request(request)

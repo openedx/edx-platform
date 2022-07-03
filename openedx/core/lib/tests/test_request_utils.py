@@ -73,7 +73,6 @@ class RequestUtilTestCase(unittest.TestCase):
         """ Test course_id_from_url(). """
 
         assert course_id_from_url('/login') is None
-        assert course_id_from_url('/course/edX/maths/2020') is None
         assert course_id_from_url('/courses/edX/maths/') is None
         assert course_id_from_url('/api/courses/v1/blocks/edX/maths/2020') is None
         assert course_id_from_url('/api/courses/v1/blocks/course-v1:incidental+courseid+formatting') is None
@@ -82,8 +81,14 @@ class RequestUtilTestCase(unittest.TestCase):
         course_id = course_id_from_url('/courses/course-v1:edX+maths+2020')
         self.assertCourseIdFieldsMatch(course_id=course_id, org="edX", course='maths', run='2020')
 
+        course_id = course_id_from_url('/course/course-v1:edX+maths+2020')
+        self.assertCourseIdFieldsMatch(course_id=course_id, org="edX", course='maths', run='2020')
+
         course_id = course_id_from_url('/courses/edX/maths/2020')
         self.assertCourseIdFieldsMatch(course_id=course_id, org='edX', course='maths', run='2020')
+
+        course_id = course_id_from_url('/course/edX/maths/2020')
+        self.assertCourseIdFieldsMatch(course_id=course_id, org="edX", course='maths', run='2020')
 
         course_id = course_id_from_url('/api/courses/v1/courses/course-v1:edX+maths+2020')
         self.assertCourseIdFieldsMatch(course_id=course_id, org='edX', course='maths', run='2020')
@@ -261,6 +266,51 @@ class RequestUtilTestCase(unittest.TestCase):
             call('cookies.2.size', 10),
             call('cookies_total_size', 25),
         ], any_order=True)
+
+    @override_settings(COOKIE_SIZE_LOGGING_THRESHOLD=1)
+    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.encrypt_for_log")
+    def test_log_encrypted_cookies_no_key(self, mock_encrypt, mock_capture_cookie_sizes):
+        middleware = CookieMonitoringMiddleware()
+
+        cookies_dict = {
+            "a": "." * 10,
+            "b": "." * 15,
+        }
+
+        factory = RequestFactory()
+        for name, value in cookies_dict.items():
+            factory.cookies[name] = value
+
+        mock_request = factory.request()
+
+        middleware.process_request(mock_request)
+        mock_encrypt.assert_not_called()
+
+    @override_settings(COOKIE_SIZE_LOGGING_THRESHOLD=1)
+    @override_settings(COOKIE_HEADER_DEBUG_PUBLIC_KEY="fake-key")
+    @patch("openedx.core.lib.request_utils.CAPTURE_COOKIE_SIZES")
+    @patch("openedx.core.lib.request_utils.encrypt_for_log")
+    def test_log_encrypted_cookies(self, mock_encrypt, mock_capture_cookie_sizes):
+
+        middleware = CookieMonitoringMiddleware()
+
+        cookies_dict = {
+            "a": "." * 10,
+            "b": "." * 15,
+        }
+
+        factory = RequestFactory()
+        for name, value in cookies_dict.items():
+            factory.cookies[name] = value
+
+        mock_request = factory.request()
+        cookie_header = str(mock_request.META.get('HTTP_COOKIE', ''))
+
+        middleware.process_request(mock_request)
+        mock_encrypt.assert_has_calls([
+            call(cookie_header, "fake-key")
+        ])
 
 
 class TestGetExpectedErrorSettingsDict(unittest.TestCase):

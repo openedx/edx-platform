@@ -1,0 +1,29 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+% if show_banner:
+<div class="upgrade-banner d-flex bg-primary text-white align-items-center px-4 py-3">
+    <div class="d-flex w-100">
+        ${_("We've made some changes to this experience! (Preview for educators only)")}
+    </div>
+
+    % if show_mfe:
+    <a class="btn btn-outline-light mr-2" href="${legacy_url}">
+        ${_("View legacy experience")}
+    </a>
+    % else:
+    <a class="btn btn-outline-light mr-2" href="${mfe_url}">
+        ${_("View the new experience")}
+    </a>
+    % endif
+
+    <a class="btn btn-outline-light">
+        ${_("Share feedback")}
+    </a>
+</div>
+% endif

@@ -17,11 +17,11 @@ from path import Path
 
 from cms.djangoapps.contentstore.utils import add_instructor
 from openedx.core.lib.extract_tar import safetar_extractall
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore.xml_importer import import_library_from_xml
+from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import DuplicateCourseError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.xml_importer import import_library_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class Command(BaseCommand):
@@ -43,13 +43,13 @@ class Command(BaseCommand):
         username = options['owner_username']
 
         data_root = Path(settings.GITHUB_REPO_ROOT)
-        subdir = base64.urlsafe_b64encode(os.path.basename(archive_path))
+        subdir = base64.urlsafe_b64encode(os.path.basename(archive_path).encode('utf-8')).decode('utf-8')
         course_dir = data_root / subdir
 
         # Extract library archive
         tar_file = tarfile.open(archive_path)  # lint-amnesty, pylint: disable=consider-using-with
         try:
-            safetar_extractall(tar_file, course_dir.encode('utf-8'))
+            safetar_extractall(tar_file, course_dir)
         except SuspiciousOperation as exc:
             raise CommandError(f'\n=== Course import {archive_path}: Unsafe tar file - {exc.args[0]}\n')  # lint-amnesty, pylint: disable=raise-missing-from
         finally:

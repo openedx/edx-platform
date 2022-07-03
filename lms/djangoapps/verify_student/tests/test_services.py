@@ -2,7 +2,7 @@
 Tests for the service classes in verify_student.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
 import ddt
@@ -17,8 +17,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 FAKE_SETTINGS = {
     "DAYS_GOOD_FOR": 365,
@@ -130,7 +130,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
         course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         path = IDVerificationService.get_verify_location(course.id)
         expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
-        assert path == (expected_path + '?course_id=Robot/999/Test_Course')
+        assert path == (expected_path + '?course_id=course-v1%3ARobot%2B999%2BTest_Course')
 
     def test_get_verify_location_from_string(self):
         """
@@ -139,6 +139,22 @@ class TestIDVerificationService(ModuleStoreTestCase):
         path = IDVerificationService.get_verify_location('course-v1:edX+DemoX+Demo_Course')
         expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         assert path == (expected_path + '?course_id=course-v1%3AedX%2BDemoX%2BDemo_Course')
+
+    def test_get_expiration_datetime(self):
+        """
+        Test that the latest expiration datetime is returned if there are multiple records
+        """
+        user_a = UserFactory.create()
+
+        SSOVerification.objects.create(
+            user=user_a, status='approved', expiration_date=datetime(2021, 11, 12, 0, 0, tzinfo=timezone.utc)
+        )
+        newer_record = SSOVerification.objects.create(
+            user=user_a, status='approved', expiration_date=datetime(2022, 1, 12, 0, 0, tzinfo=timezone.utc)
+        )
+
+        expiration_datetime = IDVerificationService.get_expiration_datetime(user_a, ['approved'])
+        assert expiration_datetime == newer_record.expiration_datetime
 
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)

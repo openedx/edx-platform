@@ -14,9 +14,8 @@ from rest_framework.views import APIView
 from common.djangoapps.static_replace import make_static_urls_absolute
 from lms.djangoapps.courseware.courses import get_course_info_section_module
 from lms.djangoapps.course_goals.models import UserActivity
-from lms.djangoapps.course_goals.toggles import COURSE_GOALS_NUMBER_OF_DAYS_GOALS
 from openedx.core.lib.xblock_utils import get_course_update_items
-
+from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from ..decorators import mobile_course_access, mobile_view
 
 User = get_user_model()
@@ -157,7 +156,7 @@ class CourseGoalsRecordUserActivity(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if not COURSE_GOALS_NUMBER_OF_DAYS_GOALS.is_enabled(course_key):
+        if not ENABLE_COURSE_GOALS.is_enabled(course_key):
             log.warning('For this mobile request, user activity is not enabled for this user {} and course {}'.format(
                 str(user_id), str(course_key))
             )

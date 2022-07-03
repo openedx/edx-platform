@@ -123,6 +123,7 @@ def get_split_user_partitions(user_partitions):
 
 @XBlock.needs("i18n")
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
+@XBlock.needs('mako')
 @XBlock.needs('partitions')
 @XBlock.needs('user')
 class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
@@ -301,7 +302,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         sorted_inactive_contents = sorted(inactive_contents, key=itemgetter('group_name'))
 
         # Use the new template
-        fragment.add_content(self.system.render_template('split_test_staff_view.html', {
+        fragment.add_content(self.runtime.service(self, 'mako').render_template('split_test_staff_view.html', {
             'items': sorted_active_contents + sorted_inactive_contents,
         }))
         fragment.add_css('.split-test-child { display: none; }')
@@ -328,7 +329,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
                 fragment, inactive_children, context
             )
 
-        fragment.add_content(self.system.render_template('split_test_author_view.html', {
+        fragment.add_content(self.runtime.service(self, 'mako').render_template('split_test_author_view.html', {
             'split_test': self,
             'is_root': is_root,
             'is_configured': self.is_configured,
@@ -367,7 +368,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         Return the studio view.
         """
         fragment = Fragment(
-            self.system.render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
         add_webpack_to_fragment(fragment, 'SplitTestBlockStudio')
         shim_xmodule_js(fragment, self.studio_js_module_name)
@@ -386,7 +387,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
             return self._staff_view(context)
         else:
             child_fragment = self.child.render(STUDENT_VIEW, context)
-            fragment = Fragment(self.system.render_template('split_test_student_view.html', {
+            fragment = Fragment(self.runtime.service(self, 'mako').render_template('split_test_student_view.html', {
                 'child_content': child_fragment.content,
                 'child_id': self.child.scope_ids.usage_id,
             }))

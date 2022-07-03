@@ -1,5 +1,5 @@
 {% load i18n %}
-{% trans "You’re almost there!" %}
+{% trans "You're almost there!" %}
 {% trans "There's still time to reach your goal" as tmsg %}
 {% blocktrans %}You set a goal of learning {{days_per_week}} times a week in {{course_name}}. You're not quite there, but there's still time to reach that goal!{% endblocktrans %}
 {% trans "Jump back in"}

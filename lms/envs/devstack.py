@@ -110,10 +110,12 @@ DEBUG_TOOLBAR_CONFIG = {
 
 def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing-function-docstring
     # We always want the toolbar on devstack unless running tests from another Docker container
-    hostname = request.get_host()
-    if hostname.startswith('edx.devstack.lms:') or hostname.startswith('lms.devstack.edx:'):
-        return False
-    return True
+    # Alway return False
+    return False
+    # hostname = request.get_host()
+    # if hostname.startswith('edx.devstack.lms:') or hostname.startswith('lms.devstack.edx:'):
+    #     return False
+    # return True
 
 ########################### PIPELINE #################################
 
@@ -163,13 +165,21 @@ FEATURES['LICENSING'] = True
 
 
 ########################## Courseware Search #######################
-FEATURES['ENABLE_COURSEWARE_SEARCH'] = False
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF'] = True
 SEARCH_ENGINE = 'search.elastic.ElasticSearchEngine'
+ELASTIC_SEARCH_CONFIG = [
+    {
+        'use_ssl': False,
+        'host': '13.214.22.79',
+        'port': 9201
+    }
+]
+
 
 
 ########################## Dashboard Search #######################
-FEATURES['ENABLE_DASHBOARD_SEARCH'] = False
+FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
 
 
 ########################## Certificates Web/HTML View #######################
@@ -277,6 +287,7 @@ LOGIN_REDIRECT_WHITELIST.extend([
     'localhost:2001',  # frontend-app-course-authoring
     'localhost:3001',  # frontend-app-library-authoring
     'localhost:18400',  # frontend-app-publisher
+    'localhost:1993',  # frontend-app-ora-grading
     ENTERPRISE_LEARNER_PORTAL_NETLOC,  # frontend-app-learner-portal-enterprise
     ENTERPRISE_ADMIN_PORTAL_NETLOC,  # frontend-app-admin-portal
 ])
@@ -338,11 +349,16 @@ ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
 
+################### FRONTEND APPLICATION DISCUSSIONS ###################
+DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
+
 ############## Docker based devstack settings #######################
 
 FEATURES.update({
     'AUTOMATIC_AUTH_FOR_TESTING': True,
-    'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_DISCUSSION_SERVICE': False,
+    'ENABLE_DISCUSSION_HOME_PANEL': False,
+    'WIKI_ENABLED': False,
     'SHOW_HEADER_LANGUAGE_SELECTOR': True,
 
     # Enable enterprise integration by default.
@@ -351,6 +367,11 @@ FEATURES.update({
     # Toggle this off if you don't want anything to do with enterprise in devstack.
     'ENABLE_ENTERPRISE_INTEGRATION': True,
 })
+
+HELP_TOKENS_BOOKS = {
+    'course_author': 'https://funix.gitbook.io/funix-documentation/',
+    'learner': 'https://funix.gitbook.io/funix-documentation/',
+}
 
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
 MARKETING_SITE_ROOT = os.environ.get('MARKETING_SITE_ROOT', 'http://localhost:8080')
@@ -404,11 +425,6 @@ if FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION'):
 DCS_SESSION_COOKIE_SAMESITE = 'Lax'
 DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 
-#####################################################################
-# See if the developer has any local overrides.
-if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
-    from .private import *  # pylint: disable=import-error,wildcard-import
-
 ########################## THEMING  #######################
 # If you want to enable theming in devstack, uncomment this section and add any relevant
 # theme directories to COMPREHENSIVE_THEME_DIRS
@@ -442,3 +458,9 @@ PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
+
+################# New settings must go ABOVE this line #################
+########################################################################
+# See if the developer has any local overrides.
+if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
+    from .private import *  # pylint: disable=import-error,wildcard-import

@@ -62,9 +62,10 @@ from openedx.features.course_experience.utils import is_block_structure_complete
 from common.djangoapps.static_replace import replace_static_urls
 from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from common.djangoapps.util.date_utils import strftime_localized
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.course_api.blocks.transformers.block_completion import BlockCompletionTransformer
 
 log = logging.getLogger(__name__)
 
@@ -73,6 +74,10 @@ log = logging.getLogger(__name__)
 _Assignment = namedtuple(
     'Assignment', ['block_key', 'title', 'url', 'date', 'contains_gated_content', 'complete', 'past_due',
                    'assignment_type', 'extra_info', 'first_component_block_id']
+)
+
+_Funix_Assignment = namedtuple(
+    'Assignment', ['block_key', 'title', 'url', 'date', 'contains_gated_content', 'complete', 'past_due', 'assignment_type', 'extra_info', 'first_component_block_id', 'complete_date', 'effort_time']
 )
 
 
@@ -464,7 +469,7 @@ def get_course_date_blocks(course, user, request=None, include_access=False,
     ]
     blocks.extend([cls(course, user) for cls in default_block_classes])
 
-    blocks = filter(lambda b: b.is_allowed and b.date and (include_past_dates or b.is_enabled), blocks)  # lint-amnesty, pylint: disable=filter-builtin-not-iterating
+    blocks = filter(lambda b: b.is_allowed and b.date and (include_past_dates or b.is_enabled), blocks)
     return sorted(blocks, key=date_block_key_fn)
 
 
@@ -570,8 +575,10 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
                 assignment_released = not start or start < now
                 if assignment_released:
                     url = reverse('jump_to', args=[course_key, subsection_key])
+                    complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
+                else:
+                    complete = False
 
-                complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
                 past_due = not complete and due < now
                 assignments.append(_Assignment(
                     subsection_key, title, url, due, contains_gated_content,
@@ -902,3 +909,67 @@ def get_course_chapter_ids(course_key):
         log.exception('Failed to retrieve course from modulestore.')
         return []
     return [str(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
+
+def get_course_granded_lesson(course_key, user, include_access=False):
+    if not user.id:
+        return []
+    store = modulestore()
+    course_usage_key = store.make_course_usage_key(course_key)
+    block_data = get_course_blocks(user, course_usage_key, allow_start_dates_in_future=True, include_completion=True, include_effort_estimation=True)
+
+    now = datetime.now(pytz.UTC)
+    assignments = []
+    for section_key in block_data.get_children(course_usage_key):  # lint-amnesty, pylint: disable=too-many-nested-blocks
+        for subsection_key in block_data.get_children(section_key):
+            due = block_data.get_xblock_field(subsection_key, 'due', None)
+            graded = block_data.get_xblock_field(subsection_key, 'graded', False)
+            effort_time = block_data.get_xblock_field(subsection_key, 'effort_time', -1)
+            if graded and effort_time != -1:
+                first_component_block_id = get_first_component_of_block(subsection_key, block_data)
+                contains_gated_content = include_access and block_data.get_xblock_field(
+                    subsection_key, 'contains_gated_content', False)
+                title = block_data.get_xblock_field(subsection_key, 'display_name', _('Assignment'))
+
+                assignment_type = block_data.get_xblock_field(subsection_key, 'format', None)
+                complete_date = block_data.get_xblock_field(subsection_key, BlockCompletionTransformer.COMPLETE_TIME, None)
+
+                url = None
+                start = block_data.get_xblock_field(subsection_key, 'start')
+                assignment_released = not start or start < now
+                if assignment_released:
+                    # url = reverse('jump_to', args=[course_key, subsection_key])
+                    complete = block_data.get_xblock_field(subsection_key, 'complete', False)
+                    # complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
+                else:
+                    complete = False
+
+                # past_due = not complete and due < now
+                past_due = False
+                assignments.append(_Funix_Assignment(
+                    subsection_key, title, url, due, contains_gated_content,
+                    complete, past_due, assignment_type, None, first_component_block_id, complete_date, effort_time
+                ))
+
+    return assignments
+
+def funix_get_assginment_date_blocks(course, user, request, num_return=None, include_past_dates=True):
+    date_blocks = []
+    for assignment in get_course_granded_lesson(course.id, user, include_access=True):
+        date_block = CourseAssignmentDate(course, user)
+        date_block.date = assignment.date
+        date_block.contains_gated_content = assignment.contains_gated_content
+        date_block.first_component_block_id = assignment.first_component_block_id
+        date_block.complete = assignment.complete
+        date_block.assignment_type = assignment.assignment_type
+        date_block.past_due = assignment.past_due
+        date_block.block_key = assignment.block_key
+        date_block.complete_date = assignment.complete_date
+        date_block.effort_time = assignment.effort_time // 60
+        # date_block.link = request.build_absolute_uri(assignment.url) if assignment.url else ''
+        date_block.set_title(assignment.title, link=assignment.url)
+        date_block._extra_info = assignment.extra_info  # pylint: disable=protected-access
+        date_blocks.append(date_block)
+    date_blocks = sorted((b for b in date_blocks if (b.is_enabled or include_past_dates)), key=date_block_key_fn)
+    if num_return:
+        return date_blocks[:num_return]
+    return date_blocks

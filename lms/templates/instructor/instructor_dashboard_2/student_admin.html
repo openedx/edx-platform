@@ -59,6 +59,25 @@
   <hr>
 </div>
 
+<div class="student-dates-container action-type-container">
+    <h4 class="hd hd-4">${_("View a specific learner's dates")}</h4>
+    <div class="request-response-error"></div>
+    <label for="student-select-dates">
+        ${_("Learner's {platform_name} email address or username").format(platform_name=settings.PLATFORM_NAME)}
+    </label>
+    <br>
+    <input type="text" name="student-select-dates" placeholder="${_('Learner email address or username')}" >
+    <br><br>
+    <div class="progress-link-wrapper">
+        <span name="dates-link">
+            <a href="" class="dates-link" data-endpoint="${ section_data['get_student_dates_url_url'] }">
+                ${_("View Dates Page")}
+            </a>
+        </span>
+    </div>
+  <hr>
+</div>
+
 <div class="student-grade-container action-type-container">
     <h4 class="hd hd-4">${_("Adjust a learner's grade for a specific problem")}</h4>
     <div class="request-response-error"></div>

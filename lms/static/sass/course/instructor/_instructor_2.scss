@@ -2669,6 +2669,11 @@ input[name="subject"] {
           width: 140px;
         }
 
+        &.attempt-ready-to-resume {
+          width: 60px;
+          @include text-align(center);
+        }
+
         &.email {
           width: ($baseline*8);
           word-wrap: break-word;
@@ -2715,7 +2720,8 @@ input[name="subject"] {
 
       td:nth-child(6),
       td:nth-child(5),
-      td:nth-child(7) {
+      td:nth-child(7),
+      td:nth-child(8){
         @include padding-left(0);
 
         text-align: center;
@@ -2726,7 +2732,7 @@ input[name="subject"] {
         text-align: center;
       }
 
-      td:nth-child(8) {
+      td:nth-child(9) {
         word-wrap: break-word;
         text-align: center;
       }

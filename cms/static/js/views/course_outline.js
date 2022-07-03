@@ -160,6 +160,7 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                 var modal;
                 var enableProctoredExams = false;
                 var enableTimedExams = false;
+                var unitLevelDiscussions = false;
                 if (this.model.get('category') === 'sequential') {
                     if (this.parentView.parentView.model.has('enable_proctored_exams')) {
                         enableProctoredExams = this.parentView.parentView.model.get('enable_proctored_exams');
@@ -168,12 +169,15 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                         enableTimedExams = this.parentView.parentView.model.get('enable_timed_exams');
                     }
                 }
-
+                if (this.model.get('category') === 'vertical') {
+                    unitLevelDiscussions = this.parentView.parentView.parentView.model.get('unit_level_discussions');
+                }
                 modal = CourseOutlineModalsFactory.getModal('edit', this.model, {
                     onSave: this.refresh.bind(this),
                     parentInfo: this.parentInfo,
                     enable_proctored_exams: enableProctoredExams,
                     enable_timed_exams: enableTimedExams,
+                    unit_level_discussions: unitLevelDiscussions,
                     xblockType: XBlockViewUtils.getXBlockType(
                         this.model.get('category'), this.parentView.model, true
                     )

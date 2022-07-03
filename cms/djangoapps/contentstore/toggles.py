@@ -1,7 +1,7 @@
 """
 CMS feature toggles.
 """
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace, SettingDictToggle
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace, SettingDictToggle, WaffleFlag
 
 # .. toggle_name: FEATURES['ENABLE_EXPORT_GIT']
 # .. toggle_implementation: SettingDictToggle
@@ -81,3 +81,60 @@ def exam_setting_view_enabled():
     Returns a boolean if proctoring exam setting mfe view is enabled.
     """
     return ENABLE_EXAM_SETTINGS_HTML_VIEW.is_enabled()
+
+
+# .. toggle_name: new_core_editors.use_new_text_editor
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new core text xblock editor
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-12-1
+# .. toggle_target_removal_date: 2022-1-30
+# .. toggle_tickets: TNL-9306
+# .. toggle_warnings:
+ENABLE_NEW_TEXT_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_text_editor', __name__)
+
+
+def use_new_text_editor():
+    """
+    Returns a boolean = true if new text editor is enabled
+    """
+    return ENABLE_NEW_TEXT_EDITOR_FLAG.is_enabled()
+
+
+# .. toggle_name: new_core_editors.use_new_video_editor
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new core video xblock editor
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-12-1
+# .. toggle_target_removal_date: 2022-1-30
+# .. toggle_tickets: TNL-9306
+# .. toggle_warnings:
+ENABLE_NEW_VIDEO_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_video_editor', __name__)
+
+
+def use_new_video_editor():
+    """
+    Returns a boolean = true if new video editor is enabled
+    """
+    return ENABLE_NEW_VIDEO_EDITOR_FLAG.is_enabled()
+
+
+# .. toggle_name: new_core_editors.use_new_problem_editor
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new core problem xblock editor
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-12-1
+# .. toggle_target_removal_date: 2022-1-30
+# .. toggle_tickets: TNL-9306
+# .. toggle_warnings:
+ENABLE_NEW_PROBLEM_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_problem_editor', __name__)
+
+
+def use_new_problem_editor():
+    """
+    Returns a boolean if new problem editor is enabled
+    """
+    return ENABLE_NEW_PROBLEM_EDITOR_FLAG.is_enabled()

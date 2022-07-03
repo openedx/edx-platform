@@ -12,7 +12,6 @@ from django.core.validators import ValidationError, validate_email
 from django.utils.translation import override as override_language
 from django.utils.translation import gettext as _
 from edx_name_affirmation.name_change_validator import NameChangeValidator
-from edx_name_affirmation.toggles import is_verified_name_enabled
 from pytz import UTC
 from common.djangoapps.student import views as student_views
 from common.djangoapps.student.models import (
@@ -25,7 +24,9 @@ from common.djangoapps.student.models import (
 from common.djangoapps.util.model_utils import emit_settings_changed_event
 from common.djangoapps.util.password_policy_validators import validate_password
 from lms.djangoapps.certificates.api import get_certificates_for_user
+from lms.djangoapps.certificates.data import CertificateStatuses
 
+from openedx.core.djangoapps.enrollments.api import get_verified_enrollments
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.errors import (
     AccountUpdateError,
@@ -33,6 +34,7 @@ from openedx.core.djangoapps.user_api.errors import (
     PreferenceValidationError
 )
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
+from openedx.core.djangoapps.user_authn.utils import check_pwned_password
 from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
 from openedx.core.lib.api.view_utils import add_serializer_errors
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
@@ -270,21 +272,31 @@ def _validate_name_change(user_profile, data, field_errors):
 
 def _does_name_change_require_verification(user_profile, old_name, new_name):
     """
-    If name change requires verification, do not update it through this API.
+    If name change requires ID verification, do not update it through this API.
     """
-
     profile_meta = user_profile.get_meta()
     old_names_list = profile_meta['old_names'] if 'old_names' in profile_meta else []
 
     user = user_profile.user
-    num_certs = len(get_certificates_for_user(user.username))
 
-    validator = NameChangeValidator(old_names_list, num_certs, old_name, new_name)
-
-    return (
-        is_verified_name_enabled()
-        and not validator.validate()
+    # We only want to validate on a list of passing certificates for the learner. A learner may have
+    # a certificate in a non-passing status, and we do not have to require ID verification based on certificates
+    # that are not passing.
+    passing_certs = filter(
+        lambda cert: CertificateStatuses.is_passing_status(cert["status"]),
+        get_certificates_for_user(user.username)
     )
+    num_passing_certs = len(list(passing_certs))
+
+    # We check whether the learner has active verified enrollments because we do not want to
+    # require the learner to perform ID verification if the learner is not enrolled in a verified mode
+    # in any courses. The learner will not be able to complete ID verification without being enrolled in
+    # at least one seat.
+    has_verified_enrollments = len(get_verified_enrollments(user.username)) > 0
+
+    validator = NameChangeValidator(old_names_list, num_passing_certs, old_name, new_name)
+
+    return not validator.validate() and has_verified_enrollments
 
 
 def _get_old_language_proficiencies_if_updating(user_profile, data):
@@ -437,17 +449,18 @@ def get_confirm_email_validation_error(confirm_email, email):
     return _validate(_validate_confirm_email, errors.AccountEmailInvalid, confirm_email, email)
 
 
-def get_password_validation_error(password, username=None, email=None):
+def get_password_validation_error(password, username=None, email=None, reset_password_page=False):
     """Get the built-in validation error message for when
     the password is invalid in some way.
 
     :param password: The proposed password (unicode).
     :param username: The username associated with the user's account (unicode).
     :param email: The email associated with the user's account (unicode).
+    :param reset_password_page: The flag that determines the validation page (bool).
     :return: Validation error message.
 
     """
-    return _validate(_validate_password, errors.AccountPasswordInvalid, password, username, email)
+    return _validate(_validate_password, errors.AccountPasswordInvalid, password, username, email, reset_password_page)
 
 
 def get_country_validation_error(country):
@@ -591,7 +604,7 @@ def _validate_confirm_email(confirm_email, email):
         raise errors.AccountEmailInvalid(accounts.REQUIRED_FIELD_CONFIRM_EMAIL_MSG)
 
 
-def _validate_password(password, username=None, email=None):
+def _validate_password(password, username=None, email=None, reset_password_page=False):
     """Validate the format of the user's password.
 
     Passwords cannot be the same as the username of the account,
@@ -602,6 +615,7 @@ def _validate_password(password, username=None, email=None):
         password (unicode): The proposed password.
         username (unicode): The username associated with the user's account.
         email (unicode): The email associated with the user's account.
+        reset_password_page (bool): The flag that determines the validation page.
 
     Returns:
         None
@@ -618,6 +632,13 @@ def _validate_password(password, username=None, email=None):
         raise errors.AccountPasswordInvalid(str(invalid_password_err))
     except ValidationError as validation_err:
         raise errors.AccountPasswordInvalid(' '.join(validation_err.messages))
+
+    # TODO: VAN-666 - Restrict this feature to reset password page for now until it is
+    #  enabled on account sign in and register.
+    if settings.ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY and reset_password_page:
+        pwned_response = check_pwned_password(password)
+        if pwned_response.get('vulnerability', 'no') == 'yes':
+            raise errors.AccountPasswordInvalid(accounts.AUTHN_PASSWORD_COMPROMISED_MSG)
 
 
 def _validate_country(country):

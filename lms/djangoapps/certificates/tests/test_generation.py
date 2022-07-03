@@ -2,13 +2,11 @@
 Tests for certificate generation
 """
 import ddt
-import logging
-from unittest import mock
+import logging  # lint-amnesty, pylint: disable=wrong-import-order
+from unittest import mock  # lint-amnesty, pylint: disable=wrong-import-order
 
 from edx_name_affirmation.api import create_verified_name, create_verified_name_config
 from edx_name_affirmation.statuses import VerifiedNameStatus
-from edx_name_affirmation.toggles import VERIFIED_NAME_FLAG
-from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import UserProfile
@@ -18,8 +16,8 @@ from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.generation import generate_course_certificate
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
@@ -195,14 +193,13 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
             assert cert.grade == self.grade
             assert cert.name == ''
 
-    @override_waffle_flag(VERIFIED_NAME_FLAG, active=True)
     @ddt.data((True, VerifiedNameStatus.APPROVED),
               (True, VerifiedNameStatus.DENIED),
               (False, VerifiedNameStatus.PENDING))
     @ddt.unpack
     def test_generation_verified_name(self, should_use_verified_name_for_certs, status):
         """
-        Test that if verified name functionality is enabled and the user has their preference set to use
+        Test that if the user has their preference set to use
         verified name for certificates, their verified name will appear on the certificate rather than
         their profile name.
         """

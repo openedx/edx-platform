@@ -111,10 +111,12 @@ DEBUG_TOOLBAR_CONFIG = {
 
 def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing-function-docstring
     # We always want the toolbar on devstack unless running tests from another Docker container
-    hostname = request.get_host()
-    if hostname.startswith('edx.devstack.studio:') or hostname.startswith('studio.devstack.edx:'):
-        return False
-    return True
+    # Alway return False
+    return False
+    # hostname = request.get_host()
+    # if hostname.startswith('edx.devstack.studio:') or hostname.startswith('studio.devstack.edx:'):
+    #     return False
+    # return True
 
 
 ################################ MILESTONES ################################
@@ -136,13 +138,24 @@ FEATURES['LICENSING'] = True
 XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 ################################ SEARCH INDEX ################################
-FEATURES['ENABLE_COURSEWARE_INDEX'] = False
-FEATURES['ENABLE_LIBRARY_INDEX'] = False
-FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
+FEATURES['ENABLE_COURSEWARE_INDEX'] = True
+FEATURES['ENABLE_LIBRARY_INDEX'] = True
+FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = True
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
+ELASTIC_SEARCH_CONFIG = [
+    {
+        'use_ssl': False,
+        'host': '13.214.22.79',
+        'port': 9201
+    }
+]
+
+
 ################################ COURSE DISCUSSIONS ###########################
-FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
+FEATURES['ENABLE_DISCUSSION_HOME_PANEL'] = False
+FEATURES['WIKI_ENABLED'] = False
 
 ################################ CREDENTIALS ###########################
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
@@ -161,6 +174,9 @@ LIBRARY_AUTHORING_MICROFRONTEND_URL = 'http://localhost:3001'
 
 ################### FRONTEND APPLICATION COURSE AUTHORING ###################
 COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
+
+################### FRONTEND APPLICATION DISCUSSIONS ###################
+DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
 
 ################################# DJANGO-REQUIRE ###############################
 

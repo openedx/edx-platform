@@ -3,8 +3,7 @@ Unit tests for courseware context_processor
 """
 
 from pytz import timezone
-from unittest.mock import Mock
-from django.conf import settings
+from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
 from django.contrib.auth.models import AnonymousUser
 
 from lms.djangoapps.courseware.context_processor import (
@@ -13,8 +12,8 @@ from lms.djangoapps.courseware.context_processor import (
 )
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
@@ -33,7 +32,7 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
         self.request.user = AnonymousUser()
         context = user_timezone_locale_prefs(self.request)
         assert context['user_timezone'] is None
-        assert context['user_language'] == settings.LANGUAGE_CODE
+        assert context['user_language'] is None
 
     def test_no_timezone_preference(self):
         set_user_preference(self.user, 'pref-lang', 'en')
@@ -48,6 +47,13 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
         assert context['user_language'] is None
         assert context['user_timezone'] is not None
         assert context['user_timezone'] == 'Asia/Tokyo'
+
+    @patch("lms.djangoapps.courseware.context_processor.get_value")
+    def test_site_wide_language_set(self, mock_get_value):
+        mock_get_value.return_value = 'ar'
+        set_user_preference(self.user, 'pref-lang', 'en')
+        context = user_timezone_locale_prefs(self.request)
+        assert context['user_language'] == 'ar'
 
     def test_get_user_timezone_or_last_seen_timezone_or_utc(self):
         # We default to UTC

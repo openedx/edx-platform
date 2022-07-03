@@ -11,9 +11,9 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
+from edx_name_affirmation.api import get_verified_name
 from rest_framework import serializers
 
-from edx_name_affirmation.toggles import is_verified_name_enabled
 
 from common.djangoapps.student.models import (
     LanguageProficiency,
@@ -170,10 +170,11 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "extended_profile_fields": None,
             "phone_number": None,
             "pending_name_change": None,
-            "is_verified_name_enabled": is_verified_name_enabled(),
         }
 
         if user_profile:
+            verified_name_obj = get_verified_name(user, is_verified=True)
+            verified_name = verified_name_obj.verified_name if verified_name_obj else None
             data.update(
                 {
                     "bio": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.bio),
@@ -186,6 +187,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
                         user_profile.language_proficiencies.all().order_by('code'), many=True
                     ).data,
                     "name": user_profile.name,
+                    "verified_name": verified_name,
                     "gender": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.gender),
                     "goals": user_profile.goals,
                     "year_of_birth": user_profile.year_of_birth,

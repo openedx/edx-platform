@@ -11,6 +11,7 @@ from xblock.field_data import DictFieldData
 
 from xmodule.lti_2_util import LTIError
 from xmodule.lti_module import LTIBlock
+from xmodule.tests.helpers import StubUserService
 
 from . import get_test_system
 
@@ -18,11 +19,13 @@ from . import get_test_system
 class LTI20RESTResultServiceTest(unittest.TestCase):
     """Logic tests for LTI module. LTI2.0 REST ResultService"""
 
+    USER_STANDIN = Mock()
+    USER_STANDIN.id = 999
+
     def setUp(self):
         super().setUp()
-        self.system = get_test_system()
+        self.system = get_test_system(user=self.USER_STANDIN)
         self.environ = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'POST'}
-        self.system.get_real_user = Mock()
         self.system.publish = Mock()
         self.system.rebind_noauth_module_to_user = Mock()
 
@@ -37,8 +40,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         mocked_course = Mock(name='mocked_course', lti_passports=['lti_id:test_client:test_secret'])
         modulestore = Mock(name='modulestore')
         modulestore.get_course.return_value = mocked_course
-        runtime = Mock(name='runtime', modulestore=modulestore, anonymous_student_id='student')
-        self.xmodule.runtime = runtime
+        self.xmodule.runtime.modulestore = modulestore
         self.xmodule.lti_id = "lti_id"
 
         test_cases = (  # (before sanitize, after sanitize)
@@ -224,14 +226,10 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         mock_request.body = body
         return mock_request
 
-    USER_STANDIN = Mock()
-    USER_STANDIN.id = 999
-
     def setup_system_xmodule_mocks_for_lti20_request_test(self):
         """
         Helper fn to set up mocking for lti 2.0 request test
         """
-        self.system.get_real_user = Mock(return_value=self.USER_STANDIN)
         self.xmodule.max_score = Mock(return_value=1.0)
         self.xmodule.get_client_key_secret = Mock(return_value=('test_client_key', 'test_client_secret'))
         self.xmodule.verify_oauth_body_sign = Mock()
@@ -372,7 +370,7 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
         Test that we get a 404 when the supplied user does not exist
         """
         self.setup_system_xmodule_mocks_for_lti20_request_test()
-        self.system.get_real_user = Mock(return_value=None)
+        self.system._services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
         response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         assert response.status_code == 404

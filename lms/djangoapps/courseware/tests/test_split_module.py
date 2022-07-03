@@ -5,14 +5,14 @@ Test for split test XModule
 
 from unittest.mock import MagicMock
 from django.urls import reverse
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import Group, UserPartition
 
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import Group, UserPartition
 
 
 class SplitTestBase(SharedModuleStoreTestCase):
@@ -21,6 +21,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
     Also provides tests of rendered HTML for two user_tag conditions, 0 and 1.
     """
     __test__ = False
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     COURSE_NUMBER = 'split-test-base'
     ICON_CLASSES = None
     TOOLTIPS = None

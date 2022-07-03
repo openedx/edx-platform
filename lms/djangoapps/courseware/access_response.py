@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 
-class AccessResponse:  # pylint: disable=eq-without-hash
+class AccessResponse:
     """Class that represents a response from a has_access permission check."""
     def __init__(self, has_access, error_code=None, developer_message=None, user_message=None,
                  additional_context_user_message=None, user_fragment=None):

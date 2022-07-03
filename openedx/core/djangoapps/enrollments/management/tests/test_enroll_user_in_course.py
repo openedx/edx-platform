@@ -12,8 +12,8 @@ from django.core.management.base import CommandError
 from openedx.core.djangoapps.enrollments.api import get_enrollment
 from common.djangoapps.student.tests.factories import UserFactory
 
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt

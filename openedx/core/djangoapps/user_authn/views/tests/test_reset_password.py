@@ -9,7 +9,6 @@ import unittest
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 import ddt
-import django
 from django.conf import settings
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, make_password
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -23,7 +22,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.http import int_to_base36
-from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from oauth2_provider import models as dot_models
 from pytz import UTC
@@ -37,7 +35,6 @@ from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MI
 from openedx.core.djangoapps.user_authn.views.password_reset import (
     SETTING_CHANGE_INITIATED, password_reset, LogistrationPasswordResetView,
     PasswordResetConfirmWrapper)
-from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from common.djangoapps.student.tests.test_configuration_overrides import fake_get_value
@@ -256,7 +253,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @ddt.data(('plain_text', "You're receiving this e-mail because you requested a password reset"),
-              ('html', "You&#39;re receiving this e-mail because you requested a password reset"))
+              ('html', "You&#x27;re receiving this e-mail because you requested a password reset"))
     @ddt.unpack
     def test_reset_password_email(self, body_type, expected_output):
         """Tests contents of reset password email, and that user is not active"""
@@ -283,9 +280,6 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         }
 
         body = bodies[body_type]
-
-        if django.VERSION >= (3, 0) and body_type == 'html':
-            expected_output = "You&#x27;re receiving this e-mail because you requested a password reset"
 
         assert 'Password reset' in sent_message.subject
         assert expected_output in body
@@ -329,7 +323,6 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
 
     @override_settings(FEATURES=ENABLE_AUTHN_MICROFRONTEND)
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @ddt.data(('Crazy Awesome Site', 'Crazy Awesome Site'), ('edX', 'edX'))
     @ddt.unpack

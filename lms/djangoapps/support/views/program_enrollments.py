@@ -2,14 +2,15 @@
 Support tool for changing course enrollments.
 """
 
-
-import csv
-from uuid import UUID
-
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.views.generic import View
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from rest_framework.views import APIView
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from social_django.models import UserSocialAuth
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -17,7 +18,6 @@ from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 from lms.djangoapps.program_enrollments.api import (
     fetch_program_enrollments_by_student,
     get_users_by_external_keys_and_org_key,
-    link_program_enrollments
 )
 from lms.djangoapps.program_enrollments.exceptions import (
     BadOrganizationShortNameException,
@@ -26,6 +26,7 @@ from lms.djangoapps.program_enrollments.exceptions import (
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ProgramEnrollmentSerializer, serialize_user_info
 from lms.djangoapps.verify_student.services import IDVerificationService
+from lms.djangoapps.support.views.utils import validate_and_link_program_enrollments
 
 TEMPLATE_PATH = 'support/link_program_enrollments.html'
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
@@ -60,7 +61,7 @@ class LinkProgramEnrollmentSupportView(View):
         """
         program_uuid = request.POST.get('program_uuid', '').strip()
         text = request.POST.get('text', '')
-        successes, errors = self._validate_and_link(program_uuid, text)
+        successes, errors = validate_and_link_program_enrollments(program_uuid, text)
         return render_to_response(
             TEMPLATE_PATH,
             {
@@ -71,108 +72,55 @@ class LinkProgramEnrollmentSupportView(View):
             }
         )
 
-    @staticmethod
-    def _validate_and_link(program_uuid_string, linkage_text):
-        """
-        Validate arguments, and if valid, call `link_program_enrollments`.
 
-        Returns: (successes, errors)
-            where successes and errors are both list[str]
-        """
-        if not (program_uuid_string and linkage_text):
-            error = (
-                "You must provide both a program uuid "
-                "and a series of lines with the format "
-                "'external_user_key,lms_username'."
-            )
-            return [], [error]
-        try:
-            program_uuid = UUID(program_uuid_string)
-        except ValueError:
-            return [], [
-                f"Supplied program UUID '{program_uuid_string}' is not a valid UUID."
-            ]
-        reader = csv.DictReader(
-            linkage_text.splitlines(), fieldnames=('external_key', 'username')
-        )
-        ext_key_to_username = {
-            (item.get('external_key') or '').strip(): (item['username'] or '').strip()
-            for item in reader
-        }
-        if not (all(ext_key_to_username.keys()) and all(ext_key_to_username.values())):
-            return [], [
-                "All linking lines must be in the format 'external_user_key,lms_username'"
-            ]
-        link_errors = link_program_enrollments(
-            program_uuid, ext_key_to_username
-        )
-        successes = [
-            str(item)
-            for item in ext_key_to_username.items()
-            if item not in link_errors
-        ]
-        errors = list(link_errors.values())
-        return successes, errors
-
-
-class ProgramEnrollmentsInspectorView(View):
+class LinkProgramEnrollmentSupportAPIView(APIView):
     """
-    The view to search and display the program enrollments
-    information of a learner.
+    Support-only API View for linking learner enrollments by support staff.
     """
-    exclude_from_schema = True
-    CONSOLE_TEMPLATE_PATH = 'support/program_enrollments_inspector.html'
+    authentication_classes = (
+        JwtAuthentication, SessionAuthentication
+    )
+    permission_classes = (
+        IsAuthenticated,
+    )
 
     @method_decorator(require_support_permission)
-    def get(self, request):
+    def post(self, request):
         """
-        Based on the query string parameters passed through the GET request
-        Search the data store for information about ProgramEnrollment and
-        SSO linkage with the user.
-        """
-        search_error = ''
-        edx_username_or_email = request.GET.get('edx_user', '').strip()
-        org_key = request.GET.get('org_key', '').strip()
-        external_user_key = request.GET.get('external_user_key', '').strip()
-        learner_program_enrollments = {}
-        saml_providers_with_org_key = self._get_org_keys_and_idps()
-        selected_provider = None
-        if org_key:
-            selected_provider = saml_providers_with_org_key.get(org_key)
-        if edx_username_or_email:
-            learner_program_enrollments, search_error = self._get_account_info(
-                edx_username_or_email,
-                selected_provider,
-            )
-        elif org_key and external_user_key:
-            learner_program_enrollments = self._get_external_user_info(
-                external_user_key,
-                org_key,
-                selected_provider,
-            )
-            if not learner_program_enrollments:
-                search_error = 'No user found for external key {} for institution {}'.format(
-                    external_user_key, org_key
-                )
-        elif not org_key and not external_user_key:
-            # This is initial rendering state.
-            pass
-        else:
-            search_error = (
-                "To perform a search, you must provide either the student's "
-                "(a) edX username, "
-                "(b) email address associated with their edX account, or "
-                "(c) Identity-providing institution and external key!"
-            )
-
-        return render_to_response(
-            self.CONSOLE_TEMPLATE_PATH,
+        Links learner enrollments by support staff
+        * Example Request:
+            - POST / support / link_program_enrollments_details/
+            * Sample Payload
             {
-                'error': search_error,
-                'learner_program_enrollments': learner_program_enrollments,
-                'org_keys': sorted(saml_providers_with_org_key.keys()),
+                program_uuid: < program_uuid > ,
+                username_pair_text: 'external_user_key,lms_username'
             }
-        )
+        * Example Response:
+            {
+                program_uuid: < program_uuid>,
+                username_pair_text: 'external_user_key,lms_username'
+                successes: 'Success messages if Linkages are created',
+                errors: 'Error messages if there is no linkages'
+            }
+        """
+
+        program_uuid = request.POST.get('program_uuid', '').strip()
+        username_pair_text = request.POST.get('username_pair_text', '')
+        successes, errors = validate_and_link_program_enrollments(program_uuid, username_pair_text)
+        data = {
+            'successes': successes,
+            'errors': errors,
+            'program_uuid': program_uuid,
+            'username_pair_text': username_pair_text,
+        }
+        return Response(data)
+
+
+class ProgramEnrollmentInspector:
+    """
+    A common class to provide functionality of search and display the program enrollments
+    information of a learner for Program Inspector Views and APIViews.
+    """
 
     def _get_org_keys_and_idps(self):
         """
@@ -261,3 +209,191 @@ class ProgramEnrollmentsInspectorView(View):
         ).prefetch_related('program_course_enrollments')
         serialized = ProgramEnrollmentSerializer(program_enrollments, many=True)
         return serialized.data
+
+
+class SAMLProvidersWithOrg(APIView):
+    """
+    Support-only API View for fetching a list of all
+    organizations names which will be utilized as keys.
+    """
+    @method_decorator(require_support_permission)
+    def get(self, request):
+        """
+        The get request returns a list of all
+        organizations names which will be utilized as keys.
+        * Example Request:
+            - GET /support/get_saml_providers/
+        * Example Response:
+            [
+                'test_org',
+                'donut_org',
+                'tri_org'
+            ]
+        """
+        org_key_names = self._get_org_key_names()
+        return Response(data=org_key_names)
+
+    def _get_org_key_names(self):
+        """
+        From our Third_party_auth models, return a list of
+        of organizations names which will be utilized as keys.
+        """
+        saml_providers = SAMLProviderConfig.objects.current_set().filter(
+            enabled=True,
+            organization__isnull=False
+        ).select_related('organization')
+
+        return [saml_provider.organization.short_name for saml_provider in saml_providers]
+
+
+class ProgramEnrollmentsInspectorView(ProgramEnrollmentInspector, View):
+    """
+    The view to search and display the program enrollments
+    information of a learner.
+    """
+    exclude_from_schema = True
+    CONSOLE_TEMPLATE_PATH = 'support/program_enrollments_inspector.html'
+
+    @method_decorator(require_support_permission)
+    def get(self, request):
+        """
+        Based on the query string parameters passed through the GET request
+        Search the data store for information about ProgramEnrollment and
+        SSO linkage with the user.
+        """
+        search_error = ''
+        edx_username_or_email = request.GET.get('edx_user', '').strip()
+        org_key = request.GET.get('org_key', '').strip()
+        external_user_key = request.GET.get('external_user_key', '').strip()
+        learner_program_enrollments = {}
+        saml_providers_with_org_key = self._get_org_keys_and_idps()
+        selected_provider = None
+        if org_key:
+            selected_provider = saml_providers_with_org_key.get(org_key)
+        if edx_username_or_email:
+            learner_program_enrollments, search_error = self._get_account_info(
+                edx_username_or_email,
+                selected_provider,
+            )
+        elif org_key and external_user_key:
+            learner_program_enrollments = self._get_external_user_info(
+                external_user_key,
+                org_key,
+                selected_provider,
+            )
+            if not learner_program_enrollments:
+                search_error = 'No user found for external key {} for institution {}'.format(
+                    external_user_key, org_key
+                )
+        elif not org_key and not external_user_key:
+            # This is initial rendering state.
+            pass
+        else:
+            search_error = (
+                "To perform a search, you must provide either the student's "
+                "(a) edX username, "
+                "(b) email address associated with their edX account, or "
+                "(c) Identity-providing institution and external key!"
+            )
+
+        return render_to_response(
+            self.CONSOLE_TEMPLATE_PATH,
+            {
+                'error': search_error,
+                'learner_program_enrollments': learner_program_enrollments,
+                'org_keys': sorted(saml_providers_with_org_key.keys()),
+            }
+        )
+
+
+class ProgramEnrollmentsInspectorAPIView(ProgramEnrollmentInspector, APIView):
+    """
+    The APIview to search and display the program enrollments
+    information of a learner.
+    """
+
+    authentication_classes = (
+        JwtAuthentication, SessionAuthentication
+    )
+    permission_classes = (
+        IsAuthenticated,
+    )
+
+    @method_decorator(require_support_permission)
+    def get(self, request):
+        """
+        Based on the query string parameters passed through the GET request
+        Search the data store for information about ProgramEnrollment and
+        SSO linkage with the user.
+        * Example Request:
+            - GET / support/program_enrollments_inspector_details?
+                    edx_user=<edx_user>&org_key=<org_key>&external_user_key=<external_user_key>
+        * Example Response:
+            {
+                learner_program_enrollments: {
+                    "user": {
+                        "username": "edx",
+                        "email": "edx@example.com"
+                    },
+                    "id_verification": {
+                        "status": "none",
+                        "error": <error>,
+                        "should_display": true,
+                        "status_date": <status_date>,
+                        "verification_expiry": <verification_expiry>
+                    },
+                    "enrollments": [
+                        {
+                            "created": "2021-11-25T04:56:25",
+                            "modified": "2021-12-19T22:27:34",
+                            "external_user_key": "testuser",
+                            "status": "enrolled",
+                            "program_uuid": <program_uuid>,
+                            "program_course_enrollments": [],
+                            "program_name": <program_name>
+                        }
+                    ],
+                    "user": {
+                        "external_user_key": "testuser"
+                    }
+                },
+                org_key: < org_key >
+                errors: 'Error messages for invalid query'
+            }
+        """
+        search_error = ''
+        edx_username_or_email = request.query_params.get('edx_user', '').strip()
+        org_key = request.query_params.get('org_key', '').strip()
+        external_user_key = request.query_params.get('external_user_key', '').strip()
+        learner_program_enrollments = {}
+        saml_providers_with_org_key = self._get_org_keys_and_idps()
+        selected_provider = None
+        if org_key:
+            selected_provider = saml_providers_with_org_key.get(org_key)
+        if edx_username_or_email:
+            learner_program_enrollments, search_error = self._get_account_info(
+                edx_username_or_email,
+                selected_provider,
+            )
+        elif org_key and external_user_key:
+            learner_program_enrollments = self._get_external_user_info(
+                external_user_key,
+                org_key,
+                selected_provider,
+            )
+            if not learner_program_enrollments:
+                search_error = 'No user found for external key {} for institution {}'.format(
+                    external_user_key, org_key
+                )
+        else:
+            search_error = (
+                "To perform a search, you must provide either the student's "
+                "(a) edX username, "
+                "(b) email address associated with their edX account, or "
+                "(c) Identity-providing institution and external key!"
+            )
+        return Response(data={
+            'error': search_error,
+            'learner_program_enrollments': learner_program_enrollments,
+            'org_keys': org_key,
+        })

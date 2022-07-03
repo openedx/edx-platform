@@ -5,6 +5,7 @@ Block Completion Transformer
 
 from completion.models import BlockCompletion
 from xblock.completable import XBlockCompletionMode as CompletionMode
+from lms.djangoapps.courseware.models import StudentModule
 
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
@@ -17,6 +18,7 @@ class BlockCompletionTransformer(BlockStructureTransformer):
     WRITE_VERSION = 1
     COMPLETION = 'completion'
     COMPLETE = 'complete'
+    COMPLETE_TIME = 'complete_time'
     RESUME_BLOCK = 'resume_block'
 
     @classmethod
@@ -56,7 +58,19 @@ class BlockCompletionTransformer(BlockStructureTransformer):
 
         return completion_mode == CompletionMode.EXCLUDED
 
-    def mark_complete(self, complete_course_blocks, latest_complete_block_key, block_key, block_structure):
+    def _get_complete_time(self, child_blocks, block_structure):
+        return max([block_structure.get_xblock_field(child_key, self.COMPLETE_TIME, 0) for child_key in child_blocks])
+
+    def _get_complete_time_leaf_block(self, block_key, usage_info):
+        complete_block = BlockCompletion.objects.get(
+            user=usage_info.user,
+            context_key=usage_info.course_key,
+            block_key=block_key
+        )
+        return complete_block.modified
+
+
+    def mark_complete(self, complete_course_blocks, latest_complete_block_key, block_key, block_structure, usage_info):
         """
         Helper function to mark a block as 'complete' as dictated by
         complete_course_blocks (for problems) or all of a block's children being complete.
@@ -68,7 +82,17 @@ class BlockCompletionTransformer(BlockStructureTransformer):
         :param block_structure: A BlockStructureBlockData object
         """
         if block_key in complete_course_blocks:
+            key = str(block_key)
+
+            if 'problem' in key:
+                if not StudentModule.get_score_done(block_key=key, user_id=usage_info.user.id):
+                    return
+
             block_structure.override_xblock_field(block_key, self.COMPLETE, True)
+
+            complete_time = self._get_complete_time_leaf_block(block_key, usage_info)
+            block_structure.override_xblock_field(block_key, self.COMPLETE_TIME, complete_time)
+
             if str(block_key) == str(latest_complete_block_key):
                 block_structure.override_xblock_field(block_key, self.RESUME_BLOCK, True)
         elif block_structure.get_xblock_field(block_key, 'completion_mode') == CompletionMode.AGGREGATOR:
@@ -79,6 +103,10 @@ class BlockCompletionTransformer(BlockStructureTransformer):
 
             if all_children_complete:
                 block_structure.override_xblock_field(block_key, self.COMPLETE, True)
+
+                if len(children) > 0:
+                    complete_time = self._get_complete_time(children, block_structure)
+                    block_structure.override_xblock_field(block_key, self.COMPLETE_TIME, complete_time)
 
             if any(block_structure.get_xblock_field(child_key, self.RESUME_BLOCK) for child_key in children):
                 block_structure.override_xblock_field(block_key, self.RESUME_BLOCK, True)
@@ -138,4 +166,4 @@ class BlockCompletionTransformer(BlockStructureTransformer):
         if latest_complete_key:
             complete_keys = {key for key, completion in completions_dict.items() if completion == 1.0}
             for block_key in block_structure.post_order_traversal():
-                self.mark_complete(complete_keys, latest_complete_key, block_key, block_structure)
+                self.mark_complete(complete_keys, latest_complete_key, block_key, block_structure, usage_info)

@@ -20,6 +20,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_USE_LEGACY_FRONTEND
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
@@ -46,8 +47,8 @@ from openedx.features.enterprise_support.utils import (
     update_logistration_context_for_enterprise,
     update_third_party_auth_context_for_enterprise
 )
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 TEST_PASSWORD = 'test'
 
@@ -481,6 +482,15 @@ class TestEnterpriseUtils(TestCase):
 
         assert not mock_cache_set.called
 
+    @mock.patch('django.core.cache.cache.set')
+    @mock.patch('django.core.cache.cache.get')
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled', return_value=False)
+    def test_is_enterprise_learner_enterprise_disabled(self, _, mock_cache_get, mock_cache_set):
+        assert not is_enterprise_learner(self.user)
+        assert not is_enterprise_learner(self.user.id)
+        assert not mock_cache_get.called
+        assert not mock_cache_set.called
+
     @mock.patch('openedx.features.enterprise_support.utils.reverse')
     def test_get_enterprise_slug_login_url_no_reverse_match(self, mock_reverse):
         mock_reverse.side_effect = NoReverseMatch
@@ -629,6 +639,7 @@ class TestCourseAccessed(SharedModuleStoreTestCase, CompletionWaffleTestMixin):
             }
         )
 
+    @override_waffle_flag(COURSE_HOME_USE_LEGACY_FRONTEND, active=True)
     def test_course_accessed_for_visit_course_home(self):
         """
         Test that a visit to course home does not fall under course access

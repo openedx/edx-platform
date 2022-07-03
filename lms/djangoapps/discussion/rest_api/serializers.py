@@ -6,6 +6,7 @@ from urllib.parse import urlencode, urlunparse
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db.models import TextChoices
 from django.urls import reverse
 from django.utils.html import strip_tags
 from django.utils.text import Truncator
@@ -13,11 +14,9 @@ from rest_framework import serializers
 
 from common.djangoapps.student.models import get_user_by_username_or_email
 from lms.djangoapps.discussion.django_comment_client.utils import (
-    available_division_schemes,
     course_discussion_division_enabled,
     get_group_id_for_user,
     get_group_name,
-    get_group_names_by_id,
     is_comment_too_deep,
 )
 from lms.djangoapps.discussion.rest_api.permissions import (
@@ -27,20 +26,31 @@ from lms.djangoapps.discussion.rest_api.permissions import (
     get_editable_fields,
 )
 from lms.djangoapps.discussion.rest_api.render import render_body
-from lms.djangoapps.discussion.views import get_divided_discussions
+from openedx.core.djangoapps.discussions.models import DiscussionTopicLink
+from openedx.core.djangoapps.discussions.utils import get_group_names_by_id
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.user import User as CommentClientUser
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.django_comment_common.models import (
-    CourseDiscussionSettings,
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
+    CourseDiscussionSettings,
     Role,
 )
+from openedx.core.lib.api.serializers import CourseKeyField
 
 User = get_user_model()
+
+
+class TopicOrdering(TextChoices):
+    """
+    Enum for the available options for ordering topics.
+    """
+    COURSE_STRUCTURE = "course_structure", "Course Structure"
+    ACTIVITY = "activity", "Activity"
+    NAME = "name", "Name"
 
 
 def get_context(course, request, thread=None):
@@ -124,6 +134,8 @@ class _ContentSerializer(serializers.Serializer):
     vote_count = serializers.SerializerMethodField()
     editable_fields = serializers.SerializerMethodField()
     can_delete = serializers.SerializerMethodField()
+    anonymous = serializers.BooleanField(default=False)
+    anonymous_to_peers = serializers.BooleanField(default=False)
 
     non_updatable_fields = set()
 
@@ -391,7 +403,10 @@ class CommentSerializer(_ContentSerializer):
         """
         Returns the username of the endorsing user, if the information is
         available and would not identify the author of an anonymous thread.
+        This information is unavailable outside the thread context.
         """
+        if not self.context.get("thread"):
+            return None
         endorsement = obj.get("endorsement")
         if endorsement:
             endorser_id = int(endorsement["user_id"])
@@ -407,8 +422,11 @@ class CommentSerializer(_ContentSerializer):
     def get_endorsed_by_label(self, obj):
         """
         Returns the role label (i.e. "Staff" or "Community TA") for the
-        endorsing user
+        endorsing user.
+        This information is unavailable outside the thread context.
         """
+        if not self.context.get("thread"):
+            return None
         endorsement = obj.get("endorsement")
         if endorsement:
             return self._get_user_label(int(endorsement["user_id"]))
@@ -418,7 +436,10 @@ class CommentSerializer(_ContentSerializer):
     def get_endorsed_at(self, obj):
         """
         Returns the timestamp for the endorsement, if available.
+        This information is unavailable outside the thread context.
         """
+        if not self.context.get("thread"):
+            return None
         endorsement = obj.get("endorsement")
         return endorsement["time"] if endorsement else None
 
@@ -499,6 +520,7 @@ class DiscussionTopicSerializer(serializers.Serializer):
     name = serializers.CharField(read_only=True)
     thread_list_url = serializers.CharField(read_only=True)
     children = serializers.SerializerMethodField()
+    thread_counts = serializers.DictField(read_only=True)
 
     def get_children(self, obj):
         """
@@ -512,96 +534,48 @@ class DiscussionTopicSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-class DiscussionSettingsSerializer(serializers.Serializer):
+class DiscussionTopicSerializerV2(serializers.Serializer):
     """
-    Serializer for course discussion settings.
+    Serializer for new style topics.
     """
-    divided_discussions = serializers.ListField(
-        child=serializers.CharField(),
-        write_only=True,
-    )
-    divided_course_wide_discussions = serializers.ListField(
-        child=serializers.CharField(),
+    id = serializers.CharField(  # pylint: disable=invalid-name
         read_only=True,
+        source="external_id",
+        help_text="Provider-specific unique id for the topic"
     )
-    divided_inline_discussions = serializers.ListField(
-        child=serializers.CharField(),
+    usage_key = serializers.CharField(
         read_only=True,
+        help_text="Usage context for the topic",
     )
-    always_divide_inline_discussions = serializers.BooleanField()
-    division_scheme = serializers.CharField()
+    name = serializers.CharField(
+        read_only=True,
+        source="title",
+        help_text="Topic name",
+    )
+    thread_counts = serializers.SerializerMethodField(
+        read_only=True,
+        help_text="Mapping of thread counts by type of thread",
+    )
+    enabled_in_context = serializers.BooleanField(
+        read_only=True,
+        help_text="Whether this topic is enabled in its context",
+    )
 
-    def to_internal_value(self, data: dict) -> dict:
+    def get_thread_counts(self, obj: DiscussionTopicLink) -> Dict[str, int]:
         """
-        Transform the *incoming* primitive data into a native value.
+        Get thread counts from provided context
         """
-        payload = super().to_internal_value(data) or {}
-        course = self.context['course']
-        instance = self.context['settings']
-        if any(item in data for item in ('divided_course_wide_discussions', 'divided_inline_discussions')):
-            divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
-                course, instance
-            )
-            divided_course_wide_discussions = data.get(
-                'divided_course_wide_discussions',
-                divided_course_wide_discussions
-            )
-            divided_inline_discussions = data.get('divided_inline_discussions', divided_inline_discussions)
-            try:
-                payload['divided_discussions'] = divided_course_wide_discussions + divided_inline_discussions
-            except TypeError as error:
-                raise ValidationError(str(error)) from error
-        for item in ('always_divide_inline_discussions', 'division_scheme'):
-            if item in data:
-                payload[item] = data[item]
-        return payload
-
-    def to_representation(self, instance: CourseDiscussionSettings) -> dict:
-        """
-        Return a serialized representation of the course discussion settings.
-        """
-        payload = super().to_representation(instance)
-        course = self.context['course']
-        instance = self.context['settings']
-        course_key = course.id
-        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
-            course, instance
-        )
-        payload = {
-            'id': instance.id,
-            'divided_inline_discussions': divided_inline_discussions,
-            'divided_course_wide_discussions': divided_course_wide_discussions,
-            'always_divide_inline_discussions': instance.always_divide_inline_discussions,
-            'division_scheme': instance.division_scheme,
-            'available_division_schemes': available_division_schemes(course_key)
-        }
-        return payload
-
-    def create(self, validated_data):
-        """
-        This method intentionally left empty
-        """
-
-    def update(self, instance: CourseDiscussionSettings, validated_data: dict) -> CourseDiscussionSettings:
-        """
-        Update and save an existing instance
-        """
-        if not any(field in validated_data for field in self.fields):
-            raise ValidationError('Bad request')
-        try:
-            instance.update(validated_data)
-        except ValueError as e:
-            raise ValidationError(str(e)) from e
-        return instance
+        return self.context['thread_counts'].get(obj.external_id, {
+            "discussion": 0,
+            "question": 0,
+        })
 
 
 class DiscussionRolesSerializer(serializers.Serializer):
@@ -620,12 +594,20 @@ class DiscussionRolesSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         self.user = None
 
-    def validate_user_id(self, user_id):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def validate_user_id(self, user_id):
+        """
+        Validate user id
+        Args:
+            user_id (str): username or email
+
+        Returns:
+            str: user id if valid
+        """
         try:
             self.user = get_user_by_username_or_email(user_id)
             return user_id
-        except User.DoesNotExist:
-            raise ValidationError(f"'{user_id}' is not a valid student identifier")  # lint-amnesty, pylint: disable=raise-missing-from
+        except User.DoesNotExist as err:
+            raise ValidationError(f"'{user_id}' is not a valid student identifier") from err
 
     def validate(self, attrs):
         """Validate the data at an object level."""
@@ -639,13 +621,11 @@ class DiscussionRolesSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DiscussionRolesMemberSerializer(serializers.Serializer):
@@ -672,13 +652,11 @@ class DiscussionRolesMemberSerializer(serializers.Serializer):
         """
         Overriden create abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
         Overriden update abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DiscussionRolesListSerializer(serializers.Serializer):
@@ -704,12 +682,70 @@ class DiscussionRolesListSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         """
-        Overriden create abstract method
+        Overridden create abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def update(self, instance, validated_data):
         """
-        Overriden update abstract method
+        Overridden update abstract method
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+
+
+class UserStatsSerializer(serializers.Serializer):
+    """
+    Serializer for course user stats.
+    """
+    threads = serializers.IntegerField()
+    replies = serializers.IntegerField()
+    responses = serializers.IntegerField()
+    active_flags = serializers.IntegerField()
+    inactive_flags = serializers.IntegerField()
+    username = serializers.CharField()
+
+    def to_representation(self, instance):
+        """Remove flag counts if user is not privileged."""
+        data = super().to_representation(instance)
+        if not self.context.get("is_privileged", False):
+            data["active_flags"] = None
+            data["inactive_flags"] = None
+        return data
+
+
+class BlackoutDateSerializer(serializers.Serializer):
+    """
+    Serializer for blackout dates.
+    """
+    start = serializers.DateTimeField(help_text="The ISO 8601 timestamp for the start of the blackout period")
+    end = serializers.DateTimeField(help_text="The ISO 8601 timestamp for the end of the blackout period")
+
+
+class CourseMetadataSerailizer(serializers.Serializer):
+    """
+    Serializer for course metadata.
+    """
+    id = CourseKeyField(help_text="The identifier of the course")
+    blackouts = serializers.ListField(
+        child=BlackoutDateSerializer(),
+        help_text="A list of objects representing blackout periods "
+                  "(during which discussions are read-only except for privileged users)."
+    )
+    thread_list_url = serializers.URLField(
+        help_text="The URL of the list of all threads in the course.",
+    )
+    following_thread_list_url = serializers.URLField(
+        help_text="thread_list_url with parameter following=True",
+    )
+    topics_url = serializers.URLField(help_text="The URL of the topic listing for the course.")
+    allow_anonymous = serializers.BooleanField(
+        help_text="A boolean which indicating whether anonymous posts are allowed or not.",
+    )
+    allow_anonymous_to_peers = serializers.BooleanField(
+        help_text="A boolean which indicating whether posts anonymous to peers are allowed or not.",
+    )
+    user_roles = serializers.ListField(
+        child=serializers.CharField(),
+        help_text="A list of all the roles the requesting user has for this course.",
+    )
+    user_is_privileged = serializers.BooleanField(
+        help_text="A boolean indicating if the current user has a privileged role",
+    )

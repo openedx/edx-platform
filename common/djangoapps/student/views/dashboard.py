@@ -29,6 +29,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
     get_pseudo_session_for_entitlement,
@@ -57,7 +58,7 @@ from common.djangoapps.student.models import (
     UserProfile
 )
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger("edx.student")
 
@@ -472,6 +473,22 @@ def get_dashboard_course_limit():
     return course_limit
 
 
+def check_for_unacknowledged_notices(context):
+    """
+    Checks the notices apps plugin context to see if there are any unacknowledged notices the user needs to take action
+    on. If so, build a redirect url to the first unack'd notice.
+    """
+    notice_url = None
+
+    notices = context.get("plugins", {}).get("notices", {}).get("unacknowledged_notices")
+    if notices:
+        # We will only show one notice to the user one at a time. Build a redirect URL to the first notice in the
+        # list of unacknowledged notices.
+        notice_url = f"{settings.LMS_ROOT_URL}{notices[0]}?next={settings.LMS_ROOT_URL}/dashboard/"
+
+    return notice_url
+
+
 @login_required
 @ensure_csrf_cookie
 @add_maintenance_banner
@@ -732,8 +749,17 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     else:
         redirect_message = ''
 
+    all_integrity_enabled = True
+    if not course_enrollments:
+        all_integrity_enabled = is_integrity_signature_enabled(None)
+    for enrollment in course_enrollments:
+        if not is_integrity_signature_enabled(enrollment.course_id):
+            all_integrity_enabled = False
+            break
+
     valid_verification_statuses = ['approved', 'must_reverify', 'pending', 'expired']
-    display_sidebar_on_dashboard = verification_status['status'] in valid_verification_statuses and \
+    display_sidebar_on_dashboard = not all_integrity_enabled and \
+        verification_status['status'] in valid_verification_statuses and \
         verification_status['should_display']
 
     # Filter out any course enrollment course cards that are associated with fulfilled entitlements
@@ -809,6 +835,10 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         context
     )
     context.update(context_from_plugins)
+
+    notice_url = check_for_unacknowledged_notices(context)
+    if notice_url:
+        return redirect(notice_url)
 
     course = None
     context.update(

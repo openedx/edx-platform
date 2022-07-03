@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreIsolationMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreIsolationMixin
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -21,7 +21,6 @@ class ProviderState(ModuleStoreIsolationMixin):
     """ Provider State Setup """
 
     COURSE_KEY = "course-v1:edX+DemoX+Demo_Course"
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def clean_db(self, user, course_key):
         """ Utility method to clean db """

@@ -46,7 +46,7 @@ from common.djangoapps.student.models import (
     UserTestGroup
 )
 from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()  # pylint:disable=invalid-name
 
@@ -524,7 +524,7 @@ class AllowedAuthUserAdmin(admin.ModelAdmin):
 class CourseEnrollmentCelebrationAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
     """Admin interface for the CourseEnrollmentCelebration model. """
     raw_id_fields = ('enrollment',)
-    list_display = ('id', 'course', 'user', 'celebrate_first_section')
+    list_display = ('id', 'course', 'user', 'celebrate_first_section', 'celebrate_weekly_goal',)
     search_fields = ('enrollment__course__id', 'enrollment__user__username')
 
     class Meta:

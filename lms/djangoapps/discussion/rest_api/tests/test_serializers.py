@@ -11,7 +11,7 @@ import httpretty
 from django.test.client import RequestFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -293,6 +293,8 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "child_count": 0,
         }
         expected = {
+            "anonymous": False,
+            "anonymous_to_peers": False,
             "id": "test_comment",
             "thread_id": "test_thread",
             "parent_id": None,
@@ -412,6 +414,8 @@ class ThreadSerializerDeserializationTest(
         SharedModuleStoreTestCase
 ):
     """Tests for ThreadSerializer deserialization."""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUpClass(cls):
@@ -476,7 +480,9 @@ class ThreadSerializerDeserializationTest(
             'thread_type': ['discussion'],
             'title': ['Test Title'],
             'body': ['Test body'],
-            'user_id': [str(self.user.id)]
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
         }
         assert saved['id'] == 'test_id'
 
@@ -492,7 +498,9 @@ class ThreadSerializerDeserializationTest(
             'title': ['Test Title'],
             'body': ['Test body'],
             'user_id': [str(self.user.id)],
-            'group_id': ['42']
+            'group_id': ['42'],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
         }
 
     def test_create_missing_field(self):
@@ -522,6 +530,28 @@ class ThreadSerializerDeserializationTest(
         data["type"] = "invalid_type"
         serializer = ThreadSerializer(data=data)
         assert not serializer.is_valid()
+
+    def test_create_anonymous(self):
+        """
+        Test that serializer correctly deserializes the anonymous field when
+        creating a new thread.
+        """
+        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
+        data = self.minimal_data.copy()
+        data["anonymous"] = True
+        self.save_and_reserialize(data)
+        assert httpretty.last_request().parsed_body["anonymous"] == ['True']  # lint-amnesty, pylint: disable=no-member
+
+    def test_create_anonymous_to_peers(self):
+        """
+        Test that serializer correctly deserializes the anonymous_to_peers field
+        when creating a new thread.
+        """
+        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
+        data = self.minimal_data.copy()
+        data["anonymous_to_peers"] = True
+        self.save_and_reserialize(data)
+        assert httpretty.last_request().parsed_body["anonymous_to_peers"] == ['True']  # lint-amnesty, pylint: disable=no-member
 
     def test_update_empty(self):
         self.register_put_thread_response(self.existing_thread.attributes)
@@ -567,6 +597,30 @@ class ThreadSerializerDeserializationTest(
         for key in data:
             assert saved[key] == data[key]
 
+    def test_update_anonymous(self):
+        """
+        Test that serializer correctly deserializes the anonymous field when
+        updating an existing thread.
+        """
+        self.register_put_thread_response(self.existing_thread.attributes)
+        data = {
+            "anonymous": True,
+        }
+        self.save_and_reserialize(data, self.existing_thread)
+        assert httpretty.last_request().parsed_body["anonymous"] == ['True']  # lint-amnesty, pylint: disable=no-member
+
+    def test_update_anonymous_to_peers(self):
+        """
+        Test that serializer correctly deserializes the anonymous_to_peers
+        field when updating an existing thread.
+        """
+        self.register_put_thread_response(self.existing_thread.attributes)
+        data = {
+            "anonymous_to_peers": True,
+        }
+        self.save_and_reserialize(data, self.existing_thread)
+        assert httpretty.last_request().parsed_body["anonymous_to_peers"] == ['True']  # lint-amnesty, pylint: disable=no-member
+
     @ddt.data("", " ")
     def test_update_empty_string(self, value):
         serializer = ThreadSerializer(
@@ -594,6 +648,8 @@ class ThreadSerializerDeserializationTest(
 @ddt.ddt
 class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer deserialization."""
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -662,7 +718,9 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         assert httpretty.last_request().parsed_body == {  # lint-amnesty, pylint: disable=no-member
             'course_id': [str(self.course.id)],
             'body': ['Test body'],
-            'user_id': [str(self.user.id)]
+            'user_id': [str(self.user.id)],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
         }
         assert saved['id'] == 'test_comment'
         assert saved['parent_id'] == parent_id
@@ -682,7 +740,9 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             'course_id': [str(self.course.id)],
             'body': ['Test body'],
             'user_id': [str(self.user.id)],
-            'endorsed': ['True']
+            'endorsed': ['True'],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
         }
 
     def test_create_parent_id_nonexistent(self):
@@ -760,12 +820,36 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             'course_id': [str(self.course.id)],
             'body': ['Test body'],
             'user_id': [str(self.user.id)],
-            'endorsed': ['True']
+            'endorsed': ['True'],
+            'anonymous': ['False'],
+            'anonymous_to_peers': ['False'],
         }
         assert saved['endorsed']
         assert saved['endorsed_by'] is None
         assert saved['endorsed_by_label'] is None
         assert saved['endorsed_at'] is None
+
+    def test_create_anonymous(self):
+        """
+        Test that serializer correctly deserializes the anonymous field when
+        creating a new comment.
+        """
+        self.register_post_comment_response({"username": self.user.username}, thread_id="test_thread")
+        data = self.minimal_data.copy()
+        data["anonymous"] = True
+        self.save_and_reserialize(data)
+        assert httpretty.last_request().parsed_body["anonymous"] == ['True']  # lint-amnesty, pylint: disable=no-member
+
+    def test_create_anonymous_to_peers(self):
+        """
+        Test that serializer correctly deserializes the anonymous_to_peers
+        field when creating a new comment.
+        """
+        self.register_post_comment_response({"username": self.user.username}, thread_id="test_thread")
+        data = self.minimal_data.copy()
+        data["anonymous_to_peers"] = True
+        self.save_and_reserialize(data)
+        assert httpretty.last_request().parsed_body["anonymous_to_peers"] == ['True']  # lint-amnesty, pylint: disable=no-member
 
     def test_update_empty(self):
         self.register_put_comment_response(self.existing_comment.attributes)
@@ -812,6 +896,30 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         )
         assert not serializer.is_valid()
         assert serializer.errors == {'raw_body': ['This field may not be blank.']}
+
+    def test_update_anonymous(self):
+        """
+        Test that serializer correctly deserializes the anonymous field when
+        updating an existing comment.
+        """
+        self.register_put_comment_response(self.existing_comment.attributes)
+        data = {
+            "anonymous": True,
+        }
+        self.save_and_reserialize(data, self.existing_comment)
+        assert httpretty.last_request().parsed_body["anonymous"] == ['True']  # lint-amnesty, pylint: disable=no-member
+
+    def test_update_anonymous_to_peers(self):
+        """
+        Test that serializer correctly deserializes the anonymous_to_peers
+        field when updating an existing comment.
+        """
+        self.register_put_comment_response(self.existing_comment.attributes)
+        data = {
+            "anonymous_to_peers": True,
+        }
+        self.save_and_reserialize(data, self.existing_comment)
+        assert httpretty.last_request().parsed_body["anonymous_to_peers"] == ['True']  # lint-amnesty, pylint: disable=no-member
 
     @ddt.data("thread_id", "parent_id")
     def test_update_non_updatable(self, field):

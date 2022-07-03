@@ -9,7 +9,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from organizations.models import Organization
 
-from ..models import DEFAULT_CONFIG_ENABLED, DEFAULT_PROVIDER_TYPE
+from ..models import DEFAULT_CONFIG_ENABLED, DEFAULT_PROVIDER_TYPE, Provider
 from ..models import DiscussionsConfiguration
 from ..models import ProviderFilter
 
@@ -137,7 +137,7 @@ class DiscussionsConfigurationModelTest(TestCase):
         self.configuration_with_values = DiscussionsConfiguration(
             context_key=self.course_key_with_values,
             enabled=False,
-            provider_type='legacy',
+            provider_type=Provider.LEGACY,
             plugin_configuration={
                 'url': 'http://localhost',
             },
@@ -162,7 +162,7 @@ class DiscussionsConfigurationModelTest(TestCase):
         assert configuration.enabled  # by default
         assert configuration.lti_configuration is None
         assert len(configuration.plugin_configuration.keys()) == 0
-        assert not configuration.provider_type
+        assert configuration.provider_type == DEFAULT_PROVIDER_TYPE
 
     def test_get_with_values(self):
         """
@@ -236,7 +236,7 @@ class DiscussionsConfigurationModelTest(TestCase):
         assert configuration.enabled
         assert not configuration.lti_configuration
         assert not configuration.plugin_configuration
-        assert not configuration.provider_type
+        assert configuration.provider_type == 'legacy'
 
     def test_get_explicit(self):
         """

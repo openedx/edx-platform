@@ -60,7 +60,7 @@ def lms_enroll_user_in_course(
             )
             log.info('The user [%s] has been enrolled in course run [%s].', username, course_id)
             return response
-        except CourseEnrollmentExistsError as error:
+        except CourseEnrollmentExistsError as error:  # pylint: disable=unused-variable
             log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
             return None
         except CourseEnrollmentError as error:

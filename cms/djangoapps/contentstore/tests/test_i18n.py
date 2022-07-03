@@ -8,14 +8,14 @@ from unittest import mock, skip
 
 from django.utils import translation
 from django.utils.translation import get_language
+from xmodule.modulestore.django import ModuleI18nService
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.views.preview import _preview_module_system
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.lib.edx_six import get_gettext
-from xmodule.modulestore.django import ModuleI18nService
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class FakeTranslations(ModuleI18nService):
@@ -57,6 +57,7 @@ class FakeTranslations(ModuleI18nService):
 
 class TestModuleI18nService(ModuleStoreTestCase):
     """ Test ModuleI18nService """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         """ Setting up tests """

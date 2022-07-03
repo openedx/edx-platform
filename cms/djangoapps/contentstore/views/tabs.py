@@ -1,7 +1,7 @@
 """
 Views related to course tabs
 """
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional, Union
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
@@ -61,10 +61,10 @@ def tabs_handler(request, course_key_string):
             return JsonResponse()
 
     elif request.method == "GET":  # assume html
-        # get all tabs from the tabs list: static tabs (a.k.a. user-created tabs) and built-in tabs
+        # get all tabs from the tabs list and select only static tabs (a.k.a. user-created tabs)
         # present in the same order they are displayed in LMS
 
-        tabs_to_render = list(get_course_tabs(course_item, request.user))
+        tabs_to_render = list(get_course_static_tabs(course_item, request.user))
 
         return render_to_response(
             "edit-tabs.html",
@@ -78,9 +78,9 @@ def tabs_handler(request, course_key_string):
         return HttpResponseNotFound()
 
 
-def get_course_tabs(course_item: CourseBlock, user: User) -> Iterable[CourseTab]:
+def get_course_static_tabs(course_item: CourseBlock, user: User) -> Iterable[CourseTab]:
     """
-    Yields all the course tabs in a course including hidden tabs.
+    Yields all the static tabs in a course including hidden tabs.
 
     Args:
         course_item (CourseBlock): The course object from which to get the tabs
@@ -96,7 +96,7 @@ def get_course_tabs(course_item: CourseBlock, user: User) -> Iterable[CourseTab]
             # static tab needs its locator information to render itself as an xmodule
             static_tab_loc = course_item.id.make_usage_key("static_tab", tab.url_slug)
             tab.locator = static_tab_loc
-        yield tab
+            yield tab
 
 
 def update_tabs_handler(course_item: CourseBlock, tabs_data: Dict, user: User) -> None:
@@ -110,7 +110,7 @@ def update_tabs_handler(course_item: CourseBlock, tabs_data: Dict, user: User) -
     """
 
     if "tabs" in tabs_data:
-        reorder_tabs_handler(course_item, tabs_data, user)
+        reorder_tabs_handler(course_item, tabs_data["tabs"], user)
     elif "tab_id_locator" in tabs_data:
         edit_tab_handler(course_item, tabs_data, user)
     else:
@@ -119,30 +119,14 @@ def update_tabs_handler(course_item: CourseBlock, tabs_data: Dict, user: User) -
 
 def reorder_tabs_handler(course_item, tabs_data, user):
     """
-    Helper function for handling reorder of tabs request
+    Helper function for handling reorder of static tabs request
     """
 
-    # Tabs are identified by tab_id or locators.
-    # The locators are used to identify static tabs since they are xmodules.
+    # Static tabs are identified by locators (a UsageKey) instead of a tab id like
+    # other tabs. These can be used to identify static tabs since they are xmodules.
     # Although all tabs have tab_ids, newly created static tabs do not know
     # their tab_ids since the xmodule editor uses only locators to identify new objects.
-    requested_tab_id_locators = tabs_data["tabs"]
-
-    # original tab list in original order
-    old_tab_list = course_item.tabs
-
-    # create a new list in the new order
-    new_tab_list = []
-    for tab_id_locator in requested_tab_id_locators:
-        tab = get_tab_by_tab_id_locator(old_tab_list, tab_id_locator)
-        if tab is None:
-            raise ValidationError({"error": f"Tab with id_locator '{tab_id_locator}' does not exist."})
-        new_tab_list.append(tab)
-
-    # the old_tab_list may contain additional tabs that were not rendered in the UI because of
-    # global or course settings.  so add those to the end of the list.
-    non_displayed_tabs = set(old_tab_list) - set(new_tab_list)
-    new_tab_list.extend(non_displayed_tabs)
+    new_tab_list = create_new_list(tabs_data, course_item.tabs)
 
     # validate the tabs to make sure everything is Ok (e.g., did the client try to reorder unmovable tabs?)
     try:
@@ -150,9 +134,33 @@ def reorder_tabs_handler(course_item, tabs_data, user):
     except InvalidTabsException as exception:
         raise ValidationError({"error": f"New list of tabs is not valid: {str(exception)}."}) from exception
 
-    # persist the new order of the tabs
     course_item.tabs = new_tab_list
+
     modulestore().update_item(course_item, user.id)
+
+
+def create_new_list(tab_locators, old_tab_list):
+    """
+    Helper function for creating a new course tab list in the new order of
+    reordered tabs.
+
+    It will take tab_locators for static tabs and resolve them to actual tab
+    instances.
+    """
+    new_tab_list = []
+    for tab_locator in tab_locators:
+        tab = get_tab_by_tab_id_locator(old_tab_list, tab_locator)
+        if tab is None:
+            raise ValidationError({"error": f"Tab with id_locator '{tab_locator}' does not exist."})
+        if not isinstance(tab, StaticTab):
+            raise ValidationError({"error": f"Cannot reorder tabs of type '{tab.type}'"})
+        new_tab_list.append(tab)
+
+    # the old_tab_list may contain additional tabs that were not rendered in the UI because of
+    # global or course settings.  so add those to the end of the list.
+    non_displayed_tabs = set(old_tab_list) - set(new_tab_list)
+    new_tab_list.extend(non_displayed_tabs)
+    return sorted(new_tab_list, key=lambda item: item.priority or float('inf'))
 
 
 def edit_tab_handler(course_item: CourseBlock, tabs_data: Dict, user: User):
@@ -191,11 +199,12 @@ def get_tab_by_tab_id_locator(tab_list: List[CourseTab], tab_id_locator: Dict[st
     return tab
 
 
-def get_tab_by_locator(tab_list: List[CourseTab], usage_key_string: str) -> Optional[CourseTab]:
+def get_tab_by_locator(tab_list: List[CourseTab], tab_location: Union[str, UsageKey]) -> Optional[CourseTab]:
     """
     Look for a tab with the specified locator.  Returns the first matching tab.
     """
-    tab_location = UsageKey.from_string(usage_key_string)
+    if isinstance(tab_location, str):
+        tab_location = UsageKey.from_string(tab_location)
     item = modulestore().get_item(tab_location)
     static_tab = StaticTab(
         name=item.display_name,

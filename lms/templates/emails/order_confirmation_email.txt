@@ -1,5 +1,5 @@
 ## mako
-<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import gettext as _ %>
 ${_("Hi {name},").format(name=order.user.profile.name)}
 
 ${_("Your payment was successful. You will see the charge below on your next credit or debit card statement under the company name {merchant_name}.").format(merchant_name=settings.CC_MERCHANT_NAME)}

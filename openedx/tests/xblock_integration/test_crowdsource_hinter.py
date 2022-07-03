@@ -8,18 +8,19 @@ import unittest
 import simplejson as json
 from django.conf import settings
 from django.urls import reverse
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.lib.url_utils import quote_slashes
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Create the test environment with the crowdsourcehinter xblock.
     """
+    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
     STUDENTS = [
         {'email': 'view@test.com', 'password': 'foo'},
         {'email': 'view2@test.com', 'password': 'foo'}

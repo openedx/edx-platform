@@ -7,7 +7,7 @@ from django.conf import settings
 from django.utils.translation import gettext_noop
 
 from common.djangoapps.student.roles import CourseCcxCoachRole
-from xmodule.tabs import CourseTab
+from xmodule.tabs import CourseTab  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .permissions import VIEW_CCX_COACH_DASHBOARD
 
@@ -18,6 +18,7 @@ class CcxCourseTab(CourseTab):
     """
 
     type = "ccx_coach"
+    priority = 310
     title = gettext_noop("CCX Coach")
     view_name = "ccx_coach_dashboard"
     is_dynamic = True    # The CCX view is dynamically added to the set of tabs when it is enabled

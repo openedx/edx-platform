@@ -31,7 +31,6 @@ from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
-from openedx.core.djangolib.markup import HTML, Text
 from xmodule.contentstore.django import contentstore
 from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -48,6 +47,12 @@ from xmodule.x_module import (
     shim_xmodule_js
 )
 from xmodule.xml_module import XmlMixin
+from common.djangoapps.xblock_django.constants import (
+    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_ID,
+)
+from openedx.core.djangolib.markup import HTML, Text
 
 from .fields import Date, ScoreField, Timedelta
 from .progress import Progress
@@ -113,8 +118,13 @@ class Randomization(String):
     to_json = from_json
 
 
-@XBlock.wants('user')
+@XBlock.needs('user')
 @XBlock.needs('i18n')
+@XBlock.needs('mako')
+@XBlock.needs('cache')
+@XBlock.needs('sandbox')
+# Studio doesn't provide XQueueService, but the LMS does.
+@XBlock.wants('xqueue')
 @XBlock.wants('call_to_action')
 class ProblemBlock(
     ScorableXBlockMixin,
@@ -387,7 +397,7 @@ class ProblemBlock(
         Return the studio view.
         """
         fragment = Fragment(
-            self.system.render_template(self.mako_template, self.get_context())
+            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
         add_webpack_to_fragment(fragment, 'ProblemBlockStudio')
         shim_xmodule_js(fragment, 'MarkdownEditingDescriptor')
@@ -784,9 +794,10 @@ class ProblemBlock(
         """
         if self.rerandomize == RANDOMIZATION.NEVER:
             self.seed = 1
-        elif self.rerandomize == RANDOMIZATION.PER_STUDENT and hasattr(self.runtime, 'seed'):
+        elif self.rerandomize == RANDOMIZATION.PER_STUDENT:
+            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
             # see comment on randomization_bin
-            self.seed = randomization_bin(self.runtime.seed, str(self.location).encode('utf-8'))
+            self.seed = randomization_bin(user_id, str(self.location).encode('utf-8'))
         else:
             self.seed = struct.unpack('i', os.urandom(4))[0]
 
@@ -801,20 +812,27 @@ class ProblemBlock(
         if text is None:
             text = self.data
 
+        user_service = self.runtime.service(self, 'user')
+        anonymous_student_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+        seed = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
+
+        sandbox_service = self.runtime.service(self, 'sandbox')
+        cache_service = self.runtime.service(self, 'cache')
+
         capa_system = LoncapaSystem(
             ajax_url=self.ajax_url,
-            anonymous_student_id=self.runtime.anonymous_student_id,
-            cache=self.runtime.cache,
-            can_execute_unsafe_code=self.runtime.can_execute_unsafe_code,
-            get_python_lib_zip=self.runtime.get_python_lib_zip,
+            anonymous_student_id=anonymous_student_id,
+            cache=cache_service,
+            can_execute_unsafe_code=sandbox_service.can_execute_unsafe_code,
+            get_python_lib_zip=sandbox_service.get_python_lib_zip,
             DEBUG=self.runtime.DEBUG,
             filestore=self.runtime.filestore,
             i18n=self.runtime.service(self, "i18n"),
             node_path=self.runtime.node_path,
-            render_template=self.runtime.render_template,
-            seed=self.runtime.seed,      # Why do we do this if we have self.seed?
+            render_template=self.runtime.service(self, 'mako').render_template,
+            seed=seed,  # Why do we do this if we have self.seed?
             STATIC_URL=self.runtime.STATIC_URL,
-            xqueue=self.runtime.xqueue,
+            xqueue=self.runtime.service(self, 'xqueue'),
             matlab_api_key=self.matlab_api_key
         )
 
@@ -905,7 +923,7 @@ class ProblemBlock(
         """
         curr_score, total_possible = self.get_display_progress()
 
-        return self.runtime.render_template('problem_ajax.html', {
+        return self.runtime.service(self, 'mako').render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': str(self.location),
             'ajax_url': self.ajax_url,
@@ -961,6 +979,11 @@ class ProblemBlock(
         # then we disable the "submit" button
         # Also, disable the "submit" button if we're waiting
         # for the user to reset a randomized problem
+
+        # if Past Due => Can submit
+        if self.is_past_due():
+            return True
+
         if self.closed() or submitted_without_reset:
             return False
         else:
@@ -1253,7 +1276,7 @@ class ProblemBlock(
             'submit_disabled_cta': submit_disabled_ctas[0] if submit_disabled_ctas else None,
         }
 
-        html = self.runtime.render_template('problem.html', context)
+        html = self.runtime.service(self, 'mako').render_template('problem.html', context)
 
         if encapsulate:
             html = HTML('<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
@@ -1412,6 +1435,7 @@ class ProblemBlock(
         """
         Is the user allowed to see an answer?
         """
+        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
         if not self.correctness_available():
             # If correctness is being withheld, then don't show answers either.
             return False
@@ -1419,7 +1443,7 @@ class ProblemBlock(
             return False
         elif self.showanswer == SHOWANSWER.NEVER:
             return False
-        elif self.runtime.user_is_staff:
+        elif user_is_staff:
             # This is after the 'never' check because admins can see the answer
             # unless the problem explicitly prevents it
             return True
@@ -1459,10 +1483,11 @@ class ProblemBlock(
 
         Limits access to the correct/incorrect flags, messages, and problem score.
         """
+        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
         return ShowCorrectness.correctness_available(
             show_correctness=self.show_correctness,
             due_date=self.close_date,
-            has_staff_access=self.runtime.user_is_staff,
+            has_staff_access=user_is_staff,
         )
 
     def update_score(self, data):
@@ -1561,7 +1586,7 @@ class ProblemBlock(
 
         return {
             'answers': new_answers,
-            'correct_status_html': self.runtime.render_template(
+            'correct_status_html': self.runtime.service(self, 'mako').render_template(
                 'status_span.html',
                 {'status': Status('correct', self.runtime.service(self, "i18n").ugettext)}
             )
@@ -1731,24 +1756,25 @@ class ProblemBlock(
         if self.lcp.is_queued():
             prev_submit_time = self.lcp.get_recentmost_queuetime()
 
-            waittime_between_requests = self.runtime.xqueue['waittime']
+            xqueue_service = self.runtime.service(self, 'xqueue')
+            waittime_between_requests = xqueue_service.waittime if xqueue_service else 0
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = _("You must wait at least {wait} seconds between submissions.").format(
                     wait=waittime_between_requests)
                 return {'success': msg, 'html': ''}
 
         # Wait time between resets: check if is too soon for submission.
-        if self.last_submission_time is not None and self.submission_wait_seconds not in [0, None]:
-            seconds_since_submission = (current_time - self.last_submission_time).total_seconds()
-            if seconds_since_submission < self.submission_wait_seconds:
-                remaining_secs = int(self.submission_wait_seconds - seconds_since_submission)
-                msg = _('You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
-                    wait_secs=self.pretty_print_seconds(self.submission_wait_seconds),
-                    remaining_secs=self.pretty_print_seconds(remaining_secs))
-                return {
-                    'success': msg,
-                    'html': ''
-                }
+        # if self.last_submission_time is not None and self.submission_wait_seconds not in [0, None]:
+        #     seconds_since_submission = (current_time - self.last_submission_time).total_seconds()
+        #     if seconds_since_submission < self.submission_wait_seconds:
+        #         remaining_secs = int(self.submission_wait_seconds - seconds_since_submission)
+        #         msg = _('You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
+        #             wait_secs=self.pretty_print_seconds(self.submission_wait_seconds),
+        #             remaining_secs=self.pretty_print_seconds(remaining_secs))
+        #         return {
+        #             'success': msg,
+        #             'html': ''
+        #         }
 
         try:
             # expose the attempt number to a potential python custom grader
@@ -1777,7 +1803,8 @@ class ProblemBlock(
             # If the user is a staff member, include
             # the full exception, including traceback,
             # in the response
-            if self.runtime.user_is_staff:
+            user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+            if user_is_staff:
                 msg = f"Staff debug info: {traceback.format_exc()}"
 
             # Otherwise, display just an error message,

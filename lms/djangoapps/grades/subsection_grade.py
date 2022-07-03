@@ -11,8 +11,8 @@ from lazy import lazy
 
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
 from lms.djangoapps.grades.scores import compute_percent, get_score, possibly_scored
-from xmodule import block_metadata_utils, graders
-from xmodule.graders import AggregatedScore, ShowCorrectness
+from xmodule import block_metadata_utils, graders  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.graders import AggregatedScore, ShowCorrectness  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = getLogger(__name__)
 

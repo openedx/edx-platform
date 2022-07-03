@@ -92,7 +92,7 @@ def can_show_streak_discount_coupon(user, course):
     """
 
     # Feature needs to be enabled
-    if not COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT.is_enabled():
+    if not COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT.is_enabled(course.id):
         return False
 
     # Course end date needs to be in the future

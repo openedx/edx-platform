@@ -1,13 +1,14 @@
 
 
-(function(globals) {
-
-  var django = globals.django || (globals.django = {});
+'use strict';
+{
+  const globals = this;
+  const django = globals.django || (globals.django = {});
 
   
   django.pluralidx = function(n) {
-    var v=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);
-    if (typeof(v) == 'boolean') {
+    const v = (n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);
+    if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
@@ -19,7 +20,7 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
+  const newcatalog = {
     " and ": " \u0456 ",
     "%(errorCount)s error found in form.": [
       "%(errorCount)s \u043f\u043e\u043c\u0438\u043b\u043a\u0430 \u0437\u043d\u0430\u0439\u0434\u0435\u043d\u0430.",
@@ -223,7 +224,6 @@
     "Background color": "\u041a\u043e\u043b\u0456\u0440 \u0444\u043e\u043d\u0443",
     "Basic": "\u041e\u0441\u043d\u043e\u0432\u043d\u0435",
     "Basic Account Information": "\u041e\u0441\u043d\u043e\u0432\u043d\u0430 \u0456\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0456\u044f \u043e\u0431\u043b\u0456\u043a\u043e\u0432\u043e\u0433\u043e \u0437\u0430\u043f\u0438\u0441\u0443",
-    "Before proceeding, please {htmlStart}activate your account{htmlEnd}.": "\u041f\u0435\u0440\u0448 \u043d\u0456\u0436 \u043f\u0440\u043e\u0434\u043e\u0432\u0436\u0438\u0442\u0438, \u0430\u043a\u0442\u0438\u0432\u0443\u0439\u0442\u0435 {htmlStart} \u0441\u0432\u0456\u0439 \u0430\u043a\u0430\u0443\u043d\u0442{htmlEnd}.",
     "Before proceeding, please {htmlStart}unlink all social media accounts{htmlEnd}.": "\u041f\u0435\u0440\u0448 \u043d\u0456\u0436 \u043f\u0440\u043e\u0434\u043e\u0432\u0436\u0438\u0442\u0438,\u0431\u0443\u0434\u044c \u043b\u0430\u0441\u043a\u0430{htmlStart} \u0432\u0456\u0434\u2019\u0454\u0434\u043d\u0430\u0439\u0442\u0435 \u0432\u0441\u0456 \u043e\u0431\u043b\u0456\u043a\u043e\u0432\u0456 \u0437\u0430\u043f\u0438\u0441\u0438 \u0441\u043e\u0446\u0456\u0430\u043b\u044c\u043d\u0438\u0445 \u043c\u0435\u0434\u0456\u0430 {htmlEnd}.",
     "Biography": "\u0406\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0456\u044f",
     "Block view is unavailable": "\u0411\u043b\u043e\u0447\u043d\u0438\u0439 \u0432\u0438\u0434 \u043d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u043d\u0438\u0439",
@@ -1556,24 +1556,24 @@
     "{type} Progress": "{type} \u041f\u0440\u043e\u0433\u0440\u0435\u0441",
     "\u2026": "..."
   };
-  for (var key in newcatalog) {
+  for (const key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
   
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
-      var value = django.catalog[msgid];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[msgid];
+      if (typeof value === 'undefined') {
         return msgid;
       } else {
-        return (typeof(value) == 'string') ? value : value[0];
+        return (typeof value === 'string') ? value : value[0];
       }
     };
 
     django.ngettext = function(singular, plural, count) {
-      var value = django.catalog[singular];
-      if (typeof(value) == 'undefined') {
+      const value = django.catalog[singular];
+      if (typeof value === 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
         return value.constructor === Array ? value[django.pluralidx(count)] : value;
@@ -1583,16 +1583,16 @@
     django.gettext_noop = function(msgid) { return msgid; };
 
     django.pgettext = function(context, msgid) {
-      var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.gettext(context + '\x04' + msgid);
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
     };
 
     django.npgettext = function(context, singular, plural, count) {
-      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      let value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
@@ -1615,11 +1615,9 @@
       "%d.%m.%Y %H:%M:%S",
       "%d.%m.%Y %H:%M:%S.%f",
       "%d.%m.%Y %H:%M",
-      "%d.%m.%Y",
       "%d %B %Y %H:%M:%S",
       "%d %B %Y %H:%M:%S.%f",
       "%d %B %Y %H:%M",
-      "%d %B %Y",
       "%Y-%m-%d %H:%M:%S",
       "%Y-%m-%d %H:%M:%S.%f",
       "%Y-%m-%d %H:%M",
@@ -1648,8 +1646,8 @@
   };
 
     django.get_format = function(format_type) {
-      var value = django.formats[format_type];
-      if (typeof(value) == 'undefined') {
+      const value = django.formats[format_type];
+      if (typeof value === 'undefined') {
         return format_type;
       } else {
         return value;
@@ -1668,6 +1666,5 @@
 
     django.jsi18n_initialized = true;
   }
-
-}(this));
+};
 

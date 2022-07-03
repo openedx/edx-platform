@@ -14,6 +14,7 @@ from edx_django_utils.cache import RequestCache
 
 from common.djangoapps.edxmako import LOOKUP, add_lookup
 from common.djangoapps.edxmako.request_context import get_template_request_context
+from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.edxmako.shortcuts import (
     is_any_marketing_link_set,
     is_marketing_link_set,
@@ -208,3 +209,23 @@ class MakoRequestContextTest(TestCase):
         the threadlocal REQUEST_CONTEXT.context. This is meant to run in CMS.
         """
         assert "We're having trouble rendering your component" in render_to_string('html_error.html', None)
+
+
+@ddt.ddt
+class MakoServiceTestCase(TestCase):
+    """
+    Tests for the MakoService
+    """
+    @ddt.data(
+        (MakoService(),
+         '<div id="mako_id" ns="main">Testing the MakoService</div>\n'),
+        (MakoService(namespace_prefix='lms.'),
+         '<div id="mako_id" ns="main">Testing the MakoService</div>\n'),
+    )
+    @ddt.unpack
+    def test_render_template(self, service, expected_html):
+        """
+        Tests MakoService.render_template returns the expected rendered content.
+        """
+        html = service.render_template('templates/edxmako.html', {'element_id': 'mako_id'})
+        assert html == expected_html

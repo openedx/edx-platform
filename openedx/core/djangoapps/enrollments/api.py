@@ -14,11 +14,64 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.enrollments import errors
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
 
 DEFAULT_DATA_API = 'openedx.core.djangoapps.enrollments.data'
+
+
+def get_verified_enrollments(username, include_inactive=False):
+    """Retrieves all the courses in which user is enrolled in a verified mode.
+
+    Takes a user and retrieves all relative enrollments in which the learner is enrolled in a verified mode.
+    Includes information regarding how the user is enrolled
+    in the the course.
+
+    Args:
+        username: The username of the user we want to retrieve course enrollment information for.
+        include_inactive (bool): Determines whether inactive enrollments will be included
+
+    Returns:
+        A list of enrollment information for the given user.
+
+    Examples:
+        >>> get_verified_enrollments("Bob")
+        [
+            {
+                "created": "2014-10-25T20:18:00Z",
+                "mode": "verified",
+                "is_active": True,
+                "user": "Bob",
+                "course_details": {
+                    "course_id": "edX/edX-Insider/2014T2",
+                    "course_name": "edX Insider Course",
+                    "enrollment_end": "2014-12-20T20:18:00Z",
+                    "enrollment_start": "2014-10-15T20:18:00Z",
+                    "course_start": "2015-02-03T00:00:00Z",
+                    "course_end": "2015-05-06T00:00:00Z",
+                    "course_modes": [
+                        {
+                            "slug": "honor",
+                            "name": "Honor Code Certificate",
+                            "min_price": 0,
+                            "suggested_prices": "",
+                            "currency": "usd",
+                            "expiration_datetime": null,
+                            "description": null,
+                            "sku": null,
+                            "bulk_sku": null
+                        }
+                    ],
+                    "invite_only": True
+                }
+            }
+        ]
+
+    """
+    enrollments = get_enrollments(username, include_inactive)
+    enrollments = filter(lambda enrollment: CourseMode.is_verified_slug(enrollment['mode']), enrollments)
+    return list(enrollments)
 
 
 def get_enrollments(username, include_inactive=False):

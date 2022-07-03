@@ -64,7 +64,8 @@
                     this.autoRegisterWelcomeMessage = data.thirdPartyAuth.autoRegisterWelcomeMessage || '';
                     this.registerFormSubmitButtonText =
                         data.thirdPartyAuth.registerFormSubmitButtonText || _('Create Account');
-                    this.is_require_third_party_auth_enabled = data.is_require_third_party_auth_enabled || false;
+                    this.is_require_third_party_auth_enabled = data.is_require_third_party_auth_enabled;
+                    this.enableCoppaCompliance = data.enableCoppaCompliance;
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
                     this.listenTo(this.model, 'validation', this.renderLiveValidations);
@@ -85,7 +86,7 @@
                         html.push(HtmlUtils.template(fieldTpl)($.extend(fields[i], {
                             form: this.formType,
                             requiredStr: this.requiredStr,
-                            optionalStr: this.optionalStr,
+                            optionalStr: fields[i].name === 'marketing_emails_opt_in' ? '' : this.optionalStr,
                             supplementalText: fields[i].supplementalText || '',
                             supplementalLink: fields[i].supplementalLink || ''
                         })));
@@ -135,7 +136,9 @@
                     html = this.renderFields(requiredFields, 'required-fields');
 
                     html.push.apply(html, this.renderFields(exposedOptionalFields, 'exposed-optional-fields'));
-                    html.push.apply(html, this.renderFields(optionalFields, 'optional-fields'));
+                    html.push.apply(html, this.renderFields(
+                      optionalFields, `optional-fields ${!this.enableCoppaCompliance ? '' : 'full-length-fields'}`
+                    ));
 
                     this.render(html.join(''));
                 },

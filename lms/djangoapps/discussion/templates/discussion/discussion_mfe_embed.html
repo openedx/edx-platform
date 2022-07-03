@@ -1,0 +1,16 @@
+## mako
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%page expression_filter="h"/>
+
+<%!
+import json
+from django.utils.translation import ugettext as _
+%>
+
+<section class="discussion discussion-board page-content-container" id="discussion-container"
+         data-course-id="${course_key}" >
+    <%include file="_switch_experience_fragment.html" />
+    <iframe id='discussions-mfe-tab-embed' src='${discussions_mfe_url}'></iframe>
+</section>

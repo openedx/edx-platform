@@ -22,9 +22,9 @@ from six.moves.urllib.parse import urljoin
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.track import segment
 from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_accessible_discussion_xblocks_by_course_id,
     permalink
 )
+from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks_by_course_id
 from openedx.core.djangoapps.ace_common.message import BaseMessageType
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -128,8 +128,16 @@ def _is_not_subcomment(comment_id):
 
 def _is_first_comment(comment_id, thread_id):  # lint-amnesty, pylint: disable=missing-function-docstring
     thread = cc.Thread.find(id=thread_id).retrieve(with_responses=True)
-    if getattr(thread, 'children', None):
-        first_comment = thread.children[0]
+
+    if thread.get('thread_type') == 'question':
+        endorsed_comments = getattr(thread, 'endorsed_responses', [])
+        non_endorsed_comments = getattr(thread, 'non_endorsed_responses', [])
+        comments = endorsed_comments + non_endorsed_comments
+    else:
+        comments = getattr(thread, 'children', [])
+
+    if comments:
+        first_comment = sorted(comments, key=lambda c: c['created_at'])[0]
         return first_comment.get('id') == comment_id
     else:
         return False

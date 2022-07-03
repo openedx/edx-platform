@@ -12,19 +12,17 @@ from path import Path as path
 from rest_framework import status
 from rest_framework.test import APITestCase
 from user_tasks.models import UserTaskStatus
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class CourseImportViewTest(SharedModuleStoreTestCase, APITestCase):
     """
     Test importing courses via a RESTful API (POST method only)
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

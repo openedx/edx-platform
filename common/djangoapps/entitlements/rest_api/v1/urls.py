@@ -2,9 +2,10 @@
 URLs for the V1 of the Entitlements API.
 """
 
-from django.conf.urls import include, url
+from django.conf.urls import include
 from rest_framework.routers import DefaultRouter
 
+from django.urls import path, re_path
 from .views import EntitlementEnrollmentViewSet, EntitlementViewSet
 
 router = DefaultRouter()
@@ -17,8 +18,8 @@ ENROLLMENTS_VIEW = EntitlementEnrollmentViewSet.as_view({
 
 app_name = 'v1'
 urlpatterns = [
-    url(r'', include(router.urls)),
-    url(
+    path('', include(router.urls)),
+    re_path(
         fr'entitlements/(?P<uuid>{EntitlementViewSet.ENTITLEMENT_UUID4_REGEX})/enrollments$',
         ENROLLMENTS_VIEW,
         name='enrollments'
