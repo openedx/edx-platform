@@ -101,7 +101,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 }
                 if (this.isLibrarySourced) {
                     this.selectedLibraryComponents = [];
-                    this.storeSelectedLibraryComponents = [];
+                    this.storedSelectedLibraryComponents = [];
                     this.getSelectedLibraryComponents();
                 }
 
@@ -315,7 +315,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                   ModuleUtils.getUpdateUrl(locator) + '/handler/get_block_ids',
                   function(data) {
                       self.selectedLibraryComponents = Array.from(data.source_block_ids);
-                      self.storeSelectedLibraryComponents = Array.from(data.source_block_ids);
+                      self.storedSelectedLibraryComponents = Array.from(data.source_block_ids);
                   }
               );
             },
@@ -326,9 +326,9 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
               e.preventDefault();
               $.postJSON(
                   ModuleUtils.getUpdateUrl(locator) + '/handler/submit_studio_edits',
-                  {values: {source_block_ids: self.storeSelectedLibraryComponents}},
+                  {values: {source_block_ids: self.storedSelectedLibraryComponents}},
                   function() {
-                      self.selectedLibraryComponents = Array.from(self.storeSelectedLibraryComponents);
+                      self.selectedLibraryComponents = Array.from(self.storedSelectedLibraryComponents);
                       self.toggleSaveButton();
                   }
               );
@@ -336,19 +336,19 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
 
             toggleLibraryComponent: function(event) {
               var componentId = $(event.target).closest('.studio-xblock-wrapper').data('locator');
-              var storeIndex = this.storeSelectedLibraryComponents.indexOf(componentId);
+              var storeIndex = this.storedSelectedLibraryComponents.indexOf(componentId);
               if (storeIndex > -1) {
-                this.storeSelectedLibraryComponents.splice(storeIndex, 1);
+                this.storedSelectedLibraryComponents.splice(storeIndex, 1);
                 this.toggleSaveButton();
               } else {
-                this.storeSelectedLibraryComponents.push(componentId);
+                this.storedSelectedLibraryComponents.push(componentId);
                 this.toggleSaveButton();
               }
             },
 
             toggleSaveButton: function() {
               var $saveButton = $('.nav-actions .save-button');
-              if (JSON.stringify(this.selectedLibraryComponents.sort()) === JSON.stringify(this.storeSelectedLibraryComponents.sort())) {
+              if (JSON.stringify(this.selectedLibraryComponents.sort()) === JSON.stringify(this.storedSelectedLibraryComponents.sort())) {
                 $saveButton.addClass('is-hidden');
                 window.removeEventListener('beforeunload', this.onBeforePageUnloadCallback);
               } else {
