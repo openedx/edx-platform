@@ -366,9 +366,17 @@ class VideoBlock(
             self.youtube_streams = youtube_streams or create_youtube_string(self)  # pylint: disable=W0201
 
         settings_service = self.runtime.service(self, 'settings')
-
         poster = None
-        if edxval_api and self.edx_video_id:
+        try:
+            if self.edx_video_id:
+                from eol_vimeo.models import EolVimeoVideo
+                video_vimeo = EolVimeoVideo.objects.get(edx_video_id=self.edx_video_id.strip(), course_key=self.course_id)
+                poster = video_vimeo.url_picture
+        except EolVimeoVideo.DoesNotExist:
+            log.info('EolVimeo - Video id does not exist, edx_video_id: {}'.format(self.edx_video_id.strip()))
+        except ImportError:
+            log.error('EolVimeo - Import Error')
+        if not poster and edxval_api and self.edx_video_id:
             poster = edxval_api.get_course_video_image_url(
                 course_id=self.runtime.course_id.for_branch(None),
                 edx_video_id=self.edx_video_id.strip()
@@ -858,6 +866,7 @@ class VideoBlock(
         #### EOL ####
         eol_videolist = self.get_eol_videos_vimeo(self.course_id)
         _context['eol_videolist'] = {'data': eol_videolist, 'edx_video_id': self.edx_video_id}
+        _context['course_id'] = str(self.course_id)
         #### EOL END ####
         return _context
 
