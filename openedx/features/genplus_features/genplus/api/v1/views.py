@@ -50,13 +50,15 @@ class UserInfo(views.APIView):
                 'on_board': gen_user.student.onboarded,
                 'character_id': gen_user.student.character.id
                                 if gen_user.student.character else None,
-                'profile_image': gen_user.student.character.profile_pic.url
+                'profile_image': self.request.build_absolute_uri(
+                                    gen_user.student.character.profile_pic.url)
                                  if gen_user.student.character else None
             }
             user_info.update(student)
         if gen_user.is_teacher:
             teacher = {
-                'profile_image': gen_user.teacher.profile_image.url
+                'profile_image': self.request.build_absolute_uri(
+                                    gen_user.teacher.profile_image.url)
                                  if gen_user.teacher.profile_image else None
             }
             user_info.update(teacher)
