@@ -249,7 +249,7 @@ class LibrarySourcedBlock(
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.NOT_CONFIGURED,
-                    _("A library has not yet been selected."),
+                    _("A library has not been selected yet."),
                     action_class='edit-button',
                     action_label=_("Select a Library.")
                 )
