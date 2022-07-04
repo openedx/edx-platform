@@ -13,7 +13,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrarie
 
 class LibrarySourcedBlockTestCase(MixedSplitTestCase, ContentLibrariesRestApiTest):
     """
-    Tests for LibraryToolsService which interact with blockstore-based content libraries
+    Tests for LibraryToolsService which interact with content libraries
     """
     def setUp(self):
         super().setUp()
@@ -38,6 +38,9 @@ class LibrarySourcedBlockTestCase(MixedSplitTestCase, ContentLibrariesRestApiTes
         self.submit_url = f'/xblock/{self.source_block.scope_ids.usage_id}/handler/submit_studio_edits'
 
     def test_block_views(self):
+        """
+        Check that all stored source_block_id's are displayed in the student view.
+        """
         # Import the html blocks from the library to the course
         self.source_block.refresh_children()
         # Save children block_ids as source_block_ids
