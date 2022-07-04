@@ -3253,7 +3253,7 @@ INSTALLED_APPS = [
     'blockstore.apps.bundles',
 
     # MFE API
-    'lms.djangoapps.mfe_api',
+    'lms.djangoapps.mfe_config_api',
 ]
 
 ######################### CSRF #########################################
@@ -5143,7 +5143,7 @@ COURSE_LIVE_GLOBAL_CREDENTIALS = {}
 
 PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
 
-# .. toggle_name: ENABLE_MFE_API
+# .. toggle_name: ENABLE_MFE_CONFIG_API
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
 # .. toggle_description: Set to True to enable MFE Config REST API. This is disabled by
@@ -5153,10 +5153,10 @@ PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: None
-ENABLE_MFE_API = False
+ENABLE_MFE_CONFIG_API = False
 
-# .. setting_name: MFE_API_CONFIG_CACHE_TIMEOUT
+# .. setting_name: MFE_CONFIG_API_CACHE_TIMEOUT
 # .. setting_default: 60*5
 # .. setting_description: The MFE_CONFIG site configuration will be cached during the
 #   specified time
-MFE_API_CONFIG_CACHE_TIMEOUT = 60 * 5
+MFE_CONFIG_API_CACHE_TIMEOUT = 60 * 5

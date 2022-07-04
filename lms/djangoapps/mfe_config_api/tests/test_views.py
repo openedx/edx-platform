@@ -17,10 +17,10 @@ class MFEConfigTestCase(APITestCase):
     Test the use case that exposes the site configuration with the mfe api.
     """
     def setUp(self):
-        self.mfe_config_api_url = reverse("mfe_api:config")
+        self.mfe_config_api_url = reverse("mfe_config_api:config")
         return super().setUp()
 
-    @patch("lms.djangoapps.mfe_api.views.configuration_helpers")
+    @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
     def test_get_mfe_config(self, configuration_helpers_mock):
         """Test the get mfe config from site configuration with the mfe api.
 
@@ -37,7 +37,7 @@ class MFEConfigTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), {"EXAMPLE_VAR": "value"})
 
-    @patch("lms.djangoapps.mfe_api.views.configuration_helpers")
+    @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
     def test_get_mfe_config_with_queryparam(self, configuration_helpers_mock):
         """Test the get mfe config with a query param from site configuration.
 
@@ -56,7 +56,7 @@ class MFEConfigTestCase(APITestCase):
         configuration_helpers_mock.get_value.assert_has_calls(calls)
         self.assertEqual(response.json(), {"EXAMPLE_VAR": "mymfe_value", "OTHER": "other"})
 
-    @patch("lms.djangoapps.mfe_api.views.configuration_helpers")
+    @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
     @ddt.data(
         [{}, {}, {}],
         [{"EXAMPLE_VAR": "value"}, {}, {"EXAMPLE_VAR": "value"}],
@@ -93,8 +93,8 @@ class MFEConfigTestCase(APITestCase):
         configuration_helpers_mock.get_value.assert_has_calls(calls)
         self.assertEqual(response.json(), expected_response)
 
-    @patch("lms.djangoapps.mfe_api.views.configuration_helpers")
-    @override_settings(ENABLE_MFE_API=False)
+    @patch("lms.djangoapps.mfe_config_api.views.configuration_helpers")
+    @override_settings(ENABLE_MFE_CONFIG_API=False)
     def test_404_get_mfe_config(self, configuration_helpers_mock):
         """Test the 404 not found response from get mfe config.
 
