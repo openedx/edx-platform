@@ -36,7 +36,7 @@ from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_module import RawMixin
-from xmodule.util.sandboxing import get_python_lib_zip
+from xmodule.util.sandboxing import SandboxService
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
@@ -684,7 +684,9 @@ class ProblemBlock(
             anonymous_student_id=None,
             cache=None,
             can_execute_unsafe_code=lambda: None,
-            get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, self.runtime.course_id)),
+            get_python_lib_zip=(
+                lambda: SandboxService(contentstore, self.scope_ids.usage_id.context_key).get_python_lib_zip()
+            ),
             DEBUG=None,
             i18n=self.runtime.service(self, "i18n"),
             render_template=None,
