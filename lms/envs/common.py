@@ -4711,6 +4711,12 @@ SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/h'
 EDX_BRAZE_API_KEY = None
 EDX_BRAZE_API_SERVER = None
 
+### SETTINGS FOR AMPLITUDE ####
+AMPLITUDE_URL = 'https://profile-api.amplitude.com/v1/userprofile'
+AMPLITUDE_API_KEY = ''
+REC_ID = ''
+GENERAL_RECOMMENDATION = {}
+
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
 # .. setting_default: retired__user_

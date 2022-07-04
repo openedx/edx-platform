@@ -18,7 +18,6 @@ from openedx.core.djangoapps.programs.utils import (
 )
 from openedx.core.djangoapps.catalog.utils import get_course_data
 from lms.djangoapps.learner_dashboard.api.utils import get_personalized_course_recommendations
-from lms.djangoapps.learner_dashboard.api.v0.constant import GENERAL_RECOMMENDATION
 
 
 class Programs(APIView):
@@ -369,7 +368,7 @@ class CourseRecommendationApiView(APIView):
         )
 
         if is_control:
-            return Response(GENERAL_RECOMMENDATION, status=200)
+            return Response(status=400)
         recommended_courses = []
         for course_id in course_keys:
             course_data = get_course_data(course_id)
@@ -380,4 +379,6 @@ class CourseRecommendationApiView(APIView):
                     'logo_image_url': course_data['owners'][0]['logo_image_url'],
                     'marketing_url': course_data['course_runs'][0]['marketing_url']
                 })
+            else:
+                return Response(status=400)
         return Response({'courses': recommended_courses, 'is_personalized_recommendation': not is_control}, status=200)
