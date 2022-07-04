@@ -35,9 +35,6 @@ def with_site_configuration(domain="test.localhost", configuration=None):
                 site_configuration.site_values = configuration
                 site_configuration.save()
 
-            # TODO: RED-2828 remove this line after ENABLE_CONFIG_VALUES_MODIFIER is enabled on prod
-            site_configuration.save()
-
             with patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration',
                        return_value=site_configuration):
                 with patch('openedx.core.djangoapps.theming.helpers.get_current_site', return_value=site):
@@ -64,9 +61,6 @@ def with_site_configuration_context(domain="test.localhost", configuration=None)
     if not created:
         site_configuration.site_values = configuration
         site_configuration.save()
-
-    # TODO: RED-2828 remove this line after ENABLE_CONFIG_VALUES_MODIFIER is enabled on prod
-    site_configuration.save()
 
     with patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration',
                return_value=site_configuration):

@@ -7,8 +7,6 @@ from logging import getLogger
 
 from django.conf import settings
 
-from openedx.core.djangoapps.appsembler.sites.waffle import ENABLE_CONFIG_VALUES_MODIFIER
-
 log = getLogger(__name__)
 
 
@@ -104,5 +102,4 @@ class TahoeConfigurationValueModifier:
 
 
 def init_configuration_modifier_for_site_config(sender, instance, **kwargs):
-    if ENABLE_CONFIG_VALUES_MODIFIER.is_enabled():
-        instance.tahoe_config_modifier = TahoeConfigurationValueModifier(site_config_instance=instance)
+    instance.tahoe_config_modifier = TahoeConfigurationValueModifier(site_config_instance=instance)

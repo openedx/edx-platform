@@ -6,7 +6,6 @@ from django.contrib.sites.models import Site
 from unittest.mock import Mock
 
 from openedx.core.djangoapps.appsembler.sites.config_values_modifier import TahoeConfigurationValueModifier
-from openedx.core.djangoapps.appsembler.sites.waffle import ENABLE_CONFIG_VALUES_MODIFIER
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
@@ -15,22 +14,11 @@ def test_site_config_init_signal_with_modifier_flag():
     """
     Ensure SiteConfiguration gets a TahoeConfigurationValueModifier instance after initialization.
     """
-    with ENABLE_CONFIG_VALUES_MODIFIER.override(True):
-        site_config = SiteConfiguration()
+    site_config = SiteConfiguration()
     assert site_config.tahoe_config_modifier, (
         'The `init_configuration_modifier_for_site_config` function should be '
         'connected correctly to SiteConfiguration\'s `post_init`'
     )
-
-
-@pytest.mark.django_db
-def test_site_config_init_signal_without_modifier_flag():
-    """
-    Ensure SiteConfiguration shouldn't get a TahoeConfigurationValueModifier if the waffle flag is disabled.
-    """
-    with ENABLE_CONFIG_VALUES_MODIFIER.override(False):
-        site_config = SiteConfiguration()
-    assert not site_config.tahoe_config_modifier, 'ENABLE_CONFIG_VALUES_MODIFIER is disabled, do not init the modifier'
 
 
 def test_values_normalization():
@@ -74,9 +62,8 @@ def test_modifier_urls(settings, config_name, expected_value, message):
 
 @pytest.mark.django_db
 def test_css_override_file_with_port_number():
-    with ENABLE_CONFIG_VALUES_MODIFIER.override(True):
-        site_config = SiteConfiguration()
-        site_config.site = Site(domain='test.localhost:18000')
+    site_config = SiteConfiguration()
+    site_config.site = Site(domain='test.localhost:18000')
     modifier = site_config.tahoe_config_modifier
     assert modifier.get_css_overrides_file() == 'test.localhost.css', 'Should not include port number in css file name'
 
