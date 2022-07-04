@@ -171,16 +171,16 @@ class RemoveSiteCommandTestCase(TestCase):
         call_command('create_devstack_site', self.to_be_deleted, 'localhost')
         call_command('create_devstack_site', self.shall_remain, 'localhost')
 
-    def test_create_devstack_site(self):
+    def test_remove_devstack_site_commit(self):
         """
-        Test that `create_devstack_site` and creates the required objects.
+        Test that `remove_site` and removes the site _with_ commit.
         """
-        call_command('remove_site', '{}.localhost:18000'.format(self.to_be_deleted))
-
-        # Ensure objects are removed correctly.
         deleted_domain = '{}.localhost:18000'.format(self.to_be_deleted)
         remained_domain = '{}.localhost:18000'.format(self.shall_remain)
 
+        call_command('remove_site', deleted_domain, commit=True)
+
+        # Ensure objects are removed correctly.
         assert not Site.objects.filter(domain=deleted_domain).exists()
         site = Site.objects.get(domain=remained_domain)
 
@@ -188,6 +188,14 @@ class RemoveSiteCommandTestCase(TestCase):
         assert SiteConfiguration.objects.get(site=site)
 
         assert SiteTheme.objects.filter(site=site).count() == site.themes.count()
+
+    def test_remove_devstack_site_rollback(self):
+        """
+        Test that `remove_site` do not remove the site _without_ committing.
+        """
+        deleted_domain = '{}.localhost:18000'.format(self.to_be_deleted)
+        call_command('remove_site', deleted_domain)
+        assert Site.objects.filter(domain=deleted_domain).exists()
 
 
 class TestOffboardSiteCommand(ModuleStoreTestCase):

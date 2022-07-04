@@ -3,10 +3,13 @@ A big module for Tahoe Sites multi-tenancy helpers.
 
 A lot of this module should be migrated into more specific modules such as `tahoe-sites`.
 """
+import tahoe_sites.api
+from django.apps import apps
 
 from datetime import timedelta
 
 import beeline
+from opaque_keys.edx.django.models import CourseKeyField
 
 from urllib.parse import urlparse
 
@@ -20,7 +23,7 @@ from django.core.files.storage import get_storage_class
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, FieldError
 
 from oauth2_provider.models import AccessToken, RefreshToken, Application
 from oauth2_provider.generators import generate_client_id
@@ -29,9 +32,10 @@ from django.utils.text import slugify
 
 from organizations import api as org_api
 from organizations import models as org_models
-from organizations.models import UserOrganizationMapping, Organization
+from organizations.models import UserOrganizationMapping, Organization, OrganizationCourse
 from tahoe_sites.api import create_tahoe_site_by_link
 
+from common.djangoapps.util.organizations_helpers import get_organization_courses
 from openedx.core.lib.api.api_key_permissions import is_request_has_valid_api_key
 from openedx.core.lib.log_utils import audit_log
 from openedx.core.djangoapps.theming.helpers import get_current_request, get_current_site
@@ -39,6 +43,7 @@ from openedx.core.djangoapps.theming.models import SiteTheme
 
 from ..tahoe_tiers.legacy_amc_helpers import get_active_tiers_uuids_from_amc_postgres
 from .site_config_client_helpers import get_active_site_uuids_from_site_config_service
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 
 @beeline.traced(name="get_lms_link_from_course_key")
@@ -479,11 +484,67 @@ def bootstrap_site(site, org_data=None, username=None):
     return organization, site, user
 
 
+def get_models_using_course_key():
+    course_key_field_names = {
+        'course_key',
+        'course_id',
+    }
+
+    models_with_course_key = {
+        (CourseOverview, 'id'),  # The CourseKeyField with a `id` name. Hard-coding it for simplicity.
+        (OrganizationCourse, 'course_id'),  # course_id is CharField
+    }
+
+    model_classes = apps.get_models()
+    for model_class in model_classes:
+        for field_name in course_key_field_names:
+            field_object = getattr(model_class, field_name, None)
+            if field_object:
+                field_definition = getattr(field_object, 'field', None)
+                if field_definition and isinstance(field_definition, CourseKeyField):
+                    models_with_course_key.add(
+                        (model_class, field_name,)
+                    )
+
+    return models_with_course_key
+
+
+def delete_organization_courses(organization):
+    course_keys = []
+
+    for course in get_organization_courses({'id': organization.id}):
+        course_keys.append(course['course_id'])
+
+    for model_class, field_name in get_models_using_course_key():
+        print('Deleting models of', model_class.__name__, 'with field', field_name)
+        objects_to_delete = model_class.objects.filter(**{
+            '{field_name}__in'.format(field_name=field_name): course_keys,
+        })
+        objects_to_delete.delete()
+
+
 @beeline.traced(name="delete_site")
 def delete_site(site):
+    print('Deleting SiteConfiguration of', site)
     site.configuration.delete()
+
+    print('Deleting theme of', site)
     site.themes.all().delete()
 
+    organization = tahoe_sites.api.get_organization_by_site(site)
+
+    users = tahoe_sites.api.get_users_of_organization(organization)
+
+    print('Deleting users of', site)
+    users.delete()
+
+    print('Deleting courses of', site)
+    delete_organization_courses(organization)
+
+    print('Deleting organization', organization)
+    organization.delete()
+
+    print('Deleting site', site)
     site.delete()
 
 

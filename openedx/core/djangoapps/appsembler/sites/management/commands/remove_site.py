@@ -18,10 +18,16 @@ class Command(BaseCommand):
             help='The domain of the organization to be deleted.',
             type=str,
         )
+        parser.add_argument(
+            '--commit',
+            default=False,
+            dest='commit',
+            help='Fully delete the site, otherwise the transaction will be rolled back.',
+            action='store_true',
+        )
 
     def handle(self, *args, **options):
         organization_domain = options['domain']
-        self.stdout.write(self.style.WARNING('Same command must be ran on the connected AMC instance'))
 
         self.stdout.write('Removing "%s" in progress...' % organization_domain)
         organization = self._get_site(organization_domain)
@@ -29,7 +35,15 @@ class Command(BaseCommand):
         with transaction.atomic():
             delete_site(organization)
 
-        self.stdout.write(self.style.SUCCESS('Successfully removed site "%s"' % organization_domain))
+            if not options['commit']:
+                transaction.set_rollback(True)
+
+        self.stdout.write(self.style.SUCCESS(
+            '{message} removed site "{domain}"'.format(
+                message='Successfully' if options['commit'] else 'Dry run',
+                domain=organization_domain,
+            )
+        ))
 
     def _get_site(self, domain):
         """

@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 from django.core.validators import validate_slug, ValidationError
 from django.conf import settings
+from django.db import transaction
 
 from openedx.core.djangoapps.appsembler.sites.serializers import RegistrationSerializer
 from openedx.core.djangoapps.appsembler.sites.utils import reset_amc_tokens
@@ -62,6 +63,10 @@ class Command(BaseCommand):
         ))
 
     def handle(self, *args, **options):
+        with transaction.atomic():
+            self._handle_with_atmoic(*args, **options)
+
+    def _handle_with_atmoic(self, *args, **options):
         if not settings.DEBUG:
             raise CommandError('This only works on devstack.')
 
