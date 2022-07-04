@@ -1424,7 +1424,6 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         self.initialize_block(data=sample_xml)
         self.video = self.item_descriptor
         self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
-        self.video.runtime.course_id = MagicMock()
 
     def setup_val_video(self, associate_course_in_val=False):
         """
@@ -1527,7 +1526,6 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         self.initialize_block(data=sample_xml)
         self.video = self.item_descriptor
         self.video.runtime.handler_url = Mock(return_value=self.transcript_url)
-        self.video.runtime.course_id = MagicMock()
         result = self.get_result()
         self.verify_result_with_youtube_url(result)
 
@@ -1595,7 +1593,6 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
     def setUp(self):
         super().setUp()
         self.descriptor.runtime.handler_url = MagicMock()
-        self.descriptor.runtime.course_id = MagicMock()
         self.temp_dir = mkdtemp()
         file_system = OSFS(self.temp_dir)
         self.file_system = file_system.makedir(EXPORT_IMPORT_COURSE_DIR, recreate=True)
