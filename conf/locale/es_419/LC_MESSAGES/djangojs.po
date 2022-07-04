@@ -46,7 +46,7 @@
 # Nuri Plans Toral <nplans@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # palichis <palichis@solid-ec.org>, 2015
-# Sarina Canelake <sarina@edx.org>, 2015
+# Sarina Canelake <sarina@tcril.org>, 2015
 # Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2016
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
@@ -62,6 +62,7 @@
 # Anatoli Pena <djanatoli@gmail.com>, 2016
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # Antonio Pardo <apardo@alabs.org>, 2013
+# Carolina De Mares <carolina.demares@edunext.co>, 2021
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2016
 # Diego Rojas <diego.rojas@edunext.co>, 2017
@@ -88,6 +89,7 @@
 # palichis <palichis@solid-ec.org>, 2015
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
 # Yovany Alexander Álvarez Correa <yalvarez@innovapues.com>, 2018
+# Zimeng Chen, 2021
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/).
 # Copyright (C) 2021 EdX
@@ -149,6 +151,7 @@
 # Anatoli Pena <djanatoli@gmail.com>, 2016
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # Carla Duarte <cduarte@edx.org>, 2021
+# Carolina De Mares <carolina.demares@edunext.co>, 2021
 # Morphyne <cirrosis60@gmail.com>, 2014
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
@@ -171,9 +174,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-21 17:10+0000\n"
-"PO-Revision-Date: 2021-09-15 17:16+0000\n"
-"Last-Translator: Carla Duarte <cduarte@edx.org>\n"
+"POT-Creation-Date: 2021-12-19 20:42+0000\n"
+"PO-Revision-Date: 2021-11-12 16:08+0000\n"
+"Last-Translator: Carolina De Mares <carolina.demares@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -5082,8 +5085,8 @@ msgstr ""
 "redes sociales{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
-msgstr "Antes de continuar, por favor {htmlStart} active su cuenta {htmlEnd}."
+msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
+msgstr " Antes de proceder, por favor {htmlStart}{emailMsg}{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -6006,7 +6009,7 @@ msgstr "certificado"
 
 #: cms/static/js/certificates/views/certificate_preview.js
 msgid "Deactivating"
-msgstr ""
+msgstr "Desactivando"
 
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
@@ -6020,7 +6023,7 @@ msgstr "Todavía no ha creado ningún certificado."
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
-msgstr ""
+msgstr "¿Deseas eliminar \"<%- signatoryName %>\" de la lista de signatarios?"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
@@ -6289,12 +6292,16 @@ msgstr ""
 #: cms/static/js/models/settings/course_details.js
 msgid "The certificate display behavior must be one of: {behavior_options}"
 msgstr ""
+"El comportamiento de visualización del certificado debe ser uno de los "
+"siguientes: {behavior_options}"
 
 #: cms/static/js/models/settings/course_details.js
 msgid ""
 "The certificates display behavior must be {valid_option} if certificate "
 "available date is set."
 msgstr ""
+"El comportamiento de visualización del certificado debe ser {valid_option} "
+"si se establece la fecha de disponibilidad del certificado."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
@@ -6327,6 +6334,7 @@ msgstr "Por favor ingrese un número entero no negativo."
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <%- types %> assignments than are assigned."
 msgstr ""
+"No se pueden eliminar más asignaciones de <%- types %> de las asignadas."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -6486,7 +6494,7 @@ msgstr "Añadiendo"
 
 #: cms/static/js/views/container.js
 msgid "{startTag}{requestToken}{endTag}{selector}"
-msgstr ""
+msgstr "{startTag}{requestToken}{endTag}{selector}"
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
@@ -6813,7 +6821,7 @@ msgstr "Destacados por {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable Course Highlight Emails"
-msgstr ""
+msgstr "Habilitar correos electrónicos destacados del curso "
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable"
@@ -6856,6 +6864,8 @@ msgstr "Componente"
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Studio's having trouble parsing the problem component's content"
 msgstr ""
+"Studio esta presentando problemas para analizar el contenido del componente "
+"problema"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move"
@@ -7164,12 +7174,16 @@ msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than <%- limit %> characters."
 msgstr ""
+"La duración combinada de los campos de organización, número de curso y "
+"ejecución del curso no puede ser superior a <%- limit %> carácteres."
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
 "more than <%- limit %> characters."
 msgstr ""
+"La duración combinada de los campos de organización y código de librería no "
+"puede ser superior  a <%- limit %> carácteres."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -10355,7 +10369,7 @@ msgstr "Copiar la ubicación del Componente"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Course Highlight Emails"
-msgstr ""
+msgstr "Correos destacados del curso"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Enabled"
@@ -11153,29 +11167,36 @@ msgstr "Borrar la fecha y hora de liberación"
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid "Due in:"
-msgstr ""
+msgstr "Vence en: "
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid "weeks from learner enrollment date"
-msgstr ""
+msgstr "Semanas para la fecha de inscripción del estudiante "
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
 "If a learner starts on {startDate}, this subsection will be due on "
 "{projectedDueIn}."
 msgstr ""
+"Si un estudiante empieza en {startDate}, esta subsección será vencida en "
+"{projectedDueIn}."
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
 "The maximum number of weeks this subsection can be due in is 18 weeks from "
 "the learner enrollment date."
 msgstr ""
+"El número máximo de semanas para esta subsección puede tener fecha de "
+"vencimiento en 18 semanas a partir de la fecha de inscripción del "
+"estudiante."
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
 "The minimum number of weeks this subsection can be due in is 1 week from the"
 " learner enrollment date."
 msgstr ""
+"El mínimo número de semanas para esta subsección puede tener vencimiento en "
+"1 semana a partir de la fecha de inscripción del estudiante."
 
 #: cms/templates/js/show-correctness-editor.underscore
 msgid "Assessment Results Visibility"
@@ -11398,6 +11419,10 @@ msgid ""
 " back to a basic exam. You may not configure it as a special exam now. "
 "Contact edX Support for assistance."
 msgstr ""
+"Esta subsección fue lanzada para los estudiantes como un examen especial, "
+"pero fue revertida a un examen básico. Ahora no puede configurarlo como un "
+"examen especial. Ponte en contacto con el servicio de asistencia de edX para"
+" obtener ayuda."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
@@ -11406,6 +11431,11 @@ msgid ""
 " basic exam by selecting 'None', but you will NOT be able to configure it as"
 " a special exam in the future."
 msgstr ""
+"Este examen especial ha sido lanzado a los estudiantes. Ahora no puede "
+"configurarlo como otro tipo de examen especial. Puedes revertir esta "
+"subsección para que vuelva a hacer un examen básico seleccionado la opción "
+"''Ninguno'', pero NO podrás configurar nuevamente este examen como especial "
+"en el futuro. "
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
@@ -11431,11 +11461,14 @@ msgstr "Supervisado"
 msgid ""
 "Proctored exams are timed and they record video of each learner taking the "
 "exam. The videos are then reviewed to ensure that learners follow all "
-"examination rules."
+"examination rules. Please note that setting this exam as proctored will "
+"change the visibility settings to \"Hide content after due date.\""
 msgstr ""
-"Los exámenes supervisados son cronometrados y un software graba a cada "
-"estudiante que toma el examen. Los videos luego son revisados para "
-"garantizar que el estudiante cumplió con todas las reglas del examen."
+"Los exámenes supervisados son cronometrados y se graba en vídeo a cada "
+"estudiante que realiza el examen. Los vídeos se revisan para garantizar que "
+"los estudiantes siguen todas las reglas del examen. Tenga en cuenta que al "
+"configurar este examen como supervisado cambiará la configuración de "
+"visibilidad a \"Ocultar contenido después de la fecha de vencimiento\"."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"

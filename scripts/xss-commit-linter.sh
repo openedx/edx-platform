@@ -48,7 +48,7 @@ for i in "$@"; do
             shift # past argument=value
             ;;
         -v|--verbose)
-            VERBOSE=true
+            show_verbose
             ;;
         -h|--help|*)
             # help or unknown option
@@ -85,9 +85,6 @@ if [ "$diff_files" = "" ]; then
     echo ""
     echo "No files linted."
 else
-    if [ ${VERBOSE} ] ; then
-        show_verbose
-    fi
     for f in $diff_files; do
         echo ""
         echo "Linting $f:"

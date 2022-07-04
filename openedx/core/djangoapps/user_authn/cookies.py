@@ -2,7 +2,6 @@
 Utility functions for setting "logged in" cookies used by subdomains.
 """
 
-
 import json
 import logging
 import time

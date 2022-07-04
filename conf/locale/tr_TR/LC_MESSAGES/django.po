@@ -125,15 +125,15 @@
 # EdX Team <info@edx.org>, 2021.
 #
 # Translators:
-# Ali Işıngör <ali@artistanbul.io>, 2019
+# Ali Işıngör <ali@artistanbul.io>, 2021
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-21 17:10+0000\n"
+"POT-Creation-Date: 2021-12-26 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
-"Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
+"Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
@@ -154,6 +154,11 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Tartışma"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Text"
+msgstr "Metin"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -402,9 +407,12 @@ msgstr ""
 msgid "{currency_symbol}{price}"
 msgstr "{currency_symbol}{price}"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+#: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "Ücretsiz"
 
@@ -822,34 +830,32 @@ msgstr "Beklenmedik hesap durumu"
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
-"{html_start}Your account could not be activated{html_end}Something went "
-"wrong, please <a href=\"{support_url}\">contact support</a> to resolve this "
-"issue."
+"{html_start}Your {account_or_email} could not be "
+"{activated_or_confirmed}{html_end}Something went wrong, please <a "
+"href=\"{support_url}\">contact support</a> to resolve this issue."
 msgstr ""
-"{html_start}Hesabınız etkinleştirilemedi.{html_end}Bir şeyler yanlış gitti, "
-"lütfen  <a href=\"{support_url}\">destek ekibiyle iletişime geçerek</a> "
-"sorunu bildirin."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid "{html_start}This account has already been activated.{html_end}"
-msgstr "{html_start}Bu hesap daha önceden etkinleştirilmişti.{html_end}"
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid "{html_start}Success{html_end} You have activated your account."
-msgstr "{html_start}Kutlarız!{html_end} Hesabınızı etkinleştirdiniz."
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
-"{html_start}Success! You have activated your account.{html_end}You will now "
-"receive email updates and alerts from us related to the courses you are "
-"enrolled in. Sign In to continue."
+"{html_start}This {account_or_email} has already been "
+"{activated_or_confirmed}.{html_end}"
 msgstr ""
-"{html_start}Kutlarız! Hesabınızı etkinleştirdiniz.{html_end} Bundan sonra "
-"kayıt olduğunuz derslerle ilgili duyuru ve güncellemeler e-posta kutunuza "
-"düşmeye başlayacak. Devam etmek için lütfen giriş yapın."
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid ""
+"{html_start}Success{html_end} You have {activated_or_confirmed} your "
+"{account_or_email}."
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid ""
+"{html_start}Success! You have {activated_or_confirmed} your "
+"{account_or_email}.{html_end}You will now receive email updates and alerts "
+"from us related to the courses you are enrolled in. Sign In to continue."
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
@@ -2061,6 +2067,19 @@ msgstr "Personelin cevabı bir sayı olarak algılanamadı."
 msgid "Could not interpret '{given_answer}' as a number."
 msgstr "'{given_answer}' bir sayı olarak algılanamadı."
 
+#: common/lib/capa/capa/safe_exec/remote_exec.py
+msgid ""
+"Codejail API Service is unavailable. Please try again in a few minutes."
+msgstr ""
+
+#: common/lib/capa/capa/safe_exec/remote_exec.py
+msgid "Codejail API Service invalid response."
+msgstr ""
+
+#: common/lib/capa/capa/safe_exec/remote_exec.py
+msgid "Invalid JSON response received from codejail api service."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "XML data for the annotation"
 msgstr "Bilgi notu için XML verisi"
@@ -2813,6 +2832,14 @@ msgstr ""
 "False ise, oluşturma zamanı üzerinden kronolojik olarak sıralanır."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussions Plugin Settings"
+msgstr "Tartışmalar Eklenti Ayarları "
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Settings for discussions plugins."
+msgstr "Tartışmalar eklentileri için ayarlar."
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Announcement Date"
 msgstr "Dersin İlan Tarihi"
 
@@ -3396,7 +3423,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Proctored Exams"
-msgstr "Gözetmenli Sınavları Etkinleştir"
+msgstr "Gözetimli Sınavları Etkinleştir"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3405,12 +3432,12 @@ msgid ""
 "exams."
 msgstr ""
 "True ya da False değerleriyle işaretleyin. Bu değer True olarak "
-"ayarlanmışsa, dersinizde gözetmenli sınavlar etkindir. Gözetmenli sınavları "
+"ayarlanmışsa, dersinizde gözetimli sınavlar etkindir. Gözetimli sınavları "
 "etkinleştirmenin süreli sınavları da etkin hale getireceğini unutmayın."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Proctoring Provider"
-msgstr "Gözetmen Sağlayıcısı"
+msgstr "Gözetim Hizmet Sağlayıcısı"
 
 #: common/lib/xmodule/xmodule/course_module.py
 #, python-brace-format
@@ -3418,7 +3445,7 @@ msgid ""
 "Enter the proctoring provider you want to use for this course run. Choose "
 "from the following options: {available_providers}."
 msgstr ""
-"Bu ders yayınında kullanmayı istediğiniz gözetmen sağlayıcısını girin. "
+"Bu ders yayınında kullanmayı istediğiniz gözetim sağlayıcısını girin. "
 "Aşağıdakilerden birini seçebilirsiniz: {available_providers}."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3431,13 +3458,13 @@ msgid ""
 " email address to be contacted by the support team whenever there are "
 "escalations (e.g. appeals, delayed reviews, etc.)."
 msgstr ""
-"Gözetmen sağlayıcısı olarak 'proctortrack' seçiliyse gereklidir. Sorun "
+"Gözetim sağlayıcısı olarak 'proctortrack' seçiliyse gereklidir. Sorun "
 "(itiraz, gecikmiş değerlendirme vs.) iletiminin gerektiği durumlarda "
 "kullanılacak destek ekibi iletişim e-posta adresini girin."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Opting Out of Proctored Exams"
-msgstr "Gözetmenli Sınava Katılmamaya İzin Ver"
+msgstr "Gözetimli Sınavlara Katılmamaya İzin Ver"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3447,14 +3474,13 @@ msgid ""
 "exams are enabled for the course."
 msgstr ""
 "True ya da False değerleriyle işaretleyin. Değer True olarak girilmişse, "
-"öğrenciler gözetim olmaksızın gözetmenli sınavı alabilecekler. Değer False "
-"olarak girilmişse, tüm öğrenciler sınavı gözetmenli olarak almak zorundadır."
-" Bu ayar ders için gözetmenli sınavlar etkinleştirilmişse uygulanacaktır."
+"öğrenciler gözetim olmaksızın gözetimli sınavı alabilecekler. Değer False "
+"olarak girilmişse, tüm öğrenciler sınavı gözetimli olarak almak zorundadır. "
+"Bu ayar ders için gözetimli sınavlar etkinleştirilmişse uygulanacaktır."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
-msgstr ""
-"Şüpheli Gözetmenli Sınav Girişimleri için Zendesk Bildirimleri Oluştur"
+msgstr "Şüpheli Gözetimli Sınav Girişimleri için Zendesk Bildirimleri Oluştur"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3476,8 +3502,8 @@ msgid ""
 msgstr ""
 "True ya da False değerleriyle işaretleyin. Eğer bu değer True olarak "
 "girilmişse, dersinizde süreli sınavlar etkinleştirilecek. Süreli sınavları "
-"etkinleştirmek için Gözetmenli Sınavları Etkinleştir seçeneği değeri de True"
-" olmalı."
+"etkinleştirmek için Gözetimli Sınavları Etkinleştir seçeneği değeri de True "
+"olmalı."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
@@ -3587,6 +3613,26 @@ msgstr ""
 "tüm renkli vurgulamalar öğrencilere planlanan zaman diliminde ileti olarak "
 "gönderilecek."
 
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course-wide Custom JS"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter Javascript resource URLs you want to be loaded globally throughout the"
+" course pages."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course-wide Custom CSS"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter CSS resource URLs you want to be loaded globally throughout the course"
+" pages."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/course_module.py cms/templates/certificates.html
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
@@ -3650,10 +3696,6 @@ msgid ""
 msgstr ""
 "HATA: \"{block_type}\" bilinmeyen bir bileşen türü. Bu bileşen LMS'de "
 "gizlenecek."
-
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "Text"
-msgstr "Metin"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Html contents to display for this module"
@@ -4413,11 +4455,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Is Proctoring Enabled"
-msgstr "Gözetmenlik Etkin Mi"
+msgstr "Gözetim Etkinleştirilmiş Mi"
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "This setting indicates whether this exam is a proctored exam."
-msgstr "Bu ayar bu sınavın gözetmenli sınav olup olmadığını gösterir."
+msgstr "Bu ayar bu sınavın gözetimli sınav olup olmadığını gösterir."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Software Secure Review Rules"
@@ -4428,8 +4470,8 @@ msgid ""
 "This setting indicates what rules the proctoring team should follow when "
 "viewing the videos."
 msgstr ""
-"Bu ayar gözetmen ekibi videoları izlerken hangi kuralları izleyeceğine "
-"işaret eder."
+"Bu ayar gözetim ekibi videoları izlerken hangi kuralları izleyeceğine işaret"
+" eder."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Is Practice Exam"
@@ -4614,6 +4656,14 @@ msgstr "Kaydet ve İçe Aktar"
 #: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "İptal"
+
+#: common/lib/xmodule/xmodule/vertical_block.py
+msgid "Enable in-context discussions for the Unit"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/vertical_block.py
+msgid "Add discussion for the Unit."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 #, python-brace-format
@@ -5054,7 +5104,6 @@ msgid "Account activation"
 msgstr "Hesap etkinleştirme"
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
-#: common/templates/student/edx_ace/accountactivation/email/body.txt
 #, python-format
 msgid ""
 "You're almost there! Use the link below to activate your account to access "
@@ -5098,6 +5147,14 @@ msgstr ""
 "Bu ileti %(lms_url)s tarafından otomatik olarak gönderildi çünkü birileri bu"
 " e-posta adresini kullanarak %(platform_name)s platformunda hesap "
 "oluşturmayı denedi."
+
+#: common/templates/student/edx_ace/accountactivation/email/body.txt
+#, python-format
+msgid ""
+"You’re almost there! Use the link below to activate your account to access "
+"engaging, high-quality %(platform_name)s courses. Note that you will not be "
+"able to log back into your account until you have activated it."
+msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
 #, python-format
@@ -5251,7 +5308,7 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"                    %(course_name)s dersi için gözetmen gereklilikleri\n"
+"                    %(course_name)s dersi için gözetim gereklilikleri\n"
 "                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
@@ -5273,7 +5330,7 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"                     %(platform_name)s platformunda %(course_name)s derslerine kaydoldunuz. Bu ders gözetmenli sınavlar içerir.\n"
+"                     %(platform_name)s platformunda %(course_name)s derslerine kaydoldunuz. Bu ders gözetimli sınavlar içerir.\n"
 "                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
@@ -5284,7 +5341,7 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"                    Gözetmenli sınavlar, gözetmenlik yazılımının bilgisayarınızın masaüstünü, web kamerası videosunu ve sesini izlerken girdiğiniz süreli sınavlardır. Dersiniz %(proctoring_provider)s gözetmen yazılımını kullanıyor.\n"
+"                    Gözetimli sınavlar, gözetim yazılımının bilgisayarınızın masaüstünü, web kamerası videosunu ve sesini izlerken girdiğiniz süreli sınavlardır. Dersiniz %(proctoring_provider)s gözetim yazılımını kullanıyor.\n"
 "                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
@@ -5294,7 +5351,7 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"                    Hazır olduğunuzdan emin olmak için sistem gereksinimlerini ve gözetmenli bir sınava girme adımlarını dikkatlice inceleyin.\n"
+"                    Hazır olduğunuzdan emin olmak için sistem gereksinimlerini ve gözetimli bir sınava girme adımlarını dikkatlice inceleyin.\n"
 "                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
@@ -5304,18 +5361,15 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"                Gözetmen Yönergeleri ve Gereklilikler\n"
+"                Gözetim Yönergeleri ve Gereklilikler\n"
 "            "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 msgid ""
 "\n"
-"                    Before taking a graded proctored exam, you must have approved ID verification photos. \n"
+"                    Before taking a graded proctored exam, you must have approved ID verification photos.\n"
 "                "
 msgstr ""
-"\n"
-"                    Notlandırılmış bir gözetmenli sınava girmeden önce, doğrulanmış kimlik fotoğraflarınız olmalıdır. \n"
-"                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 msgid ""
@@ -5361,7 +5415,7 @@ msgid ""
 "contains proctored exams."
 msgstr ""
 "%(platform_name)s platformunda %(course_name)s derslerine kaydoldunuz. Bu "
-"ders gözetmenli sınavlar içerir."
+"ders gözetimli sınavlar içerir."
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
 #, python-format
@@ -5370,17 +5424,17 @@ msgid ""
 "monitors your computer's desktop, webcam video, and audio. Your course uses "
 "%(proctoring_provider)s software for proctoring."
 msgstr ""
-"Gözetmenli sınavlar, gözetmenlik yazılımının bilgisayarınızın masaüstünü, "
-"web kamerası videosunu ve sesini izlerken girdiğiniz süreli sınavlardır.  "
-"Dersiniz %(proctoring_provider)s gözetmen yazılımını kullanıyor."
+"Gözetimli sınavlar, gözetim yazılımının bilgisayarınızın masaüstünü, web "
+"kamerası videosunu ve sesini izlerken girdiğiniz süreli sınavlardır. "
+"Dersiniz %(proctoring_provider)s gözetim yazılımını kullanıyor."
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
 msgid ""
 "Carefully review the system requirements as well as the steps to take a "
 "proctored exam in order to ensure that you are prepared."
 msgstr ""
-"Hazır olduğunuzdan emin olmak için sistem gereksinimlerini ve gözetmenli bir"
-" sınava girme adımlarını dikkatlice inceleyin.         "
+"Hazır olduğunuzdan emin olmak için sistem gereksinimlerini ve gözetimli bir "
+"sınava girme adımlarını dikkatlice inceleyin.         "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
 #, python-format
@@ -5388,7 +5442,7 @@ msgid ""
 "To view proctoring instructions and requirements, please visit: "
 "%(proctoring_requirements_url)s"
 msgstr ""
-"Gözetmen yönerge ve gerekliliklerini görmek için, "
+"Gözetim yönerge ve gerekliliklerini görmek için, "
 "lütfen%(proctoring_requirements_url)s adresini ziyaret edin"
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
@@ -5398,7 +5452,7 @@ msgid ""
 "verification photos. You can submit ID verification photos here: "
 "%(id_verification_url)s"
 msgstr ""
-"Notlandırılmış bir gözetmenli sınava girmeden önce, doğrulanmış kimlik "
+"Notlandırılmış bir gözetimli sınava girmeden önce, doğrulanmış kimlik "
 "fotoğraflarınız olmalıdır. Kimlik doğrulama fotoğraflarınızı buraya "
 "gönderebilirsiniz: %(id_verification_url)s"
 
@@ -5413,7 +5467,7 @@ msgstr ""
 #: common/templates/student/edx_ace/proctoringrequirements/email/subject.txt
 #, python-format
 msgid "Proctoring requirements for %(course_name)s"
-msgstr "%(course_name)s eğitimi için gözetmen gereklilikleri"
+msgstr "%(course_name)s eğitimi için gözetim gereklilikleri"
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 msgid "Create Recovery Email"
@@ -6208,6 +6262,81 @@ msgstr "Dersi keşfet"
 msgid "Not sure yet"
 msgstr "Emin değilim"
 
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                            There’s still time to reach your goal\n"
+"                        "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+#, python-format, python-brace-format
+msgid ""
+"\n"
+"                            You set a goal of learning {start_bold}%(days_per_week)s time a week in %(course_name)s{end_bold}. You’re not quite there, but there's still time to reach that goal!\n"
+"                            "
+msgid_plural ""
+"\n"
+"                            You set a goal of learning {start_bold}%(days_per_week)s times a week in %(course_name)s{end_bold}. You're not quite there, but there's still time to reach that goal!\n"
+"                        "
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                                Jump back in\n"
+"                            "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                            Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
+"                        "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                            Adjust my goal\n"
+"                        "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
+msgid ""
+"\n"
+"                            Unsubscribe from goal reminder emails for this course\n"
+"                        "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+msgid "You're almost there!"
+msgstr "Neredeyse bitirdiniz!"
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+msgid "There's still time to reach your goal"
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+#, python-format
+msgid ""
+"You set a goal of learning %(days_per_week)s times a week in "
+"%(course_name)s. You're not quite there, but there's still time to reach "
+"that goal!"
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
+msgid ""
+"Remember, you can always change your learning goal. The best goal is one "
+"that you can stick to.  "
+msgstr ""
+
+#: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/subject.txt
+#, python-format
+msgid "You've almost reached your goal in %(course_name)s"
+msgstr ""
+
 #: lms/djangoapps/course_home_api/admin.py
 msgid ""
 "These define the context to disable the frontend-app-learning progress "
@@ -6272,14 +6401,14 @@ msgstr "Ders hedefiniz başarıyla belirlendi."
 msgid "Course goal updated successfully."
 msgstr "Ders hedefiniz başarıyla güncellendi."
 
-#: lms/djangoapps/course_wiki/plugins/__init__.py
+#: lms/djangoapps/course_wiki/plugins/course_app.py
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Wiki"
 msgstr "Wiki"
 
-#: lms/djangoapps/course_wiki/plugins/__init__.py
+#: lms/djangoapps/course_wiki/plugins/course_app.py
 msgid ""
 "Enable learners to access, and collaborate on course-related information."
 msgstr ""
@@ -6662,14 +6791,14 @@ msgstr ""
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Proctoring"
-msgstr "Gözetmenli"
+msgstr "Gözetimli"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid ""
 "Maintain exam integrity by enabling a proctoring solution for your course"
 msgstr ""
 
-#: cms/templates/edit-tabs.html
+#: lms/djangoapps/courseware/plugins.py
 msgid "Custom pages"
 msgstr "Özel yapılmış sayfalar"
 
@@ -7008,7 +7137,7 @@ msgstr ""
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid "Proctored Exam Review: {review_status}"
-msgstr "Gözetmenli Sınav İncelemesi: {review_status}"
+msgstr "Gözetimli Sınav İncelemesi: {review_status}"
 
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
@@ -7054,11 +7183,43 @@ msgstr "Yüklenen dosya okunamadı."
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
-"Data in row #{row_num} must have exactly four columns: email, username, full"
-" name, and country"
+"Data in row #{row_num} must have between four and six columns: email, "
+"username, full name, country, cohort, and course mode. The last two columns "
+"are optional."
 msgstr ""
-"#{row_num} numaralı satırdaki veriler tam olarak dört sütuna sahip "
-"olmalıdır: e-posta, kullanıcı adı, tam isim ve ülke"
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid ""
+"Data in row #{row_num} must have exactly four columns: email, username, full"
+" name, and country."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Course is not cohorted but cohort provided. Ignoring cohort assignment for "
+"all users."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid ""
+"Cohort name not found: {cohort}. Ignoring cohort assignment for all users."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid ""
+"Invalid course mode: {mode}. Falling back to the default mode, or keeping "
+"the current mode in case the user is already enrolled."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid ""
+"Invalid course mode: {mode}.  Failling back to {default_mode}, or resetting "
+"to {default_mode} in case the user is already enrolled."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -7297,7 +7458,7 @@ msgstr "anket"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "proctored exam results"
-msgstr "gözetmenli sınav sonuçları"
+msgstr "gözetimli sınav sonuçları"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Anonymized User IDs"
@@ -7706,6 +7867,7 @@ msgid "Cohorts"
 msgstr "Topluluklar"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Discussions"
 msgstr "Forum"
@@ -8095,6 +8257,7 @@ msgid " (out of {total})"
 msgstr " ({total} içinde)"
 
 #: lms/djangoapps/learner_dashboard/programs.py
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/learner_dashboard/programs.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
@@ -8409,6 +8572,18 @@ msgstr "Kullanıcı {username} bu takımla ilgili olan derse kayıtlı değil."
 msgid "You can't leave an instructor managed team."
 msgstr "Eğitmen tarafından yönetilen bir takımı terkedemezsiniz."
 
+#: lms/djangoapps/user_tours/models.py
+msgid "Show existing user tour"
+msgstr ""
+
+#: lms/djangoapps/user_tours/models.py
+msgid "Show new user tour"
+msgstr ""
+
+#: lms/djangoapps/user_tours/models.py
+msgid "Do not show user tour"
+msgstr ""
+
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr "Bu son tarihin uygulandığı ders"
@@ -8475,15 +8650,6 @@ msgid "Missing required parameter face_image"
 msgstr "Boş kalan gerekli parametre yüz_resmi"
 
 #: lms/djangoapps/verify_student/views.py
-msgid "No profile found for user"
-msgstr "Kullanıcı için bir profil bulunamadı"
-
-#: lms/djangoapps/verify_student/views.py
-#, python-brace-format
-msgid "Name must be at least {min_length} character long."
-msgstr "İsim en az {min_length} karakter uzunluğunda olmalıdır."
-
-#: lms/djangoapps/verify_student/views.py
 msgid "Image data is in an unsupported format."
 msgstr "Resim verisi desteklenmeyen bir biçimde."
 
@@ -8494,7 +8660,7 @@ msgstr "Resim verisi geçerli değil."
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
 msgid "Your {platform_name} ID verification was approved!"
-msgstr ""
+msgstr "{platform_name} platformu kimlik doğrulamanız onaylandı!"
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
@@ -8984,6 +9150,56 @@ msgstr "İzin ver"
 msgid "Error"
 msgstr "Hata"
 
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Check out this course on edx"
+msgstr ""
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Enroll now"
+msgstr "Hemen kaydol"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
+msgid "View Course"
+msgstr "Derse Gözat"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Estimated 6 weeks"
+msgstr ""
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "4-6 hours per week"
+msgstr ""
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Self-paced"
+msgstr "Kendi Kendine Eğitim"
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Progress at your own speed"
+msgstr ""
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
+msgid "Optional upgrade available"
+msgstr ""
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
+#, python-format
+msgid "Check out this course on %(platform_name)s."
+msgstr ""
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
+#, python-format
+msgid "This email message was automatically sent by %(lms_url)s "
+msgstr ""
+
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
+#, python-format
+msgid "%(display_name)s"
+msgstr ""
+
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
 msgstr "Kimlik Doğrulama Onaylandı"
@@ -9048,7 +9264,7 @@ msgid ""
 "You must have a valid ID verification to take proctored exams and qualify "
 "for certificates."
 msgstr ""
-"Gözetmenli sınavlara katılmaya ve sertifika almaya hak kazanmak için kimlik "
+"Gözetimli sınavlara katılmaya ve sertifika almaya hak kazanmak için kimlik "
 "doğrulamasını tamamlamanız gerekiyor."
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
@@ -9603,10 +9819,19 @@ msgid "Go to %(platform_name)s Home Page"
 msgstr "%(platform_name)s Ana Sayfasına Git"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: cms/templates/widgets/header.html
-msgid "Sign In"
-msgstr "Giriş"
+#: cms/templates/index.html lms/templates/courseware/courses.html
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Courses"
+msgstr "Dersler"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+msgid "My Account"
+msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -10404,6 +10629,22 @@ msgid "The LTI configuration data for this context/provider."
 msgstr "Bu bağlam/sağlayıcı için LTI yapılandırma verisi."
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"If enabled, discussion topics will be created for each non-graded unit in "
+"the course. A UI for discussions will show up with each unit."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"If enabled, discussion topics will be created for graded units as well."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"If enabled, discussions will need to be manually enabled for each unit."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The plugin configuration data for this context/provider."
 msgstr "Bu bağlam/sağlayıcı için eklenti yapılandırma verisi."
 
@@ -10417,7 +10658,7 @@ msgstr "Forum aracı/sağlayıcısı kimliği"
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Program UUID"
-msgstr ""
+msgstr "Program UUID"
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
@@ -10430,6 +10671,38 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The discussion provider's id"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Context key for context in which this discussion topic exists."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"Usage key for in-context discussion topic. Set to null for course-level "
+"topics."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Title for discussion topic."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Group for divided discussions."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Provider id for discussion provider."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"Discussion context ID in external forum provider. e.g. commentable_id for "
+"cs_comments_service."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Whether this topic should be shown in-context in the course."
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/plugins.py
@@ -10531,6 +10804,8 @@ msgid ""
 "Comma-separated list of filters that this application will be allowed to "
 "request."
 msgstr ""
+"Bu uygulamanın istemesine izin verilecek filtrelerin virgülle ayrılmış "
+"listesi."
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid "Content Provider"
@@ -11024,8 +11299,17 @@ msgstr ""
 "e-posta adresi ile tekrar deneyin."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "It looks like this email address is already registered"
-msgstr "Görünüşe göre bu e-posta adresi zaten kayıtlı"
+#, python-brace-format
+msgid ""
+"This email is already associated with an existing or previous "
+"{settings.PLATFORM_NAME} account"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid ""
+"The password you entered is on a list of known compromised passwords. Please"
+" choose a different one."
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
@@ -11671,6 +11955,11 @@ msgstr "Bitirdiğiniz En Yüksek Okul Seviyesi"
 msgid "Year of birth"
 msgstr "Doğum yılı"
 
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+#, python-brace-format
+msgid "I agree that {platform_name} may send me marketing messages."
+msgstr ""
+
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
@@ -12266,6 +12555,11 @@ msgstr ""
 "kullandınız."
 
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: cms/templates/widgets/header.html
+msgid "Sign In"
+msgstr "Giriş"
+
+#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "E-posta adresimiz şöyle: "
 
@@ -12637,10 +12931,6 @@ msgstr "İzin Reddedildi: {user} kimlik doğrulaması başarısız"
 #, python-brace-format
 msgid "{platform_name} Support Levels:"
 msgstr "{platform_name} Destek Seviyeleri:"
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "HTML"
-msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"
@@ -13259,7 +13549,8 @@ msgstr "Ders Taslağı"
 msgid "Warning"
 msgstr "Uyarı"
 
-#: cms/templates/html_error.html lms/templates/module-error.html
+#: cms/templates/html_error.html lms/templates/course_modes/error.html
+#: lms/templates/module-error.html
 msgid "Error:"
 msgstr "Hata:"
 
@@ -13277,16 +13568,6 @@ msgstr "Ders Numarası:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Run:"
 msgstr "Ders Zamanı:"
-
-#: cms/templates/index.html lms/templates/courseware/courses.html
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Courses"
-msgstr "Dersler"
 
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -14808,6 +15089,12 @@ msgid ""
 "at any time, in its sole discretion, does not benefit or serve the best "
 "interests of {platform_name}, its users and its partners."
 msgstr ""
+"{platform_name_capitalized}, API'lerin herhangi bir kullanımının kabul "
+"edilebilir olup olmadığını belirleme hakkına sahiptir ve {platform_name}, "
+"{platform_name} tarafından belirlenen herhangi bir kullanım için "
+"{platform_name} kullanıcılarının ve iş ortaklarının yararına olmayan veya "
+"onlara hizmet etmeyen API erişimini, kendi takdirine bağlı olarak, istediği "
+"zaman iptal etme hakkını saklı tutar."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -16069,6 +16356,22 @@ msgstr ""
 "testlere ve forumlara tam erişim hakkına sahip olun.  {b_start}Lütfen bu "
 "iznin geçer not kazanan öğrencilere sertifika vermediğini unutmayın.{b_end}"
 
+#: lms/templates/course_modes/error.html
+msgid "Unable to enroll in {course_name}"
+msgstr ""
+
+#: lms/templates/course_modes/error.html
+msgid "Sorry, we were unable to enroll you in"
+msgstr ""
+
+#: lms/templates/course_modes/error.html
+msgid "Explore all courses on edX"
+msgstr ""
+
+#: lms/templates/course_modes/error.html
+msgid "Explore all courses"
+msgstr ""
+
 #: lms/templates/course_modes/fbe.html lms/templates/course_modes/unfbe.html
 msgid ""
 "Showcase a {link_start}verified certificate{link_end} of completion on your "
@@ -16137,14 +16440,10 @@ msgstr ""
 
 #: lms/templates/course_modes/track_selection.html
 msgid "Access this course"
-msgstr ""
+msgstr "Bu derse erişin"
 
 #: lms/templates/course_modes/unfbe.html
 msgid "Get access to the course material, including videos and readings"
-msgstr ""
-
-#: lms/templates/course_modes/unfbe.html
-msgid "Some graded content may be locked"
 msgstr ""
 
 #: lms/templates/courseware/accordion.html
@@ -16177,12 +16476,6 @@ msgstr "Bir hata oluştu. Lütfen daha sonra tekrar deneyin."
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr "Bu derse kaydoldunuz"
-
-#: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-#: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
-msgid "View Course"
-msgstr "Derse Gözat"
 
 #: lms/templates/courseware/course_about.html
 msgid "Course is full"
@@ -16749,6 +17042,9 @@ msgid ""
 "dashboard{link_end} and clicking the {bold_start}Get Credit{bold_end} button"
 " below the course title."
 msgstr ""
+"{link_start}{platform_name} kontrol paneline{link_end} gidip ders başlığının"
+" altındaki {bold_start}Kredi Al{bold_end} düğmesini tıklayarak kredi satın "
+"alın."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -16757,6 +17053,9 @@ msgid ""
 "request an official academic transcript at the institution that granted the "
 "credit."
 msgstr ""
+"Ödemeniz tamamlandığında, panele dönün ve krediyi veren kurumdan resmi bir "
+"akademik transkript istemek için ders başlığının altındaki {bold_start}Kredi"
+" İste{bold_end} düğmesine tıklayın."
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -16886,12 +17185,12 @@ msgstr ""
 "onur kodu {cert_name_short} verilmiştir."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "You are not eligible for a certificate."
+msgid "You are not yet eligible for a certificate."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "This link will open the course progress page"
-msgstr ""
+msgstr "Bu bağlantı ders ilerleme sayfasını açacak"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "View grades"
@@ -18875,12 +19174,10 @@ msgid ""
 "To register and enroll a list of users in this course, choose a CSV file "
 "that contains the following columns in this exact order: email, username, "
 "name, and country. Please include one student per row and do not include any"
-" headers, footers, or blank lines."
+" headers, footers, or blank lines. Optionally, extra columns can be "
+"provided: cohort and course mode, in that order. These extra columns may be "
+"blank."
 msgstr ""
-"Bu derse kullanıcıları kaydetmek için içeriğindeki sütunların şu sırada "
-"içeren bir CSV dosyası oluşturun: e-posta, kullanıcı adı, isim ve ülke. Her "
-"satıra yalnızca bir öğrenci eklenmeli ve başlık, altbaşlık veya boş satır "
-"bulunmamalıdır."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Upload a CSV for bulk enrollment"
@@ -20536,13 +20833,9 @@ msgstr "edX Hakkında"
 msgid ""
 "{link_start}edX{link_end} offers interactive online classes and MOOCs from "
 "the world's best universities, including MIT, Harvard, Berkeley, University "
-"of Texas, and many others. edX is a non-profit online initiative created by "
+"of Texas, and many others. edX is a mission driven initiative created by "
 "founding partners Harvard and MIT."
 msgstr ""
-"{link_start}edX{link_end} MIT, Harvard, Berkeley, University of Texas gibi "
-"Dünya'nın en iyi üniversitelerinden çevrimiçi etkileşimli sınıflar ve "
-"Kitlesel Açık Çevrimiçi Dersler sunmaktadır. edX kurucu ortakları olan "
-"Harvard ve MIT tarafından oluşturulmuş, kâr amacı gütmeyen bir platformdur. "
 
 #: themes/edx.org/lms/templates/certificates/_accomplishment-banner.html
 msgid "Congratulations, {user_name}!"
@@ -20597,20 +20890,16 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
-"certificates to help fund affordable education to everyone globally."
+"{b_start}Support our Mission: {b_end}EdX relies on verified certificates to "
+"help fund affordable education to everyone globally."
 msgstr ""
-"{b_start}Misyonumuzu Destekle: {b_end}EdX, kâr amacı gütmeyen, onaylı "
-"sertifikaları sayesinde herkes için erişilebilir eğitimleri fonlamayı "
-"sağlayan bir yapıdır."
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
-"{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
-"certificates to help fund free education for everyone globally"
+"{b_start}Support our Mission: {b_end} EdX, a mission driven initiative, "
+"relies on verified certificates to help fund free education for everyone "
+"globally"
 msgstr ""
-"{b_start}Misyonumuzu Destekle: {b_end}Edx, kâr amacı gütmeyen, onaylı "
-"sertifikaları sayesinde evrensel ücretsiz eğitimlerini fonlayan bir yapıdır"
 
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Find Courses"
@@ -21046,7 +21335,7 @@ msgstr "Gelişmiş Ayarlar"
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 msgid "Proctored Exam Settings"
-msgstr "Gözetmenli Sınav Ayarları"
+msgstr "Gözetimli Sınav Ayarları"
 
 #: cms/templates/checklists.html cms/templates/widgets/header.html
 msgid "Checklists"
@@ -21074,8 +21363,7 @@ msgstr "Taşı"
 msgid "Delete this component"
 msgstr "Bu bileşeni sil"
 
-#: cms/templates/component.html cms/templates/edit-tabs.html
-#: cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
 msgstr "Tekrar düzenlemek için sürükle"
 
@@ -21399,15 +21687,15 @@ msgstr "Desteklenmeyen Gelişmiş Modüller"
 #: cms/templates/course_outline.html cms/templates/settings_advanced.html
 msgid ""
 "This course has proctored exam settings that are incomplete or invalid."
-msgstr "Bu ders eksik ya da geçersiz gözetmenli sınav ayarlarına sahip."
+msgstr "Bu ders eksik ya da geçersiz gözetimli sınav ayarlarına sahip."
 
 #: cms/templates/course_outline.html
 msgid ""
 "To update these settings go to the {link_start}Proctored Exam Settings "
 "page{link_end}."
 msgstr ""
-"Bu ayarları güncellemek için {link_start}Gözetmenli Sınav Ayarları{link_end}"
-" sayfasına gidin."
+"Bu ayarları güncellemek için {link_start}Gözetimli Sınav Ayarları{link_end} "
+"sayfasına gidin."
 
 #: cms/templates/course_outline.html
 msgid ""
@@ -21419,7 +21707,7 @@ msgstr ""
 
 #: cms/templates/course_outline.html cms/templates/settings_advanced.html
 msgid "Proctoring Settings Errors"
-msgstr "Gözetmen Ayar Hataları"
+msgstr "Gözetim Ayar Hataları"
 
 #: cms/templates/course_outline.html
 msgid "Click to add a new section"
@@ -21540,12 +21828,10 @@ msgstr ""
 msgid "Learn more about content visibility settings"
 msgstr "İçerik görünürlüğü ayarları hakkında daha fazla bilgi"
 
-#. Translators: Pages refer to the tabs that appear in the top navigation of
-#. each course.
-#: cms/templates/edit-tabs.html cms/templates/export.html
+#: cms/templates/edit-tabs.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
-msgid "Pages"
-msgstr "Sayfalar"
+msgid "Pages & Resources"
+msgstr "Sayfalar & Kaynaklar"
 
 #: cms/templates/edit-tabs.html
 msgid "New Page"
@@ -21562,18 +21848,6 @@ msgstr ""
 "sayfayı görebilirler."
 
 #: cms/templates/edit-tabs.html
-msgid "Show this page"
-msgstr "Bu sayfayı göster"
-
-#: cms/templates/edit-tabs.html
-msgid "Show/hide page"
-msgstr "Sayfayı göster/gizle"
-
-#: cms/templates/edit-tabs.html
-msgid "This page cannot be reordered"
-msgstr "Bu sayfa yeniden sıralanamaz"
-
-#: cms/templates/edit-tabs.html
 msgid "You can add additional custom pages to your course."
 msgstr "Dersinize özel olarak yaptığınız sayfaları ekleyebilirsiniz."
 
@@ -21582,48 +21856,33 @@ msgid "Add a New Page"
 msgstr "Yeni Bir Sayfa Ekle"
 
 #: cms/templates/edit-tabs.html
-msgid "What are pages?"
-msgstr "Sayfalar neye yarar?"
-
-#: cms/templates/edit-tabs.html
-msgid ""
-"Pages are listed horizontally at the top of your course. Default pages "
-"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
-" custom pages that you create."
+msgid "What are custom pages?"
 msgstr ""
-"Sayfalar dersinizin üst kısmında yatay olarak sıralanmıştır. Varsayılan "
-"sayfaları (Anasayfa, Ders, Tartışma, Wiki ve İlerleme) ders kitapları ve "
-"oluşturduğunuz özel yapım sayfalar izlemektedir."
 
 #: cms/templates/edit-tabs.html
 msgid ""
 "You can create and edit custom pages to provide students with additional "
 "course content. For example, you can create pages for the grading policy, "
-"course slides, and a course calendar. "
+"course syllabus, and a course calendar. "
 msgstr ""
-"Öğrencilere ek ders içeriği sunmak için özel yapım sayfalar oluşturabilir ve"
-" var olanları değiştirebilirsiniz. Örneğin, notlandırma yöntemi, ders "
-"slaytları ve ders takvimi gibi sayfaları bu şekilde oluşturabilirsiniz."
 
 #: cms/templates/edit-tabs.html
-msgid "How do pages look to students in my course?"
-msgstr "Dersimde sayfalar öğrencilere nasıl görünüyor?"
+msgid "How do custom pages look to students in my course?"
+msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"Students see the default and custom pages at the top of your course and use "
-"these links to navigate."
+"Custom pages are listed horizontally at the top of your course after default"
+" pages."
 msgstr ""
-"Öğrenciler varsayılan ve özel yapım sayfaları dersin üst kısmında görür ve "
-"bu bağlantıları gezinti için kullanırlar."
 
 #: cms/templates/edit-tabs.html
 msgid "See an example"
 msgstr "Bir örnek görün"
 
 #: cms/templates/edit-tabs.html
-msgid "Pages in Your Course"
-msgstr "Dersinizdeki Sayfalar"
+msgid "Custom pages in your course"
+msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "Preview of Pages in your course"
@@ -21631,13 +21890,10 @@ msgstr "Dersinizdeki Sayfaların Önizlemesi"
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"Pages appear in your course's top navigation bar. The default pages (Home, "
-"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
-" pages."
+"Custom pages are listed horizontally at the top of your course after default"
+" pages and textbooks. In the above example, custom pages for \"Course "
+"Schedule\" and \"Supplements\" have been added to a course."
 msgstr ""
-"Dersinizin üst gezinti çubuğunda görünen sayfalar. Varsayılan sayfaları (Ana"
-" sayfa, Ders, Tartışma, Wiki ve İlerleme) ders kitapları ve özel yapım "
-"sayfalar izlemektedir."
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 msgid "close modal"
@@ -21824,6 +22080,10 @@ msgstr "Ders Yapısı"
 #: cms/templates/export.html
 msgid "Individual Problems"
 msgstr "Bireysel Problemler"
+
+#: cms/templates/export.html cms/templates/widgets/header.html
+msgid "Pages"
+msgstr "Sayfalar"
 
 #: cms/templates/export.html
 msgid "Course Assets"
@@ -23318,11 +23578,11 @@ msgstr "Minimum Not"
 
 #: cms/templates/settings.html
 msgid "Successful Proctored Exam"
-msgstr "Başarılı Gözetmenli Sınav"
+msgstr "Başarılı Gözetimli Sınav"
 
 #: cms/templates/settings.html
 msgid "Proctored Exam {number}"
-msgstr "Gözetmenli Sınav {number}"
+msgstr "Gözetimli Sınav {number}"
 
 #: cms/templates/settings.html
 msgid "ID Verification"
@@ -23834,7 +24094,7 @@ msgid ""
 "these settings go to the {link_start}Proctored Exam Settings page{link_end}."
 msgstr ""
 "Hatalar düzeltilinceye kadar değişiklik yapamayacaksınız. Bu ayarları "
-"güncellemek için {link_start}Gözetmenli Sınav Ayarları sayfasına{link_end} "
+"güncellemek için {link_start}Gözetimli Sınav Ayarları sayfasına{link_end} "
 "gidin."
 
 #: cms/templates/settings_advanced.html
@@ -24009,10 +24269,6 @@ msgstr "Erişim Ver"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
 msgstr "Bu blok çoklu bileşen içermektedir."
-
-#: cms/templates/textbooks.html cms/templates/widgets/header.html
-msgid "Pages & Resources"
-msgstr "Sayfalar & Kaynaklar"
 
 #: cms/templates/textbooks.html
 msgid "New Textbook"
@@ -25650,7 +25906,7 @@ msgid ""
 "Click on the \"Start System Check\" link below to download and run the "
 "proctoring software."
 msgstr ""
-"Gözetmenli sınav yazılımını çalıştırmak için aşağıdaki \"Sistem Denetimini "
+"Gözetimli sınav yazılımını çalıştırmak için aşağıdaki \"Sistem Denetimini "
 "Başlat\" bağlantısına tıklayın."
 
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
@@ -25666,11 +25922,10 @@ msgid ""
 "To confirm that proctoring has started, make sure your webcam feed and the "
 "blue Proctortrack box are both visible on your screen."
 msgstr ""
-"Gözetmenli oturumun başlamasını doğrulamak için web kameranızın veri "
-"akışının ve mavi Proctortrack kutusunun ekranınızda görünür olduğuna emin "
-"olun."
+"Gözetimli oturumun başlamasını doğrulamak için web kameranızın veri akışının"
+" ve mavi Proctortrack kutusunun ekranınızda görünür olduğuna emin olun."
 
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr ""
-"Devam etmek için aşağıdaki \"Gözetmenli Sınavı Başlat\" düğmesine tıklayın."
+"Devam etmek için aşağıdaki \"Gözetimli Sınavı Başlat\" düğmesine tıklayın."

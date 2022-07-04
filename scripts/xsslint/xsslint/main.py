@@ -55,9 +55,12 @@ def _process_file(full_path, template_linters, options, summary_results, out):
     num_violations = 0
     directory = os.path.dirname(full_path)
     file_name = os.path.basename(full_path)
-    for template_linter in template_linters:
-        results = template_linter.process_file(directory, file_name)
-        results.print_results(options, summary_results, out)
+    try:
+        for template_linter in template_linters:
+            results = template_linter.process_file(directory, file_name)
+            results.print_results(options, summary_results, out)
+    except BaseException as e:
+        raise Exception(f"Failed to process path: {full_path}") from e
 
 
 def _process_os_dir(directory, files, template_linters, options, summary_results, out):

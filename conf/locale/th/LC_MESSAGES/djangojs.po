@@ -14,6 +14,7 @@
 # peemmaruj <peemmaruj@gmail.com>, 2014
 # Phondanai Khanti <phondanai@gmail.com>, 2015
 # Pornchai TummarATTAnanonT <yantaku@gmail.com>, 2015-2016
+# prakai <prakai.na@gmail.com>, 2021
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015
 # Sorathan Chaturapruek <tummykung@gmail.com>, 2013,2015
 # Sorathan Chaturapruek <tummykung@gmail.com>, 2013
@@ -28,6 +29,7 @@
 # Jirayu Chamamahattana <mman2x@gmail.com>, 2015
 # J.14 <jithinchman@gmail.com>, 2014
 # Noppachai Eiamwasant <noporo@hotmail.com>, 2015
+# prakai <prakai.na@gmail.com>, 2021
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (https://www.transifex.com/open-edx/teams/6205/th/).
@@ -70,9 +72,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-09-21 17:10+0000\n"
-"PO-Revision-Date: 2021-08-01 20:44+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2021-12-26 20:42+0000\n"
+"PO-Revision-Date: 2021-12-16 02:59+0000\n"
+"Last-Translator: prakai <prakai.na@gmail.com>\n"
 "Language-Team: Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
@@ -4555,7 +4557,7 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
+msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -10392,7 +10394,8 @@ msgstr ""
 msgid ""
 "Proctored exams are timed and they record video of each learner taking the "
 "exam. The videos are then reviewed to ensure that learners follow all "
-"examination rules."
+"examination rules. Please note that setting this exam as proctored will "
+"change the visibility settings to \"Hide content after due date.\""
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
