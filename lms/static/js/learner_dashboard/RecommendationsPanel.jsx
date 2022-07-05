@@ -36,48 +36,59 @@ class RecommendationsPanel extends React.Component {
 
   getCourseList = async () => {
     const coursesRecommendationData = await fetch(`${this.props.lmsRootUrl}/api/dashboard/v0/recommendation/courses/`)
-     .then(response => {
-        if(response.status == 400){
-        return this.props.generalRecommendations;
+      .then(response => {
+          if (response.status === 400) {
+            return this.props.generalRecommendations;
+          } else {
+            return response.json();
+          }
         }
-        else{
-        return response.json();
-        }
-      }
       );
-     this.setState({ coursesList: coursesRecommendationData['courses'], isPersonalizedRecommendation: coursesRecommendationData['is_personalized_recommendation']});
+    this.setState({
+      coursesList: coursesRecommendationData['courses'],
+      isPersonalizedRecommendation: coursesRecommendationData['is_personalized_recommendation']
+    });
   };
 
-
-   componentDidMount() {
-     this.getCourseList();
-   };
+  componentDidMount() {
+    this.getCourseList();
+  };
 
 
   render() {
     return (
       <div className="p-4 panel-background">
         <div className="recommend-heading mb-4">{gettext('Recommendations for you')}</div>
-        { this.state.coursesList.map(course => (
-         <a href={course.marketing_url} className="course-link" onClick={() => this.onCourseSelect(course.course_key)}>
-          <div className="course-card box-shadow-down-1 bg-white mb-3">
-            <div className="box-shadow-down-1 image-box">
-            <img
-              className="panel-course-img"
-              src={course.logo_image_url}
-              alt="course image"
-            />
-          </div>
-          <div className="course-title pl-3">
-                {course.title}
-          </div>
+        <div className={this.state.coursesList.length ? '' : 'spinner-container'}>
+          {this.state.coursesList.length ? this.state.coursesList.map(course => (
+            <a href={course.marketing_url} className="course-link"
+               onClick={() => this.onCourseSelect(course.course_key)}>
+              <div className="course-card box-shadow-down-1 bg-white mb-3">
+                <div className="box-shadow-down-1 image-box">
+                  <img
+                    className="panel-course-img"
+                    src={course.logo_image_url}
+                    alt="course image"
+                  />
+                </div>
+                <div className="course-title pl-3">
+                  {course.title}
+                </div>
+              </div>
+            </a>
+          )) : (
+            <div className="d-flex justify-content-center align-items-center">
+              <div role="status" className="spinner">
+                <span className="sr-only">{gettext('loading')}</span>
+              </div>
+            </div>
+          )}
         </div>
-        </a>
-        ))}
 
         {this.props.exploreCoursesUrl ? (
           <div className="d-flex justify-content-center">
-            <a href={this.props.exploreCoursesUrl} className="panel-explore-courses justify-content-center align-items-center">
+            <a href={this.props.exploreCoursesUrl}
+               className="panel-explore-courses justify-content-center align-items-center">
               {gettext('Explore courses')}
               <span className="icon fa fa-search search-icon" aria-hidden="true"/>
             </a>
