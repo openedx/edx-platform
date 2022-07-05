@@ -9,7 +9,6 @@ from time import sleep
 from paver.easy import call_task, cmdopts, dry, might_call, needs, sh, task
 
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
-from pavelib.database import update_local_bokchoy_db_from_s3
 from pavelib.utils.envs import Env
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.bokchoy_options import (
@@ -102,18 +101,7 @@ def update_fixtures():
 
 
 @task
-@timed
-def reset_test_database():
-    """
-    Reset the database used by the bokchoy tests.
-
-    Use the database cache automation defined in pavelib/database.py
-    """
-    update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
-
-
-@task
-@needs(['reset_test_database', 'clear_mongo', 'load_bok_choy_data', 'load_courses', 'update_fixtures'])
+@needs(['clear_mongo', 'load_bok_choy_data', 'load_courses', 'update_fixtures'])
 @might_call('start_servers')
 @cmdopts([BOKCHOY_FASTTEST], share_with=['start_servers'])
 @timed
