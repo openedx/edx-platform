@@ -103,7 +103,7 @@ class CharacterViewSet(viewsets.ModelViewSet):
     serializer_class = CharacterSerializer
     queryset = Character.objects.all()
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['put'])
     def select_character(self, request, pk=None):  # pylint: disable=unused-argument
         """
         select character at the time of onboarding or changing character from
