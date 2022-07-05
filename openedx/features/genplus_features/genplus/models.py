@@ -97,6 +97,9 @@ class Class(TimeStampedModel):
     image = models.ImageField(upload_to='gen_plus_classes', null=True)
     name = models.CharField(max_length=128)
     is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
+    students = models.ManyToManyField(Student, related_name='classes', blank=True)
+    objects = models.Manager()
+    visible_objects = ClassManager()
 
     @property
     def current_program(self):
@@ -112,7 +115,7 @@ class Class(TimeStampedModel):
 class Teacher(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
     profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True)
-    classes = models.ManyToManyField(Class, related_name='teachers')
+    classes = models.ManyToManyField(Class, related_name='teachers', blank=True)
     favourite_classes = models.ManyToManyField(Class)
 
     def __str__(self):

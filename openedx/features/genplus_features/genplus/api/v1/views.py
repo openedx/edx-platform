@@ -129,7 +129,7 @@ class ClassViewSet(viewsets.ModelViewSet):
     lookup_field = 'group_id'
 
     def get_queryset(self):
-        return Class.visible_objects.filter(school=self.request.user.genuser.school)
+        return Class.visible_objects.filter(school=self.request.user.gen_user.school)
 
     def list(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         gen_user = self.request.user.gen_user
@@ -154,13 +154,13 @@ class ClassViewSet(viewsets.ModelViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         data = serializer.data
-        rm_class = self.get_object()
-        genuser = GenUser.objects.get(user=self.request.user)
+        gen_class = self.get_object()
+        gen_user = GenUser.objects.get(user=self.request.user)
         if data['action'] == 'add':
-            genuser.teacher.favourite_classes.add(rm_class)
-            return Response(SuccessMessages.CLASS_ADDED_TO_FAVORITES.format(class_name=rm_class.name),
+            gen_user.teacher.favourite_classes.add(gen_class)
+            return Response(SuccessMessages.CLASS_ADDED_TO_FAVORITES.format(class_name=gen_class.name),
                             status=status.HTTP_204_NO_CONTENT)
         else:
-            genuser.teacher.favourite_classes.remove(rm_class)
-            return Response(SuccessMessages.CLASS_REMOVED_FROM_FAVORITES.format(class_name=rm_class.name),
+            gen_user.teacher.favourite_classes.remove(gen_class)
+            return Response(SuccessMessages.CLASS_REMOVED_FROM_FAVORITES.format(class_name=gen_class.name),
                             status=status.HTTP_204_NO_CONTENT)
