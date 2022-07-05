@@ -116,7 +116,7 @@ class Teacher(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
     profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True, blank=True)
     classes = models.ManyToManyField(Class, related_name='teachers', blank=True)
-    favourite_classes = models.ManyToManyField(Class)
+    favourite_classes = models.ManyToManyField(Class, blank=True)
 
     def __str__(self):
         return self.gen_user.user.username
