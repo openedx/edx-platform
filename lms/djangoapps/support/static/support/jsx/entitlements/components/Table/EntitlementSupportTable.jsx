@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
-import { Button, Hyperlink, Table } from '@edx/paragon';
+import { Button, Hyperlink, Table } from '@edx/paragon-new';
 
 const entitlementColumns = [
   {

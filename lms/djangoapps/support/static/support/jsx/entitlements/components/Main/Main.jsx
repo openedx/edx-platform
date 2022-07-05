@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { Button, StatusAlert } from '@edx/paragon';
+import { Button, StatusAlert } from '@edx/paragon-new';
 import SearchContainer from '../Search/SearchContainer';
 import EntitlementSupportTableContainer from '../Table/EntitlementSupportTableContainer';
 import EntitlementFormContainer from '../EntitlementForm/container';

@@ -1,5 +1,5 @@
 /* global gettext */
-import { Icon } from '@edx/paragon';
+import { Icon } from '@edx/paragon-new';
 import classNames from 'classnames';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';

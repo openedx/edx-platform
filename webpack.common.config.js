@@ -351,7 +351,7 @@ module.exports = Merge.smart({
                         {
                             loader: 'css-loader',
                             options: {
-                                modules: true
+                                modules: true,
                             }
                         }
                     ]
