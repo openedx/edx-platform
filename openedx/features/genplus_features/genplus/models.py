@@ -94,7 +94,7 @@ class Class(TimeStampedModel):
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='classes')
     group_id = models.CharField(primary_key=True, max_length=128)
     color = models.CharField(blank=True, null=True, max_length=32, choices=COLOR_CHOICES)
-    image = models.ImageField(upload_to='gen_plus_classes', null=True)
+    image = models.ImageField(upload_to='gen_plus_classes', null=True, blank=True)
     name = models.CharField(max_length=128)
     is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
     students = models.ManyToManyField(Student, related_name='classes', blank=True)
@@ -114,7 +114,7 @@ class Class(TimeStampedModel):
 
 class Teacher(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
-    profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True)
+    profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True, blank=True)
     classes = models.ManyToManyField(Class, related_name='teachers', blank=True)
     favourite_classes = models.ManyToManyField(Class)
 
