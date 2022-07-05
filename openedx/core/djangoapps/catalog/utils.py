@@ -743,14 +743,14 @@ def get_programs_for_organization(organization):
 
 def get_course_data(course_key_str):
     """
-        Retrieve information about the course with the given course key
+    Retrieve information about the course with the given course key.
 
-        Arguments:
-            course_key_str: key for the course about which we are retrieving information
+    Arguments:
+        course_key_str: key for the course about which we are retrieving information.
 
-        Returns:
-            dict with details about specified course
-        """
+    Returns:
+        dict with details about specified course.
+    """
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course UUID')
     if user:
         api_client = get_catalog_api_client(user)

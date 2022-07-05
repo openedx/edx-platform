@@ -4712,7 +4712,7 @@ EDX_BRAZE_API_KEY = None
 EDX_BRAZE_API_SERVER = None
 
 ### SETTINGS FOR AMPLITUDE ####
-AMPLITUDE_URL = 'https://profile-api.amplitude.com/v1/userprofile'
+AMPLITUDE_URL = ''
 AMPLITUDE_API_KEY = ''
 REC_ID = ''
 GENERAL_RECOMMENDATION = {}
