@@ -4711,6 +4711,12 @@ SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/h'
 EDX_BRAZE_API_KEY = None
 EDX_BRAZE_API_SERVER = None
 
+### SETTINGS FOR AMPLITUDE ####
+AMPLITUDE_URL = ''
+AMPLITUDE_API_KEY = ''
+REC_ID = ''
+GENERAL_RECOMMENDATION = {}
+
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
 # .. setting_default: retired__user_
@@ -5132,3 +5138,5 @@ ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://127.0.0.1:8000/oaut
 
 # keys for  big blue button live provider
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
+
+PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
