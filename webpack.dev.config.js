@@ -38,8 +38,9 @@ module.exports = _.values(Merge.smart(commonConfig, {
                             loader: 'css-loader',
                             options: {
                                 sourceMap: true,
-                                modules: true,
-                                localIdentName: '[name]__[local]'
+                                modules: {
+                                    localIdentName: '[name]__[local]',
+                                },
                             }
                         },
                         {

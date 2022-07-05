@@ -2,7 +2,7 @@
 /* eslint-disable react/no-danger, import/prefer-default-export */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Icon, StatusAlert } from '@edx/paragon';
+import { Button, Icon, StatusAlert } from '@edx/paragon-new';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import StudentAccountDeletionModal from './StudentAccountDeletionModal';
 

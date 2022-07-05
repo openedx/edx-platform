@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, InputText } from '@edx/paragon';
+import { Button, InputText } from '@edx/paragon-new';
 import PropTypes from 'prop-types';
 
 
