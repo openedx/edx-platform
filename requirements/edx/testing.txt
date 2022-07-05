@@ -18,6 +18,8 @@
     # via -r requirements/edx/base.txt
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
     # via -r requirements/edx/base.txt
+# Temporary version for testing ORA 2
+-e git+https://github.com/open-craft/edx-ora2.git@tecoholic/BB-6151-upgrade-tinymce-to-v5#egg=ora2
 acid-xblock==0.2.1
     # via -r requirements/edx/base.txt
 aiohttp==3.8.1
