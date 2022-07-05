@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 
 class PlatformSettingsSerializer(serializers.Serializer):
-    """Serializer for edX platform-level info, emails, and URLs"""
+    """Serializer for platform-level info, emails, and URLs"""
 
     supportEmail = serializers.EmailField()
     billingEmail = serializers.EmailField()
@@ -143,7 +143,7 @@ class SuggestedCourseSerializer(serializers.Serializer):
 class LearnerDashboardSerializer(serializers.Serializer):
     """Serializer for all info required to render the Learner Dashboard"""
 
-    edx = PlatformSettingsSerializer()
+    platformSettings = PlatformSettingsSerializer()
     enrollments = serializers.ListField(
         child=LearnerEnrollmentSerializer(), allow_empty=True
     )

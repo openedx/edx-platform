@@ -418,7 +418,7 @@ class TestLearnerDashboardSerializer(TestCase):
         """Test that empty inputs return the right keys"""
 
         input_data = {
-            "edx": None,
+            "platformSettings": None,
             "enrollments": [],
             "unfulfilledEntitlements": [],
             "suggestedCourses": [],
@@ -428,7 +428,7 @@ class TestLearnerDashboardSerializer(TestCase):
         self.assertDictEqual(
             output_data,
             {
-                "edx": None,
+                "platformSettings": None,
                 "enrollments": [],
                 "unfulfilledEntitlements": [],
                 "suggestedCourses": [],
@@ -452,7 +452,7 @@ class TestLearnerDashboardSerializer(TestCase):
         )
 
         input_data = {
-            "edx": {},
+            "platformSettings": {},
             "enrollments": [{}],
             "unfulfilledEntitlements": [],
             "suggestedCourses": [],
@@ -462,7 +462,7 @@ class TestLearnerDashboardSerializer(TestCase):
         self.assertDictEqual(
             output_data,
             {
-                "edx": mock_platform_settings_serializer,
+                "platformSettings": mock_platform_settings_serializer,
                 "enrollments": [mock_learner_enrollment_serializer],
                 "unfulfilledEntitlements": [],
                 "suggestedCourses": [],
