@@ -21,7 +21,14 @@ from .constants import (
     TAHOE_IDP_PROVIDER_NAME,
 )
 
-from student.roles import OrgInstructorRole, OrgStaffRole
+from student.roles import (
+    CourseAccessRole,
+    CourseCreatorRole,
+    CourseInstructorRole,
+    CourseStaffRole,
+    OrgInstructorRole,
+    OrgStaffRole,
+)
 
 
 def is_tahoe_idp_enabled():
@@ -99,6 +106,27 @@ def remove_tahoe_idp_from_account_settings(providers):
     ]
 
 
+def deprecated_has_course_specific_role(user):
+    """
+    Check if the user has Studio access in a specific course.
+
+    This is deprecated until Tahoe IdP migration is complete.
+
+    Afterward, FusionAuth should control the roles and course-specific access should
+    be handled there.
+
+    TODO: RED-3139 remove this function after adding support for course-specific roles.
+    """
+    return CourseAccessRole.objects.filter(
+        user=user,
+        role__in=[
+            CourseCreatorRole.ROLE,
+            CourseInstructorRole.ROLE,
+            CourseStaffRole.ROLE,
+        ],
+    )
+
+
 def is_studio_allowed_for_user(user, organization=None):
     """
     Check whether the given user is permitted to log into studio or not
@@ -107,6 +135,7 @@ def is_studio_allowed_for_user(user, organization=None):
        The user is superuser
     OR the user is staff user
     OR the user is an admin on the organization
+    OR the user has deprecated_has_course_specific_role()
     OR the user has (OrgStaffRole) or (OrgInstructorRole) role
 
     :param user: the user in question
@@ -123,8 +152,13 @@ def is_studio_allowed_for_user(user, organization=None):
     if is_active_admin_on_organization(user=user, organization=organization):
         return True
 
+    if deprecated_has_course_specific_role(user):
+        return True
+
     short_name = organization.short_name
-    return OrgStaffRole(short_name).has_user(user) or OrgInstructorRole(short_name).has_user(user)
+    has_org_wide_role = OrgStaffRole(short_name).has_user(user) or OrgInstructorRole(short_name).has_user(user)
+
+    return has_org_wide_role
 
 
 def is_studio_login_form_overridden():
