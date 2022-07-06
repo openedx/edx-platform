@@ -1,7 +1,7 @@
 """
 Support tool for changing course enrollments.
 """
-
+import logging
 from collections import defaultdict
 
 import markupsafe
@@ -31,7 +31,7 @@ from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values
-from openedx.core.djangoapps.enrollments.api import get_enrollments, update_enrollment
+from openedx.core.djangoapps.enrollments.api import get_enrollments, get_enrollment_attributes, update_enrollment
 from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
 from openedx.core.djangoapps.enrollments.serializers import ModeSerializer
 from openedx.features.enterprise_support.api import (
@@ -40,6 +40,9 @@ from openedx.features.enterprise_support.api import (
     get_enterprise_course_enrollments
 )
 from openedx.features.enterprise_support.serializers import EnterpriseCourseEnrollmentSerializer
+
+
+logger = logging.getLogger(__name__)
 
 
 class EnrollmentSupportView(View):
@@ -118,6 +121,8 @@ class EnrollmentSupportListView(GenericAPIView):
             enrollment['course_modes'] = self.get_course_modes(course_key)
             # Add the price of the course's verified mode.
             self.include_verified_mode_info(enrollment, course_key)
+            # Add order number associated with the enrollment if available
+            self.include_order_number(enrollment)
             # Add manual enrollment history, if it exists
             enrollment['manual_enrollment'] = self.manual_enrollment_data(enrollment, course_key)
 
@@ -257,6 +262,28 @@ class EnrollmentSupportListView(GenericAPIView):
                 enrollment_data['verified_price'] = mode['min_price']
                 enrollment_data['verified_upgrade_deadline'] = mode['expiration_datetime']
                 enrollment_data['verification_deadline'] = VerificationDeadline.deadline_for_course(course_key)
+
+    @staticmethod
+    def include_order_number(enrollment):
+        """
+        For a provided enrollment data dictionary, include order_number from CourseEnrollmentAttribute if available.
+        """
+        username = enrollment['user']
+        course_id = enrollment['course_id']
+        enrollment_attributes = get_enrollment_attributes(username, course_id)
+        order_attribute = [
+            enrollment_attribute.get('value', '') for enrollment_attribute in enrollment_attributes if
+            enrollment_attribute['namespace'] == 'order' and enrollment_attribute['name'] == 'order_number'
+        ]
+        if len(order_attribute) > 1:
+            # logging this warning for info/debug purpose
+            logger.warning(
+                "Found multiple order name attributes for CourseEnrollment for user %s with course %s",
+                username,
+                course_id
+            )
+        enrollment['order_number'] = order_attribute[-1] if order_attribute else ''
+
 
     @staticmethod
     def manual_enrollment_data(enrollment_data, course_key):
