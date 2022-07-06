@@ -5108,6 +5108,8 @@ DISCUSSION_MODERATION_EDIT_REASON_CODES = {
     "needs-clarity": _("Content needs clarity"),
     "academic-integrity": _("Has academic integrity concern"),
     "inappropriate-language": _("Has inappropriate language"),
+    "format-change": _("Formatting changes needed"),
+    "post-type-change": _("Post type needs change"),
     "contains-pii": _("Contains personally identifiable information"),
 }
 # Provide a list of reason codes for moderators to close posts, as a mapping
