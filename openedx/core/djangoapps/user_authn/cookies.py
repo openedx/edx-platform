@@ -252,7 +252,8 @@ def _get_user_info_cookie_data(request, user):
     # Add 'resume course' last completed block
     try:
         header_urls['resume_block'] = retrieve_last_sitewide_block_completed(user)
-    except User.DoesNotExist:
+    except Exception:  # pylint: disable=broad-except
+        log.exception('retrieve_last_sitewide_block_completed exception ARCHBOM-2137 PROD-2877')
         pass
 
     header_urls = _convert_to_absolute_uris(request, header_urls)
