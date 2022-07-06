@@ -23,6 +23,7 @@
     cd common/static/js/vendor/tinymce/js/plugins/codemirror/
     uglify plugin.js -m -o plugin.min.js
     ```
+**IMPORTANT NOTE:** Regenerate the `tinymce.full.min.js` bundle everytime the code-mirror `plugin.min.js` is regenerated to ensure the latest changes are added to the bundle.
 
 # Instructions for creating js/tinymce.full.min.js
 
@@ -48,7 +49,5 @@ The following uses the version 5.5.1 as a reference. Change your filenames depen
 6. Generate a bundled version of the TinyMCE with all the plugins using the following command
     ```
     cd common/static/js/vendor/tinymce/js/tinymce
-    cat tinymce.min.js */*/*.min.js plugins/emoticons/js/emojis.min.js > tinymce.full.min.js
+    LC_ALL=C cat tinymce.min.js */*/*.min.js plugins/emoticons/js/emojis.min.js > tinymce.full.min.js
     ```
-
-**NOTE:** Regenerate the `tinymce.full.min.js` bundle everytime the code-mirror `plugin.min.js` is regenerated to ensure the latest changes are added to the bundle.
