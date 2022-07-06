@@ -96,6 +96,7 @@ class EntitlementSerializer(serializers.Serializer):
     canViewCourse = serializers.BooleanField()
     changeDeadline = serializers.DateTimeField()
     isExpired = serializers.BooleanField()
+    expirationDate = serializers.DateTimeField()
 
 
 class RelatedProgramSerializer(serializers.Serializer):
