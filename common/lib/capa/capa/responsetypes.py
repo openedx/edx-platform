@@ -2094,9 +2094,9 @@ class CustomResponse(LoncapaResponse):
 
     allowed_inputfields = ['textline', 'textbox', 'crystallography',
                            'chemicalequationinput', 'vsepr_input',
-                           'drag_and_drop_input', 'editamoleculeinput',
-                           'designprotein2dinput', 'editageneinput',
-                           'annotationinput', 'jsinput', 'formulaequationinput']
+                           'drag_and_drop_input', 'designprotein2dinput',
+                           'editageneinput', 'annotationinput',
+                           'jsinput', 'formulaequationinput']
     code = None
     expect = None
 
