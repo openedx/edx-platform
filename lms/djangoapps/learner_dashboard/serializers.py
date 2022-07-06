@@ -54,6 +54,8 @@ class EnrollmentSerializer(serializers.Serializer):
     canUpgrade = serializers.BooleanField()
     isAuditAccessExpired = serializers.BooleanField()
     isEmailEnabled = serializers.BooleanField()
+    lastEnrolled = serializers.DateTimeField()
+    isEnrolled = serializers.BooleanField()
 
 
 class GradeDataSerializer(serializers.Serializer):
