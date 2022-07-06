@@ -37,13 +37,15 @@ class RecommendationsPanel extends React.Component {
   getCourseList = async () => {
     const coursesRecommendationData = await fetch(`${this.props.lmsRootUrl}/api/dashboard/v0/recommendation/courses/`)
       .then(response => {
-          if (response.status === 400) {
-            return this.props.generalRecommendations;
-          } else {
-            return response.json();
-          }
+        if (response.status === 400) {
+          return this.props.generalRecommendations;
+        } else {
+          return response.json();
         }
-      );
+      }).catch(() => {
+        return this.props.generalRecommendations;
+      });
+
     this.setState({
       coursesList: coursesRecommendationData['courses'],
       isPersonalizedRecommendation: coursesRecommendationData['is_personalized_recommendation']
