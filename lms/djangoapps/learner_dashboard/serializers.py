@@ -144,6 +144,11 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
 class SuggestedCourseSerializer(serializers.Serializer):
     """Serializer for a suggested course"""
 
+    bannerUrl = serializers.URLField()
+    logoUrl =serializers.URLField()
+    title= serializers.CharField()
+    courseUrl = serializers.URLField()
+
 
 class LearnerDashboardSerializer(serializers.Serializer):
     """Serializer for all info required to render the Learner Dashboard"""
