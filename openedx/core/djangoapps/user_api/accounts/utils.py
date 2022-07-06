@@ -2,6 +2,7 @@
 Utility methods for the account settings.
 """
 
+import logging
 import random
 import re
 import string
@@ -24,6 +25,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 from ..models import UserRetirementStatus
 
 ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH = 'enable_secondary_email_feature'
+LOGGER = logging.getLogger(__name__)
 
 
 def validate_social_link(platform_name, new_social_link):
@@ -171,7 +173,7 @@ def retrieve_last_sitewide_block_completed(user):
     try:
         item = modulestore().get_item(candidate_block_key, depth=1)
     except Exception as err:  # pylint: disable=broad-except
-        log.exception(
+        LOGGER.exception(
             '[PROD-2877] Error retrieving resume block for user %s with raw error %r',
             user.username, err,
         )
