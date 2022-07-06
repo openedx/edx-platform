@@ -49,6 +49,16 @@ def random_url(allow_null=False):
     return choice([f"{random_uuid}.example.com", f"example.com/{random_uuid}"])
 
 
+def random_grade():
+    """Return a random grade (0-100) with 2 decimal places of padding"""
+    return randint(0, 10000) / 100
+
+
+def decimal_to_grade_format(decimal):
+    """Util for matching serialized grade format, pads a decimal to 2 places"""
+    return "{:.2f}".format(decimal)
+
+
 def datetime_to_django_format(datetime_obj):
     """Util for matching serialized Django datetime format for comparison"""
     if datetime_obj:
@@ -136,7 +146,7 @@ class TestCourseRunSerializer(TestCase):
             "isArchived": random_bool(),
             "courseNumber": f"{uuid4()}-101",
             "accessExpirationDate": random_date(),
-            "minPassingGrade": randint(0, 10000) / 100,
+            "minPassingGrade": random_grade(),
             "endDate": random_date(),
             "homeUrl": f"{uuid4()}.example.com",
             "marketingUrl": f"{uuid4()}.example.com",
@@ -158,7 +168,7 @@ class TestCourseRunSerializer(TestCase):
             "accessExpirationDate": datetime_to_django_format(
                 input_data["accessExpirationDate"]
             ),
-            "minPassingGrade": str(input_data["minPassingGrade"]),
+            "minPassingGrade": decimal_to_grade_format(input_data["minPassingGrade"]),
             "endDate": datetime_to_django_format(input_data["endDate"]),
             "homeUrl": input_data["homeUrl"],
             "marketingUrl": input_data["marketingUrl"],
