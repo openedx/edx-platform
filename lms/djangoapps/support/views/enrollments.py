@@ -267,6 +267,12 @@ class EnrollmentSupportListView(GenericAPIView):
     def include_order_number(enrollment):
         """
         For a provided enrollment data dictionary, include order_number from CourseEnrollmentAttribute if available.
+
+        From all the attributes of a course enrollment:
+
+          * Filter order_number attributes namespaced under `order`
+          * Use the last/latest order number attr if multiple attrs found
+             * This is to keep the usage consistent with get_order_attribute_value method in CourseEnrollment
         """
         username = enrollment['user']
         course_id = enrollment['course_id']
@@ -283,7 +289,6 @@ class EnrollmentSupportListView(GenericAPIView):
                 course_id
             )
         enrollment['order_number'] = order_attribute[-1] if order_attribute else ''
-
 
     @staticmethod
     def manual_enrollment_data(enrollment_data, course_key):

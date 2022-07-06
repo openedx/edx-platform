@@ -347,7 +347,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
                 enrollment=self.enrollment,
                 namespace='order',
                 name='order_number',
-                value='ORD-00{}'.format(count+1)
+                value='ORD-00{}'.format(count + 1)
             )
         url = reverse(
             'support:enrollment_list',
