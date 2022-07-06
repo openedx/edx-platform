@@ -254,6 +254,12 @@ def _get_user_info_cookie_data(request, user):
         header_urls['resume_block'] = retrieve_last_sitewide_block_completed(user)
     except User.DoesNotExist:
         pass
+    except Exception as err:  # pylint: disable=broad-except
+        log.exception(
+            '[PROD-2877] Error retrieving resume block for user %s with raw error %s',
+            user.username, str(err),
+        )
+        pass
 
     header_urls = _convert_to_absolute_uris(request, header_urls)
 
