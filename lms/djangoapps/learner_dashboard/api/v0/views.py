@@ -1,6 +1,7 @@
 """ API v0 views. """
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from enterprise.models import EnterpriseCourseEnrollment
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -347,7 +348,7 @@ class CourseRecommendationApiView(APIView):
     GET api/dashboard/v0/recommendation/courses/
     """
 
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
+    authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
@@ -379,4 +380,5 @@ class CourseRecommendationApiView(APIView):
                 })
             else:
                 return Response(status=400)
+
         return Response({'courses': recommended_courses, 'is_personalized_recommendation': not is_control}, status=200)
