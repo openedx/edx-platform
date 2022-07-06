@@ -158,7 +158,7 @@ class LearnerDashboardSerializer(serializers.Serializer):
         child=LearnerEnrollmentSerializer(), allow_empty=True
     )
     unfulfilledEntitlements = serializers.ListField(
-        child=EntitlementSerializer(), allow_empty=True
+        child=UnfulfilledEntitlementSerializer(), allow_empty=True
     )
     suggestedCourses = serializers.ListField(
         child=SuggestedCourseSerializer(), allow_empty=True
