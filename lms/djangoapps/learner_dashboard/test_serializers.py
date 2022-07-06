@@ -192,19 +192,26 @@ class TestEnrollmentSerializer(TestCase):
             "canUpgrade": random_bool(),
             "isAuditAccessExpired": random_bool(),
             "isEmailEnabled": random_bool(),
+            "lastEnrolled": random_date(),
+            "isEnrolled": random_bool(),
         }
 
     def test_happy_path(self):
         input_data = self.generate_test_enrollment_info()
         output_data = EnrollmentSerializer(input_data).data
 
-        assert output_data == {
-            "isAudit": input_data["isAudit"],
-            "isVerified": input_data["isVerified"],
-            "canUpgrade": input_data["canUpgrade"],
-            "isAuditAccessExpired": input_data["isAuditAccessExpired"],
-            "isEmailEnabled": input_data["isEmailEnabled"],
-        }
+        self.assertDictEqual(
+            output_data,
+            {
+                "isAudit": input_data["isAudit"],
+                "isVerified": input_data["isVerified"],
+                "canUpgrade": input_data["canUpgrade"],
+                "isAuditAccessExpired": input_data["isAuditAccessExpired"],
+                "isEmailEnabled": input_data["isEmailEnabled"],
+                "lastEnrolled": datetime_to_django_format(input_data["lastEnrolled"]),
+                "isEnrolled": input_data["isEnrolled"],
+            },
+        )
 
 
 class TestGradeDataSerializer(TestCase):
