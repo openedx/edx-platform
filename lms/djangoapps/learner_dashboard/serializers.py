@@ -135,6 +135,11 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
 class UnfulfilledEntitlementSerializer(serializers.Serializer):
     """Serializer for an unfulfilled entitlement"""
 
+    courseProvider = CourseProviderSerializer(allow_null=True)
+    course = CourseSerializer()
+    entitlements = EntitlementSerializer()
+    programs = ProgramsSerializer()
+
 
 class SuggestedCourseSerializer(serializers.Serializer):
     """Serializer for a suggested course"""
