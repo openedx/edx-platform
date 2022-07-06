@@ -9,28 +9,28 @@ from django.utils.translation import ugettext as _
 % if show_banner:
 <div class="upgrade-banner d-flex bg-primary text-white align-items-center px-4 py-1">
     % if show_mfe:
-    <div class="d-flex w-100 small">
-        ${_("You are viewing an educator only preview of the new discussions experience!")}
+    <div class="d-flex w-100 small align-items-center">
+        ${_("Welcome to the new discussions experience. Please share your feedback.")}
+        <a href="${legacy_url}" class="ml-2 text-white">
+            <i class="fa fa-info-circle">
+                <span class="legacy-tooltip">${_("View legacy experience")}</span>
+            </i>
+        </a>
     </div>
     % else:
     <div class="d-flex w-100 small">
-        ${_("An educator preview of new discussions experience is available!")}
+        ${_("You are currently using the old discussions experience that will be deprecated soon. If you are facing any issues with the new experience, please share using the feedback button.")}
     </div>
+    <a class="btn btn-inverse-primary ml-2" style="font-size: 12px;" href="${mfe_url}">
+        ${_("Switch to new experience")}
+    </a>
     %endif
 
-    % if show_mfe:
-    <a class="btn btn-inverse-primary" style="font-size: 12px;" href="${legacy_url}">
-        ${_("View legacy experience")}
-    </a>
     % if share_feedback_url:
         <a class="btn btn-inverse-primary ml-2" style="font-size: 12px;" href="${share_feedback_url}" target="_blank" rel="noopener">
             ${_("Share feedback")}
         </a>
     % endif
-    % else:
-    <a class="btn btn-inverse-primary ml-2" style="font-size: 12px;" href="${mfe_url}">
-        ${_("View the new experience")}
-    </a>
-    % endif
 </div>
 % endif
+

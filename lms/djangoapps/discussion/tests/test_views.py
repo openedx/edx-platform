@@ -2301,11 +2301,10 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
                 response = self.client.get(reverse("forum_form_discussion", args=[self.course.id]))
                 content = response.content.decode('utf8')
         if mfe_url and toggle_enabled:
-            assert "You are viewing an educator only preview of the new discussions experience!" in content
-            assert "legacy experience" in content
-            assert "new experience" not in content
+            assert "Welcome to the new discussions experience. Please share your feedback." in content
+            assert "Switch to new experience" not in content
         else:
-            assert "You are viewing an educator only preview of the new discussions experience!" not in content
+            assert "Welcome to the new discussions experience. Please share your feedback." not in content
 
     @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
     @ddt.data(*itertools.product((True, False), ("legacy", "new", None)))

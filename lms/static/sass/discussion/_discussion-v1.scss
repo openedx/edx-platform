@@ -71,6 +71,25 @@
   }
 }
 
+.legacy-tooltip {
+    position: absolute;
+    z-index: 1070;
+    display: none;
+    margin: 0;
+    line-height: 1.55556;
+    font-family: "Inter","Helvetica Neue",Arial,sans-serif;
+    background: white;
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    &:hover,
+    &:active,
+    &:focus {
+        display: block;
+    }
+}
+
 // Layout control for discussion modules that does not apply to the discussion board
 .discussion-module {
   .discussion {
