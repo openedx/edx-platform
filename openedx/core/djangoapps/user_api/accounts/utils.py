@@ -170,7 +170,11 @@ def retrieve_last_sitewide_block_completed(user):
 
     try:
         item = modulestore().get_item(candidate_block_key, depth=1)
-    except ItemNotFoundError:
+    except Exception as err:  # pylint: disable=broad-except
+        log.exception(
+            '[PROD-2877] Error retrieving resume block for user %s with raw error %r',
+            user.username, err,
+        )
         item = None
 
     if not (lms_root and item):
