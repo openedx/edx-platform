@@ -145,8 +145,8 @@ class SuggestedCourseSerializer(serializers.Serializer):
     """Serializer for a suggested course"""
 
     bannerUrl = serializers.URLField()
-    logoUrl =serializers.URLField()
-    title= serializers.CharField()
+    logoUrl = serializers.URLField()
+    title = serializers.CharField()
     courseUrl = serializers.URLField()
 
 
