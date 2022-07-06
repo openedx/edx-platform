@@ -400,25 +400,6 @@ class TestLearnerEnrollmentsSerializer(TestCase):
         ]
         assert output_data.keys() == set(expected_keys)
 
-    def test_allowed_empty(self):
-        """Tests for allowed null fields, mostly that nothing breaks"""
-        input_data = self.generate_test_enrollments_data()
-        input_data["courseProvider"] = None
-
-        output_data = LearnerEnrollmentSerializer(input_data).data
-
-        expected_keys = [
-            "courseProvider",
-            "course",
-            "courseRun",
-            "enrollment",
-            "gradeData",
-            "certificate",
-            "entitlements",
-            "programs",
-        ]
-        assert output_data.keys() == set(expected_keys)
-
 
 class TestUnfulfilledEntitlementSerializer(TestCase):
     """High-level tests for UnfulfilledEntitlementSerializer"""
@@ -534,13 +515,23 @@ class TestLearnerDashboardSerializer(TestCase):
         )
 
     @mock.patch(
+        "lms.djangoapps.learner_dashboard.serializers.SuggestedCourseSerializer.to_representation"
+    )
+    @mock.patch(
+        "lms.djangoapps.learner_dashboard.serializers.UnfulfilledEntitlementSerializer.to_representation"
+    )
+    @mock.patch(
         "lms.djangoapps.learner_dashboard.serializers.LearnerEnrollmentSerializer.to_representation"
     )
     @mock.patch(
         "lms.djangoapps.learner_dashboard.serializers.PlatformSettingsSerializer.to_representation"
     )
     def test_linkage(
-        self, mock_platform_settings_serializer, mock_learner_enrollment_serializer
+        self,
+        mock_platform_settings_serializer,
+        mock_learner_enrollment_serializer,
+        mock_entitlements_serializer,
+        mock_suggestions_serializer,
     ):
         mock_platform_settings_serializer.return_value = (
             mock_platform_settings_serializer
@@ -548,12 +539,14 @@ class TestLearnerDashboardSerializer(TestCase):
         mock_learner_enrollment_serializer.return_value = (
             mock_learner_enrollment_serializer
         )
+        mock_entitlements_serializer.return_value = mock_entitlements_serializer
+        mock_suggestions_serializer.return_value = mock_suggestions_serializer
 
         input_data = {
             "platformSettings": {},
             "enrollments": [{}],
-            "unfulfilledEntitlements": [],
-            "suggestedCourses": [],
+            "unfulfilledEntitlements": [{}],
+            "suggestedCourses": [{}],
         }
         output_data = LearnerDashboardSerializer(input_data).data
 
@@ -562,7 +555,7 @@ class TestLearnerDashboardSerializer(TestCase):
             {
                 "platformSettings": mock_platform_settings_serializer,
                 "enrollments": [mock_learner_enrollment_serializer],
-                "unfulfilledEntitlements": [],
-                "suggestedCourses": [],
+                "unfulfilledEntitlements": [mock_entitlements_serializer],
+                "suggestedCourses": [mock_suggestions_serializer],
             },
         )
