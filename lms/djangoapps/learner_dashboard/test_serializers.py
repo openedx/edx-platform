@@ -290,6 +290,7 @@ class TestEntitlementSerializer(TestCase):
             "canViewCourse": random_bool(),
             "changeDeadline": random_date(),
             "isExpired": random_bool(),
+            "expirationDate": random_date(),
         }
 
     def test_happy_path(self):
@@ -314,6 +315,7 @@ class TestEntitlementSerializer(TestCase):
             "canViewCourse": input_data["canViewCourse"],
             "changeDeadline": datetime_to_django_format(input_data["changeDeadline"]),
             "isExpired": input_data["isExpired"],
+            "expirationDate": datetime_to_django_format(input_data["expirationDate"]),
         }
 
 
