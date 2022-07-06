@@ -19,6 +19,7 @@ from lms.djangoapps.learner_dashboard.serializers import (
     PlatformSettingsSerializer,
     ProgramsSerializer,
     LearnerDashboardSerializer,
+    SuggestedCourseSerializer,
     UnfulfilledEntitlementSerializer,
 )
 
@@ -459,6 +460,50 @@ class TestUnfulfilledEntitlementSerializer(TestCase):
             "programs",
         ]
         assert output_data.keys() == set(expected_keys)
+
+
+class TestSuggestedCourseSerializer(TestCase):
+    """High-level tests for SuggestedCourseSerializer"""
+
+    @classmethod
+    def generate_test_suggested_courses(cls):
+        return {
+            "bannerUrl": random_url(),
+            "logoUrl": random_url(),
+            "title": f"{uuid4()}",
+            "courseUrl": random_url(),
+        }
+
+    def test_structure(self):
+        """Test that nothing breaks and the output fields look correct"""
+        input_data = self.generate_test_suggested_courses()
+
+        output_data = SuggestedCourseSerializer(input_data).data
+
+        expected_keys = [
+            "bannerUrl",
+            "logoUrl",
+            "title",
+            "courseUrl",
+        ]
+        assert output_data.keys() == set(expected_keys)
+
+    def test_happy_path(self):
+        """Test that data serializes correctly"""
+
+        input_data = self.generate_test_suggested_courses()
+
+        output_data = SuggestedCourseSerializer(input_data).data
+
+        self.assertDictEqual(
+            output_data,
+            {
+                "bannerUrl": input_data["bannerUrl"],
+                "logoUrl": input_data["logoUrl"],
+                "title": input_data["title"],
+                "courseUrl": input_data["courseUrl"],
+            },
+        )
 
 
 class TestLearnerDashboardSerializer(TestCase):
