@@ -48,7 +48,6 @@ from organizations.exceptions import InvalidOrganizationException
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
-from common.djangoapps.student.forms import DocumentForm 
 from common.djangoapps.student.models import DocumentStorage 
 from common.djangoapps.student.views.serializer import CourseSerializer 
 from django.views.decorators.csrf import csrf_exempt # To Import
@@ -69,6 +68,13 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     UserBasedRole
 )
+from rest_framework.response import Response ##
+from rest_framework.views import APIView ##
+from common.djangoapps.student.forms import DocumentForm  , BadgeForm
+from cms.djangoapps.contentstore.views.serializers import BadgeSerializer, CoursePointsSerializer
+
+
+from common.djangoapps.student.models import Badges, DocumentStorage , CoursePoints, Announcement,CourseEnrollment # To Import
 from common.djangoapps.util.course import get_link_for_about_page
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
@@ -2070,5 +2076,126 @@ def delete_doc(request):
         
 
 
+
+
+
+
+class BadgeView(APIView):
+
+    authentication_classes = (
+                    JwtAuthentication,
+                    BearerAuthenticationAllowInactiveUser,
+                    SessionAuthenticationAllowInactiveUser,
+                            )
+    permission_classes = (IsAuthenticated, )
+    
+    def get(self, request, active=None):
+        try:
+            if request.user.is_staff:
+                all_badges = Badges.objects.all()
+                if active == None or active== "all":
+                    return Response({"success":True, "data":{"badge_list":BadgeSerializer(all_badges, many=True).data}})
+                active = bool(active.capitalize())
+                return Response({"success":True, "data":{"badge_list":BadgeSerializer(all_badges.filter(active=active), many=True).data}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))
+        except Exception as e:
+            return Response({"success":False, "message":{"error":f"{e}"} })
+      
+    def post(self, request):
+        try:
+            data = request.data
+            form_data = BadgeForm(data=data,files=data)
+            if request.user.is_staff:
+                if form_data.is_valid():
+                    form_data = form_data.save(commit=False)
+                    form_data.created_by = request.user 
+                    form_data.last_updated_by = request.user
+                    form_data.save() 
+                    return Response({"success":True, "message":{"created":"Created Successfully"}})
+                return Response({"success":False, "message":{"errors":form_data.errors}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))        
+        except Exception as e:
+            return Response({"success":False, "message":{"error":f"{e}"} })
+
+    def put(self, request,badge_id=None):
+        try:
+            if request.user.is_staff:
+                if badge_id:
+                    data = request.data
+                    file = data.get('badge_image')
+                    try:
+                        badge_data = Badges.objects.get(id=badge_id)
+                    except Badges.DoesNotExist  as not_exist:
+                        return Response({"success":False, "message":{"badge_id":not_exist}})
+                    form_data = BadgeForm(data=data, instance=badge_data)
+                    if form_data.is_valid():
+                        form_data = form_data.save(commit=False)
+                        form_data.last_updated_by = request.user
+                        form_data.save()
+                        return Response({"success":True, "message":{"updated": 'Data updated Successfully.'}})
+                    return Response({"success":False, "message":{"errors":form_data.errors}})
+                return Response({"success":False, "message":{"id":'Id not provided'}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))
+        except Exception as e:
+            return Response({"success":False, "message":{"error":f"{e}"} })
+
+    def delete(self, request,badge_id=None):
+        try:
+            if request.user.is_staff:
+                if badge_id:
+                    data = request.data
+                    active = data.get('active')
+                    try:
+                        badge_data = Badges.objects.get(id=badge_id)
+                    except Badges.DoesNotExist  as not_exist:
+                        return Response({"success":False, "message":{"badge_id":not_exist}})
+                    badge_data.active = active
+                    badge_data.last_updated_by = request.user
+                    badge_data.save()
+                    return Response({"success":True, "message":{"updated": 'Status Changed Successfully.'}})
+                return Response({"success":False, "message":{"id":'Id not provided'}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))
+        except Exception as e:
+            return Response({"success":False, "message":{"error":f"{e}"} })
+
+
+class PointsView(APIView):
+
+    authentication_classes = (
+                    JwtAuthentication,
+                    BearerAuthenticationAllowInactiveUser,
+                    SessionAuthenticationAllowInactiveUser,
+                            )
+    permission_classes = (IsAuthenticated, )
+    
+    def post(self, request):
+        try:
+            if request.user.is_staff:
+                data = request.data
+                serialized_data = CoursePointsSerializer(data=data)
+                if serialized_data.is_valid():
+                    serialized_data.save(created_by=self.request.user)
+                    return Response({"success":True, "message":{"created":"Added Successfully"}})
+                return Response({"success":False, "message":{"error":serialized_data.errors}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))
+        except Exception as e:
+            return Response({"success":False, "message":{'error':f"{e}"}})
+
+    
+    def get(self, request, course_id=None):
+
+        try:
+            if request.user.is_staff:
+                if course_id != None:
+                    filtered_data = CoursePoints.objects.filter(course_id=course_id)
+                    if filtered_data.exists():
+                        filtered_data = [{"id": data.id, "course":course_id, "chapter":data.chapter, "reward_coins":data.reward_coins} for data in filtered_data]
+                    return Response({"success":True, "data":filtered_data})
+                return Response({"success":False, "message":{"id":"Course Id not provided"}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))
+        except Exception as e:
+            return Response({"success":False, "message":{'error':f"{e}"}})
+
+        
 
 

@@ -963,6 +963,7 @@ class LiveClasses(models.Model):
     is_recurrence_meeting =  models.BooleanField(max_length=60, null=False)
     meeting_notes = models.CharField(max_length=60, null=True)
     course = models.ForeignKey(CourseOverview, db_index=True, on_delete=models.CASCADE ,null=True )
+    days=models.JSONField(null=True, blank=True)
 
 
 #     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)

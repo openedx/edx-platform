@@ -2,7 +2,7 @@ import logging
 from urllib import response
 
 from openedx.core.djangoapps.enrollments.serializers import  (LiveClassesSerializer , UserListSerializer ,UserAttendanceListSerializer ,CourseEnrollmentSerializer ,LiveClassEnrollmentSerializer ,LiveClassUserDetailsSerializer ,UserLiveClassDetailsSerializer, CourseEnrolledUserDetailsSerializer ,LoginStaffCourseDetailsSerializer
-, StaffNotifyCallSerializer)
+, StaffNotifyCallSerializer , STudentUserListSerializer , StudentListbytaffDetailsSerializer)
 from common.djangoapps.student.models import LiveClassEnrollment, UserProfile , NotifyCallRequest
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.lib.log_utils import audit_log
@@ -42,7 +42,11 @@ from openedx.core.lib.exceptions import CourseNotFoundError
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
 
 
+# from apscheduler.schedulers.background import BackgroundScheduler
+# from apscheduler.schedulers.blocking import BlockingScheduler
 
+# import django_apscheduler
+# import django_crontab
 
 
 
@@ -70,6 +74,18 @@ REQUIRED_ATTRIBUTES = {
     "credit": ["credit:provider_id"],
 }
 
+
+# sched = BlockingScheduler()
+
+# @sched.scheduled_job('interval', minutes=3)
+# def timed_job():
+#     print('This job is run every three minutes.')
+
+# @sched.scheduled_job('cron', day_of_week='mon-fri', hour=17)
+# def scheduled_job():
+#     print('This job is run every weekday at 5pm.')
+
+# sched.start()
 
 
 
@@ -170,6 +186,25 @@ class UserDetailsListApiView(DeveloperErrorViewMixin, ListAPIView):
 
 
 
+class StudentUserDetailsListApiView(ListAPIView):
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
+    serializer_class = STudentUserListSerializer
+    queryset = User.objects.all()
+
+
+    def get_queryset(self):
+        return User.objects.filter(is_active=True , is_staff=False , is_superuser=False)
+
+
+
+
 class UserAttendanceDetailsListApiView(DeveloperErrorViewMixin, ListAPIView):
 
     authentication_classes = (
@@ -187,6 +222,8 @@ class UserAttendanceDetailsListApiView(DeveloperErrorViewMixin, ListAPIView):
         """Get Serializer"""
         if self.request.method == 'GET':
             return UserAttendanceListSerializer
+
+
 
 
 
@@ -208,7 +245,7 @@ class EnrollLiveClassCreateView(DeveloperErrorViewMixin, CreateAPIView):
         """Upload documents"""
         try:
             serializer = self.serializer_class(
-                data=request.data,
+                data=request.data, context = {'assigned_by':self.request.user}
             )
             serializer.is_valid(raise_exception=True)
             
@@ -241,25 +278,26 @@ class EnrollLiveClassUserDetailsView(DeveloperErrorViewMixin, ListCreateAPIView)
 
 
 
-class EnrollCourseUserDetailsView(DeveloperErrorViewMixin, ListAPIView):
+class EnrollCourseUserDetailsView(DeveloperErrorViewMixin, RetrieveDestroyAPIView):
     authentication_classes = (
         JwtAuthentication,
         BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAdminUser,)
-    #throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = CourseEnrolledUserDetailsSerializer
-    # pagination_class = LiveClassesSerializer
     lookup_url_kwarg = 'course_id'
 
 
-    # lookup_field = "username"
+    def get(self, request, *args, **kwargs):
 
-    def get_queryset(self):
+        serializer = self.serializer_class(CourseEnrollment.objects.filter(course_id=self.kwargs.get('course_id')), many=True)
+
+        data={}
+        data['course_id']=self.kwargs.get('course_id')
+        data['datas']=serializer.data
     
-        return CourseEnrollment.objects.filter(course_id=self.kwargs.get('course_id'))
-
+        return Response(data, status=status.HTTP_200_OK)
 
 
 
@@ -553,6 +591,7 @@ class UserCourseEnrollment(CreateAPIView , ApiKeyPermissionMixIn):
                     str(course_id),
                     mode=mode,
                     is_active=is_active,
+                    assigned_by=self.request.user,
                     enrollment_attributes=enrollment_attributes,
                     enterprise_uuid=request.data.get('enterprise_uuid')
                 )
@@ -751,18 +790,6 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         )
 
 
-    # queryset = CourseOverview.objects.all()
-    # def get_serializer_class(self):
-    #     """Get Serializer"""
-    #     if self.request.method == 'GET':
-    #         return CourseSerializer
-
-
-
-
-
-
-
 
 
 
@@ -807,14 +834,44 @@ class StaffNotifyCallRequestRetrieveDetails(DeveloperErrorViewMixin, RetrieveDes
     
    
         if instance.requested_to == self.request.user:
-                    instance.active_status = False
+                    instance.seen = True
                     instance.save()
                     serializer = self.serializer_class(instance)
 
-                    # serializers= serializer.data.popitem('active_status')
+                    # serializers= serializer.data.popitem('seen')
         else:
             return Response("You are not notify with this call request", status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status = status.HTTP_200_OK)
 
 
 
+class StudentListbyCourseDetailsList(DeveloperErrorViewMixin, ListAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
+    serializer_class = StudentListbytaffDetailsSerializer
+    lookup_url_kwarg = 'assigned_by'
+
+
+    # def get_queryset(self):
+    
+    #     return CourseEnrollment.objects.filter(assigned_by=self.request.user)
+
+
+    def get(self, request, *args, **kwargs):
+
+        courses=CourseEnrollment.objects.filter(assigned_by=self.request.user)
+        # courses_l = courses.values_list('course').distinct()
+        data = {}
+
+        for course in courses:
+
+            serializer = self.serializer_class(courses.filter(course_id=course.course_id) ,many=True).data
+            data[str(course.course_id)]=serializer
+        return Response(data, status=status.HTTP_200_OK)
+
+        

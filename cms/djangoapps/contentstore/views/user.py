@@ -49,6 +49,8 @@ def course_team_handler(request, course_key_string=None, email=None):
     DELETE:
         json: remove a particular course team member from the course team (email is required).
     """
+
+    # import pdb;pdb.set_trace()
     course_key = CourseKey.from_string(course_key_string) if course_key_string else None
     # No permissions check here - each helper method does its own check.
 
@@ -103,7 +105,10 @@ def _course_team_user(request, course_key, email):
     """
     Handle the add, remove, promote, demote requests ensuring the requester has authority
     """
+
     # check that logged in user has permissions to this item
+    # import pdb;pdb.set_trace()
+
     requester_perms = get_user_permissions(request.user, course_key)
     permissions_error_response = JsonResponse({"error": _("Insufficient permissions")}, 403)
     if (requester_perms & STUDIO_VIEW_USERS) or (email == request.user.email):

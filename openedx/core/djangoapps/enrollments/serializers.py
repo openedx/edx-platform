@@ -153,7 +153,7 @@ class LiveClassesSerializer(serializers.ModelSerializer):
         
         model = LiveClasses
         
-        fields = ('id', 'start_time' ,'end_time' , 'start_date' , 'end_date' , 'room_key' , 'room_name', 'topic_name' , 'client_token', 'meeting_link' ,'created_by_id', 'created_date' , 'meeting_notes' , 'is_recurrence_meeting' , 'course' , 'course_id')
+        fields = ('id', 'start_time' ,'end_time' , 'start_date' , 'end_date' , 'room_key' , 'room_name', 'topic_name' , 'client_token', 'meeting_link' ,'created_by_id', 'created_date' , 'days', 'meeting_notes' , 'is_recurrence_meeting' , 'course' , 'course_id')
 
     def create(self, validated_data ):
         validated_data['created_date']= datetime.datetime.now()
@@ -165,6 +165,32 @@ class LiveClassesSerializer(serializers.ModelSerializer):
         super(LiveClassesSerializer, self).update(instance, validated_data)
         return instance 
 
+    def validate(self, data):
+        current_date_time = datetime.datetime.now()
+        current_date = current_date_time.date()
+        current_time = current_date_time.time()
+        start_date  = data.get('start_date')
+        end_date = data.get('end_date')
+        start_time = data.get('start_time')
+        end_time = data.get('end_time')
+        days = data.get('days')
+        days_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+        if start_date and start_time and end_date and end_time is not None:
+            if int(float((end_date - start_date).days)/30.5)> 6:
+                raise serializers.ValidationError("Live Course should not exceed 6 months.")
+            if start_date < current_date or start_time < current_time:
+                raise serializers.ValidationError("Start date and time shouldn't be less than today's date and time ")
+            if end_date < start_date or end_time < start_time:
+                raise serializers.ValidationError("End date and time shouldn't be less than start date and time")
+        if data.get('is_recurrence_meeting') is not None:
+            if data.get('is_recurrence_meeting'):
+                if type(days) != list or days == [] :
+                    raise serializers.ValidationError("Days should be non empty list")
+                if not set(days).issubset(set(days_list)):
+                    raise serializers.ValidationError(f"Invalid list of days Should be {days_list}")
+        return data 
+        
 
 
 class CourseEnrollmentsApiListSerializer(CourseEnrollmentSerializer):
@@ -229,6 +255,23 @@ class UserListSerializer(serializers.ModelSerializer):
 
 
 
+class StaffListSerializer(serializers.ModelSerializer):
+    
+
+    class Meta:
+        model = User
+        fields = ('id' , 'username', 'email' ,  'is_staff' )
+
+
+class STudentUserListSerializer(serializers.ModelSerializer):
+    
+
+    class Meta:
+        model = User
+        fields = ('id' , 'username', 'email' ,  'is_active' ,'first_name' , 'last_name' , 'date_joined')
+
+
+
 
 class UserAttendanceListSerializer(serializers.ModelSerializer):
     
@@ -253,7 +296,7 @@ class LiveClassEnrollmentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         instance=LiveClassEnrollment.objects.create(live_class=validated_data.get('live_class'), user=validated_data.get('user') , updated_at = datetime.datetime.now())
         instance.save()
-        CourseEnrollment.objects.create(course=instance.live_class.course, user=instance.user)
+        CourseEnrollment.objects.create(course=instance.live_class.course, user=instance.user, assigned_by=self.context['assigned_by'])
         
         return instance
 
@@ -276,13 +319,12 @@ class CourseEnrolledUserDetailsSerializer(serializers.ModelSerializer):
 
     #live_class =LiveClassesSerializer(read_only=True)
     user =UserListSerializer( read_only=True)
-    course_id = serializers.CharField()
 
 
 
     class Meta:
         model = CourseEnrollment
-        fields = ( 'course_id','user', 'created')
+        fields = ( 'assigned_by' ,'user')
         
 
 
@@ -330,7 +372,7 @@ class UserRequestCallSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = NotifyCallRequest
-        fields= ('requested_to', 'messeage' , 'requested_at' , 'active_status')
+        fields= ('requested_to', 'messeage' , 'requested_at' , 'seen')
 
 
     def create(self, validated_data ):
@@ -347,6 +389,48 @@ class StaffNotifyCallSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = NotifyCallRequest
-        fields= ('id','requested_by', 'messeage' , 'requested_at' , 'active_status')
+        fields= ('id','requested_by', 'messeage' , 'requested_at' , 'seen')
+
+
+class StaffofCourseDetailsSerializer(serializers.ModelSerializer):
+
+    user = serializers.CharField()
+    assigned_by = serializers.CharField()
+    # course=serializers.CharField()
+    course = CourseSerializer(read_only=True)
+
+    
+
+    class Meta:
+        model= CourseEnrollment
+        fields=('id', 'user' , 'assigned_by', 'course')
+
+
+class StudentListbytaffDetailsSerializer(serializers.ModelSerializer):
+
+    user = serializers.CharField()
+
+    # course = CourseSerializer(read_only=True)
+  
+
+    class Meta:
+        model= CourseEnrollment
+        fields=('id', 'user' )
+
+
+
+class CourseandStafAassignedDetailsSerializer(serializers.ModelSerializer):
+
+    assigned_by = serializers.CharField()
+    course = serializers.CharField()
+
+    
+    class Meta:
+        model= CourseEnrollment
+        fields=('id', 'course' , 'assigned_by' )
+
+
+
+   
 
 

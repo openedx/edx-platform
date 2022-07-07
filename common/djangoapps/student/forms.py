@@ -17,7 +17,7 @@ from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from common.djangoapps.student.message_types import AccountRecovery as AccountRecoveryMessage
-from common.djangoapps.student.models import DocumentStorage
+from common.djangoapps.student.models import DocumentStorage , Badges
 
 
 def send_account_recovery_email_for_user(user, request, email=None):
@@ -61,3 +61,11 @@ class DocumentForm(forms.ModelForm):
     class Meta:
         model = DocumentStorage
         exclude= ('created_by', 'added_on', 'updated_on', 'course','course_id')
+
+
+
+class BadgeForm(forms.ModelForm):
+
+    class Meta:
+        model = Badges
+        fields = ('badge_name', 'min_points', 'badge_image')

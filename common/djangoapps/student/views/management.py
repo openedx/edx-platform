@@ -9,6 +9,7 @@ import urllib.parse
 import uuid
 from collections import namedtuple
 from rest_framework.parsers import JSONParser
+from django.db.models import Q
 
 from django.conf import settings
 from django.contrib import messages
@@ -39,6 +40,9 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
+
+from rest_framework.views import APIView, status
+from rest_framework.response import Response 
 
 from common.djangoapps.track import views as track_views
 from lms.djangoapps.bulk_email.models import Optout
@@ -76,8 +80,14 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     UserSignupSource,
     UserStanding,
     create_comments_service_user,
-    email_exists_or_retired
+    email_exists_or_retired, 
+        email_exists_or_retired ,DocumentStorage , Announcement
 )
+
+
+from rest_framework.generics import ListAPIView , ListCreateAPIView , RetrieveAPIView
+from common.djangoapps.student.views.serializer import  AnnouncementSerializer
+from openedx.core.djangoapps.enrollments.serializers import StaffListSerializer , StaffofCourseDetailsSerializer , CourseandStafAassignedDetailsSerializer
 from common.djangoapps.student.signals import REFUND_ORDER
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
@@ -972,3 +982,129 @@ def uploaded_doc_view(request):
         return JsonResponse({"success":False, 'message':{'id':'Document Id not provided.'}})  
     except Exception as e:
         return JsonResponse({"success":False, "message":{"error":f"{e}"} })
+
+
+
+class AnnouncementView(APIView):
+
+    authentication_classes = (
+                    JwtAuthentication,
+                    BearerAuthenticationAllowInactiveUser,
+                    SessionAuthenticationAllowInactiveUser,
+                            )
+    permission_classes = (IsAuthenticated, )
+    
+    ann_model = Announcement
+    serializer = AnnouncementSerializer
+    course_model = CourseEnrollment
+    
+
+    def get(self, request):
+        try:
+            active_announcement = self.ann_model.objects.filter(active=True)
+            if request.user.is_staff:
+                created_announcement = active_announcement.filter(created_by=request.user)
+                created_announcement = self.serializer(created_announcement, many=True).data
+                return Response({"success":True, "data":{"announcement_list":created_announcement}})
+            courses=self.course_model.objects.filter(user=request.user,is_active=True)
+            all_student = self.serializer(active_announcement.filter(announcement_bases='all'), many=True).data
+            student_announcement = self.serializer(active_announcement.filter(Q(announcement_for__contains=str(request.user.id))|Q(announcement_for__contains=request.user.id),announcement_bases='student'), many=True).data
+            course_bases = active_announcement.filter(announcement_bases='course')
+            course_announcement= []
+            for courses_l in course_bases:
+                for course_id in courses_l.announcement_for:
+                    if courses.filter(course_id=course_id).exists():
+                       course_announcement.append(self.serializer(courses_l, many=False).data)
+            return Response({"success":True, "data":{"all_student":all_student, "specific_student":student_announcement, "specific_course":course_announcement}})
+        except Exception as e:
+            return Response({"success":False, "message":{'error':f"{e}"}})
+
+
+    def post(self, request):
+        try:
+            if request.user.is_staff or request.user.is_superuser: 
+                data = request.data
+                serialized_data = self.serializer(data=data)
+                if serialized_data.is_valid():
+                    serialized_data.save(created_by=request.user)
+                    return Response({"success":True, "message":{"created":"Announcement Created Successfully"}})
+                return Response({"success":False, "message":{"error": serialized_data.errors}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))
+        except Exception as e:
+            return Response({"success":False, "message":{'error':f"{e}"}})
+
+
+    def delete(self, request, ann_id=None):
+        try:
+            if request.user.is_staff or request.user.is_superuser:
+                if ann_id:
+                    try:
+                        ann_detail = self.ann_model.objects.get(id=ann_id, active=True)
+                        ann_detail.active = False
+                        ann_detail.save()
+                        return Response({"success":True, "message":{"active":"Deactivated Successfully"}})
+                    except self.ann_model.DoesNotExist as not_exist:
+                        return Response({"success":False, "message":{"ann_id":f"{not_exist} or already deactivated."}})
+                return Response({"success":False, "message":{"id":"Id not provided"}})                    
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))     
+        except Exception as e:
+            return Response({"success":False, "message":{'error':f"{e}"}})
+
+
+class StaffDetailsListApiView(ListAPIView):
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    # permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
+    serializer_class = StaffListSerializer
+    queryset = User.objects.all()
+
+
+    def get_queryset(self):
+        return User.objects.filter(is_staff=True , is_superuser=False)
+
+        
+
+class StaffofCourseDetailslist(RetrieveAPIView):
+
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    # permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
+    serializer_class = StaffofCourseDetailsSerializer
+    lookup_field = 'course_id'
+
+    # def get_queryset(self):
+    #     return CourseEnrollment.objects.filter(user=self.request.user)
+
+
+    def get(self, request, *args, **kwargs):
+        instance = CourseEnrollment.objects.get(user_id=self.request.user, course_id=self.kwargs.get('course_id'))
+        serializer = self.serializer_class(instance=instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class CourseandStafAassignedDetailsList(ListAPIView) :
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    pagination_class = None
+    serializer_class = CourseandStafAassignedDetailsSerializer
+    # lookup_field = "username"
+
+    def get_queryset(self):
+
+        return CourseEnrollment.objects.filter(user_id=self.request.user)
+
+        

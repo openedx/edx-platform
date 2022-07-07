@@ -847,34 +847,34 @@ def get_course_prices(course, verified_only=False):
     registration_price is the minimum price for the course across all course modes.
     cosmetic_display_prices is the course price as a string preceded by correct currency, or 'Free'.
     """
-    log.info("____Course_from_api______", course)
+    # log.info("____Course_from_api______", course)
     # Find the
     if verified_only:
-        log.info("____get__verified______", verified_only)
+        # log.info("____get__verified______", verified_only)
         registration_price = CourseMode.min_course_price_for_verified_for_currency(
             course.id,
             settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
         )
-        log.info("____registration__Price1______",  registration_price, course.id , settings)
+        # log.info("____registration__Price1______",  registration_price, course.id , settings)
     else:
         registration_price = CourseMode.min_course_price_for_currency(
             course.id,
             settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
         )
-        log.info("____registration__Price2______",  registration_price, course.id , settings)
+        # log.info("____registration__Price2______",  registration_price, course.id , settings)
 
     if registration_price > 0:
         price = registration_price
-        log.info("____get__Price1______", price)
+        # log.info("____get__Price1______", price)
     # Handle course overview objects which have no cosmetic_display_price
     elif hasattr(course, 'cosmetic_display_price'):
         price = course.cosmetic_display_price
-        log.info("____get__Price2______", price)
+        # log.info("____get__Price2______", price)
     else:
         price = None
-        log.info("____get__Price3______", price)
+        # log.info("____get__Price3______", price)
     
-    log.info("____Price44______", price)
+    # log.info("____Price44______", price)
     return registration_price, format_course_price(price) 
 
 
@@ -892,7 +892,7 @@ def format_course_price(price ,verified_only=False):
         # Translators: This refers to the cost of the course. In this case, the course costs nothing so it is free.
         cosmetic_display_price = _('Free')
 
-    log.info("____Price-cos-cosmetic______", cosmetic_display_price)
+    # log.info("____Price-cos-cosmetic______", cosmetic_display_price)
     return cosmetic_display_price
 
 

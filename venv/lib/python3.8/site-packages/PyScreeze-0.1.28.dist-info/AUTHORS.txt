@@ -1,0 +1,21 @@
+Here is an inevitably incomplete list of MUCH-APPRECIATED CONTRIBUTORS --
+people who have submitted patches, reported bugs, added translations, helped
+answer newbie questions, and generally made PyScreeze that much better:
+
+Al Sweigart https://github.com/asweigart
+Aneesh Kumar https://github.com/anush0247
+anolir https://github.com/anolir
+Ari Lacenski https://github.com/tensory
+Brian Redmond https://github.com/bredmond
+Christopher Valles https://github.com/christophervalles
+Davee Nguyen https://github.com/daveenguyen
+David O'Gwynn https://github.com/dogwynn
+ijknabla https://github.com/ijknabla
+Jeremy R. Gray https://github.com/jeremygray
+John Hendy https://github.com/jwhendy
+Jon Winsley https://github.com/glitchassassin
+Julien Schueller https://github.com/jschueller
+Lauritz Thaulow https://github.com/LauritzThaulow
+Rob Putt https://github.com/robputt796
+vorstrelok https://github.com/vorstrelok
+zerocewl https://github.com/zerocewl

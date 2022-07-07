@@ -1,0 +1,42 @@
+Metadata-Version: 2.1
+Name: mysql-connector-python
+Version: 8.0.29
+Summary: MySQL driver written in Python
+Home-page: http://dev.mysql.com/doc/connector-python/en/index.html
+Author: Oracle and/or its affiliates
+Author-email: 
+License: GNU GPLv2 (with FOSS License Exception)
+Download-URL: http://dev.mysql.com/downloads/connector/python/
+Keywords: mysql db
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Other Environment
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Topic :: Database
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Dist: protobuf (>=3.0.0)
+Provides-Extra: compression
+Requires-Dist: lz4 (>=2.1.6) ; extra == 'compression'
+Requires-Dist: zstandard (>=0.12.0) ; extra == 'compression'
+Provides-Extra: dns-srv
+Requires-Dist: dnspython (>=1.16.0) ; extra == 'dns-srv'
+Provides-Extra: gssapi
+Requires-Dist: gssapi (>=1.6.9) ; extra == 'gssapi'
+
+
+MySQL driver written in Python which does not depend on MySQL C client
+libraries and implements the DB API v2.0 specification (PEP-249).
+
+
