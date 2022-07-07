@@ -373,7 +373,8 @@ class CourseRecommendationApiView(APIView):
             course_data = get_course_data(course_id)
             if course_data:
                 recommended_courses.append({
-                    'course_key': course_data['key'],
+                    'course_run_key': [run['key'] for run in course_data['course_runs']
+                                       if run['availability'] == 'Current'][-1],
                     'title': str(course_data['title']),
                     'logo_image_url': course_data['owners'][0]['logo_image_url'],
                     'marketing_url': course_data.get('marketing_url')

@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 
 def get_personalized_course_recommendations(user_id):
-    """ get personalize recommendations from Amplitude. """
+    """ Get personalize recommendations from Amplitude. """
     headers = {
         'Authorization': f'Api-Key {settings.AMPLITUDE_API_KEY}',
         'Content-Type': 'application/json'
