@@ -931,7 +931,7 @@ class SequenceBlock(
             user_id = current_user.opt_attrs.get(ATTR_KEY_USER_ID)
             user_is_staff = current_user.opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
             user_role_in_course = 'staff' if user_is_staff else 'student'
-            course_id = self.runtime.course_id
+            course_id = self.scope_ids.usage_id.context_key
             content_id = self.location
 
             context = {
