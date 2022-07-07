@@ -2706,15 +2706,22 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     def test_replace_urls(self):
         html = '<a href="/static/id">'
         assert self.runtime.replace_urls(html) == \
-            static_replace.replace_static_urls(html, course_id=self.runtime.course_id)
+            static_replace.replace_static_urls(html, course_id=self.course.id)
 
     def test_replace_course_urls(self):
         html = '<a href="/course/id">'
         assert self.runtime.replace_course_urls(html) == \
-            static_replace.replace_course_urls(html, course_key=self.runtime.course_id)
+            static_replace.replace_course_urls(html, course_key=self.course.id)
 
     def test_replace_jump_to_id_urls(self):
         html = '<a href="/jump_to_id/id">'
-        jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': str(self.runtime.course_id), 'module_id': ''})
+        jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': str(self.course.id), 'module_id': ''})
         assert self.runtime.replace_jump_to_id_urls(html) == \
-            static_replace.replace_jump_to_id_urls(html, self.runtime.course_id, jump_to_id_base_url)
+            static_replace.replace_jump_to_id_urls(html, self.course.id, jump_to_id_base_url)
+
+    @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
+    def test_course_id(self):
+        descriptor = ItemFactory(category="pure", parent=self.course)
+
+        block = render.get_module(self.user, Mock(), descriptor.location, None)
+        assert str(block.runtime.course_id) == self.COURSE_ID

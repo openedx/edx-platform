@@ -683,7 +683,6 @@ def get_module_system_for_user(
         get_module=inner_get_module,
         user=user,
         publish=publish,
-        course_id=course_id,
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,

@@ -51,7 +51,7 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         view_name = 'xblock_handler_noauth'
 
     url = reverse(view_name, kwargs={
-        'course_id': str(block.location.course_key),
+        'course_id': str(block.scope_ids.usage_id.context_key),
         'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
         'handler': handler_name,
         'suffix': suffix,

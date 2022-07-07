@@ -26,6 +26,14 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 
 class BlockMock(Mock):
     """Mock class that we fill with our "handler" methods."""
+    scope_ids = ScopeIds(
+        None,
+        None,
+        None,
+        BlockUsageLocator(
+            CourseLocator(org="mockx", course="100", run="2015"), block_type='mock_type', block_id="mock_id"
+        ),
+    )
 
     def handler(self, _context):
         """
@@ -45,20 +53,13 @@ class BlockMock(Mock):
         """
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
-    @property
-    def location(self):
-        """Create a functional BlockUsageLocator for testing URL generation."""
-        course_key = CourseLocator(org="mockx", course="100", run="2015")
-        return BlockUsageLocator(course_key, block_type='mock_type', block_id="mock_id")
-
 
 class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
 
     def setUp(self):
         super().setUp()
-        self.block = BlockMock(name='block', scope_ids=ScopeIds(None, None, None, 'dummy'))
-        self.course_key = CourseLocator("org", "course", "run")
+        self.block = BlockMock(name='block')
         self.runtime = LmsModuleSystem(
             track_function=Mock(),
             get_module=Mock(),
