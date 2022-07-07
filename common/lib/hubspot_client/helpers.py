@@ -36,12 +36,13 @@ def prepare_user_data_for_hubspot_contact_creation(user):
             }
         )
 
-    if extended_profile and (extended_profile.language or extended_profile.country or extended_profile.city):
+    profile = user.profile if hasattr(user, 'profile') else None
+    if profile and (profile.language or profile.country or profile.city):
         user_json['properties'].update(
             {
-                'edx_language': extended_profile.language or '',
-                'edx_country': extended_profile.country.name.format() if extended_profile.country else '',
-                'edx_city': extended_profile.city or '',
+                'edx_language': profile.language or '',
+                'edx_country': profile.country.name.format() if extended_profile.country else '',
+                'edx_city': profile.city or '',
             }
         )
 
