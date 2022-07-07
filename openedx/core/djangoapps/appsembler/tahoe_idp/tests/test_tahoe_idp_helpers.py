@@ -12,7 +12,16 @@ from tahoe_sites import api as tahoe_sites_apis
 
 from openedx.core.djangoapps.appsembler.tahoe_idp import helpers
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from student.roles import OrgInstructorRole, OrgStaffRole
+
+from student.roles import (
+    CourseAccessRole,
+    CourseCreatorRole,
+    CourseInstructorRole,
+    CourseStaffRole,
+    OrgInstructorRole,
+    OrgStaffRole,
+)
+
 from student.tests.factories import UserFactory
 
 
@@ -171,6 +180,21 @@ def test_is_studio_allowed_for_user_instructor_role(user_with_org, client):
     user, organization = user_with_org
     OrgInstructorRole(organization.short_name).add_users(user)
     assert helpers.is_studio_allowed_for_user(user, organization)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('role_class', [
+    CourseCreatorRole,
+    CourseInstructorRole,
+    CourseStaffRole,
+])
+def test_is_studio_allowed_for_course_instructor(user_with_org, role_class):
+    """
+    Verify CourseInstructorRole is allowed via is_studio_allowed_for_user.
+    """
+    instructor, organization = user_with_org
+    CourseAccessRole.objects.create(user=instructor, role=role_class.ROLE)
+    assert helpers.is_studio_allowed_for_user(instructor, organization)
 
 
 @pytest.mark.django_db
