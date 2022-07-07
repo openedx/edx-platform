@@ -11,7 +11,7 @@ from django.core import serializers
 
 from common.lib.hubspot_client.client import HubSpotClient
 from common.lib.hubspot_client.tasks import task_send_hubspot_email
-from mailchimp_pipeline.signals.handlers import update_user_email_in_mailchimp
+from common.lib.hubspot_client.handlers import update_user_email_in_hubspot
 from nodebb.tasks import task_update_user_profile_on_nodebb
 from oef.models import OrganizationOefUpdatePrompt
 from lms.djangoapps.onboarding.constants import ORG_SEARCH_TERM_LENGTH
@@ -8104,7 +8104,7 @@ def update_user_email(user, old_email, new_email):
     from student.models import CourseEnrollmentAllowed, ManualEnrollmentAudit, UserProfile
 
     # update email in mailchimp
-    update_user_email_in_mailchimp(old_email, new_email)
+    update_user_email_in_hubspot(old_email, new_email)
 
     # update email in NodeBB
     data_to_sync = {

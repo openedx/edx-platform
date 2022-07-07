@@ -268,6 +268,15 @@ class Organization(TimeStampedModel):
         """ Return list of active organization partners"""
         return self.organization_partners.filter(end_date__gt=datetime.utcnow()).values_list('partner', flat=True)
 
+    def hubspot_data(self):
+        """
+        Create data for sync with HubSpot.
+        """
+        org_label = self.label
+        org_type = OrgSector.objects.get_map().get(self.org_type, "")
+        focus_area = FocusArea.get_map().get(self.focus_area, "")
+        return org_label, org_type, focus_area
+
     def __unicode__(self):
         return self.label
 
@@ -415,6 +424,7 @@ class UserExtendedProfile(TimeStampedModel):
     interests = MultiSelectField(choices=choices.INTERESTS, blank=True)
     learners_related = MultiSelectField(choices=choices.INTERESTED_LEARNERS, blank=True)
     goals = MultiSelectField(choices=choices.GOALS, blank=True)
+    hubspot_contact_id = models.CharField(max_length=20, null=True)
 
     def __str__(self):
         return str(self.user)

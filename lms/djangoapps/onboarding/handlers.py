@@ -22,7 +22,6 @@ from lms.djangoapps.onboarding.models import (
     OrganizationMetricUpdatePrompt,
     UserExtendedProfile
 )
-from mailchimp_pipeline.signals.handlers import sync_metric_update_prompt_with_mail_chimp
 from oef.models import OrganizationOefUpdatePrompt
 from util.model_utils import USER_FIELD_CHANGED, get_changed_fields_dict
 
@@ -36,13 +35,6 @@ def update_user_profile(sender, instance, update_fields, **kwargs):
     if (not update_fields or 'last_login' not in update_fields) and user_profile:
         user_profile.name = '{} {}'.format(user.first_name.encode('utf-8'), user.last_name.encode('utf-8'))
         user_profile.save()
-
-
-@receiver(post_save, sender=OrganizationMetricUpdatePrompt)
-def sync_metric_update_prompts_in_mailchimp(sender, instance, update_fields, **kwargs):
-    # we can't put post_save on below method directly because it's being used
-    # in a Data Migration, Management command too.
-    sync_metric_update_prompt_with_mail_chimp(instance)
 
 
 @receiver(post_save, sender=Organization)

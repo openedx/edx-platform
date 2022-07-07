@@ -167,39 +167,3 @@ class TestStudentDashboard(SharedModuleStoreTestCase):
 
         recommended_courses = get_recommended_xmodule_courses(self.request, _from)
         self.assertEqual(len(recommended_courses), 0)
-
-    def test_get_enrolled_past_courses(self):
-        """
-        This method is covering :func:`~lms.djangoapps.student_dashboard.views.get_enrolled_past_courses` test will
-        assert if there no enrolled course for the user or there is any past enrollment for the current user. Because as
-        per the data we have initialized we are expecting one enrolled course and zero past enrolled courses.
-        """
-        self.initialize_test()
-
-        with mock.patch(
-            'mailchimp_pipeline.signals.handlers.send_user_enrollments_to_mailchimp') \
-                as send_user_enrollments_to_mailchimp:
-            with mock.patch.object(CourseEnrollment, 'send_signal') as send_signal:
-                send_signal.return_value = None
-                send_user_enrollments_to_mailchimp.return_value = None
-
-                enrolled, past = get_enrolled_past_courses(self.request, self.course_enrollments)
-                self.assertEqual((len(enrolled), len(past)), (1, 0))
-
-    def test_get_enrolled_past_courses_without_course_card(self):
-        """
-        This method is covering :func:`~lms.djangoapps.student_dashboard.views.get_enrolled_past_courses` without
-        setting course cards it is mandatory to have course card record in database for the past enrolled courses
-        so that we are expecting zero results for both past and current enrolled courses.
-        """
-        self.initialize_test(add_course_overviews=False, initialize=False, add_settings=False)
-
-        with mock.patch(
-            'mailchimp_pipeline.signals.handlers.send_user_enrollments_to_mailchimp') \
-                as send_user_enrollments_to_mailchimp:
-            with mock.patch.object(CourseEnrollment, 'send_signal') as send_signal:
-                send_signal.return_value = None
-                send_user_enrollments_to_mailchimp.return_value = None
-
-                enrolled, past = get_enrolled_past_courses(self.request, self.course_enrollments)
-                self.assertEqual((len(enrolled), len(past)), (0, 0))
