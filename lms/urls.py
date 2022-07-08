@@ -1022,3 +1022,8 @@ urlpatterns += [
 urlpatterns += [
     path('api/instructor_task/', include('lms.djangoapps.instructor_task.rest_api.urls')),
 ]
+
+# MFE API urls
+urlpatterns += [
+    path('api/v1/mfe_config', include(('lms.djangoapps.mfe_config_api.urls', 'lms.djangoapps.mfe_config_api'), namespace='mfe_config_api'))
+]
