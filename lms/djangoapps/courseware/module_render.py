@@ -7,10 +7,12 @@ import json
 import logging
 import textwrap
 from collections import OrderedDict
+
 from functools import partial
 
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
+from completion.services import CompletionService
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
@@ -22,7 +24,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
-from edx_django_utils.cache import RequestCache
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE, RequestCache
 from edx_django_utils.monitoring import set_custom_attributes_for_course_key, set_monitoring_transaction_name
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
@@ -39,12 +41,18 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
+from lms.djangoapps.badges.service import BadgingService
+from lms.djangoapps.badges.utils import badges_enabled
+from lms.djangoapps.teams.services import TeamsService
+from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore.django import modulestore
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.partitions.partitions_service import PartitionService
 from xmodule.util.sandboxing import SandboxService
-from xmodule.services import RebindUserService
+from xmodule.services import RebindUserService, SettingsService, TeamsConfigurationService
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
 from common.djangoapps.xblock_django.constants import ATTR_KEY_USER_ID
@@ -63,7 +71,7 @@ from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
 from lms.djangoapps.grades.api import signals as grades_signals
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, UserTagsService
 from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
@@ -678,10 +686,11 @@ def get_module_system_for_user(
     field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
     field_data = LmsFieldData(field_data, student_data)
 
+    store = modulestore()
+
     system = LmsModuleSystem(
         track_function=track_function,
         get_module=inner_get_module,
-        user=user,
         publish=publish,
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
@@ -705,6 +714,18 @@ def get_module_system_for_user(
             'xqueue': xqueue_service,
             'replace_urls': replace_url_service,
             'rebind_user': rebind_user_service,
+            'completion': CompletionService(user=user, context_key=course_id)
+            if user and user.is_authenticated
+            else None,
+            'i18n': ModuleI18nService,
+            'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
+            'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
+            'settings': SettingsService(),
+            'user_tags': UserTagsService(user=user, course_id=course_id),
+            'badging': BadgingService(course_id=course_id, modulestore=store) if badges_enabled() else None,
+            'teams': TeamsService(),
+            'teams_configuration': TeamsConfigurationService(),
+            'call_to_action': CallToActionService(),
         },
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         request_token=request_token,
