@@ -26,9 +26,11 @@ class SiteConfigurationTests(TestCase):
     test_config1 = {
         "university": "Test University",
         "platform_name": "Test Education Program",
-        "SITE_NAME": "test.localhost",
+        # Appsembler naming format for css override - RED-2828
+        "SITE_NAME": "site_configuration_post_save_receiver_example.com",
         "course_org_filter": "TestX",
-        "css_overrides_file": "test/css/site.css",
+        # Appsembler naming format for css override - RED-2828
+        "css_overrides_file": "site_configuration_post_save_receiver_example.com.css",
         "ENABLE_MKTG_SITE": False,
         "ENABLE_THIRD_PARTY_AUTH": False,
         "course_about_show_social_links": False,
@@ -40,7 +42,7 @@ class SiteConfigurationTests(TestCase):
         "platform_name": "Test Another Education Program",
         "SITE_NAME": "test-another.localhost",
         "course_org_filter": "TestAnotherX",
-        "css_overrides_file": "test-another/css/site.css",
+        "css_overrides_file": "test-another.localhost.css",  # Appsembler naming format for css override - RED-2828
         "ENABLE_MKTG_SITE": True,
         "ENABLE_THIRD_PARTY_AUTH": True,
         "course_about_show_social_links": False,
