@@ -43,9 +43,10 @@ class MFEConfigView(APIView):
         if not settings.ENABLE_MFE_CONFIG_API:
             return HttpResponseNotFound()
 
-        mfe_config = configuration_helpers.get_value('MFE_CONFIG', {})
+        mfe_config = configuration_helpers.get_value('MFE_CONFIG', getattr(settings, 'MFE_CONFIG', {}))
         if request.query_params.get('mfe'):
             mfe = str(request.query_params.get('mfe')).upper()
-            mfe_config.update(configuration_helpers.get_value(f'MFE_CONFIG_{mfe}', {}))
+            mfe_config.update(configuration_helpers.get_value(
+                f'MFE_CONFIG_{mfe}', getattr(settings, f'MFE_CONFIG_{mfe}', {})))
 
         return JsonResponse(mfe_config, status=status.HTTP_200_OK)

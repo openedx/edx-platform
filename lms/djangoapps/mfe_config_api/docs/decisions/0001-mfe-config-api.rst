@@ -15,9 +15,9 @@ Currently, MFE settings are set via command line environment variables or an .en
 Decision
 ********
 
-- A lightweight API will be created that returns the mfe configuration variables from the site configuration.
+- A lightweight API will be created that returns the mfe configuration variables from the site configuration or django settings. `PR Discussion about django settings`_
 - The API will be enabled or disabled using the setting ``ENABLE_MFE_CONFIG_API``.
-- The API will take the mfe configuration in the ``MFE_CONFIG`` keyset in the site configuration (admin > site configuration > your domain).
+- The API will take the mfe configuration in the ``MFE_CONFIG`` keyset in the site configuration (admin > site configuration > your domain) or in django settings.
 - This API allows to consult the configurations by specific MFE. Making a request like ``api/v1/mfe_config?mfe=mymfe`` will return the configuration defined in ``MFE_CONFIG_MYMFE`` merged with the ``MFE_CONFIG`` configuration.
 - The API will have a mechanism to cache the response with ``MFE_CONFIG_API_CACHE_TIMEOUT`` variable.
 - The API will live in lms/djangoapps because this is not something Studio needs to serve and it is a lightweight API. `PR Discussion`_
@@ -48,10 +48,10 @@ Consequences
 
 - We have to change all the mfes so that they take the information from the API. `Issue MFE runtime configuration in frontend-wg`_
 - Initialize the MFE could have a delay due to the HTTP method.
-- `Site configuration is going to be deprecated`_ so later we have to take the configuration from django settings.
-- The operator is responsible for configuring the settings in site configuration.
+- `Site configuration is going to be deprecated`_ so later we have to clean the code that uses site configuration.
+- The operator is responsible for configuring the settings in site configuration or django settings.
 - We can have duplicate keys in site configuration (example: we can have a logo definition for each mfe).
-- If the request is made from a domain that does not have a site configuration, it returns an empty json.
+- If the request is made from a domain that does not have a site configuration, it returns django settings.
 
 Rejected Alternatives
 **********************
@@ -68,3 +68,5 @@ References
 .. _Site configuration is going to be deprecated: https://github.com/openedx/platform-roadmap/issues/21
 
 .. _Issue MFE runtime configuration in frontend-wg: https://github.com/openedx/frontend-wg/issues/103
+
+.. _PR Discussion about django settings: https://github.com/openedx/edx-platform/pull/30473#discussion_r916263245
