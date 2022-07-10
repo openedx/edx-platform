@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-03 20:34+0000\n"
-"PO-Revision-Date: 2022-07-03 20:34:59.594702\n"
+"POT-Creation-Date: 2022-07-10 20:34+0000\n"
+"PO-Revision-Date: 2022-07-10 20:34:59.679799\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -3399,6 +3399,10 @@ msgstr "Gö tö däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Recommendations for you"
 msgstr "Réçömméndätïöns för ýöü Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid "loading"
+msgstr "löädïng Ⱡ'σяєм ιρѕυм #"
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Explore courses"

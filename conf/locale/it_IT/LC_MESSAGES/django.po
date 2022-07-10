@@ -125,7 +125,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-06-26 20:47+0000\n"
+"POT-Creation-Date: 2022-07-03 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2021\n"
 "Language-Team: Italian (Italy) (https://www.transifex.com/open-edx/teams/6205/it_IT/)\n"
@@ -148,8 +148,7 @@ msgstr "Testo"
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
 #: openedx/core/djangoapps/discussions/plugins.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-#: openedx/features/lti_course_tab/tab.py
+#: openedx/features/lti_course_tab/tab.py xmodule/discussion_block.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
@@ -310,10 +309,9 @@ msgstr ""
 msgid "Professional Ed"
 msgstr "Formazione professionale"
 
-#: common/djangoapps/course_modes/models.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-#: xmodule/annotatable_module.py xmodule/capa_module.py
-#: xmodule/conditional_module.py xmodule/html_module.py
+#: common/djangoapps/course_modes/models.py xmodule/annotatable_module.py
+#: xmodule/capa_module.py xmodule/conditional_module.py
+#: xmodule/discussion_block.py xmodule/html_module.py
 #: xmodule/library_content_module.py xmodule/library_sourced_block.py
 #: xmodule/lti_module.py xmodule/split_test_module.py xmodule/unit_block.py
 #: xmodule/word_cloud_module.py xmodule/x_module.py
@@ -3850,14 +3848,12 @@ msgstr ""
 " o {register_link} e iscriversi a questo corso."
 
 #: lms/djangoapps/courseware/views/index.py
-#: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+#: lms/djangoapps/courseware/views/views.py xmodule/discussion_block.py
 msgid "sign in"
 msgstr "accedi"
 
 #: lms/djangoapps/courseware/views/index.py
-#: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+#: lms/djangoapps/courseware/views/views.py xmodule/discussion_block.py
 msgid "register"
 msgstr "registrati"
 
@@ -9434,53 +9430,6 @@ msgstr ""
 "Una licenza definisce il modo in cui il contenuto di questo blocco può "
 "essere condiviso o riutilizzato."
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-#: xmodule/annotatable_module.py xmodule/capa_module.py
-#: xmodule/conditional_module.py xmodule/html_module.py
-#: xmodule/library_content_module.py xmodule/library_root_xblock.py
-#: xmodule/library_sourced_block.py xmodule/poll_module.py
-#: xmodule/unit_block.py xmodule/video_module/video_xfields.py
-#: xmodule/word_cloud_module.py xmodule/x_module.py
-msgid "The display name for this component."
-msgstr "Il nome visualizzato per questo componente."
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid "Category"
-msgstr "Categoria"
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid "Week 1"
-msgstr "Settimana 1"
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid ""
-"A category name for the discussion. This name appears in the left pane of "
-"the discussion forum for the course."
-msgstr ""
-"Un nome categoria per la discussione. Questo nome appare nel riquadro "
-"sinistro del forum di discussione per il corso."
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid "Subcategory"
-msgstr "Sottocategoria"
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid ""
-"A subcategory name for the discussion. This name appears in the left pane of"
-" the discussion forum for the course."
-msgstr ""
-"Un nome sottocategoria per la discussione. Questo nome appare nel riquadro "
-"sinistro del forum di discussione per il corso."
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-#, python-brace-format
-msgid ""
-"You are not signed in. To view the discussion content, {sign_in_link} or "
-"{register_link}, and enroll in this course."
-msgstr ""
-"Non si è collegati. Per visualizzare il contenuto della discussione, "
-"{sign_in_link} o {register_link}, e iscriversi a questo corso."
-
 #: openedx/features/calendar_sync/ics.py
 #, python-brace-format
 msgid "{assignment} is due for {course}."
@@ -9868,6 +9817,16 @@ msgstr "Il nostro indirizzo email è"
 #: xmodule/annotatable_module.py
 msgid "XML data for the annotation"
 msgstr "Dati XML associati all'annotazione"
+
+#: xmodule/annotatable_module.py xmodule/capa_module.py
+#: xmodule/conditional_module.py xmodule/discussion_block.py
+#: xmodule/html_module.py xmodule/library_content_module.py
+#: xmodule/library_root_xblock.py xmodule/library_sourced_block.py
+#: xmodule/poll_module.py xmodule/unit_block.py
+#: xmodule/video_module/video_xfields.py xmodule/word_cloud_module.py
+#: xmodule/x_module.py
+msgid "The display name for this component."
+msgstr "Il nome visualizzato per questo componente."
 
 #: xmodule/annotatable_module.py
 msgid "Annotation"
@@ -11422,6 +11381,43 @@ msgstr ""
 #: xmodule/course_module.py
 msgid "General"
 msgstr "Generale"
+
+#: xmodule/discussion_block.py
+msgid "Category"
+msgstr "Categoria"
+
+#: xmodule/discussion_block.py
+msgid "Week 1"
+msgstr "Settimana 1"
+
+#: xmodule/discussion_block.py
+msgid ""
+"A category name for the discussion. This name appears in the left pane of "
+"the discussion forum for the course."
+msgstr ""
+"Un nome categoria per la discussione. Questo nome appare nel riquadro "
+"sinistro del forum di discussione per il corso."
+
+#: xmodule/discussion_block.py
+msgid "Subcategory"
+msgstr "Sottocategoria"
+
+#: xmodule/discussion_block.py
+msgid ""
+"A subcategory name for the discussion. This name appears in the left pane of"
+" the discussion forum for the course."
+msgstr ""
+"Un nome sottocategoria per la discussione. Questo nome appare nel riquadro "
+"sinistro del forum di discussione per il corso."
+
+#: xmodule/discussion_block.py
+#, python-brace-format
+msgid ""
+"You are not signed in. To view the discussion content, {sign_in_link} or "
+"{register_link}, and enroll in this course."
+msgstr ""
+"Non si è collegati. Per visualizzare il contenuto della discussione, "
+"{sign_in_link} o {register_link}, e iscriversi a questo corso."
 
 #: xmodule/graders.py
 #, python-brace-format
@@ -21413,7 +21409,8 @@ msgstr "Sposta"
 msgid "Delete this component"
 msgstr "Cancella questo componente"
 
-#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/edit-tabs.html
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
 msgstr "Sposta e riordina"
 
@@ -21909,6 +21906,13 @@ msgstr "Scopri di più sulle impostazioni di visibilità del contenuto "
 msgid "Pages & Resources"
 msgstr "Pagine & Risorse"
 
+#. Translators: Custom Pages refer to the tabs that appear in the top
+#. navigation of each course.
+#: cms/templates/edit-tabs.html cms/templates/export.html
+#: cms/templates/widgets/header.html
+msgid "Pages"
+msgstr "Pagine"
+
 #: cms/templates/edit-tabs.html
 msgid "New Page"
 msgstr "Nuova Pagina"
@@ -21924,12 +21928,56 @@ msgstr ""
 "collegati al corso. "
 
 #: cms/templates/edit-tabs.html
+msgid "Show this page"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "Show/hide page"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "This page cannot be reordered"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
 msgid "You can add additional custom pages to your course."
 msgstr "È possibile aggiungere ulteriori pagine personalizzate al corso. "
 
 #: cms/templates/edit-tabs.html
 msgid "Add a New Page"
 msgstr "Aggiungi una Nuova Pagina"
+
+#: cms/templates/edit-tabs.html
+msgid "What are pages?"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid ""
+"Pages are listed horizontally at the top of your course. Default pages "
+"(Home, Course, Discussion, Wiki, and Progress) are followed by textbooks and"
+" custom pages that you create."
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid ""
+"You can create and edit custom pages to provide students with additional "
+"course content. For example, you can create pages for the grading policy, "
+"course slides, and a course calendar. "
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "How do pages look to students in my course?"
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid ""
+"Students see the default and custom pages at the top of your course and use "
+"these links to navigate."
+msgstr ""
+
+#: cms/templates/edit-tabs.html
+msgid "See an example"
+msgstr "Visualizza un esempio "
 
 #: cms/templates/edit-tabs.html
 msgid "What are custom pages?"
@@ -21953,11 +22001,7 @@ msgid ""
 msgstr ""
 
 #: cms/templates/edit-tabs.html
-msgid "See an example"
-msgstr "Visualizza un esempio "
-
-#: cms/templates/edit-tabs.html
-msgid "Custom pages in your course"
+msgid "Pages in Your Course"
 msgstr ""
 
 #: cms/templates/edit-tabs.html
@@ -21966,9 +22010,9 @@ msgstr "Anteprima delle pagine nel corso "
 
 #: cms/templates/edit-tabs.html
 msgid ""
-"Custom pages are listed horizontally at the top of your course after default"
-" pages and textbooks. In the above example, custom pages for \"Course "
-"Schedule\" and \"Supplements\" have been added to a course."
+"Pages appear in your course's top navigation bar. The default pages (Home, "
+"Course, Discussion, Wiki, and Progress) are followed by textbooks and custom"
+" pages."
 msgstr ""
 
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
@@ -22156,10 +22200,6 @@ msgstr "Struttura Corso"
 #: cms/templates/export.html
 msgid "Individual Problems"
 msgstr "Problemi Individuali"
-
-#: cms/templates/export.html cms/templates/widgets/header.html
-msgid "Pages"
-msgstr "Pagine"
 
 #: cms/templates/export.html
 msgid "Course Assets"

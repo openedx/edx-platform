@@ -2176,6 +2176,7 @@
     "incorrect": "\u1d09n\u0254\u00f8\u0279\u0279\u01dd\u0254\u0287",
     "last activity": "l\u0250s\u0287 \u0250\u0254\u0287\u1d09\u028c\u1d09\u0287\u028e",
     "less than a minute": "l\u01ddss \u0287\u0265\u0250n \u0250 \u026f\u1d09nn\u0287\u01dd",
+    "loading": "l\u00f8\u0250d\u1d09n\u0183",
     "marked as answer %(time_ago)s": "\u026f\u0250\u0279\u029e\u01ddd \u0250s \u0250ns\u028d\u01dd\u0279 %(time_ago)s",
     "marked as answer %(time_ago)s by %(user)s": "\u026f\u0250\u0279\u029e\u01ddd \u0250s \u0250ns\u028d\u01dd\u0279 %(time_ago)s b\u028e %(user)s",
     "minute": "\u026f\u1d09nn\u0287\u01dd",
