@@ -153,9 +153,17 @@ class SuggestedCourseSerializer(serializers.Serializer):
     courseUrl = serializers.URLField()
 
 
+class EmailConfirmationSerializer(serializers.Serializer):
+    """Serializer for email confirmation banner resources"""
+
+    isNeeded = serializers.BooleanField()
+    sendEmailUrl = serializers.URLField()
+
+
 class LearnerDashboardSerializer(serializers.Serializer):
     """Serializer for all info required to render the Learner Dashboard"""
 
+    emailConfirmation = EmailConfirmationSerializer()
     platformSettings = PlatformSettingsSerializer()
     enrollments = serializers.ListField(
         child=LearnerEnrollmentSerializer(), allow_empty=True
