@@ -160,10 +160,27 @@ class EmailConfirmationSerializer(serializers.Serializer):
     sendEmailUrl = serializers.URLField()
 
 
+class EnterpriseDashboardSerializer(serializers.Serializer):
+    """Serializer for individual enterprise dashboard data"""
+
+    label = serializers.CharField()
+    url = serializers.URLField()
+
+
+class EnterpriseDashboardsSerializer(serializers.Serializer):
+    """Listing of available enterprise dashboards"""
+
+    availableDashboards = serializers.ListField(
+        child=EnterpriseDashboardSerializer(), allow_empty=True
+    )
+    mostRecentDashboard = EnterpriseDashboardSerializer()
+
+
 class LearnerDashboardSerializer(serializers.Serializer):
     """Serializer for all info required to render the Learner Dashboard"""
 
     emailConfirmation = EmailConfirmationSerializer()
+    enterpriseDashboards = EnterpriseDashboardsSerializer()
     platformSettings = PlatformSettingsSerializer()
     enrollments = serializers.ListField(
         child=LearnerEnrollmentSerializer(), allow_empty=True

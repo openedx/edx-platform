@@ -14,6 +14,7 @@ from lms.djangoapps.learner_dashboard.serializers import (
     CourseSerializer,
     EmailConfirmationSerializer,
     EnrollmentSerializer,
+    EnterpriseDashboardsSerializer,
     EntitlementSerializer,
     GradeDataSerializer,
     LearnerEnrollmentSerializer,
@@ -535,6 +536,55 @@ class TestEmailConfirmationSerializer(TestCase):
         )
 
 
+class TestEnterpriseDashboardsSerializer(TestCase):
+    """High-level tests for EnterpriseDashboardsSerializer"""
+
+    @classmethod
+    def generate_test_dashboard(cls):
+        return {
+            "label": f"{uuid4()}",
+            "url": random_url(),
+        }
+
+    @classmethod
+    def generate_test_data(cls):
+        return {
+            "availableDashboards": [
+                cls.generate_test_dashboard() for _ in range(randint(0, 3))
+            ],
+            "mostRecentDashboard": cls.generate_test_dashboard()
+            if random_bool()
+            else None,
+        }
+
+    def test_structure(self):
+        """Test that nothing breaks and the output fields look correct"""
+        input_data = self.generate_test_data()
+
+        output_data = EnterpriseDashboardsSerializer(input_data).data
+
+        expected_keys = [
+            "availableDashboards",
+            "mostRecentDashboard",
+        ]
+        assert output_data.keys() == set(expected_keys)
+
+    def test_happy_path(self):
+        """Test that data serializes correctly"""
+
+        input_data = self.generate_test_data()
+
+        output_data = EnterpriseDashboardsSerializer(input_data).data
+
+        self.assertDictEqual(
+            output_data,
+            {
+                "availableDashboards": input_data["availableDashboards"],
+                "mostRecentDashboard": input_data["mostRecentDashboard"],
+            },
+        )
+
+
 class TestLearnerDashboardSerializer(TestCase):
     """High-level tests for Learner Dashboard serialization"""
 
@@ -546,6 +596,7 @@ class TestLearnerDashboardSerializer(TestCase):
 
         input_data = {
             "emailConfirmation": None,
+            "enterpriseDashboards": None,
             "platformSettings": None,
             "enrollments": [],
             "unfulfilledEntitlements": [],
@@ -557,6 +608,7 @@ class TestLearnerDashboardSerializer(TestCase):
             output_data,
             {
                 "emailConfirmation": None,
+                "enterpriseDashboards": None,
                 "platformSettings": None,
                 "enrollments": [],
                 "unfulfilledEntitlements": [],
@@ -577,11 +629,15 @@ class TestLearnerDashboardSerializer(TestCase):
         "lms.djangoapps.learner_dashboard.serializers.PlatformSettingsSerializer.to_representation"
     )
     @mock.patch(
+        "lms.djangoapps.learner_dashboard.serializers.EnterpriseDashboardsSerializer.to_representation"
+    )
+    @mock.patch(
         "lms.djangoapps.learner_dashboard.serializers.EmailConfirmationSerializer.to_representation"
     )
     def test_linkage(
         self,
         mock_email_confirmation_serializer,
+        mock_enterprise_dashboards_serializer,
         mock_platform_settings_serializer,
         mock_learner_enrollment_serializer,
         mock_entitlements_serializer,
@@ -589,6 +645,9 @@ class TestLearnerDashboardSerializer(TestCase):
     ):
         mock_email_confirmation_serializer.return_value = (
             mock_email_confirmation_serializer
+        )
+        mock_enterprise_dashboards_serializer.return_value = (
+            mock_enterprise_dashboards_serializer
         )
         mock_platform_settings_serializer.return_value = (
             mock_platform_settings_serializer
@@ -601,6 +660,7 @@ class TestLearnerDashboardSerializer(TestCase):
 
         input_data = {
             "emailConfirmation": {},
+            "enterpriseDashboards": [{}],
             "platformSettings": {},
             "enrollments": [{}],
             "unfulfilledEntitlements": [{}],
@@ -612,6 +672,7 @@ class TestLearnerDashboardSerializer(TestCase):
             output_data,
             {
                 "emailConfirmation": mock_email_confirmation_serializer,
+                "enterpriseDashboards": mock_enterprise_dashboards_serializer,
                 "platformSettings": mock_platform_settings_serializer,
                 "enrollments": [mock_learner_enrollment_serializer],
                 "unfulfilledEntitlements": [mock_entitlements_serializer],
