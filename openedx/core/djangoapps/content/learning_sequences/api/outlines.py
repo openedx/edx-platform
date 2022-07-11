@@ -47,8 +47,9 @@ from .processors.milestones import MilestonesOutlineProcessor
 from .processors.schedule import ScheduleOutlineProcessor
 from .processors.special_exams import SpecialExamsOutlineProcessor
 from .processors.visibility import VisibilityOutlineProcessor
+import logging as log
 
-log = logging.getLogger(__name__)
+# log = logging.getLogger(__name__)
 
 # Public API...
 __all__ = [

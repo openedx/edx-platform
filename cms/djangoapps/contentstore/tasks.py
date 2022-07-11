@@ -67,6 +67,7 @@ from .outlines import update_outline_from_modulestore
 from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
+import logging as log
 
 User = get_user_model()
 
@@ -673,7 +674,7 @@ def update_all_outlines_from_modulestore_task():
     Celery task that creates multiple celery tasks - one per learning_sequence course outline
     to regenerate. The list of course keys to regenerate comes from the proxy model itself.
     """
-    LOGGER.info("Outline modulestore start===========================================================s")
+    log.info("Outline modulestore start===========================================================s")
     course_key_list = [str(course_key) for course_key in CourseOutlineRegenerate.get_course_outline_ids()]
     for course_key_str in course_key_list:
         try:

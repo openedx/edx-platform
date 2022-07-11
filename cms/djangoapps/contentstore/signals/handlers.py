@@ -23,8 +23,8 @@ from openedx.core.djangoapps.discussions.tasks import update_discussions_setting
 from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore.django import SignalHandler, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from .signals import GRADING_POLICY_CHANGED
-
-log = logging.getLogger(__name__)
+import logging as log
+# log = logging.getLogger(__name__)
 
 GRADING_POLICY_COUNTDOWN_SECONDS = 3600
 

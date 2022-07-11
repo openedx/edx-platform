@@ -10,7 +10,7 @@ This should be invoked from the Studio process.
 import logging
 
 from django.core.management.base import BaseCommand
-
+import logging as log
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.learning_sequences.api import (
     get_course_keys_with_outlines,
@@ -19,7 +19,7 @@ from openedx.core.djangoapps.content.learning_sequences.api import (
 
 from ...tasks import update_outline_from_modulestore_task
 
-log = logging.getLogger('backfill_course_outlines')
+# log = logging.getLogger('backfill_course_outlines')
 
 
 class Command(BaseCommand):
