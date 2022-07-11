@@ -4,7 +4,7 @@ This file contains celery tasks for contentstore views
 
 import base64
 import json
-import logging
+import LOGGER
 import os
 import shutil
 import tarfile
@@ -673,7 +673,7 @@ def update_all_outlines_from_modulestore_task():
     Celery task that creates multiple celery tasks - one per learning_sequence course outline
     to regenerate. The list of course keys to regenerate comes from the proxy model itself.
     """
-    logging.info("Outline modulestore start===========================================================s")
+    LOGGER.info("Outline modulestore start===========================================================s")
     course_key_list = [str(course_key) for course_key in CourseOutlineRegenerate.get_course_outline_ids()]
     for course_key_str in course_key_list:
         try:
