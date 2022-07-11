@@ -83,7 +83,7 @@ Note that Slack is no longer the recommended communication channel to ask about
 technical issues. To do so, you should instead join the `official forum <#forum>`__.
 
 .. _Slack: https://slack.com/
-.. _Sign up for a free account: https://openedx-slack-invite.herokuapp.com/
+.. _Sign up for a free account: https://openedx.org/slack
 
 Byte-sized Tasks & Bugs
 -----------------------
