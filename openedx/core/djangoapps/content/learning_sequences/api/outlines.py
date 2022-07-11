@@ -380,6 +380,8 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
 @function_trace('learning_sequences.api.replace_course_outline')
 def replace_course_outline(course_outline: CourseOutlineData,
                            content_errors: Optional[List[ContentErrorData]] = None):
+
+    log.info('COurse content-replace=======================')
     """
     Replace the model data stored for the Course Outline with the contents of
     course_outline (a CourseOutlineData). Record any content errors.
@@ -398,10 +400,11 @@ def replace_course_outline(course_outline: CourseOutlineData,
     with transaction.atomic():
         # Update or create the basic CourseContext...
         course_context = _update_course_context(course_outline)
+        log.info('in course context==================', course_context)
 
         # Wipe out the CourseSectionSequences join+ordering table
         course_context.section_sequences.all().delete()
-
+        log.info('updating all====================================')
         _update_sections(course_outline, course_context)
         _update_sequences(course_outline, course_context)
         _update_course_section_sequences(course_outline, course_context)
@@ -412,6 +415,7 @@ def _update_course_context(course_outline: CourseOutlineData):
     """
     Update CourseContext with given param:course_outline data.
     """
+    log.info(course_outline, "sending data to create learning_out================")
     learning_context, _ = LearningContext.objects.update_or_create(
         context_key=course_outline.course_key,
         defaults={
@@ -441,95 +445,104 @@ def _update_sections(course_outline: CourseOutlineData, course_context: CourseCo
     """
     Add/Update relevant sections
     """
-    for ordering, section_data in enumerate(course_outline.sections):
-        sec_model, _created = CourseSection.objects.update_or_create(
-            course_context=course_context,
-            usage_key=section_data.usage_key,
-            defaults={
-                'title': section_data.title,
-                'ordering': ordering,
-                'hide_from_toc': section_data.visibility.hide_from_toc,
-                'visible_to_staff_only': section_data.visibility.visible_to_staff_only,
-            }
-        )
-        # clear out any user partition group mappings, and remake them...
-        _update_user_partition_groups(section_data.user_partition_groups, sec_model)
+    try:
+        for ordering, section_data in enumerate(course_outline.sections):
+            sec_model, _created = CourseSection.objects.update_or_create(
+                course_context=course_context,
+                usage_key=section_data.usage_key,
+                defaults={
+                    'title': section_data.title,
+                    'ordering': ordering,
+                    'hide_from_toc': section_data.visibility.hide_from_toc,
+                    'visible_to_staff_only': section_data.visibility.visible_to_staff_only,
+                }
+            )
+            # clear out any user partition group mappings, and remake them...
+            _update_user_partition_groups(section_data.user_partition_groups, sec_model)
 
-    # Delete sections that we don't want any more
-    section_usage_keys_to_keep = [
-        section_data.usage_key for section_data in course_outline.sections
-    ]
-    CourseSection.objects \
-        .filter(course_context=course_context) \
-        .exclude(usage_key__in=section_usage_keys_to_keep) \
-        .delete()
+        # Delete sections that we don't want any more
+        section_usage_keys_to_keep = [
+            section_data.usage_key for section_data in course_outline.sections
+        ]
+        CourseSection.objects \
+            .filter(course_context=course_context) \
+            .exclude(usage_key__in=section_usage_keys_to_keep) \
+            .delete()
+    except Exception as e:
+        log.info('- Update Section error', f"{e}")
 
 
 def _update_sequences(course_outline: CourseOutlineData, course_context: CourseContext):
     """
     Add/Update relevant sequences
+
     """
-    for section_data in course_outline.sections:
-        for sequence_data in section_data.sequences:
-            LearningSequence.objects.update_or_create(
-                learning_context=course_context.learning_context,
-                usage_key=sequence_data.usage_key,
-                defaults={'title': sequence_data.title}
-            )
-    LearningSequence.objects \
-        .filter(learning_context=course_context.learning_context) \
-        .exclude(usage_key__in=course_outline.sequences) \
-        .delete()
+    try:
+        for section_data in course_outline.sections:
+            for sequence_data in section_data.sequences:
+                LearningSequence.objects.update_or_create(
+                    learning_context=course_context.learning_context,
+                    usage_key=sequence_data.usage_key,
+                    defaults={'title': sequence_data.title}
+                )
+        LearningSequence.objects \
+            .filter(learning_context=course_context.learning_context) \
+            .exclude(usage_key__in=course_outline.sequences) \
+            .delete()
+    except Exception as e:
+        log.info('- Update Sequence error', f"{e}")
 
 
 def _update_course_section_sequences(course_outline: CourseOutlineData, course_context: CourseContext):
     """
     Add/Update relevant course section and sequences
     """
-    section_models = {
-        section_model.usage_key: section_model
-        for section_model
-        in CourseSection.objects.filter(course_context=course_context).all()
-    }
-    sequence_models = {
-        sequence_model.usage_key: sequence_model
-        for sequence_model
-        in LearningSequence.objects.filter(learning_context=course_context.learning_context).all()
-    }
+    try:
+        section_models = {
+            section_model.usage_key: section_model
+            for section_model
+            in CourseSection.objects.filter(course_context=course_context).all()
+        }
+        sequence_models = {
+            sequence_model.usage_key: sequence_model
+            for sequence_model
+            in LearningSequence.objects.filter(learning_context=course_context.learning_context).all()
+        }
 
-    ordering = 0
-    for section_data in course_outline.sections:
-        for sequence_data in section_data.sequences:
-            course_section_sequence, _ = CourseSectionSequence.objects.update_or_create(
-                course_context=course_context,
-                section=section_models[section_data.usage_key],
-                sequence=sequence_models[sequence_data.usage_key],
-                defaults={
-                    'ordering': ordering,
-                    'inaccessible_after_due': sequence_data.inaccessible_after_due,
-                    'hide_from_toc': sequence_data.visibility.hide_from_toc,
-                    'visible_to_staff_only': sequence_data.visibility.visible_to_staff_only,
-                },
-            )
-            ordering += 1
-
-            # If a sequence is an exam, update or create an exam record
-            if bool(sequence_data.exam):
-                CourseSequenceExam.objects.update_or_create(
-                    course_section_sequence=course_section_sequence,
+        ordering = 0
+        for section_data in course_outline.sections:
+            for sequence_data in section_data.sequences:
+                course_section_sequence, _ = CourseSectionSequence.objects.update_or_create(
+                    course_context=course_context,
+                    section=section_models[section_data.usage_key],
+                    sequence=sequence_models[sequence_data.usage_key],
                     defaults={
-                        'is_practice_exam': sequence_data.exam.is_practice_exam,
-                        'is_proctored_enabled': sequence_data.exam.is_proctored_enabled,
-                        'is_time_limited': sequence_data.exam.is_time_limited,
+                        'ordering': ordering,
+                        'inaccessible_after_due': sequence_data.inaccessible_after_due,
+                        'hide_from_toc': sequence_data.visibility.hide_from_toc,
+                        'visible_to_staff_only': sequence_data.visibility.visible_to_staff_only,
                     },
                 )
-            else:
-                # Otherwise, delete any exams associated with it
-                CourseSequenceExam.objects.filter(course_section_sequence=course_section_sequence).delete()
+                ordering += 1
 
-            # clear out any user partition group mappings, and remake them...
-            _update_user_partition_groups(sequence_data.user_partition_groups, course_section_sequence)
+                # If a sequence is an exam, update or create an exam record
+                if bool(sequence_data.exam):
+                    CourseSequenceExam.objects.update_or_create(
+                        course_section_sequence=course_section_sequence,
+                        defaults={
+                            'is_practice_exam': sequence_data.exam.is_practice_exam,
+                            'is_proctored_enabled': sequence_data.exam.is_proctored_enabled,
+                            'is_time_limited': sequence_data.exam.is_time_limited,
+                        },
+                    )
+                else:
+                    # Otherwise, delete any exams associated with it
+                    CourseSequenceExam.objects.filter(course_section_sequence=course_section_sequence).delete()
 
+                # clear out any user partition group mappings, and remake them...
+                _update_user_partition_groups(sequence_data.user_partition_groups, course_section_sequence)
+    except Exception as e:
+        log.info('_update_course_section_sequences error', f"{e}")
 
 def _update_user_partition_groups(upg_data: Dict[int, FrozenSet[int]],
                                   model_obj: Union[CourseSection, CourseSectionSequence]):
@@ -552,30 +565,33 @@ def _update_publish_report(course_outline: CourseOutlineData,
     """
     Record ContentErrors for this course publish. Deletes previous errors.
     """
-    set_custom_attribute('learning_sequences.api.num_content_errors', len(content_errors))
-    learning_context = course_context.learning_context
     try:
-        # Normal path if we're updating a PublishReport
-        publish_report = learning_context.publish_report
-        publish_report.num_errors = len(content_errors)
-        publish_report.num_sections = len(course_outline.sections)
-        publish_report.num_sequences = len(course_outline.sequences)
-        publish_report.content_errors.all().delete()
-    except PublishReport.DoesNotExist:
-        # Case where we're creating it for the first time.
-        publish_report = PublishReport(
-            learning_context=learning_context,
-            num_errors=len(content_errors),
-            num_sections=len(course_outline.sections),
-            num_sequences=len(course_outline.sequences),
-        )
+        set_custom_attribute('learning_sequences.api.num_content_errors', len(content_errors))
+        learning_context = course_context.learning_context
+        try:
+            # Normal path if we're updating a PublishReport
+            publish_report = learning_context.publish_report
+            publish_report.num_errors = len(content_errors)
+            publish_report.num_sections = len(course_outline.sections)
+            publish_report.num_sequences = len(course_outline.sequences)
+            publish_report.content_errors.all().delete()
+        except PublishReport.DoesNotExist:
+            # Case where we're creating it for the first time.
+            publish_report = PublishReport(
+                learning_context=learning_context,
+                num_errors=len(content_errors),
+                num_sections=len(course_outline.sections),
+                num_sequences=len(course_outline.sequences),
+            )
 
-    publish_report.save()
-    publish_report.content_errors.bulk_create([
-        ContentError(
-            publish_report=publish_report,
-            usage_key=error_data.usage_key,
-            message=error_data.message,
-        )
-        for error_data in content_errors
-    ])
+        publish_report.save()
+        publish_report.content_errors.bulk_create([
+            ContentError(
+                publish_report=publish_report,
+                usage_key=error_data.usage_key,
+                message=error_data.message,
+            )
+            for error_data in content_errors
+        ])
+    except Exception as e:
+        log.info('_update_publish_report error', f"{e}")

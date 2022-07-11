@@ -67,6 +67,6 @@ class Command(BaseCommand):
             if key_supports_outlines(course_key):
                 log.info("Queuing outline creation for %s", course_key)
                 if not dry_run:
-                    update_outline_from_modulestore_task.delay(str(course_key))
+                    update_outline_from_modulestore_task(str(course_key))
             else:
                 log.info("Outlines not supported for %s - skipping", course_key)

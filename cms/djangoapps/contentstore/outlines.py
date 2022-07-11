@@ -5,7 +5,7 @@ learning_sequences at publish time.
 """
 from datetime import timezone
 from typing import List, Tuple
-
+import logging as log
 from edx_django_utils.monitoring import function_trace, set_custom_attribute
 
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
@@ -381,5 +381,5 @@ def update_outline_from_modulestore(course_key):
     course_outline_data, content_errors = get_outline_from_modulestore(course_key)
     set_custom_attribute('num_sequences', len(course_outline_data.sequences))
     set_custom_attribute('num_content_errors', len(content_errors))
-
+    log.info("Callin replace===================")
     replace_course_outline(course_outline_data, content_errors=content_errors)

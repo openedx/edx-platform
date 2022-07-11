@@ -34,7 +34,7 @@ def regenerate_course_outlines_subset(modeladmin, request, queryset):
     for course_key in all_course_keys_qs:
         if key_supports_outlines(course_key):
             log.info("Queuing outline creation for %s", course_key)
-            update_outline_from_modulestore_task.delay(str(course_key))
+            update_outline_from_modulestore_task(str(course_key))
             regenerates += 1
         else:
             log.info("Outlines not supported for %s - skipping", course_key)
