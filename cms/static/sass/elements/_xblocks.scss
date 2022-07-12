@@ -428,7 +428,7 @@
       border-color: $blue;
     }
 
-    .xblock-header {
+    .xblock-header:not(.is-hidden) {
       display: block;
     }
 

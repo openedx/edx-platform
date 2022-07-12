@@ -155,11 +155,21 @@ class LibrarySourcedBlock(
         Renders the Studio preview view.
         """
         fragment = Fragment()
-        context = {} if not context else copy(context)  # Isolate context - without this there are weird bugs in Studio
-        # EditableChildrenMixin.render_children will render HTML that allows instructors to make edits to the children
-        context['can_move'] = False
-        context['selectable'] = True
-        self.render_children(context, fragment, can_reorder=False, can_add=False)
+        root_xblock = context.get('root_xblock')
+        is_root = root_xblock and root_xblock.location == self.location  # pylint: disable=no-member
+        # If block ID is not defined, ask user for the component ID in the author_view itself.
+        # We don't display the editor if is_root as that page should represent the student_view without any ambiguity
+        status = self.tools.import_task_status(self)
+        is_loading = status == 'In Progress'
+        if is_root and not is_loading:
+            context = {} if not context else copy(context)  # Isolate context - without this there are weird
+            # bugs in Studio EditableChildrenMixin.render_children will render HTML that allows instructors
+            # to make edits to the children
+            context['can_move'] = False
+            context['selectable'] = True
+            self.render_children(context, fragment, can_reorder=False, can_add=False)
+            return fragment
+        context['is_loading'] = is_loading
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_source_edit.js'))
         fragment.initialize_js('LibrarySourceAuthorView')
         return fragment
@@ -303,14 +313,22 @@ class LibrarySourcedBlock(
 
     def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
         """
+        If source_library_id is empty, clear source_library_version and children.
+        """
+        self.children = []
+        if not self.source_library_id:
+            self.source_library_version = ""
+        else:
+            self.source_library_version = str(self.tools.get_library_version(self.source_library_id))
+
+    def post_editor_saved(self):  # lint-amnesty, pylint: disable=unused-argument
+        """
         If source_library_id has been edited, refresh_children automatically.
         """
-        old_source_library_id = old_metadata.get('source_library_id', [])
-        if old_source_library_id != self.source_library_id:
-            try:
-                self.refresh_children()
-            except ValueError:
-                pass  # The validation area will display an error message, no need to do anything now.
+        try:
+            self.refresh_children()
+        except ValueError:
+            pass  # The validation area will display an error message, no need to do anything now.
 
     @XBlock.handler
     def refresh_children(self, request=None, suffix=None):  # lint-amnesty, pylint: disable=unused-argument
@@ -338,3 +356,11 @@ class LibrarySourcedBlock(
         Return source_block_ids.
         """
         return Response(json.dumps({'source_block_ids': self.source_block_ids}))
+
+    @XBlock.handler
+    def get_import_task_status(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
+        """
+        Return task status for update_children_task.
+        """
+        status = self.tools.import_task_status(self)
+        return Response(json.dumps({'status': status}))

@@ -33,4 +33,18 @@ window.LibrarySourceAuthorView = function(runtime, element) {
             }
         });
     });
+    // Hide loader and show element when import task finished.
+    var $loader = $wrapper.find('.ui-loading');
+    var $xblockHeader = $wrapper.find('.xblock-header');
+    if (!$loader.hasClass('is-hidden')) {
+        var timer = setInterval(function() { 
+            $.get(runtime.handlerUrl(element, 'get_import_task_status'), function( data ) {
+                if (data.status == 'Succeeded') {
+                    $loader.addClass('is-hidden');
+                    $xblockHeader.removeClass('is-hidden');
+                    clearInterval(timer);
+                }
+            })
+        }, 1000);
+    }
 };

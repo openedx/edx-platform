@@ -52,9 +52,12 @@ block_is_unit = is_unit(xblock)
         has-group-visibility-set
     % endif
     ">
+    <div class="ui-loading ${'is-hidden' if not is_loading else ''}">
+        <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Importing components")}</span></p>
+    </div>
 % endif
 
-<header class="xblock-header xblock-header-${xblock.category}">
+<header class="xblock-header xblock-header-${xblock.category} ${'is-hidden' if is_loading else ''}">
     <div class="xblock-header-primary
     % if not show_preview:
         is-collapsed

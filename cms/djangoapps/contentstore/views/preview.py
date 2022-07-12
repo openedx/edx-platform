@@ -309,6 +309,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'content': frag.content,
             'is_root': is_root,
             'is_reorderable': is_reorderable,
+            'is_loading': context.get('is_loading', False),
             'is_selected': context.get('is_selected', False),
             'selectable': context.get('selectable', False),
             'can_edit': context.get('can_edit', True),
