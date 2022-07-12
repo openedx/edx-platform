@@ -281,32 +281,32 @@ class CourseEnrollmentForm(forms.ModelForm):
         fields = '__all__'
 
 
-@admin.register(CourseEnrollment)
-class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
-    """ Admin interface for the CourseEnrollment model. """
-    list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
-    list_filter = ('mode', 'is_active',)
-    raw_id_fields = ('user', 'course')
-    search_fields = ('course__id', 'mode', 'user__username',)
-    form = CourseEnrollmentForm
-
-    def get_search_results(self, request, queryset, search_term):
-        qs, use_distinct = super().get_search_results(request, queryset, search_term)
-
-        # annotate each enrollment with whether the username was an
-        # exact match for the search term
-        qs = qs.annotate(exact_username_match=models.Case(
-            models.When(user__username=search_term, then=models.Value(True)),
-            default=models.Value(False),
-            output_field=models.BooleanField()))
-
-        # present exact matches first
-        qs = qs.order_by('-exact_username_match', 'user__username', 'course_id')
-
-        return qs, use_distinct
-
-    def queryset(self, request):
-        return super().queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
+# @admin.register(CourseEnrollment)
+# class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
+#     """ Admin interface for the CourseEnrollment model. """
+#     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
+#     list_filter = ('mode', 'is_active',)
+#     raw_id_fields = ('user', 'course')
+#     search_fields = ('course__id', 'mode', 'user__username',)
+#     form = CourseEnrollmentForm
+#
+#     def get_search_results(self, request, queryset, search_term):
+#         qs, use_distinct = super().get_search_results(request, queryset, search_term)
+#
+#         # annotate each enrollment with whether the username was an
+#         # exact match for the search term
+#         qs = qs.annotate(exact_username_match=models.Case(
+#             models.When(user__username=search_term, then=models.Value(True)),
+#             default=models.Value(False),
+#             output_field=models.BooleanField()))
+#
+#         # present exact matches first
+#         qs = qs.order_by('-exact_username_match', 'user__username', 'course_id')
+#
+#         return qs, use_distinct
+#
+#     def queryset(self, request):
+#         return super().queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
 
 class UserProfileInline(admin.StackedInline):
