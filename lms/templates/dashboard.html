@@ -501,7 +501,7 @@ from common.djangoapps.student.models import CourseEnrollment
   loadData()
   function loadData()
   {
-    fetch("http://student.launchpadlearning.ca/api/enrollment/v1/enrollments/live_class",
+    fetch("https://student.launchpadlearning.ca/api/enrollment/v1/enrollments/live_class",
        )
     .then( res => res.json() )
     .then(response => {
