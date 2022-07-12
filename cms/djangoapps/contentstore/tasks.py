@@ -4,7 +4,6 @@ This file contains celery tasks for contentstore views
 
 import base64
 import json
-# import logger
 import os
 import shutil
 import tarfile
