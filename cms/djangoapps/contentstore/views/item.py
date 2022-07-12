@@ -198,7 +198,7 @@ def xblock_handler(request, usage_key_string=None):
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
-            return _save_xblock(
+            response = _save_xblock(
                 request.user,
                 _get_xblock(usage_key, request.user),
                 data=request.json.get('data'),
@@ -213,6 +213,8 @@ def xblock_handler(request, usage_key_string=None):
                 publish=request.json.get('publish'),
                 fields=request.json.get('fields'),
             )
+            _post_editor_saved_callback(_get_xblock(usage_key, request.user))
+            return response
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
             parent_usage_key = usage_key_with_run(request.json['parent_locator'])
@@ -526,6 +528,14 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
 
     # Update after the callback so any changes made in the callback will get persisted.
     return modulestore().update_item(xblock, user.id)
+
+
+def _post_editor_saved_callback(xblock):
+    """
+    Updates the xblock in the modulestore after saving xblock.
+    """
+    if callable(getattr(xblock, "post_editor_saved", None)):
+        xblock.post_editor_saved()
 
 
 def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, nullout=None,  # lint-amnesty, pylint: disable=too-many-statements
