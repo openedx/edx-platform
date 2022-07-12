@@ -89,6 +89,8 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         response_data = json.loads(response.content)
         expected_keys = set(
             [
+                "emailConfirmation",
+                "enterpriseDashboards",
                 "platformSettings",
                 "enrollments",
                 "unfulfilledEntitlements",
