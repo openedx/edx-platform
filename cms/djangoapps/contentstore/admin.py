@@ -81,5 +81,5 @@ class CourseOutlineRegenerateAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
 admin.site.register(BackfillCourseTabsConfig, ConfigurationModelAdmin)
 admin.site.register(VideoUploadConfig, ConfigurationModelAdmin)
 admin.site.register(CourseOutlineRegenerate, CourseOutlineRegenerateAdmin)
-admin.site.register(CourseEnrollment)
+# admin.site.register(CourseEnrollment)
 admin.site.register(LiveClassEnrollment)
