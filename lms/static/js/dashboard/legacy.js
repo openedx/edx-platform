@@ -6,7 +6,9 @@
  * modules with unit tests.
  */
 
+
  /* globals Logger, accessible_modal, interpolate */
+
 
  var edx = edx || {};
 
@@ -30,6 +32,7 @@
      *         - verifyToggleBannerFailedOff
      */
      edx.dashboard.legacy.init = function(urls) {
+
          var $notifications = $('.dashboard-notifications'),
              $upgradeButtonLinks = $('.action-upgrade'),
              $verifyButtonLinks = $('.verification-cta > .cta');
@@ -39,10 +42,12 @@
              $notifications.focus();
          }
 
+
          live_class()
          function live_class()
          {
-            // alert("test")
+            // alert("sd")
+            
             $.ajax({
                 type: 'GET',
                 url: '/api/enrollment/v1/enrollment/live_class/enroll',
@@ -53,11 +58,13 @@
                     //   function(){
                         var output = document.getElementById('output');
                         output.style.display='block';
-                        var response = JSON.parse(JSON.stringify(response))
-                        
-                        for(let i=0;i<response.results.length;i++)
+                        // var response = JSON.parse(JSON.stringify(response))
+                        var response = JSON.parse(JSON.stringify(response.results))
+                        console.log(response);
+                        for(let i=0;i<response.length;i++)
                           {
-                              if(response.results[i]['live_class']!=undefined && response.results[i]['live_class']!=null )
+                            console.log("Inside for loop");
+                              if(response[i]['live_class']!=undefined && response[i]['live_class']!=null )
                               {
                                 var parent = document.createElement("div");
                                 parent.classList.add('d-flex', 'justify-content-between', 'align-items-center',)
@@ -71,14 +78,14 @@
                                 ele.setAttribute("class","inner");
                                 ele.appendChild(image);
                                 const span = document.createElement("span");
-                                span.innerText = response.results[i]['live_class']["topic_name"];
+                                span.innerText = response[i]['live_class']["topic_name"];
                                 span.style.marginLeft = '40px';
                                 ele.appendChild(span);
                                 parent.appendChild(ele);
                                 var ele1= document.createElement("a");
                                 ele1.setAttribute("id","timedrpact1"+i);
                                 ele1.setAttribute("class","button inner-link");
-                                ele1.setAttribute("href",response.results[i]['live_class']["meeting_link"]);
+                                ele1.setAttribute("href",response[i]['live_class']["meeting_link"]);
                                 ele1.setAttribute("target",'_black');
                                 ele1.setAttribute(
                                   "style", "font-size: 18px; margin-right: 20px; box-shadow: 0px 5px 0px #ee6100; border: none; color:#fff; background: #ff7f27; border-radius: 12px; padding: 12px 20px; background-image: none; text-shadow: 0 0");
@@ -94,6 +101,75 @@
                 }
             });
         }
+
+        function teachers_list(){
+
+            var courses = document.querySelector("#my-courses")
+            courses.innerText = "";
+
+            $.ajax({
+                type: 'GET',
+                url: 'get/staff/list/details',
+                data: $(this).serializeArray(),
+                success: function(response) {
+                    console.log(response);
+
+                    var teachersHeading = document.createElement('h2');
+                    teachersHeading.innerText = "All Teachers";
+                    teachersHeading.style = "font-size: 24px; font-weight: 900; margin-bottom: 24px"
+                    courses.appendChild(teachersHeading);
+
+                    response.forEach(element => {
+                        console.log(element);
+                        var teacher = document.createElement("div");
+                        teacher.style = "background: #fff; box-shadow: 0 2px 7px 0 rgba(0,0,0,.08); padding-bottom:0; margin-bottom: 36px; overflow: hidden; border-radius: 8px; flex: 1 1 100%; display: flex;"
+                        
+                        var teacher_image = document.createElement("img");
+                        teacher_image.src = "https://i.pravatar.cc/150";
+                        teacher_image.style="margin-right: 10px"
+                        
+                        var teacher_details = document.createElement("div");
+                        teacher_details.className = "wrapper-course-details"
+                        teacher_details.style="width:100%"
+                        
+                        var name = document.createElement("h3");
+                        name.className = "course-title";
+                        name.style = " font-weight:600 ; color:#000; font-family: Roboto;"
+                        name.innerText = element.username;
+
+                        var email = document.createElement("p");
+                        email.style="display:inline-block"
+                        email.innerText = element.email;
+                        
+                        
+                        
+                        var contact= document.createElement("div");
+                        contact.className = "continue-button";
+
+                        var teacher_contact =  document.createElement("a");
+                        teacher_contact.style="background: #ff7f27; border: none; color: #fff; border-radius: 12px; box-shadow: 0px 5px 0px #ee6100; display:inline-block; padding: 4px 24px; float: right";
+                        teacher_contact.innerText = "Contact";
+
+                        contact.append(email, teacher_contact);
+
+                        teacher_details.append(name, contact);
+                        
+                        
+                        teacher.append(teacher_image, teacher_details);
+                        courses.appendChild(teacher); 
+                    });
+
+                    // courses.innerText = JSON.stringify(response);
+                }
+            });
+        }
+
+        const teachers_tab = document.querySelector(".teachers-link");
+        teachers_tab.onclick = teachers_list;
+
+        // teachers_list();
+
+
 
         // Track clicks of the upgrade button. The `trackLink` method is a helper that makes
         // a `track` call whenever a bound link is clicked. Usually the page would change before

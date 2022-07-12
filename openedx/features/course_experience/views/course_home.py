@@ -12,6 +12,8 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
+from django.shortcuts import redirect
+
 
 from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active
 from lms.djangoapps.courseware.access import has_access
@@ -72,6 +74,12 @@ class CourseHomeView(CourseTabView):
             return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
         microfrontend_url = get_learning_mfe_home_url(course_key=course_id, url_fragment='home', params=request.GET)
         raise Redirect(microfrontend_url)
+
+
+@ensure_valid_course_key
+def outline_tab(request, course_id):
+    """Simply redirects to the MFE outline tab, as this legacy view for the course home/outline no longer exists."""
+    return redirect(get_learning_mfe_home_url(course_key=course_id, url_fragment='home', params=request.GET))
 
 
 class CourseHomeFragmentView(EdxFragmentView):

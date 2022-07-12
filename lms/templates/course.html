@@ -30,7 +30,7 @@ from six import text_type
           <div class="course-date localized_datetime" aria-hidden="true" data-format="shortDate" data-datetime="${course_date_string}" data-language="${LANGUAGE_CODE}" data-string="${_("Starts: {date}")}"></div>
       % endif
     </div>    
-    <a href="${reverse('about_course', args=[text_type(course.id)])}" style="color: #fff; background: #ff7f27; padding: 9px 16px; border-radius: 12px; box-shadow: 0px 4px 0px #EE6100">${_("View Course")}</a>
+    <a href="${reverse('home', args=[text_type(course.id)])}" style="color: #fff; background: #ff7f27; padding: 9px 16px; border-radius: 12px; box-shadow: 0px 4px 0px #EE6100">${_("View Course")}</a>
   </div>
 </article>
 

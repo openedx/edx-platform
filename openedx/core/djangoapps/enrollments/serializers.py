@@ -427,10 +427,8 @@ class CourseandStafAassignedDetailsSerializer(serializers.ModelSerializer):
     
     class Meta:
         model= CourseEnrollment
-        fields=('id', 'course' , 'assigned_by' )
+        fields=('id', 'course' , 'assigned_by')
 
 
-
-   
 
 

@@ -55,6 +55,7 @@ from common.djangoapps.student import views as student_views
 from common.djangoapps.util import views as util_views
 from common.djangoapps.student.views.management import uploaded_doc_view, AnnouncementView ,StaffDetailsListApiView ,StaffofCourseDetailslist ,CourseandStafAassignedDetailsList
 from lms.djangoapps.course_api.views import ProgressView
+from openedx.features.course_experience.views.course_home import outline_tab
 
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
@@ -116,6 +117,9 @@ urlpatterns = [
 
     path('i18n/', include('django.conf.urls.i18n')),
 
+
+
+
     # Enrollment API RESTful endpoints
     path('api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
@@ -169,7 +173,7 @@ urlpatterns = [
                              namespace='catalog')),
 
 
-    path("get_doc/details", uploaded_doc_view, name='uploaded_doc_view'),
+    path("get_doc/", uploaded_doc_view, name='uploaded_doc_view'),
     path('student/announcement/', AnnouncementView.as_view(), name="announcement"),
     path('start_progress/', ProgressView.as_view(), name="progress-start"),
     path('update_progress/<int:progress_id>/', ProgressView.as_view(), name='progress_update'),
@@ -377,6 +381,15 @@ urlpatterns += [
         courseware_views.course_about,
         name='about_course',
     ),
+
+    re_path(
+        r'^courses/{}/home$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        outline_tab,
+        name='home',
+    ),
+
     path(
         'courses/yt_video_metadata',
         courseware_views.yt_video_metadata,

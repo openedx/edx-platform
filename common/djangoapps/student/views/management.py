@@ -1103,8 +1103,20 @@ class CourseandStafAassignedDetailsList(ListAPIView) :
     serializer_class = CourseandStafAassignedDetailsSerializer
     # lookup_field = "username"
 
-    def get_queryset(self):
+    # def get_queryset(self):
 
-        return CourseEnrollment.objects.filter(user_id=self.request.user)
+    #     return CourseEnrollment.objects.filter(user_id=self.request.user)
 
+
+    def get(self, request, *args, **kwargs):
+
+        courses_staff=CourseEnrollment.objects.filter(user_id=self.request.user)
+        # courses_l = courses.values_list('course').distinct()
+        data = {}
+
+        for assigned_by in courses_staff:
+
+            serializer = self.serializer_class(courses_staff.filter(assigned_by=assigned_by.assigned_by_id) ,many=True).data
+            data[assigned_by.assigned_by_id]=serializer
+        return Response(data, status=status.HTTP_200_OK)
         
