@@ -8,6 +8,7 @@ import logging
 import uuid
 from functools import reduce
 
+import json
 import pytz
 import six
 import urllib
@@ -177,7 +178,6 @@ def instructor_dashboard_2(request, course_id):
     # Gate access to course email by feature flag & by course-specific authorization
     if is_bulk_email_feature_enabled(course_key) and (access['staff'] or access['instructor']):
         sections.append(_section_send_email(course, access))
-
     # Gate access to Special Exam tab depending if either timed exams or proctored exams
     # are enabled in the course
 
@@ -721,6 +721,17 @@ def _section_send_email(course, access):
             'list_email_content', kwargs={'course_id': six.text_type(course_key)}
         ),
     }
+    ## EOL
+    try:
+        from welcome_mail.models import WelcomeMail
+        section_data['welcome_data'] = '{}'
+        section_data['welcome-mail-save'] = reverse('welcome-mail:save', kwargs={'course_id': str(course_key)})
+        if WelcomeMail.objects.filter(course_key=course_key).exists():
+            mail = WelcomeMail.objects.get(course_key=course_key)
+            section_data['welcome_data'] = json.dumps({'subject':mail.subject, 'message':mail.html_message, 'is_active':mail.is_active})
+    except ImportError:
+        log.error('WelcomeMail - App doesnt installed')
+    ## END EOL
     return section_data
 
 
