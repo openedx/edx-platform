@@ -27,7 +27,10 @@ from simple_history.models import HistoricalRecords
 from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 from lms.djangoapps.grades import events  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.lib.cache_utils import get_cache
-from lms.djangoapps.grades.signals.signals import COURSE_GRADE_PASSED_FIRST_TIME
+from lms.djangoapps.grades.signals.signals import (
+    COURSE_GRADE_PASSED_FIRST_TIME,
+    COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY
+)
 
 log = logging.getLogger(__name__)
 
@@ -649,6 +652,11 @@ class PersistentCourseGrade(TimeStampedModel):
                 sender=None,
                 course_id=course_id,
                 user_id=user_id
+            )
+            COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send(
+                sender=None,
+                user_id=user_id,
+                course_id=course_id,
             )
             grade.passed_timestamp = now()
             grade.save()
