@@ -453,7 +453,7 @@ function enroll_student()
         "course_id":str_data[str_data.length-1]
     }
 }
-  fetch("https://studio.launchpadlearning.ca/user/enrollment", {
+  fetch("http://studio.launchpadlearning.ca/user/enrollment", {
       method: "POST",
       headers: {
       'Content-Type': 'application/json',
@@ -494,7 +494,7 @@ function login()
           let formData = new FormData();
 formData.append("email","edx@example.com");
 formData.append( "password","edx123456");
-  fetch('https://studio.launchpadlearning.ca/api/user/v1/account/login_session/', {
+  fetch('http://studio.launchpadlearning.ca/api/user/v1/account/login_session/', {
     body: formData,
            method: "POST"
 
@@ -508,7 +508,7 @@ formData.append( "password","edx123456");
 }
 function csrftoken()
 {
-  fetch('https://studio.launchpadlearning.ca/csrf/api/v1/token', {headers: {
+  fetch('http://studio.launchpadlearning.ca/csrf/api/v1/token', {headers: {
           'Content-Type': 'application/json',
         }},)
     .then( res => res.json() )
@@ -523,8 +523,8 @@ function getStudents()
   url=window.location.href;
   str_data = url.split('/')
 
-   fetch("https://studio.launchpadlearning.ca/course/enroll/course/detail/"+encodeURIComponent(str_data[str_data.length-1]),
-  // fetch("https://studio.launchpadlearning.ca/user/enrollment?course_id="+encodeURIComponent(str_data[str_data.length-1]),
+   fetch("http://studio.launchpadlearning.ca/course/enroll/course/detail/"+encodeURIComponent(str_data[str_data.length-1]),
+  // fetch("http://studio.launchpadlearning.ca/user/enrollment?course_id="+encodeURIComponent(str_data[str_data.length-1]),
        )
     .then( res => res.json() )
     .then(response => {
@@ -575,7 +575,7 @@ function createRoom()
        nbf:start_unix,
        exp:end_unix
       }}
-      fetch("https://api.daily.co/v1/rooms/", {
+      fetch("http://api.daily.co/v1/rooms/", {
       method: "POST",
       headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10'},
       body: JSON.stringify(crt_room)
@@ -617,7 +617,7 @@ function updateLiveClass(meetingResponse)
 
   };
   //alert(JSON.stringify(data))
-  post_url = "https://student.launchpadlearning.ca/api/enrollment/v1/enrollment/"+encodeURIComponent(str_data1[str_data1.length-1])+"/live_classes";
+  post_url = "http://student.launchpadlearning.ca/api/enrollment/v1/enrollment/"+encodeURIComponent(str_data1[str_data1.length-1])+"/live_classes";
 
   fetch(post_url, {
       method: "POST",
@@ -629,7 +629,7 @@ function updateLiveClass(meetingResponse)
 
 }
 function getRooms(){
-    fetch('https://api.daily.co/v1/rooms?limit=50', {headers: {
+    fetch('http://api.daily.co/v1/rooms?limit=50', {headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10',
         }},)
