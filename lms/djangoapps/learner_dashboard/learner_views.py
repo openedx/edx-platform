@@ -25,6 +25,8 @@ def get_platform_settings():
 def dashboard_view(request):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
     learner_dash_data = {
+        "emailConfirmation": None,
+        "enterpriseDashboards": None,
         "platformSettings": get_platform_settings(),
         "enrollments": [],
         "unfulfilledEntitlements": [],

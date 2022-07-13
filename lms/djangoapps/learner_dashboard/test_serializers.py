@@ -12,13 +12,17 @@ from lms.djangoapps.learner_dashboard.serializers import (
     CourseProviderSerializer,
     CourseRunSerializer,
     CourseSerializer,
+    EmailConfirmationSerializer,
     EnrollmentSerializer,
+    EnterpriseDashboardsSerializer,
     EntitlementSerializer,
     GradeDataSerializer,
     LearnerEnrollmentSerializer,
     PlatformSettingsSerializer,
     ProgramsSerializer,
     LearnerDashboardSerializer,
+    SuggestedCourseSerializer,
+    UnfulfilledEntitlementSerializer,
 )
 
 
@@ -47,6 +51,16 @@ def random_url(allow_null=False):
 
     random_uuid = uuid4()
     return choice([f"{random_uuid}.example.com", f"example.com/{random_uuid}"])
+
+
+def random_grade():
+    """Return a random grade (0-100) with 2 decimal places of padding"""
+    return randint(0, 10000) / 100
+
+
+def decimal_to_grade_format(decimal):
+    """Util for matching serialized grade format, pads a decimal to 2 places"""
+    return "{:.2f}".format(decimal)
 
 
 def datetime_to_django_format(datetime_obj):
@@ -136,7 +150,7 @@ class TestCourseRunSerializer(TestCase):
             "isArchived": random_bool(),
             "courseNumber": f"{uuid4()}-101",
             "accessExpirationDate": random_date(),
-            "minPassingGrade": randint(0, 10000) / 100,
+            "minPassingGrade": random_grade(),
             "endDate": random_date(),
             "homeUrl": f"{uuid4()}.example.com",
             "marketingUrl": f"{uuid4()}.example.com",
@@ -158,7 +172,7 @@ class TestCourseRunSerializer(TestCase):
             "accessExpirationDate": datetime_to_django_format(
                 input_data["accessExpirationDate"]
             ),
-            "minPassingGrade": str(input_data["minPassingGrade"]),
+            "minPassingGrade": decimal_to_grade_format(input_data["minPassingGrade"]),
             "endDate": datetime_to_django_format(input_data["endDate"]),
             "homeUrl": input_data["homeUrl"],
             "marketingUrl": input_data["marketingUrl"],
@@ -180,19 +194,26 @@ class TestEnrollmentSerializer(TestCase):
             "canUpgrade": random_bool(),
             "isAuditAccessExpired": random_bool(),
             "isEmailEnabled": random_bool(),
+            "lastEnrolled": random_date(),
+            "isEnrolled": random_bool(),
         }
 
     def test_happy_path(self):
         input_data = self.generate_test_enrollment_info()
         output_data = EnrollmentSerializer(input_data).data
 
-        assert output_data == {
-            "isAudit": input_data["isAudit"],
-            "isVerified": input_data["isVerified"],
-            "canUpgrade": input_data["canUpgrade"],
-            "isAuditAccessExpired": input_data["isAuditAccessExpired"],
-            "isEmailEnabled": input_data["isEmailEnabled"],
-        }
+        self.assertDictEqual(
+            output_data,
+            {
+                "isAudit": input_data["isAudit"],
+                "isVerified": input_data["isVerified"],
+                "canUpgrade": input_data["canUpgrade"],
+                "isAuditAccessExpired": input_data["isAuditAccessExpired"],
+                "isEmailEnabled": input_data["isEmailEnabled"],
+                "lastEnrolled": datetime_to_django_format(input_data["lastEnrolled"]),
+                "isEnrolled": input_data["isEnrolled"],
+            },
+        )
 
 
 class TestGradeDataSerializer(TestCase):
@@ -271,6 +292,7 @@ class TestEntitlementSerializer(TestCase):
             "canViewCourse": random_bool(),
             "changeDeadline": random_date(),
             "isExpired": random_bool(),
+            "expirationDate": random_date(),
         }
 
     def test_happy_path(self):
@@ -295,6 +317,7 @@ class TestEntitlementSerializer(TestCase):
             "canViewCourse": input_data["canViewCourse"],
             "changeDeadline": datetime_to_django_format(input_data["changeDeadline"]),
             "isExpired": input_data["isExpired"],
+            "expirationDate": datetime_to_django_format(input_data["expirationDate"]),
         }
 
 
@@ -388,24 +411,178 @@ class TestLearnerEnrollmentsSerializer(TestCase):
         ]
         assert output_data.keys() == set(expected_keys)
 
-    def test_allowed_empty(self):
-        """Tests for allowed null fields, mostly that nothing breaks"""
-        input_data = self.generate_test_enrollments_data()
-        input_data["courseProvider"] = None
 
-        output_data = LearnerEnrollmentSerializer(input_data).data
+class TestUnfulfilledEntitlementSerializer(TestCase):
+    """High-level tests for UnfulfilledEntitlementSerializer"""
+
+    @classmethod
+    def generate_test_entitlements_data(cls):
+        return {
+            "courseProvider": TestCourseProviderSerializer.generate_test_provider_info(),
+            "course": TestCourseSerializer.generate_test_course_info(),
+            "entitlements": TestEntitlementSerializer.generate_test_entitlement_info(),
+            "programs": TestProgramsSerializer.generate_test_programs_info(),
+        }
+
+    def test_happy_path(self):
+        """Test that nothing breaks and the output fields look correct"""
+        input_data = self.generate_test_entitlements_data()
+
+        output_data = UnfulfilledEntitlementSerializer(input_data).data
 
         expected_keys = [
             "courseProvider",
             "course",
-            "courseRun",
-            "enrollment",
-            "gradeData",
-            "certificate",
             "entitlements",
             "programs",
         ]
         assert output_data.keys() == set(expected_keys)
+
+    def test_allowed_empty(self):
+        """Tests for allowed null fields, mostly that nothing breaks"""
+        input_data = self.generate_test_entitlements_data()
+        input_data["courseProvider"] = None
+
+        output_data = UnfulfilledEntitlementSerializer(input_data).data
+
+        expected_keys = [
+            "courseProvider",
+            "course",
+            "entitlements",
+            "programs",
+        ]
+        assert output_data.keys() == set(expected_keys)
+
+
+class TestSuggestedCourseSerializer(TestCase):
+    """High-level tests for SuggestedCourseSerializer"""
+
+    @classmethod
+    def generate_test_suggested_courses(cls):
+        return {
+            "bannerUrl": random_url(),
+            "logoUrl": random_url(),
+            "title": f"{uuid4()}",
+            "courseUrl": random_url(),
+        }
+
+    def test_structure(self):
+        """Test that nothing breaks and the output fields look correct"""
+        input_data = self.generate_test_suggested_courses()
+
+        output_data = SuggestedCourseSerializer(input_data).data
+
+        expected_keys = [
+            "bannerUrl",
+            "logoUrl",
+            "title",
+            "courseUrl",
+        ]
+        assert output_data.keys() == set(expected_keys)
+
+    def test_happy_path(self):
+        """Test that data serializes correctly"""
+
+        input_data = self.generate_test_suggested_courses()
+
+        output_data = SuggestedCourseSerializer(input_data).data
+
+        self.assertDictEqual(
+            output_data,
+            {
+                "bannerUrl": input_data["bannerUrl"],
+                "logoUrl": input_data["logoUrl"],
+                "title": input_data["title"],
+                "courseUrl": input_data["courseUrl"],
+            },
+        )
+
+
+class TestEmailConfirmationSerializer(TestCase):
+    """High-level tests for EmailConfirmationSerializer"""
+
+    @classmethod
+    def generate_test_data(cls):
+        return {
+            "isNeeded": random_bool(),
+            "sendEmailUrl": random_url(),
+        }
+
+    def test_structure(self):
+        """Test that nothing breaks and the output fields look correct"""
+        input_data = self.generate_test_data()
+
+        output_data = EmailConfirmationSerializer(input_data).data
+
+        expected_keys = [
+            "isNeeded",
+            "sendEmailUrl",
+        ]
+        assert output_data.keys() == set(expected_keys)
+
+    def test_happy_path(self):
+        """Test that data serializes correctly"""
+
+        input_data = self.generate_test_data()
+
+        output_data = EmailConfirmationSerializer(input_data).data
+
+        self.assertDictEqual(
+            output_data,
+            {
+                "isNeeded": input_data["isNeeded"],
+                "sendEmailUrl": input_data["sendEmailUrl"],
+            },
+        )
+
+
+class TestEnterpriseDashboardsSerializer(TestCase):
+    """High-level tests for EnterpriseDashboardsSerializer"""
+
+    @classmethod
+    def generate_test_dashboard(cls):
+        return {
+            "label": f"{uuid4()}",
+            "url": random_url(),
+        }
+
+    @classmethod
+    def generate_test_data(cls):
+        return {
+            "availableDashboards": [
+                cls.generate_test_dashboard() for _ in range(randint(0, 3))
+            ],
+            "mostRecentDashboard": cls.generate_test_dashboard()
+            if random_bool()
+            else None,
+        }
+
+    def test_structure(self):
+        """Test that nothing breaks and the output fields look correct"""
+        input_data = self.generate_test_data()
+
+        output_data = EnterpriseDashboardsSerializer(input_data).data
+
+        expected_keys = [
+            "availableDashboards",
+            "mostRecentDashboard",
+        ]
+        assert output_data.keys() == set(expected_keys)
+
+    def test_happy_path(self):
+        """Test that data serializes correctly"""
+
+        input_data = self.generate_test_data()
+
+        output_data = EnterpriseDashboardsSerializer(input_data).data
+
+        self.assertDictEqual(
+            output_data,
+            {
+                "availableDashboards": input_data["availableDashboards"],
+                "mostRecentDashboard": input_data["mostRecentDashboard"],
+            },
+        )
 
 
 class TestLearnerDashboardSerializer(TestCase):
@@ -418,6 +595,8 @@ class TestLearnerDashboardSerializer(TestCase):
         """Test that empty inputs return the right keys"""
 
         input_data = {
+            "emailConfirmation": None,
+            "enterpriseDashboards": None,
             "platformSettings": None,
             "enrollments": [],
             "unfulfilledEntitlements": [],
@@ -428,6 +607,8 @@ class TestLearnerDashboardSerializer(TestCase):
         self.assertDictEqual(
             output_data,
             {
+                "emailConfirmation": None,
+                "enterpriseDashboards": None,
                 "platformSettings": None,
                 "enrollments": [],
                 "unfulfilledEntitlements": [],
@@ -436,35 +617,65 @@ class TestLearnerDashboardSerializer(TestCase):
         )
 
     @mock.patch(
+        "lms.djangoapps.learner_dashboard.serializers.SuggestedCourseSerializer.to_representation"
+    )
+    @mock.patch(
+        "lms.djangoapps.learner_dashboard.serializers.UnfulfilledEntitlementSerializer.to_representation"
+    )
+    @mock.patch(
         "lms.djangoapps.learner_dashboard.serializers.LearnerEnrollmentSerializer.to_representation"
     )
     @mock.patch(
         "lms.djangoapps.learner_dashboard.serializers.PlatformSettingsSerializer.to_representation"
     )
+    @mock.patch(
+        "lms.djangoapps.learner_dashboard.serializers.EnterpriseDashboardsSerializer.to_representation"
+    )
+    @mock.patch(
+        "lms.djangoapps.learner_dashboard.serializers.EmailConfirmationSerializer.to_representation"
+    )
     def test_linkage(
-        self, mock_platform_settings_serializer, mock_learner_enrollment_serializer
+        self,
+        mock_email_confirmation_serializer,
+        mock_enterprise_dashboards_serializer,
+        mock_platform_settings_serializer,
+        mock_learner_enrollment_serializer,
+        mock_entitlements_serializer,
+        mock_suggestions_serializer,
     ):
+        mock_email_confirmation_serializer.return_value = (
+            mock_email_confirmation_serializer
+        )
+        mock_enterprise_dashboards_serializer.return_value = (
+            mock_enterprise_dashboards_serializer
+        )
         mock_platform_settings_serializer.return_value = (
             mock_platform_settings_serializer
         )
         mock_learner_enrollment_serializer.return_value = (
             mock_learner_enrollment_serializer
         )
+        mock_entitlements_serializer.return_value = mock_entitlements_serializer
+        mock_suggestions_serializer.return_value = mock_suggestions_serializer
 
         input_data = {
+            "emailConfirmation": {},
+            "enterpriseDashboards": [{}],
             "platformSettings": {},
             "enrollments": [{}],
-            "unfulfilledEntitlements": [],
-            "suggestedCourses": [],
+            "unfulfilledEntitlements": [{}],
+            "suggestedCourses": [{}],
         }
         output_data = LearnerDashboardSerializer(input_data).data
 
         self.assertDictEqual(
             output_data,
             {
+                "emailConfirmation": mock_email_confirmation_serializer,
+                "enterpriseDashboards": mock_enterprise_dashboards_serializer,
                 "platformSettings": mock_platform_settings_serializer,
                 "enrollments": [mock_learner_enrollment_serializer],
-                "unfulfilledEntitlements": [],
-                "suggestedCourses": [],
+                "unfulfilledEntitlements": [mock_entitlements_serializer],
+                "suggestedCourses": [mock_suggestions_serializer],
             },
         )

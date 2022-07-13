@@ -54,6 +54,8 @@ class EnrollmentSerializer(serializers.Serializer):
     canUpgrade = serializers.BooleanField()
     isAuditAccessExpired = serializers.BooleanField()
     isEmailEnabled = serializers.BooleanField()
+    lastEnrolled = serializers.DateTimeField()
+    isEnrolled = serializers.BooleanField()
 
 
 class GradeDataSerializer(serializers.Serializer):
@@ -94,6 +96,7 @@ class EntitlementSerializer(serializers.Serializer):
     canViewCourse = serializers.BooleanField()
     changeDeadline = serializers.DateTimeField()
     isExpired = serializers.BooleanField()
+    expirationDate = serializers.DateTimeField()
 
 
 class RelatedProgramSerializer(serializers.Serializer):
@@ -135,20 +138,55 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
 class UnfulfilledEntitlementSerializer(serializers.Serializer):
     """Serializer for an unfulfilled entitlement"""
 
+    courseProvider = CourseProviderSerializer(allow_null=True)
+    course = CourseSerializer()
+    entitlements = EntitlementSerializer()
+    programs = ProgramsSerializer()
+
 
 class SuggestedCourseSerializer(serializers.Serializer):
     """Serializer for a suggested course"""
+
+    bannerUrl = serializers.URLField()
+    logoUrl = serializers.URLField()
+    title = serializers.CharField()
+    courseUrl = serializers.URLField()
+
+
+class EmailConfirmationSerializer(serializers.Serializer):
+    """Serializer for email confirmation banner resources"""
+
+    isNeeded = serializers.BooleanField()
+    sendEmailUrl = serializers.URLField()
+
+
+class EnterpriseDashboardSerializer(serializers.Serializer):
+    """Serializer for individual enterprise dashboard data"""
+
+    label = serializers.CharField()
+    url = serializers.URLField()
+
+
+class EnterpriseDashboardsSerializer(serializers.Serializer):
+    """Listing of available enterprise dashboards"""
+
+    availableDashboards = serializers.ListField(
+        child=EnterpriseDashboardSerializer(), allow_empty=True
+    )
+    mostRecentDashboard = EnterpriseDashboardSerializer()
 
 
 class LearnerDashboardSerializer(serializers.Serializer):
     """Serializer for all info required to render the Learner Dashboard"""
 
+    emailConfirmation = EmailConfirmationSerializer()
+    enterpriseDashboards = EnterpriseDashboardsSerializer()
     platformSettings = PlatformSettingsSerializer()
     enrollments = serializers.ListField(
         child=LearnerEnrollmentSerializer(), allow_empty=True
     )
     unfulfilledEntitlements = serializers.ListField(
-        child=EntitlementSerializer(), allow_empty=True
+        child=UnfulfilledEntitlementSerializer(), allow_empty=True
     )
     suggestedCourses = serializers.ListField(
         child=SuggestedCourseSerializer(), allow_empty=True
