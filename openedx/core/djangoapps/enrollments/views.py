@@ -819,6 +819,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 update_email_opt_in(request.user, org, email_opt_in)
 
             log.info(u'The user [%s] has already been enrolled in course run [%s].', username, course_id)
+            ## EOL
+            try:
+                from welcome_mail.views import send_email
+                send_email(user.email, course_id)
+            except Exception as e:
+                log.error('WelcomeMail - Error to send_email(), error: {}'.format(str(e)))
+            ## END EOL
             return Response(response)
         except CourseModeNotFoundError as error:
             return Response(
