@@ -13,6 +13,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.x_module import STUDIO_VIEW
+from xmodule.tasks import get_import_task_status
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from cms.djangoapps.contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
@@ -31,7 +32,6 @@ from common.djangoapps.student.roles import (
     OrgStaffRole
 )
 from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 
 
 class LibraryTestCase(ModuleStoreTestCase):
@@ -98,20 +98,9 @@ class LibraryTestCase(ModuleStoreTestCase):
 
     def _refresh_children(self, lib_content_block, status_code_expected=200):
         """
-        Helper method: Uses the REST API to call the 'refresh_children' handler
-        of a LibraryContent block
+        Helper method: Update children and return library.
         """
-        if 'user' not in lib_content_block.runtime._services:  # pylint: disable=protected-access
-            user_service = DjangoXBlockUserService(self.user)
-            lib_content_block.runtime._services['user'] = user_service  # pylint: disable=protected-access
-
-        handler_url = reverse_usage_url(
-            'component_handler',
-            lib_content_block.location,
-            kwargs={'handler': 'refresh_children'}
-        )
-        response = self.client.ajax_post(handler_url)
-        self.assertEqual(response.status_code, status_code_expected)
+        lib_content_block.refresh_children()
         return modulestore().get_item(lib_content_block.location)
 
     def _bind_module(self, descriptor, user=None):
@@ -358,9 +347,7 @@ class TestLibraries(LibraryTestCase):
         )
         self.assertEqual(resp.status_code, 200)
         lc_block = modulestore().get_item(lc_block.location)
-        self.assertEqual(len(lc_block.children), 1)  # Children should not be deleted due to a bad setting.
-        html_block = modulestore().get_item(lc_block.children[0])
-        self.assertEqual(html_block.data, data_value)
+        self.assertEqual(len(lc_block.children), 0)  # Children deleted due to a changing source_library_id.
 
     def test_refreshes_children_if_libraries_change(self):
         """ Tests that children are automatically refreshed if libraries list changes """
@@ -406,7 +393,7 @@ class TestLibraries(LibraryTestCase):
         html_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(html_block.data, data2)
 
-    @patch("xmodule.library_tools.SearchEngine.get_search_engine", Mock(return_value=None, autospec=True))
+    @patch("xmodule.tasks.SearchEngine.get_search_engine", Mock(return_value=None, autospec=True))
     def test_refreshes_children_if_capa_type_change(self):
         """ Tests that children are automatically refreshed if capa type field changes """
         name1, name2 = "Option Problem", "Multiple Choice Problem"
@@ -475,8 +462,9 @@ class TestLibraries(LibraryTestCase):
             {"source_library_id": "library-v1:NOT+FOUND"},
         )
         self.assertEqual(resp.status_code, 200)
-        with self.assertRaises(ValueError):
-            self._refresh_children(lc_block, status_code_expected=400)
+        self._refresh_children(lc_block, status_code_expected=200)
+        status = get_import_task_status(lc_block.location)
+        self.assertEqual(status, 'Failed')
 
     def test_library_filters(self):
         """
@@ -738,7 +726,7 @@ class TestLibraryAccess(LibraryTestCase):
     @ddt.data(
         (LibraryUserRole, CourseStaffRole, True),
         (CourseStaffRole, CourseStaffRole, True),
-        (None, CourseStaffRole, False),
+        (None, CourseStaffRole, True),
         (LibraryUserRole, None, False),
     )
     @ddt.unpack
@@ -768,6 +756,11 @@ class TestLibraryAccess(LibraryTestCase):
         # We must use the CMS's module system in order to get permissions checks.
         self._bind_module(lc_block, user=self.non_staff_user)
         lc_block = self._refresh_children(lc_block, status_code_expected=200 if expected_result else 403)
+        status = get_import_task_status(lc_block.location)
+        if not library_role and expected_result:
+            self.assertEqual(status, 'Failed')
+        elif expected_result:
+            self.assertEqual(status, 'Succeeded')
         self.assertEqual(len(lc_block.children), 1 if expected_result else 0)
 
     def test_studio_user_permissions(self):
@@ -993,27 +986,24 @@ class TestOverrides(LibraryTestCase):
         self.library = store.get_library(self.lib_key)
 
         # Refresh our reference to the block
+        self.lc_block.refresh_children()
         self.lc_block = store.get_item(self.lc_block.location)
         self.problem_in_course = store.get_item(self.problem_in_course.location)
 
         # The library has changed...
         self.assertEqual(len(self.library.children), 2)
 
-        # But the block hasn't.
-        self.assertEqual(len(self.lc_block.children), 1)
-        self.assertEqual(self.problem_in_course.location, self.lc_block.children[0])
-        self.assertEqual(self.problem_in_course.display_name, self.original_display_name)
+        # and the block has changed too.
+        self.assertEqual(len(self.lc_block.children), 2)
 
         # Duplicate self.lc_block:
         duplicate = store.get_item(
             _duplicate_item(self.course.location, self.lc_block.location, self.user)
         )
         # The duplicate should have identical children to the original:
-        self.assertEqual(len(duplicate.children), 1)
+        self.assertEqual(len(duplicate.children), 2)
         self.assertTrue(self.lc_block.source_library_version)
         self.assertEqual(self.lc_block.source_library_version, duplicate.source_library_version)
-        problem2_in_course = store.get_item(duplicate.children[0])
-        self.assertEqual(problem2_in_course.display_name, self.original_display_name)
 
 
 class TestIncompatibleModuleStore(LibraryTestCase):

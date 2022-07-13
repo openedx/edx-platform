@@ -298,6 +298,7 @@ def update_children_task(self, user_id, dest_block_key, version=None):
                 dest_block.children = store.copy_from_template(
                     source_blocks, dest_block.location, user_id, head_validation=head_validation
                 )
+                dest_block.source_library_version = str(library.location.library_key.version_guid)
                 store.update_item(dest_block, user_id)
                 # ^-- copy_from_template updates the children in the DB
                 # but we must also set .children here to avoid overwriting the DB again
@@ -312,6 +313,7 @@ def update_children_task(self, user_id, dest_block_key, version=None):
             source_blocks = library_api.get_library_blocks(library_key, block_types=None)
             source_block_ids = [str(block.usage_key) for block in source_blocks]
             import_from_blockstore(user_id, store, dest_block, source_block_ids)
+            dest_block.source_library_version = str(library.version)
             store.update_item(dest_block, user_id)
         except Exception as exception:  # pylint: disable=broad-except
             LOGGER.exception('Error importing children for %s', dest_block_key, exc_info=True)

@@ -714,7 +714,7 @@ class LibraryContentBlock(
         """
         If source_library_id is empty, clear source_library_version and children.
         """
-        self.children = []
+        self.children = []  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         if not self.source_library_id:
             self.source_library_version = ""
         else:
