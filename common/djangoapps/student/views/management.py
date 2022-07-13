@@ -360,6 +360,13 @@ def change_enrollment(request, check_access=True):
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 if enroll_mode:
                     CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
+                    ## EOL
+                    try:
+                        from welcome_mail.views import send_email
+                        send_email(user.email, course_id)
+                    except Exception as e:
+                        log.error('WelcomeMail - Error to send_email(), error: {}'.format(str(e)))
+                    ## END EOL
             except Exception:  # pylint: disable=broad-except
                 return HttpResponseBadRequest(_("Could not enroll"))
 
