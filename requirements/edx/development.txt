@@ -968,7 +968,7 @@ openedx-filters==0.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-ora2==4.4.2
+ora2==4.4.4
     # via -r requirements/edx/testing.txt
 oscrypto==1.3.0
     # via
