@@ -9,12 +9,13 @@ from rest_framework.decorators import action
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import GenUser, Character, Class, Teacher, Student
-from .serializers import CharacterSerializer, ClassSerializer, FavoriteClassSerializer
+from .serializers import CharacterSerializer, ClassSerializer, FavoriteClassSerializer, UserInfoSerializer
 from .permissions import IsStudent, IsTeacher
 from openedx.features.genplus_features.genplus.display_messages import SuccessMessages, ErrorMessages
+from .mixins import GenzMixin
 
 
-class UserInfo(views.APIView):
+class UserInfo(GenzMixin, views.APIView):
     """
     API for genplus user information
     """
@@ -25,76 +26,41 @@ class UserInfo(views.APIView):
         """
         get user's basic info
         """
-        try:
-            gen_user = GenUser.objects.select_related('user', 'school').get(user=self.request.user)
-        except GenUser.DoesNotExist:
-            return Response(ErrorMessages.INTERNAL_SERVER, status=status.HTTP_400_BAD_REQUEST)
+        user_info = UserInfoSerializer(self.request.user, context={
+            'request': self.request,
+            'gen_user': self.gen_user
+        })
 
-        user_info = {
-            'id': self.request.user.id,
-            'name': self.request.user.profile.name,
-            'username': self.request.user.username,
-            'csrf_token': csrf.get_token(self.request),
-            'role': gen_user.role,
-            'first_name': gen_user.user.first_name,
-            'last_name': gen_user.user.last_name,
-            'email': gen_user.user.email,
-            'school': gen_user.school.name,
-            'on_board': '',
-            'character_id': '',
-            'profile_image': '',
-        }
-
-        if gen_user.is_student:
-            student = {
-                'on_board': gen_user.student.onboarded,
-                'character_id': gen_user.student.character.id
-                                if gen_user.student.character else None,
-                'profile_image': self.request.build_absolute_uri(
-                                    gen_user.student.character.profile_pic.url)
-                                 if gen_user.student.character else None
-            }
-            user_info.update(student)
-        if gen_user.is_teacher:
-            teacher = {
-                'profile_image': self.request.build_absolute_uri(
-                                    gen_user.teacher.profile_image.url)
-                                 if gen_user.teacher.profile_image else None
-            }
-            user_info.update(teacher)
-
-        return Response(status=status.HTTP_200_OK, data=user_info)
+        return Response(status=status.HTTP_200_OK, data=user_info.data)
 
     def post(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
         update user's profile image
         """
         try:
-            gen_user = GenUser.objects.get(user=self.request.user)
-            if gen_user.is_teacher:
+            if self.gen_user.is_teacher:
                 image = self.request.data.get('image', None)
                 if not image:
                     raise ValueError('image field was empty')
-                teacher = Teacher.objects.get(gen_user=gen_user)
+                teacher = Teacher.objects.get(gen_user=self.gen_user)
                 teacher.profile_image = image
                 teacher.save()
 
-            if gen_user.is_student:
+            if self.gen_user.is_student:
                 character = self.request.data.get('character', None)
                 if not character:
                     raise ValueError('character field was empty')
                 new_character = Character.objects.get(id=int(character))
-                student = Student.objects.get(gen_user=gen_user)
-                student.character  = new_character
+                student = Student.objects.get(gen_user=self.gen_user)
+                student.character = new_character
                 student.save()
-
+                
             return Response(SuccessMessages.PROFILE_IMAGE_UPDATED, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
-
-class CharacterViewSet(viewsets.ModelViewSet):
+class CharacterViewSet(GenzMixin, viewsets.ModelViewSet):
     """
     Viewset for character APIs
     """
@@ -110,16 +76,16 @@ class CharacterViewSet(viewsets.ModelViewSet):
         the profile
         """
         character = self.get_object()
-        gen_user = GenUser.objects.get(user=self.request.user)
-        gen_user.student.character = character
-        if request.data.get("onboarded") and not gen_user.student.onboarded:
-            gen_user.student.onboarded = True
+        student = Student.objects.get(gen_user=self.gen_user)
+        student.character = character
+        if request.data.get("onboarded") and not self.gen_user.student.onboarded:
+            student.onboarded = True
 
-        gen_user.student.save()
+        student.save()
         return Response(SuccessMessages.CHARACTER_SELECTED, status=status.HTTP_204_NO_CONTENT)
 
 
-class ClassViewSet(viewsets.ModelViewSet):
+class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
     """
     Viewset for class APIs
     """
@@ -129,15 +95,14 @@ class ClassViewSet(viewsets.ModelViewSet):
     lookup_field = 'group_id'
 
     def get_queryset(self):
-        return Class.visible_objects.filter(school=self.request.user.gen_user.school)
+        return Class.visible_objects.filter(school=self.school)
 
     def list(self, request, *args, **kwargs):  # pylint: disable=unused-argument
-        gen_user = self.request.user.gen_user
-        favourite_classes = gen_user.teacher.favourite_classes.all()
+        favourite_classes = self.gen_user.teacher.favourite_classes.all()
         favourite_classes_serializer = self.get_serializer(favourite_classes, many=True)
         class_queryset = self.filter_queryset(self.get_queryset())
         class_serializer = self.get_serializer(
-            class_queryset.exclude(group_id__in=gen_user.teacher.favourite_classes.values('group_id', )),
+            class_queryset.exclude(group_id__in=favourite_classes.values('group_id', )),
             many=True)
         data = {
             'favourite_classes': favourite_classes_serializer.data,
@@ -155,12 +120,12 @@ class ClassViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         data = serializer.data
         gen_class = self.get_object()
-        gen_user = GenUser.objects.get(user=self.request.user)
+        teacher = Teacher.objects.get(gen_user=self.gen_user)
         if data['action'] == 'add':
-            gen_user.teacher.favourite_classes.add(gen_class)
+            teacher.favourite_classes.add(gen_class)
             return Response(SuccessMessages.CLASS_ADDED_TO_FAVORITES.format(class_name=gen_class.name),
                             status=status.HTTP_204_NO_CONTENT)
         else:
-            gen_user.teacher.favourite_classes.remove(gen_class)
+            teacher.favourite_classes.remove(gen_class)
             return Response(SuccessMessages.CLASS_REMOVED_FROM_FAVORITES.format(class_name=gen_class.name),
                             status=status.HTTP_204_NO_CONTENT)
