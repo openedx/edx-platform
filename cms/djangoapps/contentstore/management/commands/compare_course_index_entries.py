@@ -5,9 +5,6 @@ from opaque_keys.edx.locator import CourseLocator
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 from xmodule.modulestore.split_mongo.mongo_connection import MongoPersistenceBackend, DjangoFlexPersistenceBackend
 
-
-
-
 logger = logging.getLogger(__name__)
 
 """
@@ -15,6 +12,7 @@ A Command to determine if the Mongo active_versions and Django course_index tabl
 """
 
 class Command(BaseCommand):
+
 
     """
     A Command to determine if the Mongo active_versions and Django course_index tables are out of sync with one another.
@@ -53,7 +51,7 @@ class Command(BaseCommand):
 
         print(out_of_sync)
         for course in out_of_sync:
-            print('*'*8)
+            print('*' * 8)
             print(f'{course} is out of sync in course_index tables')
             print(f'MONGO draft     id: {out_of_sync[course][0]}')
             print(f'MONGO published id: {out_of_sync[course][1]}')
