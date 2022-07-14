@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 A Command to determine if the Mongo active_versions and Django course_index tables are out of sync with one another.
 """
 
-class Command(BaseCommand):
 
+class Command(BaseCommand):
 
     """
     A Command to determine if the Mongo active_versions and Django course_index tables are out of sync with one another.
@@ -57,5 +57,5 @@ class Command(BaseCommand):
             print(f'MONGO published id: {out_of_sync[course][1]}')
             print(f'MYSQL draft     id: {out_of_sync[course][2]}')
             print(f'MYSQL published id: {out_of_sync[course][3]}')
-        print('*'*8)
+        print('*' * 8)
         print(f'The number of out-of-sync courses is : {len(out_of_sync)}')
