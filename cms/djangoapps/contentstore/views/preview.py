@@ -206,6 +206,9 @@ def _preview_module_system(request, descriptor, field_data):
         else:
             preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
 
+    # Avoid circular import issues
+    from .item import StudioPermissionsService
+
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -220,6 +223,7 @@ def _preview_module_system(request, descriptor, field_data):
         # Get the raw DescriptorSystem, not the CombinedSystem
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
+            "studio_user_permissions": StudioPermissionsService(request.user),
             "field-data": field_data,
             "i18n": ModuleI18nService,
             'mako': mako_service,

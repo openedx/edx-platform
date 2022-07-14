@@ -13,7 +13,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.x_module import STUDIO_VIEW
-from xmodule.tasks import get_import_task_status
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from cms.djangoapps.contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
@@ -32,6 +31,7 @@ from common.djangoapps.student.roles import (
     OrgStaffRole
 )
 from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 
 
 class LibraryTestCase(ModuleStoreTestCase):
@@ -98,9 +98,20 @@ class LibraryTestCase(ModuleStoreTestCase):
 
     def _refresh_children(self, lib_content_block, status_code_expected=200):
         """
-        Helper method: Update children and return library.
+        Helper method: Uses the REST API to call the 'refresh_children' handler
+        of a LibraryContent block
         """
-        lib_content_block.refresh_children()
+        if 'user' not in lib_content_block.runtime._services:  # pylint: disable=protected-access
+            user_service = DjangoXBlockUserService(self.user)
+            lib_content_block.runtime._services['user'] = user_service  # pylint: disable=protected-access
+
+        handler_url = reverse_usage_url(
+            'preview_handler',
+            lib_content_block.location,
+            kwargs={'handler': 'refresh_children'}
+        )
+        response = self.client.ajax_post(handler_url)
+        self.assertEqual(response.status_code, status_code_expected)
         return modulestore().get_item(lib_content_block.location)
 
     def _bind_module(self, descriptor, user=None):
@@ -462,9 +473,8 @@ class TestLibraries(LibraryTestCase):
             {"source_library_id": "library-v1:NOT+FOUND"},
         )
         self.assertEqual(resp.status_code, 200)
-        self._refresh_children(lc_block, status_code_expected=200)
-        status = get_import_task_status(lc_block.location)
-        self.assertEqual(status, 'Failed')
+        with self.assertRaises(ValueError):
+            self._refresh_children(lc_block, status_code_expected=400)
 
     def test_library_filters(self):
         """
@@ -726,7 +736,7 @@ class TestLibraryAccess(LibraryTestCase):
     @ddt.data(
         (LibraryUserRole, CourseStaffRole, True),
         (CourseStaffRole, CourseStaffRole, True),
-        (None, CourseStaffRole, True),
+        (None, CourseStaffRole, False),
         (LibraryUserRole, None, False),
     )
     @ddt.unpack
@@ -756,11 +766,6 @@ class TestLibraryAccess(LibraryTestCase):
         # We must use the CMS's module system in order to get permissions checks.
         self._bind_module(lc_block, user=self.non_staff_user)
         lc_block = self._refresh_children(lc_block, status_code_expected=200 if expected_result else 403)
-        status = get_import_task_status(lc_block.location)
-        if not library_role and expected_result:
-            self.assertEqual(status, 'Failed')
-        elif expected_result:
-            self.assertEqual(status, 'Succeeded')
         self.assertEqual(len(lc_block.children), 1 if expected_result else 0)
 
     def test_studio_user_permissions(self):
@@ -986,8 +991,7 @@ class TestOverrides(LibraryTestCase):
         self.library = store.get_library(self.lib_key)
 
         # Refresh our reference to the block
-        self.lc_block.refresh_children()
-        self.lc_block = store.get_item(self.lc_block.location)
+        self.lc_block = self._refresh_children(self.lc_block)
         self.problem_in_course = store.get_item(self.problem_in_course.location)
 
         # The library has changed...
