@@ -187,9 +187,7 @@ from common.djangoapps.student.models import CourseEnrollment
     <div class="dashboard" id="dashboard-main">
       <div class="main-container">
         <div class="my-courses" id="my-courses">
-        <div class="alert" id="alert-check">
-                <input type="Button" onclick="callAlert()">
-            </div>
+
 
           % if len(course_entitlements + course_enrollments) > 0:
             <ul class="listing-courses">

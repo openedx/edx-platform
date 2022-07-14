@@ -79,7 +79,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
           lang="${course_overview.language}"
         % endif
       >
-      
+
 <article class="course${mode_class}" aria-labelledby="course-title-${enrollment.course_id}" id="course-card-${course_card_index}">
   <% course_target = course_home_url(course_overview.id) %>
   <section class="details" aria-labelledby="details-heading-${enrollment.course_id}">
@@ -88,7 +88,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
       % if show_courseware_link and not is_unfulfilled_entitlement:
         % if not is_course_expired:
             <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover course-target-link" tabindex="-1">
-              <img           
+              <img
               style=" border-radius: 12px 0 0 12px" src="${course_overview.image_urls['small']}" class="course-image" alt="${_('{course_number} {course_name} Home Page').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
             </a>
         % else:
@@ -125,6 +125,9 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
         </h3>
         <div class="wrapper-course-info-actions">
           <div class="wrapper-course-info-row">
+              <div class="alert" id="alert-check">
+                <input type="Button" onclick="callAlert()">
+            </div>
             <div class="course-info">
               <!-- <span class="info-university">${course_overview.display_org_with_default} - </span> -->
               <!-- <span class="info-course-id">${course_overview.display_number_with_default}</span> -->
