@@ -78,4 +78,5 @@ def add_stats_for_users_with_no_discussion_content(course_stats, users_in_course
             'active_flags': 0,
             'inactive_flags': 0,
         })
+    updated_course_stats = sorted(updated_course_stats, key=lambda d: len(d['username']))
     return updated_course_stats
