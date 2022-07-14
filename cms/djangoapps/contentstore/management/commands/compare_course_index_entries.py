@@ -1,4 +1,4 @@
-"""A Command to determine if the Mongo active_versions and Django course_index tables are out of sync with one another."""
+"""A Command to determine if the Mongo active_versions and Django course_index tables are out of sync"""
 import logging
 from django.core.management.base import BaseCommand
 from django.conf import settings
