@@ -9,6 +9,7 @@ jobs:
   # See also https://docs.docker.com/docker-hub/builds/
   push:
     runs-on: ubuntu-latest
+    if: github.repository == 'openedx/edx-platform' || github.repository == 'edx/edx-platform-private'
     if: github.event_name == 'push'
 
     steps:
