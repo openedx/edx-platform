@@ -8,6 +8,7 @@ from opaque_keys.edx.locator import (
     LibraryLocator,
     LibraryLocatorV2,
 )
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.tasks import update_children_task, get_import_task_status
 
@@ -137,6 +138,18 @@ class LibraryToolsService:
         """
         if user_perms and not user_perms.can_write(dest_block.location.course_key):
             raise PermissionDenied()
+        library_key = dest_block.source_library_key
+        is_v2_lib = isinstance(library_key, LibraryLocatorV2)
+        if version and not is_v2_lib:
+            library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
+
+        library = self._get_library(library_key, is_v2_lib)
+        if library is None:
+            raise ValueError(f"Requested library {library_key} not found.")
+
+        if not is_v2_lib:
+            if user_perms and not user_perms.can_read(library_key):
+                raise PermissionDenied()
         update_children_task.delay(self.user_id, str(dest_block.location), version)
 
     def import_task_status(self, dest_block):

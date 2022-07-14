@@ -7,11 +7,9 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
-    LibraryLocator,
     LibraryLocatorV2,
     LibraryUsageLocator,
     LibraryUsageLocatorV2
@@ -205,16 +203,6 @@ def import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
         dest_block.children = store.get_item(dest_key).children
 
 
-def get_library_key(library_id):
-    """
-    Convenience method to get the library ID as a LibraryLocator and not just a string
-    """
-    try:
-        return LibraryLocator.from_string(library_id)
-    except InvalidKeyError:
-        return LibraryLocatorV2.from_string(library_id)
-
-
 class LibraryUpdateChildrenTask(UserTask):  # pylint: disable=abstract-method
     """
     Base class for course and library export tasks.
@@ -264,9 +252,8 @@ def update_children_task(self, user_id, dest_block_key, version=None):
     store = modulestore()
     dest_block_id = BlockUsageLocator.from_string(dest_block_key)
     dest_block = store.get_item(dest_block_id)
-    user_perms = dest_block.runtime.service(dest_block, 'studio_user_permissions')
     source_blocks = []
-    library_key = get_library_key(dest_block.source_library_id)
+    library_key = dest_block.source_library_key
     is_v2_lib = isinstance(library_key, LibraryLocatorV2)
 
     if version and not is_v2_lib:
@@ -281,11 +268,7 @@ def update_children_task(self, user_id, dest_block_key, version=None):
         filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
     else:
         filter_children = None
-
     if not is_v2_lib:
-        if user_perms and not user_perms.can_read(library_key):
-            self.status.fail(f"Permission Denied for library: {library_key}.")
-            return
         if filter_children:
             # Apply simple filtering based on CAPA problem types:
             source_blocks.extend(_problem_type_filter(store, library, dest_block.capa_type))
