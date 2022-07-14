@@ -460,6 +460,7 @@ class LibraryContentBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit_helpers.js'))
         add_webpack_to_fragment(fragment, 'LibraryContentBlockStudio')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
@@ -520,6 +521,22 @@ class LibraryContentBlock(
             return Response("Library Tools unavailable in current runtime.", status=400)
         self.tools.update_children(self, user_perms)
         return Response()
+
+    @XBlock.json_handler
+    def is_v2_library(self, data, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
+        """
+        Check the library version by library_id.
+
+        This is a temporary handler needed for hiding the Problem Type xblock editor field for V2 libraries.
+        """
+        lib_key = data.get('library_key')
+        try:
+            LibraryLocatorV2.from_string(lib_key)
+        except InvalidKeyError:
+            is_v2 = False
+        else:
+            is_v2 = True
+        return {'is_v2': is_v2}
 
     # Copy over any overridden settings the course author may have applied to the blocks.
     def _copy_overrides(self, store, user_id, source, dest):
