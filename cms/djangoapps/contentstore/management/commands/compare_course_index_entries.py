@@ -1,3 +1,4 @@
+"""A Command to determine if the Mongo active_versions and Django course_index tables are out of sync with one another."""
 import logging
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -6,10 +7,6 @@ from common.djangoapps.split_modulestore_django.models import SplitModulestoreCo
 from xmodule.modulestore.split_mongo.mongo_connection import MongoPersistenceBackend, DjangoFlexPersistenceBackend
 
 logger = logging.getLogger(__name__)
-
-"""
-A Command to determine if the Mongo active_versions and Django course_index tables are out of sync with one another.
-"""
 
 
 class Command(BaseCommand):
