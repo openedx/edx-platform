@@ -197,7 +197,9 @@ from common.djangoapps.student.models import CourseEnrollment
                     getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
                 )
             %>
-
+            <<div class="alert" id="alert-check">
+                <input type="Button">
+            </div>
             <div class="live_class">
               <h3 style="font-size: 24px; font-weight: 900; margin-bottom: 24px">Live Classes</h3>
               <div id="output" class="out" style="position: relative;display: none;"></div>

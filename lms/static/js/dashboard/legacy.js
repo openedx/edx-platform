@@ -308,4 +308,8 @@
              $('#unenroll_course_name').text($(event.target).data('course-name'));
          });
      };
+
+     function callAlert(){
+     alert('calling alert');
+     }
  }(jQuery, gettext, Logger, accessible_modal, interpolate));
