@@ -39,7 +39,7 @@ def task_create_or_update_hubspot_contact(user_email, user_json, is_contact_crea
         user_json (dict): Data for HubSpot request.
         is_contact_created (bool): Is contact already synced with HubSpot.
     """
-    logger.info('Syncing user data with HubSpot', user_email, user_json, is_contact_created)
+    logger.info('Syncing user data with HubSpot %s %s %s', user_email, user_json, is_contact_created)
 
     user = User.objects.filter(email=user_email).first()
     if not user:

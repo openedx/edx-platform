@@ -41,7 +41,7 @@ def prepare_user_data_for_hubspot_contact_creation(user):
         user_json['properties'].update(
             {
                 'edx_language': profile.language or '',
-                'edx_country': profile.country.name.format() if extended_profile.country else '',
+                'edx_country': profile.country.name.format() if profile.country else '',
                 'edx_city': profile.city or '',
             }
         )
