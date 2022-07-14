@@ -7,6 +7,7 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
 
     """
