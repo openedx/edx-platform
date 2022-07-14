@@ -17,6 +17,7 @@ from common.djangoapps.student.models import (
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
+    CourseEnrollmentAttribute,
     CourseEnrollmentCelebration,
     PendingEmailChange,
     Registration,
@@ -192,6 +193,13 @@ class CourseEnrollmentFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
 class CourseEnrollmentCelebrationFactory(DjangoModelFactory):
     class Meta:
         model = CourseEnrollmentCelebration
+
+    enrollment = factory.SubFactory(CourseEnrollmentFactory)
+
+
+class CourseEnrollmentAttributeFactory(DjangoModelFactory):
+    class Meta:
+        model = CourseEnrollmentAttribute
 
     enrollment = factory.SubFactory(CourseEnrollmentFactory)
 
