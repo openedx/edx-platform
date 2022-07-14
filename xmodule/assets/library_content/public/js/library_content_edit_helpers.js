@@ -30,26 +30,13 @@ function checkProblemTypeShouldBeVisible(editor) {
     });
 }
 
-var $librarySelect = $("select[name='Library']");
-
-$(document).on('change', $librarySelect, (e) => {
-    waitForEditorLoading();
-})
-
-$libraryContentEditors = $('.xblock-header.xblock-header-library_content');
-$editBtns = $libraryContentEditors.find('.action-item.action-edit');
-$(document).on('click', $editBtns, (e) => {
-    console.log('edit clicked')
-    waitForEditorLoading();
-})
-
 /**
  * Waits untill editor html loaded, than calls checks for Program Type field toggling.
  */
 function waitForEditorLoading() {
     var checkContent = setInterval(function() {
-        $modal = $('.xblock-editor');
-        content = $modal.html();
+        var $modal = $('.xblock-editor');
+        var content = $modal.html();
         if (content) {
             clearInterval(checkContent);
             checkProblemTypeShouldBeVisible($modal);
@@ -58,3 +45,10 @@ function waitForEditorLoading() {
 }
 // Initial call
 waitForEditorLoading();
+
+var $librarySelect = $("select[name='Library']");
+$(document).on('change', $librarySelect, waitForEditorLoading)
+
+var $libraryContentEditors = $('.xblock-header.xblock-header-library_content');
+var $editBtns = $libraryContentEditors.find('.action-item.action-edit');
+$(document).on('click', $editBtns, waitForEditorLoading)
