@@ -75,7 +75,3 @@ scipy<1.8.0
 # See issue: https://github.com/sphinx-contrib/openapi/issues/123
 mistune<2.0.0
 
-# The team that owns this package will manually bump this package rather than having it pulled in automatically.
-# This is to allow them to better control its deployment and to do it in a process that works better
-# for them.
-learner-pathway-progress==1.0.1

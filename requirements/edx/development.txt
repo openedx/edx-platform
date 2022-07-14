@@ -838,7 +838,7 @@ lazy-object-proxy==1.7.1
     # via
     #   -r requirements/edx/testing.txt
     #   astroid
-learner-pathway-progress==1.0.1
+learner-pathway-progress==1.2.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
