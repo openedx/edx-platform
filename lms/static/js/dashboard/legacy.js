@@ -15,7 +15,7 @@
 
      edx.dashboard = edx.dashboard || {};
      edx.dashboard.legacy = {};
-     callAlert()
+
     /**
      * Initialize the dashboard using legacy JavaScript.
      *
