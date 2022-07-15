@@ -22,11 +22,12 @@ class SAMLProviderConfigSerializer(serializers.ModelSerializer):  # lint-amnesty
         # are not archived, raise a validation error. We do this to prevent provider configs from sharing entity ID's
         # which link a provider config to provider data (SAML certificates). An entity ID therefore, is uniquely linked
         # to a single slug/provider config (which in the case of enterprise provider slug == customer slug).
-        if SAMLProviderConfig.objects.current_set().filter(
-            entity_id=data['entity_id'],
-            archived=False,
-        ).exclude(slug=data['slug']):
-            raise serializers.ValidationError(f"Entity ID: {data['entity_id']} already taken")
+        if data.get('entity_id'):
+            if SAMLProviderConfig.objects.current_set().filter(
+                entity_id=data['entity_id'],
+                archived=False,
+            ).exclude(slug=data['slug']):
+                raise serializers.ValidationError(f"Entity ID: {data['entity_id']} already taken")
         return data
 
     def create(self, validated_data):
