@@ -250,7 +250,7 @@
                          '</svg>'
                          );
                        }, 500); // adding timeout to make spinner animation longer
-                 }
+                 };
              });
              e.preventDefault();
              $('#activate-account-modal p svg').remove();
@@ -309,7 +309,7 @@
          });
      };
 
-     if($("#live_classes_list").is("visible")){
+     $(document).ready(if($("#live_classes_list").is("visible")){
        {
             alert("Id is visible");
 
@@ -361,11 +361,11 @@
 
                           }
 
-                    //  }, 500); // adding timeout to make spinner animation longer
+                     }, 500); // adding timeout to make spinner animation longer
                 }
             });
         }
-     }
+     });
       $("#asde_2").click(function live_class(){
       $.ajax({
                 type: 'GET',
@@ -415,7 +415,7 @@
 
                           }
 
-                    //  }, 500); // adding timeout to make spinner animation longer
+                     }, 500); // adding timeout to make spinner animation longer
                 }
             });
       var data = {"name":"shiv"};
