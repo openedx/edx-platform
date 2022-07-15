@@ -22,7 +22,7 @@ from openedx.core.djangoapps.django_comment_common.utils import seed_permissions
 from student.helpers import AccountValidationError
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student import auth
-from student.models import CourseEnrollment
+from student.models import CourseAccessRole, CourseEnrollment
 from util.organizations_helpers import add_organization_course, get_organization_by_short_name
 from xmodule.course_module import CourseFields
 from xmodule.modulestore.django import modulestore
@@ -190,6 +190,7 @@ class Command(BaseCommand):
 
         for user in dummy_users:
             try:
+                logger.info('Registering user: {}'.format(user['username']))
                 _register_user(
                     params=user,
                     site=site,
@@ -199,6 +200,7 @@ class Command(BaseCommand):
                     skip_email=True,
                 )
             except (AccountValidationError, ValidationError):
+                logger.info('Failure registering user: {}'.format(user['username']))
                 pass
 
     def create_dummy_courses(self, edx_org, courses, user):
@@ -208,6 +210,7 @@ class Command(BaseCommand):
         new_courses = []
         for course in courses:
             try:
+                logger.info('Creating Dummy Course: {}'.format(course['run']))
                 new_course = self.create_new_course(
                     user=user,
                     org=edx_org,
@@ -231,6 +234,7 @@ class Command(BaseCommand):
         """
         edly_user_profiles = EdlyUserProfile.objects.filter(user__in=users)
         for user_profile in edly_user_profiles:
+            logger.info('Saving edly user activity')
             user_profile.edly_sub_organizations.add(*edly_sub_orgs)
             user_profile.save()
             for edly_sub_org in edly_sub_orgs:
@@ -241,7 +245,7 @@ class Command(BaseCommand):
                         edly_sub_organization=edly_sub_org,
                     )
                 except Exception:  # pylint: disable=broad-except
-                    logger.exception('unable to add edly_user_activity')
+                    logger.exception('Unable to add edly_user_activity')
 
     def enroll_dummy_users_in_courses(self, courses, users):
         """
@@ -249,7 +253,18 @@ class Command(BaseCommand):
         """
         for course in courses:
             for user in users:
+                logger.info('Enrolling user {} in course {}'.format(user.username, course.id))
                 CourseEnrollment.enroll(user, course.id)
+
+    def create_staff_users(self, org, users):
+        indices = list(range(len(users)))
+        indices = sample(indices, 5)
+        for index in indices:
+            CourseAccessRole.objects.get_or_create(
+                user=users[index],
+                org=org,
+                role='global_course_creator',
+            )
 
     def handle(self, *args, **options):
         """
@@ -281,6 +296,7 @@ class Command(BaseCommand):
             edly_sub_orgs.append(edly_sub_org)
             self.register_dummy_users(site, dummy_users)
 
+            logger.info('Saving Site Monthly Metrics')
             smm, _ = SiteMonthlyMetrics.objects.get_or_create(
                 month_for=populate_date,
                 site=site,
@@ -289,6 +305,7 @@ class Command(BaseCommand):
             smm.save()
 
             for date in dates:
+                logger.info('Saving Site Daily Metrics')
                 sdm, _ = SiteDailyMetrics.objects.get_or_create(
                     date_for=date['date_for'],
                     site_id=site.id,
@@ -310,5 +327,7 @@ class Command(BaseCommand):
             new_courses.extend(self.create_dummy_courses(edx_org, courses, user_objects[0]))
 
         self.enroll_dummy_users_in_courses(new_courses, user_objects)
+        edx_org = edx_organizations[0] if edx_organizations else 'edly'
+        self.create_staff_users(edx_org, user_objects)
 
         logger.info('All sites data has been populated.')
