@@ -747,6 +747,8 @@ ora2==4.4.4
     # via -r requirements/edx/base.in
 oscrypto==1.3.0
     # via snowflake-connector-python
+outcome-surveys==1.1.0
+    # via -r requirements/edx/base.in
 packaging==21.3
     # via
     #   drf-yasg

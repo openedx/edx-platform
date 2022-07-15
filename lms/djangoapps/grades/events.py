@@ -4,6 +4,7 @@ Emits course grade events.
 from logging import getLogger
 
 from crum import get_current_user
+from django.conf import settings
 from eventtracking import tracker
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -15,6 +16,7 @@ from common.djangoapps.track.event_transaction_utils import (
     get_event_transaction_type,
     set_event_transaction_type
 )
+from lms.djangoapps.grades.signals.signals import SCHEDULE_FOLLOW_UP_SEGMENT_EVENT_FOR_COURSE_PASSED_FIRST_TIME
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.enterprise_support.context import get_enterprise_event_context
 
@@ -30,7 +32,6 @@ SUBSECTION_GRADE_CALCULATED = 'edx.grades.subsection.grade_calculated'
 COURSE_GRADE_PASSED_FIRST_TIME_EVENT_TYPE = 'edx.course.grade.passed.first_time'
 COURSE_GRADE_NOW_PASSED_EVENT_TYPE = 'edx.course.grade.now_passed'
 COURSE_GRADE_NOW_FAILED_EVENT_TYPE = 'edx.course.grade.now_failed'
-LEARNER_PASSED_COURSE_FIRST_TIME = 'edx.course.learner.passed.first_time'
 
 
 def grade_updated(**kwargs):
@@ -215,7 +216,7 @@ def fire_segment_event_on_course_grade_passed_first_time(user_id, course_locator
 
     * Event should be only fired for learners enrolled in paid enrollment modes.
     """
-    event_name = LEARNER_PASSED_COURSE_FIRST_TIME
+    event_name = 'edx.course.learner.passed.first_time'
     courserun_key = str(course_locator)
     courserun_org = course_locator.org
     paid_enrollment_modes = (
@@ -246,5 +247,14 @@ def fire_segment_event_on_course_grade_passed_first_time(user_id, course_locator
         'COURSE_ORG_NAME': courserun_org,
     }
     segment.track(user_id, event_name, event_properties)
+
+    if getattr(settings, 'OUTCOME_SURVEYS_FOLLOW_UP_SIGNAL_ENABLED', False):
+        # fire signal so that a follow up event can be scheduled in outcome_surveys app
+        SCHEDULE_FOLLOW_UP_SEGMENT_EVENT_FOR_COURSE_PASSED_FIRST_TIME.send(
+            sender=None,
+            user_id=user_id,
+            course_id=course_locator,
+            event_properties=event_properties
+        )
 
     log.info("Segment event fired for passed learners. Event: [{}], Data: [{}]".format(event_name, event_properties))
