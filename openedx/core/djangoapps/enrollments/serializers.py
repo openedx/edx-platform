@@ -101,7 +101,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     #live_class_details= serializers.SerializerMethodField()
     user = serializers.SerializerMethodField('get_username')
 
-
+    # course_price = serializers.CharField()
     # def get_price(self , obj):   #(request, course_id):
     #     price = get_course_prices(
     #         obj.course
@@ -166,6 +166,9 @@ class LiveClassesSerializer(serializers.ModelSerializer):
         return instance 
 
     def validate(self, data):
+        topic_name = data.get('topic_name')
+        if topic_name is None:
+            raise serializers.ValidationError({"topic_name":"topic_name required"})
         current_date_time = datetime.datetime.now()
         current_date = current_date_time.date()
         current_time = current_date_time.time()

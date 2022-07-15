@@ -508,7 +508,7 @@ class CourseMode(models.Model):
         modes = cls.modes_for_course(course_id)
         for mode in modes:
             if (mode.currency.lower() == currency.lower()) and (mode.slug == 'verified'):
-                log.info("____modes__________" , modes)
+                # log.info("____modes__________" , modes)
                 return mode.min_price
         return 0
 
