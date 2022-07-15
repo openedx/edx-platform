@@ -309,7 +309,8 @@
          });
      };
 
-  $(document).ready(if($("#live_classes_list").is("visible")){
+//  $(document).ready(
+  if($("#live_classes_list").is("visible")){
          alert("Id is visible");
 //         $.ajax({
 //          type: 'GET',
@@ -352,7 +353,8 @@
 //
 //         }, 500});
 
-  });
+  };
+//  );
 
 
 
