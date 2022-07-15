@@ -12,9 +12,7 @@ from django.utils.translation import ugettext as _
     <div class="d-flex w-100 small align-items-center">
         ${_("Welcome to the new discussions experience. Please share your feedback.")}
         <a href="${legacy_url}" class="ml-2 text-white">
-            <i class="fa fa-info-circle">
-                <span class="legacy-tooltip">${_("View legacy experience")}</span>
-            </i>
+            <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="${_('View legacy experience')}"> </i>
         </a>
     </div>
     % else:
