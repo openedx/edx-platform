@@ -308,8 +308,15 @@
              $('#unenroll_course_name').text($(event.target).data('course-name'));
          });
      };
-
+      $("#asde_2").click(function live_class(){
+      data = {"name":"shiv"};
+        $.get("", function(data, status){
+            alert("here is data", data);
+            alert('here is status', status);
+            }  )
+      }
+      );
      $(".asde").click(function callAlert(){
-     alert('calling alert updated');
+     alert('calling alert updated new');
      })
  }(jQuery, gettext, Logger, accessible_modal, interpolate));
