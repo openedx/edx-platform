@@ -309,7 +309,7 @@
          });
      };
 
-     function callAlert(){
-     alert('calling alert');
-     }
+     $(".asde").click(function callAlert(){
+     alert('calling alert updated');
+     })
  }(jQuery, gettext, Logger, accessible_modal, interpolate));
