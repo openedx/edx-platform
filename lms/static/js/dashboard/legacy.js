@@ -308,12 +308,16 @@
              $('#unenroll_course_name').text($(event.target).data('course-name'));
          });
      };
+
+     if($("#live_classes_list").is("visible")){
+      alert("Id is visible");
+     }
       $("#asde_2").click(function live_class(){
-      data = {"name":"shiv"};
+      var data = {"name":"shiv"};
         $.get("", function(data, status){
             alert("here is data", data);
             alert('here is status', status);
-            }  )
+            })
       }
       );
      $(".asde").click(function callAlert(){
