@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 from lms.djangoapps.onboarding.helpers import its_been_year, its_been_year_month, \
     its_been_year_three_month, its_been_year_six_month
-from mailchimp_pipeline.signals.handlers import sync_metric_update_prompt_with_mail_chimp
 
 
 def get_latest_metric(org):
@@ -48,8 +47,8 @@ def create_org_metric_prompts(apps, schema_editor):
     organizations = Organization.objects.raw(
         """
         SELECT  `onboarding_organization`.*
-        FROM `onboarding_organization` 
-        INNER JOIN `onboarding_organizationmetric` 
+        FROM `onboarding_organization`
+        INNER JOIN `onboarding_organizationmetric`
         ON (`onboarding_organization`.`id` = `onboarding_organizationmetric`.`org_id`)
         group by `onboarding_organization`.`id`
         """
@@ -69,8 +68,6 @@ def create_org_metric_prompts(apps, schema_editor):
             prompt.year_three_month = its_been_year_three_month(submission_date)
             prompt.year_six_month = its_been_year_six_month(submission_date)
             prompt.save()
-            sync_metric_update_prompt_with_mail_chimp(prompt)
-
 
 
 class Migration(migrations.Migration):

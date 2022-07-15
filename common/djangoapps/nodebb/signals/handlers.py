@@ -9,15 +9,10 @@ from django.db.models.signals import post_delete, post_save, pre_delete, pre_sav
 from django.dispatch import receiver
 
 from common.lib.nodebb_client.client import NodeBBClient
-from lms.djangoapps.certificates.models import GeneratedCertificate
+from common.lib.hubspot_client.handlers import send_user_info_to_hubspot, send_user_enrollments_to_hubspot
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.onboarding.models import FocusArea, Organization, UserExtendedProfile
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from mailchimp_pipeline.signals.handlers import (
-    send_user_course_completions_to_mailchimp,
-    send_user_enrollments_to_mailchimp,
-    send_user_info_to_mailchimp
-)
 from nodebb.helpers import get_community_id
 from nodebb.models import DiscussionCommunity, TeamGroupChat
 from nodebb.tasks import (
@@ -29,7 +24,6 @@ from nodebb.tasks import (
     task_update_user_profile_on_nodebb
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 from openedx.features.badging.models import UserBadge
 from student.models import CourseEnrollment, UserProfile
 from util.model_utils import get_changed_fields_dict
@@ -42,12 +36,6 @@ def log_action_response(user, status_code, response_body):
         log.error("Error: Can not update user(%s) on nodebb due to %s", user.username, response_body)
     else:
         log.info('Success: User(%s) has been updated on nodebb', user.username)
-
-
-@receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
-def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: disable=unused-argument
-    data = {"user_id": user.id}
-    send_user_course_completions_to_mailchimp.delay(data)
 
 
 @receiver(pre_save, sender=UserProfile)
@@ -147,7 +135,7 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     """
         Create user account at nodeBB when user created at edx Platform
     """
-    send_user_info_to_mailchimp(sender, instance, created, kwargs)
+    send_user_info_to_hubspot(sender, instance, created, kwargs)
 
     request = get_current_request()
     if not request or 'login' in request.path:
@@ -262,7 +250,7 @@ def manage_membership_on_nodebb_group(instance, **kwargs):
             category_id=community_id, username=username)
         # We have to sync user enrollments only in case of
         # un-enroll because
-        send_user_enrollments_to_mailchimp(instance.user)
+        send_user_enrollments_to_hubspot(instance.user)
 
 
 @receiver(pre_delete, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.delete_groupchat_on_nodebb")

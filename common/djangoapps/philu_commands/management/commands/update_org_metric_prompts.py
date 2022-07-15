@@ -13,7 +13,6 @@ from lms.djangoapps.onboarding.helpers import (
     its_been_year_three_month
 )
 from lms.djangoapps.onboarding.models import OrganizationMetricUpdatePrompt
-from mailchimp_pipeline.signals.handlers import sync_metric_update_prompt_with_mail_chimp
 
 log = getLogger(__name__)
 
@@ -76,6 +75,5 @@ class Command(BaseCommand):
                 if prompt.remind_me_later:
                     prompt.remind_me_later = None
                 prompt.save()
-                sync_metric_update_prompt_with_mail_chimp(prompt)
             else:
                 log.info('No change detected')

@@ -69,3 +69,52 @@ class HubSpotClient:
 
         logger.info(response.json())
         return response
+
+    def create_contact(self, user_json):
+        """
+        Create new contact on HubSpot.
+
+        Arguments:
+            user_json (dict): User data.
+        """
+        logger.info('Creating HubSpot contact, Data: {user_json}'.format(user_json=user_json))
+
+        url = '{hubspot_api_url}/crm/v3/objects/contacts?hapikey={api_key}'.format(
+            hubspot_api_url=self.HUBSPOT_API_URL,
+            api_key=self.api_key
+        )
+        headers = {'Content-type': 'application/json'}
+        response = requests.post(url, headers=headers, json=user_json)
+
+        logger.info(response.json())
+        return response
+
+    def update_contact(self, user, user_json):
+        """
+        Update contact on HubSpot.
+
+        Arguments:
+            user_json (dict): User data.
+            user (User): User object.
+        """
+        logger.info(
+            'Updating HubSpot contact, User: {user} & Data: {user_json}'.format(user=user, user_json=user_json)
+        )
+
+        url = '{hubspot_api_url}/crm/v3/objects/contacts/{contact_id}?hapikey={api_key}'.format(
+            hubspot_api_url=self.HUBSPOT_API_URL,
+            api_key=self.api_key,
+            contact_id=user.extended_profile.hubspot_contact_id
+        )
+        headers = {'Content-type': 'application/json'}
+        response = requests.patch(url, headers=headers, json=user_json)
+
+        if response.status_code == 200:
+            logger.info('Contact Updated Successfully!')
+        else:
+            logger.exception(
+                'Could not Update HubSpot Contact, Status Code: {status_code}'.format(status_code=response.status_code)
+            )
+
+        logger.info(response.json())
+        return response

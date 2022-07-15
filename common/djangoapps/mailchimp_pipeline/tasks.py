@@ -8,50 +8,12 @@ from django.contrib.auth.models import User
 from django.db import connection
 
 from lms.djangoapps.certificates import api as certificate_api
-from lms.djangoapps.onboarding.models import FocusArea, OrgSector, UserExtendedProfile
+from lms.djangoapps.onboarding.models import FocusArea, OrgSector
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
 from mailchimp_pipeline.helpers import get_enrollements_course_short_ids, get_user_active_enrollements
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = getLogger(__name__)
-
-
-@task()
-def update_org_details_at_mailchimp(org_label, org_type, work_area, org_id, list_id):
-    """
-    Update the details of the organization associated with the org_id
-
-    Arguments:
-        org_id (int): id of the target organization
-        org_label (str): Label of the organization to update to
-        org_type (str): Type of the organization to update to
-        work_area (str): Work area of the organization to update to
-        list_id (str): List id to add the update member to
-
-    Returns:
-        None
-    """
-    return
-
-    log.info("Task to send organization details to MailChimp")
-    log.info(org_label)
-
-    extended_profiles = UserExtendedProfile.objects.filter(organization_id=org_id).values("user__email")
-
-    user_json = {
-        "merge_fields": {
-            "ORG": org_label,
-            "ORGTYPE": org_type,
-            "WORKAREA": work_area
-        }
-    }
-
-    for extended_profile in extended_profiles:
-        try:
-            response = ChimpClient().add_update_member_to_list(list_id, extended_profile.get('user__email'), user_json)
-            log.info(response)
-        except MailChimpException as ex:
-            log.exception(ex)
 
 
 @task()

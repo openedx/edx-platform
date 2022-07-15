@@ -739,21 +739,15 @@ class Registration(models.Model):
         log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
     def _track_activation(self):
-        """ Update the isActive flag in mailchimp for activated users."""
+        """ Update the isActive flag in segment for activated users."""
         has_segment_key = getattr(settings, 'LMS_SEGMENT_KEY', None)
-        has_mailchimp_id = hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID')
-        if has_segment_key and has_mailchimp_id:
+        if has_segment_key:
             segment.identify(
                 self.user.id,  # pylint: disable=no-member
                 {
                     'email': self.user.email,
                     'username': self.user.username,
                     'activated': 1,
-                },
-                {
-                    "MailChimp": {
-                        "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
-                    }
                 }
             )
 
@@ -1345,8 +1339,8 @@ class CourseEnrollment(models.Model):
 
         # if we listen CourseEnrollments post save, celery behaves weirdly
         # so we had to make this change in core
-        from mailchimp_pipeline.signals.handlers import send_user_enrollments_to_mailchimp
-        send_user_enrollments_to_mailchimp(user)
+        from common.lib.hubspot_client.handlers import send_user_enrollments_to_hubspot
+        send_user_enrollments_to_hubspot(user)
 
         enrollment.send_signal(EnrollStatusChange.enroll)
 
