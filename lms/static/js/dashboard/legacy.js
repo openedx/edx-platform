@@ -312,9 +312,8 @@
      function callAlert(){
      alert('calling alert updated');
      }
-       live_class()
-       function live_class()
-          {
+      live_class()
+      function live_class(){
              // alert("sd")
 
              $.ajax({
