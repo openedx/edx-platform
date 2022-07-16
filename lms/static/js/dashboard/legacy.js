@@ -313,5 +313,7 @@
 
  }(jQuery, gettext, Logger, accessible_modal, interpolate));
  $(document).ready(function () {
-      alert("Ready");
+      if($("#live_classes_list").is("visible")){
+        alert('LIve class id visible');
+      };
       });
