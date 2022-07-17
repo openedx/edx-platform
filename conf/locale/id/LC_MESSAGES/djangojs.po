@@ -13,6 +13,7 @@
 # samdon <chdono@netravisi.com>, 2014
 # cholif yulian <cholifyulian123@gmail.com>, 2015
 # Dean Jay Mathew <djaymathew@gmail.com>, 2015
+# Faizar Septiawan <faizarsangster@gmail.com>, 2022
 # Fazhar Restu <budaknewbie@gmail.com>, 2016
 # fizdoonk, 2013
 # hafizhuddin amin, 2013
@@ -82,7 +83,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-03 20:43+0000\n"
+"POT-Creation-Date: 2022-07-10 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
@@ -2912,6 +2913,10 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Recommendations for you"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid "loading"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx

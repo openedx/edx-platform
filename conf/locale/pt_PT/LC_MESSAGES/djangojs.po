@@ -79,7 +79,7 @@
 # Cátia Lopes <catia.lopes@bridgelk.com>, 2018-2019
 # Filipa Macieira <filipa.macieira@fccn.pt>, 2021
 # Ivo Branco <ivo.branco@fccn.pt>, 2021
-# Waldo Luis Ribeiro, 2016
+# 8b7f539cfdb680c92813b22b241ff5ad_86793ec, 2016
 # João Gomes da Graça <johngraceair@gmail.com>, 2015
 # Luis Manuel Moreno <luis.moreno@edunext.co>, 2019
 # Manuela Silva <mmsrs@sky.com>, 2016,2018
@@ -111,7 +111,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-03 20:43+0000\n"
+"POT-Creation-Date: 2022-07-10 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Nika Shahidian, 2022\n"
 "Language-Team: Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/)\n"
@@ -3108,6 +3108,10 @@ msgstr "Ir para Painel de Controlo"
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Recommendations for you"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid "loading"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx

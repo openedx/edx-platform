@@ -8,7 +8,7 @@
 # Firdaus x, 2014
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2018-2019
 # Ahmad Sofyan <asofyan@niskala.net>, 2013
-# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2021
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2022
 # fizdoonk, 2013
 # hafizhuddin amin, 2013
 # ichs <ichsansp@outlook.com>, 2014
@@ -29,7 +29,7 @@
 # Aldiantoro Nugroho <kriwil@gmail.com>, 2015
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
 # Ahmad Sofyan <asofyan@niskala.net>, 2013
-# Faizar Septiawan <faizarsangster@gmail.com>, 2020
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020,2022
 # fizdoonk, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
@@ -75,7 +75,7 @@
 # Translators:
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
 # Ahmad Sofyan <asofyan@niskala.net>, 2013
-# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2021
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2022
 # fizdoonk, 2013
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Prita Ika Dewi <prita.tenda@gmail.com>, 2014
@@ -105,7 +105,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-03 20:43+0000\n"
+"POT-Creation-Date: 2022-07-10 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"

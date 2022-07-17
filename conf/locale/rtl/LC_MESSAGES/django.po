@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-10 20:34+0000\n"
-"PO-Revision-Date: 2022-07-10 20:34:59.844211\n"
+"POT-Creation-Date: 2022-07-17 20:34+0000\n"
+"PO-Revision-Date: 2022-07-17 20:34:58.687526\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -12861,8 +12861,8 @@ msgid "Blank"
 msgstr "Ƀlɐnʞ"
 
 #: cms/djangoapps/contentstore/views/component.py
-msgid "Blank Open Response Assessment"
-msgstr "Ƀlɐnʞ Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ"
+msgid "Peer Assessment Only"
+msgstr "Ᵽǝǝɹ Ⱥssǝssɯǝnʇ Ønlʎ"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
@@ -17415,26 +17415,31 @@ msgid "Posts I'm Following"
 msgstr "Ᵽøsʇs Ɨ'ɯ Følløʍᴉnƃ"
 
 #: lms/templates/discussion/_switch_experience_fragment.html
-msgid ""
-"You are viewing an educator only preview of the new discussions experience!"
+msgid "Welcome to the new discussions experience. Please share your feedback."
 msgstr ""
-"Ɏøn ɐɹǝ ʌᴉǝʍᴉnƃ ɐn ǝdnɔɐʇøɹ ønlʎ dɹǝʌᴉǝʍ øɟ ʇɥǝ nǝʍ dᴉsɔnssᴉøns ǝxdǝɹᴉǝnɔǝ!"
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "An educator preview of new discussions experience is available!"
-msgstr "Ⱥn ǝdnɔɐʇøɹ dɹǝʌᴉǝʍ øɟ nǝʍ dᴉsɔnssᴉøns ǝxdǝɹᴉǝnɔǝ ᴉs ɐʌɐᴉlɐblǝ!"
+"Wǝlɔøɯǝ ʇø ʇɥǝ nǝʍ dᴉsɔnssᴉøns ǝxdǝɹᴉǝnɔǝ. Ᵽlǝɐsǝ sɥɐɹǝ ʎønɹ ɟǝǝdbɐɔʞ."
 
 #: lms/templates/discussion/_switch_experience_fragment.html
 msgid "View legacy experience"
 msgstr "Vᴉǝʍ lǝƃɐɔʎ ǝxdǝɹᴉǝnɔǝ"
 
 #: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Share feedback"
-msgstr "Sɥɐɹǝ ɟǝǝdbɐɔʞ"
+msgid ""
+"You are currently using the old discussions experience that will be "
+"deprecated soon. If you are facing any issues with the new experience, "
+"please share using the feedback button."
+msgstr ""
+"Ɏøn ɐɹǝ ɔnɹɹǝnʇlʎ nsᴉnƃ ʇɥǝ øld dᴉsɔnssᴉøns ǝxdǝɹᴉǝnɔǝ ʇɥɐʇ ʍᴉll bǝ "
+"dǝdɹǝɔɐʇǝd søøn. Ɨɟ ʎøn ɐɹǝ ɟɐɔᴉnƃ ɐnʎ ᴉssnǝs ʍᴉʇɥ ʇɥǝ nǝʍ ǝxdǝɹᴉǝnɔǝ, "
+"dlǝɐsǝ sɥɐɹǝ nsᴉnƃ ʇɥǝ ɟǝǝdbɐɔʞ bnʇʇøn."
 
 #: lms/templates/discussion/_switch_experience_fragment.html
-msgid "View the new experience"
-msgstr "Vᴉǝʍ ʇɥǝ nǝʍ ǝxdǝɹᴉǝnɔǝ"
+msgid "Switch to new experience"
+msgstr "Sʍᴉʇɔɥ ʇø nǝʍ ǝxdǝɹᴉǝnɔǝ"
+
+#: lms/templates/discussion/_switch_experience_fragment.html
+msgid "Share feedback"
+msgstr "Sɥɐɹǝ ɟǝǝdbɐɔʞ"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
