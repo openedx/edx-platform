@@ -1554,11 +1554,15 @@ class CourseEnrollment(models.Model):
                                   mode=mode, course_id=course_id,
                                   cost=cost, currency=currency)
 
-    def emit_event(self, event_name, enterprise_uuid=None):
+    def emit_event(self, event_name, enterprise_uuid=None):    # pylint: disable=too-many-statements
         """
         Emits an event to explicitly track course enrollment and unenrollment.
         """
+        from common.djangoapps.student.helpers import get_course_dates_for_email, get_instructors
         from openedx.core.djangoapps.schedules.config import set_up_external_updates_for_enrollment
+        from openedx.core.djangoapps.catalog.api import get_course_run_details
+        from openedx.core.djangoapps.catalog.utils import get_owners_for_course, get_course_uuid_for_course
+        from openedx.features.course_experience import ENABLE_COURSE_GOALS
         from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
         from openedx.features.enterprise_support.utils import is_enterprise_learner
 
@@ -1596,6 +1600,46 @@ class CourseEnrollment(models.Model):
             segment_traits['email'] = self.user.email
 
             if event_name == EVENT_NAME_ENROLLMENT_ACTIVATED:
+                request = crum.get_current_request()
+                marketing_root_url = settings.MKTG_URLS.get('ROOT')
+                course_date_list = get_course_dates_for_email(self.user, self.course.id, request)
+
+                course_run_fields = [
+                    'key', 'title', 'short_description', 'marketing_url', 'pacing_type', 'min_effort',
+                    'max_effort', 'weeks_to_complete', 'enrollment_count', 'image', 'staff',
+                ]
+                course_run = get_course_run_details(str(self.course_id), course_run_fields)
+
+                course_uuid = get_course_uuid_for_course(str(self.course_id))
+                owners = get_owners_for_course(course_uuid=course_uuid)
+                extra_segment_properties = {}
+                if course_run:
+                    instructors = get_instructors(course_run, marketing_root_url)
+                    extra_segment_properties.update({
+                        'instructors': instructors,
+                        'instructors_count': 'even' if len(instructors) % 2 == 0 else 'odd',
+                        'pacing_type': course_run.get('pacing_type'),
+                        'min_effort': course_run.get('min_effort'),
+                        'max_effort': course_run.get('max_effort'),
+                        'weeks_to_complete': course_run.get('weeks_to_complete'),
+                        'learners_count': '{:,}'.format(course_run.get('enrollment_count')),
+                        'course_title': course_run.get('title'),
+                        'short_description': course_run.get('short_description'),
+                        'marketing_url': course_run.get('marketing_url'),
+                        'banner_image_url': course_run.get('image').get('src') if course_run.get('image') else ''
+                    })
+                extra_segment_properties.update({
+                    'goals_enabled': ENABLE_COURSE_GOALS.is_enabled(self.course_id),
+                    'course_date_blocks': course_date_list,
+                    'partner_image_url': owners[0].get('logo_image_url') if owners else '',
+                    'price': self.course_price,
+                    'learner_name': self.user.profile.name,
+                    'course_run_key': str(self.course_id),
+                    'lms_base_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+                    'learning_base_url': (configuration_helpers.
+                                          get_value('LEARNING_MICROFRONTEND_URL', settings.LEARNING_MICROFRONTEND_URL))
+                })
+                segment_properties.update(extra_segment_properties)
                 segment_properties['email'] = self.user.email
                 # This next property is for an experiment, see method's comments for more information
                 segment_properties['external_course_updates'] = set_up_external_updates_for_enrollment(self.user,
