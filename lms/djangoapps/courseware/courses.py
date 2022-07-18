@@ -7,6 +7,7 @@ import logging
 from collections import defaultdict, namedtuple
 from datetime import datetime
 
+import six
 import pytz
 from crum import get_current_request
 from dateutil.parser import parse as parse_date
@@ -494,6 +495,28 @@ def date_block_key_fn(block):
     return block.date or datetime.max.replace(tzinfo=pytz.UTC)
 
 
+def _get_absolute_url(request, url_path):
+    """Construct an absolute URL back to the site.
+
+    Arguments:
+        request (request): request object.
+        url_path (string): The path of the URL.
+
+    Returns:
+        URL
+
+    """
+    if not url_path:
+        return ''
+
+    if request:
+        return request.build_absolute_uri(url_path)
+
+    site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
+    parts = ("https" if settings.HTTPS == "on" else "http", site_name, url_path, '', '', '')
+    return six.moves.urllib.parse.urlunparse(parts)
+
+
 def get_course_assignment_date_blocks(course, user, request, num_return=None,
                                       include_past_dates=False, include_access=False):
     """
@@ -510,7 +533,7 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
         date_block.complete = assignment.complete
         date_block.assignment_type = assignment.assignment_type
         date_block.past_due = assignment.past_due
-        date_block.link = request.build_absolute_uri(assignment.url) if assignment.url else ''
+        date_block.link = _get_absolute_url(request, assignment.url)
         date_block.set_title(assignment.title, link=assignment.url)
         date_block._extra_info = assignment.extra_info  # pylint: disable=protected-access
         date_blocks.append(date_block)

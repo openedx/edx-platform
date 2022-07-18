@@ -338,8 +338,10 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     """
     NUM_PROBLEMS = 20
 
-    def test_index_query_counts(self):
+    @patch('common.djangoapps.student.helpers.get_course_dates_for_email')
+    def test_index_query_counts(self, mock_course_dates_for_email):
         # TODO: decrease query count as part of REVO-28
+        mock_course_dates_for_email.return_value = []
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
@@ -349,6 +351,20 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                 vertical = ItemFactory.create(category='vertical', parent_location=section.location)
                 for _ in range(self.NUM_PROBLEMS):
                     ItemFactory.create(category='problem', parent_location=vertical.location)
+
+        course_run = CourseRunFactory.create(key=course.id)
+        course_run['title'] = course.display_name
+        course_run['short_description'] = None
+        course_run['marketing_url'] = 'www.edx.org'
+        course_run['pacing_type'] = 'self_paced'
+        course_run['banner_image_url'] = ''
+        course_run['min_effort'] = 1
+        course_run['enrollment_count'] = 12345
+
+        patch_course_data = patch('openedx.core.djangoapps.catalog.api.get_course_run_details')
+        course_data = patch_course_data.start()
+        course_data.return_value = course_run
+        self.addCleanup(patch_course_data.stop)
 
         self.client.login(username=self.user.username, password=self.user_password)
         CourseEnrollment.enroll(self.user, course.id)

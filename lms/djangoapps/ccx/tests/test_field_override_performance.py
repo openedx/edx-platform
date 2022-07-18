@@ -76,6 +76,11 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         self.course = None
         self.ccx = None
 
+        patch_context = mock.patch('common.djangoapps.student.helpers.get_course_dates_for_email')
+        get_course = patch_context.start()
+        get_course.return_value = []
+        self.addCleanup(patch_context.stop)
+
     def setup_course(self, size, enable_ccx, view_as_ccx):
         """
         Build a gradable course where each node has `size` children.
