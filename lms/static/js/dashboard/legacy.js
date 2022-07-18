@@ -320,12 +320,11 @@
                 alert(response.status);
                 alert(JSON.parse(JSON.stringify(response)));
                 if (response.status == 200){
-                    var output = document.getElementById('output');
                 var response_new = JSON.parse(JSON.stringify(response));
                 alert(JSON.parse(JSON.stringify(response)));
                 alert(response_new);
 
-                for(let i=0; i<response_new.results.length; i++){
+                for(var i=0; i<response_new.results.length; i++){
                     var live_response = response_new.results[i]['live_class'];
                     if(live_response != undefined && live_response != null){
                         alert('in if');
