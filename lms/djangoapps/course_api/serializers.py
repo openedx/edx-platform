@@ -13,7 +13,7 @@ from openedx.core.djangoapps.content.course_overviews.models import \
     CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.api.fields import AbsoluteURLField
-
+from common.djangoapps.student.models import Progress
 
 class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
@@ -173,3 +173,14 @@ class CourseKeySerializer(serializers.BaseSerializer):  # pylint:disable=abstrac
         monitoring_utils.increment('course_key_serializer_to_representation_call_count')
 
         return str(instance)
+
+
+
+
+class ProgressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Progress
+        fields = ('chapter_name', 'hw_completed', 'assign_completed')
+        
+                 

@@ -87,26 +87,3 @@ def get_course_user_stats(course_key: CourseKey, params: Optional[Dict] = None) 
             "function:get_course_user_stats",
         ],
     )
-
-
-@function_trace("update_course_users_stats")
-def update_course_users_stats(course_key: CourseKey) -> Dict:
-    """
-    Update the user stats for all users for a particular course.
-
-    Args:
-        course_key (str|CourseKey): course key for which stats are needed.
-
-    Returns:
-        dict: data returned by API. Contains count of users updated.
-    """
-    url = f"{settings.PREFIX}/users/{course_key}/update_stats"
-    return perform_request(
-        'post',
-        url,
-        metric_action='user.update_course_stats',
-        metric_tags=[
-            f"course_key:{course_key}",
-            "function:update_course_users_stats",
-        ],
-    )

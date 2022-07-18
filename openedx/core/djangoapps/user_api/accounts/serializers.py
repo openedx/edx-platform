@@ -43,8 +43,8 @@ from .image_helpers import get_profile_image_urls_for_user
 from .utils import format_social_link, validate_social_link
 
 PROFILE_IMAGE_KEY_PREFIX = 'image_url'
-LOGGER = logging.getLogger(__name__)
-
+#LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 class PhoneNumberSerializer(serializers.BaseSerializer):  # lint-amnesty, pylint: disable=abstract-method
     """
@@ -122,9 +122,11 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
         """
         try:
             user_profile = user.profile
+            #import pdb; pdb.set_trace()
         except ObjectDoesNotExist:
             user_profile = None
-            LOGGER.warning("user profile for the user [%s] does not exist", user.username)
+            #LOGGER.warning("user profile for the user [%s] does not exist", user.username)
+            log.warning("user profile for the user [%s] does not exist", user.username)
 
         try:
             account_recovery = user.account_recovery
@@ -169,6 +171,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "social_links": None,
             "extended_profile_fields": None,
             "phone_number": None,
+            "user_attendance": None,
             "pending_name_change": None,
             "verified_name": None,
         }
@@ -200,6 +203,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
                     ).data,
                     "extended_profile": get_extended_profile(user_profile),
                     "phone_number": user_profile.phone_number,
+                    "user_attendance": user_profile.user_attendance,
                 }
             )
 
@@ -225,6 +229,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
 
         if self.custom_fields:
             fields = self.custom_fields
+            log.info('yah pe aaya ', fields)
         elif user_profile:
             fields = _visible_fields(user_profile, user, self.configuration)
         else:
@@ -289,7 +294,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         fields = (
             "name", "gender", "goals", "year_of_birth", "level_of_education", "country", "state", "social_links",
             "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies",
-            "phone_number"
+            "phone_number" ,"user_attendance" ,
         )
         # Currently no read-only field, but keep this so view code doesn't need to know.
         read_only_fields = ()

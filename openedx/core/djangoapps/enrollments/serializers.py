@@ -5,6 +5,7 @@ Serializers for all Course Enrollment related return objects.
 
 from asyncore import read
 import logging
+# from itsdangerous import Serializer
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from lms.djangoapps.courseware.courses import (
@@ -14,7 +15,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode , get_course_prices ,format_course_price ,get_cosmetic_display_price
-from common.djangoapps.student.models import CourseEnrollment , LiveClassEnrollment
+from common.djangoapps.student.models import CourseEnrollment , LiveClassEnrollment , UserProfile , NotifyCallRequest
 from openedx.core.djangoapps.content.course_overviews.models import LiveClasses, CourseOverview
 
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
@@ -100,7 +101,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     #live_class_details= serializers.SerializerMethodField()
     user = serializers.SerializerMethodField('get_username')
 
-
+    # course_price = serializers.CharField()
     # def get_price(self , obj):   #(request, course_id):
     #     price = get_course_prices(
     #         obj.course
@@ -129,15 +130,16 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CourseEnrollment
-        fields = ('created', 'mode', 'is_active', 'course_details', 'user' , 'course_price') # , 'live_class_details') #,'live_class_details' ,'course_live_class' ) # , 'price')
+        fields = ('id','created', 'mode', 'is_active', 'course_details', 'user' , 'course_price') # , 'live_class_details') #,'live_class_details' ,'course_live_class' ) # , 'price')
         lookup_field = 'username'
+        # read_only_fields = ('id')
 
 
 
 
 class LiveClassesSerializer(serializers.ModelSerializer):
 
-    course_id = serializers.CharField(write_only=True)
+    course_id = serializers.CharField(write_only=True , required =False)
 
     created_by_id = serializers.CharField(source="created_by", read_only=True)
 
@@ -151,7 +153,7 @@ class LiveClassesSerializer(serializers.ModelSerializer):
         
         model = LiveClasses
         
-        fields = ('id', 'start_time' ,'end_time' , 'start_date' , 'end_date' , 'room_key' , 'room_name', 'topic_name' , 'client_token', 'meeting_link' ,'created_by_id', 'created_date' , 'meeting_notes' , 'is_recurrence_meeting' , 'course' , 'course_id')
+        fields = ('id', 'start_time' ,'end_time' , 'start_date' , 'end_date' , 'room_key' , 'room_name', 'topic_name' , 'client_token', 'meeting_link' ,'created_by_id', 'created_date' , 'days', 'meeting_notes' , 'is_recurrence_meeting' , 'course' , 'course_id')
 
     def create(self, validated_data ):
         validated_data['created_date']= datetime.datetime.now()
@@ -163,6 +165,35 @@ class LiveClassesSerializer(serializers.ModelSerializer):
         super(LiveClassesSerializer, self).update(instance, validated_data)
         return instance 
 
+    def validate(self, data):
+        topic_name = data.get('topic_name')
+        if topic_name is None:
+            raise serializers.ValidationError({"topic_name":"topic_name required"})
+        current_date_time = datetime.datetime.now()
+        current_date = current_date_time.date()
+        current_time = current_date_time.time()
+        start_date  = data.get('start_date')
+        end_date = data.get('end_date')
+        start_time = data.get('start_time')
+        end_time = data.get('end_time')
+        days = data.get('days')
+        days_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+        if start_date and start_time and end_date and end_time is not None:
+            if int(float((end_date - start_date).days)/30.5)> 6:
+                raise serializers.ValidationError("Live Course should not exceed 6 months.")
+            if start_date < current_date or start_time < current_time:
+                raise serializers.ValidationError("Start date and time shouldn't be less than today's date and time ")
+            if end_date < start_date or end_time < start_time:
+                raise serializers.ValidationError("End date and time shouldn't be less than start date and time")
+        if data.get('is_recurrence_meeting') is not None:
+            if data.get('is_recurrence_meeting'):
+                if type(days) != list or days == [] :
+                    raise serializers.ValidationError("Days should be non empty list")
+                if not set(days).issubset(set(days_list)):
+                    raise serializers.ValidationError(f"Invalid list of days Should be {days_list}")
+        return data 
+        
 
 
 class CourseEnrollmentsApiListSerializer(CourseEnrollmentSerializer):
@@ -227,15 +258,35 @@ class UserListSerializer(serializers.ModelSerializer):
 
 
 
+class StaffListSerializer(serializers.ModelSerializer):
+    
+
+    class Meta:
+        model = User
+        fields = ('id' , 'username', 'email' ,  'is_staff' )
+
+
+class STudentUserListSerializer(serializers.ModelSerializer):
+    
+
+    class Meta:
+        model = User
+        fields = ('id' , 'username', 'email' ,  'is_active' ,'first_name' , 'last_name' , 'date_joined')
 
 
 
+
+class UserAttendanceListSerializer(serializers.ModelSerializer):
+    
+    user = serializers.CharField()
+
+
+    class Meta:
+        model = UserProfile
+        fields = ('user','user_attendance')
 
 
 class LiveClassEnrollmentSerializer(serializers.ModelSerializer):
-
-    #live_class =LiveClassesSerializer(read_only=True)
-    # user =UserListSerializer( read_only=True)
 
 
     class Meta:
@@ -243,42 +294,14 @@ class LiveClassEnrollmentSerializer(serializers.ModelSerializer):
         fields = ( 'id','user', 'live_class')
 
 
+
+ 
     def create(self, validated_data):
-        instance=LiveClassEnrollment.objects.create(live_class=validated_data.get('live_class'), user=validated_data.get('user'))
+        instance=LiveClassEnrollment.objects.create(live_class=validated_data.get('live_class'), user=validated_data.get('user') , updated_at = datetime.datetime.now())
         instance.save()
-        CourseEnrollment.objects.create(course=instance.live_class.course, user=instance.user)
+        CourseEnrollment.objects.create(course=instance.live_class.course, user=instance.user, assigned_by=self.context['assigned_by'])
         
-        return instance 
-
-    # def create(self, validated_data):
-    #     pass
-
-        #return super().create(validated_data)
-        #read_only_fields = ('id',)
-
-
-    # def to_internal_value(self, data):
-    #     username = data.get('username')
-    #     user = User.objects.get(username=username)
-
-    #     data['user_id']=user.id
-    #     return data
-        
-    # def create(self, validated_data):
-    #     return super(LiveClassEnrollmentSerializer, self).create(validated_data)
-        
-    #     #return LiveClassEnrollment.objects.create(**validated_data)
-
-
-
-    # @transaction.atomic
-    # def create(self, validated_data):
-    #     username = validated_data.get('username')
-    #     users = User.objects.get(username=username)
-    #     validated_data['user']= users.id        
-    #     # live_classes = LiveClassEnrollment.objects.create(**validated_data,user_id=instance.id)
-    #     # live_classes.save()
-
+        return instance
 
 
 class LiveClassUserDetailsSerializer(serializers.ModelSerializer):
@@ -299,16 +322,13 @@ class CourseEnrolledUserDetailsSerializer(serializers.ModelSerializer):
 
     #live_class =LiveClassesSerializer(read_only=True)
     user =UserListSerializer( read_only=True)
-    course_id = serializers.CharField()
 
 
 
     class Meta:
         model = CourseEnrollment
-        fields = ( 'course_id','user', 'created')
-        # read_only_fields = ('id',)
-
-
+        fields = ( 'assigned_by' ,'user')
+        
 
 
 
@@ -321,6 +341,7 @@ class UserLiveClassDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = LiveClassEnrollment
         fields = ( 'id','user', 'live_class')
+        
 
 
 
@@ -330,17 +351,6 @@ class LoginStaffCourseDetailsSerializer(serializers.ModelSerializer):
 
     # edited_by_id = serializers.CharField()
 
-    # edited_by_id = serializers.SerializerMethodField('get_username')
-
-
-    
-    # def get_edited_by_id(self, model):
-    #     """Retrieves the username from the associated model."""
-    #     return model.username
-
-
-
-
     class Meta:
         model = SplitModulestoreCourseIndex
         fields = ('org' ,'course_id' ,'edited_by_id' ,'edited_on' ,'last_update' )
@@ -348,6 +358,79 @@ class LoginStaffCourseDetailsSerializer(serializers.ModelSerializer):
 
 
 
+
+class LiveClassUserTotalAttendanceSerializer(serializers.ModelSerializer):
+
+
+    user = serializers.CharField()
+    
+    class Meta:
+        model = LiveClassEnrollment
+        fields= ('id','liveclass_attendance', 'user' , )
+
+
+class UserRequestCallSerializer(serializers.ModelSerializer):
+
+
+    
+    class Meta:
+        model = NotifyCallRequest
+        fields= ('requested_to', 'messeage' , 'requested_at' , 'seen')
+
+
+    def create(self, validated_data ):
+        validated_data['requested_at']= datetime.datetime.now()
+        validated_data['requested_by_id']= self.context['user'].id
+        return NotifyCallRequest.objects.create(**validated_data)
+    
+
+
+class StaffNotifyCallSerializer(serializers.ModelSerializer):
+
+
+    requested_by = serializers.CharField()
+    
+    class Meta:
+        model = NotifyCallRequest
+        fields= ('id','requested_by', 'messeage' , 'requested_at' , 'seen')
+
+
+class StaffofCourseDetailsSerializer(serializers.ModelSerializer):
+
+    user = serializers.CharField()
+    assigned_by = serializers.CharField()
+    # course=serializers.CharField()
+    course = CourseSerializer(read_only=True)
+
+    
+
+    class Meta:
+        model= CourseEnrollment
+        fields=('id', 'user' , 'assigned_by', 'course')
+
+
+class StudentListbytaffDetailsSerializer(serializers.ModelSerializer):
+
+    user = serializers.CharField()
+
+    # course = CourseSerializer(read_only=True)
+  
+
+    class Meta:
+        model= CourseEnrollment
+        fields=('id', 'user' )
+
+
+
+class CourseandStafAassignedDetailsSerializer(serializers.ModelSerializer):
+
+    assigned_by = serializers.CharField()
+    course = serializers.CharField()
+
+    
+    class Meta:
+        model= CourseEnrollment
+        fields=('id', 'course' , 'assigned_by')
 
 
 

@@ -110,13 +110,6 @@ from lms.envs.common import (
 
     # Enterprise service settings
     ENTERPRISE_CATALOG_INTERNAL_ROOT_URL,
-    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_KEY,
-    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_SECRET,
-    ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL,
-
-    # Blockstore
-    BLOCKSTORE_USE_BLOCKSTORE_APP_API,
-    BUNDLE_ASSET_STORAGE_SETTINGS,
 
     # Methods to derive settings
     _make_mako_template_dirs,
@@ -404,7 +397,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
+    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_ALL_FILE_URLS': False,
 
     # .. toggle_name: FEATURES['ENABLE_ORA_USER_STATE_UPLOAD_DATA']
@@ -416,7 +409,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warning: This temporary feature toggle does not have a target removal date.
+    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
 
     # .. toggle_name: FEATURES['DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO']
@@ -430,7 +423,7 @@ FEATURES = {
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-06-12
     # .. toggle_target_removal_date: 2021-04-01
-    # .. toggle_warning: This can be removed once support is removed for deprecated
+    # .. toggle_warnings: This can be removed once support is removed for deprecated
     #   course keys.
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
     'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
@@ -443,7 +436,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-06-20
     # .. toggle_target_removal_date: 2020-12-31
     # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
-    # .. toggle_warning: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
+    # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
     #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
     'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
 
@@ -456,7 +449,7 @@ FEATURES = {
     #   otherwise the course creation functionality will work as it should.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-12-02
-    # .. toggle_warning: Another toggle DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
+    # .. toggle_warnings: Another toggle DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
     'DISABLE_COURSE_CREATION': False,
 
     # Can be turned off to disable the help link in the navbar
@@ -491,31 +484,6 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MST-1348'
     'ENABLE_INTEGRITY_SIGNATURE': False,
-
-    # .. toggle_name: MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: If enabled, the Library Content Block is marked as complete when users view it.
-    #   Otherwise (by default), all children of this block must be completed.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2022-03-22
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/28268
-    # .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
-    #   in the LMS and CMS.
-    'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': False,
-
-    # .. toggle_name: FEATURES['DISABLE_UNENROLLMENT']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to disable self-unenrollments via REST API.
-    #   This also hides the "Unenroll" button on the Learner Dashboard.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2021-10-11
-    # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
-    #   in the LMS and CMS.
-    # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
-    'DISABLE_UNENROLLMENT': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -550,51 +518,6 @@ LIBRARY_AUTHORING_MICROFRONTEND_URL = None
 # .. toggle_creation_date: 2021-12-03
 # .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-666
 ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
-# .. toggle_name: ENABLE_AUTHN_REGISTER_HIBP_POLICY
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy on Authn MFE's registration.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2022-03-25
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-669
-ENABLE_AUTHN_REGISTER_HIBP_POLICY = False
-HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3
-
-# .. toggle_name: ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-668
-ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY = False
-HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
-
-# .. toggle_name: ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-667
-ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
-HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
-
-# .. toggle_name: ENABLE_DYNAMIC_REGISTRATION_FIELDS
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle adds fields configured in
-# REGISTRATION_EXTRA_FIELDS to Authn MFE
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2022-04-21
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-838
-ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
@@ -724,18 +647,13 @@ DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 # in the global settings.py
 AWS_SES_REGION_NAME = 'us-east-1'
 AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
-AWS_ACCESS_KEY_ID = 'AKIA43ATNRFGIW6HF5CV'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = None
+AWS_SECRET_ACCESS_KEY = None
 AWS_SECURITY_TOKEN = None
 AWS_QUERYSTRING_AUTH = False
-AWS_STORAGE_BUCKET_NAME = 'edxlaunchpad'
-AWS_S3_FILE_OVERWRITE = False
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-AWS_HEADERS = {'Access-Control-Allow-Origin': '*'} 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-# File store here 
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/' 
+AWS_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
+AWS_S3_CUSTOM_DOMAIN = 'SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)'
+
 ##############################################################################
 
 EDX_ROOT_URL = ''
@@ -745,7 +663,7 @@ AUTHENTICATION_BACKENDS = [
     'auth_backends.backends.EdXOAuth2',
     'rules.permissions.ObjectPermissionBackend',
     'openedx.core.djangoapps.content_libraries.auth.LtiAuthenticationBackend',
-    'django.contrib.auth.backends.AllowAllUsersModelBackend',
+    'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
     'bridgekeeper.backends.RulePermissionBackend',
 ]
 
@@ -804,8 +722,29 @@ ELASTIC_SEARCH_CONFIG = [
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
 from lms.envs.common import (
-    COURSE_KEY_PATTERN, COURSE_KEY_REGEX, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
+    COURSE_KEY_PATTERN, COURSE_KEY_REGEX, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN ,LIVE_CLASS_ID_PATTERN
 )
+
+# S3BotoStorage insists on a timeout for uploaded assets. We should make it
+# permanent instead, but rather than trying to figure out exactly where that
+# setting is, I'm just bumping the expiration time to something absurd (100
+# years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
+# in the global settings.py
+AWS_SES_REGION_NAME = 'us-east-1'
+AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
+AWS_ACCESS_KEY_ID = 'AKIA43ATNRFGIW6HF5CV'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_SECURITY_TOKEN = None
+AWS_QUERYSTRING_AUTH = False
+AWS_STORAGE_BUCKET_NAME = 'edxlaunchpad'
+AWS_S3_FILE_OVERWRITE = False
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_HEADERS = {'Access-Control-Allow-Origin': '*'} 
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# File store here 
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/' 
+
 
 ######################### CSRF #########################################
 
@@ -891,6 +830,9 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
 
     'codejail.django_integration.ConfigureCodeJailMiddleware',
+
+    # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
+    'ratelimitbackend.middleware.RateLimitMiddleware',
 
     # for expiring inactive sessions
     'openedx.core.djangoapps.session_inactivity_timeout.middleware.SessionInactivityTimeout',
@@ -1069,7 +1011,12 @@ DATABASES = {
         'PASSWORD': 'password',
         'PORT': '3306',
         'USER': 'edxapp001'
-    }
+    },
+
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'edx',
+    },
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
@@ -1117,10 +1064,10 @@ COURSES_WITH_UNSAFE_CODE = []
 # Cojail REST service
 ENABLE_CODEJAIL_REST_SERVICE = False
 # .. setting_name: CODE_JAIL_REST_SERVICE_REMOTE_EXEC
-# .. setting_default: 'capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+# .. setting_default: 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
 # .. setting_description: Set the python package.module.function that is reponsible of
 #   calling the remote service in charge of jailed code execution
-CODE_JAIL_REST_SERVICE_REMOTE_EXEC = 'capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+CODE_JAIL_REST_SERVICE_REMOTE_EXEC = 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
 # .. setting_name: CODE_JAIL_REST_SERVICE_HOST
 # .. setting_default: 'http://127.0.0.1:8550'
 # .. setting_description: Set the codejail remote service host
@@ -1670,7 +1617,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.self_paced',
 
     # Coursegraph
-    'cms.djangoapps.coursegraph.apps.CoursegraphConfig',
+    'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
 
     # Credit courses
     'openedx.core.djangoapps.credit.apps.CreditConfig',
@@ -1767,6 +1714,8 @@ INSTALLED_APPS = [
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
+    'ratelimitbackend',
+
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
 
@@ -1781,9 +1730,6 @@ INSTALLED_APPS = [
 
     # For edx ace template tags
     'edx_ace',
-
-    # Blockstore
-    'blockstore.apps.bundles',
 ]
 
 
@@ -2134,13 +2080,12 @@ DEFAULT_SITE_THEME = None
 # .. toggle_description: See LMS annotation.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2016-06-30
-ENABLE_COMPREHENSIVE_THEMING = False
+ENABLE_COMPREHENSIVE_THEMING = True
 
 ############################ Global Database Configuration #####################
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
-    'openedx.core.lib.blockstore_api.db_routers.BlockstoreRouter',
 ]
 
 ############################ Cache Configuration ###############################
@@ -2298,33 +2243,7 @@ POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 # .. setting_default: value of LOW_PRIORITY_QUEUE
 # .. setting_description: The name of the Celery queue to which CourseGraph refresh
 #      tasks will be sent
-COURSEGRAPH_JOB_QUEUE: str = LOW_PRIORITY_QUEUE
-
-# .. setting_name: COURSEGRAPH_CONNECTION
-# .. setting_default: 'bolt+s://localhost:7687', in dictionary form.
-# .. setting_description: Dictionary specifying Neo4j connection parameters for
-#      CourseGraph refresh. Accepted keys are protocol ('bolt' or 'http'),
-#      secure (bool), host (str), port (int), user (str), and password (str).
-#      See https://py2neo.org/2021.1/profiles.html#individual-settings for a
-#      a description of each of those keys.
-COURSEGRAPH_CONNECTION: dict = {
-    "protocol": "bolt",
-    "secure": True,
-    "host": "localhost",
-    "port": 7687,
-    "user": "neo4j",
-    "password": None,
-}
-
-# .. toggle_name: COURSEGRAPH_DUMP_COURSE_ON_PUBLISH
-# .. toggle_implementation: DjangoSetting
-# .. toggle_creation_date: 2022-01-27
-# .. toggle_use_cases: open_edx
-# .. toggle_default: False
-# .. toggle_description: Whether, upon publish, a course should automatically
-#      be exported to Neo4j via the connection parameters specified in
-#      `COURSEGRAPH_CONNECTION`.
-COURSEGRAPH_DUMP_COURSE_ON_PUBLISH: bool = False
+COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
 
 ########## Settings for video transcript migration tasks ############
 VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
@@ -2546,6 +2465,10 @@ BLOCKSTORE_BUNDLE_CACHE_TIMEOUT = 3000
 ###################### LEARNER PORTAL ################################
 LEARNER_PORTAL_URL_ROOT = 'https://learner-portal-localhost:18000'
 
+######################### MICROSITE ###############################
+MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
+MICROSITE_CONFIGURATION = {}
+
 ############################ JWT #################################
 JWT_ISSUER = 'http://127.0.0.1:8000/oauth2'
 DEFAULT_JWT_ISSUER = {
@@ -2566,7 +2489,7 @@ REGISTRATION_EXTRA_FIELDS = {
     'year_of_birth': 'optional',
     'mailing_address': 'optional',
     'goals': 'optional',
-    'honor_code': 'required',
+    'honor_code': 'hidden',
     'terms_of_service': 'hidden',
     'city': 'hidden',
     'country': 'hidden',
@@ -2583,7 +2506,7 @@ EDXAPP_PARSE_KEYS = {}
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-12-02
 # .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warning: This url can be removed once it no longer has any real traffic.
+# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
 # .. toggle_tickets: ARCH-1253
 DISABLE_DEPRECATED_SIGNIN_URL = False
 
@@ -2594,7 +2517,7 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-12-02
 # .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warning: This url can be removed once it no longer has any real traffic.
+# .. toggle_warnings: This url can be removed once it no longer has any real traffic.
 # .. toggle_tickets: ARCH-1253
 DISABLE_DEPRECATED_SIGNUP_URL = False
 
@@ -2670,4 +2593,3 @@ TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-runn
 TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
-COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_assets/course_live.html"

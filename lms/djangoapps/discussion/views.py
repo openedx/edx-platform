@@ -29,7 +29,6 @@ from xmodule.modulestore.django import modulestore
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
@@ -45,10 +44,10 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     get_group_id_for_comments_service,
     get_group_id_for_user,
     is_commentable_divided,
-    strip_none
+    strip_none,
 )
 from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserException
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
 from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
@@ -56,16 +55,9 @@ from openedx.core.djangoapps.discussions.utils import (
     available_division_schemes,
     get_discussion_categories_ids,
     get_divided_discussions,
-    get_group_names_by_id
+    get_group_names_by_id,
 )
-from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_COMMUNITY_TA,
-    FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_MODERATOR,
-    CourseDiscussionSettings,
-    Role
-)
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
@@ -711,11 +703,7 @@ def followed_threads(request, course_key, user_id):
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
 
-def _discussions_mfe_context(query_params: Dict,
-                             course_key: CourseKey,
-                             is_educator_or_staff=False,
-                             legacy_only_view=False,
-                             is_privileged=False) -> Optional[Dict]:
+def _discussions_mfe_context(query_params: Dict, course_key: CourseKey, legacy_only_view=False) -> Optional[Dict]:
     """
     Returns the context for rendering the MFE banner and MFE.
 
@@ -730,15 +718,12 @@ def _discussions_mfe_context(query_params: Dict,
     if not mfe_url:
         return {"show_banner": False, "show_mfe": False}
     discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
-    discussions_mfe_enabled_for_everyone = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key)
-    enabled_for_educator_or_staff = is_educator_or_staff and discussions_mfe_enabled
-    enable_mfe = enabled_for_educator_or_staff or discussions_mfe_enabled_for_everyone
     # Show the MFE if the new MFE is enabled,
     # and if the legacy experience is not requested via query param
     # and if the current view isn't only that's only supported by the legacy view
     show_mfe = (
         query_params.get("discussions_experience", "").lower() != "legacy"
-        and enable_mfe
+        and discussions_mfe_enabled
         and not legacy_only_view
     )
     forum_url = reverse("forum_form_discussion", args=[course_key])
@@ -748,31 +733,9 @@ def _discussions_mfe_context(query_params: Dict,
         "mfe_url": f"{forum_url}?discussions_experience=new",
         "share_feedback_url": settings.DISCUSSIONS_MFE_FEEDBACK_URL,
         "course_key": course_key,
-        "show_banner": enable_mfe and is_privileged,
+        "show_banner": discussions_mfe_enabled,
         "discussions_mfe_url": mfe_url,
     }
-
-
-def is_course_staff(course_key: CourseKey, user: User):
-    """
-    Check if user has course instructor or course staff role.
-    """
-    return CourseInstructorRole(course_key).has_user(user) or CourseStaffRole(course_key).has_user(user)
-
-
-def is_privileged_user(course_key: CourseKey, user: User):
-    """
-    Returns True if user has one of following course role
-    Administrator, Moderator, Group Moderator, Community TA
-    """
-    forum_roles = [
-        FORUM_ROLE_COMMUNITY_TA,
-        FORUM_ROLE_GROUP_MODERATOR,
-        FORUM_ROLE_MODERATOR,
-        FORUM_ROLE_ADMINISTRATOR
-    ]
-    has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
-    return GlobalStaff().has_user(user) or is_course_staff(course_key, user) or has_course_role
 
 
 class DiscussionBoardFragmentView(EdxFragmentView):
@@ -804,10 +767,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         # Force using the legacy view if a user profile is requested or the URL contains a specific topic or thread
         force_legacy_view = (profile_page_context or thread_id or discussion_id)
-        is_educator_or_staff = is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user)
-        is_privileged = is_privileged_user(course_key, request.user)
-        mfe_context = _discussions_mfe_context(request.GET, course_key, is_educator_or_staff, force_legacy_view,
-                                               is_privileged)
+        mfe_context = _discussions_mfe_context(request.GET, course_key, force_legacy_view)
         if mfe_context["show_mfe"]:
             fragment = Fragment(render_to_string('discussion/discussion_mfe_embed.html', mfe_context))
             fragment.add_css(

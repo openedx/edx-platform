@@ -51,7 +51,12 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     is_username_retired,
     is_email_retired
 )
-from common.djangoapps.student.models_api import confirm_name_change, do_name_change_request, get_pending_name_change
+from common.djangoapps.student.models_api import (
+    confirm_name_change,
+    do_name_change_request,
+    get_pending_name_change
+)
+from openedx.core.djangoapps.user_api.accounts import RETIRED_EMAIL_MSG
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
@@ -59,7 +64,6 @@ from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequireme
 from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
-from openedx.core.djangoapps.user_api.accounts import RETIRED_EMAIL_MSG
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -72,7 +76,7 @@ from ..models import (
     RetirementStateError,
     UserOrgTag,
     UserRetirementPartnerReportingStatus,
-    UserRetirementStatus,
+    UserRetirementStatus
 )
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanGetAccountInfo, CanReplaceUsername, CanRetireUser
@@ -80,7 +84,7 @@ from .serializers import (
     PendingNameChangeSerializer,
     UserRetirementPartnerReportSerializer,
     UserRetirementStatusSerializer,
-    UserSearchEmailSerializer,
+    UserSearchEmailSerializer
 )
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
 from .utils import create_retirement_request_and_deactivate_account, username_suffix_generator
@@ -962,8 +966,10 @@ class AccountRetirementStatusView(ViewSet):
         Updates the RetirementStatus row for the given user to the new
         status, and append any messages to the message log.
 
-        Note that this implementation DOES NOT use the "merge patch" implementation seen in AccountViewSet.
-        The content type for this request is 'application/json'.
+        Note that this implementation DOES NOT use the "merge patch"
+        implementation seen in AccountViewSet. Slumber, the project
+        we use to power edx-rest-api-client, does not currently support
+        it. The content type for this request is 'application/json'.
         """
         try:
             username = request.data['username']

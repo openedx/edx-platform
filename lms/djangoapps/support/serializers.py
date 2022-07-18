@@ -3,12 +3,13 @@ Serializers for use in the support app.
 """
 import json
 
+from django.urls import reverse
 from rest_framework import serializers
 
 from common.djangoapps.student.models import CourseEnrollment, ManualEnrollmentAudit
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from openedx.core.djangoapps.catalog.utils import get_programs_by_uuids
-from openedx.features.course_experience import default_course_url
+from openedx.features.course_experience import default_course_url_name
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 # pylint: disable=abstract-method
@@ -46,7 +47,8 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
         model = ProgramCourseEnrollment
 
     def get_course_url(self, obj):
-        return default_course_url(obj.course_key)
+        course_url_name = default_course_url_name(obj.course_key)
+        return reverse(course_url_name, kwargs={'course_id': obj.course_key})
 
 
 class ProgramEnrollmentSerializer(serializers.Serializer):
@@ -84,35 +86,17 @@ def serialize_user_info(user, user_social_auths=None):
     return user_info
 
 
-def serialize_sso_records(user_social_auth, user_social_auths_history):
+def serialize_sso_records(user_social_auths):
     """
     Serialize user social auth model object
     """
-    sso_records = {
-        'provider': user_social_auth.provider,
-        'uid': user_social_auth.uid,
-        'created': user_social_auth.created,
-        'modified': user_social_auth.modified,
-        'history': serialize_sso_history(
-            user_social_auths_history
-        ),
-        'extraData': json.dumps(user_social_auth.extra_data),
-    }
-    return sso_records
-
-
-def serialize_sso_history(user_social_auths_history):
-    """
-    Serialize history for user social auth model object
-    """
-    history = []
-    for sso_history in user_social_auths_history:
-        history.append({
-            'uid': sso_history.uid,
-            'provider': sso_history.provider,
-            'created': sso_history.created,
-            'modified': sso_history.modified,
-            'extraData': json.dumps(sso_history.extra_data),
-            'history_date': sso_history.history_date
+    sso_records = []
+    for user_social_auth in user_social_auths:
+        sso_records.append({
+            'provider': user_social_auth.provider,
+            'uid': user_social_auth.uid,
+            'created': user_social_auth.created,
+            'modified': user_social_auth.modified,
+            'extraData': json.dumps(user_social_auth.extra_data),
         })
-    return history
+    return sso_records

@@ -9,7 +9,7 @@ from django.contrib import admin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.utils.translation import gettext as _
 from edx_django_utils.admin.mixins import ReadOnlyAdminMixin
-from common.djangoapps.student.models import LiveClassEnrollment, CourseEnrollment
+
 from cms.djangoapps.contentstore.models import BackfillCourseTabsConfig, VideoUploadConfig
 from cms.djangoapps.contentstore.outlines_regenerate import CourseOutlineRegenerate
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
@@ -34,7 +34,7 @@ def regenerate_course_outlines_subset(modeladmin, request, queryset):
     for course_key in all_course_keys_qs:
         if key_supports_outlines(course_key):
             log.info("Queuing outline creation for %s", course_key)
-            update_outline_from_modulestore_task(str(course_key))
+            update_outline_from_modulestore_task.delay(str(course_key))
             regenerates += 1
         else:
             log.info("Outlines not supported for %s - skipping", course_key)
@@ -81,5 +81,3 @@ class CourseOutlineRegenerateAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
 admin.site.register(BackfillCourseTabsConfig, ConfigurationModelAdmin)
 admin.site.register(VideoUploadConfig, ConfigurationModelAdmin)
 admin.site.register(CourseOutlineRegenerate, CourseOutlineRegenerateAdmin)
-admin.site.register(CourseEnrollment)
-admin.site.register(LiveClassEnrollment)

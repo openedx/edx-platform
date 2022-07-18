@@ -2,13 +2,12 @@
 
 
 import logging
-from urllib.parse import urljoin
 
 from django.urls import reverse
+from edx_rest_api_client import exceptions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from requests.exceptions import HTTPError
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
@@ -19,7 +18,7 @@ from common.djangoapps.entitlements.models import CourseEntitlement
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.courseware import courses
-from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.enrollments.views import EnrollmentCrossDomainSessionAuth
@@ -160,23 +159,15 @@ class BasketsView(APIView):
 
 
 class BasketOrderView(APIView):
-    """
-    Retrieve the order associated with a basket.
-    """
+    """ Retrieve the order associated with a basket. """
 
     authentication_classes = (SessionAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *_args, **kwargs):
-        """
-        HTTP handler.
-        """
+        """ HTTP handler. """
         try:
-            api_url = urljoin(f"{get_ecommerce_api_base_url()}/", f"baskets/{kwargs['basket_id']}/order/")
-            response = get_ecommerce_api_client(request.user).get(api_url)
-            response.raise_for_status()
-            return JsonResponse(response.json())
-        except HTTPError as err:
-            if err.response.status_code == 404:
-                return JsonResponse(status=404)
-            raise
+            order = ecommerce_api_client(request.user).baskets(kwargs['basket_id']).order.get()
+            return JsonResponse(order)
+        except exceptions.HttpNotFoundError:
+            return JsonResponse(status=404)

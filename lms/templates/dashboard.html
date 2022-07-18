@@ -187,7 +187,7 @@ from common.djangoapps.student.models import CourseEnrollment
     <div class="dashboard" id="dashboard-main">
       <div class="main-container">
         <div class="my-courses" id="my-courses">
-
+          
 
           % if len(course_entitlements + course_enrollments) > 0:
             <ul class="listing-courses">
@@ -197,9 +197,9 @@ from common.djangoapps.student.models import CourseEnrollment
                     getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
                 )
             %>
-
-            <div class="live_class" >
-              <h3 id="live_classes_list" class="live_classes_list" style="font-size: 24px; font-weight: 900; margin-bottom: 24px">Live Classes</h3>
+           
+            <div class="live_class">
+              <h3 style="font-size: 24px; font-weight: 900; margin-bottom: 24px">Live Classes</h3>
               <div id="output" class="out" style="position: relative;display: none;"></div>
             </div>
 
@@ -265,8 +265,8 @@ from common.djangoapps.student.models import CourseEnrollment
                 resume_button_url = resume_button_urls[dashboard_index]
               %>
               <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_voucher_refundable=is_course_voucher_refundable, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url, partner_managed_enrollment=partner_managed_enrollment' />
-
-
+              
+              
             % endfor
             % if show_explore_courses:
               <div style="padding-top: 50px; text-align: center">
@@ -275,7 +275,7 @@ from common.djangoapps.student.models import CourseEnrollment
                   ${_('View More Courses')}
                 </a>
               </div>
-            % endif
+            % endif 
             % if show_load_all_courses_link:
                 <br/>
                  ${len(course_enrollments)} ${_("results successfully populated,")}
@@ -285,7 +285,7 @@ from common.djangoapps.student.models import CourseEnrollment
             % endif
             </ul>
           % else:
-
+          
           % endif
 
           % if staff_access and len(errored_courses) > 0:
@@ -308,8 +308,8 @@ from common.djangoapps.student.models import CourseEnrollment
       </div>
       <div class="side-container" role="complementary" aria-label="messages" style="max-width: 388px; width: 100%">
         <div>
-
-
+          
+            
           <h3 style="font-size: 24px; font-weight: 500; margin-bottom: 28px;">Learning Path</h3>
           <div style="background-color: #fff; border-radius: 12px;">
             <section class="ftco-section" style="padding: 0">
@@ -495,56 +495,6 @@ from common.djangoapps.student.models import CourseEnrollment
 
 <%include file="dashboard/_dashboard_entitlement_unenrollment_modal.html"/>
 
-
-
-<script>
-  loadData()
-  function loadData()
-  {
-    fetch("https://student.launchpadlearning.ca/api/enrollment/v1/enrollments/live_class",
-       )
-    .then( res => res.json() )
-    .then(response => {
-     var output = document.getElementById('output');
-                output.style.display='block';
-                var response = JSON.parse(JSON.stringify(response))
-
-                for(let i=0;i<response.results.length;i++)
-                  {
-                    var parent = document.createElement("div");
-                    parent.classList.add('d-flex', 'justify-content-between', 'align-items-center',)
-                    parent.setAttribute("style", "background: #fff; box-shadow: 0 2px 7px 0 rgb(0, 0, 0,.8%); overflow: hidden; border-radius: 8px; margin-bottom: 24px");
-                    var image = document.createElement("img");
-                    image.setAttribute('src', 'http://via.placeholder.com/220x120')
-                    var ele = document.createElement("div");
-                    ele.setAttribute(
-                      "style", "font-size: 1.2em; font-weight: 900; color:#000;");
-                    ele.setAttribute("id","timedrpact"+i);
-                    ele.setAttribute("class","inner");
-                    ele.appendChild(image);
-                    const span = document.createElement("span");
-                    span.innerText = response.results[i]["topic_name"];
-                    span.style.marginLeft = '40px';
-                    ele.appendChild(span);
-                    parent.appendChild(ele);
-                    var ele1= document.createElement("a");
-                    ele1.setAttribute("id","timedrpact1"+i);
-                    ele1.setAttribute("class","button inner-link");
-                    ele1.setAttribute("href",response.results[i]["meeting_link"]);
-                    ele1.setAttribute("target",'_black');
-                    ele1.setAttribute(
-                      "style", "font-size: 18px; margin-right: 20px; box-shadow: 0px 5px 0px #ee6100; border: none; color:#fff; background: #ff7f27; border-radius: 12px; padding: 12px 20px; background-image: none; text-shadow: 0 0");
-                    ele1.innerHTML='Join Class';
-                    parent.appendChild(ele1);
-                    output.appendChild(parent);
-
-                  }
-
-
-    })
-    .catch(error => console.error('Error:', error));
-  }
-</script>
 
 
 

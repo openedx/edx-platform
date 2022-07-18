@@ -21,7 +21,7 @@ from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
-from openedx.core.djangoapps.user_authn.utils import check_pwned_password, is_registration_api_v1 as is_api_v1
+from openedx.core.djangoapps.user_authn.utils import is_registration_api_v1 as is_api_v1
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from common.djangoapps.student.models import (
@@ -172,6 +172,8 @@ class AccountCreationForm(forms.Form):
         validators=[validate_name]
     )
 
+    country = forms.CharField(required=False)
+
     def __init__(
         self,
         data=None,
@@ -202,7 +204,7 @@ class AccountCreationForm(forms.Form):
         for field_name, field_value in extra_fields.items():
             if field_name not in self.fields:
                 if field_name == "honor_code":
-                    if field_value == "required":
+                    if field_value == "hidden":
                         self.fields[field_name] = TrueField(
                             error_messages={
                                 "required": _("To enroll, you must follow the honor code.")
@@ -238,16 +240,6 @@ class AccountCreationForm(forms.Form):
             email = self.cleaned_data.get('email')
             temp_user = User(username=username, email=email) if username else None
             validate_password(password, temp_user)
-
-            if settings.ENABLE_AUTHN_REGISTER_HIBP_POLICY:
-                # Checks the Pwned Databases for password vulnerability.
-                pwned_response = check_pwned_password(password)
-
-                if (
-                    pwned_response.get('vulnerability', 'no') == 'yes' and
-                    pwned_response.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
-                ):
-                    raise ValidationError(accounts.AUTHN_PASSWORD_COMPROMISED_MSG)
         return password
 
     def clean_email(self):
@@ -938,7 +930,7 @@ class RegistrationFormFactory:
             required=required
         )
 
-    def _add_country_field(self, form_desc, required=True):
+    def _add_country_field(self, form_desc, required="hidden"):
         """Add a country field to a form description.
         Arguments:
             form_desc: A form description
@@ -968,18 +960,18 @@ class RegistrationFormFactory:
 
         form_desc.add_field(
             "country",
-            label=country_label,
+            #label=country_label,
             instructions=country_instructions,
             field_type="select",
             options=list(countries),
-            include_default_option=True,
-            required=required,
+            include_default_option=False,
+            required="hidden",
             error_messages={
                 "required": error_msg
             }
         )
 
-    def _add_honor_code_field(self, form_desc, required=True):
+    def _add_honor_code_field(self, form_desc, required=False):
         """Add an honor code field to a form description.
         Arguments:
             form_desc: A form description
@@ -1045,7 +1037,7 @@ class RegistrationFormFactory:
 
         form_desc.add_field(
             "honor_code",
-            label=label,
+            #label=label,
             field_type=field_type,
             default=False,
             required=required,

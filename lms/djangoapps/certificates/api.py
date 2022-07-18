@@ -874,16 +874,17 @@ def _course_uses_available_date(course):
     )
 
 
-def available_date_for_certificate(course, certificate):
+def available_date_for_certificate(course, certificate, certificate_available_date=None):
     """
     Returns the available date to use with a certificate
 
     Arguments:
         course (CourseOverview or course descriptor): The course we're checking
         certificate (GeneratedCertificate): The certificate we're getting the date for
+        certificate_available_date (datetime): An optional date to override the from the course overview.
     """
     if _course_uses_available_date(course):
-        return course.certificate_available_date
+        return certificate_available_date or course.certificate_available_date
     return certificate.modified_date
 
 

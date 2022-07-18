@@ -1,18 +1,23 @@
+from lib2to3.pgen2 import token
 import logging
-from openedx.core.djangoapps.enrollments.serializers import  LiveClassesSerializer , UserListSerializer ,CourseEnrollmentSerializer ,LiveClassEnrollmentSerializer ,LiveClassUserDetailsSerializer ,UserLiveClassDetailsSerializer, CourseEnrolledUserDetailsSerializer ,LoginStaffCourseDetailsSerializer
-from common.djangoapps.student.models import LiveClassEnrollment
+from urllib import response
+
+import json
+from openedx.core.djangoapps.enrollments.serializers import  (LiveClassesSerializer , UserListSerializer ,UserAttendanceListSerializer ,CourseEnrollmentSerializer ,LiveClassEnrollmentSerializer ,LiveClassUserDetailsSerializer ,UserLiveClassDetailsSerializer, CourseEnrolledUserDetailsSerializer ,LoginStaffCourseDetailsSerializer
+, StaffNotifyCallSerializer , STudentUserListSerializer , StudentListbytaffDetailsSerializer)
+from common.djangoapps.student.models import LiveClassEnrollment, UserProfile , NotifyCallRequest
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.lib.log_utils import audit_log
 from openedx.core.djangoapps.enrollments.views import ApiKeyPermissionMixIn
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
-
-
 from lms.djangoapps.course_api.serializers import CourseSerializer
 from lms.djangoapps.course_api.forms import  CourseListGetForm
 from lms.djangoapps.course_api.api import  list_courses ,course_detail, list_course_keys, _filter_by_search
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+
+import requests
 
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
@@ -40,7 +45,11 @@ from openedx.core.lib.exceptions import CourseNotFoundError
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
 
 
+# from apscheduler.schedulers.background import BackgroundScheduler
+# from apscheduler.schedulers.blocking import BlockingScheduler
 
+# import django_apscheduler
+# import django_crontab
 
 
 
@@ -63,25 +72,23 @@ from opaque_keys import InvalidKeyError
 from django.contrib.auth.models import User 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {
     "credit": ["credit:provider_id"],
 }
 
+
+# sched = BlockingScheduler()
+
+# @sched.scheduled_job('interval', minutes=3)
+# def timed_job():
+#     print('This job is run every three minutes.')
+
+# @sched.scheduled_job('cron', day_of_week='mon-fri', hour=17)
+# def scheduled_job():
+#     print('This job is run every weekday at 5pm.')
+
+# sched.start()
 
 
 
@@ -97,24 +104,63 @@ class LiveClassesApiListView(DeveloperErrorViewMixin, ListCreateAPIView):
     #pagination_class = LiveClassesSerializer
     lookup_field = "username"
 
-    # def get_queryset(self):
-    #     created_by_id = self.kwargs.get('username')
+   
+    def rooms(self, topic_name):
+        url = "https://api.daily.co/v1/rooms/"
+        payload = json.dumps({
+            "name": topic_name,
+            "privacy": "private",
+            "properties": {
+            "start_audio_off": True,
+            "start_video_off": True,
+            # "owner_only_broadcast": False
 
-    #     return LiveClasses.objects.filter(created_by=created_by_id)
+            }
+        })
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10",
+        }
 
+        response = requests.request("POST", url, headers=headers, data= payload)
+        if response.status_code==200:
+            data=json.loads(response.text)
+            link_url = data.get('url')
+
+            url = "https://api.daily.co/v1/meeting-tokens"
+            payload = json.dumps({
+                "properties": {
+                    "room_name": topic_name
+                }
+                })
+            headers = {
+            "authorization": "Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10",
+            "Content-Type": "application/json"
+            }
+            
+            response = requests.request("POST", url, headers=headers, data=payload)
+
+            if response.status_code==200:
+                data=json.loads(response.text)
+                token = data.get('token')
+                return (link_url , token)
+        else:
+            return None , None
 
     def get_queryset(self):
         return LiveClasses.objects.filter(created_by=self.request.user)
 
-
-
-
-        
-
-
     def post(self, request, *args, **kwargs):
         """Upload documents"""
         try:
+            data= request.data
+            room_name =data.get('topic_name')
+            call_dailyco=self.rooms(room_name)
+
+
+            data['meeting_link']=call_dailyco[0]
+            data['client_token']=call_dailyco[1]
+
             serializer = self.serializer_class(
                 data=request.data, context={'user':self.request.user}
             )
@@ -124,6 +170,197 @@ class LiveClassesApiListView(DeveloperErrorViewMixin, ListCreateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+
+
+
+# def rooms():
+#         url = "https://api.daily.co/v1/rooms/"
+#         payload = json.dumps({
+#             "name": "display_name",
+#             "privacy": "private",
+#             "properties": {
+#             "start_audio_off": True,
+#             "start_video_off": True,
+#             "nbf": "start_unix",
+#             "exp": "end_unix"
+
+#             }
+#         })
+#         headers = {
+#             "Content-Type": "application/json",
+#             "Authorization": "Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10",
+#         }
+
+#         response = requests.request("POST", url, headers=headers, data= payload)
+#         if response.status_code==200:
+#             data=json.loads(response.text)
+#             link_url = data.get('url')
+
+#             url = "https://api.daily.co/v1/meeting-tokens"
+#             payload = json.dumps({
+#                 "properties": {
+#                     "room_name": "display_name"
+#                 }
+#                 })
+#             headers = {
+#             "authorization": "Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10",
+#             "Content-Type": "application/json"
+#             }
+            
+#             response = requests.request("POST", url, headers=headers, data=payload)
+#             if response.status_code==200:
+#                 data=json.loads(response.text)
+#                 token = data.get('token')
+#                 log.info(response.text)
+#                 return (link_url , token)
+#         return None , None
+        
+
+# rooms()
+
+
+# var saveNewLiveClass = function (e) {
+#     e.preventDefault();
+
+#     var $newLiveClassForm = $(this).closest("#create-liveclass-form");
+
+#     var display_name = $newLiveClassForm.find(".new-liveclass-name").val();
+#     var course_id = $("#category :selected").attr("id");
+#     var liveclass_timezone_adjustment = parseInt($("#category_zone :selected").val());
+
+#     // console.log("Timezone : " + liveclass_timezone_adjustment + " " + typeof(liveclass_timezone_adjustment) );
+
+#     var liveclass_startdate = $newLiveClassForm.find(".new-liveclass-startdate").val();
+#     var liveclass_starttime = $newLiveClassForm.find(".new-liveclass-starttime").val();
+#     var liveclass_enddate = $newLiveClassForm.find(".new-liveclass-enddate").val();
+#     var liveclass_endtime = $newLiveClassForm.find(".new-liveclass-endtime").val();
+#     var meeting_notes = $newLiveClassForm.find(".new-liveclass-notes").val();
+
+#     var liveclass_starttime_seconds =
+#       liveclass_starttime.split(":")[0] * 60 * 60 + liveclass_starttime.split(":")[1] * 60;
+#     var liveclass_endtime_seconds = liveclass_endtime.split(":")[0] * 60 * 60 + liveclass_endtime.split(":")[1] * 60;
+
+#     const start_unix =
+#       Date.parse(liveclass_startdate) / 1000 + liveclass_starttime_seconds + liveclass_timezone_adjustment;
+#     const end_unix = Date.parse(liveclass_enddate) / 1000 + liveclass_endtime_seconds + liveclass_timezone_adjustment;
+
+#     let crt_room = {
+#       name: display_name,
+#       privacy: "private",
+#       properties: {
+#         start_audio_off: true,
+#         start_video_off: true,
+#         nbf: start_unix,
+#         exp: end_unix,
+#       },
+#     };
+
+#     //Creating Room
+#     fetch("https://api.daily.co/v1/rooms/", {
+#       method: "POST",
+#       headers: {
+#         "Content-Type": "application/json",
+#         Authorization: "Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10",
+#       },
+#       body: JSON.stringify(crt_room),
+#     })
+#       .then(function (res) {
+#         return res.json();
+#       })
+#       .then(function (data) {
+#         var lib_info = {
+#           properties: { room_name: data.name },
+#         };
+
+#         //Creating client_token and giving it to liveclass
+#         const client_token = async () => {
+#           var response;
+#           await fetch("https://api.daily.co/v1/meeting-tokens", {
+#             method: "POST",
+#             headers: {
+#               "Content-Type": "application/json",
+#               Authorization: "Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10",
+#             },
+#             body: JSON.stringify(lib_info),
+#           })
+#             .then((data) => data.json())
+#             .then((data) => {
+#               response = data;
+#             })
+#           return response["token"];
+#         };
+
+#         // console.log("The response is", client_token());
+#         client_token()
+#         .then((token)=>{
+#           var lib_info = {
+#             topic_name: display_name,
+#             is_recurrence_meeting: false,
+#             meeting_link: data.url,
+#             course_id: course_id,
+#             start_date: liveclass_startdate,
+#             start_time: liveclass_starttime,
+#             end_date: liveclass_enddate,
+#             end_time: liveclass_endtime,
+#             meeting_notes: meeting_notes,
+#             client_token: token,
+#           };
+#           analytics.track("Created a LiveClass", lib_info);
+
+#           CreateLiveClassUtils.create(lib_info, function (errorMessage) {
+#             if (errorMessage.id == undefined) {
+#               var msg = edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML("<p>"), errorMessage, edx.HtmlUtils.HTML("</p>"));
+#               $(".create-liveclass .wrap-error").addClass("is-shown");
+#               edx.HtmlUtils.setHtml($("#liveclass_creation_error"), msg);
+#               $(".new-liveclass-save").addClass("is-disabled").attr("aria-disabled", true);
+#             } else if (
+#               liveclass_startdate < liveclass_enddate ||
+#               (liveclass_startdate === liveclass_enddate && liveclass_starttime < liveclass_endtime)
+#             ) {
+#               // alert(`Live Class Created\nStart: ${liveclass_startdate} ${liveclass_starttime} \nEnd: ${liveclass_enddate} ${liveclass_endtime}`);
+#               localStorage.setItem("liveclass_id", errorMessage.id);
+#             } else {
+#               alert("End Date should be after Start Date");
+#             }
+#           });
+#       });
+
+#       });
+#   };
+
+#   var updateLiveClass = function (e) {
+#     alert("Updated");
+#   };
+
+#   var addNewLiveClass = function (e) {
+#     e.preventDefault();
+#     $(".new-liveclass-button").addClass("is-disabled").attr("aria-disabled", true);
+#     $(".new-liveclass-save").addClass("is-disabled").attr("aria-disabled", true);
+#     var $newLiveClass = $(".wrapper-create-liveclass").addClass("is-shown");
+#     GetLiveClassUtils.getCourse({}, function (res, errorMessage) {
+#       //alert(res)
+#     });
+#     var $cancelButton = $newLiveClass.find(".new-liveclass-cancel");
+#     $(".new-liveclass-save").on("click", saveNewLiveClass);
+
+#     $cancelButton.bind("click", makeCancelHandler("liveclass"));
+#     CancelOnEscape($cancelButton);
+#     CreateLiveClassUtils.configureHandlers();
+#   };
+#   var checkClass = function (e) {
+#     if (e.target.checked) {
+#       document.getElementById("field-liveclass-repeatcriteria").style.display = "block";
+#       document.getElementById("field-liveclass-date").style.display = "none";
+#     } else {
+#       document.getElementById("field-liveclass-repeatcriteria").style.display = "none";
+#       document.getElementById("field-liveclass-date").style.display = "block";
+#     }
+#   };
+
 
 
 class LiveClassesDeleteUpdateApiView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView):
@@ -179,17 +416,51 @@ class UserDetailsListApiView(DeveloperErrorViewMixin, ListAPIView):
     queryset = User.objects.all()
 
 
-    # def get_queryset(self):
-    #     is_active = self.kwargs.get('is_active')
+    def get_serializer_class(self):
+        """Get Serializer"""
+        if self.request.method == 'GET':
+            return UserListSerializer
 
-    #     return User.objects.filter(is_active=is_active)
 
+
+
+class StudentUserDetailsListApiView(ListAPIView):
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
+    serializer_class = STudentUserListSerializer
+    queryset = User.objects.all()
+
+
+    def get_queryset(self):
+        return User.objects.filter(is_active=True , is_staff=False , is_superuser=False)
+
+
+
+
+class UserAttendanceDetailsListApiView(DeveloperErrorViewMixin, ListAPIView):
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
+    serializer_class = UserListSerializer
+    queryset = UserProfile.objects.all()
 
 
     def get_serializer_class(self):
         """Get Serializer"""
         if self.request.method == 'GET':
-            return UserListSerializer
+            return UserAttendanceListSerializer
+
 
 
 
@@ -212,7 +483,7 @@ class EnrollLiveClassCreateView(DeveloperErrorViewMixin, CreateAPIView):
         """Upload documents"""
         try:
             serializer = self.serializer_class(
-                data=request.data,
+                data=request.data, context = {'assigned_by':self.request.user}
             )
             serializer.is_valid(raise_exception=True)
             
@@ -245,25 +516,26 @@ class EnrollLiveClassUserDetailsView(DeveloperErrorViewMixin, ListCreateAPIView)
 
 
 
-class EnrollCourseUserDetailsView(DeveloperErrorViewMixin, ListAPIView):
+class EnrollCourseUserDetailsView(DeveloperErrorViewMixin, RetrieveDestroyAPIView):
     authentication_classes = (
         JwtAuthentication,
         BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAdminUser,)
-    #throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = CourseEnrolledUserDetailsSerializer
-    # pagination_class = LiveClassesSerializer
     lookup_url_kwarg = 'course_id'
 
 
-    # lookup_field = "username"
+    def get(self, request, *args, **kwargs):
 
-    def get_queryset(self):
+        serializer = self.serializer_class(CourseEnrollment.objects.filter(course_id=self.kwargs.get('course_id')), many=True)
+
+        data={}
+        data['course_id']=self.kwargs.get('course_id')
+        data['datas']=serializer.data
     
-        return CourseEnrollment.objects.filter(course_id=self.kwargs.get('course_id'))
-
+        return Response(data, status=status.HTTP_200_OK)
 
 
 
@@ -557,6 +829,7 @@ class UserCourseEnrollment(CreateAPIView , ApiKeyPermissionMixIn):
                     str(course_id),
                     mode=mode,
                     is_active=is_active,
+                    assigned_by=self.request.user,
                     enrollment_attributes=enrollment_attributes,
                     enterprise_uuid=request.data.get('enterprise_uuid')
                 )
@@ -755,8 +1028,88 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         )
 
 
-    # queryset = CourseOverview.objects.all()
-    # def get_serializer_class(self):
-    #     """Get Serializer"""
-    #     if self.request.method == 'GET':
-    #         return CourseSerializer                
+
+
+
+class StaffNotifyCallRequestListDetails(DeveloperErrorViewMixin, ListAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
+    serializer_class = StaffNotifyCallSerializer
+
+    lookup_field = "requested_to"
+
+
+    # lookup_field = "username"
+
+    def get_queryset(self):
+
+        return NotifyCallRequest.objects.filter(requested_to=self.request.user)
+
+
+class StaffNotifyCallRequestRetrieveDetails(DeveloperErrorViewMixin, RetrieveDestroyAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    serializer_class = StaffNotifyCallSerializer
+
+    model = NotifyCallRequest
+    lookup_field = "id"
+
+
+
+    def get(self, request, *args, **kwargs):
+        
+
+        instance=self.model.objects.get(id=self.kwargs.get('id'))
+    
+   
+        if instance.requested_to == self.request.user:
+                    instance.seen = True
+                    instance.save()
+                    serializer = self.serializer_class(instance)
+
+                    # serializers= serializer.data.popitem('seen')
+        else:
+            return Response("You are not notify with this call request", status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+
+
+
+class StudentListbyCourseDetailsList(DeveloperErrorViewMixin, ListAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAdminUser,)
+    pagination_class = None
+    serializer_class = StudentListbytaffDetailsSerializer
+    lookup_url_kwarg = 'assigned_by'
+
+
+    # def get_queryset(self):
+    
+    #     return CourseEnrollment.objects.filter(assigned_by=self.request.user)
+
+
+    def get(self, request, *args, **kwargs):
+
+        courses=CourseEnrollment.objects.filter(assigned_by=self.request.user)
+        # courses_l = courses.values_list('course').distinct()
+        data = {}
+
+        for course in courses:
+
+            serializer = self.serializer_class(courses.filter(course_id=course.course_id) ,many=True).data
+            data[str(course.course_id)]=serializer
+        return Response(data, status=status.HTTP_200_OK)
+
+        

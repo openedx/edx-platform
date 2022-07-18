@@ -7,21 +7,19 @@ import logging
 import uuid
 
 import pycountry
-import requests
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from edx_rest_api_client.auth import SuppliedJwtAuth
+from edx_rest_api_client.client import EdxRestApiClient
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
-from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.catalog.cache import (
-    CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
     COURSE_PROGRAMS_CACHE_KEY_TPL,
+    CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
+    PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
-    PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
     PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
     PROGRAMS_BY_TYPE_SLUG_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
@@ -29,32 +27,24 @@ from openedx.core.djangoapps.catalog.cache import (
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
-from openedx.core.lib.edx_api_utils import get_api_data
+from openedx.core.lib.edx_api_utils import get_edx_api_data
+from common.djangoapps.student.models import CourseEnrollment
 
 logger = logging.getLogger(__name__)
 
 missing_details_msg_tpl = 'Failed to get details for program {uuid} from the cache.'
 
 
-def get_catalog_api_base_url(site=None):
-    """
-    Returns a base API url used to make Catalog API requests.
-    """
-    if site:
-        return site.configuration.get_value('COURSE_CATALOG_API_URL')
-
-    return CatalogIntegration.current().get_internal_api_url()
-
-
-def get_catalog_api_client(user):
-    """
-    Returns an API client which can be used to make Catalog API requests.
-    """
+def create_catalog_api_client(user, site=None):
+    """Returns an API client which can be used to make Catalog API requests."""
     jwt = create_jwt_for_user(user)
-    client = requests.Session()
-    client.auth = SuppliedJwtAuth(jwt)
 
-    return client
+    if site:
+        url = site.configuration.get_value('COURSE_CATALOG_API_URL')
+    else:
+        url = CatalogIntegration.current().get_internal_api_url()
+
+    return EdxRestApiClient(url, jwt=jwt)
 
 
 def check_catalog_integration_and_get_user(error_message_field):
@@ -241,15 +231,11 @@ def get_program_types(name=None):
     """
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Program types')
     if user:
+        api = create_catalog_api_client(user)
         cache_key = f'{catalog_integration.CACHE_KEY}.program_types'
 
-        data = get_api_data(
-            catalog_integration,
-            "program_types",
-            api_client=get_catalog_api_client(user),
-            base_api_url=get_catalog_api_base_url(),
-            cache_key=cache_key if catalog_integration.is_cache_enabled else None
-        )
+        data = get_edx_api_data(catalog_integration, 'program_types', api=api,
+                                cache_key=cache_key if catalog_integration.is_cache_enabled else None)
 
         # Filter by name if a name was provided
         if name:
@@ -325,15 +311,11 @@ def get_currency_data():
     """
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Currency data')
     if user:
+        api = create_catalog_api_client(user)
         cache_key = f'{catalog_integration.CACHE_KEY}.currency'
 
-        return get_api_data(
-            catalog_integration,
-            "currency",
-            api_client=get_catalog_api_client(user),
-            base_api_url=get_catalog_api_base_url(),
-            traverse_pagination=False,
-            cache_key=cache_key if catalog_integration.is_cache_enabled else None)
+        return get_edx_api_data(catalog_integration, 'currency', api=api, traverse_pagination=False,
+                                cache_key=cache_key if catalog_integration.is_cache_enabled else None)
     else:
         return []
 
@@ -428,18 +410,14 @@ def get_course_runs():
     course_runs = []
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course runs')
     if user:
+        api = create_catalog_api_client(user)
+
         querystring = {
             'page_size': catalog_integration.page_size,
             'exclude_utm': 1,
         }
 
-        course_runs = get_api_data(
-            catalog_integration,
-            'course_runs',
-            api_client=get_catalog_api_client(user),
-            base_api_url=get_catalog_api_base_url(),
-            querystring=querystring
-        )
+        course_runs = get_edx_api_data(catalog_integration, 'course_runs', api=api, querystring=querystring)
 
     return course_runs
 
@@ -447,14 +425,16 @@ def get_course_runs():
 def get_course_runs_for_course(course_uuid):  # lint-amnesty, pylint: disable=missing-function-docstring
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course runs')
     if user:
-        cache_key = f"{catalog_integration.CACHE_KEY}.course.{course_uuid}.course_runs"
-
-        data = get_api_data(
+        api = create_catalog_api_client(user)
+        cache_key = '{base}.course.{uuid}.course_runs'.format(
+            base=catalog_integration.CACHE_KEY,
+            uuid=course_uuid
+        )
+        data = get_edx_api_data(
             catalog_integration,
             'courses',
             resource_id=course_uuid,
-            api_client=get_catalog_api_client(user),
-            base_api_url=get_catalog_api_base_url(),
+            api=api,
             cache_key=cache_key if catalog_integration.is_cache_enabled else None,
             long_term_cache=True,
             many=False
@@ -467,21 +447,23 @@ def get_course_runs_for_course(course_uuid):  # lint-amnesty, pylint: disable=mi
 def get_owners_for_course(course_uuid):  # lint-amnesty, pylint: disable=missing-function-docstring
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Owners')
     if user:
-        cache_key = f"{catalog_integration.CACHE_KEY}.course.{course_uuid}.course_runs"
-
-        data = get_api_data(
+        api = create_catalog_api_client(user)
+        cache_key = '{base}.course.{uuid}.course_runs'.format(
+            base=catalog_integration.CACHE_KEY,
+            uuid=course_uuid
+        )
+        data = get_edx_api_data(
             catalog_integration,
             'courses',
             resource_id=course_uuid,
-            api_client=get_catalog_api_client(user),
-            base_api_url=get_catalog_api_base_url(),
+            api=api,
             cache_key=cache_key if catalog_integration.is_cache_enabled else None,
             long_term_cache=True,
             many=False
         )
         return data.get('owners', [])
-
-    return []
+    else:
+        return []
 
 
 def get_course_uuid_for_course(course_run_key):
@@ -497,17 +479,18 @@ def get_course_uuid_for_course(course_run_key):
     """
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course UUID')
     if user:
-        api_client = get_catalog_api_client(user)
-        base_api_url = get_catalog_api_base_url()
+        api = create_catalog_api_client(user)
 
-        run_cache_key = f"{catalog_integration.CACHE_KEY}.course_run.{course_run_key}"
+        run_cache_key = '{base}.course_run.{course_run_key}'.format(
+            base=catalog_integration.CACHE_KEY,
+            course_run_key=course_run_key
+        )
 
-        course_run_data = get_api_data(
+        course_run_data = get_edx_api_data(
             catalog_integration,
             'course_runs',
             resource_id=str(course_run_key),
-            api_client=api_client,
-            base_api_url=base_api_url,
+            api=api,
             cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
             long_term_cache=True,
             many=False,
@@ -516,14 +499,16 @@ def get_course_uuid_for_course(course_run_key):
         course_key_str = course_run_data.get('course', None)
 
         if course_key_str:
-            run_cache_key = f"{catalog_integration.CACHE_KEY}.course.{course_key_str}"
+            run_cache_key = '{base}.course.{course_key}'.format(
+                base=catalog_integration.CACHE_KEY,
+                course_key=course_key_str
+            )
 
-            data = get_api_data(
+            data = get_edx_api_data(
                 catalog_integration,
                 'courses',
                 resource_id=course_key_str,
-                api_client=api_client,
-                base_api_url=base_api_url,
+                api=api,
                 cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
                 long_term_cache=True,
                 many=False,
@@ -613,16 +598,12 @@ def get_course_run_details(course_run_key, fields):
         error_message_field=f'Data for course_run {course_run_key}'
     )
     if user:
+        api = create_catalog_api_client(user)
+
         cache_key = f'{catalog_integration.CACHE_KEY}.course_runs'
 
-        course_run_details = get_api_data(
-            catalog_integration,
-            'course_runs',
-            api_client=get_catalog_api_client(user),
-            base_api_url=get_catalog_api_base_url(),
-            resource_id=course_run_key,
-            cache_key=cache_key, many=False, traverse_pagination=False, fields=fields
-        )
+        course_run_details = get_edx_api_data(catalog_integration, 'course_runs', api, resource_id=course_run_key,
+                                              cache_key=cache_key, many=False, traverse_pagination=False, fields=fields)
     return course_run_details
 
 

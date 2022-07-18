@@ -19,6 +19,7 @@ from .production import *  # pylint: disable=wildcard-import, unused-wildcard-im
 
 # Don't use S3 in devstack, fall back to filesystem
 del DEFAULT_FILE_STORAGE
+MEDIA_ROOT = "/edx/var/edxapp/uploads"
 ORA2_FILEUPLOAD_BACKEND = 'django'
 
 
@@ -198,7 +199,7 @@ FEATURES['ENABLE_COURSE_DISCOVERY'] = False
 # Setting for overriding default filtering facets for Course discovery
 # COURSE_DISCOVERY_FILTERS = ["org", "language", "modes"]
 FEATURES['COURSES_ARE_BROWSEABLE'] = True
-HOMEPAGE_COURSE_MAX = 9
+HOMEPAGE_COURSE_MAX = 5
 
 # Software secure fake page feature flag
 FEATURES['ENABLE_SOFTWARE_SECURE_FAKE'] = True
@@ -335,7 +336,6 @@ EDXNOTES_CLIENT_NAME = 'edx_notes_api-backend-service'
 ############## Settings for Microfrontends  #########################
 LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
 ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
-COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
 
@@ -389,8 +389,6 @@ MKTG_URLS = {
 }
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
-
-ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://edx.devstack.lms:18000/oauth2"
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
@@ -446,10 +444,6 @@ PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
-
-#################### Network configuration ####################
-# Devstack is directly exposed to the caller
-CLOSEST_CLIENT_IP_FROM_HEADERS = []
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

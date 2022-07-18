@@ -41,7 +41,10 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
-from lms.djangoapps.courseware.toggles import course_exit_page_is_active
+from lms.djangoapps.courseware.toggles import (
+    courseware_legacy_is_visible,
+    course_exit_page_is_active,
+)
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -91,6 +94,10 @@ class CoursewareMeta:
         self.request.user = self.effective_user
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
+        self.can_view_legacy_courseware = courseware_legacy_is_visible(
+            course_key=course_key,
+            is_global_staff=self.original_user_is_global_staff,
+        )
 
     def __getattr__(self, name):
         return getattr(self.overview, name)
@@ -440,6 +447,8 @@ class CoursewareInformation(RetrieveAPIView):
             * `"empty"`: no start date is specified
         * pacing: Course pacing. Possible values: instructor, self
         * user_timezone: User's chosen timezone setting (or null for browser default)
+        * can_load_course: Whether the user can view the course (AccessResponse object)
+        * can_view_legacy_courseware: Indicates whether the user is able to see the legacy courseware view
         * user_has_passing_grade: Whether or not the effective user's grade is equal to or above the courses minimum
             passing grade
         * course_exit_page_is_active: Flag for the learning mfe on whether or not the course exit page should display

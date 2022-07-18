@@ -89,6 +89,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.utils import username_suffix_generator
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
+from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from common.djangoapps.third_party_auth.utils import (
     get_associated_user_by_email_response,
@@ -756,7 +757,7 @@ def associate_by_email_if_oauth(auth_entry, backend, details, user, strategy, *a
     `ENABLE_REQUIRE_THIRD_PARTY_AUTH` is enabled.
     """
 
-    if is_oauth_provider(backend.name, **kwargs):
+    if is_require_third_party_auth_enabled() and is_oauth_provider(backend.name, **kwargs):
         association_response, user_is_active = get_associated_user_by_email_response(
             backend, details, user, *args, **kwargs)
 
@@ -1038,5 +1039,5 @@ def ensure_redirect_url_is_safe(strategy, *args, **kwargs):
         )
 
         if not is_safe:
-            safe_redirect_url = getattr(settings, 'SOCIAL_AUTH_LOGIN_REDIRECT_URL', '/dashboard')
+            safe_redirect_url = getattr(settings, 'SOCIAL_AUTH_LOGIN_REDIRECT_URL', '/courses')
             strategy.session_set(REDIRECT_FIELD_NAME, safe_redirect_url)

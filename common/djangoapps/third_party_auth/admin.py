@@ -108,12 +108,8 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """ Do we have cached metadata for this SAML provider? """
         if not inst.is_active:
             return None  # N/A
-        records = SAMLProviderData.objects.filter(entity_id=inst.entity_id)
-        for record in records:
-            if record.is_valid():
-                return True
-        return False
-
+        data = SAMLProviderData.current(inst.entity_id)
+        return bool(data and data.is_valid())
     has_data.short_description = 'Metadata Ready'
     has_data.boolean = True
 

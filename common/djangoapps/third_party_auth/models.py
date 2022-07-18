@@ -223,14 +223,6 @@ class ProviderConfig(ConfigurationModel):
         )
     )
 
-    was_valid_at = models.DateTimeField(
-        blank=True,
-        null=True,
-        help_text=(
-            "Timestamped field that indicates a user has successfully logged in using this configuration at least once."
-        )
-    )
-
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
     accepts_logins = True  # Whether to display a sign-in button when the provider is enabled
@@ -708,6 +700,14 @@ class SAMLProviderConfig(ProviderConfig):
         blank=True,
     )
 
+    was_valid_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text=(
+            "Timestamped field that indicates a user has successfully logged in using this configuration at least once."
+        )
+    )
+
     def clean(self):
         """ Standardize and validate fields """
         super().clean()
@@ -784,23 +784,16 @@ class SAMLProviderConfig(ProviderConfig):
             conf['attr_defaults'][field] = default
 
         # Now get the data fetched automatically from the metadata.xml:
-        data_records = SAMLProviderData.objects.filter(entity_id=self.entity_id)
-        public_keys = []
-        for record in data_records:
-            if record.is_valid():
-                public_keys.append(record.public_key)
-                sso_url = record.sso_url
-        if not public_keys:
+        data = SAMLProviderData.current(self.entity_id)
+        if not data or not data.is_valid():
             log.error(
                 'No SAMLProviderData found for provider "%s" with entity id "%s" and IdP slug "%s". '
                 'Run "manage.py saml pull" to fix or debug.',
                 self.name, self.entity_id, self.slug
             )
             raise AuthNotConfigured(provider_name=self.name)
-
-        conf['x509certMulti'] = {'signing': public_keys}
-        conf['x509cert'] = ''
-        conf['url'] = sso_url
+        conf['x509cert'] = data.public_key
+        conf['url'] = data.sso_url
 
         # Add SAMLConfiguration appropriate for this IdP
         conf['saml_sp_configuration'] = (

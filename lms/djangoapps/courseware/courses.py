@@ -27,7 +27,6 @@ from lms.djangoapps.courseware.access_response import (
     AuthenticationRequiredAccessError,
     EnrollmentRequiredAccessError,
     MilestoneAccessError,
-    OldMongoAccessError,
     StartDateError,
 )
 from lms.djangoapps.courseware.date_summary import (
@@ -212,15 +211,6 @@ def check_course_access_with_redirect(course, user, action, check_if_enrolled=Fa
             raise CourseAccessRedirect('{dashboard_url}?{params}'.format(
                 dashboard_url=reverse('dashboard'),
                 params=params.urlencode()
-            ), access_response)
-
-        # Redirect if trying to access an Old Mongo course
-        if isinstance(access_response, OldMongoAccessError):
-            params = QueryDict(mutable=True)
-            params['access_response_error'] = access_response.user_message
-            raise CourseAccessRedirect('{dashboard_url}?{params}'.format(
-                dashboard_url=reverse('dashboard'),
-                params=params.urlencode(),
             ), access_response)
 
         # Redirect if the user must answer a survey before entering the course.
@@ -557,7 +547,6 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
     """
     if not user.id:
         return []
-
     store = modulestore()
     course_usage_key = store.make_course_usage_key(course_key)
     block_data = get_course_blocks(user, course_usage_key, allow_start_dates_in_future=True, include_completion=True)
@@ -659,6 +648,7 @@ def get_course_assignments(course_key, user, include_access=False):  # lint-amne
                             _("Open Response Assessment due dates are set by your instructor and can't be shifted."),
                             first_component_block_id,
                         ))
+
     return assignments
 
 

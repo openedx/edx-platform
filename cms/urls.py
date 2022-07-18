@@ -10,7 +10,8 @@ from django.urls import path, re_path
 from django.utils.translation import gettext_lazy as _
 from auth_backends.urls import oauth2_urlpatterns
 from edx_api_doc_tools import make_docs_urls
-from django.contrib import admin
+from ratelimitbackend import admin
+# from django.contrib import admin
 
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
@@ -18,16 +19,14 @@ import openedx.core.djangoapps.lang_pref.views
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import views as contentstore_views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
-from cms.djangoapps.contentstore.views.live_class import LiveClassesApiListView ,CourseListView,UserCourseUnEnrollment, LiveClassesDeleteUpdateApiView , UserDetailsListApiView ,EnrollLiveClassCreateView,EnrollLiveClassUserDetailsView ,EnrollLiveClassUserDeleteApiView , UserCourseEnrollment ,EnrollCourseUserDetailsView , LoginStaffCourseDetailsList
-
+from cms.djangoapps.contentstore.views.live_class import (LiveClassesApiListView ,CourseListView,UserCourseUnEnrollment, UserAttendanceDetailsListApiView ,LiveClassesDeleteUpdateApiView , UserDetailsListApiView ,EnrollLiveClassCreateView,EnrollLiveClassUserDetailsView ,EnrollLiveClassUserDeleteApiView , UserCourseEnrollment ,EnrollCourseUserDetailsView , 
+LoginStaffCourseDetailsList, StaffNotifyCallRequestRetrieveDetails , StaffNotifyCallRequestListDetails , StudentUserDetailsListApiView , StudentListbyCourseDetailsList)
+from cms.djangoapps.contentstore.views.course import doc_upload_view, delete_doc, update_doc ,BadgeView ,PointsView # To Import
+from common.djangoapps.student.views.management import uploaded_doc_view, AnnouncementView  # To Import
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
-from cms.djangoapps.contentstore.views.course import doc_upload_view, delete_doc, update_doc # To Import
-from common.djangoapps.student.views.management import uploaded_doc_view
-
-
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
@@ -99,6 +98,12 @@ urlpatterns = oauth2_urlpatterns + [
     path('live_class/details/', LiveClassesApiListView.as_view(), name='user_live_class' ),
     path('live_class/<id>', LiveClassesDeleteUpdateApiView.as_view(), name='live_class_delete_update' ),
     path('accounts/details', UserDetailsListApiView.as_view(), name='all_user_details' ),
+    
+    path('all/student/user/accounts/details', StudentUserDetailsListApiView.as_view(), name='all_student_user_details' ),
+
+
+    path('all/users/attendance/details', UserAttendanceDetailsListApiView.as_view(), name='all_user_details' ),
+
     path('live_class/user/enrollment', EnrollLiveClassCreateView.as_view(), name='enroll_live_class_to_user' ),
 
     path('live_class/enroll/detail/<live_class_id>', EnrollLiveClassUserDetailsView.as_view(), name='live_class_user_details' ),
@@ -107,7 +112,14 @@ urlpatterns = oauth2_urlpatterns + [
     
     path('staff/course/detail/<edited_by_id>', LoginStaffCourseDetailsList.as_view(), name='live_class_user_details' ),
 
- path('home/courses/all/courses', CourseListView.as_view(), name="course-list"),
+    path('home/courses/all/courses', CourseListView.as_view(), name="course-list"),
+
+    path('staff/call/request/notify/details', StaffNotifyCallRequestListDetails.as_view(), name="staff_call_request_notify_details"),
+    path('staff/call/request/data/<id>', StaffNotifyCallRequestRetrieveDetails.as_view(), name="staff_call_request_notify_details"),
+
+
+
+
 
 
 
@@ -116,6 +128,32 @@ urlpatterns = oauth2_urlpatterns + [
     path('user/enrollment', UserCourseEnrollment.as_view() , name='user_course_enrollment'),
     path('user/course/unenrollment/<id>', UserCourseUnEnrollment.as_view() , name='user_course_enrollment'),
     
+    path('student_user/course/enroll/list', StudentListbyCourseDetailsList.as_view() , name='student_user_course_enroll_list'),
+
+    
+    
+    
+    path('upload_doc', doc_upload_view, name='upload_doc'),
+    path('update_doc', update_doc, name='update_doc'),
+    path('delete_doc/', delete_doc, name='view_doc'),
+
+
+
+    path("get_doc/", uploaded_doc_view, name='uploaded_doc_view'),
+
+    
+
+    path('get_badges/<str:active>/', BadgeView.as_view(), name='get_badges'),
+    path('create_badge/', BadgeView.as_view(), name='create_badge'),
+    path('update_badge/<int:badge_id>/', BadgeView.as_view(), name='update_badge'),
+    path('badge_status/<int:badge_id>/', BadgeView.as_view(), name='change_badge_status'),
+    path('add_coins/', PointsView.as_view(), name='add_points'),
+    path('get_coins/<str:course_id>/', PointsView.as_view(), name="get_points"),
+    path('announcement/', AnnouncementView.as_view(), name="generate_announcement"),
+    path('deactivate_announcement/<int:ann_id>/', AnnouncementView.as_view(), name='deactivate'),
+
+    
+
     
     path('signin_redirect_to_lms', contentstore_views.login_redirect_to_lms, name='login_redirect_to_lms'),
     path('request_course_creator', contentstore_views.request_course_creator, name='request_course_creator'),
@@ -210,11 +248,6 @@ urlpatterns = oauth2_urlpatterns + [
     path('api/val/v0/', include('edxval.urls')),
     path('api/tasks/v0/', include('user_tasks.urls')),
     path('accessibility', contentstore_views.accessibility, name='accessibility'),
-    path('upload_doc', doc_upload_view, name='upload_doc'),
-    path('update_doc', update_doc, name='update_doc'),
-    path('view_doc/', delete_doc, name='view_doc'),
-    path("get_doc/", uploaded_doc_view, name='uploaded_doc_view'),
-
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:

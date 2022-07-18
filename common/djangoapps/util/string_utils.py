@@ -20,7 +20,7 @@ def _has_non_ascii_characters(data_string):
     :param data_string: str or unicode object
     """
     try:
-        data_string.encode('ascii')
+        data_string.encode('utf8')
     except UnicodeEncodeError:
         return True
 

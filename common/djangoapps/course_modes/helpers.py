@@ -2,14 +2,16 @@
 
 
 import logging
-from urllib.parse import urljoin
-
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from requests.exceptions import RequestException
+from urllib.parse import urljoin  # lint-amnesty, pylint: disable=wrong-import-order
+
+from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
+from slumber.exceptions import SlumberBaseException
 
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
+from common.djangoapps.student.helpers import VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED  # lint-amnesty, pylint: disable=line-too-long
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
 DISPLAY_VERIFIED = "verified"
 DISPLAY_HONOR = "honor"
@@ -19,7 +21,7 @@ DISPLAY_PROFESSIONAL = "professional"
 LOGGER = logging.getLogger(__name__)
 
 
-def enrollment_mode_display(mode, course_id):
+def enrollment_mode_display(mode, verification_status, course_id):
     """ Select appropriate display strings and CSS classes.
 
         Uses mode and verification status to select appropriate display strings and CSS classes
@@ -36,13 +38,19 @@ def enrollment_mode_display(mode, course_id):
     image_alt = ''
     enrollment_title = ''
     enrollment_value = ''
-    display_mode = _enrollment_mode_display(mode, course_id)
+    display_mode = _enrollment_mode_display(mode, verification_status, course_id)
 
     if display_mode == DISPLAY_VERIFIED:
-        enrollment_title = _("You're enrolled as a verified student")
-        enrollment_value = _("Verified")
-        show_image = True
-        image_alt = _("ID Verified Ribbon/Badge")
+        if settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE') or verification_status == VERIFY_STATUS_APPROVED:
+            enrollment_title = _("You're enrolled as a verified student")
+            enrollment_value = _("Verified")
+            show_image = True
+            image_alt = _("ID Verified Ribbon/Badge")
+        elif verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
+            enrollment_title = _("Your verification is pending")
+            enrollment_value = _("Verified: Pending Verification")
+            show_image = True
+            image_alt = _("ID verification pending")
     elif display_mode == DISPLAY_HONOR:
         enrollment_title = _("You're enrolled as an honor code student")
         enrollment_value = _("Honor Code")
@@ -59,7 +67,7 @@ def enrollment_mode_display(mode, course_id):
     }
 
 
-def _enrollment_mode_display(enrollment_mode, course_id):
+def _enrollment_mode_display(enrollment_mode, verification_status, course_id):
     """Checking enrollment mode and status and returns the display mode
      Args:
         enrollment_mode (str): enrollment mode.
@@ -71,9 +79,15 @@ def _enrollment_mode_display(enrollment_mode, course_id):
     course_mode_slugs = [mode.slug for mode in CourseMode.modes_for_course(course_id)]
 
     if enrollment_mode == CourseMode.VERIFIED:
-        display_mode = DISPLAY_VERIFIED
-        if DISPLAY_HONOR in course_mode_slugs:
+        if (
+            settings.FEATURES.get('ENABLE_INTEGRITY_SIGNATURE')
+            or verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]
+        ):
+            display_mode = DISPLAY_VERIFIED
+        elif DISPLAY_HONOR in course_mode_slugs:
             display_mode = DISPLAY_HONOR
+        else:
+            display_mode = DISPLAY_AUDIT
     elif enrollment_mode in [CourseMode.PROFESSIONAL, CourseMode.NO_ID_PROFESSIONAL_MODE]:
         display_mode = DISPLAY_PROFESSIONAL
     else:
@@ -88,17 +102,11 @@ def get_course_final_price(user, sku, course_price):
     """
     price_details = {}
     try:
-        api_url = urljoin(f"{get_ecommerce_api_base_url()}/", "baskets/calculate/")
-        response = get_ecommerce_api_client(user).get(
-            api_url,
-            params={
-                "sku": [sku],
-                "username": user.username,
-            }
+        price_details = ecommerce_api_client(user).baskets.calculate.get(
+            sku=[sku],
+            username=user.username,
         )
-        response.raise_for_status()
-        price_details = response.json()
-    except RequestException as exc:
+    except (SlumberBaseException, ConnectionError, Timeout) as exc:
         LOGGER.info(
             '[e-commerce calculate endpoint] Exception raise for sku [%s] - user [%s] and exception: %s',
             sku,

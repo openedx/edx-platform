@@ -42,7 +42,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}" async></script>
 <script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}" async></script>
 
-<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="preload" type="text/css" as="style">
+<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="preload" type="text/css">
   ${HTML(fragment.head_html())}
 
 % if is_learning_mfe:
@@ -118,7 +118,7 @@ ${HTML(fragment.foot_html())}
   (function() {
     // If this view is rendered in an iframe within the learning microfrontend app
     // it will report the height of its contents to the parent window when the
-    // document loads, window resizes, or DOM resizes.
+    // document loads, window resizes, or DOM mutates.
     if (window !== window.parent) {
       document.body.className += ' view-in-mfe';
       var lastHeight = window.offsetHeight;
@@ -126,11 +126,12 @@ ${HTML(fragment.foot_html())}
       var contentElement = document.getElementById('content');
 
       function dispatchResizeMessage(event) {
-        // Note: event is actually an Array of ResizeObserverEntry objects when fired from the ResizeObserver
-        var isLoadEvent = event.type === 'load';
+        // Note: event is actually an Array of MutationRecord objects
+        // when fired from the MutationObserver
+        var eventType = event.type || 'mutate';
         var newHeight = contentElement.offsetHeight;
         var newWidth = contentElement.offsetWidth;
-        if (!isLoadEvent && newWidth === lastWidth && newHeight === lastHeight) {
+        if (eventType !== 'load' && newWidth === lastWidth && newHeight === lastHeight) {
             // Monitor when any anchor tag is clicked, it is checked to make sure
             // it is referencing an element's id or name (not an external website). If
             // the href attribute is an id or name, the location of the selected focus
@@ -189,8 +190,11 @@ ${HTML(fragment.foot_html())}
         window.scrollTo(0, 0);
       }
 
-      const observer = new ResizeObserver(dispatchResizeMessage);
-      observer.observe(document.body);
+      // Create an observer instance linked to the callback function
+      const observer = new MutationObserver(dispatchResizeMessage);
+
+      // Start observing the target node for configured mutations
+      observer.observe(document.body, { attributes: true, childList: true, subtree: true });
 
       window.addEventListener('load', dispatchResizeMessage);
       window.addEventListener('resize', dispatchResizeMessage);

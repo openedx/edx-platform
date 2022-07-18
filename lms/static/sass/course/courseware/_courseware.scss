@@ -635,17 +635,6 @@ html.video-fullscreen {
         border-bottom: 1px solid #ddd;
         margin-bottom: ($baseline*0.75);
         padding: 0 0 15px;
-
-        .problem-reset-btn-wrapper {
-          position: relative;
-          .problem-reset-btn {
-            &:hover,
-            &:focus,
-            &:active {
-              color: $primary;
-            }
-          }
-        }
       }
 
       .vert > .xblock-student_view.is-hidden,

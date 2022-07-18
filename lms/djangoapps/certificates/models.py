@@ -213,12 +213,11 @@ class GeneratedCertificate(models.Model):
         'masters',
         'executive-education',
         'paid-executive-education',
-        'paid-bootcamp',
     )
 
     VERIFIED_CERTS_MODES = [
         CourseMode.VERIFIED, CourseMode.CREDIT_MODE, CourseMode.MASTERS, CourseMode.EXECUTIVE_EDUCATION,
-        CourseMode.PAID_EXECUTIVE_EDUCATION, CourseMode.PAID_BOOTCAMP
+        CourseMode.PAID_EXECUTIVE_EDUCATION
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)

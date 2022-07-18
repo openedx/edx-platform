@@ -5,12 +5,10 @@ from django.core.exceptions import ValidationError
 from lti_consumer.api import get_lti_pii_sharing_state_for_course
 from lti_consumer.models import LtiConfiguration
 from rest_framework import serializers
-from xmodule.modulestore.django import modulestore
 
-from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_EMAIL_NOTIFICATIONS
-from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.courses import get_course_by_id
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from .models import DiscussionsConfiguration, Provider
 from .utils import available_division_schemes, get_divided_discussions
 
@@ -86,7 +84,6 @@ class LegacySettingsSerializer(serializers.BaseSerializer):
             'divided_course_wide_discussions',
             'divided_inline_discussions',
             'division_scheme',
-            'reported_content_email_notifications'
         ]
 
     def create(self, validated_data):
@@ -258,7 +255,6 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         # have already been set
         instance = self._update_lti(instance, validated_data)
         instance.save()
-        update_discussions_settings_from_course_task.delay(str(instance.context_key))
         return instance
 
     def _update_lti(
@@ -367,7 +363,6 @@ class DiscussionSettingsSerializer(serializers.Serializer):
         read_only=True,
     )
     always_divide_inline_discussions = serializers.BooleanField()
-    reported_content_email_notifications = serializers.BooleanField()
     division_scheme = serializers.CharField()
 
     def to_internal_value(self, data: dict) -> dict:
@@ -411,10 +406,7 @@ class DiscussionSettingsSerializer(serializers.Serializer):
             'divided_course_wide_discussions': divided_course_wide_discussions,
             'always_divide_inline_discussions': instance.always_divide_inline_discussions,
             'division_scheme': instance.division_scheme,
-            'available_division_schemes': available_division_schemes(course_key),
-            'reported_content_email_notifications': instance.reported_content_email_notifications,
-            'reported_content_email_notifications_flag':
-                ENABLE_REPORTED_CONTENT_EMAIL_NOTIFICATIONS.is_enabled(course_key),
+            'available_division_schemes': available_division_schemes(course_key)
         }
         return payload
 

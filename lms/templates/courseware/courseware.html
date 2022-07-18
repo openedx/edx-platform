@@ -22,9 +22,14 @@ from openedx.features.course_experience import course_home_page_title, DISABLE_C
    (course.enable_proctored_exams or course.enable_timed_exams)
    )
 
-   completion_aggregator_url = getattr(settings, "COMPLETION_AGGREGATOR_URL", "")
+   completion_aggregator_url = settings.COMPLETION_AGGREGATOR_URL if settings.FEATURES.get("SHOW_PROGRESS_BAR", False) else ""
 %>
 
+% if display_reset_dates_banner:
+    <script type="text/javascript">
+        $('.reset-deadlines-banner').css('display', 'flex');
+    </script>
+% endif
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
@@ -238,7 +243,7 @@ ${HTML(fragment.foot_html())}
                                 <span class="nav-item nav-item-sequence">${sequence_title}</span>
                             % endif
                         </div>
-                        % if settings.FEATURES.get("SHOW_PROGRESS_BAR", False) and completion_aggregator_url:
+                        % if settings.FEATURES.get("SHOW_PROGRESS_BAR", False):
                           <div class="container">
                             <iframe style="border: none; height: 50px; position: relative; top: 10px; width: -webkit-fill-available" src="${completion_aggregator_url}/${course.id}/">
                             </iframe>

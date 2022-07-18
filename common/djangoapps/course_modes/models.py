@@ -138,8 +138,6 @@ class CourseMode(models.Model):
     EXECUTIVE_EDUCATION = 'executive-education'
     PAID_EXECUTIVE_EDUCATION = 'paid-executive-education'
     UNPAID_EXECUTIVE_EDUCATION = 'unpaid-executive-education'
-    PAID_BOOTCAMP = 'paid-bootcamp'
-    UNPAID_BOOTCAMP = 'unpaid-bootcamp'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],
@@ -164,17 +162,15 @@ class CourseMode(models.Model):
         MASTERS,
         EXECUTIVE_EDUCATION,
         PAID_EXECUTIVE_EDUCATION,
-        UNPAID_EXECUTIVE_EDUCATION,
-        PAID_BOOTCAMP,
-        UNPAID_BOOTCAMP
+        UNPAID_EXECUTIVE_EDUCATION
     ]
 
     # Modes utilized for audit/free enrollments
-    AUDIT_MODES = [AUDIT, HONOR, UNPAID_EXECUTIVE_EDUCATION, UNPAID_BOOTCAMP]
+    AUDIT_MODES = [AUDIT, HONOR, UNPAID_EXECUTIVE_EDUCATION]
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = [
-        VERIFIED, PROFESSIONAL, MASTERS, EXECUTIVE_EDUCATION, PAID_EXECUTIVE_EDUCATION, PAID_BOOTCAMP
+        VERIFIED, PROFESSIONAL, MASTERS, EXECUTIVE_EDUCATION, PAID_EXECUTIVE_EDUCATION
     ]
 
     # Modes that allow a student to pursue a non-verified certificate
@@ -185,8 +181,7 @@ class CourseMode(models.Model):
 
     # Modes that are eligible to purchase credit
     CREDIT_ELIGIBLE_MODES = [
-        VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE, EXECUTIVE_EDUCATION, PAID_EXECUTIVE_EDUCATION,
-        PAID_BOOTCAMP
+        VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE, EXECUTIVE_EDUCATION, PAID_EXECUTIVE_EDUCATION
     ]
 
     # Modes for which certificates/programs may need to be updated
@@ -513,6 +508,7 @@ class CourseMode(models.Model):
         modes = cls.modes_for_course(course_id)
         for mode in modes:
             if (mode.currency.lower() == currency.lower()) and (mode.slug == 'verified'):
+                # log.info("____modes__________" , modes)
                 return mode.min_price
         return 0
 
@@ -838,6 +834,7 @@ def get_cosmetic_verified_display_price(course):
 
 
 def get_cosmetic_display_price(course):
+
     """
     Returns the course price as a string preceded by correct currency, or 'Free'.
     """
@@ -850,30 +847,38 @@ def get_course_prices(course, verified_only=False):
     registration_price is the minimum price for the course across all course modes.
     cosmetic_display_prices is the course price as a string preceded by correct currency, or 'Free'.
     """
+    # log.info("____Course_from_api______", course)
     # Find the
     if verified_only:
+        # log.info("____get__verified______", verified_only)
         registration_price = CourseMode.min_course_price_for_verified_for_currency(
             course.id,
             settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
         )
+        # log.info("____registration__Price1______",  registration_price, course.id , settings)
     else:
         registration_price = CourseMode.min_course_price_for_currency(
             course.id,
             settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
         )
+        # log.info("____registration__Price2______",  registration_price, course.id , settings)
 
     if registration_price > 0:
         price = registration_price
+        # log.info("____get__Price1______", price)
     # Handle course overview objects which have no cosmetic_display_price
     elif hasattr(course, 'cosmetic_display_price'):
         price = course.cosmetic_display_price
+        # log.info("____get__Price2______", price)
     else:
         price = None
+        # log.info("____get__Price3______", price)
+    
+    # log.info("____Price44______", price)
+    return registration_price, format_course_price(price) 
 
-    return registration_price, format_course_price(price)
 
-
-def format_course_price(price):
+def format_course_price(price ,verified_only=False):
     """
     Return a formatted price for a course (a string preceded by correct currency, or 'Free').
     """
@@ -887,6 +892,7 @@ def format_course_price(price):
         # Translators: This refers to the cost of the course. In this case, the course costs nothing so it is free.
         cosmetic_display_price = _('Free')
 
+    # log.info("____Price-cos-cosmetic______", cosmetic_display_price)
     return cosmetic_display_price
 
 

@@ -3,9 +3,9 @@
 Programmatic integration point for User API Accounts sub-application
 """
 
+import logging
 
 import datetime
-import re
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -48,6 +48,8 @@ if name_affirmation_installed:
 
 # Public access point for this function.
 visible_fields = _visible_fields
+log = logging.getLogger(__name__)
+
 
 
 @helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
@@ -84,6 +86,7 @@ def get_account_settings(request, usernames=None, configuration=None, view=None)
     usernames = usernames or [requesting_user.username]
 
     requested_users = User.objects.select_related('profile').filter(username__in=usernames)
+    
     if not requested_users:
         raise errors.UserNotFound()
 
@@ -94,13 +97,14 @@ def get_account_settings(request, usernames=None, configuration=None, view=None)
             admin_fields = settings.ACCOUNT_VISIBILITY_CONFIGURATION.get('admin_fields')
         else:
             admin_fields = None
+        
         serialized_users.append(UserReadOnlySerializer(
             user,
             configuration=configuration,
             custom_fields=admin_fields,
             context={'request': request}
         ).data)
-
+    #log.info('api_view of accounts' , serialized_users)
     return serialized_users
 
 
@@ -404,11 +408,7 @@ def get_name_validation_error(name):
     :return: Validation error message.
 
     """
-    if name:
-        regex = re.findall(r'https|http?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', name)
-        return _('Enter a valid name') if bool(regex) else ''
-    else:
-        return accounts.REQUIRED_FIELD_NAME_MSG
+    return '' if name else accounts.REQUIRED_FIELD_NAME_MSG
 
 
 def get_username_validation_error(username):
@@ -646,17 +646,12 @@ def _validate_password(password, username=None, email=None, reset_password_page=
     except ValidationError as validation_err:
         raise errors.AccountPasswordInvalid(' '.join(validation_err.messages))
 
-    if (
-        (settings.ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY and reset_password_page) or
-        (settings.ENABLE_AUTHN_REGISTER_HIBP_POLICY and not reset_password_page)
-    ):
+    # TODO: VAN-666 - Restrict this feature to reset password page for now until it is
+    #  enabled on account sign in and register.
+    if settings.ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY and reset_password_page:
         pwned_response = check_pwned_password(password)
         if pwned_response.get('vulnerability', 'no') == 'yes':
-            if (
-                reset_password_page or
-                pwned_response.get('frequency', 0) >= settings.HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
-            ):
-                raise errors.AccountPasswordInvalid(accounts.AUTHN_PASSWORD_COMPROMISED_MSG)
+            raise errors.AccountPasswordInvalid(accounts.AUTHN_PASSWORD_COMPROMISED_MSG)
 
 
 def _validate_country(country):

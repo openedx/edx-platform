@@ -70,6 +70,7 @@
           },
           "show_calculator": false,
           "original_user_is_staff": true,
+          "can_view_legacy_courseware": true,
           "is_staff": true,
           "course_access": {
             "has_access": true,
@@ -197,6 +198,9 @@
             "match": "type"
           },
           "$.body.original_user_is_staff": {
+            "match": "type"
+          },
+          "$.body.can_view_legacy_courseware": {
             "match": "type"
           },
           "$.body.is_staff": {
