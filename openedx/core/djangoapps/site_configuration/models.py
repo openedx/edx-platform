@@ -130,7 +130,7 @@ class SiteConfiguration(models.Model):
                     return self.api_adapter.get_value_of_type(self.api_adapter.TYPE_SETTING, name, default)
                 else:
                     beeline.add_context_field('value_source', 'django_model')
-                    return self.site_values.get(name, default)
+                    return self.site_values.get(name, default) if self.site_values else default
             except AttributeError as error:
                 logger.exception(u'Invalid JSON data. \n [%s]', error)
         else:
@@ -180,7 +180,7 @@ class SiteConfiguration(models.Model):
             return self.api_adapter.get_value_of_type(self.api_adapter.TYPE_ADMIN, name, default)
         else:
             beeline.add_context_field('setting_source', 'django_model')
-            return self.site_values.get(name, default)
+            return self.site_values.get(name, default) if self.site_values else default
 
     @beeline.traced('site_config.get_secret_value')
     def get_secret_value(self, name, default=None):
@@ -202,7 +202,7 @@ class SiteConfiguration(models.Model):
             return self.api_adapter.get_value_of_type(self.api_adapter.TYPE_SECRET, name, default)
         else:
             beeline.add_context_field('setting_source', 'django_model')
-            return self.site_values.get(name, default)
+            return self.site_values.get(name, default) if self.site_values else default
 
     @classmethod
     def get_configuration_for_org(cls, org, select_related=None):
