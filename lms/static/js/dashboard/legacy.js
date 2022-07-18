@@ -322,10 +322,37 @@
                 var asd = JSON.stringify(response);
                 alert(asd, typeof(asd), 'response');
                 var response_new = JSON.stringify(response);
+                var output = document.getElementById('output');
+                output.style.display = 'block';
                 for(var i=0; i<response_new.results.length; i++){
                     var live_response = response_new.results[i]['live_class'];
-                    if(live_response != undefined && live_response != null){
+                    if(live_response == undefined || live_response == null){
                         alert('in if');
+                        var parent = document.createElement("div");
+                        parent.classList.add('d-flex', 'justify-content-between', 'align-items-center');
+                        parent.setAttribute("style", "background: #fff; box-shadow: 0 2px 7px 0 rgb(0, 0, 0,.8%); overflow: hidden; border-radius: 8px; margin-bottom: 24px");
+                        parent.setAttribute("style", "background: #fff; box-shadow: 0 2px 7px 0 rgb(0, 0, 0,.8%); overflow: hidden; border-radius: 8px; margin-bottom: 24px");
+                        var image = document.createElement("img");
+                        image.setAttribute('src', 'http://via.placeholder.com/220x120');
+                        var ele = document.createElement("div");
+                        ele.setAttribute("style", "font-size: 1.2em; font-weight: 900; color:#000;");
+                        ele.setAttribute("id","timedrpact"+i);
+                        ele.setAttribute("class","inner");
+                        ele.appendChild(image);
+                        var span = document.createElement("span");
+                        span.innerText = live_response.topic_name;
+                        span.style.marginLeft = '40px';
+                        ele.appendChild(span);
+                        parent.appendChild(ele);
+                        var meet_link= document.createElement("a");
+                        meet_link.setAttribute("id","meet_link_"+i);
+                        meet_link.setAttribute("class","button inner-link");
+                        meet_link.setAttribute("href",live_response.meeting_link);
+                        meet_link.setAttribute("target",'_blank');
+                        meet_link.setAttribute("style", "font-size: 18px; margin-right: 20px; box-shadow: 0px 5px 0px #ee6100; border: none; color:#fff; background: #ff7f27; border-radius: 12px; padding: 12px 20px; background-image: none; text-shadow: 0 0");
+                        meet_link.innerHTML='Join Class';
+                        parent.appendChild(meet_link);
+                        output.appendChild(parent);
                     }
                 }
 
