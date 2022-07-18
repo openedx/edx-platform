@@ -310,21 +310,33 @@
          });
      };
 
-      $(document).ready(function(){
-    if($('#live_classes_list').is(':visible')){
+     $(document).ready(function(){
+    if($("#live_classes_list").is(":visible")){
         $.ajax({
             url:  '/api/enrollment/v1/enrollment/live_class/enroll',
             type: 'GET',
             data: $(this).serializeArray(),
-            success: function(response){
-                alert("On Success");
-                alert(response);
-                alert(JSON.parse(response));
-            }
+            success: function((response)){
+                alert(response.status);
+                if (response.status == 200){
+                    var output = document.getElementById('output');
+
+                output.style.display = 'block';
+                var response_new = JSON.parse(JSON.stringify(response.results));
+                alert(JSON.parse(JSON.stringify(response)));
+                alert(response_new);
+
+                for(let i=0; i<response_new.length; i++){
+                    var live_response = response_new[i]['live_class'];
+                    if(live_response != undefined && live_response != null){
+                        alert('in if')
+                    }
+                }
+                };
+              }
         });
     }
     });
-
 
  }(jQuery, gettext, Logger, accessible_modal, interpolate));
 
