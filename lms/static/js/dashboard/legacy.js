@@ -318,7 +318,7 @@
             headers: new Headers({'Content-Type':'application/json'}),
             data: $(this).serializeArray(),
             success: function(response){
-                alert(response.status),'status';
+                alert(response.status,'status');
                 var asd = JSON.stringify(response);
                 alert(asd, typeof(asd), 'response');
                 var response_new = JSON.stringify(response);
