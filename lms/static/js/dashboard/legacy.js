@@ -311,7 +311,7 @@
      };
 
       $(document).ready(function () {
-      if($("#live_classes_list").is("visible")){
+      if($("#live_classes_list").is(":visible")){
         alert('LIve class id visible');
       };
       });
