@@ -310,7 +310,7 @@
          });
      };
 
-     $$(document).ready(function(){
+     $(document).ready(function(){
     if($("#live_classes_list").is(":visible")){
         $.ajax({
             url:  '/api/enrollment/v1/enrollment/live_class/enroll',
@@ -321,8 +321,8 @@
                 alert(JSON.parse(JSON.stringify(response)));
                 if (response.status == 200){
                 var response_new = JSON.parse(JSON.stringify(response));
-                alert(JSON.parse(JSON.stringify(response)));
-                alert(response_new);
+                alert(JSON.parse(JSON.stringify(response)))
+                alert(response_new)
 
                 for(var i=0; i<response_new.results.length; i++){
                     var live_response = response_new.results[i]['live_class'];
