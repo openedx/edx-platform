@@ -310,14 +310,15 @@
          });
      };
 
-     $(document).ready(function(){
+     $$(document).ready(function(){
     if($("#live_classes_list").is(":visible")){
         $.ajax({
             url:  '/api/enrollment/v1/enrollment/live_class/enroll',
             type: 'GET',
             data: $(this).serializeArray(),
-            success: function((response)){
+            success: function(response){
                 alert(response.status);
+                alert(JSON.parse(JSON.stringify(response)));
                 if (response.status == 200){
                     var output = document.getElementById('output');
                 var response_new = JSON.parse(JSON.stringify(response));
