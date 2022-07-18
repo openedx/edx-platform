@@ -311,7 +311,7 @@
      };
 
       $(document).ready(function(){
-        if($("#live_classes_list").is(":visible")){
+    if($("#live_classes_list").is(":visible")){
         $.ajax({
             url:  '/api/enrollment/v1/enrollment/live_class/enroll',
             type: 'GET',
@@ -319,15 +319,15 @@
             success: function(response){
                 var output = document.getElementById('output');
                 output.style.display = 'block';
-                var response = JSON.parse(JSON.stringify(response.results));
-                for(let i=0; i<response.length; i++){
-                    live_response = response[i]['live_class']
+                var response_new = JSON.parse(JSON.stringify(response.results));
+                for(let i=0; i<response_new.length; i++){
+                    live_response = response_new[i]['live_class'];
                     if(live_response != undefined && live_response != null){
                         var parent = document.createElement("div");
-                        parent.classList.add('d-flex', 'justify-content-between', 'align-items-center')
+                        parent.classList.add('d-flex', 'justify-content-between', 'align-items-center');
                          parent.setAttribute("style", "background: #fff; box-shadow: 0 2px 7px 0 rgb(0, 0, 0,.8%); overflow: hidden; border-radius: 8px; margin-bottom: 24px");
                          var image = document.createElement("img");
-                          image.setAttribute('src', 'http://via.placeholder.com/220x120')
+                          image.setAttribute('src', 'http://via.placeholder.com/220x120');
                           var ele = document.createElement("div");
                         ele.setAttribute(
                                   "style", "font-size: 1.2em; font-weight: 900; color:#000;");
@@ -335,14 +335,14 @@
                         ele.setAttribute("class","inner");
                         ele.appendChild(image);
                         const span = document.createElement("span");
-                        span.innerText = response[i]['live_class']["topic_name"];
+                        span.innerText = response_new[i]['live_class']["topic_name"];
                         span.style.marginLeft = '40px';
                         ele.appendChild(span);
                         parent.appendChild(ele);
                         var ele1= document.createElement("a");
                         ele1.setAttribute("id","timedrpact1"+i);
                         ele1.setAttribute("class","button inner-link");
-                        ele1.setAttribute("href",response[i]['live_class']["meeting_link"]);
+                        ele1.setAttribute("href",response_new[i]['live_class']["meeting_link"]);
                         ele1.setAttribute("target",'_black');
                         ele1.setAttribute(
                                   "style", "font-size: 18px; margin-right: 20px; box-shadow: 0px 5px 0px #ee6100; border: none; color:#fff; background: #ff7f27; border-radius: 12px; padding: 12px 20px; background-image: none; text-shadow: 0 0");
@@ -350,12 +350,12 @@
                         parent.appendChild(ele1);
                         output.appendChild(parent);
 
-                    };
+                    }
 
-                };
+                }
             }
         });
-    };
+    }
     });
 
 
