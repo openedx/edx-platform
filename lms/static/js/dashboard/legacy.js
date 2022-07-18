@@ -318,7 +318,7 @@
             data: $(this).serializeArray(),
             success: function(response){
                 alert(response.status);
-                alert(JSON.parse(JSON.stringify(response)));
+                alert(JSON.stringify(response));
                 if (response.status == 200){
                 var response_new = JSON.parse(JSON.stringify(response));
                 alert(JSON.parse(JSON.stringify(response)))
