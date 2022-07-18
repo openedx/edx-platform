@@ -321,7 +321,7 @@
                 output.style.display = 'block';
                 var response_new = JSON.parse(JSON.stringify(response.results));
                 for(let i=0; i<response_new.length; i++){
-                    live_response = response_new[i]['live_class'];
+                    var live_response = response_new[i]['live_class'];
                     if(live_response != undefined && live_response != null){
                         var parent = document.createElement("div");
                         parent.classList.add('d-flex', 'justify-content-between', 'align-items-center');
