@@ -311,13 +311,14 @@
      };
 
       $(document).ready(function(){
-    if($("#live_classes_list").is(":visible")){
+    if($('#live_classes_list').is(':visible')){
         $.ajax({
             url:  '/api/enrollment/v1/enrollment/live_class/enroll',
             type: 'GET',
             data: $(this).serializeArray(),
             success: function(response){
                 alert("On Success");
+                alert(response);
                 alert(JSON.parse(response));
             }
         });
