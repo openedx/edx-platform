@@ -310,10 +310,12 @@
          });
      };
 
-
- }(jQuery, gettext, Logger, accessible_modal, interpolate));
- $(document).ready(function () {
+      $(document).ready(function () {
       if($("#live_classes_list").is("visible")){
         alert('LIve class id visible');
       };
       });
+
+
+ }(jQuery, gettext, Logger, accessible_modal, interpolate));
+
