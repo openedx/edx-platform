@@ -319,19 +319,15 @@
             data: $(this).serializeArray(),
             success: function(response){
                 alert(response.status),'status';
-                alert(JSON.stringify(response), 'response');
-                if (response.status == 200){
-                var response_new = JSON.parse(JSON.stringify(response));
-                alert(JSON.parse(JSON.stringify(response)));
-                alert(response_new);
-
+                var asd = JSON.stringify(response);
+                alert(asd, typeof(asd), 'response');
                 for(var i=0; i<response_new.results.length; i++){
                     var live_response = response_new.results[i]['live_class'];
                     if(live_response != undefined && live_response != null){
                         alert('in if');
                     }
                 }
-                }
+
               }
         });
     }
