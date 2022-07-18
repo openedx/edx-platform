@@ -315,14 +315,15 @@
         $.ajax({
             url:  '/api/enrollment/v1/enrollment/live_class/enroll',
             type: 'GET',
+            headers: new Headers({'Content-Type':'application/json'}),
             data: $(this).serializeArray(),
             success: function(response){
-                alert(response.status);
-                alert(JSON.stringify(response));
+                alert(response.status),'status';
+                alert(JSON.stringify(response), 'response');
                 if (response.status == 200){
                 var response_new = JSON.parse(JSON.stringify(response));
-                alert(JSON.parse(JSON.stringify(response)))
-                alert(response_new)
+                alert(JSON.parse(JSON.stringify(response)));
+                alert(response_new);
 
                 for(var i=0; i<response_new.results.length; i++){
                     var live_response = response_new.results[i]['live_class'];
