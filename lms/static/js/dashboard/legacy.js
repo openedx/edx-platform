@@ -321,6 +321,7 @@
                 alert(response.status),'status';
                 var asd = JSON.stringify(response);
                 alert(asd, typeof(asd), 'response');
+                var response_new = JSON.stringify(response);
                 for(var i=0; i<response_new.results.length; i++){
                     var live_response = response_new.results[i]['live_class'];
                     if(live_response != undefined && live_response != null){
