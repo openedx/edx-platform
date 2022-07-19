@@ -16,6 +16,9 @@ from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_red
 from third_party_auth import pipeline as tpa_pipeline
 
 
+from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
+
+
 class LogoutView(TemplateView):
     """
     Logs out user and redirects.
@@ -65,7 +68,9 @@ class LogoutView(TemplateView):
             dot_client_id=self.request.GET.get('client_id'),
             require_https=self.request.is_secure(),
         )
-        return target_url if use_target_url else self.default_target
+
+        tahoe_idp_redirect_url = tahoe_idp_helpers.get_idp_logout_url()
+        return target_url if use_target_url else (tahoe_idp_redirect_url or self.default_target)
 
     def dispatch(self, request, *args, **kwargs):
         # We do not log here, because we have a handler registered to perform logging on successful logouts.

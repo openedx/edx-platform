@@ -22,7 +22,7 @@ https://github.com/edx-solutions/xblock-google-drive/archive/589d9f51f9b.tar.gz 
 django-tiers==0.2.7
 fusionauth-client==1.36.0
 google-cloud-storage==1.32.0
-tahoe-idp==1.2.4
+tahoe-idp==1.2.5
 tahoe-sites==0.1.6
 tahoe-lti==0.3.0
 site-configuration-client==0.1.12
