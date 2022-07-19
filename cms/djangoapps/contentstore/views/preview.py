@@ -315,6 +315,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_reorderable': is_reorderable,
             'is_loading': context.get('is_loading', False),
             'is_selected': context.get('is_selected', False),
+            'is_sourced_block': context.get('is_sourced_block', False),
             'selectable': context.get('selectable', False),
             'can_collapse': context.get('can_collapse', False),
             'can_edit': context.get('can_edit', True),
