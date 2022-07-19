@@ -6,7 +6,15 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.paginator import Paginator
 from django.db.models.functions import Length
 
+from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
+from openedx.core.djangoapps.django_comment_common.models import (
+    Role,
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+)
 
 
 def discussion_open_for_user(course, user):
@@ -80,3 +88,39 @@ def add_stats_for_users_with_no_discussion_content(course_stats, users_in_course
         })
     updated_course_stats = sorted(updated_course_stats, key=lambda d: len(d['username']))
     return updated_course_stats
+
+
+def get_course_staff_users_list(course_id):
+    """
+    Gets user ids for Staff roles for course discussions.
+    Roles include Discussion Administrator, Discussion Moderator, Course Instructor and Course Staff.
+    """
+    # TODO: cache staff_user_ids if we need to improve perf
+    staff_user_ids = [
+        user.id
+        for role in Role.objects.filter(
+            name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR],
+            course_id=course_id
+        )
+        for user in role.users.all()
+    ]
+    staff = list(CourseStaffRole(course_id).users_with_role().values_list('id', flat=True))
+    admins = list(CourseInstructorRole(course_id).users_with_role().values_list('id', flat=True))
+    staff_user_ids.extend(staff)
+    staff_user_ids.extend(admins)
+    return set(staff_user_ids)
+
+
+def get_course_ta_users_list(course_id):
+    """
+    Gets user ids for TA roles for course discussions.
+    Roles include Community TA and Group Community TA.
+    """
+    # TODO: cache ta_user_ids if we need to improve perf
+    ta_user_ids = {
+        user.id
+        for role in Role.objects.filter(name__in=[FORUM_ROLE_COMMUNITY_TA,
+                                                  FORUM_ROLE_GROUP_MODERATOR], course_id=course_id)
+        for user in role.users.all()
+    }
+    return ta_user_ids
