@@ -812,7 +812,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==4.2.1
+lti-consumer-xblock==4.3.0
     # via -r requirements/edx/base.txt
 lxml==4.9.0
     # via
