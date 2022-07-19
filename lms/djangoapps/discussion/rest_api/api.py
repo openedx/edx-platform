@@ -1626,7 +1626,7 @@ def get_course_discussion_user_stats(
 
     """
     course_key = CourseKey.from_string(course_key_str)
-    is_privileged = has_discussion_privileges(user=request.user, course_id=course_key)
+    is_privileged = has_discussion_privileges(user=request.user, course_id=course_key) or request.user.is_staff
     if is_privileged:
         order_by = order_by or UserOrdering.BY_FLAGS
     else:
