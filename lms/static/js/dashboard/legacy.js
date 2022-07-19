@@ -320,7 +320,7 @@
             success: function(response){
                 alert(response.status,'status');
                 var asd = JSON.stringify(response);
-                alert(asd, typeof(asd), 'response');
+                alert(asd, typeof(asd), 'my-response');
                 var response_new = JSON.stringify(response);
                 var output = document.getElementById('output');
                 output.style.display = 'block';
