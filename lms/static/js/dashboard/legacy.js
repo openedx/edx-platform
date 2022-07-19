@@ -318,16 +318,13 @@
             headers: new Headers({'Content-Type':'application/json'}),
             data: $(this).serializeArray(),
             success: function(response){
-                alert(response.status,'status');
                 var asd = JSON.stringify(response);
-                alert(asd, typeof(asd), 'my-response');
                 var response_new = JSON.stringify(response);
                 var output = document.getElementById('output');
                 output.style.display = 'block';
                 for(var i=0; i<response_new.results.length; i++){
                     var live_response = response_new.results[i]['live_class'];
                     if(live_response == undefined || live_response == null){
-                        alert('in if');
                         var parent = document.createElement("div");
                         parent.classList.add('d-flex', 'justify-content-between', 'align-items-center');
                         parent.setAttribute("style", "background: #fff; box-shadow: 0 2px 7px 0 rgb(0, 0, 0,.8%); overflow: hidden; border-radius: 8px; margin-bottom: 24px");
