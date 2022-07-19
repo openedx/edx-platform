@@ -13,6 +13,7 @@ from lazy import lazy
 from openedx.core.lib.grade_utils import round_away_from_zero
 from xmodule import block_metadata_utils  # lint-amnesty, pylint: disable=wrong-import-order
 
+from .config import assume_zero_if_absent
 from .scores import compute_percent
 from .subsection_grade import ZeroSubsectionGrade
 from .subsection_grade_factory import SubsectionGradeFactory
@@ -293,7 +294,14 @@ class CourseGrade(CourseGradeBase):
         Returns whether any of the subsections in this course
         have been attempted by the student.
         """
-        return True
+        if assume_zero_if_absent(self.course_data.course_key):
+            return True
+
+        for chapter in self.chapter_grades.values():
+            for subsection_grade in chapter['sections']:
+                if subsection_grade.all_total.first_attempted:
+                    return True
+        return False
 
     def _get_subsection_grade(self, subsection, force_update_subsections=False):
         if self.force_update_subsections:

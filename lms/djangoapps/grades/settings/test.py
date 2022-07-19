@@ -1,3 +1,4 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 def plugin_settings(settings):
-    pass  # amnesty, pylint: disable=unnecessary-pass
+    settings.FEATURES['PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS'] = True
+    settings.FEATURES['ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS'] = True
