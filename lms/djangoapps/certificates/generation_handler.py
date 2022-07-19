@@ -62,7 +62,7 @@ def generate_allowlist_certificate_task(user, course_key, generation_mode=None,
     Create a task to generate an allowlist certificate for this user in this course run.
     """
     enrollment_mode = _get_enrollment_mode(user, course_key)
-    course_grade = _get_course_grade(user, course_key)
+    course_grade = _get_course_grade(user, course_key, send_course_grade_signals=False)
     if _can_generate_allowlist_certificate(user, course_key, enrollment_mode):
         try:
             return _generate_certificate_task(
@@ -91,7 +91,7 @@ def _generate_regular_certificate_task(user, course_key, generation_mode=None, d
     eligible and a certificate can be generated.
     """
     enrollment_mode = _get_enrollment_mode(user, course_key)
-    course_grade = _get_course_grade(user, course_key)
+    course_grade = _get_course_grade(user, course_key, send_course_grade_signals=False)
     if _can_generate_regular_certificate(user, course_key, enrollment_mode, course_grade):
         return _generate_certificate_task(user=user, course_key=course_key, enrollment_mode=enrollment_mode,
                                           course_grade=course_grade, generation_mode=generation_mode,
@@ -411,11 +411,14 @@ def _get_grade_value(course_grade):
     return ''
 
 
-def _get_course_grade(user, course_key):
+def _get_course_grade(user, course_key, send_course_grade_signals=True):
     """
     Get the user's course grade in this course run. Note that this may be None.
+
+    Use send_course_grade_signals=False to avoid firing the course grade signals recursively.
+    See details in lms/djangoapps/grades/course_grade_factory.py _update method.
     """
-    return CourseGradeFactory().read(user, course_key=course_key)
+    return CourseGradeFactory().read(user, course_key=course_key, send_course_grade_signals=send_course_grade_signals)
 
 
 def _get_enrollment_mode(user, course_key):

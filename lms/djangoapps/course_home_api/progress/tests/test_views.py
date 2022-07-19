@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import dateutil
 import ddt
+from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -20,9 +21,9 @@ from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.models import DisableProgressPageStackedConfig
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND_PROGRESS_TAB
 from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.models import (
-    PersistentCourseGrade,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride
 )
@@ -192,54 +193,48 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert not gated_score['learner_has_access']
         assert ungated_score['learner_has_access']
 
+    @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     def test_override_is_visible(self):
-        chapter = ItemFactory(parent=self.course, category='chapter')
-        subsection = ItemFactory.create(parent=chapter, category="sequential", display_name="Subsection")
+        with persistent_grades_feature_flags(global_flag=True):
+            chapter = ItemFactory(parent=self.course, category='chapter')
+            subsection = ItemFactory.create(parent=chapter, category="sequential", display_name="Subsection")
 
-        CourseEnrollment.enroll(self.user, self.course.id)
-        course_grade_params = {
-            "user_id": self.user.id,
-            "course_id": self.course.id,
-            "percent_grade": 77.7,
-            "letter_grade": "pass",
-            "passed": True,
-        }
-        PersistentCourseGrade.update_or_create(**course_grade_params)
+            CourseEnrollment.enroll(self.user, self.course.id)
 
-        params = {
-            "user_id": self.user.id,
-            "usage_key": subsection.location,
-            "course_version": self.course.course_version,
-            "subtree_edited_timestamp": "2016-08-01 18:53:24.354741Z",
-            "earned_all": 6.0,
-            "possible_all": 12.0,
-            "earned_graded": 6.0,
-            "possible_graded": 8.0,
-            "visible_blocks": [],
-            "first_attempted": datetime.now(),
-        }
+            params = {
+                "user_id": self.user.id,
+                "usage_key": subsection.location,
+                "course_version": self.course.course_version,
+                "subtree_edited_timestamp": "2016-08-01 18:53:24.354741Z",
+                "earned_all": 6.0,
+                "possible_all": 12.0,
+                "earned_graded": 6.0,
+                "possible_graded": 8.0,
+                "visible_blocks": [],
+                "first_attempted": datetime.now(),
+            }
 
-        created_grade = PersistentSubsectionGrade.update_or_create_grade(**params)
-        proctoring_failure_comment = "Failed Test Proctoring"
-        PersistentSubsectionGradeOverride.update_or_create_override(
-            requesting_user=self.staff_user,
-            subsection_grade_model=created_grade,
-            earned_all_override=0.0,
-            earned_graded_override=0.0,
-            system=GradeOverrideFeatureEnum.proctoring,
-            feature=GradeOverrideFeatureEnum.proctoring,
-            comment=proctoring_failure_comment
-        )
+            created_grade = PersistentSubsectionGrade.update_or_create_grade(**params)
+            proctoring_failure_comment = "Failed Test Proctoring"
+            PersistentSubsectionGradeOverride.update_or_create_override(
+                requesting_user=self.staff_user,
+                subsection_grade_model=created_grade,
+                earned_all_override=0.0,
+                earned_graded_override=0.0,
+                system=GradeOverrideFeatureEnum.proctoring,
+                feature=GradeOverrideFeatureEnum.proctoring,
+                comment=proctoring_failure_comment
+            )
 
-        response = self.client.get(self.url)
-        assert response.status_code == 200
+            response = self.client.get(self.url)
+            assert response.status_code == 200
 
-        sections = response.data['section_scores']
-        overridden_subsection = sections[1]['subsections'][0]
-        override_entry = overridden_subsection["override"]
+            sections = response.data['section_scores']
+            overridden_subsection = sections[1]['subsections'][0]
+            override_entry = overridden_subsection["override"]
 
-        assert override_entry['system'] == GradeOverrideFeatureEnum.proctoring
-        assert override_entry['reason'] == proctoring_failure_comment
+            assert override_entry['system'] == GradeOverrideFeatureEnum.proctoring
+            assert override_entry['reason'] == proctoring_failure_comment
 
     def test_view_other_students_progress_page(self):
         # Test the ability to view progress pages of other students by changing the url

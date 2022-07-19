@@ -488,6 +488,13 @@ class TestSendGradeIfInteresting(TestCase):
         assert mock_send_grade_to_credentials.delay.call_args[0] == (self.user.username, str(self.key), True, 'B', 0.81)
         mock_send_grade_to_credentials.delay.reset_mock()
 
+    @mock.patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
+    def test_send_grade_without_grade(self, mock_is_course_run_in_a_program, mock_send_grade_to_credentials,
+                                      _mock_is_learner_issuance_enabled):
+        mock_is_course_run_in_a_program.return_value = True
+        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
+        assert not mock_send_grade_to_credentials.delay.called
+
     def test_send_grade_without_issuance_enabled(self, _mock_is_course_run_in_a_program,
                                                  mock_send_grade_to_credentials, mock_is_learner_issuance_enabled):
         mock_is_learner_issuance_enabled.return_value = False
