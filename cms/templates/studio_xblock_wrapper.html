@@ -171,7 +171,7 @@ block_is_unit = is_unit(xblock)
                 <li class="action-item action-view">
                     <a href="${xblock_url}" class="action-button">
                         ## Translators: this is a verb describing the action of viewing more details
-                        <span class="action-button-text">${_('View')}</span>
+                        <span class="action-button-text">${_('Configure') if is_sourced_block else _('View')}</span>
                         <span class="icon fa fa-arrow-right" aria-hidden="true"></span>
                     </a>
                 </li>
