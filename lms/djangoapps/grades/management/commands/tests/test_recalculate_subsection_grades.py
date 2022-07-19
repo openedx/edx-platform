@@ -7,7 +7,6 @@ from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import ddt
-from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 
@@ -21,7 +20,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-a
 DATE_FORMAT = "%Y-%m-%d %H:%M"
 
 
-@patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
 @ddt.ddt
 class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTestCase):
     """
