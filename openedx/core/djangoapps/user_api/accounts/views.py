@@ -86,11 +86,8 @@ from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE
 
 from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
 
-try:
-    from tahoe_idp import api as tahoe_idp_api
-except ImportError:
-    # Ignore import error until `tahoe-idp` installed in appsembler.txt for production.
-    pass
+from tahoe_idp import api as tahoe_idp_api
+
 
 log = logging.getLogger(__name__)
 

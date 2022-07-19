@@ -16,7 +16,7 @@ from student.tests.factories import UserFactory
 
 @ddt.ddt
 @skip_unless_lms
-@patch('openedx.core.djangoapps.user_authn.views.password_reset.tahoe_idp_api', create=True)
+@patch('tahoe_idp.api.request_password_reset')
 class TahoeIdpResetPasswordTests(TestCase):
     """
     Tests that clicking reset works with both Tahoe IdP and non-idp logic.
@@ -31,7 +31,7 @@ class TahoeIdpResetPasswordTests(TestCase):
         'enable_tahoe_idp': True,
         'message': 'Tahoe 2.0 logic: should NOT send email via Open edX, `tahoe_idp` takes care of that',
     })
-    def test_reset_password_with_tahoe_idp(self, tahoe_idp_api_mock, enable_tahoe_idp, message):
+    def test_reset_password_with_tahoe_idp(self, mock_request_password_reset, enable_tahoe_idp, message):
         """
         Tests Tahoe IdP/non-idp password reset.
         """
@@ -50,7 +50,7 @@ class TahoeIdpResetPasswordTests(TestCase):
         )
 
         assert enable_tahoe_idp == (not mail.outbox), message
-        assert tahoe_idp_api_mock.request_password_reset.called == enable_tahoe_idp, 'should be called only for idp'
+        assert mock_request_password_reset.called == enable_tahoe_idp, 'should be called only for idp'
 
         if enable_tahoe_idp:
-            tahoe_idp_api_mock.request_password_reset.assert_called_once_with(user.email)
+            mock_request_password_reset.assert_called_once_with(user.email)

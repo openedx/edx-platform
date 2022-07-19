@@ -62,8 +62,6 @@ RUN rm -rf /openedx/staticfiles/ \
 RUN echo "Installing pip packages:" \
     && pip install gestore==0.1.0-dev3 \
     && pip install xblock-grade-fetcher==0.2 \
-    && pip install -e 'git+https://github.com/appsembler/tahoe-idp.git@main#egg=tahoe-idp' \
-    && pip install "google-cloud-storage==1.32.0" \
     && echo "Finished installing pip packages."
 
 RUN mkdir -p /openedx/themes/ \

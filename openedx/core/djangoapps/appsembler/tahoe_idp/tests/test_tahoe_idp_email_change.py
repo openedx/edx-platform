@@ -25,20 +25,20 @@ class EmailChangeWithIdpTests(TestCase):
         self.new_email = self.pending_change_request.new_email
         self.key = self.pending_change_request.activation_key
 
-    @patch('student.views.management.tahoe_idp_api', create=True)
-    def test_successful_email_change_without_idp(self, mock_tahoe_idp_api):
+    @patch('tahoe_idp.api.update_user_email')
+    def test_successful_email_change_without_idp(self, mock_update_user_email):
         """
         Test `confirm_email_change` with ENABLE_TAHOE_IDP = False.
         """
         with patch.dict(settings.FEATURES, {'ENABLE_TAHOE_IDP': False}):
             response = self.client.get(reverse('confirm_email_change', args=[self.key]))
         assert response.status_code == 200, 'Should succeed: {}'.format(response.content.decode('utf-8'))
-        assert not mock_tahoe_idp_api.update_user_email.called, (
+        assert not mock_update_user_email.called, (
             'Should not use idp unless explicitly enabled via ENABLE_TAHOE_IDP'
         )
 
-    @patch('student.views.management.tahoe_idp_api', create=True)
-    def test_successful_email_change_with_idp(self, mock_tahoe_idp_api):
+    @patch('tahoe_idp.api.update_user_email')
+    def test_successful_email_change_with_idp(self, mock_update_user_email):
         """
         Test `confirm_email_change` with ENABLE_TAHOE_IDP = True.
         """
@@ -48,8 +48,8 @@ class EmailChangeWithIdpTests(TestCase):
         assert response.status_code == 200, 'Should succeed: {}'.format(response.content.decode('utf-8'))
         assert len(mail.outbox) == 2, 'Must have two items in outbox: one for old email, another for new email'
 
-        assert mock_tahoe_idp_api.update_user_email.called, 'Should update idp email when ENABLE_TAHOE_IDP=True'
-        mock_tahoe_idp_api.update_user_email.assert_called_once_with(
+        assert mock_update_user_email.called, 'Should update idp email when ENABLE_TAHOE_IDP=True'
+        mock_update_user_email.assert_called_once_with(
             self.user,
             self.new_email,
             set_email_as_verified=True,
