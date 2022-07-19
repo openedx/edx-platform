@@ -27,21 +27,16 @@ from lms.djangoapps.discussion.rest_api.permissions import (
     get_editable_fields,
 )
 from lms.djangoapps.discussion.rest_api.render import render_body
+from lms.djangoapps.discussion.rest_api.utils import get_course_staff_users_list, get_course_ta_users_list
 from openedx.core.djangoapps.discussions.models import DiscussionTopicLink
 from openedx.core.djangoapps.discussions.utils import get_group_names_by_id
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.user import User as CommentClientUser
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
-from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_COMMUNITY_TA,
-    FORUM_ROLE_MODERATOR,
-    CourseDiscussionSettings,
-    Role,
-)
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.api.serializers import CourseKeyField
-from common.djangoapps.student.roles import (GlobalStaff)
+from common.djangoapps.student.roles import GlobalStaff
 
 User = get_user_model()
 
@@ -63,20 +58,8 @@ def get_context(course, request, thread=None):
     Returns a context appropriate for use with ThreadSerializer or
     (if thread is provided) CommentSerializer.
     """
-    # TODO: cache staff_user_ids and ta_user_ids if we need to improve perf
-    staff_user_ids = {
-        user.id
-        for role in Role.objects.filter(
-            name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR],
-            course_id=course.id
-        )
-        for user in role.users.all()
-    }
-    ta_user_ids = {
-        user.id
-        for role in Role.objects.filter(name=FORUM_ROLE_COMMUNITY_TA, course_id=course.id)
-        for user in role.users.all()
-    }
+    staff_user_ids = get_course_staff_users_list(course.id)
+    ta_user_ids = get_course_ta_users_list(course.id)
     requester = request.user
     cc_requester = CommentClientUser.from_django_user(requester).retrieve()
     cc_requester["course_id"] = course.id
