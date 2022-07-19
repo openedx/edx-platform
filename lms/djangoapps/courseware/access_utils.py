@@ -7,25 +7,23 @@ It allows us to share code between access.py and block transformers.
 from datetime import datetime, timedelta
 from logging import getLogger
 
+from crum import get_current_request
 from django.conf import settings
 from pytz import UTC
-from lms.djangoapps.courseware.access_response import (
-    AccessResponse,
-    StartDateError,
-    EnrollmentRequiredAccessError,
-    AuthenticationRequiredAccessError,
-)
-from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
-from openedx.core.djangoapps.util.user_messages import PageLevelMessages  # lint-amnesty, pylint: disable=unused-import
-from openedx.core.djangolib.markup import HTML  # lint-amnesty, pylint: disable=unused-import
-from openedx.features.course_experience import (
-    COURSE_PRE_START_ACCESS_FLAG,
-    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-)
+
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseBetaTesterRole
-from xmodule.util.xmodule_django import get_current_request_hostname  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.courseware.access_response import (
+    AccessResponse,
+    AuthenticationRequiredAccessError,
+    DataSharingConsentRequiredAccessError,
+    EnrollmentRequiredAccessError,
+    StartDateError
+)
+from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, COURSE_PRE_START_ACCESS_FLAG
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.util.xmodule_django import get_current_request_hostname  # lint-amnesty, pylint: disable=wrong-import-order
 
 DEBUG_ACCESS = False
 log = getLogger(__name__)
@@ -168,3 +166,23 @@ def check_public_access(course, visibilities):
         return ACCESS_GRANTED
 
     return ACCESS_DENIED
+
+
+def check_data_sharing_consent(course_id):
+    """
+        Grants access if the user is do not need DataSharing consent, otherwise returns data sharing link.
+
+        Returns:
+            AccessResponse: Either ACCESS_GRANTED or DataSharingConsentRequiredAccessError
+        """
+    from openedx.features.enterprise_support.api import get_enterprise_consent_url
+    consent_url = get_enterprise_consent_url(
+        request=get_current_request(),
+        course_id=course_id,
+        return_to='courseware',
+        enrollment_exists=True,
+        source='CoursewareAccess'
+    )
+    if consent_url:
+        return DataSharingConsentRequiredAccessError(consent_url=consent_url)
+    return ACCESS_GRANTED

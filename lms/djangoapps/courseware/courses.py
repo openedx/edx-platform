@@ -19,17 +19,21 @@ from fs.errors import ResourceNotFound
 from opaque_keys.edx.keys import UsageKey
 from path import Path as path
 
-from openedx.core.lib.cache_utils import request_cached
-
+from common.djangoapps.edxmako.shortcuts import render_to_string
+from common.djangoapps.static_replace import replace_static_urls
+from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps import branding
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
     AuthenticationRequiredAccessError,
     EnrollmentRequiredAccessError,
     MilestoneAccessError,
     OldMongoAccessError,
-    StartDateError,
+    StartDateError
 )
+from lms.djangoapps.courseware.access_utils import check_authentication, check_data_sharing_consent, check_enrollment
+from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
     CourseAssignmentDate,
@@ -40,29 +44,20 @@ from lms.djangoapps.courseware.date_summary import (
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate
 )
-from lms.djangoapps.courseware.exceptions import CourseRunNotFound
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, CourseRunNotFound
 from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module
-from common.djangoapps.edxmako.shortcuts import render_to_string
-from lms.djangoapps.courseware.access_utils import (
-    check_authentication,
-    check_enrollment,
-)
-from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import get_course_enrollment_details
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import LazySequence
+from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from openedx.features.course_experience.utils import is_block_structure_complete_for_assignments
-from common.djangoapps.static_replace import replace_static_urls
-from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
-from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
@@ -135,7 +130,15 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     return course_overview
 
 
-def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
+def check_course_access(
+    course,
+    user,
+    action,
+    check_if_enrolled=False,
+    check_survey_complete=True,
+    check_if_authenticated=False,
+    check_if_dsc_required=False,
+):
     """
     Check that the user has the access to perform the specified action
     on the course (CourseBlock|CourseOverview).
@@ -160,6 +163,11 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
             enrollment_access_response = check_enrollment(user, course)
             if not enrollment_access_response:
                 return enrollment_access_response
+
+        if check_if_dsc_required:
+            data_sharing_consent_response = check_data_sharing_consent(course)
+            if not data_sharing_consent_response:
+                return data_sharing_consent_response
 
         # Redirect if the user must answer a survey before entering the course.
         if check_survey_complete and action == 'load':

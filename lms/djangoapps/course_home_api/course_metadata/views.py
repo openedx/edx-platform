@@ -88,6 +88,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'load',
             check_if_enrolled=True,
             check_if_authenticated=True,
+            check_if_dsc_required=True,
         )
 
         _, request.user = setup_masquerade(

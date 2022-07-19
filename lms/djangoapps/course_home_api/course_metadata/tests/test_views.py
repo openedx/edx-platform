@@ -99,32 +99,51 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
             'enroll_user': True,
             'instructor_role': False,
             'masquerade_role': None,
+            'dsc_required': False,
             'expect_course_access': True,
+            'error_code': None,
         },
         {
             # Un-enrolled learners should NOT have access.
             'enroll_user': False,
             'instructor_role': False,
             'masquerade_role': None,
+            'dsc_required': False,
             'expect_course_access': False,
+            'error_code': 'enrollment_required'
         },
         {
             # Un-enrolled instructors should have access.
             'enroll_user': False,
             'instructor_role': True,
             'masquerade_role': None,
+            'dsc_required': False,
             'expect_course_access': True,
+            'error_code': None
         },
         {
             # Un-enrolled instructors masquerading as students should have access.
             'enroll_user': False,
             'instructor_role': True,
             'masquerade_role': 'student',
+            'dsc_required': False,
             'expect_course_access': True,
+            'error_code': None
         },
+        {
+            # Data sharing Consent required learners should Not have access.
+            'enroll_user': True,
+            'instructor_role': False,
+            'masquerade_role': None,
+            'dsc_required': True,
+            'expect_course_access': False,
+            'error_code': 'data_sharing_access_required'
+        }
     )
     @ddt.unpack
-    def test_course_access(self, enroll_user, instructor_role, masquerade_role, expect_course_access):
+    def test_course_access(
+        self, enroll_user, instructor_role, masquerade_role, dsc_required, expect_course_access, error_code
+    ):
         """
         Test that course_access is calculated correctly based on
         access to MFE and access to the course itself.
@@ -136,13 +155,12 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         if masquerade_role:
             self.update_masquerade(role=masquerade_role)
 
-        response = self.client.get(self.url)
+        consent_url = 'dump/consent/url' if dsc_required else None
+        with mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url', return_value=consent_url):
+            response = self.client.get(self.url)
 
         assert response.status_code == 200
-        if expect_course_access:
-            assert response.data['course_access']['has_access']
-        else:
-            assert not response.data['course_access']['has_access']
-
+        assert response.data['course_access']['has_access'] == expect_course_access
+        assert response.data['course_access']['error_code'] == error_code
         # Start date is used when handling some errors, so make sure it is present too
         assert response.data['start'] == self.course.start.isoformat() + 'Z'
