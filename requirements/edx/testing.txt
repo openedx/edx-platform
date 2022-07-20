@@ -463,9 +463,8 @@ django-waffle==2.6.0
     #   edx-enterprise
     #   edx-proctoring
     #   edx-toggles
-django-webpack-loader==0.7.0
+django-webpack-loader==1.6.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-proctoring
 djangorestframework==3.12.4
