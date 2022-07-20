@@ -75,3 +75,6 @@ scipy<1.8.0
 # See issue: https://github.com/sphinx-contrib/openapi/issues/123
 mistune<2.0.0
 
+# edx-enterprise, snowflake-connector-python require charset-normalizer==2.0.0
+# Can be removed once snowflake-connector-python>2.7.9 is released with the fix.
+charset-normalizer<2.1.0
