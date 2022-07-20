@@ -23,7 +23,7 @@ centralized LMS.
 We have integrated our fork of DOP_ with support for OpenID Connect. So, an
 access_token request with a DOP client::
 
-    curl -X POST -d "client_id=abc&client_secret=def&grant_type=client_credentials" http://localhost:18000/oauth2/access_token/
+    curl -X POST -d "client_id=abc&client_secret=def&grant_type=client_credentials" http://student.launchpadlearning.ca/oauth2/access_token/
 
 includes an id_token field::
 
