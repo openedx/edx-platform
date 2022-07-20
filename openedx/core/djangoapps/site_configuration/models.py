@@ -18,8 +18,6 @@ from django.utils.encoding import python_2_unicode_compatible
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 
-from .exceptions import TahoeConfigurationException
-from ..appsembler.sites.waffle import ENABLE_CONFIG_VALUES_MODIFIER
 from ..appsembler.preview.helpers import is_preview_mode
 
 
@@ -132,7 +130,7 @@ class SiteConfiguration(models.Model):
                     return self.api_adapter.get_value_of_type(self.api_adapter.TYPE_SETTING, name, default)
                 else:
                     beeline.add_context_field('value_source', 'django_model')
-                    return self.site_values.get(name, default)
+                    return self.site_values.get(name, default) if self.site_values else default
             except AttributeError as error:
                 logger.exception(u'Invalid JSON data. \n [%s]', error)
         else:
@@ -182,7 +180,7 @@ class SiteConfiguration(models.Model):
             return self.api_adapter.get_value_of_type(self.api_adapter.TYPE_ADMIN, name, default)
         else:
             beeline.add_context_field('setting_source', 'django_model')
-            return self.site_values.get(name, default)
+            return self.site_values.get(name, default) if self.site_values else default
 
     @beeline.traced('site_config.get_secret_value')
     def get_secret_value(self, name, default=None):
@@ -204,7 +202,7 @@ class SiteConfiguration(models.Model):
             return self.api_adapter.get_value_of_type(self.api_adapter.TYPE_SECRET, name, default)
         else:
             beeline.add_context_field('setting_source', 'django_model')
-            return self.site_values.get(name, default)
+            return self.site_values.get(name, default) if self.site_values else default
 
     @classmethod
     def get_configuration_for_org(cls, org, select_related=None):
@@ -454,39 +452,6 @@ class SiteConfiguration(models.Model):
         if 'customer-sass-input' in path:
             return [(path, self.get_value('customer_sass_input', ''))]
         return None
-
-
-@receiver(pre_save, sender=SiteConfiguration)
-def tahoe_update_site_values_on_save(sender, instance, **kwargs):
-    """
-    Temp. helper until ENABLE_CONFIG_VALUES_MODIFIER is enabled on production.
-
-    # TODO: RED-2828 Clean up after production QA
-    """
-    if not ENABLE_CONFIG_VALUES_MODIFIER.is_enabled():
-        logger.info('ENABLE_CONFIG_VALUES_MODIFIER: switch is disabled, saving override values inline.')
-        from openedx.core.djangoapps.appsembler.sites.config_values_modifier import TahoeConfigurationValueModifier
-        tahoe_config_modifier = TahoeConfigurationValueModifier(site_config_instance=instance)
-
-        if not instance.site_values:
-            instance.site_values = {}
-
-        if not instance.site_values.get('platform_name'):
-            instance.site_values['platform_name'] = instance.site.name
-
-        if not instance.site_values.get('PLATFORM_NAME'):  # First-time the config is saved with save()
-            instance.site_values['css_overrides_file'] = tahoe_config_modifier.get_css_overrides_file()
-            instance.site_values['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
-
-        # Everytime the config is saved with save()
-        instance.site_values.update({
-            'PLATFORM_NAME': instance.site_values.get('platform_name', ''),
-            'LANGUAGE_CODE': instance.site_values.get('LANGUAGE_CODE', 'en'),
-            'LMS_ROOT_URL': tahoe_config_modifier.get_lms_root_url(),
-            'SITE_NAME': tahoe_config_modifier.get_domain(),
-            'ACTIVATION_EMAIL_SUPPORT_LINK': tahoe_config_modifier.get_activation_email_support_link(),
-            'PASSWORD_RESET_SUPPORT_LINK': tahoe_config_modifier.get_password_reset_support_link(),
-        })
 
 
 @receiver(post_save, sender=SiteConfiguration)

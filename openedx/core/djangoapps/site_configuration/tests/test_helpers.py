@@ -17,7 +17,7 @@ test_config = {   # pylint: disable=invalid-name
     "platform_name": "Test Education Program",
     "SITE_NAME": "test.localhost",
     "course_org_filter": "TestX",
-    "css_overrides_file": "test/css/site.css",
+    "css_overrides_file": "test.localhost.css",  # Appsembler naming format for css override - RED-2828
     "ENABLE_MKTG_SITE": False,
     "ENABLE_THIRD_PARTY_AUTH": False,
     "course_about_show_social_links": False,

@@ -18,23 +18,8 @@ from django.test.utils import override_settings
 
 from site_config_client.openedx.adapter import SiteConfigAdapter
 
-from openedx.core.djangoapps.appsembler.sites.waffle import ENABLE_CONFIG_VALUES_MODIFIER
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
-
-
-def ddt_without_and_with_modifier(test_func):
-    """
-    Decorator to pass `use_modifier` parameter.
-    """
-    test_func = ddt.data({
-        'use_modifier': False,
-    }, {
-        'use_modifier': True,
-    })(test_func)
-
-    test_func = ddt.unpack(test_func)
-    return test_func
 
 
 @pytest.fixture
@@ -95,98 +80,75 @@ class SiteConfigurationTests(TestCase):
         cls.expected_site_root_url = '{scheme}://{domain}'.format(
             scheme=cls.scheme, domain=cls.domain)
 
-    @ddt_without_and_with_modifier
-    def test_site_configuration_compile_sass_on_save(self, use_modifier):
+    def test_site_configuration_compile_sass_on_save(self):
         """
-        Test compile_microsite_sass with and without the TahoeConfigurationValueModifier.
+        Test compile_microsite_sass
         """
-        with ENABLE_CONFIG_VALUES_MODIFIER.override(use_modifier):
-            # add SiteConfiguration to database
-            site_configuration = SiteConfigurationFactory.build(
-                site=self.site,
-            )
+        # add SiteConfiguration to database
+        site_configuration = SiteConfigurationFactory.build(
+            site=self.site,
+        )
 
-            site_configuration.save()  # Should not throw an exception
+        site_configuration.save()  # Should not throw an exception
 
-    @ddt_without_and_with_modifier
-    def test_get_value(self, use_modifier):
+    def test_get_value(self):
         """
         Test that get_value returns correct value for Tahoe custom keys.
         """
         # add SiteConfiguration to database
-        with ENABLE_CONFIG_VALUES_MODIFIER.override(use_modifier):
-            site_configuration = SiteConfigurationFactory.build(
-                site=self.site,
-                site_values=self.test_config
-            )
-            site_configuration.save()
-            site_configuration.refresh_from_db()
-            assert bool(site_configuration.tahoe_config_modifier) == use_modifier, 'Sanity check for `override()`'
+        site_configuration = SiteConfigurationFactory.build(
+            site=self.site,
+            site_values=self.test_config
+        )
+        site_configuration.save()
+        site_configuration.refresh_from_db()
+        assert bool(site_configuration.tahoe_config_modifier), 'Sanity check for `override()`'
 
-            # Make sure entry is saved and retrieved correctly
-            assert site_configuration.get_value("PLATFORM_NAME") == self.test_config['platform_name']
-            assert site_configuration.get_value("LMS_ROOT_URL") == self.expected_site_root_url
-            assert site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK')
-            assert site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK').endswith('/help')
-            assert site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK')
-            assert site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK').endswith('/help')
+        # Make sure entry is saved and retrieved correctly
+        assert site_configuration.get_value("PLATFORM_NAME") == self.test_config['platform_name']
+        assert site_configuration.get_value("LMS_ROOT_URL") == self.expected_site_root_url
+        assert site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK')
+        assert site_configuration.get_value('ACTIVATION_EMAIL_SUPPORT_LINK').endswith('/help')
+        assert site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK')
+        assert site_configuration.get_value('PASSWORD_RESET_SUPPORT_LINK').endswith('/help')
 
-            site_configuration.site_values['platform_name'] = 'new platform name'
-            site_configuration.save()
-            site_configuration.refresh_from_db()
-            assert site_configuration.get_value('platform_name') == 'new platform name'
-            assert site_configuration.get_value('PLATFORM_NAME') == 'new platform name'
+        site_configuration.site_values['platform_name'] = 'new platform name'
+        site_configuration.save()
+        site_configuration.refresh_from_db()
+        assert site_configuration.get_value('platform_name') == 'new platform name'
+        assert site_configuration.get_value('PLATFORM_NAME') == 'new platform name'
 
-    @ddt_without_and_with_modifier
-    def test_hardcoded_values_for_unsaved_config_instance(self, use_modifier):
+    def test_hardcoded_values_for_unsaved_config_instance(self):
         """
         If a SiteConfiguration has no site yet, the `get_value` will work safely.
         """
-        with ENABLE_CONFIG_VALUES_MODIFIER.override(use_modifier):
-            site_config = SiteConfiguration(enabled=True)
+        site_config = SiteConfiguration(enabled=True)
 
         assert site_config.get_value('SITE_NAME') is None
         assert site_config.get_value('SITE_NAME', 'test.com') == 'test.com'
 
-    def test_hardcoded_values_for_config_instance_with_site_without_modifier(self):
-        """
-        If a SiteConfiguration has a site the `get_value` should return the right one.
-
-        with ENABLE_CONFIG_VALUES_MODIFIER disabled.
-        """
-        with ENABLE_CONFIG_VALUES_MODIFIER.override(False):
-            site = Site.objects.create(domain='my-site.com')
-            site_config = SiteConfiguration(enabled=True, site=site)
-            site_config.save()
-            assert site_config.get_value('SITE_NAME', 'test.com') == 'my-site.com'
-
     def test_hardcoded_values_for_config_instance_with_site_with_modifier(self):
         """
         If a SiteConfiguration has a site the `get_value` should return the right one.
-
-        with ENABLE_CONFIG_VALUES_MODIFIER enabled.
         """
-        with ENABLE_CONFIG_VALUES_MODIFIER.override(True):
-            site = Site.objects.create(domain='my-site.com')
-            site_config = SiteConfiguration(enabled=True, site=site)  # No need to save for the value modifier to work
-            assert site_config.get_value('SITE_NAME', 'test.com') == 'my-site.com'
+        site = Site.objects.create(domain='my-site.com')
+        site_config = SiteConfiguration(enabled=True, site=site)  # No need to save for the value modifier to work
+        assert site_config.get_value('SITE_NAME', 'test.com') == 'my-site.com'
 
-    @ddt_without_and_with_modifier
-    def test_get_value_for_org(self, use_modifier):
+    def test_get_value_for_org(self):
         """
         Test that get_value_for_org returns correct value for Tahoe custom keys.
         """
-        with ENABLE_CONFIG_VALUES_MODIFIER.override(use_modifier):
-            # add SiteConfiguration to database
-            site_config = SiteConfigurationFactory.create(
-                site=self.site,
-                site_values=self.test_config
-            )
-            site_config.save()
+        # add SiteConfiguration to database
+        site_config = SiteConfigurationFactory.create(
+            site=self.site,
+            site_values=self.test_config
+        )
+        site_config.save()
 
-            # Test that LMS_ROOT_URL is assigned to the SiteConfiguration on creation
-            tahoex_org_name = self.test_config['course_org_filter']
-            assert SiteConfiguration.get_value_for_org(tahoex_org_name, 'LMS_ROOT_URL') == self.expected_site_root_url
+        # Test that LMS_ROOT_URL is assigned to the SiteConfiguration on creation
+        tahoex_org_name = self.test_config['course_org_filter']
+        assert SiteConfiguration.get_value_for_org(tahoex_org_name, 'LMS_ROOT_URL') == self.expected_site_root_url
 
     def test_get_css_url_in_live_mode(self):
         site_config = SiteConfigurationFactory.create(site=self.site)
