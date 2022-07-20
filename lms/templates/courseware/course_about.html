@@ -78,10 +78,10 @@ from six import string_types
             <a href="${course_target}">
           %endif
 
-          <span class="register disabled">${_("You are enrolled in this course")}</span>
+          <span class="register disabled">${_("You already started this course")}</span>
 
           %if show_courseware_link:
-            <strong>${_("View Course")}</strong>
+            <strong>${_("Continue Course")}</strong>
             </a>
           %endif
 
@@ -99,7 +99,7 @@ from six import string_types
         %elif allow_anonymous:
           %if show_courseware_link:
             <a href="${course_target}">
-            <strong>${_("View Course")}</strong>
+            <strong>${_("Continue Course")}</strong>
             </a>
           %endif
         %else:
@@ -113,8 +113,8 @@ from six import string_types
             else:
               href_class = "register"
           %>
-          <a href="${reg_href}" class="${href_class}">
-            ${_("Enroll Now")}
+          <a href="${course_target}" class="${href_class}">
+            ${_("Start Now")}
           </a>
           <div id="register_error"></div>
         %endif

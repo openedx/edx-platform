@@ -4,18 +4,18 @@ URLs for LMS
 
 from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
+from django.urls import include, re_path
 from django.conf.urls.static import static
-from django.contrib import admin
 from django.contrib.admin import autodiscover as django_autodiscover
-from django.urls import include, path, re_path
+from django.urls import path
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import RedirectView
 from edx_api_doc_tools import make_docs_urls
 from edx_django_utils.plugins import get_plugin_url_patterns
+from ratelimitbackend import admin
 
-from common.djangoapps.student import views as student_views
-from common.djangoapps.util import views as util_views
 from lms.djangoapps.branding import views as branding_views
+from lms.djangoapps.debug import views as debug_views
 from lms.djangoapps.courseware.masquerade import MasqueradeView
 from lms.djangoapps.courseware.module_render import (
     handle_xblock_callback,
@@ -26,14 +26,13 @@ from lms.djangoapps.courseware.module_render import (
 from lms.djangoapps.courseware.views import views as courseware_views
 from lms.djangoapps.courseware.views.index import CoursewareIndex
 from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
-from lms.djangoapps.debug import views as debug_views
 from lms.djangoapps.discussion import views as discussion_views
 from lms.djangoapps.discussion.config.settings import is_forum_daily_digest_enabled
 from lms.djangoapps.discussion.notification_prefs import views as notification_prefs_views
 from lms.djangoapps.instructor.views import instructor_dashboard as instructor_dashboard_views
 from lms.djangoapps.instructor_task import views as instructor_task_views
-from lms.djangoapps.static_template_view import views as static_template_view_views
 from lms.djangoapps.staticbook import views as staticbook_views
+from lms.djangoapps.static_template_view import views as static_template_view_views
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -50,11 +49,18 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
+from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.features.enterprise_support.api import enterprise_enabled
+from common.djangoapps.student import views as student_views
+from common.djangoapps.util import views as util_views
+from common.djangoapps.student.views.management import uploaded_doc_view, AnnouncementView ,StaffDetailsListApiView ,StaffofCourseDetailslist ,CourseandStafAassignedDetailsList
+from lms.djangoapps.course_api.views import ProgressView
+from openedx.features.course_experience.views.course_home import outline_tab
+
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
-RENDER_VIDEO_XBLOCK_NAME = 'render_public_video_xblock'
+COURSE_DATES_NAME = 'dates'
 COURSE_PROGRESS_NAME = 'progress'
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -111,6 +117,9 @@ urlpatterns = [
 
     path('i18n/', include('django.conf.urls.i18n')),
 
+
+
+
     # Enrollment API RESTful endpoints
     path('api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
@@ -162,6 +171,24 @@ urlpatterns = [
 
     path('catalog/', include(('openedx.core.djangoapps.catalog.urls', 'openedx.core.djangoapps.catalog'),
                              namespace='catalog')),
+
+
+    path("get_doc/", uploaded_doc_view, name='uploaded_doc_view'),
+    path('student/announcement/', AnnouncementView.as_view(), name="announcement"),
+    path('start_progress/', ProgressView.as_view(), name="progress-start"),
+    path('update_progress/<int:progress_id>/', ProgressView.as_view(), name='progress_update'),
+    path('get_progress/<str:bases>/', ProgressView.as_view(), name="get_progress"),
+
+    path('get/staff/list/details' , StaffDetailsListApiView.as_view(), name="get_staff_list_details"),
+
+    path('get/enroll/course/staff/details/<course_id>' , StaffofCourseDetailslist.as_view(), name="get_course_staff_list_details"),
+
+    path('get/all/staff/details/of/all/course' , CourseandStafAassignedDetailsList.as_view(), name="get_all_staff_details_of_all_course"),
+
+
+
+
+
 
     # Update session view
     path('lang_pref/session_language', lang_pref_views.update_session_language, name='session_language'),
@@ -238,10 +265,9 @@ urlpatterns += [
 # Multicourse wiki (Note: wiki urls must be above the courseware ones because of
 # the custom tab catch-all)
 if settings.WIKI_ENABLED:
-    from django_notify.urls import get_pattern as notify_pattern
     from wiki.urls import get_pattern as wiki_pattern
-
     from lms.djangoapps.course_wiki import views as course_wiki_views
+    from django_notify.urls import get_pattern as notify_pattern
 
     wiki_url_patterns, wiki_app_name = wiki_pattern()
     notify_url_patterns, notify_app_name = notify_pattern()
@@ -317,11 +343,6 @@ urlpatterns += [
         courseware_views.render_xblock,
         name=RENDER_XBLOCK_NAME,
     ),
-    re_path(
-        fr'^videos/{settings.USAGE_KEY_PATTERN}$',
-        courseware_views.render_public_video_xblock,
-        name=RENDER_VIDEO_XBLOCK_NAME,
-    ),
 
     # xblock Resource URL
     re_path(
@@ -361,6 +382,15 @@ urlpatterns += [
         courseware_views.course_about,
         name='about_course',
     ),
+
+    re_path(
+        r'^courses/{}/home$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        outline_tab,
+        name='home',
+    ),
+
     path(
         'courses/yt_video_metadata',
         courseware_views.yt_video_metadata,
@@ -505,8 +535,14 @@ urlpatterns += [
         name=COURSE_PROGRESS_NAME,
     ),
 
-    # dates page (no longer functional, just redirects to MFE)
-    re_path(r'^courses/{}/dates'.format(settings.COURSE_ID_PATTERN), courseware_views.dates, name='dates'),
+    # dates page
+    re_path(
+        r'^courses/{}/dates'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        courseware_views.dates,
+        name=COURSE_DATES_NAME,
+    ),
 
     # Takes optional student_id for instructor use--shows profile as that student sees it.
     re_path(
@@ -606,6 +642,13 @@ urlpatterns += [
         discussion_views.discussion_topics,
         name='discussion_topics',
     ),
+    re_path(
+        r'^courses/{}/verified_track_content/settings'.format(
+            settings.COURSE_KEY_PATTERN,
+        ),
+        verified_track_content_views.cohorting_settings,
+        name='verified_track_cohorting',
+    ),
 
     # LTI endpoints listing
     re_path(
@@ -657,6 +700,14 @@ urlpatterns += [
     re_path(
         fr'^courses/{settings.COURSE_ID_PATTERN}/',
         include('openedx.features.calendar_sync.urls'),
+    ),
+
+    # Course search
+    re_path(
+        r'^courses/{}/search/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.course_search.urls'),
     ),
 
     # Learner profile
@@ -792,6 +843,12 @@ if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW', settings.FEATU
     urlpatterns += [
         path('api/bulk_enroll/v1/', include('lms.djangoapps.bulk_enroll.urls')),
     ]
+
+# Course goals
+urlpatterns += [
+    path('api/course_goals/', include(('lms.djangoapps.course_goals.urls', 'lms.djangoapps.course_goals'),
+                                      namespace='course_goals_api')),
+]
 
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
@@ -935,21 +992,6 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             'financial-assistance/submit/',
             courseware_views.financial_assistance_request,
             name='submit_financial_assistance_request'
-        ),
-        path(
-            'financial-assistance_v2/submit/',
-            courseware_views.financial_assistance_request_v2,
-            name='submit_financial_assistance_request_v2'
-        ),
-        re_path(
-            fr'financial-assistance/{settings.COURSE_ID_PATTERN}/apply/',
-            courseware_views.financial_assistance_form,
-            name='financial_assistance_form_v2'
-        ),
-        re_path(
-            fr'financial-assistance/{settings.COURSE_ID_PATTERN}',
-            courseware_views.financial_assistance,
-            name='financial_assistance_v2'
         )
     ]
 
@@ -1025,9 +1067,4 @@ if settings.ENABLE_SAVE_FOR_LATER:
 # Enhanced Staff Grader (ESG) URLs
 urlpatterns += [
     path('api/ora_staff_grader/', include('lms.djangoapps.ora_staff_grader.urls', 'ora-staff-grader')),
-]
-
-# Scheduled Bulk Email (Instructor Task) URLs
-urlpatterns += [
-    path('api/instructor_task/', include('lms.djangoapps.instructor_task.rest_api.urls')),
 ]

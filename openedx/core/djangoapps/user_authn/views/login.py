@@ -11,6 +11,7 @@ import re
 import urllib
 
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
@@ -19,7 +20,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
-from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt ,csrf_protect, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 from edx_django_utils.monitoring import set_custom_attribute
@@ -42,10 +43,12 @@ from common.djangoapps.util.password_policy_validators import normalize_password
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api import accounts
-from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
+from openedx.core.djangoapps.user_authn.config.waffle import (
+    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
+    ADMIN_AUTH_REDIRECT_TO_LMS
+)
 from openedx.core.djangoapps.user_authn.cookies import get_response_with_refreshed_jwt_cookies, set_logged_in_cookies
-from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError, VulnerablePasswordError
+from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.user_authn.toggles import (
     is_require_third_party_auth_enabled,
     should_redirect_to_authn_microfrontend
@@ -187,7 +190,7 @@ def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint:
         password_policy_compliance.enforce_compliance_on_login(user, request.POST.get('password'))
     except password_policy_compliance.NonCompliantPasswordWarning as e:
         # Allow login, but warn the user that they will be required to reset their password soon.
-        PageLevelMessages.register_warning_message(request, HTML(str(e)))
+        PageLevelMessages.register_warning_message(request, str(e))
     except password_policy_compliance.NonCompliantPasswordException as e:
         # Increment the lockout counter to safguard from further brute force requests
         # if user's password has been compromised.
@@ -481,6 +484,7 @@ def enterprise_selection_page(request, user, next_url):
 
 
 @ensure_csrf_cookie
+#@csrf_exempt
 @require_http_methods(['POST'])
 @ratelimit(
     key='openedx.core.djangoapps.util.ratelimit.request_post_email',
@@ -492,7 +496,8 @@ def enterprise_selection_page(request, user, next_url):
     rate=settings.LOGISTRATION_RATELIMIT_RATE,
     method='POST',
 )  # lint-amnesty, pylint: disable=too-many-statements
-def login_user(request, api_version='v1'):  # pylint: disable=too-many-statements
+def login_user(request, api_version='v1'):
+    # import pdb;pdb.set_trace()
     """
     AJAX request to log in the user.
 
@@ -577,55 +582,38 @@ def login_user(request, api_version='v1'):  # pylint: disable=too-many-statement
             if possibly_authenticated_user and password_policy_compliance.should_enforce_compliance_on_login():
                 # Important: This call must be made AFTER the user was successfully authenticated.
                 _enforce_password_policy_compliance(request, possibly_authenticated_user)
+                check_pwned_password_and_send_track_event.delay(user.id, request.POST.get('password'), user.is_staff)
 
         if possibly_authenticated_user is None or not (
             possibly_authenticated_user.is_active or settings.MARKETING_EMAILS_OPT_IN
         ):
             _handle_failed_authentication(user, possibly_authenticated_user)
 
-        pwned_properties = check_pwned_password_and_send_track_event(
-            user.id, request.POST.get('password'), user.is_staff
-        ) if not is_user_third_party_authenticated else {}
-        # Set default for third party login
-        password_frequency = pwned_properties.get('frequency', -1)
-        if (
-            settings.ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY and
-            password_frequency >= settings.HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD
-        ):
-            raise VulnerablePasswordError(
-                accounts.AUTHN_LOGIN_BLOCK_HIBP_POLICY_MSG,
-                'require-password-change'
-            )
-
         _handle_successful_authentication_and_login(possibly_authenticated_user, request)
 
         # The AJAX method calling should know the default destination upon success
         redirect_url, finish_auth_url = None, ''
+        #logging.info("____login1_____" , redirect_url , finish_auth_url )
 
         if third_party_auth_requested:
             running_pipeline = pipeline.get(request)
             finish_auth_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
+            logging.info("____login2_____" , running_pipeline , finish_auth_url )
 
         if is_user_third_party_authenticated:
             redirect_url = finish_auth_url
+            logging.info("____login3_____" , redirect_url , finish_auth_url )
         elif should_redirect_to_authn_microfrontend():
             next_url, root_url = get_next_url_for_login_page(request, include_host=True)
             redirect_url = get_redirect_url_with_host(
                 root_url,
                 enterprise_selection_page(request, possibly_authenticated_user, finish_auth_url or next_url)
             )
+            logging.info("____login4_____" , redirect_url , root_url , next_url)
 
-        if (
-            settings.ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY and
-            0 <= password_frequency <= settings.HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD
-        ):
-            raise VulnerablePasswordError(
-                accounts.AUTHN_LOGIN_NUDGE_HIBP_POLICY_MSG,
-                'nudge-password-change',
-                redirect_url
-            )
-
+        #logging.info("____login5_____" , response )
         response = JsonResponse({
+            
             'success': True,
             'redirect_url': redirect_url,
         })
@@ -647,16 +635,13 @@ def login_user(request, api_version='v1'):  # pylint: disable=too-many-statement
             set_custom_attribute('login_error_code', error_code)
         email_or_username_key = 'email' if api_version == API_V1 else 'email_or_username'
         email_or_username = request.POST.get(email_or_username_key, None)
-        email_or_username = possibly_authenticated_user.email if possibly_authenticated_user else email_or_username
+        email_or_username = possibly_authenticated_user.email \
+            if possibly_authenticated_user else email_or_username
         response_content['email'] = email_or_username
-    except VulnerablePasswordError as error:
-        response_content = error.get_response()
-        log.exception(response_content)
-
-    response = JsonResponse(response_content, status=400)
-    set_custom_attribute('login_user_auth_failed_error', True)
-    set_custom_attribute('login_user_response_status', response.status_code)
-    return response
+        response = JsonResponse(response_content, status=400)
+        set_custom_attribute('login_user_auth_failed_error', True)
+        set_custom_attribute('login_user_response_status', response.status_code)
+        return response
 
 
 # CSRF protection is not needed here because the only side effect
@@ -681,7 +666,10 @@ def redirect_to_lms_login(request):
     This view redirect the admin/login url to the site's login page if
     waffle switch is on otherwise returns the admin site's login view.
     """
-    return redirect('/login?next=/admin')
+    if ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.is_enabled() or ADMIN_AUTH_REDIRECT_TO_LMS.is_enabled():
+        return redirect('/login?next=/admin')
+    else:
+        return admin.site.login(request)
 
 
 class LoginSessionView(APIView):
@@ -692,11 +680,14 @@ class LoginSessionView(APIView):
     authentication_classes = []
 
     @method_decorator(ensure_csrf_cookie)
+    #@csrf_exempt
     def get(self, request, *args, **kwargs):
         return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")  # lint-amnesty, pylint: disable=http-response-with-content-type-json
 
+    #@method_decorator(csrf_protect)
     @csrf_exempt
     def post(self, request, api_version):
+        
         """Log in a user.
 
         See `login_user` for details.

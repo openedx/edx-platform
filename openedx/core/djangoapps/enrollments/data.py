@@ -115,7 +115,7 @@ def get_user_enrollments(course_key):
     ).order_by('created')
 
 
-def create_course_enrollment(username, course_id, mode, is_active, enterprise_uuid=None):
+def create_course_enrollment(username, course_id, mode, is_active, enterprise_uuid=None, assigned_by=None):
     """Create a new course enrollment for the given user.
 
     Creates a new course enrollment for the specified user username.
@@ -147,7 +147,7 @@ def create_course_enrollment(username, course_id, mode, is_active, enterprise_uu
         raise UserNotFoundError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
     try:
-        enrollment = CourseEnrollment.enroll(user, course_key, check_access=True, enterprise_uuid=enterprise_uuid)
+        enrollment = CourseEnrollment.enroll(user, course_key, check_access=True, enterprise_uuid=enterprise_uuid, assigned_by=assigned_by)
         return _update_enrollment(enrollment, is_active=is_active, mode=mode)
     except NonExistentCourseError as err:
         raise CourseNotFoundError(str(err))  # lint-amnesty, pylint: disable=raise-missing-from

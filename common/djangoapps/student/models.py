@@ -11,6 +11,8 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
 
+
+import crum
 import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
 import logging  # lint-amnesty, pylint: disable=wrong-import-order
@@ -19,9 +21,9 @@ from collections import defaultdict, namedtuple  # lint-amnesty, pylint: disable
 from datetime import date, datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
 from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
-from urllib.parse import urlencode, urljoin
+from urllib.parse import urlencode  # lint-amnesty, pylint: disable=wrong-import-order
+import warnings  # lint-amnesty, pylint: disable=wrong-import-order
 
-import crum
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
@@ -36,35 +38,42 @@ from django.db.models import Count, Index, Q
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError
 from django.dispatch import receiver
+
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext_noop
 from django_countries.fields import CountryField
-from edx_django_utils import monitoring
 from edx_django_utils.cache import RequestCache, TieredCache, get_cache_key
+from edx_django_utils import monitoring
+from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
 from opaque_keys.edx.keys import CourseKey
-from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
+from pytz import UTC, timezone
+from simple_history.models import HistoricalRecords
+from slumber.exceptions import HttpClientError, HttpServerError
+from user_util import user_util
+
+from openedx_events.learning.data import (
+    CourseData,
+    CourseEnrollmentData,
+    UserData,
+    UserPersonalData,
+)
 from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CHANGED,
     COURSE_ENROLLMENT_CREATED,
     COURSE_UNENROLLMENT_COMPLETED,
 )
 from openedx_filters.learning.filters import CourseEnrollmentStarted, CourseUnenrollmentStarted
-from pytz import UTC, timezone
-from requests.exceptions import HTTPError, RequestException
-from simple_history.models import HistoricalRecords
-from user_util import user_util
-
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from common.djangoapps.student.emails import send_proctoring_requirements_email
 from common.djangoapps.student.email_helpers import (
     generate_proctoring_requirements_email_context,
-    should_send_proctoring_requirements_email,
+    should_send_proctoring_requirements_email
 )
-from common.djangoapps.student.emails import send_proctoring_requirements_email
 from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from common.djangoapps.track import contexts, segment
 from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
@@ -77,7 +86,7 @@ from lms.djangoapps.courseware.models import (
 )
 from lms.djangoapps.courseware.toggles import streak_celebration_is_active
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview,LiveClasses
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview , LiveClasses
 from openedx.core.djangoapps.enrollments.api import (
     _default_course_mode,
     get_enrollment_attributes,
@@ -88,6 +97,9 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from openedx.core.toggles import ENTRANCE_EXAMS
+
+
+announcement_choice = [('all', 'all'), ('student', 'student'), ('course', 'course')]
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -153,11 +165,12 @@ class AnonymousUserId(models.Model):
     course_id = LearningContextKeyField(db_index=True, max_length=255, blank=True)
 
 
-def anonymous_id_for_user(user, course_id):
+def anonymous_id_for_user(user, course_id, save='DEPRECATED'):
     """
     Inputs:
         user: User model
         course_id: string or None
+        save: Deprecated and ignored: ID is always saved in an AnonymousUserId object
 
     Return a unique id for a (user, course_id) pair, suitable for inserting
     into e.g. personalized survey links.
@@ -169,7 +182,14 @@ def anonymous_id_for_user(user, course_id):
 
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
-    
+
+    if save != 'DEPRECATED':
+        warnings.warn(
+            "anonymous_id_for_user no longer accepts save param and now "
+            "always saves the ID in the database",
+            DeprecationWarning
+        )
+
     if user.is_anonymous:
         return None
 
@@ -511,6 +531,7 @@ class UserProfile(models.Model):
     # for users imported from our first class.
     location = models.CharField(blank=True, max_length=255, db_index=True)
 
+
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now(UTC).year
     VALID_YEARS = list(range(this_year, this_year - 120, -1))
@@ -613,7 +634,11 @@ class UserProfile(models.Model):
     phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
     #attendance = models.CharField(max_length=250, null=True, db_index=True)
-    #user_attendance = models.CharField(max_length=250, null=True, db_index=True)
+    # user_attendance = models.CharField(max_length=250, null=True, db_index=True)
+    user_attendance = models.PositiveIntegerField(default=0, blank=True, null=True)
+
+
+
     @property
     def has_profile_image(self):
         """
@@ -860,11 +885,20 @@ class UserSignupSource(models.Model):
     site = models.CharField(max_length=255, db_index=True)
 
 
-def unique_id_for_user(user):
+def unique_id_for_user(user, save='DEPRECATED'):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
+
+    Keyword arguments:
+    save -- Deprecated and ignored: ID is always saved in an AnonymousUserId object
     """
+    if save != 'DEPRECATED':
+        warnings.warn(
+            "unique_id_for_user no longer accepts save param and now "
+            "always saves the ID in the database",
+            DeprecationWarning
+        )
     # Setting course_id to '' makes it not affect the generated hash,
     # and thus produce the old per-student anonymous id
     return anonymous_id_for_user(user, None)
@@ -1209,9 +1243,148 @@ class CourseEnrollmentManager(models.Manager):
 # is used to cache the state in the request cache.
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
 
+
+
+
 class LiveClassEnrollment(models.Model):
+
     live_class = models.ForeignKey(LiveClasses, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    liveclass_attendance = models.PositiveIntegerField(default=0, blank=True, null=True)
+    updated_at = models.DateTimeField(null=True)
+
+
+
+class NotifyCallRequest(models.Model):
+    requested_by = models.ForeignKey(User, related_name="%(class)s_requested_by" , on_delete=models.CASCADE)
+
+    requested_to = models.ForeignKey(User, related_name="%(class)s_requested_to" , on_delete=models.CASCADE)
+
+    requested_at = models.DateTimeField(null=True)
+    
+    messeage = models.CharField(max_length=300 , null=True)
+
+    seen = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'notify_call_request_details'
+
+
+class DocumentStorage(models.Model):
+    objects = None
+    id = models.AutoField(primary_key=True)
+    course= models.ForeignKey(CourseOverview, related_name='Course', on_delete=models.CASCADE)
+    chapter_name = models.CharField(max_length=50, help_text='Course Chapter Name', null=True, blank=True)
+    document_type = models.CharField(max_length=10, null=True, blank=True)
+    document_name = models.CharField(max_length=50, null=True, blank=True, help_text='Enter Document Name')
+    document = models.FileField(max_length=255, upload_to="course_docs")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    added_on = models.DateTimeField(auto_now=True)
+    updated_on = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return json.dumps({"course_id":self.course_id, "document_id":self.document_id})
+
+    class Meta:
+        db_table = 'cms_doc_storage'
+
+
+
+
+class Badges(models.Model):
+    objects = None
+    id = models.AutoField(primary_key=True)
+    badge_name = models.CharField(max_length=20, null=True, blank=True)
+    min_points = models.IntegerField(default=0, unique=True,null=True, blank=True)
+    active = models.BooleanField(default=True)
+    badge_image = models.ImageField(upload_to='badge_image/', max_length=256,null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, related_name="%(class)s_created_by",on_delete=models.DO_NOTHING)
+    last_updated_by = models.ForeignKey(User,related_name="%(class)s_updated_by",on_delete=models.DO_NOTHING)
+    class Meta:
+        db_table = 'course_badges'
+
+
+
+class CoursePoints(models.Model):
+
+    objects = None
+    id = models.AutoField(primary_key=True)
+    course = models.ForeignKey(CourseOverview,on_delete=models.DO_NOTHING)
+    chapter = models.CharField(max_length=100, null=True, blank=True)
+    reward_coins = models.IntegerField(default=0, null=True, blank=True)
+    created_by = models.ForeignKey(User, related_name="%(class)s_created_by",on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+    class Meta:
+        db_table = 'course_chapter_points' 
+        unique_together=('course', 'chapter')
+
+
+
+class CoinsEarn(models.Model):
+
+    objects = None
+    id = models.AutoField(primary_key=True)
+    student = models.OneToOneField(User, on_delete=models.DO_NOTHING)
+    badge = models.ForeignKey(Badges, on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'course_coin_earn'
+
+
+
+
+class Announcement(models.Model):
+    
+    objects = None
+    id = models.AutoField(primary_key=True)
+    content = models.TextField(null=True, blank=True, default='lorem ispum')
+    active = models.BooleanField(default=True)
+    announcement_bases = models.CharField(choices=announcement_choice, default='all', max_length=7,null=True, blank=True)
+    announcement_for = models.JSONField(null=True, blank=True)    
+    created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True) 
+    
+    class Meta:
+        db_table = 'launch_announcements'
+
+
+
+class Progress(models.Model):
+
+    objects = None
+    id = models.AutoField(primary_key=True)
+    chapter_name = models.CharField(max_length=100, null=True, blank=True)
+    hw_completed = models.BooleanField(default=False)
+    assign_completed = models.BooleanField(default=False)
+    progress = models.FloatField(default=0)
+    course = models.ForeignKey(CourseOverview, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+
+    class Meta:
+        db_table = 'course_progress'
+
+    def save(self, *args, **kwargs):
+        if self.assign_completed and self.hw_completed:
+            self.progress = 100.0
+        elif self.assign_completed or self.hw_completed:
+            self.progress = 50.0
+        else:
+            self.progress = 0.0
+        return super(Progress, self).save(*args, **kwargs)
+
+
+        
+
+
+
 
 class CourseEnrollment(models.Model):
     """
@@ -1229,7 +1402,9 @@ class CourseEnrollment(models.Model):
     """
     MODEL_TAGS = ['course', 'is_active', 'mode']
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User,related_name="%(class)s_user" , on_delete=models.CASCADE)
+
+    assigned_by = models.ForeignKey(User, related_name="%(class)s_assigned_by" , on_delete=models.CASCADE  , null=True )
 
     course = models.ForeignKey(
         CourseOverview,
@@ -1246,6 +1421,7 @@ class CourseEnrollment(models.Model):
     # If is_active is False, then the student is not considered to be enrolled
     # in the course (is_enrolled() will return False)
     is_active = models.BooleanField(default=True)
+
 
     # Represents the modes that are possible. We'll update this later with a
     # list of possible values.
@@ -1292,7 +1468,7 @@ class CourseEnrollment(models.Model):
         cache.delete(self.enrollment_status_hash_cache_key(self.user))
 
     @classmethod
-    def get_or_create_enrollment(cls, user, course_key):
+    def get_or_create_enrollment(cls, user, course_key, assigned_by):
         """
         Create an enrollment for a user in a class. By default *this enrollment
         is not active*. This is useful for when an enrollment needs to go
@@ -1325,6 +1501,7 @@ class CourseEnrollment(models.Model):
         enrollment, __ = cls.objects.get_or_create(
             user=user,
             course_id=course_key,
+            assigned_by=assigned_by,
             defaults={
                 'mode': CourseMode.DEFAULT_MODE_SLUG,
                 'is_active': False
@@ -1573,7 +1750,7 @@ class CourseEnrollment(models.Model):
                 )
 
     @classmethod
-    def enroll(cls, user, course_key, mode=None, check_access=False, can_upgrade=False, enterprise_uuid=None):
+    def enroll(cls, user, course_key, mode=None, check_access=False, can_upgrade=False, enterprise_uuid=None, assigned_by=None):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -1667,7 +1844,7 @@ class CourseEnrollment(models.Model):
                 raise AlreadyEnrolledError
 
         # User is allowed to enroll if they've reached this point.
-        enrollment = cls.get_or_create_enrollment(user, course_key)
+        enrollment = cls.get_or_create_enrollment(user, course_key, assigned_by)
         enrollment.update_enrollment(is_active=True, mode=mode, enterprise_uuid=enterprise_uuid)
         enrollment.send_signal(EnrollStatusChange.enroll)
 
@@ -1968,7 +2145,6 @@ class CourseEnrollment(models.Model):
         # Due to circular import issues this import was placed close to usage. To move this to the
         # top of the file would require a large scale refactor of the refund code.
         import lms.djangoapps.certificates.api
-
         # If the student has already been given a certificate in a non refundable status they should not be refunded
         certificate = lms.djangoapps.certificates.api.get_certificate_for_user_id(
             self.user,
@@ -2049,7 +2225,7 @@ class CourseEnrollment(models.Model):
         """
 
         # NOTE: This is here to avoid circular references
-        from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
+        from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
         order_number = self.get_order_attribute_value('order_number')
         if not order_number:
             return None
@@ -2062,21 +2238,23 @@ class CourseEnrollment(models.Model):
         else:
             try:
                 # response is not cached, so make a call to ecommerce to fetch order details
-                api_url = urljoin(f"{get_ecommerce_api_base_url()}/", f"orders/{order_number}/")
-                response = get_ecommerce_api_client(self.user).get(api_url)
-                response.raise_for_status()
-                order = response.json()
-            except HTTPError as err:
+                order = ecommerce_api_client(self.user).orders(order_number).get()
+            except HttpClientError:
                 log.warning(
-                    "Encountered HTTPError while getting order details from ecommerce. "
-                    "Status code was %d, Order=%s and user %s", err.response.status_code, order_number, self.user.id
-                )
+                    "Encountered HttpClientError while getting order details from ecommerce. "
+                    "Order={number} and user {user}".format(number=order_number, user=self.user.id))
                 return None
-            except RequestException:
+
+            except HttpServerError:
+                log.warning(
+                    "Encountered HttpServerError while getting order details from ecommerce. "
+                    "Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                return None
+
+            except SlumberBaseException:
                 log.warning(
                     "Encountered an error while getting order details from ecommerce. "
-                    "Order=%s and user %s", order_number, self.user.id
-                )
+                    "Order={number} and user {user}".format(number=order_number, user=self.user.id))
                 return None
 
             cache_time_out = getattr(settings, 'ECOMMERCE_ORDERS_API_CACHE_TIMEOUT', 3600)
@@ -2817,7 +2995,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         ),
     )
 
-    def is_enabled(self, *key_fields):  # pylint: disable=arguments-differ
+    def is_enabled(self, *key_fields):
         """
         Checks both the model itself and share_settings to see if LinkedIn Add to Profile is enabled
         """
@@ -3514,22 +3692,3 @@ class UserPasswordToggleHistory(TimeStampedModel):
 
     def __str__(self):
         return self.comment
-
-class DocumentStorage(models.Model):
-    objects = None
-    id = models.AutoField(primary_key=True)
-    course= models.ForeignKey(CourseOverview, related_name='Course', on_delete=models.CASCADE)
-    chapter_name = models.CharField(max_length=50, help_text='Course Chapter Name', null=True, blank=True)
-    document_type = models.CharField(max_length=10, null=True, blank=True)
-    document_name = models.CharField(max_length=50, null=True, blank=True, help_text='Enter Document Name')
-    document = models.FileField(upload_to="course_docs")
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    added_on = models.DateTimeField(auto_now=True)
-    updated_on = models.DateTimeField(auto_now_add=True)
-
-
-    def __str__(self):
-        return json.dumps({"course_id":self.course_id, "document_id":self.document_id})
-
-    class Meta:
-        db_table = 'cms_doc_storage'

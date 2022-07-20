@@ -114,6 +114,28 @@ class AccessRole(metaclass=ABCMeta):
         """
         return User.objects.none()
 
+class GlobalActive(AccessRole):
+    """
+    The global staff role
+    """
+    def has_user(self, user):
+        return bool(user and user.is_active)
+
+    def add_users(self, *users):
+        for user in users:
+            if user.is_authenticated and user.is_active:
+                user.is_staff = False
+                user.save()
+
+    def remove_users(self, *users):
+        for user in users:
+            # don't check is_authenticated nor is_active on purpose
+            user.is_staff = False
+            user.save()
+
+    def users_with_role(self):
+        raise Exception("This operation is un-indexed, and shouldn't be used")
+
 
 class GlobalStaff(AccessRole):
     """

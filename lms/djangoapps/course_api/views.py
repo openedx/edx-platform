@@ -17,8 +17,15 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_c
 from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
 from .api import course_detail, list_course_keys, list_courses
 from .forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
-from .serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
-
+from .serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer, ProgressSerializer
+from rest_framework.views import APIView
+from common.djangoapps.student.models import Progress, CourseEnrollment
+from django.db.models import Avg # To import
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication # To import
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # To import
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser # To Import
+from rest_framework.permissions import IsAuthenticated # To Import
+from django.http import JsonResponse
 
 log = logging.getLogger(__name__)
 
@@ -485,3 +492,75 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
         This should be called once per GET request.
         """
         return super().get_serializer(*args, **kwargs)
+
+
+
+class ProgressView(APIView):
+    
+    authentication_classes = (
+                    JwtAuthentication,
+                    BearerAuthenticationAllowInactiveUser,
+                    SessionAuthenticationAllowInactiveUser,
+                            )
+    permission_classes = (IsAuthenticated, )
+    
+    serializer = ProgressSerializer
+    model = Progress
+    course_model = CourseEnrollment
+
+    def post(self, request):
+        try:
+            data = request.data
+            serialized_data = self.serializer(data=data)
+            if serialized_data.is_valid():
+                serialized_data.save(course_id= data.get('course'), user=request.user)
+                return JsonResponse({"success":True, "message":{}})
+            return JsonResponse({"success":False, "message":serialized_data.errors})
+        except Exception as e:
+            return JsonResponse({"success":False, "message":{"error":f"{e}"}})
+
+    def put(self, request,progress_id=None):
+        try:
+            if progress_id:
+                data = request.data
+                try:
+                    progress_data = self.model.objects.get(id=progress_id, user=request.user)
+                except self.model.DoesNotExist as not_exist:
+                    return JsonResponse({"status":False, "message":{"query":f"{not_exist}"}})
+                serialized_data = self.serializer(data = data, instance=progress_data)
+                if serialized_data.is_valid():
+                    serialized_data.save()
+                    return JsonResponse({"success":True, "messaage":{"messaage":"Updated successfully"}})
+                return JsonResponse({"success":False, "message":{"error":serialized_data.errors}}) 
+            return JsonResponse({"status":False, "message":{"progress_id":"Progress Id not provided."}})
+        except Exception as e:
+            return JsonResponse({"success":False, "message":{"error":f"{e}"}})
+        
+
+
+
+    def get(self, request, bases='course'):
+        try:
+            progress_query = self.model.objects.filter(user_id=request.user)
+            data = request.data
+            course_id =  data.get('course_id')
+            progress_list = []
+            if bases.lower() == 'course':
+                courses_enrolled = self.course_model.objects.filter(user_id=request.user)
+                for course_enrolled in courses_enrolled:
+                    avg = progress_query.filter(course_id=course_enrolled.course_id).aggregate(Avg('progress'))
+                    avg['course'] = str(course_enrolled.course_id)
+                    progress_list.append(avg)
+            elif bases == "chapter":
+                course_id = request.data.get('course_id')
+                progress_query = progress_query.filter(course_id=course_id)
+                progress_list = [{'chapter_name':query.chapter_name,'progress':query.progress} for query in progress_query]
+            elif bases == "overall":
+                progress_list = progress_query.aggregate.Avg('progress')
+            else:
+                return JsonResponse({"success":False, "message":{"bases":f'Invalid choice {bases}'}})
+            return JsonResponse({"success":True, "data":{"progress_list":progress_list}})
+        except Exception as e:
+            return JsonResponse({"success":False, "message":{"error":f"{e}"}})
+            
+    

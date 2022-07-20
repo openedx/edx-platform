@@ -211,21 +211,21 @@ from django.urls import reverse
       <span class="close">&times;</span>
       <h2>Create Live Class</h2>
     </div>
-
+    
     <div class="modal-body">
       <table style="text-align: center;">
         <tr>
-          <td style="width:30%">
+          <td style="width:30%">  
             <p for="meeting-topic">Topic</p>
             <input type="text" id="meeting-topic" name="meeting-topic">
           </td>
-          <td style="width:30%">
+          <td style="width:30%">  
             <p for="meeting-date">Date</p>
             <input type="date" id="meeting-date" name="meeting-date">
             </td>
         </tr>
         <tr>
-
+          
           <td style="width:30%">
             <p for="meeting-start-time">Start Time</p>
             <input type="time" id="meeting-start-time" name="meeting-start-time">
@@ -237,7 +237,7 @@ from django.urls import reverse
           </td>
         </tr>
         <!-- <tr style="margin-top: 10px;">
-          <td style="width:70%;text-align: center;">
+          <td style="width:70%;text-align: center;"> 
             <button id="generate" class="button" style="background-color: #005800;;color: #fff;border-radius: 6px;border-color: #fff;
             padding: 5px;">Generate</button>
           </td>
@@ -252,11 +252,11 @@ from django.urls import reverse
       </div>
       <div style="margin-top:10px">
       <div id="output" class="out">
-
+    
       </div>
     </div>
     </div>
-
+    
   </div>
 
 </div>
@@ -269,11 +269,11 @@ from django.urls import reverse
   <div class="modal-body">
     <table style="text-align: center;width: 100%;">
       <tr>
-        <td style="width:70%">
+        <td style="width:70%">  
           <!-- <p for="enroll-student">Name</p> -->
           <input  style="width: 100%;" type="text" id="enroll-student" name="meeting-topic" placeholder="Enter student username...">
         </td>
-        <td style="width:30%">
+        <td style="width:30%">  
           <div style="margin-top:10px;text-align:center;width: 100%;">
             <button id="add-student" class="button" style="background-color: #005800;;color: #fff;border-radius: 6px;border-color: #fff;
                 padding: 5px;">Add Student</button>
@@ -286,7 +286,7 @@ from django.urls import reverse
       </div>
       <div style="margin-top:10px">
       <div id="output-students" class="out-student">
-
+    
       </div>
     </div>
     </div>
@@ -390,7 +390,7 @@ from django.urls import reverse
   var span1 = document.getElementsByClassName("close1")[0];
   var token = '';
   csrftoken()
-
+ 
   // btn.onclick = function() {
   //   modal.style.display = "block";
   //   getRooms();
@@ -400,8 +400,8 @@ from django.urls import reverse
     modal1.style.display = "block";
     getStudents();
     // modal.style.display = "none";
-
-
+    
+   
   }
 
 
@@ -413,7 +413,7 @@ from django.urls import reverse
    // modal.style.display = "none"
     modal1.style.display = "none";
   }
-
+  
   window.onclick = function(event) {
     // if (event.target == modal) {
     //   modal.style.display = "none";
@@ -444,7 +444,7 @@ function enroll_click()
 }
 function enroll_student()
 {
-  url=window.location.href;
+  url=window.location.href;  
   str_data = url.split('/')
   student = document.getElementById('enroll-student').value
    student_data = {
@@ -453,29 +453,29 @@ function enroll_student()
         "course_id":str_data[str_data.length-1]
     }
 }
-  fetch("http://studio.launchpadlearning.ca/user/enrollment", {
+  fetch("http://localhost:18010/user/enrollment", {
       method: "POST",
       headers: {
       'Content-Type': 'application/json',
       'authorization':'Basic ZWR4OmVkeA==',
       'X-CSRFToken':token
-
-    },
+    
+    }, 
       body: JSON.stringify(student_data)
     }).then(function(res){ return res.json(); })
-    .then(function(data){
-    if(data.message==undefined)
+    .then(function(data){ 
+    if(data.message==undefined)  
     {
-
+     
     }
     else
     {
       alert(data.message)
     }
     getStudents()
-
+      
     })
-
+    
 }
 document.getElementById('generate').onclick = reply_click;
 document.getElementById('add-student').onclick = enroll_click;
@@ -490,15 +490,15 @@ function removeElementStudents() {
 }
 function login()
 {
-
+ 
           let formData = new FormData();
 formData.append("email","edx@example.com");
 formData.append( "password","edx123456");
-  fetch('http://studio.launchpadlearning.ca/api/user/v1/account/login_session/', {
+  fetch('http://localhost:18010/api/user/v1/account/login_session/', {
     body: formData,
            method: "POST"
-
-
+          
+          
 })
     .then( res => res.json() )
     .then(response => {
@@ -508,7 +508,7 @@ formData.append( "password","edx123456");
 }
 function csrftoken()
 {
-  fetch('http://studio.launchpadlearning.ca/csrf/api/v1/token', {headers: {
+  fetch('http://localhost:18010/csrf/api/v1/token', {headers: {
           'Content-Type': 'application/json',
         }},)
     .then( res => res.json() )
@@ -520,15 +520,15 @@ function csrftoken()
 
 function getStudents()
 {
-  url=window.location.href;
+  url=window.location.href;  
   str_data = url.split('/')
-
-   fetch("http://studio.launchpadlearning.ca/course/enroll/course/detail/"+encodeURIComponent(str_data[str_data.length-1]),
-  // fetch("http://studio.launchpadlearning.ca/user/enrollment?course_id="+encodeURIComponent(str_data[str_data.length-1]),
+  
+   fetch("http://localhost:18010/course/enroll/course/detail/"+encodeURIComponent(str_data[str_data.length-1]), 
+  // fetch("http://localhost:18010/user/enrollment?course_id="+encodeURIComponent(str_data[str_data.length-1]), 
        )
     .then( res => res.json() )
     .then(response => {
-
+     
 
      // alert(JSON.stringify(response))
      var output = document.getElementById('output-students');
@@ -542,11 +542,11 @@ function getStudents()
           ele.setAttribute("class","inner-student");
           ele.innerHTML=response.results[i]['user']['username']
           parent.appendChild(ele);
-          output.appendChild(parent);
+          output.appendChild(parent);  
         }
-      }
-
-
+      } 
+    
+    
     })
     .catch(error => console.error('Error:', error));
 
@@ -554,7 +554,7 @@ function getStudents()
 
 function createRoom()
 {
-    url=window.location.href;
+    url=window.location.href;  
     str_data = url.split('+')
     data_length = str_data.length-1
     topic = str_data[1]+'0f0f'+document.getElementById('meeting-topic').value
@@ -575,22 +575,22 @@ function createRoom()
        nbf:start_unix,
        exp:end_unix
       }}
-      fetch("http://api.daily.co/v1/rooms/", {
+      fetch("https://api.daily.co/v1/rooms/", {
       method: "POST",
-      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10'},
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10'}, 
       body: JSON.stringify(crt_room)
     }).then(function(res){ return res.json(); })
-    .then(function(data){
-      getRooms()
+    .then(function(data){ 
+      getRooms()  
       updateLiveClass(data)
-
-
+    
+    
 })
 }
 function updateLiveClass(meetingResponse)
 {
-
-  url=window.location.href;
+  
+  url=window.location.href;  
   str_data = url.split('+')
   str_data1= url.split('/')
   data_length = str_data.length-1
@@ -618,24 +618,24 @@ function updateLiveClass(meetingResponse)
   };
   //alert(JSON.stringify(data))
   post_url = "http://student.launchpadlearning.ca/api/enrollment/v1/enrollment/"+encodeURIComponent(str_data1[str_data1.length-1])+"/live_classes";
-
+  
   fetch(post_url, {
       method: "POST",
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/json'}, 
       body: JSON.stringify(data)
     }).then(function(res){ return res.json(); })
-    .then(function(data){
+    .then(function(data){ 
 })
-
+  
 }
 function getRooms(){
-    fetch('http://api.daily.co/v1/rooms?limit=50', {headers: {
+    fetch('https://api.daily.co/v1/rooms?limit=50', {headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10',
         }},)
     .then( res => res.json() )
     .then(response => {
-      url=window.location.href;
+      url=window.location.href;  
       str_data = url.split('+')
       topic = str_data[1]
       //alert(JSON.stringify(response))
@@ -665,14 +665,14 @@ function getRooms(){
                 // ele2.setAttribute("class","btn inner-link-delete");
                 // ele2.innerHTML='Delete';
                 // parent.appendChild(ele2);
-                output.appendChild(parent);
-
-            }
-
-
+                output.appendChild(parent);  
+                
+            }   
+            
+              
 
         }
-    })
+    }) 
     .catch(error => console.error('Error:', error));
 }
   </script>

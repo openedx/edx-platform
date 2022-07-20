@@ -1,4 +1,4 @@
-<section id="login-anchor" class="form-type">
+<section id="login-anchor"  class="form-type" style="border-radius: 8px; padding-top :70px; width: 100%;" >
     <div id="login-form" class="form-wrapper <% if ( mode !== 'login' ) { %>hidden<% } %>"></div>
 </section>
 

@@ -12,6 +12,19 @@ import string
 from collections import defaultdict
 from typing import Dict
 
+from rest_framework.parsers import JSONParser
+
+
+
+
+from django.contrib.auth.models import User 
+from opaque_keys import InvalidKeyError 
+
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication # To Import
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order# To Import
+
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser # To
+
 import django.utils
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
@@ -25,15 +38,21 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from edx_django_utils.monitoring import function_trace
-from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles import LegacyWaffleSwitchNamespace
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
-from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
+from common.djangoapps.student.models import DocumentStorage 
+from common.djangoapps.student.views.serializer import CourseSerializer 
+from django.views.decorators.csrf import csrf_exempt # To Import
+
+
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -49,7 +68,13 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     UserBasedRole
 )
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response ##
+from rest_framework.views import APIView ##
+from common.djangoapps.student.forms import DocumentForm  , BadgeForm
+from cms.djangoapps.contentstore.views.serializers import BadgeSerializer, CoursePointsSerializer
+
+
+from common.djangoapps.student.models import Badges, DocumentStorage , CoursePoints, Announcement,CourseEnrollment # To Import
 from common.djangoapps.util.course import get_link_for_about_page
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
@@ -59,13 +84,6 @@ from common.djangoapps.util.milestones_helpers import (
     remove_prerequisite_course,
     set_prerequisite_courses
 )
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication # To Import
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order# To Import
-
-from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser # To Import
-from common.djangoapps.student.forms import DocumentForm # To Import
-from common.djangoapps.student.models import DocumentStorage # To Import
-from common.djangoapps.student.views.serializer import CourseSerializer # To Import
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from openedx.core import toggles as core_toggles
@@ -80,6 +98,7 @@ from openedx.core.lib.courses import course_image_url
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_module import CourseBlock, DEFAULT_START_DATE, CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
@@ -121,11 +140,31 @@ from .library import (
     user_can_create_library,
     should_redirect_to_library_authoring_mfe
 )
+
+
 from cms.envs import common # To Import
 import boto # To Import
 from boto.s3.key import Key # To Import
 from .s3boto import * # To Import
-from django.views.decorators.csrf import csrf_exempt # To Import
+
+# s3 = bt3.resource(
+#     service_name='s3',
+#     region_name='us-east-2',
+#     aws_access_key_id='AKIA43ATNRFGIW6HF5CV',
+#     aws_secret_access_key='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'
+# )
+s3 = boto.connect_s3(
+    # service_name='s3',
+    
+    # region_name=common.AWS_SES_REGION_NAME,
+    'AKIA43ATNRFGIW6HF5CV',
+    "EUuMamQtokFW+sM23eriRcYVkdA8txjnKqPN8wF3",
+    host="us-east-1",
+    # ,aws_s3_file_overwrite=common.AWS_S3_FILE_OVERWRITE
+    )
+
+# bucket = s3.get_bucket(common.AWS_STORAGE_BUCKET_NAME)
+
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -143,9 +182,6 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'get_course_and_check_access']
 
 WAFFLE_NAMESPACE = 'studio_home'
-ENABLE_GLOBAL_STAFF_OPTIMIZATION = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    f'{WAFFLE_NAMESPACE}.enable_global_staff_optimization', __name__
-)
 
 
 class AccessListFallback(Exception):
@@ -496,20 +532,10 @@ def _accessible_courses_list_from_groups(request):
     courses_list = []
     course_keys = {}
 
-    user_global_orgs = set()
     for course_access in all_courses:
-        if course_access.course_id is not None:
-            course_keys[course_access.course_id] = course_access.course_id
-        elif course_access.org:
-            user_global_orgs.add(course_access.org)
-        else:
+        if course_access.course_id is None:
             raise AccessListFallback
-
-    if user_global_orgs:
-        # Getting courses from user global orgs
-        overviews = CourseOverview.get_all_courses(orgs=list(user_global_orgs))
-        overviews_course_keys = {overview.id: overview.id for overview in overviews}
-        course_keys.update(overviews_course_keys)
+        course_keys[course_access.course_id] = course_access.course_id
 
     course_keys = list(course_keys.values())
 
@@ -543,7 +569,8 @@ def course_listing(request):
     List all courses and libraries available to the logged in user
     """
 
-    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
+    optimization_enabled = GlobalStaff().has_user(request.user) and \
+        LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled('enable_global_staff_optimization')
 
     org = request.GET.get('org', '') if optimization_enabled else None
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
@@ -578,28 +605,29 @@ def course_listing(request):
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
 
     return render_to_response('index.html', {
-    'courses': active_courses,
-    'split_studio_home': split_library_view_on_dashboard(),
-    'archived_courses': archived_courses,
-    'in_process_course_actions': in_process_course_actions,
-    'libraries_enabled': LIBRARIES_ENABLED,
-    'liveclass_enabled': True,
-    'liveclass_enabled_list': False,
-    'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
-    'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
-    'liveclass_authoring_mfe_url': '#',
-    'libraries': [_format_library_for_view(lib, request) for lib in libraries],
-    'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
-    'show_new_liveclass_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
-    'user': user,
-    'request_course_creator_url': reverse('request_course_creator'),
-    'course_creator_status': _get_course_creator_status(user),
-    'rerun_creator_status': GlobalStaff().has_user(user),
-    'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
-    'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
-    'optimization_enabled': optimization_enabled,
-    'active_tab': 'courses'
+        'courses': active_courses,
+        'split_studio_home': split_library_view_on_dashboard(),
+        'archived_courses': archived_courses,
+        'in_process_course_actions': in_process_course_actions,
+        'libraries_enabled': LIBRARIES_ENABLED,
+        'liveclass_enabled': True,
+        'liveclass_enabled_list': False,
+        'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
+        'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
+        'liveclass_authoring_mfe_url': '#',
+        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+        'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
+        'show_new_liveclass_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
+        'user': user,
+        'request_course_creator_url': reverse('request_course_creator'),
+        'course_creator_status': _get_course_creator_status(user),
+        'rerun_creator_status': GlobalStaff().has_user(user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+        'optimization_enabled': optimization_enabled,
+        'active_tab': 'courses'
     })
+
 
 @login_required
 @ensure_csrf_cookie
@@ -884,9 +912,14 @@ def _create_or_rerun_course(request):
         start = request.json.get('start', CourseFields.start.default)
         run = request.json.get('run')
         has_course_creator_role = is_content_creator(request.user, org)
+        #log.info(org)
+        course_type = request.json.get('course_type')
 
         if not has_course_creator_role:
+            #log.info( request.user.id,org,course,)
+            # log.info(request)
             raise PermissionDenied()
+            #log.info(request)
 
         # allow/disable unicode characters in course_id according to settings
         if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
@@ -904,26 +937,35 @@ def _create_or_rerun_course(request):
         # existing xml courses this cannot be changed in CourseBlock.
         # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
         # w/ xmodule.course_module.CourseBlock.__init__
-        wiki_slug = f"{org}.{course}.{run}"
+        wiki_slug = f"{org}.{course}.{run}.{course_type}"
         definition_data = {'wiki_slug': wiki_slug}
         fields.update(definition_data)
 
         source_course_key = request.json.get('source_course_key')
+
+
         if source_course_key:
+            
             source_course_key = CourseKey.from_string(source_course_key)
-            destination_course_key = rerun_course(request.user, source_course_key, org, course, run, fields)
+            #log.info(source_course_key)
+            destination_course_key = rerun_course(request.user, source_course_key, org, course, run, fields , course_type)
+            #log.info( request.user.id,org,course,)
+            # log.info(request)
             return JsonResponse({
                 'url': reverse_url('course_handler'),
                 'destination_course_key': str(destination_course_key)
             })
+        
         else:
             try:
-                new_course = create_new_course(request.user, org, course, run, fields)
+                new_course = create_new_course(request.user, org, course, run, fields, course_type)
                 return JsonResponse({
                     'url': reverse_course_url('course_handler', new_course.id),
                     'course_key': str(new_course.id),
                 })
             except ValidationError as ex:
+                #log.info( request.user.id,org,course,)
+                # log.info(request)
                 return JsonResponse({'error': str(ex)}, status=400)
     except DuplicateCourseError:
         return JsonResponse({
@@ -951,6 +993,7 @@ def _create_or_rerun_course(request):
             request.user.id,
             org,
             course,
+            course_type,
         )
         return JsonResponse({
             'error': _('User does not have the permission to create courses in this organization '
@@ -959,7 +1002,7 @@ def _create_or_rerun_course(request):
         )
 
 
-def create_new_course(user, org, number, run, fields):
+def create_new_course(user, org, number, run, fields , course_type):
     """
     Create a new course run.
 
@@ -974,12 +1017,18 @@ def create_new_course(user, org, number, run, fields):
             'you selected does not exist in the system, you will need to add it to the system'
         ))
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
-    new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields)
+    new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields , course_type)
     add_organization_course(org_data, new_course.id)
+    #log.info(fields)
+    log.info( "-->>>>>>>>>>>>>>>>>>>>>",user,org ,course_type)
+    
     return new_course
 
+    
 
-def create_new_course_in_store(store, user, org, number, run, fields):
+
+
+def create_new_course_in_store(store, user, org, number, run, fields , course_type):
     """
     Create course in store w/ handling instructor enrollment, permissions, and defaulting the wiki slug.
     Separated out b/c command line course creation uses this as well as the web interface.
@@ -998,6 +1047,7 @@ def create_new_course_in_store(store, user, org, number, run, fields):
             number,
             run,
             user.id,
+            course_type,
             fields=fields,
         )
 
@@ -1009,7 +1059,7 @@ def create_new_course_in_store(store, user, org, number, run, fields):
     return new_course
 
 
-def rerun_course(user, source_course_key, org, number, run, fields, background=True):
+def rerun_course(user, source_course_key, org, number, run, fields, course_type, background=True):
     """
     Rerun an existing course.
     """
@@ -1020,7 +1070,7 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     # create destination course key
     store = modulestore()
     with store.default_store('split'):
-        destination_course_key = store.make_course_key(org, number, run)
+        destination_course_key = store.make_course_key(org, number, run, course_type)
 
     # verify org course and run don't already exist
     if store.has_course(destination_course_key, ignore_case=True):
@@ -1048,6 +1098,7 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
         rerun_course_task(*args)
 
     return destination_course_key
+    
 
 
 @login_required
@@ -1178,7 +1229,8 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                 'EDITABLE_SHORT_DESCRIPTION',
                 settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
             )
-            sidebar_html_enabled = ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled()
+            sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
+            # self_paced_enabled = SelfPacedConfiguration.current().enabled
 
             verified_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
             upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
@@ -1612,6 +1664,8 @@ def textbooks_list_handler(request, course_key_string):
             store.update_item(course, request.user.id)
             return JsonResponse(course.pdf_textbooks)
         elif request.method == 'POST':
+
+            # import pdb;pdb.set_trace()
             # create a new textbook for the course
             try:
                 textbook = validate_textbook_json(request.body)
@@ -1913,6 +1967,10 @@ def _get_course_creator_status(user):
 
     return course_creator_status
 
+
+
+
+
 @api_view(['POST',])
 @authentication_classes((
     JwtAuthentication,
@@ -1920,12 +1978,13 @@ def _get_course_creator_status(user):
     SessionAuthenticationAllowInactiveUser,
 ))
 @permission_classes((IsAuthenticated,))
+@csrf_exempt
 def doc_upload_view(request):
     method = request.method
     try:
         if method == 'POST':
-            # if request.user.is_staff:
-                log.info(request.POST, request.FILES)
+            if request.user.is_staff:
+                # log.info(request.POST, request.FILES)
                 file = request.FILES.get('document')
                 course = request.POST.get('course')
                 form_data = DocumentForm(request.POST, request.FILES)
@@ -1936,13 +1995,13 @@ def doc_upload_view(request):
                 if form_data.is_valid():
                     url_save = upload_to_s3(file)
                     form_data = form_data.save(commit=False)
-                    form_data.created_by_id = 1
+                    form_data.created_by_id = request.user.id
                     form_data.course= course
                     form_data.document = url_save
                     form_data.save()
                     return JsonResponse({"success":True})
                 return JsonResponse({"success":False, 'message':form_data.errors})
-            # return JsonResponse({"success":False, "message":{"error":"User not authorized"}})
+            return JsonResponse({"success":False, "message":{"error":"User not authorized"}})
         return JsonResponse({"success":False, "messages":{"method": f"{request.method} is invalid method"}})
     except Exception as e:
         return JsonResponse({"success":False, "message":{"error":f"{e}"} })
@@ -1984,25 +2043,160 @@ def update_doc(request):
         return JsonResponse({"success":False, "message":{"error":f"{e}"} })
 
 
+
 # @api_view(['POST', 'GET'])
-@csrf_exempt
+@authentication_classes(())
+@permission_classes(())
+#for retrive / delete doc 
 def delete_doc(request):
     try:
         method = request.method
+        # log.info('----method-----'  , method)
         data = JSONParser().parse(request)
         id = data.get('doc_id', None)
         if id:
             if method == "POST" :
-                # if request.user.is_staff:
+                # log.info('==user==' , request.user)
+                if request.user.is_staff:
+                    
                     try:
                         DocumentStorage.objects.get(id=id).delete()
                         return JsonResponse({"success":True, "message":{"deleted": "Data deleted Successfully."}})
                     except Exception as e:
                         return JsonResponse({"success":False, 'message':{"error":f"{e}"}})
-                # return JsonResponse({"success":False, 'message':{"role": 'Unauthorized action'}})
-            return JsonResponse({"success":False, 'message':{'id':'Document Id not provided.'}})  
+                return JsonResponse({"success":False, 'message':{"role": 'Unauthorized action'}})
+            # elif method == "GET":
+            #     stored_docs = DocumentStorage.objects.filter(course_id=id)
+            #     stored_docs = [{'id':stored_doc.id, 'course_id': id, 'chapter_name': stored_doc.chapter_name, 'document_type': stored_doc.document_type, 'document_name': stored_doc.document_name, 'document':f"{stored_doc.document}"} for stored_doc in stored_docs]
+            #     return JsonResponse({"success":True, "data":stored_docs})
+            return JsonResponse({"success":False, "message":{"method": f"{method} is invalid."}})
+        return JsonResponse({"success":False, 'message':{'id':'Document Id not provided.'}})  
     except Exception as e:
         return JsonResponse({"success":False, "message":{"error":f"{e}"} })
       
         
+
+
+
+
+
+
+class BadgeView(APIView):
+
+    authentication_classes = (
+                    JwtAuthentication,
+                    BearerAuthenticationAllowInactiveUser,
+                    SessionAuthenticationAllowInactiveUser,
+                            )
+    permission_classes = (IsAuthenticated, )
+    
+    def get(self, request, active=None):
+        try:
+            if request.user.is_staff:
+                all_badges = Badges.objects.all()
+                if active == None or active== "all":
+                    return Response({"success":True, "data":{"badge_list":BadgeSerializer(all_badges, many=True).data}})
+                active = bool(active.capitalize())
+                return Response({"success":True, "data":{"badge_list":BadgeSerializer(all_badges.filter(active=active), many=True).data}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))
+        except Exception as e:
+            return Response({"success":False, "message":{"error":f"{e}"} })
+      
+    def post(self, request):
+        try:
+            data = request.data
+            form_data = BadgeForm(data=data,files=data)
+            if request.user.is_staff:
+                if form_data.is_valid():
+                    form_data = form_data.save(commit=False)
+                    form_data.created_by = request.user 
+                    form_data.last_updated_by = request.user
+                    form_data.save() 
+                    return Response({"success":True, "message":{"created":"Created Successfully"}})
+                return Response({"success":False, "message":{"errors":form_data.errors}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))        
+        except Exception as e:
+            return Response({"success":False, "message":{"error":f"{e}"} })
+
+    def put(self, request,badge_id=None):
+        try:
+            if request.user.is_staff:
+                if badge_id:
+                    data = request.data
+                    file = data.get('badge_image')
+                    try:
+                        badge_data = Badges.objects.get(id=badge_id)
+                    except Badges.DoesNotExist  as not_exist:
+                        return Response({"success":False, "message":{"badge_id":not_exist}})
+                    form_data = BadgeForm(data=data, instance=badge_data)
+                    if form_data.is_valid():
+                        form_data = form_data.save(commit=False)
+                        form_data.last_updated_by = request.user
+                        form_data.save()
+                        return Response({"success":True, "message":{"updated": 'Data updated Successfully.'}})
+                    return Response({"success":False, "message":{"errors":form_data.errors}})
+                return Response({"success":False, "message":{"id":'Id not provided'}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))
+        except Exception as e:
+            return Response({"success":False, "message":{"error":f"{e}"} })
+
+    def delete(self, request,badge_id=None):
+        try:
+            if request.user.is_staff:
+                if badge_id:
+                    data = request.data
+                    active = data.get('active')
+                    try:
+                        badge_data = Badges.objects.get(id=badge_id)
+                    except Badges.DoesNotExist  as not_exist:
+                        return Response({"success":False, "message":{"badge_id":not_exist}})
+                    badge_data.active = active
+                    badge_data.last_updated_by = request.user
+                    badge_data.save()
+                    return Response({"success":True, "message":{"updated": 'Status Changed Successfully.'}})
+                return Response({"success":False, "message":{"id":'Id not provided'}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))
+        except Exception as e:
+            return Response({"success":False, "message":{"error":f"{e}"} })
+
+
+class PointsView(APIView):
+
+    authentication_classes = (
+                    JwtAuthentication,
+                    BearerAuthenticationAllowInactiveUser,
+                    SessionAuthenticationAllowInactiveUser,
+                            )
+    permission_classes = (IsAuthenticated, )
+    
+    def post(self, request):
+        try:
+            if request.user.is_staff:
+                data = request.data
+                serialized_data = CoursePointsSerializer(data=data)
+                if serialized_data.is_valid():
+                    serialized_data.save(created_by=self.request.user)
+                    return Response({"success":True, "message":{"created":"Added Successfully"}})
+                return Response({"success":False, "message":{"error":serialized_data.errors}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))
+        except Exception as e:
+            return Response({"success":False, "message":{'error':f"{e}"}})
+
+    
+    def get(self, request, course_id=None):
+
+        try:
+            if request.user.is_staff:
+                if course_id != None:
+                    filtered_data = CoursePoints.objects.filter(course_id=course_id)
+                    if filtered_data.exists():
+                        filtered_data = [{"id": data.id, "course":course_id, "chapter":data.chapter, "reward_coins":data.reward_coins} for data in filtered_data]
+                    return Response({"success":True, "data":filtered_data})
+                return Response({"success":False, "message":{"id":"Course Id not provided"}})
+            return Response(({"success":False,'message':{"role":'Unauthorized action'}}))
+        except Exception as e:
+            return Response({"success":False, "message":{'error':f"{e}"}})
+
+        
+
 
