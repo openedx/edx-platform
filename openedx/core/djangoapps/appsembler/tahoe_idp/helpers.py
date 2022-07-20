@@ -30,6 +30,8 @@ from student.roles import (
     OrgStaffRole,
 )
 
+from tahoe_idp import api as tahoe_idp_api
+
 
 def is_tahoe_idp_enabled():
     """
@@ -37,6 +39,16 @@ def is_tahoe_idp_enabled():
     """
     global_flag = settings.FEATURES.get('ENABLE_TAHOE_IDP', False)
     return config_client_api.get_admin_value('ENABLE_TAHOE_IDP', default=global_flag)
+
+
+def get_idp_logout_url():
+    """
+    Get Tahoe IdP URL.
+    """
+    if is_tahoe_idp_enabled():
+        # This logs out from IdP first, then the IdP redirects to Open edX logout.
+        post_logout_redirect_uri = config_client_api.get_setting_value('LMS_ROOT_URL')
+        return tahoe_idp_api.get_logout_url(post_logout_redirect_uri=post_logout_redirect_uri)
 
 
 def get_idp_login_url(next_url=None, auth_entry='login'):
