@@ -8,6 +8,7 @@ from opaque_keys.edx.locator import (
     LibraryLocator,
     LibraryLocatorV2,
 )
+from user_tasks.models import UserTaskStatus
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.tasks import update_children_task, get_import_task_status
@@ -152,11 +153,17 @@ class LibraryToolsService:
                 raise PermissionDenied()
         update_children_task.delay(self.user_id, str(dest_block.location), version)
 
-    def import_task_status(self, dest_block):
+    def import_task_status(self, location):
         """
         Return task status for update_children_task.
         """
-        return get_import_task_status(dest_block.location)
+        return get_import_task_status(location)
+
+    def is_loading(self, location):
+        """
+        Return True if status is IN_PROGRESS.
+        """
+        return self.import_task_status(location) == UserTaskStatus.IN_PROGRESS
 
     def list_available_libraries(self):
         """

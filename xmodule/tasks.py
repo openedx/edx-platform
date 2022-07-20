@@ -52,6 +52,7 @@ def _import_block(store, user_id, source_block, dest_parent_key):
             hashlib.sha1(str(source_key).encode('utf-8')).hexdigest()[:10]
         )
         return dest_parent_key.context_key.make_usage_key(source_key.block_type, block_id)
+
     source_key = source_block.scope_ids.usage_id
     new_block_key = generate_block_key(source_key, dest_parent_key)
     try:
@@ -64,9 +65,9 @@ def _import_block(store, user_id, source_block, dest_parent_key):
             )
     except ItemNotFoundError:
         new_block = store.create_child(
-            user_id=user_id,
-            parent_usage_key=dest_parent_key,
-            block_type=source_key.block_type,
+            user_id,
+            dest_parent_key,
+            source_key.block_type,
             block_id=new_block_key.block_id,
         )
 

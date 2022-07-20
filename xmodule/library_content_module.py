@@ -434,8 +434,7 @@ class LibraryContentBlock(
         fragment = Fragment()
         root_xblock = context.get('root_xblock')
         is_root = root_xblock and root_xblock.location == self.location
-        task_status = self.tools.import_task_status(self)
-        is_loading = task_status == 'In Progress'
+        is_loading = self.tools.is_loading(self.location)
         if is_root and not is_loading:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
@@ -546,7 +545,7 @@ class LibraryContentBlock(
         """
         Return task status for update_children_task.
         """
-        task_status = self.tools.import_task_status(self)
+        task_status = self.tools.import_task_status(self.location)
         return Response(json.dumps({'status': task_status}))
 
     # Copy over any overridden settings the course author may have applied to the blocks.

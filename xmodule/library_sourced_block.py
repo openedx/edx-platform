@@ -159,8 +159,7 @@ class LibrarySourcedBlock(
         is_root = root_xblock and root_xblock.location == self.location  # pylint: disable=no-member
         # If block ID is not defined, ask user for the component ID in the author_view itself.
         # We don't display the editor if is_root as that page should represent the student_view without any ambiguity
-        status = self.tools.import_task_status(self)
-        is_loading = status == 'In Progress'
+        is_loading = self.tools.is_loading(self.location)
         if is_root and not is_loading:
             context = {} if not context else copy(context)  # Isolate context - without this there are weird
             # bugs in Studio EditableChildrenMixin.render_children will render HTML that allows instructors
@@ -362,5 +361,5 @@ class LibrarySourcedBlock(
         """
         Return task status for update_children_task.
         """
-        status = self.tools.import_task_status(self)
+        status = self.tools.import_task_status(self.location)
         return Response(json.dumps({'status': status}))
