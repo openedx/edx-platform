@@ -47,7 +47,6 @@ class CompileSassView(views.APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
         configuration = SiteConfiguration.objects.get(site=site)
-        configuration.init_api_client_adapter(site)
         sass_status = configuration.compile_microsite_sass()
 
         if sass_status['successful_sass_compile']:
