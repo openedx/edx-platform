@@ -887,8 +887,9 @@ mako==1.2.1
     #   lti-consumer-xblock
     #   xblock-google-drive
     #   xblock-utils
-markdown==3.4.1
+markdown==3.3.7
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-wiki
     #   staff-graded-xblock
