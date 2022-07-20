@@ -84,7 +84,7 @@ def test_tahoe_idp_roles_step_roles(user_details, should_be_admin, should_be_sta
     strategy.request.site = site
     strategy.request.backend.name = 'tahoe-idp'
 
-    with patch('openedx.core.djangoapps.appsembler.tahoe_idp.tpa_pipeline.tahoe_idp_api', create=True) as tahoe_idp_api:
+    with patch('tahoe_idp.api.update_tahoe_user_id') as mock_update_tahoe_user_id:
         tahoe_idp_user_updates(
             auth_entry=None,
             strategy=strategy,
@@ -98,7 +98,7 @@ def test_tahoe_idp_roles_step_roles(user_details, should_be_admin, should_be_sta
     assert creator_role.has_user(user) == should_be_staff, message
     assert tahoe_sites.api.is_active_admin_on_organization(user, organization) == should_be_admin, message
     assert user.profile.get_meta() == {'tahoe_idp_metadata': {'field': 'some value'}}
-    tahoe_idp_api.update_tahoe_user_id.assert_called_once_with(user)
+    mock_update_tahoe_user_id.assert_called_once_with(user)
 
 
 def test_tahoe_idp_roles_step_missing_details():

@@ -77,10 +77,7 @@ from xmodule.modulestore.django import modulestore
 
 from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
 
-try:
-    from tahoe_idp import api as tahoe_idp_api  # Tahoe: optional dependency
-except ImportError:
-    pass
+from tahoe_idp import api as tahoe_idp_api
 
 
 log = logging.getLogger("edx.student")

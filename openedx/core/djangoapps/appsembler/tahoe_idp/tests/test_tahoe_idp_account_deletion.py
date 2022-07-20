@@ -64,14 +64,17 @@ class MultiTenantDeactivateLogoutViewTest(APITestCase):
         })
         return response
 
-    @patch('openedx.core.djangoapps.user_api.accounts.views.tahoe_idp_api', create=True)
+    @patch('tahoe_idp.api.get_tahoe_idp_id_by_user')
+    @patch('tahoe_idp.api.deactivate_user')
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_TAHOE_IDP': True})
-    def test_disallow_email_reuse_after_deactivate(self, mock_tahoe_idp_api):
+    def test_disallow_email_reuse_after_deactivate(
+        self, mock_deactivate_user, mock_get_tahoe_idp_id_by_user
+    ):
         """
         Test the account deletion with Tahoe IdP support.
         """
         social_auth_uid = 'e1ede4d8-f6f6-11ec-9eb7-f778f1c67e22'
-        mock_tahoe_idp_api.get_tahoe_idp_id_by_user.return_value = social_auth_uid
+        mock_get_tahoe_idp_id_by_user.return_value = social_auth_uid
 
         with with_organization_context(site_color=self.RED):
             register_res = self.register_user(self.RED)
@@ -79,4 +82,4 @@ class MultiTenantDeactivateLogoutViewTest(APITestCase):
             deactivate_res = self.deactivate_user(self.RED)
             assert deactivate_res.status_code == status.HTTP_204_NO_CONTENT, deactivate_res.content.decode('utf-8')
 
-        mock_tahoe_idp_api.deactivate_user.assert_called_once_with(social_auth_uid)
+        mock_deactivate_user.assert_called_once_with(social_auth_uid)

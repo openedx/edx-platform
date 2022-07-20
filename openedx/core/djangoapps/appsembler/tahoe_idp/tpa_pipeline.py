@@ -8,11 +8,7 @@ import tahoe_sites.api
 
 from openedx.core.djangoapps.appsembler.auth import course_roles
 
-try:
-    from tahoe_idp import api as tahoe_idp_api
-except ImportError:
-    # Ignore import error until `tahoe-idp` installed in appsembler.txt for production.
-    pass
+from tahoe_idp import api as tahoe_idp_api
 
 from .helpers import store_idp_metadata_in_user_profile
 

@@ -50,10 +50,7 @@ from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_he
 
 from organizations.models import UserOrganizationMapping
 
-try:
-    from tahoe_idp import api as tahoe_idp_api  # Tahoe: optional dependency
-except ImportError:
-    pass
+from tahoe_idp import api as tahoe_idp_api
 
 
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
