@@ -13,7 +13,6 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from edx_django_utils.monitoring import set_code_owner_attribute
-from MySQLdb import OperationalError
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -215,7 +214,7 @@ def paged_query(queryset, delay, page_size):
             for item in subquery.iterator():
                 index += 1
                 yield page_start + index, item
-        except OperationalError:
+        except:
             # When running the notify_credentials command locally there is an
             # OperationalError thrown by MySQL when there are no more results
             # available for the queryset iterator. This change catches that exception,
