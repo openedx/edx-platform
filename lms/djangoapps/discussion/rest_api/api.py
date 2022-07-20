@@ -3,6 +3,7 @@ Discussion API internal interface
 """
 from __future__ import annotations
 
+import logging
 import itertools
 from collections import defaultdict
 from enum import Enum
@@ -103,6 +104,7 @@ from .utils import (
 )
 
 User = get_user_model()
+log = logging.getLogger(__name__)
 
 ThreadType = Literal["discussion", "question"]
 ViewType = Literal["unread", "unanswered"]
@@ -612,8 +614,12 @@ def _get_users(discussion_entity_type, discussion_entity, username_profile_dict)
     """
     users = {}
     if discussion_entity['author']:
-        users[discussion_entity['author']] = _user_profile(username_profile_dict[discussion_entity['author']])
-
+        try:
+            users[discussion_entity['author']] = _user_profile(username_profile_dict[discussion_entity['author']])
+        except ValueError as value_error:
+            log.error(f'User Profile do not exists for Author :{discussion_entity["author"]} '
+                      f'profiles list: {username_profile_dict.keys()} ')
+            raise value_error
     if (
         discussion_entity_type == DiscussionEntity.comment
         and discussion_entity['endorsed']
