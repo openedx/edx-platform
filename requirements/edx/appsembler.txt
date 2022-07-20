@@ -25,5 +25,5 @@ google-cloud-storage==1.32.0
 tahoe-idp==2.0.0
 tahoe-sites==0.1.6
 tahoe-lti==0.3.0
-site-configuration-client==0.1.12
+site-configuration-client==0.2.1
 analytics-python==1.4.0  # RED-2969: To enable sync_mode for workers server

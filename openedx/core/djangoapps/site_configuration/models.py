@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.files.storage import get_storage_class
 from django.db import models
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.encoding import python_2_unicode_compatible
 from jsonfield.fields import JSONField
@@ -66,7 +66,9 @@ class SiteConfiguration(models.Model):
     .. no_pii:
     """
 
-    api_adapter = None  # Tahoe: Placeholder for `site_config_client`'s `SiteConfigAdapter`
+    _api_adapter = None  # Tahoe: Placeholder for `site_config_client`'s `SiteConfigAdapter`
+    _api_adapter_initialization_attempted = False
+
     tahoe_config_modifier = None  # Tahoe: Placeholder for `TahoeConfigurationValueModifier` instance
 
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
@@ -89,17 +91,19 @@ class SiteConfiguration(models.Model):
     def __repr__(self):
         return self.__str__()
 
-    @beeline.traced('site_config.init_api_client_adapter')
-    def init_api_client_adapter(self, site):
-        """
-        Initialize `api_adapter`, this method is managed externally by `get_current_site_configuration()`.
-        """
-        # Tahoe: Import is placed here to avoid model import at project startup
-        from openedx.core.djangoapps.appsembler.sites import (
-            site_config_client_helpers as site_helpers,
-        )
-        if site_helpers.is_enabled_for_site(site):
-            self.api_adapter = site_helpers.init_site_configuration_adapter(site)
+    @property
+    def api_adapter(self):
+        with beeline.tracer('site_config.init_api_client_adapter'):
+            if not self._api_adapter_initialization_attempted:
+                # Tahoe: Import is placed here to avoid model import at project startup
+                from openedx.core.djangoapps.appsembler.sites import (
+                    site_config_client_helpers as site_helpers,
+                )
+                if site_helpers.is_enabled_for_site(self.site):
+                    self._api_adapter = site_helpers.init_site_configuration_adapter(self.site)
+                self._api_adapter_initialization_attempted = True
+
+        return self._api_adapter
 
     @beeline.traced('site_config.get_value')
     def get_value(self, name, default=None):
