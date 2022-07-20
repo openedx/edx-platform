@@ -43,9 +43,6 @@ pymongo<4.0.0
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
 
-# greater version has breaking changes and requires some migration steps.
-django-webpack-loader==0.7.0
-
 # Release 2.1.0 pulls declares `pact-python` as a base requirement, even though it should be
 # a testing requirement. Installing it would cause a bunch of new tool packages to become base
 # requirements of edx-platform. Pinning temporarily until this is resolved in edx-val.
