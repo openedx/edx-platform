@@ -82,7 +82,7 @@ def compute_all_grades_for_course(**kwargs):
     default_retry_delay=RETRY_DELAY_SECONDS,
     max_retries=1,
     time_limit=COURSE_GRADE_TIMEOUT_SECONDS,
-    rate_limit=settings.POLICY_CHANGE_TASK_RATE_LIMIT,
+    rate_limit='900/h',
 )
 @set_code_owner_attribute
 def compute_grades_for_course_v2(self, **kwargs):
