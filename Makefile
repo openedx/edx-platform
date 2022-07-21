@@ -109,7 +109,7 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 
 	pip install -q pip-tools
-	pip-compile --allow-unsafe --upgrade -o requirements/pip.txt requirements/pip.in;
+	pip-compile --allow-unsafe --upgrade -o requirements/pip.txt requirements/pip.in
 
 	@ export REBUILD='--rebuild'; \
 	for f in $(REQ_FILES); do \
