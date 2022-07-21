@@ -184,8 +184,8 @@ def container_handler(request, usage_key_string):
                     break
                 index += 1
 
-            library_problem_types = [problem_type['component'] for problem_type in LIBRARY_PROBLEM_TYPES]
-            is_library_xblock = xblock.location.block_type in library_problem_types
+            library_block_types = [problem_type['component'] for problem_type in LIBRARY_BLOCK_TYPES]
+            is_library_xblock = xblock.location.block_type in library_block_types
 
             return render_to_response('container.html', {
                 'language_code': request.LANGUAGE_CODE,
