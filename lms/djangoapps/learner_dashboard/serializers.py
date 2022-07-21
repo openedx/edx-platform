@@ -24,7 +24,7 @@ class CourseProviderSerializer(serializers.Serializer):
 
 
 class CourseSerializer(serializers.Serializer):
-    """Serializer for course header info, derived from course overview"""
+    """Course header information, derived from a CourseOverview"""
 
     bannerImgSrc = serializers.URLField(source="banner_image_url")
     courseName = serializers.CharField(source="display_name_with_default")
@@ -32,8 +32,8 @@ class CourseSerializer(serializers.Serializer):
 
 class CourseRunSerializer(serializers.Serializer):
     """
-    Serializer for course run info.
-    Based on a CourseEnrollment with required context:
+    Information about a course run.
+    Derived from the CourseEnrollment with required context:
     - "resume_course_urls" (dict) with a matching course_id key
     - "ecommerce_payment_page" (url) root to the ecommerce page
     - "course_mode_info" (dict) keyed by course ID, with sub info:
