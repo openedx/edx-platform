@@ -39,8 +39,8 @@ from xblock.fields import ScopeIds  # lint-amnesty, pylint: disable=wrong-import
 from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.test.tools import TestRuntime  # lint-amnesty, pylint: disable=wrong-import-order
 
-from capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
-from capa.xqueue_interface import XQueueInterface
+from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
+from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_module import ProblemBlock
 from xmodule.contentstore.django import contentstore
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
