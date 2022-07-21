@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 import ddt
 import pytest
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from ccx_keys.locator import CCXLocator
 from crum import set_current_request
 from django.conf import settings
@@ -19,7 +20,6 @@ from submissions import api as sub_api
 
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from common.djangoapps.student.roles import CourseCcxCoachRole
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory

@@ -4,8 +4,8 @@
 import textwrap
 import unittest
 
-from xmodule.capa.responsetypes import LoncapaProblemError
-from xmodule.capa.tests.helpers import new_loncapa_problem, test_capa_system
+from capa.responsetypes import LoncapaProblemError
+from capa.tests.helpers import new_loncapa_problem, test_capa_system
 
 
 class CapaShuffleTest(unittest.TestCase):
