@@ -1357,6 +1357,8 @@ base_vendor_js = [
     # Load Bootstrap and supporting libraries
     'common/js/vendor/popper.js',
     'common/js/vendor/bootstrap.js',
+    'common/js/vendor/react.min.js',
+    'common/js/vendor/react-dom.min.js',
 
     # Finally load RequireJS
     'common/js/vendor/require.js'

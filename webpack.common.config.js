@@ -6,6 +6,7 @@ var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var StringReplace = require('string-replace-webpack-plugin');
+var CopyPlugin = require("copy-webpack-plugin");
 var Merge = require('webpack-merge');
 
 var files = require('./webpack-config/file-lists.js');
@@ -165,7 +166,12 @@ module.exports = Merge.smart({
                 name: 'commons',
                 filename: 'commons.js',
                 minChunks: 10
-            })
+            }),
+
+            new CopyPlugin([
+                { from: "node_modules/react/umd/react.production.min.js", to: path.resolve(__dirname, 'common/static/common/js/vendor/react.min.js')},
+                { from: "node_modules/react-dom/umd/react-dom.production.min.js", to: path.resolve(__dirname, 'common/static/common/js/vendor/react-dom.min.js')},
+            ], {}),
         ],
 
         module: {

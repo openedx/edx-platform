@@ -12,7 +12,7 @@
 
 edx-opaque-keys                     # Create and introspect course and xblock identities
 lazy                                # Lazily-evaluated attributes for Python objects
-libsass==0.21.0                     # Python bindings for the LibSass CSS compiler
+libsass==0.20.0                     # Python bindings for the LibSass CSS compiler
 markupsafe                          # XML/HTML/XHTML Markup safe strings
 mock                                # Stub out code with mock objects and make assertions about how they have been used
 path                                # Easier manipulation of filesystem paths
