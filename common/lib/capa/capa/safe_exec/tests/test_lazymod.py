@@ -4,7 +4,7 @@
 import sys
 import unittest
 
-from xmodule.capa.safe_exec.lazymod import LazyModule
+from capa.safe_exec.lazymod import LazyModule
 
 
 class ModuleIsolation(object):

@@ -43,8 +43,8 @@ from shapely.geometry import MultiPoint, Point
 from six import text_type
 from six.moves import map, range, zip
 
-import xmodule.capa.safe_exec as safe_exec
-import xmodule.capa.xqueue_interface as xqueue_interface
+import capa.safe_exec as safe_exec
+import capa.xqueue_interface as xqueue_interface
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib import edx_six
 from openedx.core.lib.grade_utils import round_away_from_zero

@@ -46,10 +46,10 @@ cms/static/js/spec/views/course_info_spec.js
 cms/static/js/spec/views/metadata_edit_spec.js
 cms/static/js/spec/views/textbook_spec.js
 cms/static/js/spec/views/upload_spec.js
-xmodule/capa/tests/test_files/js/test_problem_display.js
-xmodule/capa/tests/test_files/js/test_problem_generator.js
-xmodule/capa/tests/test_files/js/test_problem_grader.js
-xmodule/capa/tests/test_files/js/xproblem.js
+common/lib/capa/capa/tests/test_files/js/test_problem_display.js
+common/lib/capa/capa/tests/test_files/js/test_problem_generator.js
+common/lib/capa/capa/tests/test_files/js/test_problem_grader.js
+common/lib/capa/capa/tests/test_files/js/xproblem.js
 lms/static/js/spec/calculator_spec.js
 lms/static/js/spec/courseware_spec.js
 lms/static/js/spec/feedback_form_spec.js

@@ -26,7 +26,7 @@ from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, ScopeIds
 
-from xmodule.capa.xqueue_interface import XQueueService
+from capa.xqueue_interface import XQueueService
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.django import contentstore
 from xmodule.mako_module import MakoDescriptorSystem

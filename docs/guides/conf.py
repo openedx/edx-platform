@@ -20,6 +20,7 @@ root = Path('../..').abspath()
 # can be successfully imported
 sys.path.insert(0, root)
 sys.path.append(root / "docs/guides")
+sys.path.append(root / "common/lib/capa")
 
 
 # Use a settings module that allows all LMS and Studio code to be imported
@@ -220,6 +221,7 @@ autodoc_mock_imports = [
 # the generated *.rst files
 modules = {
     'cms': 'cms',
+    'common/lib/capa/capa': 'common/lib/capa',
     'lms': 'lms',
     'openedx': 'openedx',
     'xmodule': 'xmodule',
