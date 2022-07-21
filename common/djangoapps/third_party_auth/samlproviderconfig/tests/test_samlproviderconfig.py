@@ -265,16 +265,20 @@ class SAMLProviderConfigTests(APITestCase):
         Test that a config cannot be created with an entity ID if another config already exists with that entity ID and
         a different slug
         """
-        url = reverse('saml_provider_config-list')
-        data = copy.copy(SINGLE_PROVIDER_CONFIG)
-        data['enterprise_customer_uuid'] = ENTERPRISE_ID
-        data['slug'] = 'some-other-slug'
+        with self.assertLogs() as ctx:
+            url = reverse('saml_provider_config-list')
+            data = copy.copy(SINGLE_PROVIDER_CONFIG)
+            data['enterprise_customer_uuid'] = ENTERPRISE_ID
+            data['slug'] = 'some-other-slug'
 
-        response = self.client.post(url, data)
+            response = self.client.post(url, data)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert len(SAMLProviderConfig.objects.all()) == 1
-        assert str(response.data.get('non_field_errors')[0]) == f"Entity ID: {data['entity_id']} already taken"
+        # 7/21/22 : Disabling the exception on duplicate entity ID's because of existing data.
+        assert ctx.records[-2].msg == f"Entity ID: {data['entity_id']} already taken"
+        assert response.status_code == status.HTTP_201_CREATED
+        # assert response.status_code == status.HTTP_400_BAD_REQUEST
+        # assert len(SAMLProviderConfig.objects.all()) == 1
+        # assert str(response.data.get('non_field_errors')[0]) == f"Entity ID: {data['entity_id']} already taken"
 
     def test_unique_entity_id_constraint_with_same_slug(self):
         """
