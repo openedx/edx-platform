@@ -2285,7 +2285,9 @@ base_vendor_js = [
     'common/js/vendor/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
-    'common/js/vendor/backbone.js'
+    'common/js/vendor/backbone.js',
+    'common/js/vendor/react.min.js',
+    'common/js/vendor/react-dom.min.js',
 ]
 
 main_vendor_js = base_vendor_js + [
@@ -2677,7 +2679,9 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/groups/discussions_management/discussions_dashboard_factory':
         'js/discussions_management/views/discussions_dashboard_factory.js',
     'draggabilly': 'js/vendor/draggabilly.js',
-    'hls': 'common/js/vendor/hls.js'
+    'hls': 'common/js/vendor/hls.js',
+    'react': 'common/js/vendor/react.min.js',
+    'react-dom': 'common/js/vendor/react-dom.min.js'
 }
 
 ########################## DJANGO WEBPACK LOADER ##############################
