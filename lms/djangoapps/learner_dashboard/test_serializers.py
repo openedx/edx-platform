@@ -39,7 +39,7 @@ def random_date(allow_null=False):
         return None
 
     d = randint(1, int(time()))
-    return datetime.datetime.fromtimestamp(d)
+    return datetime.datetime.fromtimestamp(d, tz=datetime.timezone.utc)
 
 
 def random_url(allow_null=False):
