@@ -3656,7 +3656,7 @@ FINANCIAL_REPORTS = {
 
 #### Grading policy change-related settings #####
 # Rate limit for regrading tasks that a grading policy change can kick off
-POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
+POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
 
 #### PASSWORD POLICY SETTINGS #####
 AUTH_PASSWORD_VALIDATORS = [
