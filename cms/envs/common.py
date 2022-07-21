@@ -1825,6 +1825,10 @@ ADVANCED_PROBLEM_TYPES = [
     {
         'component': 'staffgradedxblock',
         'boilerplate_name': None
+    },
+    {
+        'component': 'scormxblock',
+        'boilerplate_name': None
     }
 ]
 
