@@ -6,6 +6,12 @@ from time import time
 from unittest import TestCase
 from unittest import mock
 from uuid import uuid4
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import (
+    CourseEnrollmentFactory,
+    UserFactory,
+)
 
 from lms.djangoapps.learner_dashboard.serializers import (
     CertificateSerializer,
@@ -137,16 +143,14 @@ class TestCourseSerializer(TestCase):
         }
 
 
-class TestCourseRunSerializer(TestCase):
+class TestCourseRunSerializer(SharedModuleStoreTestCase):
     """Tests for the CourseRunSerializer"""
 
     @classmethod
     def generate_test_course_run_info(cls):
         """Util to generate test course run info"""
         return {
-            "isPending": random_bool(),
             "isStarted": random_bool(),
-            "isFinished": random_bool(),
             "isArchived": random_bool(),
             "courseNumber": f"{uuid4()}-101",
             "accessExpirationDate": random_date(),
@@ -157,29 +161,46 @@ class TestCourseRunSerializer(TestCase):
             "progressUrl": f"{uuid4()}.example.com",
             "unenrollUrl": f"{uuid4()}.example.com",
             "upgradeUrl": f"{uuid4()}.example.com",
+            "resumeUrl": random_url(),
         }
 
-    def test_happy_path(self):
-        input_data = self.generate_test_course_run_info()
-        output_data = CourseRunSerializer(input_data).data
+    def setUp(self):
+        """Create a test enrollment & data"""
+        self.user = UserFactory()
 
-        assert output_data == {
-            "isPending": input_data["isPending"],
-            "isStarted": input_data["isStarted"],
-            "isFinished": input_data["isFinished"],
-            "isArchived": input_data["isArchived"],
-            "courseNumber": input_data["courseNumber"],
-            "accessExpirationDate": datetime_to_django_format(
-                input_data["accessExpirationDate"]
-            ),
-            "minPassingGrade": decimal_to_grade_format(input_data["minPassingGrade"]),
-            "endDate": datetime_to_django_format(input_data["endDate"]),
-            "homeUrl": input_data["homeUrl"],
-            "marketingUrl": input_data["marketingUrl"],
-            "progressUrl": input_data["progressUrl"],
-            "unenrollUrl": input_data["unenrollUrl"],
-            "upgradeUrl": input_data["upgradeUrl"],
+        self.course = CourseFactory(self_paced=True)
+        CourseModeFactory(
+            course_id=self.course.id,
+            mode_slug=CourseMode.AUDIT,
+        )
+
+        self.test_enrollment = CourseEnrollmentFactory(
+            course_id=self.course.id, mode=CourseMode.AUDIT
+        )
+
+        # Add extra info to exercise serialization
+        self.test_enrollment.course_overview.marketing_url = random_url()
+        self.test_enrollment.course_overview.end = random_date()
+
+    def test_with_data(self):
+        input_data = self.test_enrollment
+        input_context = {
+            "resume_course_urls": {self.course.id: random_url()},
+            "ecommerce_payment_page": random_url(),
+            "course_mode_info": {
+                self.course.id: {
+                    "verified_sku": str(uuid4()),
+                    "days_for_upsell": randint(0, 14),
+                }
+            },
         }
+
+        serializer = CourseRunSerializer(input_data, context=input_context)
+        output = serializer.data
+
+        # Serializaiton set up so all fields will have values to make testing easy
+        for key in output:
+            assert output[key] is not None
 
 
 class TestEnrollmentSerializer(TestCase):

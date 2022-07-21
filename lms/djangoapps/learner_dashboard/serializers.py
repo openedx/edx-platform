@@ -2,6 +2,8 @@
 Serializers for the Learner Dashboard
 """
 
+from django.urls import reverse
+from openedx.features.course_experience import course_home_url
 from rest_framework import serializers
 
 
@@ -22,28 +24,79 @@ class CourseProviderSerializer(serializers.Serializer):
 
 
 class CourseSerializer(serializers.Serializer):
-    """Serializer for course header info"""
+    """Serializer for course header info, derived from course overview"""
 
-    bannerImgSrc = serializers.URLField()
-    courseName = serializers.CharField()
+    bannerImgSrc = serializers.URLField(source="banner_image_url")
+    courseName = serializers.CharField(source="display_name_with_default")
 
 
 class CourseRunSerializer(serializers.Serializer):
-    """Serializer for course run info"""
+    """
+    Serializer for course run info.
+    Based on a CourseEnrollment with required context:
+    - "resume_course_urls" (dict) with a matching course_id key
+    - "ecommerce_payment_page" (url) root to the ecommerce page
+    - "course_mode_info" (dict) keyed by course ID, with sub info:
+        - "verified_sku" (uid, optional) if the course has an upgrade identifier
+        - "days_for_upsell" (int, optional) days before audit student loses access
+    """
 
-    isPending = serializers.BooleanField()
-    isStarted = serializers.BooleanField()
-    isFinished = serializers.BooleanField()
-    isArchived = serializers.BooleanField()
-    courseNumber = serializers.CharField()
-    accessExpirationDate = serializers.DateTimeField()
-    minPassingGrade = serializers.DecimalField(max_digits=5, decimal_places=2)
-    endDate = serializers.DateTimeField()
-    homeUrl = serializers.URLField()
-    marketingUrl = serializers.URLField()
-    progressUrl = serializers.URLField()
-    unenrollUrl = serializers.URLField()
-    upgradeUrl = serializers.URLField()
+    requires_context = True
+
+    isStarted = serializers.SerializerMethodField()
+    isArchived = serializers.SerializerMethodField()
+    courseNumber = serializers.CharField(
+        source="course_overview.display_number_with_default"
+    )
+    accessExpirationDate = serializers.SerializerMethodField()
+    minPassingGrade = serializers.DecimalField(
+        max_digits=5, decimal_places=2, source="course_overview.lowest_passing_grade"
+    )
+    endDate = serializers.DateTimeField(source="course_overview.end")
+    homeUrl = serializers.SerializerMethodField()
+    marketingUrl = serializers.URLField(
+        source="course_overview.marketing_url", allow_null=True
+    )
+    progressUrl = serializers.SerializerMethodField()
+    unenrollUrl = serializers.SerializerMethodField()
+    upgradeUrl = serializers.SerializerMethodField()
+    resumeUrl = serializers.SerializerMethodField()
+
+    def get_isStarted(self, instance):
+        return instance.course_overview.has_started()
+
+    def get_isArchived(self, instance):
+        return instance.course_overview.has_ended()
+
+    def get_accessExpirationDate(self, instance):
+        return (
+            self.context.get("course_mode_info", {})
+            .get(instance.course_id)
+            .get("days_for_upsell")
+        )
+
+    def get_homeUrl(self, instance):
+        return course_home_url(instance.course_id)
+
+    def get_progressUrl(self, instance):
+        return reverse("progress", kwargs={"course_id": instance.course_id})
+
+    def get_unenrollUrl(self, instance):
+        return reverse("course_run_refund_status", args=[instance.course_id])
+
+    def get_upgradeUrl(self, instance):
+        ecommerce_payment_page = self.context.get("ecommerce_payment_page")
+        verified_sku = (
+            self.context.get("course_mode_info", {})
+            .get(instance.course_id, {})
+            .get("verified_sku")
+        )
+
+        if ecommerce_payment_page and verified_sku:
+            return f"{ecommerce_payment_page}?sku={verified_sku}"
+
+    def get_resumeUrl(self, instance):
+        return self.context.get("resume_course_urls", {}).get(instance.course_id)
 
 
 class EnrollmentSerializer(serializers.Serializer):
@@ -123,10 +176,13 @@ class ProgramsSerializer(serializers.Serializer):
 
 
 class LearnerEnrollmentSerializer(serializers.Serializer):
-    """Info for displaying an enrollment on the learner dashboard"""
+    """
+    Info for displaying an enrollment on the learner dashboard.
+    Derived from a CourseEnrollment with added context.
+    """
 
     courseProvider = CourseProviderSerializer(allow_null=True)
-    course = CourseSerializer()
+    course = CourseSerializer(source="course_overview")
     courseRun = CourseRunSerializer()
     enrollment = EnrollmentSerializer()
     gradeData = GradeDataSerializer()
@@ -178,6 +234,8 @@ class EnterpriseDashboardsSerializer(serializers.Serializer):
 
 class LearnerDashboardSerializer(serializers.Serializer):
     """Serializer for all info required to render the Learner Dashboard"""
+
+    requires_context = True
 
     emailConfirmation = EmailConfirmationSerializer()
     enterpriseDashboards = EnterpriseDashboardsSerializer()
