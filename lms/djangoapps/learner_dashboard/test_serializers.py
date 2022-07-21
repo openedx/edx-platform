@@ -30,6 +30,8 @@ from lms.djangoapps.learner_dashboard.serializers import (
     SuggestedCourseSerializer,
     UnfulfilledEntitlementSerializer,
 )
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 def random_bool():
@@ -398,8 +400,27 @@ class TestProgramsSerializer(TestCase):
         assert output_data == {"relatedPrograms": []}
 
 
-class TestLearnerEnrollmentsSerializer(TestCase):
+class TestLearnerEnrollmentsSerializer(SharedModuleStoreTestCase):
     """High-level tests for LearnerEnrollmentsSerializer"""
+
+    @classmethod
+    def setUpClass(cls):
+        """Create a test user"""
+        super().setUpClass()
+        cls.user = UserFactory()
+
+    def setUp(self):
+        """Generate a test audit course and enrollment"""
+        super().setUp()
+
+        self.course = CourseFactory(self_paced=True)
+        CourseModeFactory(
+            course_id=self.course.id,
+            mode_slug=CourseMode.AUDIT,
+        )
+        self.test_enrollment = CourseEnrollmentFactory(
+            course_id=self.course.id, mode=CourseMode.AUDIT
+        )
 
     @classmethod
     def generate_test_enrollments_data(cls):
@@ -418,7 +439,24 @@ class TestLearnerEnrollmentsSerializer(TestCase):
         """Test that nothing breaks and the output fields look correct"""
         input_data = self.generate_test_enrollments_data()
 
-        output_data = LearnerEnrollmentSerializer(input_data).data
+        enrollment = self.set_up_test_enrollment()
+        input_data["courseRun"] = enrollment
+        input_data["course"] = enrollment.course
+
+        input_context = {
+            "resume_course_urls": {self.course.id: random_url()},
+            "ecommerce_payment_page": random_url(),
+            "course_mode_info": {
+                self.course.id: {
+                    "verified_sku": str(uuid4()),
+                    "days_for_upsell": randint(0, 14),
+                }
+            },
+        }
+
+        output_data = LearnerEnrollmentSerializer(
+            input_data, context=input_context
+        ).data
 
         expected_keys = [
             "courseProvider",

@@ -182,7 +182,7 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     """
 
     courseProvider = CourseProviderSerializer(allow_null=True)
-    course = CourseSerializer(source="course_overview")
+    course = CourseSerializer()
     courseRun = CourseRunSerializer()
     enrollment = EnrollmentSerializer()
     gradeData = GradeDataSerializer()
