@@ -102,13 +102,47 @@ class CourseRunSerializer(serializers.Serializer):
 class EnrollmentSerializer(serializers.Serializer):
     """Info about this particular enrollment"""
 
-    isAudit = serializers.BooleanField()
-    isVerified = serializers.BooleanField()
-    canUpgrade = serializers.BooleanField()
-    isAuditAccessExpired = serializers.BooleanField()
-    isEmailEnabled = serializers.BooleanField()
-    lastEnrolled = serializers.DateTimeField()
-    isEnrolled = serializers.BooleanField()
+    canUpgrade = serializers.SerializerMethodField()
+    hasFinished = serializers.SerializerMethodField()
+    isAudit = serializers.SerializerMethodField()
+    isAuditAccessExpired = serializers.SerializerMethodField()
+    isEnrolled = serializers.BooleanField(source="is_active")
+    isEmailEnabled = serializers.SerializerMethodField()
+    isVerified = serializers.SerializerMethodField()
+    lastEnrolled = serializers.DateTimeField(source="created")
+
+    def get_canUpgrade(self, enrollment):
+        use_ecommerce_payment_flow = self.context.get(
+            "use_ecommerce_payment_flow", False
+        )
+        course_mode_info = self.context.get("course_mode_info", {}).get(
+            enrollment.course_id, {}
+        )
+        return bool(
+            use_ecommerce_payment_flow
+            and course_mode_info.get("show_upsell", False)
+            # and not entitlement - don't think we need this any more
+            and course_mode_info.get("verified_sku", False)
+        )
+
+    def get_hasFinished(self, enrollment):
+        # TODO
+        return False
+
+    def get_isAudit(self, enrollment):
+        return enrollment.mode in ["audit", "honor"]
+
+    def get_isAuditAccessExpired(self, enrollment):
+        show_courseware_link = self.context.get("show_courseware_link", {}).get(
+            enrollment.course.id
+        )
+        return show_courseware_link.get("error_code") == "audit_expired"
+
+    def get_isEmailEnabled(self, enrollment):
+        return enrollment.course_id in self.context.get("show_email_settings_for", [])
+
+    def get_isVerified(self, enrollment):
+        return enrollment.is_verified_enrollment()
 
 
 class GradeDataSerializer(serializers.Serializer):

@@ -205,38 +205,86 @@ class TestCourseRunSerializer(SharedModuleStoreTestCase):
             assert output[key] is not None
 
 
-class TestEnrollmentSerializer(TestCase):
+class TestEnrollmentSerializer(SharedModuleStoreTestCase):
     """Tests for the EnrollmentSerializer"""
 
     @classmethod
-    def generate_test_enrollment_info(cls):
-        """Util to generate test enrollment info"""
-        return {
-            "isAudit": random_bool(),
-            "isVerified": random_bool(),
-            "canUpgrade": random_bool(),
-            "isAuditAccessExpired": random_bool(),
-            "isEmailEnabled": random_bool(),
-            "lastEnrolled": random_date(),
-            "isEnrolled": random_bool(),
+    def setUpClass(cls):
+        """Create a test user"""
+        super().setUpClass()
+        cls.user = UserFactory()
+
+    def setUp(self):
+        """Generate a test audit course and enrollment"""
+        super().setUp()
+
+        self.course = CourseFactory(self_paced=True)
+        CourseModeFactory(
+            course_id=self.course.id,
+            mode_slug=CourseMode.AUDIT,
+        )
+        self.test_enrollment = CourseEnrollmentFactory(
+            course_id=self.course.id, mode=CourseMode.AUDIT
+        )
+
+        # Starter context object for serialization
+        self.test_context = {
+            "use_ecommerce_payment_flow": True,
+            "show_email_settings_for": [self.course.id],
+            "course_mode_info": {self.course.id: {"show_upsell": False}},
+            "show_courseware_link": {self.course.id: {"has_access": True}},
         }
 
-    def test_happy_path(self):
-        input_data = self.generate_test_enrollment_info()
-        output_data = EnrollmentSerializer(input_data).data
+    def test_with_data(self):
+        input_data = self.test_enrollment
+        input_context = self.test_context
 
-        self.assertDictEqual(
-            output_data,
+        serializer = EnrollmentSerializer(input_data, context=input_context)
+        output = serializer.data
+
+        # Serializaiton set up so all fields will have values to make testing easy
+        for key in output:
+            assert output[key] is not None
+
+    def test_audit_access_expired(self):
+        input_data = self.test_enrollment
+        input_context = self.test_context
+
+        # Example audit expired context
+        input_context.update(
             {
-                "isAudit": input_data["isAudit"],
-                "isVerified": input_data["isVerified"],
-                "canUpgrade": input_data["canUpgrade"],
-                "isAuditAccessExpired": input_data["isAuditAccessExpired"],
-                "isEmailEnabled": input_data["isEmailEnabled"],
-                "lastEnrolled": datetime_to_django_format(input_data["lastEnrolled"]),
-                "isEnrolled": input_data["isEnrolled"],
+                "show_courseware_link": {
+                    self.course.id: {"error_code": "audit_expired"}
             },
+            }
         )
+
+        serializer = EnrollmentSerializer(input_data, context=input_context)
+        output = serializer.data
+
+        assert output["isAuditAccessExpired"] == True
+
+    def test_user_can_upgrade(self):
+        input_data = self.test_enrollment
+        input_context = self.test_context
+
+        # Example audit expired context
+        input_context.update(
+            {
+                "course_mode_info": {
+                    self.course.id: {"show_upsell": True, "verified_sku": uuid4()}
+                }
+            }
+        )
+
+        serializer = EnrollmentSerializer(input_data, context=input_context)
+        output = serializer.data
+
+        # Serializaiton set up so all fields will have values to make testing easy
+        for key in output:
+            assert output[key] is not None
+
+        assert output["canUpgrade"] == True
 
 
 class TestGradeDataSerializer(TestCase):
