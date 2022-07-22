@@ -389,7 +389,7 @@ class CourseEventsSignalsTest(ModuleStoreTestCase):
             }
         )
 
-    @override_settings(OUTCOME_SURVEYS_FOLLOW_UP_SIGNAL_ENABLED=True)
+    @override_settings(OUTCOME_SURVEYS_EVENTS_ENABLED=True)
     @patch('lms.djangoapps.grades.events.segment.track')
     @patch('lms.djangoapps.grades.signals.signals.SCHEDULE_FOLLOW_UP_SEGMENT_EVENT_FOR_COURSE_PASSED_FIRST_TIME.send')
     def test_segment_event_on_course_grade_passed_first_time(self, signal_mock, segment_track_mock):
