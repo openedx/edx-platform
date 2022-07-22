@@ -51,7 +51,11 @@ from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     topic_name_to_id
 )
 from lms.djangoapps.discussion.django_comment_client.utils import strip_none
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles import (
+    ENABLE_DISCUSSIONS_MFE,
+    ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE,
+    ENABLE_DISCUSSIONS_MFE_BANNER
+)
 from lms.djangoapps.discussion.views import _get_discussion_default_topic_id, course_discussions_settings_handler
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -2325,3 +2329,100 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
             assert "discussions-mfe-tab-embed" in content
         else:
             assert "discussions-mfe-tab-embed" not in content
+
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    @ddt.data(*itertools.product(("learner", "staff"), (True, False)))
+    @ddt.unpack
+    def test_redirect_from_legacy_base_url_to_new_experience(self, user_role, toggle_enabled):
+        """
+        Verify that the requested is redirected to MFE homepage when
+        ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE flag is enabled. Privileged users will
+        be able to view legacy experience. For learners, if ENABLE_DISCUSSIONS_MFE_BANNER
+        flag is enabled, they will be able to use legacy otherwise they will be redirected
+        to MFE.
+        """
+        if user_role == "staff":
+            user = self.staff_user
+        elif user_role == "learner":
+            user = self.user
+
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE, toggle_enabled):
+            self.client.login(username=user.username, password='test')
+            url = reverse("forum_form_discussion", args=[self.course.id])
+            response = self.client.get(url)
+            content = response.content.decode('utf8')
+
+        if toggle_enabled:
+            assert "discussions-mfe-tab-embed" in content
+        else:
+            assert "discussions-mfe-tab-embed" not in content
+
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    @ddt.data(*itertools.product(("learner", "staff"), (True, False)))
+    @ddt.unpack
+    def test_redirect_from_legacy_profile_url_to_new_experience(self, user_role, toggle_enabled):
+        """
+        Verify that the requested is redirected to MFE homepage when
+        ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE flag is enabled. This redirect is only
+        for learners and not for privileged users.
+        """
+        if user_role == "staff":
+            user = self.staff_user
+        elif user_role == "learner":
+            user = self.user
+
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE, toggle_enabled):
+            self.client.login(username=user.username, password='test')
+            url = reverse("user_profile", args=[self.course.id, user.id])
+            response = self.client.get(url)
+            content = response.content.decode('utf8')
+        if toggle_enabled and user == "learner":
+            assert "discussions-mfe-tab-embed" in content
+        else:
+            assert "discussions-mfe-tab-embed" not in content
+
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    @ddt.data(*itertools.product(("learner", "staff"), (True, False)))
+    @ddt.unpack
+    def test_correct_experience_for_single_thread_url_for_everyone_flag(self, user_role, toggle_enabled):
+        """
+        Verify that the correct experience is shown based on the MFE toggle for everyone
+        for Legacy single thread url
+        """
+        if user_role == "staff":
+            user = self.staff_user
+        elif user_role == "learner":
+            user = self.user
+
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE, toggle_enabled):
+            self.client.login(username=user.username, password='test')
+            url = reverse("single_thread", args=[self.course.id, "test_discussion", "test_thread"])
+            response = self.client.get(url)
+            content = response.content.decode('utf8')
+        if toggle_enabled and user == "learner":
+            assert "discussions-mfe-tab-embed" in content
+        else:
+            assert "discussions-mfe-tab-embed" not in content
+
+    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
+    @ddt.data(*itertools.product(("legacy", "new"), (True, False)))
+    @ddt.unpack
+    def test_correct_experience_for_learner_banner_flag(self, experience, toggle_enabled):
+        """
+        Verify that the correct experience is shown based on the MFE toggle for everyone
+        for Legacy single thread url
+        """
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE, True):
+            with override_waffle_flag(ENABLE_DISCUSSIONS_MFE_BANNER, toggle_enabled):
+                self.client.login(username=self.user.username, password='test')
+                url = reverse("forum_form_discussion", args=[self.course.id])
+                url += f"?discussions_experience={experience}"
+                response = self.client.get(url)
+                content = response.content.decode('utf8')
+
+            if experience == "new":
+                assert "discussions-mfe-tab-embed" in content
+            elif not toggle_enabled and experience == "legacy":
+                assert response.status_code == 302
+            else:
+                assert "discussions-mfe-tab-embed" not in content
