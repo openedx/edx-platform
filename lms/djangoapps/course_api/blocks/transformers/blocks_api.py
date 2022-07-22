@@ -11,6 +11,7 @@ from .extra_fields import ExtraFieldsTransformer
 from .navigation import BlockNavigationTransformer
 from .student_view import StudentViewTransformer
 from .video_urls import VideoBlockURLTransformer
+from .video_stream_priority import VideoBlockStreamPriorityTransformer
 
 
 class BlocksAPITransformer(BlockStructureTransformer):
@@ -72,4 +73,5 @@ class BlocksAPITransformer(BlockStructureTransformer):
         BlockDepthTransformer(self.depth).transform(usage_info, block_structure)
         BlockNavigationTransformer(self.nav_depth).transform(usage_info, block_structure)
         VideoBlockURLTransformer().transform(usage_info, block_structure)
+        VideoBlockStreamPriorityTransformer().transform(usage_info, block_structure)
         ExtraFieldsTransformer().transform(usage_info, block_structure)
