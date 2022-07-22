@@ -15,19 +15,19 @@ class RecommendationsPanel extends React.Component {
     };
   }
 
-  onCourseSelect(courseRunKey) {
+  onCourseSelect(courseKey) {
     window.analytics.track('edx.bi.user.recommended.course.click', {
-      course_key: courseRunKey,
+      course_key: courseKey,
       is_personalized_recommendation: this.state.isPersonalizedRecommendation,
     });
 
     let recommendedCourses = Cookies.get(this.cookieName);
     if (typeof recommendedCourses === 'undefined') {
-      recommendedCourses = { course_keys: [courseRunKey] };
+      recommendedCourses = { course_keys: [courseKey] };
     } else {
       recommendedCourses = JSON.parse(recommendedCourses);
-      if (!recommendedCourses.course_keys.includes(courseRunKey)) {
-        recommendedCourses.course_keys.push(courseRunKey);
+      if (!recommendedCourses.course_keys.includes(courseKey)) {
+        recommendedCourses.course_keys.push(courseKey);
       }
     }
     recommendedCourses['is_personalized_recommendation'] = this.state.isPersonalizedRecommendation;
@@ -64,7 +64,7 @@ class RecommendationsPanel extends React.Component {
         <div className={this.state.coursesList.length ? '' : 'spinner-container'}>
           {this.state.coursesList.length ? this.state.coursesList.map(course => (
             <a href={course.marketing_url} className="course-link"
-               onClick={() => this.onCourseSelect(course.course_run_key)}>
+               onClick={() => this.onCourseSelect(course.course_key)}>
               <div className="course-card box-shadow-down-1 bg-white mb-3">
                 <div className="box-shadow-down-1 image-box">
                   <img
