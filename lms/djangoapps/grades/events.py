@@ -246,9 +246,9 @@ def fire_segment_event_on_course_grade_passed_first_time(user_id, course_locator
         'COURSE_TITLE': courserun_display_name,
         'COURSE_ORG_NAME': courserun_org,
     }
-    segment.track(user_id, event_name, event_properties)
+    if getattr(settings, 'OUTCOME_SURVEYS_EVENTS_ENABLED', False):
+        segment.track(user_id, event_name, event_properties)
 
-    if getattr(settings, 'OUTCOME_SURVEYS_FOLLOW_UP_SIGNAL_ENABLED', False):
         # fire signal so that a follow up event can be scheduled in outcome_surveys app
         SCHEDULE_FOLLOW_UP_SEGMENT_EVENT_FOR_COURSE_PASSED_FIRST_TIME.send(
             sender=None,
