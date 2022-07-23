@@ -974,7 +974,7 @@ openedx-calc==3.0.1
     # via -r requirements/edx/testing.txt
 openedx-events==0.11.1
     # via -r requirements/edx/testing.txt
-openedx-filters==0.7.0
+openedx-filters==0.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock

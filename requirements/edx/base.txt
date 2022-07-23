@@ -746,7 +746,7 @@ openedx-calc==3.0.1
     # via -r requirements/edx/base.in
 openedx-events==0.11.1
     # via -r requirements/edx/base.in
-openedx-filters==0.7.0
+openedx-filters==0.8.0
     # via
     #   -r requirements/edx/base.in
     #   lti-consumer-xblock
