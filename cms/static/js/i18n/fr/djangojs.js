@@ -21,15 +21,9 @@
   django.catalog = django.catalog || {};
   
   const newcatalog = {
-    "\n                    Make sure you are on a computer with a webcam, and that you have valid photo identification\n                    such as a driver's license or passport, before you continue.\n                ": "\n                    Assurez-vous que vous \u00eates sur un ordinateur \u00e9quip\u00e9 d'une webcam et que vous poss\u00e9dez une pi\u00e8ce d'identit\u00e9 avec photo valide\n                    comme un permis de conduire ou un passeport, avant de continuer.\n                ",
-    "\n                    Your verification attempt failed. Please read our guidelines to make\n                    sure you understand the requirements for successfully completing verification,\n                    then try again.\n                ": "\n                    Votre tentative de v\u00e9rification a \u00e9chou\u00e9. Veuillez lire nos directives pour vous\n                    assurer que vous avez compris les conditions n\u00e9cessaires pour terminer avec succ\u00e8s la v\u00e9rification,\n                    puis r\u00e9essayez.\n                ",
-    "\n                    Your verification has expired. You must successfully complete a new identity verification\n                    before you can start the proctored exam.\n                ": "\n                    Votre v\u00e9rification a expir\u00e9. Vous devez effectuer avec succ\u00e8s une nouvelle v\u00e9rification d'identit\u00e9\n                    avant de pouvoir commencer l'examen surveill\u00e9.\n                ",
-    "\n                    Your verification is pending. Results should be available 2-3 days after you\n                    submit your verification.\n                ": "\n                    Votre v\u00e9rification est en attente. Les r\u00e9sultats seront disponibles 2-3 jours \n                    apr\u00e8s avoir soumis votre v\u00e9rification.\n                ",
     "\n                After the due date has passed, you can review the exam, but you cannot change your answers.\n            ": "\n                Une fois la date d'\u00e9ch\u00e9ance pass\u00e9e, vous pouvez revoir l'examen, mais vous ne pouvez pas modifier vos r\u00e9ponses.\n            ",
-    "\n                Complete your verification before starting the proctored exam.\n            ": "\n                Terminez votre v\u00e9rification avant de commencer l'examen surveill\u00e9.\n            ",
     "\n                The time allotted for this exam has expired. Your exam has been submitted and any work you completed\n                will be graded.\n            ": "\n                Le temps allou\u00e9 pour cet examen a expir\u00e9. Votre examen a \u00e9t\u00e9 soumis et tout travail que vous avez termin\u00e9\n                sera not\u00e9.\n            ",
     "\n                You have submitted your timed exam.\n            ": "\n                Vous avez soumis votre examen chronom\u00e9tr\u00e9.\n            ",
-    "\n                You must successfully complete identity verification before you can start the proctored exam.\n            ": "\n                Vous devez terminer avec succ\u00e8s la v\u00e9rification d'identit\u00e9 avant de pouvoir commencer l'examen surveill\u00e9.\n            ",
     "\n                Your proctoring session was reviewed successfully. Go to your progress page to view your exam grade.\n            ": "\n                Votre session de surveillance a \u00e9t\u00e9 examin\u00e9e avec succ\u00e8s. Acc\u00e9dez \u00e0 votre page de progression pour afficher la note de votre examen.\n            ",
     "\n            Do not close this window before you finish your exam. if you close this window, your proctoring session ends, and you will not successfully complete the proctored exam.\n          ": "\n            Ne fermez pas cette fen\u00eatre avant d'avoir termin\u00e9 votre examen. Si vous fermez cette fen\u00eatre, votre session d'examen surveill\u00e9 sera termin\u00e9.\n          ",
     "\n            If you have issues relating to proctoring, you can contact %(provider_name)s technical support by emailing %(provider_tech_support_email)s  or by calling %(provider_tech_support_phone)s.\n          ": "\n           Si vous rencontrez des probl\u00e8mes de surveillance, vous pouvez contacter le support technique %(provider_name)s en \u00e9crivant un courriel \u00e0 %(provider_tech_support_email)s ou en appelant%(provider_tech_support_phone)s.\n          ",
@@ -602,7 +596,6 @@
     "Content Group Name": "Nom du groupe de contenus",
     "Content-Specific Discussion Topics": "Sujets de discussion sp\u00e9cifiques",
     "Continue Exam Without Proctoring": "Continuer l'examen sans surveilance",
-    "Continue to Verification": "Continuer vers V\u00e9rification",
     "Continue to my practice exam": "Continuer mon examen d'essai",
     "Continue to my proctored exam.": "Continuez vers mon examen surveill\u00e9.",
     "Continue to onboarding": "Continuer vers l'int\u00e9gration",
@@ -1597,7 +1590,6 @@
     "Retake Photo": "Reprendre une photo",
     "Retake Your Photos": "Reprenez vos photos",
     "Retrieving enrollment status...": "R\u00e9cup\u00e9ration du statut d'inscription...",
-    "Retry Verification": "R\u00e9essayer la v\u00e9rification",
     "Retry my exam": "R\u00e9essayer mon examen",
     "Return and add email address": "Retourner et ajouter une adresse email",
     "Return to Export": "Retourner \u00e0 l'exportation",

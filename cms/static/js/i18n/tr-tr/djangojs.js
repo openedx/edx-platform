@@ -21,11 +21,6 @@
   django.catalog = django.catalog || {};
   
   const newcatalog = {
-    "\n                    Your verification attempt failed. Please read our guidelines to make\n                    sure you understand the requirements for successfully completing verification,\n                    then try again.\n                ": "\n                    Do\u011frulama denemeniz ba\u015far\u0131s\u0131z oldu. L\u00fctfen ba\u015far\u0131l\u0131 bir do\u011frulama i\u015flemi i\u00e7in\n                    yerine getirilmesi gerekenleri do\u011frulamak i\u00e7in k\u0131lavuz metinlerimizi yeniden okuyun,\n                    ve ard\u0131ndan tekrar deneyin.\n                ",
-    "\n                    Your verification has expired. You must successfully complete a new identity verification\n                    before you can start the proctored exam.\n                ": "\n                    Do\u011frulaman\u0131z ge\u00e7erlili\u011fini kaybetti. G\u00f6zetmenli s\u0131nava ba\u015flamadan \u00f6nce\n                    yeni bir kimlik do\u011frulamas\u0131 yapmal\u0131s\u0131n\u0131z.\n                ",
-    "\n                    Your verification is pending. Results should be available 2-3 days after you\n                    submit your verification.\n                ": "\n                    Do\u011frulanman\u0131z beklemede. Do\u011frulaman\u0131z\u0131 g\u00f6nderdikten 2-3 g\u00fcn sonra\n                    sonu\u00e7lar a\u00e7\u0131klanacakt\u0131r.\n                ",
-    "\n                Complete your verification before starting the proctored exam.\n            ": "\n                G\u00f6zetmenli s\u0131nava ba\u015flamadan \u00f6nce kimlik do\u011frulaman\u0131z\u0131 tamamlay\u0131n.\n            ",
-    "\n                You must successfully complete identity verification before you can start the proctored exam.\n            ": "\n                G\u00f6zetmenli s\u0131nava ba\u015flamadan \u00f6nce kimlik do\u011frulamas\u0131n\u0131 ba\u015far\u0131yla tamamlamal\u0131s\u0131n\u0131z.\n            ",
     "\n            Do not close this window before you finish your exam. if you close this window, your proctoring session ends, and you will not successfully complete the proctored exam.\n          ": "\n            S\u0131nav\u0131n\u0131z\u0131 bitirmeden bu pencereyi kapatmay\u0131n. Bu pencereyi kapatman\u0131z durumunda, g\u00f6zetmenli s\u0131nav oturumunuz sona erecek ve s\u0131nav\u0131 ba\u015far\u0131yla tamamlayamayacaks\u0131n\u0131z.\n          ",
     "\n          %(platform_name)s Rules for Online Proctored Exams\n      ": "\n          %(platform_name)s \u00c7evrimi\u00e7i G\u00f6zetmenli S\u0131nav Kurallar\u0131\n      ",
     "\n          Copy this unique exam code. You will be prompted to paste this code later before you start the exam.\n        ": "\n          Bu e\u015fsiz s\u0131nav kodunu kopyalay\u0131n. S\u0131nava ba\u015flarken bu kodu girmenizi isteyen bir uyar\u0131 g\u00f6receksiniz.\n        ",
@@ -486,7 +481,6 @@
     "Content Group Name": "\u0130\u00e7erik Grup Ad\u0131",
     "Content-Specific Discussion Topics": "\u0130\u00e7erik-Odakl\u0131 Tart\u0131\u015fma Ba\u015fl\u0131klar\u0131",
     "Continue Exam Without Proctoring": "S\u0131nava G\u00f6zetmensiz Olarak Devam Et",
-    "Continue to Verification": "Do\u011frulamaya Devam Et",
     "Continue to my practice exam": "Al\u0131\u015ft\u0131rma s\u0131nav\u0131ma devam et",
     "Continue to my proctored exam.": "G\u00f6zetmenli s\u0131nav\u0131ma devam et.",
     "Continue to onboarding": "Oryantasyona devam et",
@@ -1436,7 +1430,6 @@
     "Retake Photo": "Yeniden Foto\u011fraf \u00c7ek",
     "Retake Your Photos": "Fotolar\u0131n\u0131z\u0131 Tekrar \u00c7ekiniz",
     "Retrieving enrollment status...": "Kay\u0131tlanma durumu \u00e7ekiliyor...",
-    "Retry Verification": "Yeniden Do\u011frulama",
     "Retry my exam": "S\u0131nav\u0131m\u0131 tekrar et",
     "Return and add email address": "Geri d\u00f6n ve e-posta adresi ekle",
     "Return to Export": "D\u0131\u015fa Aktarmaya Geri D\u00f6n",

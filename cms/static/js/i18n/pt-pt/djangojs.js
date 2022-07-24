@@ -21,12 +21,6 @@
   django.catalog = django.catalog || {};
   
   const newcatalog = {
-    "\n                    Make sure you are on a computer with a webcam, and that you have valid photo identification\n                    such as a driver's license or passport, before you continue.\n                ": "\n                    Certifique-se que est\u00e1 num computador com uma webcam, e que tem identifica\u00e7\u00e3o fotogr\u00e1fica v\u00e1lida\n                    como uma carta de condu\u00e7\u00e3o ou passaporte, antes de continuar.\n                ",
-    "\n                    Your verification attempt failed. Please read our guidelines to make\n                    sure you understand the requirements for successfully completing verification,\n                    then try again.\n                ": "\n                    A sua tentativa de verifica\u00e7\u00e3o falhou. Por favor, leia as nossas directrizes para se\n                    certificar de que compreende os requisitos para concluir com \u00eaxito a verifica\u00e7\u00e3o,,\n                    depois tente novamente.\n                ",
-    "\n                    Your verification has expired. You must successfully complete a new identity verification\n                    before you can start the proctored exam.\n                ": "\n                    A sua verifica\u00e7\u00e3o expirou. Deve concluir com \u00eaxito uma nova verifica\u00e7\u00e3o de identidade\n                    antes de poder iniciar o exame supervisionado.\n                ",
-    "\n                    Your verification is pending. Results should be available 2-3 days after you\n                    submit your verification.\n                ": "\n                    A sua verifica\u00e7\u00e3o est\u00e1 pendente. Os resultados devem estar dispon\u00edveis 2-3 dias depois de\n                    submeter a sua verifica\u00e7\u00e3o.\n                ",
-    "\n                Complete your verification before starting the proctored exam.\n            ": "\n                Complete a sua verifica\u00e7\u00e3o antes de iniciar o exame supervisionado.\n            ",
-    "\n                You must successfully complete identity verification before you can start the proctored exam.\n            ": "\n                Voc\u00ea deve concluir com \u00eaxito a verifica\u00e7\u00e3o de identidade antes de poder iniciar o exame supervisionado.\n            ",
     "\n            Do not close this window before you finish your exam. if you close this window, your proctoring session ends, and you will not successfully complete the proctored exam.\n          ": "\n            N\u00e3o feche esta janela antes de terminar o seu exame. se fechar esta janela, a sua sess\u00e3o de supervis\u00e3o termina, e n\u00e3o concluir\u00e1 com sucesso o exame supervisionado.\n          ",
     "\n            Return to the %(platform_name)s course window to start your exam. When you have finished your exam and\n            have marked it as complete, you can close this window to end the proctoring session\n            and upload your proctoring session data for review.\n          ": "\n            Volte \u00e0 janela do curso %(platform_name)s course window to start your exam. para iniciar o exame. Quando terminar o exame e \n            o marcar como completo, pode fechar esta janela para encerrar a sess\u00e3o de supervis\u00e3o\n            e carregar seus dados de sess\u00e3o de supervis\u00e3o para revis\u00e3o.\n          ",
     "\n          You will be guided through steps to set up online proctoring software and verify your identity.\n        ": "\n          Ser\u00e1 guiado atrav\u00e9s de passos para estabelecer um programa de supervis\u00e3o online e verificar a sua identidade.\n        ",
@@ -545,7 +539,6 @@
     "Content Group Name": "Nome do Grupo de Conte\u00fado",
     "Content-Specific Discussion Topics": "T\u00f3picos de Debate Espec\u00edficos do Conte\u00fado",
     "Continue Exam Without Proctoring": "Continuar o Exame Sem Supervis\u00e3o",
-    "Continue to Verification": "Continuar a Verifica\u00e7\u00e3o",
     "Continue to my practice exam": "Continue para o meu exame de pr\u00e1tica",
     "Continue to onboarding": "Continuar para admiss\u00e3o",
     "Copy": "Copiar",
@@ -1514,7 +1507,6 @@
     "Retake Photo": "Voltar a Tirar a Fotografia",
     "Retake Your Photos": "Regressar \u00e0s Suas Fotografias",
     "Retrieving enrollment status...": "Obtendo estado da matricula...",
-    "Retry Verification": "Repita a verifica\u00e7\u00e3o",
     "Retry my exam": "Tentar de novo o meu exame",
     "Return and add email address": "Volte atr\u00e1s e adicione um endere\u00e7o de email",
     "Return to Export": "Regressar a Exporta\u00e7\u00e3o",

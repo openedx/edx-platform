@@ -397,7 +397,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-10 20:43+0000\n"
+"POT-Creation-Date: 2022-07-17 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -12003,7 +12003,7 @@ msgid "Blank"
 msgstr "空白"
 
 #: cms/djangoapps/contentstore/views/component.py
-msgid "Blank Open Response Assessment"
+msgid "Peer Assessment Only"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
@@ -16098,12 +16098,7 @@ msgid "Posts I'm Following"
 msgstr "我关注的讨论帖"
 
 #: lms/templates/discussion/_switch_experience_fragment.html
-msgid ""
-"You are viewing an educator only preview of the new discussions experience!"
-msgstr ""
-
-#: lms/templates/discussion/_switch_experience_fragment.html
-msgid "An educator preview of new discussions experience is available!"
+msgid "Welcome to the new discussions experience. Please share your feedback."
 msgstr ""
 
 #: lms/templates/discussion/_switch_experience_fragment.html
@@ -16111,11 +16106,18 @@ msgid "View legacy experience"
 msgstr ""
 
 #: lms/templates/discussion/_switch_experience_fragment.html
-msgid "Share feedback"
+msgid ""
+"You are currently using the old discussions experience that will be "
+"deprecated soon. If you are facing any issues with the new experience, "
+"please share using the feedback button."
 msgstr ""
 
 #: lms/templates/discussion/_switch_experience_fragment.html
-msgid "View the new experience"
+msgid "Switch to new experience"
+msgstr ""
+
+#: lms/templates/discussion/_switch_experience_fragment.html
+msgid "Share feedback"
 msgstr ""
 
 #. Translators: This labels a filter menu in forum navigation
