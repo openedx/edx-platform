@@ -1064,7 +1064,6 @@
     "Retake Photo": "Ambil photo kembali",
     "Retake Your Photos": "Ambil photo anda kembali",
     "Retrieving enrollment status...": "Membaca status pendaftaran...",
-    "Retry Verification": "Coba Kembali Verifikasi",
     "Return to Your Dashboard": "Kembali ke Dashboard anda",
     "Review Policy Exception": "Tinjau kebijakan pengecualian",
     "Review Rules": "Ulas Aturan",

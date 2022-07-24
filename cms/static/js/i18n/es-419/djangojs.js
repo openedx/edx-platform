@@ -21,15 +21,9 @@
   django.catalog = django.catalog || {};
   
   const newcatalog = {
-    "\n                    Make sure you are on a computer with a webcam, and that you have valid photo identification\n                    such as a driver's license or passport, before you continue.\n                ": "\nAseg\u00farese de que est\u00e9 usando una computadora con c\u00e1mara web, y que tiene una identificaci\u00f3n fotogr\u00e1fica v\u00e1lida\ncomo una licencia para conducir o un pasaporte, antes de seguir.",
-    "\n                    Your verification attempt failed. Please read our guidelines to make\n                    sure you understand the requirements for successfully completing verification,\n                    then try again.\n                ": "\nSu verificaci\u00f3n no fue aprobada. Por favor, lea nuestra gu\u00eda para asegurarse\nde que entienda los requisitos para completar la verificaci\u00f3n exit\u00f3samente,\ny despu\u00e9s intente de nuevo.",
-    "\n                    Your verification has expired. You must successfully complete a new identity verification\n                    before you can start the proctored exam.\n                ": "\nSu verificaci\u00f3n ha expirado. Debe completar la verificaci\u00f3n de identidad nuevamente\nantes de poder iniciar el examen supervisado.",
-    "\n                    Your verification is pending. Results should be available 2-3 days after you\n                    submit your verification.\n                ": "\nSu verificaci\u00f3n est\u00e1 en proceso. Los resultados deben estar disponibles entre 2-3 d\u00edas despu\u00e9s del\nenv\u00edo de su verificaci\u00f3n.",
     "\n                After the due date has passed, you can review the exam, but you cannot change your answers.\n            ": "\n                Despues de que la fecha limite de entrega haya pasado, podr\u00e1s revisar el examen, pero no podr\u00e1s cambiar las respuestas. \n            ",
-    "\n                Complete your verification before starting the proctored exam.\n            ": "\nComplete su verificaci\u00f3n antes de iniciar el examen supervisado.",
     "\n                The time allotted for this exam has expired. Your exam has been submitted and any work you completed\n                will be graded.\n            ": "\n                El tiempo asignado ha expirado. Tu examen ha sido enviado y todo trabajo completado \n                ser\u00e1 evaluado.\n            ",
     "\n                You have submitted your timed exam.\n            ": "\n                Has enviado tu examen de tiempo.\n            ",
-    "\n                You must successfully complete identity verification before you can start the proctored exam.\n            ": "\nEs necesario completar la verificaci\u00f3n de su identidad antes de iniciar el examen supervisado.",
     "\n                Your proctoring session was reviewed successfully. Go to your progress page to view your exam grade.\n            ": "\n                Su sessi\u00f3n supervisada fue revisada de manera existosa. Dirigete a la pagina de progreso para ver tu calificaci\u00f3n del examen. \n            ",
     "\n            Do not close this window before you finish your exam. if you close this window, your proctoring session ends, and you will not successfully complete the proctored exam.\n          ": "\nNo cierre esta ventana antes de completar su examen. Si la cierra, su sesi\u00f3n supervisada terminar\u00e1, y no completar\u00e1 el examen supervisado.",
     "\n            If you have issues relating to proctoring, you can contact %(provider_name)s technical support by emailing %(provider_tech_support_email)s  or by calling %(provider_tech_support_phone)s.\n          ": "\n         Si tienes problemas en relaci\u00f3n a la supervisi\u00f3n, puedes contactar  %(provider_name)s servicio tecnico a trav\u00e9s del correo electronico emailing %(provider_tech_support_email)s  o llamando al %(provider_tech_support_phone)s.\n          ",
@@ -602,7 +596,6 @@
     "Content Group Name": "Content Group Name",
     "Content-Specific Discussion Topics": "Temas de discusi\u00f3n espec\u00edficos al contenido",
     "Continue Exam Without Proctoring": "Continuar Examen Sin Supervisi\u00f3n",
-    "Continue to Verification": "Continuar a la verificaci\u00f3n",
     "Continue to my practice exam": "Continuar a mi examen de pr\u00e1ctica",
     "Continue to my proctored exam.": "Continuar a mi examen supervisado.",
     "Continue to onboarding": "Continua la inducci\u00f3n",
@@ -1596,7 +1589,6 @@
     "Retake Photo": "Tomar nuevamente la foto",
     "Retake Your Photos": "Tome nuevamente sus fotos",
     "Retrieving enrollment status...": "Recuperando el estatus de registro...",
-    "Retry Verification": "Reenviar verificaci\u00f3n",
     "Retry my exam": "Reintentar prueba",
     "Return and add email address": "Volver y introduir un correo electr\u00f3nico. ",
     "Return to Export": "Regresar a exportar",
