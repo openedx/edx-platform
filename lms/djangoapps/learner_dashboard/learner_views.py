@@ -8,6 +8,7 @@ from django.views.decorators.http import require_GET
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.learner_dashboard.serializers import LearnerDashboardSerializer
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 def get_platform_settings():
@@ -18,6 +19,24 @@ def get_platform_settings():
         "billingEmail": settings.PAYMENT_SUPPORT_EMAIL,
         "courseSearchUrl": marketing_link("COURSES"),
     }
+
+
+def get_user_account_confirmation_info(user):
+    """Determine if a user needs to verify their account and related URL info"""
+
+    activation_email_support_link = (
+        configuration_helpers.get_value(
+            "ACTIVATION_EMAIL_SUPPORT_LINK", settings.ACTIVATION_EMAIL_SUPPORT_LINK
+        )
+        or settings.SUPPORT_SITE_LINK
+    )
+
+    email_confirmation = {
+        "isNeeded": not user.is_active,
+        "sendEmailUrl": activation_email_support_link,
+    }
+
+    return email_confirmation
 
 
 @login_required
