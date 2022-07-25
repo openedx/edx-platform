@@ -134,7 +134,7 @@ class EnrollmentSerializer(serializers.Serializer):
 
     def get_isAuditAccessExpired(self, enrollment):
         show_courseware_link = self.context.get("show_courseware_link", {}).get(
-            enrollment.course.id
+            enrollment.course.id, {}
         )
         return show_courseware_link.get("error_code") == "audit_expired"
 
