@@ -77,30 +77,6 @@ def datetime_to_django_format(datetime_obj):
         return datetime_obj.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-class TestPlatformSettingsSerializer(TestCase):
-    """Tests for the PlatformSettingsSerializer"""
-
-    @classmethod
-    def generate_test_platform_settings(cls):
-        """Util to generate test platform settings data"""
-        return {
-            "feedbackEmail": f"{uuid4()}@example.com",
-            "supportEmail": f"{uuid4()}@example.com",
-            "billingEmail": f"{uuid4()}@example.com",
-            "courseSearchUrl": f"{uuid4()}.example.com/search",
-        }
-
-    def test_happy_path(self):
-        input_data = self.generate_test_platform_settings()
-        output_data = PlatformSettingsSerializer(input_data).data
-
-        assert output_data == {
-            "supportEmail": input_data["supportEmail"],
-            "billingEmail": input_data["billingEmail"],
-            "courseSearchUrl": input_data["courseSearchUrl"],
-        }
-
-
 class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
     """Base class for common setup"""
 
@@ -125,6 +101,30 @@ class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
         test_enrollment.course_overview.end = random_date()
 
         return test_enrollment
+
+
+class TestPlatformSettingsSerializer(TestCase):
+    """Tests for the PlatformSettingsSerializer"""
+
+    @classmethod
+    def generate_test_platform_settings(cls):
+        """Util to generate test platform settings data"""
+        return {
+            "feedbackEmail": f"{uuid4()}@example.com",
+            "supportEmail": f"{uuid4()}@example.com",
+            "billingEmail": f"{uuid4()}@example.com",
+            "courseSearchUrl": f"{uuid4()}.example.com/search",
+        }
+
+    def test_happy_path(self):
+        input_data = self.generate_test_platform_settings()
+        output_data = PlatformSettingsSerializer(input_data).data
+
+        assert output_data == {
+            "supportEmail": input_data["supportEmail"],
+            "billingEmail": input_data["billingEmail"],
+            "courseSearchUrl": input_data["courseSearchUrl"],
+        }
 
 
 class TestCourseProviderSerializer(TestCase):
@@ -165,52 +165,17 @@ class TestCourseSerializer(LearnerDashboardBaseTest):
         }
 
 
-class TestCourseRunSerializer(SharedModuleStoreTestCase):
+class TestCourseRunSerializer(LearnerDashboardBaseTest):
     """Tests for the CourseRunSerializer"""
 
-    @classmethod
-    def generate_test_course_run_info(cls):
-        """Util to generate test course run info"""
-        return {
-            "isStarted": random_bool(),
-            "isArchived": random_bool(),
-            "courseNumber": f"{uuid4()}-101",
-            "accessExpirationDate": random_date(),
-            "minPassingGrade": random_grade(),
-            "endDate": random_date(),
-            "homeUrl": f"{uuid4()}.example.com",
-            "marketingUrl": f"{uuid4()}.example.com",
-            "progressUrl": f"{uuid4()}.example.com",
-            "unenrollUrl": f"{uuid4()}.example.com",
-            "upgradeUrl": f"{uuid4()}.example.com",
-            "resumeUrl": random_url(),
-        }
-
-    def setUp(self):
-        """Create a test enrollment & data"""
-        self.user = UserFactory()
-
-        self.course = CourseFactory(self_paced=True)
-        CourseModeFactory(
-            course_id=self.course.id,
-            mode_slug=CourseMode.AUDIT,
-        )
-
-        self.test_enrollment = CourseEnrollmentFactory(
-            course_id=self.course.id, mode=CourseMode.AUDIT
-        )
-
-        # Add extra info to exercise serialization
-        self.test_enrollment.course_overview.marketing_url = random_url()
-        self.test_enrollment.course_overview.end = random_date()
-
     def test_with_data(self):
-        input_data = self.test_enrollment
+        input_data = self.create_test_enrollment()
+
         input_context = {
-            "resume_course_urls": {self.course.id: random_url()},
+            "resume_course_urls": {input_data.course.id: random_url()},
             "ecommerce_payment_page": random_url(),
             "course_mode_info": {
-                self.course.id: {
+                input_data.course.id: {
                     "verified_sku": str(uuid4()),
                     "days_for_upsell": randint(0, 14),
                 }
@@ -225,39 +190,21 @@ class TestCourseRunSerializer(SharedModuleStoreTestCase):
             assert output[key] is not None
 
 
-class TestEnrollmentSerializer(SharedModuleStoreTestCase):
+class TestEnrollmentSerializer(LearnerDashboardBaseTest):
     """Tests for the EnrollmentSerializer"""
 
-    @classmethod
-    def setUpClass(cls):
-        """Create a test user"""
-        super().setUpClass()
-        cls.user = UserFactory()
-
-    def setUp(self):
-        """Generate a test audit course and enrollment"""
-        super().setUp()
-
-        self.course = CourseFactory(self_paced=True)
-        CourseModeFactory(
-            course_id=self.course.id,
-            mode_slug=CourseMode.AUDIT,
-        )
-        self.test_enrollment = CourseEnrollmentFactory(
-            course_id=self.course.id, mode=CourseMode.AUDIT
-        )
-
-        # Starter context object for serialization
-        self.test_context = {
+    def create_test_context(self, course):
+        """Get a test context object"""
+        return {
             "use_ecommerce_payment_flow": True,
-            "show_email_settings_for": [self.course.id],
-            "course_mode_info": {self.course.id: {"show_upsell": False}},
-            "show_courseware_link": {self.course.id: {"has_access": True}},
+            "show_email_settings_for": [course.id],
+            "course_mode_info": {course.id: {"show_upsell": False}},
+            "show_courseware_link": {course.id: {"has_access": True}},
         }
 
     def test_with_data(self):
-        input_data = self.test_enrollment
-        input_context = self.test_context
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
 
         serializer = EnrollmentSerializer(input_data, context=input_context)
         output = serializer.data
@@ -267,14 +214,14 @@ class TestEnrollmentSerializer(SharedModuleStoreTestCase):
             assert output[key] is not None
 
     def test_audit_access_expired(self):
-        input_data = self.test_enrollment
-        input_context = self.test_context
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
 
         # Example audit expired context
         input_context.update(
             {
                 "show_courseware_link": {
-                    self.course.id: {"error_code": "audit_expired"}
+                    input_data.course.id: {"error_code": "audit_expired"}
                 },
             }
         )
@@ -285,14 +232,14 @@ class TestEnrollmentSerializer(SharedModuleStoreTestCase):
         assert output["isAuditAccessExpired"] == True
 
     def test_user_can_upgrade(self):
-        input_data = self.test_enrollment
-        input_context = self.test_context
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
 
         # Example audit expired context
         input_context.update(
             {
                 "course_mode_info": {
-                    self.course.id: {"show_upsell": True, "verified_sku": uuid4()}
+                    input_data.course.id: {"show_upsell": True, "verified_sku": uuid4()}
                 }
             }
         )
@@ -468,54 +415,20 @@ class TestProgramsSerializer(TestCase):
         assert output_data == {"relatedPrograms": []}
 
 
-class TestLearnerEnrollmentsSerializer(SharedModuleStoreTestCase):
+class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
     """High-level tests for LearnerEnrollmentsSerializer"""
-
-    @classmethod
-    def setUpClass(cls):
-        """Create a test user"""
-        super().setUpClass()
-        cls.user = UserFactory()
-
-    def setUp(self):
-        """Generate a test audit course and enrollment"""
-        super().setUp()
-
-        self.course = CourseFactory(self_paced=True)
-        CourseModeFactory(
-            course_id=self.course.id,
-            mode_slug=CourseMode.AUDIT,
-        )
-        self.test_enrollment = CourseEnrollmentFactory(
-            course_id=self.course.id, mode=CourseMode.AUDIT
-        )
-
-    @classmethod
-    def generate_test_enrollments_data(cls):
-        return {
-            "courseProvider": TestCourseProviderSerializer.generate_test_provider_info(),
-            "course": TestCourseSerializer.generate_test_course_info(),
-            "courseRun": TestCourseRunSerializer.generate_test_course_run_info(),
-            "enrollment": TestEnrollmentSerializer.generate_test_enrollment_info(),
-            "gradeData": TestGradeDataSerializer.generate_test_grade_data(),
-            "certificate": TestCertificateSerializer.generate_test_certificate_info(),
-            "entitlements": TestEntitlementSerializer.generate_test_entitlement_info(),
-            "programs": TestProgramsSerializer.generate_test_programs_info(),
-        }
 
     def test_happy_path(self):
         """Test that nothing breaks and the output fields look correct"""
-        input_data = self.generate_test_enrollments_data()
 
-        enrollment = self.set_up_test_enrollment()
-        input_data["courseRun"] = enrollment
-        input_data["course"] = enrollment.course
+        enrollment = self.create_test_enrollment()
 
+        input_data = enrollment
         input_context = {
-            "resume_course_urls": {self.course.id: random_url()},
+            "resume_course_urls": {enrollment.course.id: random_url()},
             "ecommerce_payment_page": random_url(),
             "course_mode_info": {
-                self.course.id: {
+                enrollment.course.id: {
                     "verified_sku": str(uuid4()),
                     "days_for_upsell": randint(0, 14),
                 }
@@ -539,14 +452,16 @@ class TestLearnerEnrollmentsSerializer(SharedModuleStoreTestCase):
         assert output_data.keys() == set(expected_keys)
 
 
-class TestUnfulfilledEntitlementSerializer(TestCase):
+class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
     """High-level tests for UnfulfilledEntitlementSerializer"""
 
     @classmethod
     def generate_test_entitlements_data(cls):
+        mock_enrollment = cls.create_test_enrollment(cls)
+
         return {
             "courseProvider": TestCourseProviderSerializer.generate_test_provider_info(),
-            "course": TestCourseSerializer.generate_test_course_info(),
+            "course": mock_enrollment.course,
             "entitlements": TestEntitlementSerializer.generate_test_entitlement_info(),
             "programs": TestProgramsSerializer.generate_test_programs_info(),
         }
