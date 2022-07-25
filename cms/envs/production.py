@@ -452,6 +452,12 @@ CELERY_QUEUES.update(
 # Queue to use for updating grades due to grading policy change
 POLICY_CHANGE_GRADES_ROUTING_KEY = ENV_TOKENS.get('POLICY_CHANGE_GRADES_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
 
+# Queue to use for individual learner course regrades
+SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = ENV_TOKENS.get(
+    'SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY',
+    DEFAULT_PRIORITY_QUEUE
+)
+
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = ENV_TOKENS.get(
     'SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY',
     HIGH_PRIORITY_QUEUE
@@ -601,6 +607,8 @@ ALTERNATE_ENV_TASKS = {
 EXPLICIT_QUEUES = {
     'lms.djangoapps.grades.tasks.compute_all_grades_for_course': {
         'queue': POLICY_CHANGE_GRADES_ROUTING_KEY},
+    'lms.djangoapps.grades.tasks.recalculate_course_and_subsection_grades_for_user': {
+        'queue': SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY},
     'cms.djangoapps.contentstore.tasks.update_search_index': {
         'queue': UPDATE_SEARCH_INDEX_JOB_QUEUE},
     'cms.djangoapps.coursegraph.tasks.dump_course_to_neo4j': {
