@@ -150,24 +150,18 @@ class TestCourseProviderSerializer(TestCase):
         }
 
 
-class TestCourseSerializer(TestCase):
+class TestCourseSerializer(LearnerDashboardBaseTest):
     """Tests for the CourseSerializer"""
 
-    @classmethod
-    def generate_test_course_info(cls):
-        """Util to generate test course info"""
-        return {
-            "bannerImgSrc": f"example.com/assets/{uuid4()}",
-            "courseName": f"{uuid4()}",
-        }
-
     def test_happy_path(self):
-        input_data = self.generate_test_course_info()
+        test_enrollment = self.create_test_enrollment()
+
+        input_data = test_enrollment.course_overview
         output_data = CourseSerializer(input_data).data
 
         assert output_data == {
-            "bannerImgSrc": input_data["bannerImgSrc"],
-            "courseName": input_data["courseName"],
+            "bannerImgSrc": test_enrollment.course_overview.banner_image_url,
+            "courseName": test_enrollment.course_overview.display_name_with_default,
         }
 
 
