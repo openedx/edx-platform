@@ -5191,4 +5191,4 @@ MFE_CONFIG = {}
 MFE_CONFIG_API_CACHE_TIMEOUT = 60 * 5
 
 ######################## Settings for Outcome Surveys plugin ########################
-OUTCOME_SURVEYS_EVENTS_ENABLED = False
+OUTCOME_SURVEYS_EVENTS_ENABLED = True
