@@ -275,7 +275,7 @@ class TestEnrollmentSerializer(SharedModuleStoreTestCase):
             {
                 "show_courseware_link": {
                     self.course.id: {"error_code": "audit_expired"}
-            },
+                },
             }
         )
 
@@ -712,7 +712,7 @@ class TestEnterpriseDashboardsSerializer(TestCase):
         )
 
 
-class TestLearnerDashboardSerializer(TestCase):
+class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
     """High-level tests for Learner Dashboard serialization"""
 
     # Show full diff for serialization issues
@@ -742,6 +742,44 @@ class TestLearnerDashboardSerializer(TestCase):
                 "suggestedCourses": [],
             },
         )
+
+    def test_enrollments(self):
+        """Test that enrollments-related info is linked and serialized correctly"""
+
+        enrollments = [self.create_test_enrollment()]
+
+        resume_course_urls = {
+            enrollment.course.id: random_url() for enrollment in enrollments
+        }
+        course_mode_info = {
+            enrollment.course.id: {
+                "verified_sku": str(uuid4()),
+                "days_for_upsell": randint(0, 14),
+            }
+            for enrollment in enrollments
+            if enrollment.mode == "audit"
+        }
+
+        input_data = {
+            "emailConfirmation": None,
+            "enterpriseDashboards": None,
+            "platformSettings": None,
+            "enrollments": enrollments,
+            "unfulfilledEntitlements": [],
+            "suggestedCourses": [],
+        }
+
+        input_context = {
+            "resume_course_urls": resume_course_urls,
+            "ecommerce_payment_page": random_url(),
+            "course_mode_info": course_mode_info,
+        }
+
+        output_data = LearnerDashboardSerializer(input_data, context=input_context).data
+
+        # Right now just make sure nothing broke
+        serialized_enrollments = output_data.pop("enrollments")
+        assert serialized_enrollments is not None
 
     @mock.patch(
         "lms.djangoapps.learner_dashboard.serializers.SuggestedCourseSerializer.to_representation"
