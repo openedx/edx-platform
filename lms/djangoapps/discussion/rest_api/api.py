@@ -21,6 +21,8 @@ from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.request import Request
+
+from lms.djangoapps.discussion.views import is_privileged_user
 from xmodule.course_module import CourseBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTabList
@@ -1174,7 +1176,9 @@ def _handle_abuse_flagged_field(form_value, user, cc_content):
             else:
                 comment_flagged.send(sender='flag_abuse_for_comment', user=user, post=cc_content)
     else:
-        cc_content.unFlagAbuse(user, cc_content, removeAll=False)
+        remove_all = bool(user.id != cc_content["user_id"] and is_privileged_user(course_key,
+                                                                                  User.objects.get(id=user.id)))
+        cc_content.unFlagAbuse(user, cc_content, remove_all)
 
 
 def _handle_voted_field(form_value, cc_content, api_content, request, context):

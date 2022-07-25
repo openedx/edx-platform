@@ -2823,6 +2823,36 @@ class UpdateThreadTest(
             assert httpretty.last_request().method == 'PUT'
             assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
 
+    @ddt.data(
+        (False, True),
+        (True, False),
+    )
+    @ddt.unpack
+    def test_thread_un_abuse_flag_for_moderator_role(self, is_author, remove_all):
+        """
+        Test un-abuse flag for moderator role.
+
+        When moderator unflags a reported thread, it should
+        pass the "all" flag to the api. This will indicate
+        to the api to clear all abuse_flaggers, and mark the
+        thread as unreported.
+        If moderator is author of a thread, we want to restrict
+        the usage of the remove_all flag, so it cant be used
+        to remove all abuse_flaggers from a moderator post
+        by the moderator itself.
+        """
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
+        self.register_get_user_response(self.user)
+        self.register_thread_flag_response("test_thread")
+        self.register_thread({"abuse_flaggers": ["11"], "user_id": str(self.user.id) if is_author else "12"})
+        data = {"abuse_flagged": False}
+        update_thread(self.request, "test_thread", data)
+        assert httpretty.last_request().method == 'PUT'
+        query_params = {'user_id': [str(self.user.id)]}
+        if remove_all:
+            query_params.update({'all': ['True']})
+        assert parsed_body(httpretty.last_request()) == query_params
+
     def test_invalid_field(self):
         self.register_thread()
         with pytest.raises(ValidationError) as assertion:
@@ -3277,6 +3307,36 @@ class UpdateCommentTest(
             assert last_request_path == (flag_url if new_flagged else unflag_url)
             assert httpretty.last_request().method == 'PUT'
             assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
+
+    @ddt.data(
+        (False, True),
+        (True, False),
+    )
+    @ddt.unpack
+    def test_comment_un_abuse_flag_for_moderator_role(self, is_author, remove_all):
+        """
+        Test un-abuse flag for moderator role.
+
+        When moderator unflags a reported comment, it should
+        pass the "all" flag to the api. This will indicate
+        to the api to clear all abuse_flaggers, and mark the
+        comment as unreported.
+        If moderator is author of a comment, we want to restrict
+        the usage of the remove_all flag, so it cant be used
+        to remove all abuse_flaggers from a moderator post
+        by the moderator itself.
+        """
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
+        self.register_get_user_response(self.user)
+        self.register_comment_flag_response("test_comment")
+        self.register_comment({"abuse_flaggers": ["11"], "user_id": str(self.user.id) if is_author else "12"})
+        data = {"abuse_flagged": False}
+        update_comment(self.request, "test_comment", data)
+        assert httpretty.last_request().method == 'PUT'
+        query_params = {'user_id': [str(self.user.id)]}
+        if remove_all:
+            query_params.update({'all': ['True']})
+        assert parsed_body(httpretty.last_request()) == query_params
 
     @ddt.data(
         FORUM_ROLE_ADMINISTRATOR,
