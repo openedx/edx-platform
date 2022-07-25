@@ -12,7 +12,7 @@
     #   xmodule
 -e git+https://github.com/edx/codejail.git@3.1.3#egg=codejail==3.1.3
     # via -r requirements/edx/github.in
--e git+https://github.com/edx/django-wiki.git@1.1.0#egg=django-wiki
+-e git+https://github.com/edx/django-wiki.git@1.1.1#egg=django-wiki
     # via -r requirements/edx/github.in
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
     # via -r requirements/edx/github.in
