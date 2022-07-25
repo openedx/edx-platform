@@ -227,6 +227,17 @@ class EnrollmentRequiredAccessError(AccessError):
         super().__init__(error_code, developer_message, user_message)
 
 
+class DataSharingConsentRequiredAccessError(AccessError):
+    """
+    Access denied because the user must give Data sharing consent before access it.
+    """
+    def __init__(self, consent_url):
+        error_code = "data_sharing_access_required"
+        developer_message = consent_url
+        user_message = _("You must give Data Sharing Consent for the course")
+        super().__init__(error_code, developer_message, user_message)
+
+
 class AuthenticationRequiredAccessError(AccessError):
     """
     Access denied because the user must be authenticated to see it
