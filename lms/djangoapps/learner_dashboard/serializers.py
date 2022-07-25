@@ -217,12 +217,15 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
 
     courseProvider = CourseProviderSerializer(allow_null=True)
     course = CourseSerializer()
-    courseRun = CourseRunSerializer()
-    enrollment = EnrollmentSerializer()
-    gradeData = GradeDataSerializer()
-    certificate = CertificateSerializer()
-    entitlements = EntitlementSerializer()
-    programs = ProgramsSerializer()
+    courseRun = CourseRunSerializer(source="*")
+    enrollment = EnrollmentSerializer(source="*")
+
+    # The below temporarily allow null for integration testing
+    # TODO - to be removed in final implementaitno
+    gradeData = GradeDataSerializer(allow_null=True)
+    certificate = CertificateSerializer(allow_null=True)
+    entitlements = EntitlementSerializer(allow_null=True)
+    programs = ProgramsSerializer(allow_null=True)
 
 
 class UnfulfilledEntitlementSerializer(serializers.Serializer):
