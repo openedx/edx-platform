@@ -100,7 +100,18 @@ class CourseRunSerializer(serializers.Serializer):
 
 
 class EnrollmentSerializer(serializers.Serializer):
-    """Info about this particular enrollment"""
+    """
+    Info about this particular enrollment.
+    Derived from a CourseEnrollment with added context:
+    - "use_ecommerce_payment_flow" (bool): whether or not we use an ecommerce flow to
+      upsell.
+    - "course_mode_info" (dict): keyed by course ID with the following values:
+        - "show_upsell" (bool): whether or not we offer an upsell for this course.
+        - "verified_sku" (uuid): ID for the verified mode for upgrade.
+    - "show_courseware_link": keyed by course ID with added metadata.
+    - "show_email_settings_for" (dict): keyed by course ID with a boolean whether we
+       show email settings.
+    """
 
     canUpgrade = serializers.SerializerMethodField()
     hasFinished = serializers.SerializerMethodField()
