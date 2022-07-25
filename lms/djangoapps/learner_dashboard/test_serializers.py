@@ -101,6 +101,32 @@ class TestPlatformSettingsSerializer(TestCase):
         }
 
 
+class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
+    """Base class for common setup"""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = UserFactory()
+
+    def create_test_enrollment(self):
+        course = CourseFactory(self_paced=True)
+        CourseModeFactory(
+            course_id=course.id,
+            mode_slug=CourseMode.AUDIT,
+        )
+
+        test_enrollment = CourseEnrollmentFactory(
+            course_id=course.id, mode=CourseMode.AUDIT
+        )
+
+        # Add extra info to exercise serialization
+        test_enrollment.course_overview.marketing_url = random_url()
+        test_enrollment.course_overview.end = random_date()
+
+        return test_enrollment
+
+
 class TestCourseProviderSerializer(TestCase):
     """Tests for the CourseProviderSerializer"""
 
