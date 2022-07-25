@@ -8,6 +8,7 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from django.urls import reverse
+from lms.djangoapps.learner_dashboard.test_serializers import random_url
 from rest_framework.test import APITestCase
 
 from lms.djangoapps.learner_dashboard.learner_views import (
@@ -162,3 +163,31 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         )
 
         assert expected_keys == response_data.keys()
+
+    @patch("lms.djangoapps.learner_dashboard.learner_views.get_user_account_confirmation_info")
+    def test_mocked(self, mock_user_conf_info):
+        """High level tests with mocked data"""
+
+        # Given I am logged in
+        self.log_in()
+
+        # (and we have tons of mocks to avoid integration tests)
+        mock_user_conf_info_response = (
+            TestGetUserAccountConfirmationInfo.mock_response()
+        )
+        mock_user_conf_info.return_value = mock_user_conf_info_response
+
+        # When I request the dashboard
+        response = self.client.get(self.view_url)
+
+        # Then I get the expected success response
+        assert response.status_code == 200
+        response_data = json.loads(response.content)
+
+        self.assertDictEqual(
+            response_data["emailConfirmation"],
+            {
+                "isNeeded": mock_user_conf_info_response["isNeeded"],
+                "sendEmailUrl": mock_user_conf_info_response["sendEmailUrl"],
+            },
+        )

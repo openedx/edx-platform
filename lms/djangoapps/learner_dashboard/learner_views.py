@@ -43,8 +43,13 @@ def get_user_account_confirmation_info(user):
 @require_GET
 def dashboard_view(request):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
+
+    # Get user, determine if user needs to confirm email account
+    user = request.user
+    email_confirmation = get_user_account_confirmation_info(user)
+
     learner_dash_data = {
-        "emailConfirmation": None,
+        "emailConfirmation": email_confirmation,
         "enterpriseDashboards": None,
         "platformSettings": get_platform_settings(),
         "enrollments": [],
