@@ -482,6 +482,7 @@ PLATFORM_FACEBOOK_ACCOUNT: http://www.facebook.com/YourPlatformFacebookAccount
 PLATFORM_NAME: Your Platform Name Here
 PLATFORM_TWITTER_ACCOUNT: '@YourPlatformTwitterAccount'
 POLICY_CHANGE_GRADES_ROUTING_KEY: edx.lms.core.default
+SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY: edx.lms.core.default
 PREPEND_LOCALE_PATHS: []
 PRESS_EMAIL: press@example.com
 PROCTORING_BACKENDS:
