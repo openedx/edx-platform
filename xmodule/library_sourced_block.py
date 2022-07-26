@@ -169,7 +169,6 @@ class LibrarySourcedBlock(
             context['can_collapse'] = True
             self.render_children(context, fragment, can_reorder=False, can_add=False)
             return fragment
-        context['is_sourced_block'] = True
         context['is_loading'] = is_loading
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_source_edit.js'))
         fragment.initialize_js('LibrarySourceAuthorView')

@@ -19,6 +19,7 @@ section_class = "level-nesting" if show_inline else "level-element"
 label = determine_label(xblock.display_name_with_default, xblock.scope_ids.block_type)
 messages = xblock.validate().to_json()
 block_is_unit = is_unit(xblock)
+is_sourced_block = xblock.location.block_type == 'library_sourced'
 %>
 
 <%namespace name='static' file='static_content.html'/>
