@@ -327,7 +327,8 @@ class LibrarySourcedBlock(
         If source_library_id has been edited, refresh_children automatically.
         """
         try:
-            self.refresh_children()
+            if self.source_library_id:
+                self.refresh_children()
         except ValueError:
             pass  # The validation area will display an error message, no need to do anything now.
 
