@@ -10,7 +10,6 @@ from copy import copy
 from gettext import ngettext
 
 import bleach
-from capa.responsetypes import registry
 from django.conf import settings
 from django.utils.functional import classproperty
 from lazy import lazy
@@ -26,6 +25,7 @@ from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Boolean, Integer, List, Scope, String
 
+from xmodule.capa.responsetypes import registry
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.xmodule_django import add_webpack_to_fragment
@@ -714,8 +714,8 @@ class LibraryContentBlock(
         """
         If source_library_id is empty, clear source_library_version and children.
         """
-        self.children = []  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         if not self.source_library_id:
+            self.children = []  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             self.source_library_version = ""
         else:
             self.source_library_version = str(self.tools.get_library_version(self.source_library_id))

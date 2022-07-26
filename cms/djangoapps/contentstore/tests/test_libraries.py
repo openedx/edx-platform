@@ -358,7 +358,7 @@ class TestLibraries(LibraryTestCase):
         )
         self.assertEqual(resp.status_code, 200)
         lc_block = modulestore().get_item(lc_block.location)
-        self.assertEqual(len(lc_block.children), 0)  # Children deleted due to a changing source_library_id.
+        self.assertEqual(len(lc_block.children), 1)  # Children should not be deleted due to a bad setting.
 
     def test_refreshes_children_if_libraries_change(self):
         """ Tests that children are automatically refreshed if libraries list changes """
