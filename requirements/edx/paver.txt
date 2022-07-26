@@ -48,7 +48,7 @@ stevedore==4.0.0
     # via
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
-urllib3==1.26.10
+urllib3==1.26.11
     # via requests
 watchdog==2.1.9
     # via -r requirements/edx/paver.in
