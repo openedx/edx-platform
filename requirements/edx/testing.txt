@@ -226,7 +226,7 @@ cssselect==1.1.0
     # via
     #   -r requirements/edx/testing.in
     #   pyquery
-cssutils==2.5.0
+cssutils==2.5.1
     # via
     #   -r requirements/edx/base.txt
     #   pynliner
@@ -672,7 +672,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==13.15.0
+faker==13.15.1
     # via factory-boy
 fastapi==0.79.0
     # via pact-python
@@ -896,7 +896,7 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/edx/base.txt
     #   blockstore
-newrelic==7.14.0.177
+newrelic==7.16.0.178
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -922,7 +922,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
-openedx-events==0.10.0
+openedx-events==0.11.0
     # via -r requirements/edx/base.txt
 openedx-filters==0.7.0
     # via
@@ -1209,7 +1209,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
 redis==4.3.4
     # via -r requirements/edx/base.txt
-regex==2022.7.9
+regex==2022.7.25
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1320,7 +1320,6 @@ six==1.16.0
     #   python-memcached
     #   singledispatch
     #   tox
-    #   virtualenv
 slumber==0.7.1
     # via
     #   -r requirements/edx/base.txt
@@ -1329,7 +1328,7 @@ slumber==0.7.1
     #   edx-rest-api-client
 sniffio==1.2.0
     # via anyio
-snowflake-connector-python==2.7.9
+snowflake-connector-python==2.7.10
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1418,6 +1417,7 @@ typing-extensions==4.3.0
     #   django-countries
     #   pydantic
     #   pylint
+    #   snowflake-connector-python
     #   starlette
 unicodecsv==0.14.1
     # via
@@ -1430,7 +1430,7 @@ uritemplate==4.1.1
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-urllib3==1.26.10
+urllib3==1.26.11
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -1439,6 +1439,7 @@ urllib3==1.26.10
     #   py2neo
     #   requests
     #   selenium
+    #   snowflake-connector-python
 user-util==1.0.0
     # via -r requirements/edx/base.txt
 uvicorn==0.18.2
@@ -1449,7 +1450,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.15.1
+virtualenv==20.16.0
     # via tox
 voluptuous==0.13.1
     # via
