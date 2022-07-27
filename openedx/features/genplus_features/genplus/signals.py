@@ -19,3 +19,17 @@ def create_user_profile(sender, instance, created, **kwargs):
             Student.objects.create(gen_user=instance)
         elif instance.is_teacher:
             Teacher.objects.create(gen_user=instance)
+
+
+@receiver(post_save, sender=Teacher)
+def create_teacher(sender, instance, created, **kwargs):
+    if created:
+        classes = Class.objects.filter(school=instance.gen_user.school)
+        instance.classes.add(*classes)
+
+
+@receiver(post_save, sender=Class)
+def create_gen_class(sender, instance, created, **kwargs):
+    if created:
+        teachers = Teacher.objects.filter(gen_user__school=instance.school)
+        instance.teachers.add(*teachers)

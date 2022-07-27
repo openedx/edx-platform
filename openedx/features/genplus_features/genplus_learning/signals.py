@@ -5,7 +5,7 @@ from django.dispatch import receiver
 from xmodule.modulestore.django import SignalHandler, modulestore
 from django.db.models.signals import post_save, m2m_changed, pre_save
 
-from openedx.features.genplus_features.genplus.models import Class
+from openedx.features.genplus_features.genplus.models import Class, Teacher
 from .models import ClassLesson, Program, Unit, ClassUnit
 from .constants import ProgramEnrollmentStatuses
 import openedx.features.genplus_features.genplus_learning.tasks as genplus_learning_tasks
@@ -42,9 +42,13 @@ def _listen_for_course_publish(sender, course_key, **kwargs):
     ClassLesson.objects.bulk_create(new_class_lessons)
 
 
-@receiver(post_save, sender=Class)
-def gen_class_changed(sender, instance, created, **kwargs):
-    if not created and instance.program:
+@receiver(pre_save, sender=Class)
+def gen_class_changed(sender, instance, *args, **kwargs):
+    gen_class_qs = Class.objects.filter(pk=instance.pk)
+    if gen_class_qs.exists() and gen_class_qs.first().program:
+        return
+
+    if instance.program:
         # enroll students to the program
         genplus_learning_tasks.enroll_class_students_to_program.apply_async(
             args=[instance.pk, instance.program.pk],

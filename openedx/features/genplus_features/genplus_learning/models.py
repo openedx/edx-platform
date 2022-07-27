@@ -1,4 +1,5 @@
 import uuid
+from django.conf import settings
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.core.exceptions import ValidationError
@@ -8,8 +9,8 @@ from simple_history.models import HistoricalRecords
 
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from .utils import get_section_progress
-from .constants import ProgramEnrollmentStatuses
+from xmodule.modulestore.django import modulestore
+from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
 from openedx.features.genplus_features.genplus.models import Student, Class
 
 
@@ -53,6 +54,30 @@ class Unit(models.Model):
     course = models.OneToOneField(CourseOverview, on_delete=models.CASCADE)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="units")
 
+    @property
+    def display_name(self):
+        return self.course.display_name
+
+    @property
+    def short_description(self):
+        return self.course.short_description
+
+    @property
+    def lms_url(self):
+        course = modulestore().get_course(self.course.id)
+        course_key_str = str(course.id)
+        sections = course.children
+        if sections:
+            usage_key_str = str(sections[0])
+        else:
+            usage_key_str = str(modulestore().make_course_usage_key(course.id))
+
+        return f"{settings.LMS_ROOT_URL}/courses/{course_key_str}/jump_to/{usage_key_str}"
+
+    @property
+    def banner_image_url(self):
+        return f"{settings.LMS_ROOT_URL}{self.course.course_image_url}"
+
     def __str__(self):
         return str(self.course.id)
 
@@ -87,6 +112,10 @@ class ClassUnit(models.Model):
 
     gen_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="class_units")
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="class_units")
+
+    @property
+    def is_locked(self):
+        return all([lesson.is_locked for lesson in self.class_lessons.all()])
 
     def __str__(self):
         return f"{self.gen_class.name}-{self.unit.course.display_name}"
