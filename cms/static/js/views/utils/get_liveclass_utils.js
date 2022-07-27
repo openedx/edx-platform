@@ -1,7 +1,8 @@
+
 /**
  * Provides utilities for validating liveclass during creation.
  */
-define(["jquery", "gettext", "common/js/components/utils/view_utils", "js/views/utils/create_utils_base"], function (
+ define(["jquery", "gettext", "common/js/components/utils/view_utils", "js/views/utils/create_utils_base"], function (
   $,
   gettext,
   ViewUtils,
@@ -135,6 +136,23 @@ define(["jquery", "gettext", "common/js/components/utils/view_utils", "js/views/
           output.innerHTML = "";
           output.style.display = "block";
 
+          var outputButtons = document.createElement("div");
+          outputButtons.id = "output-buttons";
+          outputButtons.style = "width:100%"
+
+          var nextButton = document.createElement("input");
+          nextButton.type = "button";
+          nextButton.innerText = "Next";
+          nextButton.className = "liveclass-next"
+
+          var prevButton = document.createElement("input");
+          prevButton.type = "button";
+          prevButton.innerText = "Previous";
+          prevButton.className = "liveclass-previous"
+
+          outputButtons.append(prevButton, nextButton);
+
+
           //Assigning the values of Previous and Next buttons
           response.next === null
             ? (nextButton.value = "http://localhost:18010/live_class/details/")
@@ -187,7 +205,7 @@ define(["jquery", "gettext", "common/js/components/utils/view_utils", "js/views/
             live_list.appendChild(live_list_item);
           });
 
-          output.appendChild(live_list);
+          output.prepend(live_list);
           nextButton.onclick = nextButtonPressed;
           prevButton.onclick = prevButtonPressed;
         })

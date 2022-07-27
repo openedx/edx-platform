@@ -5,7 +5,7 @@
  * and upon save parent invokes refresh function that fetches updated model and
  * re-renders edited course outline.
  */
-define([
+ define([
   "jquery",
   "backbone",
   "underscore",
@@ -248,7 +248,7 @@ define([
       uploadBox.innerHTML = `<form id="fileUploadForm">
                 <label for="myfile">Select file to Upload:</label>
                 <input type="file" id="inpFile" name="myfile">
-                <button id="uploadChapterFile" class="uploadChapterFile"  type="submit" hidden>Upload</button>
+                <button id="uploadChapterFile" class="uploadChapterFile" type="submit" hidden>Upload</button>
                 </form></br>`;
 
       var uploadButton = document.querySelector(".action-upload-file");
@@ -267,18 +267,18 @@ define([
         var doc_id = { doc_id: course[0] };
 
         $.getFiles("../get_doc/", doc_id, function (response) {
-          // console.log(typeof response, response);
+          console.log(typeof response, response);
 
           var data = response["data"];
 
-          // console.log("Data : " + JSON.stringify(data[3].chapter_name));
+          console.log("Data : " + JSON.stringify(data[3].chapter_name));
 
           var items = data.filter((e) => {
             if (e.chapter_name === chapter_name && e.document_name !== null) {
               return e;
             }
           });
-          // alert(JSON.stringify(items))
+
           const fileListItems = document.createElement("ul");
           items.forEach((item) => {
             let fileItem = document.createElement("li");
@@ -287,7 +287,7 @@ define([
             fileListItems.appendChild(fileItem);
           });
           const fileListHeading = document.createElement("h1");
-          fileListHeading.innerText="Available Documents"
+          fileListHeading.innerText="Available Documnets"
           modal_content.appendChild(fileListHeading);
           modal_content.appendChild(fileListItems);
         });
@@ -305,7 +305,7 @@ define([
       const myFile = document.querySelector("#inpFile");
 
       myForm.addEventListener("submit", (e) => {
-        e.preventDefault();
+        // e.preventDefault();
         const endpoint = "../upload_doc";
         const url = window.location.href;
         const url_split = url.split("/");
@@ -326,7 +326,7 @@ define([
         formData.append("chapter_name", chapter_name);
         formData.append("document_name", document_name);
         formData.append("document_type", document_type);
-        $.postFormData(endpoint, formData, function (data) {alert("Document Uploaded Successfully")});
+        $.postFormData(endpoint, formData, function (data) {});
       });
 
       // myForm.addEventListener('submit', e =>{

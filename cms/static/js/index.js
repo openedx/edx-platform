@@ -147,7 +147,7 @@ define([
 
   var addNewCourse = function (e) {
     var $newCourse, $cancelButton, $courseName;
-    alert("Inside add new course");
+    e.preventDefault();
     $(".new-course-button").addClass("is-disabled").attr("aria-disabled", true);
     $(".new-course-save").addClass("is-disabled").attr("aria-disabled", true);
     $newCourse = $(".wrapper-create-course").addClass("is-shown");
@@ -214,19 +214,18 @@ define([
 
     // console.log("Timezone : " + liveclass_timezone_adjustment + " " + typeof(liveclass_timezone_adjustment) );
 
+
     var liveclass_startdate = $newLiveClassForm.find(".new-liveclass-startdate").val();
     var liveclass_starttime = $newLiveClassForm.find(".new-liveclass-starttime").val();
     var liveclass_enddate = $newLiveClassForm.find(".new-liveclass-enddate").val();
     var liveclass_endtime = $newLiveClassForm.find(".new-liveclass-endtime").val();
-    var meeting_notes = $newLiveClassForm.find(".new-liveclass-notes").val();
 
-    var liveclass_starttime_seconds =
-      liveclass_starttime.split(":")[0] * 60 * 60 + liveclass_starttime.split(":")[1] * 60;
-    var liveclass_endtime_seconds = liveclass_endtime.split(":")[0] * 60 * 60 + liveclass_endtime.split(":")[1] * 60;
+    var liveclass_starttime_seconds = (liveclass_starttime.split(":")[0]*60*60)+(liveclass_starttime.split(":")[1]*60);
+    var liveclass_endtime_seconds = (liveclass_endtime.split(":")[0]*60*60)+(liveclass_endtime.split(":")[1]*60);
 
-    const start_unix =
-      Date.parse(liveclass_startdate) / 1000 + liveclass_starttime_seconds + liveclass_timezone_adjustment;
-    const end_unix = Date.parse(liveclass_enddate) / 1000 + liveclass_endtime_seconds + liveclass_timezone_adjustment;
+    const start_unix = ((Date.parse(liveclass_startdate))/1000)+ liveclass_starttime_seconds + liveclass_timezone_adjustment;
+    const end_unix = ((Date.parse(liveclass_enddate))/1000)+liveclass_endtime_seconds + liveclass_timezone_adjustment;
+
 
     let crt_room = {
       name: display_name,
@@ -234,12 +233,13 @@ define([
       properties: {
         start_audio_off: true,
         start_video_off: true,
-        nbf: start_unix,
-        exp: end_unix,
+        nbf:start_unix,
+        exp:end_unix
       },
     };
 
-    //Creating Room
+    alert("****Inside saveNewLiveClass inside index.js");
+
     fetch("https://api.daily.co/v1/rooms/", {
       method: "POST",
       headers: {
@@ -253,67 +253,35 @@ define([
       })
       .then(function (data) {
         var lib_info = {
-          properties: { room_name: data.name },
+          topic_name: display_name,
+          is_recurrence_meeting: false,
+          meeting_link: data.url,
+          course_id: course_id,
+          start_date: liveclass_startdate,
+          start_time: liveclass_starttime,
+          end_date: liveclass_enddate,
+          end_time: liveclass_endtime,
+
         };
+        analytics.track("Created a LiveClass", lib_info);
 
-        //Creating client_token and giving it to liveclass
-        const client_token = async () => {
-          var response;
-          await fetch("https://api.daily.co/v1/meeting-tokens", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10",
-            },
-            body: JSON.stringify(lib_info),
-          })
-            .then((data) => data.json())
-            .then((data) => {
-              response = data;
-            })
-          return response["token"];
-        };
-
-        // console.log("The response is", client_token());
-        client_token()
-        .then((token)=>{
-          var lib_info = {
-            topic_name: display_name,
-            is_recurrence_meeting: false,
-            meeting_link: data.url,
-            course_id: course_id,
-            start_date: liveclass_startdate,
-            start_time: liveclass_starttime,
-            end_date: liveclass_enddate,
-            end_time: liveclass_endtime,
-            meeting_notes: meeting_notes,
-            client_token: token,
-          };
-          analytics.track("Created a LiveClass", lib_info);
-
-          CreateLiveClassUtils.create(lib_info, function (errorMessage) {
-            if (errorMessage.id == undefined) {
-              var msg = edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML("<p>"), errorMessage, edx.HtmlUtils.HTML("</p>"));
-              $(".create-liveclass .wrap-error").addClass("is-shown");
-              edx.HtmlUtils.setHtml($("#liveclass_creation_error"), msg);
-              $(".new-liveclass-save").addClass("is-disabled").attr("aria-disabled", true);
-            } else if (
-              liveclass_startdate < liveclass_enddate ||
-              (liveclass_startdate === liveclass_enddate && liveclass_starttime < liveclass_endtime)
-            ) {
-              // alert(`Live Class Created\nStart: ${liveclass_startdate} ${liveclass_starttime} \nEnd: ${liveclass_enddate} ${liveclass_endtime}`);
-              localStorage.setItem("liveclass_id", errorMessage.id);
-            } else {
-              alert("End Date should be after Start Date");
-            }
-          });
+        CreateLiveClassUtils.create(lib_info, function (errorMessage) {
+          if (errorMessage.id == undefined) {
+            var msg = edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML("<p>"), errorMessage, edx.HtmlUtils.HTML("</p>"));
+            $(".create-liveclass .wrap-error").addClass("is-shown");
+            edx.HtmlUtils.setHtml($("#liveclass_creation_error"), msg);
+            $(".new-liveclass-save").addClass("is-disabled").attr("aria-disabled", true);
+          } else if(liveclass_startdate < liveclass_enddate){
+            //  alert('Live Class Created. \nStart Date: '+liveclass_startdate);
+            alert(
+              `Live Class Created\nStart: ${liveclass_startdate} ${liveclass_starttime} \nEnd: ${liveclass_enddate} ${liveclass_endtime}`
+            );
+            localStorage.setItem("liveclass_id", errorMessage.id);
+          } else{
+             alert('End Date should be after Start Date');
+          }
+        });
       });
-
-      });
-  };
-
-  var updateLiveClass = function (e) {
-    alert("Updated");
   };
 
   var addNewLiveClass = function (e) {
@@ -340,18 +308,13 @@ define([
       document.getElementById("field-liveclass-date").style.display = "block";
     }
   };
-  var loadData = function () {
-    var outputButtons = document.getElementById("output-buttons");
-    outputButtons.style.display = "";
-    var lib_info = { page: 1 };
-    GetLiveClassUtils.create(lib_info, function (res, errorMessage) {});
+  var loadData = function (e) {
+   // alert("Live Course Tab Pressed");
+    var lib_info = {};
+    GetLiveClassUtils.create(lib_info, function (res, errorMessage) {
+      // alert(res)
+    });
   };
-
-  document.querySelector(".liveclass-tab").onclick = loadData;
-
-  var liveclassUpdate = $(".liveclass-update");
-  liveclassUpdate.onclick = updateLiveClass;
-
   var showTab = function (tab) {
     return function (e) {
       e.preventDefault();
@@ -367,19 +330,14 @@ define([
   };
   var libraryTab = function (tab) {
     var output = document.getElementById("output");
-    var outputButtons = document.getElementById("output-buttons");
     output.style.display = "none";
-    outputButtons.style.display = "none";
   };
   var courseTab = function (tab) {
     var output = document.getElementById("output");
-    var outputButtons = document.getElementById("output-buttons");
     output.style.display = "none";
-    outputButtons.style.display = "none";
   };
 
   var assignUsers = function (tab) {
-    alert("Assigned Users Pressed");
     if (localStorage.getItem("liveclass_id") != undefined) {
       let id = localStorage.getItem("liveclass_id");
       var username = document.getElementById("new-liveclass-username").value;
@@ -403,7 +361,7 @@ define([
     }
   };
 
-  var uploadMyFile = function (e) {
+  var uploadMyFile = function(e){
     alert("Inside UploadMyFile");
   };
 
@@ -413,17 +371,11 @@ define([
     var ArchivedTabHref = $("#course-index-tabs .archived-courses-tab a").attr("href");
     var LiveClassTabHref = $("#course-index-tabs .liveclass-tab a").attr("href");
 
-    var output = document.getElementById("output");
-    var outputButtons = document.getElementById("output-buttons");
-    output.style.display = "none";
-    outputButtons.style.display = "none";
-
     $(".new-liveclass-recurrence").bind("click", checkClass);
     $(".new-course-button").bind("click", addNewCourse);
     $(".new-library-button").bind("click", addNewLibrary);
-    // $(".liveclass-update").bind("click",updateLiveClass);
     $(".new-liveclass-button").bind("click", addNewLiveClass);
-    // $(".liveclass-tab").bind("click", loadData);
+    $(".liveclass-tab").bind("click", loadData);
     $(".libraries-tab").bind("click", libraryTab);
     $(".courses-tab").bind("click", courseTab);
     $(".new-liveclass-repeattype").bind("click", courseTab);

@@ -44,7 +44,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
           <li style="color: #000; font-size: 20px; font-weight: 900">
             % if enable_help_link:
               <div class="mobile-nav-item hidden-mobile nav-item">
-                <a class="help-link discover-new-link" style="color: #000000" href="${help_link}" rel="noopener" target="_blank">${_("Learn")}</a>
+                <a class="help-link discover-new-link" style="color: #000000" href="${reverse('courses')}" rel="noopener" target="_blank">${_("Learn")}</a>
               </div>
             % endif
           </li>

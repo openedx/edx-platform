@@ -189,6 +189,7 @@ urlpatterns = [
 
 
 
+
     # Update session view
     path('lang_pref/session_language', lang_pref_views.update_session_language, name='session_language'),
 

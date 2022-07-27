@@ -1098,6 +1098,7 @@ def rerun_course(user, source_course_key, org, number, run, fields, course_type,
         rerun_course_task(*args)
 
     return destination_course_key
+    
 
 
 @login_required

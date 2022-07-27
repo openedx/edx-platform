@@ -1,7 +1,7 @@
 /**
  * Provides utilities for validating courses during creation, for both new courses and reruns.
  */
-define(["jquery", "gettext", "common/js/components/utils/view_utils", "js/views/utils/create_utils_base"], function (
+ define(["jquery", "gettext", "common/js/components/utils/view_utils", "js/views/utils/create_utils_base"], function (
   $,
   gettext,
   ViewUtils,

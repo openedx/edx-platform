@@ -173,56 +173,6 @@ class LiveClassesApiListView(DeveloperErrorViewMixin, ListCreateAPIView):
 
 
 
-
-
-
-
-# def rooms():
-#         url = "https://api.daily.co/v1/rooms/"
-#         payload = json.dumps({
-#             "name": "display_name",
-#             "privacy": "private",
-#             "properties": {
-#             "start_audio_off": True,
-#             "start_video_off": True,
-#             "nbf": "start_unix",
-#             "exp": "end_unix"
-
-#             }
-#         })
-#         headers = {
-#             "Content-Type": "application/json",
-#             "Authorization": "Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10",
-#         }
-
-#         response = requests.request("POST", url, headers=headers, data= payload)
-#         if response.status_code==200:
-#             data=json.loads(response.text)
-#             link_url = data.get('url')
-
-#             url = "https://api.daily.co/v1/meeting-tokens"
-#             payload = json.dumps({
-#                 "properties": {
-#                     "room_name": "display_name"
-#                 }
-#                 })
-#             headers = {
-#             "authorization": "Bearer a471ccb8f1587c7a95c5fdd63556391cf898fd210a997ae6635b2915b585dc10",
-#             "Content-Type": "application/json"
-#             }
-            
-#             response = requests.request("POST", url, headers=headers, data=payload)
-#             if response.status_code==200:
-#                 data=json.loads(response.text)
-#                 token = data.get('token')
-#                 log.info(response.text)
-#                 return (link_url , token)
-#         return None , None
-        
-
-# rooms()
-
-
 # var saveNewLiveClass = function (e) {
 #     e.preventDefault();
 
@@ -533,10 +483,16 @@ class EnrollCourseUserDetailsView(DeveloperErrorViewMixin, RetrieveDestroyAPIVie
 
         data={}
         data['course_id']=self.kwargs.get('course_id')
-        data['datas']=serializer.data
+        data['data']=serializer.data
     
         return Response(data, status=status.HTTP_200_OK)
 
+
+
+
+    # def get_queryset(self):
+    
+    #     return CourseEnrollment.objects.filter(course_id=self.kwargs.get('course_id'))
 
 
 
