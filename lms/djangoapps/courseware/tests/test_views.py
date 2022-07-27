@@ -12,7 +12,6 @@ from urllib.parse import quote, urlencode
 from uuid import uuid4
 
 import ddt
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
 from django.conf import settings
@@ -31,6 +30,7 @@ from rest_framework import status
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
+from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
@@ -2207,7 +2207,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
     def test_user_with_passing_grade(self, mock_is_course_passed):  # lint-amnesty, pylint: disable=unused-argument
         # If user has above passing grading then json will return cert generating message and
         # status valid code
-        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
+        with patch('xmodule.capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
             mock_send_to_queue.return_value = (0, "Successfully queued")
 
             resp = self.client.post(self.url)
