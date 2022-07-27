@@ -3,6 +3,7 @@ Serializers for the Learner Dashboard
 """
 
 from django.urls import reverse
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import course_home_url
 from rest_framework import serializers
 
@@ -141,7 +142,7 @@ class EnrollmentSerializer(serializers.Serializer):
         return False
 
     def get_isAudit(self, enrollment):
-        return enrollment.mode in ["audit", "honor"]
+        return enrollment.mode in CourseMode.AUDIT_MODES
 
     def get_isAuditAccessExpired(self, enrollment):
         show_courseware_link = self.context.get("show_courseware_link", {}).get(
