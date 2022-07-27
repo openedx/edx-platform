@@ -1,6 +1,7 @@
 """Test for learner views and related functions"""
 
 import json
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 import ddt
 
 from unittest import TestCase
@@ -8,14 +9,20 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from django.urls import reverse
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.learner_dashboard.test_serializers import random_url
 from rest_framework.test import APITestCase
 
 from lms.djangoapps.learner_dashboard.learner_views import (
+    get_enrollments,
     get_platform_settings,
     get_user_account_confirmation_info,
 )
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import (
+    CourseEnrollmentFactory,
+    UserFactory,
+)
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
@@ -109,6 +116,42 @@ class TestGetUserAccountConfirmationInfo(SharedModuleStoreTestCase):
         assert user_account_confirmation_info["sendEmailUrl"] == "example.com/support"
 
 
+class TestGetEnrollments(SharedModuleStoreTestCase):
+    """Tests for get_enrollments"""
+
+    def setUp(self):
+        self.user = UserFactory()
+
+    def create_test_enrollment(self, course_mode=CourseMode.AUDIT):
+        """Create a course and enrollment for the test user. Returns a CourseEnrollment"""
+        course = CourseFactory(self_paced=True)
+
+        CourseModeFactory(
+            course_id=course.id,
+            mode_slug=course_mode,
+        )
+
+        return CourseEnrollmentFactory(
+            course_id=course.id, mode=course_mode, user_id=self.user.id
+        )
+
+    def test_basic(self):
+        # Given a set of enrollments
+        test_enrollments = [self.create_test_enrollment() for i in range(3)]
+
+        # When I request my enrollments
+        returned_enrollments, course_mode_info = get_enrollments(self.user, None, None)
+
+        # Then I return those enrollments and course mode info
+        assert len(returned_enrollments) == len(test_enrollments)
+        assert len(course_mode_info.keys()) == len(test_enrollments)
+
+        # ... with enrollments and course info
+        for enrollment in test_enrollments:
+            assert enrollment.course_id in course_mode_info
+            assert enrollment in returned_enrollments
+
+
 class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
     """Tests for the dashboard view"""
 
@@ -164,7 +207,9 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
 
         assert expected_keys == response_data.keys()
 
-    @patch("lms.djangoapps.learner_dashboard.learner_views.get_user_account_confirmation_info")
+    @patch(
+        "lms.djangoapps.learner_dashboard.learner_views.get_user_account_confirmation_info"
+    )
     def test_mocked(self, mock_user_conf_info):
         """High level tests with mocked data"""
 
