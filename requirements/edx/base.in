@@ -84,6 +84,7 @@ edx-django-sites-extensions
 edx-django-utils>=5.0.0            # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
 edx-enterprise
+edx-event-bus-kafka>=0.4.1          # Kafka implementation of event bus
 edx-milestones
 edx-name-affirmation
 edx-opaque-keys
@@ -123,7 +124,7 @@ nltk                                # Natural language processing; used by the c
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 openedx-calc                        # Library supporting mathematical calculations for Open edX
-openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
+openedx-events>=0.12.0              # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
 optimizely-sdk                      # Optimizely full stack SDK for Python
 ora2>=4.4.0

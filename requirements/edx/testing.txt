@@ -296,6 +296,7 @@ distlib==0.3.5
     #   edx-django-utils
     #   edx-drf-extensions
     #   edx-enterprise
+    #   edx-event-bus-kafka
     #   edx-i18n-tools
     #   edx-milestones
     #   edx-name-affirmation
@@ -553,6 +554,7 @@ edx-django-utils==5.0.0
     #   django-config-models
     #   edx-drf-extensions
     #   edx-enterprise
+    #   edx-event-bus-kafka
     #   edx-name-affirmation
     #   edx-rest-api-client
     #   edx-toggles
@@ -579,6 +581,8 @@ edx-enterprise==3.56.5
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   learner-pathway-progress
+edx-event-bus-kafka==0.4.1
+    # via -r requirements/edx/base.txt
 edx-i18n-tools==0.9.1
     # via
     #   -r requirements/edx/base.txt
@@ -641,6 +645,7 @@ edx-toggles==5.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
+    #   edx-event-bus-kafka
     #   edx-name-affirmation
     #   edxval
     #   learner-pathway-progress
@@ -933,8 +938,10 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
-openedx-events==0.11.1
-    # via -r requirements/edx/base.txt
+openedx-events==0.12.0
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-event-bus-kafka
 openedx-filters==0.8.0
     # via
     #   -r requirements/edx/base.txt
