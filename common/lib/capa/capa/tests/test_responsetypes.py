@@ -22,10 +22,10 @@ import six
 from pytz import UTC
 from six import text_type
 
-from xmodule.capa.correctmap import CorrectMap
-from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
-from xmodule.capa.tests.helpers import load_fixture, new_loncapa_problem, test_capa_system
-from xmodule.capa.tests.response_xml_factory import (
+from capa.correctmap import CorrectMap
+from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
+from capa.tests.helpers import load_fixture, new_loncapa_problem, test_capa_system
+from capa.tests.response_xml_factory import (
     AnnotationResponseXMLFactory,
     ChoiceResponseXMLFactory,
     ChoiceTextResponseXMLFactory,
@@ -41,8 +41,8 @@ from xmodule.capa.tests.response_xml_factory import (
     SymbolicResponseXMLFactory,
     TrueFalseResponseXMLFactory
 )
-from xmodule.capa.util import convert_files_to_filenames
-from xmodule.capa.xqueue_interface import dateformat
+from capa.util import convert_files_to_filenames
+from capa.xqueue_interface import dateformat
 
 
 class ResponseTest(unittest.TestCase):
@@ -1568,7 +1568,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         problem = self.build_problem(answer="1+1j", tolerance=1e-3)
         self.assert_grade(problem, '1+j', 'correct')
 
-    @mock.patch('xmodule.capa.responsetypes.log')
+    @mock.patch('capa.responsetypes.log')
     def test_staff_inputs_bad_syntax(self, mock_log):
         """Test that staff may enter in a complex number as the answer."""
         staff_ans = "clearly bad syntax )[+1e"
@@ -1582,7 +1582,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
             "Content error--answer '%s' is not a valid number", staff_ans
         )
 
-    @mock.patch('xmodule.capa.responsetypes.log')
+    @mock.patch('capa.responsetypes.log')
     def test_responsetype_i18n(self, mock_log):  # lint-amnesty, pylint: disable=unused-argument
         """Test that LoncapaSystem has an i18n that works."""
         staff_ans = "clearly bad syntax )[+1e"
@@ -1622,7 +1622,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
 
         problem = self.build_problem(answer=4, tolerance='10%')
 
-        with mock.patch('xmodule.capa.responsetypes.evaluator') as mock_eval:
+        with mock.patch('capa.responsetypes.evaluator') as mock_eval:
             mock_eval.side_effect = evaluator_side_effect
             self.assert_grade(problem, 'some big input', 'incorrect')
             self.assert_grade(problem, 'some neg input', 'incorrect')
@@ -1643,7 +1643,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
             (ZeroDivisionError(), "Could not interpret '.*' as a number")
         ]
 
-        with mock.patch('xmodule.capa.responsetypes.evaluator') as mock_eval:
+        with mock.patch('capa.responsetypes.evaluator') as mock_eval:
             for err, msg_regex in errors:
 
                 def evaluator_side_effect(_, __, math_string):

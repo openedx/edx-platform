@@ -19,7 +19,7 @@ from django.test import override_settings
 from six import text_type, unichr
 from six.moves import range
 
-from xmodule.capa.safe_exec import safe_exec, update_hash
+from capa.safe_exec import safe_exec, update_hash
 
 
 class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring

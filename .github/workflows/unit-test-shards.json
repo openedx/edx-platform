@@ -261,6 +261,12 @@
     ]
   },
   "common-2": {
+    "settings": "lms.envs.test",
+    "paths": [
+      "common/lib/"
+    ]
+  },
+  "common-3": {
     "settings": "cms.envs.test",
     "paths": [
       "common/djangoapps/"

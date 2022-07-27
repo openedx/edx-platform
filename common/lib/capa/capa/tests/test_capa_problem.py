@@ -12,8 +12,8 @@ from lxml import etree
 from markupsafe import Markup
 from mock import patch
 
-from xmodule.capa.responsetypes import LoncapaProblemError
-from xmodule.capa.tests.helpers import new_loncapa_problem
+from capa.responsetypes import LoncapaProblemError
+from capa.tests.helpers import new_loncapa_problem
 from openedx.core.djangolib.markup import HTML
 
 

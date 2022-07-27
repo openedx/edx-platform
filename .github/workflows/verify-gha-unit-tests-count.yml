@@ -18,7 +18,7 @@ jobs:
       - name: install requirements
         run: |
           sudo pip install -r requirements/pip.txt
-          sudo pip install --exists-action='w' -r requirements/edx/testing.txt
+          sudo pip install -r requirements/edx/testing.txt
 
       - name: verify unit tests count
         uses: ./.github/actions/verify-tests-count

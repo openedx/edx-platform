@@ -6,7 +6,7 @@ Tests to verify that CorrectMap behaves correctly
 import datetime
 import unittest
 import pytest
-from xmodule.capa.correctmap import CorrectMap
+from capa.correctmap import CorrectMap
 
 
 class CorrectMapTest(unittest.TestCase):
@@ -220,4 +220,4 @@ class CorrectMapTest(unittest.TestCase):
         invalid_list = [None, "", False, 0]
         for invalid in invalid_list:
             self.cmap.set_dict(invalid)
-            assert not self.cmap.get_dict()
+            assert self.cmap.get_dict() == {}
