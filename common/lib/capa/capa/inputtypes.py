@@ -675,7 +675,8 @@ class TextLine(InputTypeBase):
         """
         return [
             Attribute('size', None),
-            Attribute('textmultiple', False),
+            Attribute('multiline', False),
+            Attribute('placeholder', ''),
 
             Attribute('hidden', False),
             Attribute('inline', False),
