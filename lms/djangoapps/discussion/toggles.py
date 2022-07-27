@@ -78,3 +78,14 @@ ENABLE_REPORTED_CONTENT_EMAIL_NOTIFICATIONS = CourseWaffleFlag(
 # .. toggle_creation_date: 2022-06-08
 # .. toggle_target_removal_date: 2022-09-05
 ENABLE_DISCUSSIONS_MFE_BANNER = CourseWaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.enable_mfe_banner_for_learners', __name__)
+
+# .. toggle_name: discussions.enable_view_mfe_in_iframe
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to toggle iframe view for new discussions mfe
+# .. toggle_use_cases: temporary, open_edx
+# .. toggle_creation_date: 2022-07-27
+# .. toggle_target_removal_date: 2022-12-31
+ENABLE_VIEW_MFE_IN_IFRAME = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.enable_view_mfe_in_iframe', __name__
+)
