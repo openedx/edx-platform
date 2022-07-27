@@ -356,52 +356,58 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.get_active_enterprise_customer_user')
-    def test_consent_needed_for_course_consent_already_granted(self, mock_get_active_enterprise_customer_user):
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
+    def test_consent_needed_for_course_enterprise_mismatch(
+        self,
+        enterprise_customer_uuid_for_request_mock,
+        mock_get_active_enterprise_customer_user
+    ):
         """
-        Tests that a consent is not needed when consent has already been granted for the course by user.
+        Tests that a consent is not needed when current request enterprise and learner's active
+        enterprise does not match.
         """
         user = UserFactory(username='janedoe')
         request = mock.MagicMock(
             user=user,
-            site=SiteFactory(domain="example.com"),
+            site=SiteFactory(domain='example.com'),
             session={},
             COOKIES={},
             GET={},
         )
 
-        ec_uuid = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
+        learner_enterprise = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
+        current_request_enterprise = '1234-23434-vfdfa-242sdczz'
         course_id = 'fake-course'
-        existing_consent_records = [
-            {
-                'username': user.username,
-                'enterprise_customer_uuid': ec_uuid,
-                'exists': True,
-                'course_id': course_id,
-                'consent_provided': True,
-                'consent_required': True
-            }
-        ]
+        enterprise_customer_uuid_for_request_mock.return_value = current_request_enterprise
         mock_get_active_enterprise_customer_user.return_value = self.get_mock_active_enterprise_learner_details(
             learner_id=user.id,
-            enterprise_customer_uuid=ec_uuid,
-            data_sharing_consent_records=existing_consent_records
+            enterprise_customer_uuid=learner_enterprise,
         )
 
-        # test that consent is not required if learner has already provided consent.
-        expected_message = "[ENTERPRISE DSC] Learner [{}] has already given DSC for course [{}] and enterprise [{}]"
+        expected_message = '[ENTERPRISE DSC] Enterprise mismatch. USER: [{username}], RequestEnterprise: ' \
+                           '[{current_enterprise_uuid}], LearnerEnterprise: [{active_enterprise_customer}]'
         with LogCapture(LOGGER_NAME) as log:
             assert not consent_needed_for_course(request, user, course_id)
             log.check_present(
                 (
                     LOGGER_NAME,
                     'INFO',
-                    expected_message.format(user.username, course_id, ec_uuid)
+                    expected_message.format(
+                        username=user.username,
+                        current_enterprise_uuid=current_request_enterprise,
+                        active_enterprise_customer=learner_enterprise
+                    )
                 )
             )
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.get_active_enterprise_customer_user')
-    def test_consent_needed_for_course_site_mismatch(self, mock_get_active_enterprise_customer_user):
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
+    def test_consent_needed_for_course_site_mismatch(
+        self,
+        enterprise_customer_uuid_for_request_mock,
+        mock_get_active_enterprise_customer_user,
+    ):
         """
         Tests that a consent is not needed when enterprise customer and learner's site domain does not match.
         """
@@ -418,7 +424,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         ec_uuid = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
         course_id = 'fake-course'
         ent_site = SiteFactory(domain='ent-site.com')
-
+        enterprise_customer_uuid_for_request_mock.return_value = ec_uuid
         mock_get_active_enterprise_customer_user.return_value = self.get_mock_active_enterprise_learner_details(
             learner_id=user.id,
             enterprise_customer_uuid=ec_uuid,
@@ -443,17 +449,18 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.get_active_enterprise_customer_user')
-    @mock.patch('enterprise.models.EnterpriseCustomer.catalog_contains_course')
-    def test_consent_needed_for_course_when_enrollment_exists(
+    @mock.patch('openedx.features.enterprise_support.api.ConsentApiClient.consent_required')
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
+    def test_consent_needed_for_course_when_consent_is_not_required(
         self,
-        mock_catalog_contains_course,
+        enterprise_customer_uuid_for_request_mock,
+        mock_consent_required,
         mock_get_active_enterprise_customer_user
     ):
         """
-        Tests that a consent is not needed when learner is already enrolled in a course but DSC record or
-        enterprise enrollment does not exist.
+        Tests that a consent is not needed when learner is not already enrolled and the enterprise requires consent.
         """
-        mock_catalog_contains_course.return_value = True
+        mock_consent_required.return_value = False
         user = UserFactory(username='janedoe')
         request = mock.MagicMock(
             user=user,
@@ -464,22 +471,17 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         )
         ec_uuid = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
         course_id = 'fake-course'
-        enterprise_customer = EnterpriseCustomerFactory(uuid=ec_uuid)
-        EnterpriseCustomerUserFactory(user_id=user.id, active=True, enterprise_customer=enterprise_customer)
+        enterprise_customer_uuid_for_request_mock.return_value = ec_uuid
 
         mock_get_active_enterprise_customer_user.return_value = self.get_mock_active_enterprise_learner_details(
             learner_id=user.id,
             enterprise_customer_uuid=ec_uuid,
         )
 
-        expected_message = "Consent from user [{username}] is not needed for course [{course_id}]. The user's " \
-                           "current enterprise does not require data sharing consent."
-        consent_cache_key = get_data_consent_share_cache_key(user.id, course_id, ec_uuid)
+        expected_message = "[ENTERPRISE DSC] Consent from user [{username}] is not needed for course [{course_id}]. " \
+                           "The user's current enterprise does not require data sharing consent."
         with LogCapture(LOGGER_NAME) as log:
-            assert not consent_needed_for_course(request, user, course_id, enrollment_exists=True)
-            # check if value was stored in cache
-            data_sharing_consent_needed_cache = TieredCache.get_cached_response(consent_cache_key)
-            assert data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value == 0
+            assert not consent_needed_for_course(request, user, course_id)
             log.check_present(
                 (
                     LOGGER_NAME,
@@ -490,16 +492,18 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.get_active_enterprise_customer_user')
-    @mock.patch('enterprise.models.EnterpriseCustomer.catalog_contains_course')
+    @mock.patch('openedx.features.enterprise_support.api.ConsentApiClient.consent_required')
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
     def test_consent_needed_for_course_when_consent_is_required(
         self,
-        mock_catalog_contains_course,
+        enterprise_customer_uuid_for_request_mock,
+        mock_consent_required,
         mock_get_active_enterprise_customer_user
     ):
         """
         Tests that a consent is needed when learner is not already enrolled and the enterprise requires consent.
         """
-        mock_catalog_contains_course.return_value = True
+        mock_consent_required.return_value = True
         user = UserFactory(username='janedoe')
         request = mock.MagicMock(
             user=user,
@@ -510,16 +514,15 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         )
         ec_uuid = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
         course_id = 'fake-course'
-        enterprise_customer = EnterpriseCustomerFactory(uuid=ec_uuid)
-        EnterpriseCustomerUserFactory(user_id=user.id, active=True, enterprise_customer=enterprise_customer)
+        enterprise_customer_uuid_for_request_mock.return_value = ec_uuid
 
         mock_get_active_enterprise_customer_user.return_value = self.get_mock_active_enterprise_learner_details(
             learner_id=user.id,
             enterprise_customer_uuid=ec_uuid,
         )
 
-        expected_message = "Consent from user [{username}] is needed for course [{course_id}]. The user's current " \
-                           "enterprise requires data sharing consent, and it has not been given."
+        expected_message = "[ENTERPRISE DSC] Consent from user [{username}] is needed for course [{course_id}]. " \
+                           "The user's current enterprise requires data sharing consent, and it has not been given."
         with LogCapture(LOGGER_NAME) as log:
             assert consent_needed_for_course(request, user, course_id)
             log.check_present(
@@ -652,7 +655,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         mock_enterprise_enabled.return_value = is_enterprise_enabled
         EnterpriseCustomerUserFactory(user_id=self.user.id, active=True)
         if not is_enterprise_enabled:
-            assert not get_enterprise_learner_data_from_db(self.user)
+            assert not get_active_enterprise_customer_user(self.user)
         else:
             user_data = get_active_enterprise_customer_user(self.user)
             assert user_data['user']['username'] == self.user.username
