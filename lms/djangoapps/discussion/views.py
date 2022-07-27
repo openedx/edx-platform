@@ -51,7 +51,7 @@ from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserExc
 from lms.djangoapps.discussion.toggles import (
     ENABLE_DISCUSSIONS_MFE,
     ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE,
-    ENABLE_DISCUSSIONS_MFE_BANNER
+    ENABLE_DISCUSSIONS_MFE_BANNER,
 )
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api

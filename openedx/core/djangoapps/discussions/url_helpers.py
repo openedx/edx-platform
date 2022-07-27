@@ -2,9 +2,12 @@
 Helps for building discussions URLs
 """
 from typing import Optional
+from urllib.parse import urlencode
 
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
+
+from lms.djangoapps.discussion.toggles import ENABLE_VIEW_MFE_IN_IFRAME
 
 
 def _get_url_with_view_query_params(path: str, view: Optional[str] = None) -> str:
@@ -22,8 +25,17 @@ def _get_url_with_view_query_params(path: str, view: Optional[str] = None) -> st
     if settings.DISCUSSIONS_MICROFRONTEND_URL is None:
         return ''
     url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{path}"
+
+    query_params = {}
     if view == "in_context":
-        url = f"{url}?inContext"
+        query_params.update({'inContext': True})
+
+    if ENABLE_VIEW_MFE_IN_IFRAME.is_enabled():
+        query_params.update({'inIframe': True})
+
+    if query_params:
+        url = f"{url}?{urlencode(query_params)}"
+
     return url
 
 
