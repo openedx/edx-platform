@@ -3634,6 +3634,8 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
 
+SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = 'edx.lms.core.default'
+
 RECALCULATE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
 
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
@@ -5191,4 +5193,4 @@ MFE_CONFIG = {}
 MFE_CONFIG_API_CACHE_TIMEOUT = 60 * 5
 
 ######################## Settings for Outcome Surveys plugin ########################
-OUTCOME_SURVEYS_EVENTS_ENABLED = False
+OUTCOME_SURVEYS_EVENTS_ENABLED = True
