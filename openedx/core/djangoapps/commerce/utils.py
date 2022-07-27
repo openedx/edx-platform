@@ -4,6 +4,7 @@
 import requests
 from django.conf import settings
 from edx_rest_api_client.auth import SuppliedJwtAuth
+from edx_rest_api_client.client import EdxRestApiClient
 from eventtracking import tracker
 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
@@ -36,6 +37,27 @@ def get_ecommerce_api_base_url():
     Returns an E-Commerce API base URL.
     """
     return configuration_helpers.get_value('ECOMMERCE_API_URL', settings.ECOMMERCE_API_URL)
+
+
+def ecommerce_api_client(user, session=None):
+    """
+    Returns an E-Commerce API client setup with authentication for the specified user.
+
+    DEPRECATED: To be replaced with get_ecommerce_api_client.
+    """
+    claims = {'tracking_context': create_tracking_context(user)}
+    scopes = [
+        'user_id',
+        'email',
+        'profile'
+    ]
+    jwt = create_jwt_for_user(user, additional_claims=claims, scopes=scopes)
+
+    return EdxRestApiClient(
+        configuration_helpers.get_value('ECOMMERCE_API_URL', settings.ECOMMERCE_API_URL),
+        jwt=jwt,
+        session=session
+    )
 
 
 def get_ecommerce_api_client(user):
