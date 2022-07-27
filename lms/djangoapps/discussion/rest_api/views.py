@@ -25,6 +25,7 @@ from xmodule.modulestore.django import modulestore
 from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
+from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
@@ -48,6 +49,7 @@ from ..rest_api.api import (
     get_response_comments,
     get_thread,
     get_thread_list,
+    get_learner_active_thread_list,
     get_user_comments,
     update_comment,
     update_thread,
@@ -171,12 +173,14 @@ class CourseActivityStatsView(DeveloperErrorViewMixin, APIView):
             raise ValidationError(form_query_string.errors)
         order_by = form_query_string.cleaned_data.get('order_by', None)
         order_by = UserOrdering(order_by) if order_by else None
+        username_search_string = form_query_string.cleaned_data.get('username', None)
         data = get_course_discussion_user_stats(
             request,
             course_key_string,
             form_query_string.cleaned_data['page'],
             form_query_string.cleaned_data['page_size'],
             order_by,
+            username_search_string,
         )
         return data
 
@@ -548,6 +552,61 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         """
         delete_thread(request, thread_id)
         return Response(status=204)
+
+
+class LearnerThreadView(APIView):
+    """
+    **Use Cases**
+
+        Fetch user's active threads
+
+    **Example Requests**:
+
+        GET /api/discussion/v1/courses/course-v1:ExampleX+Subject101+2015/learner/?username=edx&page=1&page_size=10
+
+    **GET Thread List Parameters**:
+
+        * username: (Required) Username of the user whose active threads are required
+
+        * page: The (1-indexed) page to retrieve (default is 1)
+
+        * page_size: The number of items per page (default is 10)
+    """
+
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthentication,
+        SessionAuthentication,
+    )
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsStaffOrCourseTeamOrEnrolled,
+    )
+
+    def get(self, request, course_id=None):
+        """
+        Implements the GET method as described in the class docstring.
+        """
+        course_key = CourseKey.from_string(course_id)
+        page_num = request.GET.get('page', 1)
+        threads_per_page = request.GET.get('page_size', 10)
+        discussion_id = None
+        username = request.GET.get('username', None)
+        user = get_object_or_404(User, username=username)
+        group_id = None
+        try:
+            group_id = get_group_id_for_comments_service(request, course_key, discussion_id)
+        except ValueError:
+            pass
+
+        query_params = {
+            "page": page_num,
+            "per_page": threads_per_page,
+            "course_id": str(course_key),
+            "user_id": user.id,
+            "group_id": group_id
+        }
+        return get_learner_active_thread_list(request, course_key, query_params)
 
 
 @view_auth_classes()

@@ -21,6 +21,12 @@
   django.catalog = django.catalog || {};
   
   const newcatalog = {
+    "\n          Note: As part of the proctored exam setup, you will be asked\n          to verify your identity. Before you begin, make sure you are\n          on a computer with a webcam, and that you have a valid form\n          of photo identification such as a driver\u2019s license or\n          passport.\n        ": "\n         Nota: Como parte de la configuraci\u00f3n del examen supervisado, se te solicitar\u00e1 \n         verificar tu identidad. Antes de empezar, aseg\u00farate de que cuentas con\n         un ordenador con c\u00e1mara web y de que tienes un documento v\u00e1lido\n          de identificaci\u00f3n con tu foto como el carn\u00e9 de conducir o\n          el pasaporte.\n        ",
+    "\n        Are you sure you want to take this exam without proctoring?\n      ": "\n        \u00bfSeguro que quieres hacer este examen sin supervisi\u00f3n?\n      ",
+    "\n        Hello %(username)s,\n    ": "\n        Hola, %(username)s:\n    ",
+    "\n      Are you sure that you want to submit your timed exam?\n    ": "\n      \u00bfSeguro que quieres enviar tu examen cronometrado?\n    ",
+    "\n      Are you sure you want to end your proctored exam?\n    ": "\n      \u00bfSeguro que quieres terminar tu examen supervisado?\n    ",
+    "\n      Your %(platform_name)s account has not yet been activated. To take the proctored exam,\n      you are required to activate your account.\n    ": "\n      No has activado a\u00fan tu cuenta de  %(platform_name)s. Para realizar el examen supervisado,\n      es necesario que actives tu cuenta primero.\n    ",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s de %(cnt)s seleccionado",
       "%(sel)s de  %(cnt)s seleccionados"
@@ -57,6 +63,7 @@
     "Criterion Deleted": "Criterio eliminado",
     "December": "Diciembre",
     "Describe ": "Describir",
+    "Enter a valid username or email": "Escribe un nombre de usuario o un correo electr\u00f3nico v\u00e1lido",
     "Error": "Error",
     "Error getting the number of ungraded responses": "Error al obtener el n\u00famero de respuestas sin calificar",
     "Error when looking up username": "Error al buscar el nombre de usuario",
@@ -87,6 +94,7 @@
     "March": "Marzo",
     "May": "Mayo",
     "Midnight": "Medianoche",
+    "Missing required query parameter course_id": "Falta el par\u00e1metro obligatorio course_id",
     "Multiple teams returned for course": "Varios equipos han regresado por curso",
     "Noon": "Mediod\u00eda",
     "Not Selected": "No seleccionado",
@@ -111,12 +119,14 @@
     "Please wait": "Por favor, espera",
     "Preformatted": "Preformateado",
     "Problem cloning rubric": "Problema al duplicar la r\u00fabrica",
+    "Proctored exam {exam_name} in {course_name} for user {username}": "Examen supervisado {exam_name} en {course_name} para {username}",
     "Refresh": "Refrescar",
     "Remove": "Eliminar",
     "Remove all": "Eliminar todos",
     "Response": "Respuesta",
     "Save Unsuccessful": "Guardado sin \u00e9xito",
     "Saving...": "Guardando...",
+    "Second Review Required": "Es necesario revisarlo una segunda vez",
     "Self": "Auto",
     "September": "Septiembre",
     "Server error.": "Error del servidor.",

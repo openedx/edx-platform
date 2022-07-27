@@ -90,20 +90,12 @@ class RuntimeShim:
     def can_execute_unsafe_code(self):
         """
         Determine if capa problems in this context/course are allowed to run
-        unsafe code. See common/lib/xmodule/xmodule/util/sandboxing.py
+        unsafe code. See xmodule/util/sandboxing.py
 
         Seems only to be used by capa.
         """
         # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
         return False  # Change this if/when we need to support unsafe courses in the new runtime.
-
-    @property
-    def DEBUG(self):
-        """
-        Should DEBUG mode (?) be used? This flag is only read by capa.
-        """
-        # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
-        return False
 
     def get_python_lib_zip(self):
         """
@@ -145,23 +137,15 @@ class RuntimeShim:
         )
         return self.resources_fs
 
-    @property
-    def node_path(self):
-        """
-        Get the path to Node.js
-
-        Seems only to be used by capa. Remove this if capa can be refactored.
-        """
-        # TODO: Refactor capa to access this directly, don't bother the runtime. Then remove it from here.
-        return getattr(settings, 'NODE_PATH', None)  # Only defined in the LMS
-
     def render_template(self, template_name, dictionary, namespace='main'):
         """
         Render a mako template
         """
         warnings.warn(
             "Use of runtime.render_template is deprecated. "
-            "Use xblockutils.resources.ResourceLoader.render_mako_template or a JavaScript-based template instead.",
+            "For template files included with your XBlock (which is preferable), use "
+            "xblockutils.resources.ResourceLoader.render_mako_template to render them, or use a JavaScript-based "
+            "template instead. For template files that are part of the LMS/Studio, use the 'mako' XBlock service.",
             DeprecationWarning, stacklevel=2,
         )
         try:

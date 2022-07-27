@@ -2,12 +2,15 @@
 Provides factories for third_party_auth models.
 """
 
-
+import factory
 from factory import SubFactory
 from factory.django import DjangoModelFactory
+from faker import Factory as FakerFactory
 
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+
+FAKER = FakerFactory.create()
 
 
 class SAMLConfigurationFactory(DjangoModelFactory):
@@ -32,8 +35,8 @@ class SAMLProviderConfigFactory(DjangoModelFactory):
     site = SubFactory(SiteFactory)
 
     enabled = True
-    slug = "test-shib"
-    name = "TestShib College"
+    slug = factory.LazyAttribute(lambda x: FAKER.slug())
+    name = factory.LazyAttribute(lambda x: FAKER.company())
 
-    entity_id = "https://idp.testshib.org/idp/shibboleth"
-    metadata_source = "https://www.testshib.org/metadata/testshib-providers.xml"
+    entity_id = factory.LazyAttribute(lambda x: FAKER.uri())
+    metadata_source = factory.LazyAttribute(lambda x: FAKER.uri())

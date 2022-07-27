@@ -573,6 +573,24 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
             response, _audit_log = self._login_response(self.user_email, 'wrong_password')
         self._assert_response(response, success=False, value='Too many failed login attempts')
 
+    @patch('openedx.core.djangoapps.util.ratelimit.real_ip')
+    def test_excessive_login_attempts_by_username(self, real_ip_mock):
+        # try logging in 6 times, the defalutlimit for the number of failed
+        # login attempts in one 5 minute period before the rate gets limited
+        # for a specific username.
+
+        # We freeze time to deal with the fact that rate limit time boundaries
+        # are not predictable and we don't want the test to be flaky.
+        with freeze_time():
+            for i in range(6):
+                password = f'test_password{i}'
+                # Provide unique IPs so we don't get ip rate limited.
+                real_ip_mock.return_value = f'192.168.1.{i}'
+                self._login_response(self.username, password)
+            # check to see if this response indicates that this was ratelimited
+            response, _audit_log = self._login_response(self.username, 'wrong_password')
+        self._assert_response(response, success=False, value='Too many failed login attempts')
+
     def test_excessive_login_attempts_by_ip(self):
         # try logging in 5 times, the default limit for the number of failed
         # login attempts in one 5 minute period before the rate gets limited

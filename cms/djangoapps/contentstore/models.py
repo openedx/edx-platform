@@ -43,3 +43,23 @@ class BackfillCourseTabsConfig(ConfigurationModel):
         help_text='How many courses to backfill in this run (or zero for all courses)',
         default=0,
     )
+
+
+class CleanStaleCertificateAvailabilityDatesConfig(ConfigurationModel):
+    """
+    Manages configuration for a run of the `clean_stale_certificate_availability_dates` management command.
+
+    .. no_pii:
+    """
+    class Meta:
+        app_label = "contentstore"
+        verbose_name = "Arguments for 'clean_stale_certificate_availability_dates'"
+        verbose_name_plural = "Arguments for 'clean_stale_certificate_availability_dates'"
+
+    arguments = TextField(
+        blank=True,
+        help_text=(
+            "A space seperated collection of arguments to be used when running the "
+            "`clean_stale_certificate_available_dates` management command.' See the management command for options."
+        )
+    )

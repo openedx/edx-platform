@@ -1345,7 +1345,7 @@ paths:
                     percent_graded: (float) the percentage of total points the user has received a grade for in a given subsection
                     show_correctness: (str) a str representing whether to show the problem/practice scores based on due date
                                       ('always', 'never', 'past_due', values defined in
-                                       common/lib/xmodule/xmodule/modulestore/inheritance.py)
+                                       xmodule/modulestore/inheritance.py)
                     show_grades: (bool) a bool for whether to show grades based on the access the user has
                     url: (str) the absolute path url to the Subsection
             enrollment_mode: (str) a str representing the enrollment the user has ('audit', 'verified', ...)

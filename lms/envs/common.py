@@ -505,8 +505,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
     # .. toggle_description: When enabled, along with the ENABLE_MKTG_SITE feature toggle, users who attempt to access a
-    #   course "about" page will be redirected to the course home url. This url might be the course "info" page or the
-    #   unified course tab (when the DISABLE_UNIFIED_COURSE_TAB_FLAG waffle is not enabled).
+    #   course "about" page will be redirected to the course home url.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2019-01-15
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19604
@@ -1081,21 +1080,12 @@ PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 OPENEDX_ROOT = REPO_ROOT / "openedx"
+XMODULE_ROOT = REPO_ROOT / "xmodule"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
 NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
-
-# For Node.js
-
-system_node_path = os.environ.get("NODE_PATH", NODE_MODULES_ROOT)
-
-node_paths = [
-    COMMON_ROOT / "static/js/vendor",
-    system_node_path,
-]
-NODE_PATH = ':'.join(node_paths)
 
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
@@ -1222,7 +1212,7 @@ MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
 MAKO_TEMPLATE_DIRS_BASE = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
-    COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
+    XMODULE_ROOT / 'capa' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
@@ -1281,7 +1271,7 @@ TEMPLATES = [
         'DIRS': [
             PROJECT_ROOT / "templates",
             COMMON_ROOT / 'templates',
-            COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
+            XMODULE_ROOT / 'capa' / 'templates',
             COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
             COMMON_ROOT / 'static',  # required to statically include common Underscore templates
         ],
@@ -1713,10 +1703,10 @@ COURSES_WITH_UNSAFE_CODE = []
 # Cojail REST service
 ENABLE_CODEJAIL_REST_SERVICE = False
 # .. setting_name: CODE_JAIL_REST_SERVICE_REMOTE_EXEC
-# .. setting_default: 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+# .. setting_default: 'xmodule.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
 # .. setting_description: Set the python package.module.function that is reponsible of
 #   calling the remote service in charge of jailed code execution
-CODE_JAIL_REST_SERVICE_REMOTE_EXEC = 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+CODE_JAIL_REST_SERVICE_REMOTE_EXEC = 'xmodule.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
 # .. setting_name: CODE_JAIL_REST_SERVICE_HOST
 # .. setting_default: 'http://127.0.0.1:8550'
 # .. setting_description: Set the codejail remote service host
@@ -3105,9 +3095,6 @@ INSTALLED_APPS = [
     # Course action state
     'common.djangoapps.course_action_state',
 
-    # Additional problem types
-    'edx_jsme',    # Molecular Structure
-
     # Country list
     'django_countries',
 
@@ -3147,9 +3134,6 @@ INSTALLED_APPS = [
 
     # Catalog integration
     'openedx.core.djangoapps.catalog',
-
-    # Self-paced course configuration
-    'openedx.core.djangoapps.self_paced',
 
     'sorl.thumbnail',
 
@@ -3268,6 +3252,9 @@ INSTALLED_APPS = [
 
     # Blockstore
     'blockstore.apps.bundles',
+
+    # MFE API
+    'lms.djangoapps.mfe_config_api',
 ]
 
 ######################### CSRF #########################################
@@ -3648,6 +3635,8 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
 
+SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = 'edx.lms.core.default'
+
 RECALCULATE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
 
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
@@ -3670,7 +3659,7 @@ FINANCIAL_REPORTS = {
 
 #### Grading policy change-related settings #####
 # Rate limit for regrading tasks that a grading policy change can kick off
-POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
+POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
 
 #### PASSWORD POLICY SETTINGS #####
 AUTH_PASSWORD_VALIDATORS = [
@@ -4457,6 +4446,16 @@ DEFAULT_SITE_THEME = None
 # .. toggle_creation_date: 2016-06-30
 ENABLE_COMPREHENSIVE_THEMING = False
 
+# .. setting_name: CUSTOM_RESOURCE_TEMPLATES_DIRECTORY
+# .. setting_default: None
+# .. setting_description: Path to an existing directory of YAML files containing
+#    html content to be used with the subclasses of xmodule.x_module.ResourceTemplates.
+#    Default example templates can be found in xmodule/templates/html.
+#    Note that the extension used is ".yaml" and not ".yml".
+#    See xmodule.x_module.ResourceTemplates for usage.
+#   "CUSTOM_RESOURCE_TEMPLATES_DIRECTORY" : null
+CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = None
+
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
@@ -4725,6 +4724,12 @@ SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/h'
 EDX_BRAZE_API_KEY = None
 EDX_BRAZE_API_SERVER = None
 
+### SETTINGS FOR AMPLITUDE ####
+AMPLITUDE_URL = ''
+AMPLITUDE_API_KEY = ''
+REC_ID = ''
+GENERAL_RECOMMENDATION = {}
+
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
 # .. setting_default: retired__user_
@@ -4921,15 +4926,10 @@ HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 ENABLE_DYNAMIC_REGISTRATION_FIELDS = False
 
 ############### Settings for the ace_common plugin #################
-ACE_ENABLED_CHANNELS = ['django_email']
-ACE_ENABLED_POLICIES = ['bulk_email_optout']
-ACE_CHANNEL_SAILTHRU_DEBUG = True
-ACE_CHANNEL_SAILTHRU_TEMPLATE_NAME = None
-ACE_ROUTING_KEY = 'edx.lms.core.default'
-ACE_CHANNEL_DEFAULT_EMAIL = 'django_email'
-ACE_CHANNEL_TRANSACTIONAL_EMAIL = 'django_email'
-ACE_CHANNEL_SAILTHRU_API_KEY = ""
-ACE_CHANNEL_SAILTHRU_API_SECRET = ""
+# Note that all settings are actually defined by the plugin
+# pylint: disable=wrong-import-position
+from openedx.core.djangoapps.ace_common.settings import common as ace_common_settings
+ACE_ROUTING_KEY = ace_common_settings.ACE_ROUTING_KEY
 
 ############### Settings swift #####################################
 SWIFT_USERNAME = None
@@ -5127,6 +5127,8 @@ DISCUSSION_MODERATION_EDIT_REASON_CODES = {
     "needs-clarity": _("Content needs clarity"),
     "academic-integrity": _("Has academic integrity concern"),
     "inappropriate-language": _("Has inappropriate language"),
+    "format-change": _("Formatting changes needed"),
+    "post-type-change": _("Post type needs change"),
     "contains-pii": _("Contains personally identifiable information"),
 }
 # Provide a list of reason codes for moderators to close posts, as a mapping
@@ -5148,3 +5150,48 @@ CREATE_FINANCIAL_ASSISTANCE_APPLICATION_URL = '/core/api/financial_assistance_ap
 ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_KEY = "enterprise-backend-service-key"
 ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_SECRET = "enterprise-backend-service-secret"
 ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://127.0.0.1:8000/oauth2"
+
+# keys for  big blue button live provider
+COURSE_LIVE_GLOBAL_CREDENTIALS = {}
+
+PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
+
+# .. toggle_name: ENABLE_MFE_CONFIG_API
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Set to True to enable MFE Config API. This is disabled by
+#   default.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2022-05-20
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
+# .. toggle_tickets: None
+ENABLE_MFE_CONFIG_API = False
+
+# .. setting_name: MFE_CONFIG
+# .. setting_implementation: DjangoSetting
+# .. setting_default: {}
+# .. setting_description: Is a configuration that will be exposed by the MFE Config API to be consumed by the mfes
+#     Example: {
+#     "BASE_URL": "https://name_of_mfe.example.com",
+#     "LANGUAGE_PREFERENCE_COOKIE_NAME": "example-language-preference",
+#     "CREDENTIALS_BASE_URL": "https://credentials.example.com",
+#     "DISCOVERY_API_BASE_URL": "https://discovery.example.com",
+#     "LMS_BASE_URL": "https://courses.example.com",
+#     "LOGIN_URL": "https://courses.example.com/login",
+#     "LOGOUT_URL": "https://courses.example.com/logout",
+#     "STUDIO_BASE_URL": "https://studio.example.com",
+#     "LOGO_URL": "https://courses.example.com/logo.png"
+# }
+# .. setting_use_cases: open_edx
+# .. setting_creation_date: 2022-07-08
+MFE_CONFIG = {}
+
+# .. setting_name: MFE_CONFIG_API_CACHE_TIMEOUT
+# .. setting_default: 60*5
+# .. setting_description: The MFE Config API response will be cached during the
+#   specified time
+MFE_CONFIG_API_CACHE_TIMEOUT = 60 * 5
+
+######################## Settings for Outcome Surveys plugin ########################
+OUTCOME_SURVEYS_EVENTS_ENABLED = True

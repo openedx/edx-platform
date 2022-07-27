@@ -31,7 +31,7 @@ jobs:
             "cms-2",
             "common-1",
             "common-2",
-            "common-3",
+            "xmodule-1"
         ]
 
 
@@ -61,7 +61,7 @@ jobs:
       - name: install requirements
         run: |
           sudo pip install -r requirements/pip.txt
-          sudo pip install -r requirements/edx/testing.txt
+          sudo pip install --exists-action='w' -r requirements/edx/testing.txt
           if [[ "${{ matrix.django-version }}" == "pinned" ]]; then
             sudo pip install -r requirements/edx/django.txt
           else

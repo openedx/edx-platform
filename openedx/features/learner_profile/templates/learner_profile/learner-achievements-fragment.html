@@ -15,7 +15,6 @@ from openedx.core.djangolib.markup import HTML, Text
         % if course_certificates:
             % for certificate in course_certificates:
                 <%
-                certificate_url = certificate['download_url']
                 course = certificate['course']
 
                 completion_date_message_html = Text(_('Completed {completion_date_html}')).format(
@@ -34,39 +33,20 @@ from openedx.core.djangolib.markup import HTML, Text
                     ),
                 )
                 %>
-                % if certificate_url:
-                    <a href="${certificate_url}" rel="noopener" target="_blank">
-                        <div class="card certificate-card mode-${certificate['type']}">
-                            <div class="card-logo">
-                                <h4 class="sr-only">
-                                    ${_('{course_mode} certificate').format(
-                                        course_mode=certificate['type'],
-                                    )}
-                                </h4>
-                            </div>
-                            <div class="card-content">
-                                <div class="card-supertitle">${course.display_org_with_default}</div>
-                                <div class="card-title">${course.display_name_with_default}</div>
-                                <p class="card-text">${completion_date_message_html}</p>
-                            </div>
-                        </div>
-                    </a>
-                % else:
-                    <div class="card certificate-card mode-${certificate['type']}">
-                        <div class="card-logo">
-                            <h4 class="sr-only">
-                                ${_('{course_mode} certificate').format(
-                                    course_mode=certificate['type'],
-                                )}
-                            </h4>
-                        </div>
-                        <div class="card-content">
-                            <div class="card-supertitle">${course.display_org_with_default}</div>
-                            <div class="card-title">${course.display_name_with_default}</div>
-                            <p class="card-text">${completion_date_message_html}</p>
-                        </div>
+                <div class="card certificate-card mode-${certificate['type']}">
+                    <div class="card-logo">
+                        <h4 class="sr-only">
+                            ${_('{course_mode} certificate').format(
+                                course_mode=certificate['type'],
+                            )}
+                        </h4>
                     </div>
-                % endif
+                    <div class="card-content">
+                        <div class="card-supertitle">${course.display_org_with_default}</div>
+                        <div class="card-title">${course.display_name_with_default}</div>
+                        <p class="card-text">${completion_date_message_html}</p>
+                    </div>
+                </div>
             % endfor
         % elif own_profile:
             <div class="learner-message">

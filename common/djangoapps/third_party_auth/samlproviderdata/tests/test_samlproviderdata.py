@@ -93,6 +93,19 @@ class SAMLProviderDataTests(APITestCase):
         assert len(results) == 1
         assert results[0]['sso_url'] == SINGLE_PROVIDER_DATA['sso_url']
 
+    def test_get_one_provider_data_with_pk_success(self):
+        # GET auth/saml/v0/providerdata/<provider data ID>/?enterprise_customer_uuid=id
+        url_base = reverse('saml_provider_data-list')
+        query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
+        url = f'{url_base}{self.saml_provider_data.id}/?{urlencode(query_kwargs)}'
+
+        response = self.client.get(url, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data.get('id') == self.saml_provider_data.id
+        assert response.data.get('entity_id') == self.saml_provider_data.entity_id
+        assert response.data.get('sso_url') == self.saml_provider_data.sso_url
+        assert response.data.get('public_key') == self.saml_provider_data.public_key
+
     def test_create_one_provider_data_success(self):
         # POST auth/saml/v0/providerdata/ -d data
         url = reverse('saml_provider_data-list')
@@ -190,7 +203,7 @@ class SAMLProviderDataTests(APITestCase):
         POST auth/saml/v0/provider_data/sync_provider_data -d data
         """
         mock_fetch.return_value = '<?xml><a>tag</a>'
-        public_key = 'askdjf;sakdjfs;adkfjas;dkfjas;dkfjas;dlkfj'
+        public_key = ['askdjf;sakdjfs;adkfjas;dkfjas;dkfjas;dlkfj']
         sso_url = 'https://fake-test.id'
         expires_at = datetime.now()
         mock_parse.return_value = (public_key, sso_url, expires_at)
@@ -206,11 +219,11 @@ class SAMLProviderDataTests(APITestCase):
         response = self.client.post(url, data)
 
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.data == " Created new record for SAMLProviderData for entityID http://entity-id-1"
+        assert response.data == " Created new record(s) for SAMLProviderData for entityID http://entity-id-1"
         assert SAMLProviderData.objects.count() == orig_count + 1
 
         # should only update this time
         response = self.client.post(url, data)
         assert response.status_code == status.HTTP_200_OK
-        assert response.data == (" Updated existing SAMLProviderData for entityID http://entity-id-1")
+        assert response.data == (" Updated existing SAMLProviderData record(s) for entityID http://entity-id-1")
         assert SAMLProviderData.objects.count() == orig_count + 1

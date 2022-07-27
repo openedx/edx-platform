@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = (n > 1);
+    const v = (n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -27,13 +27,15 @@
     "%(new_item_message)s": "%(new_item_message)s",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s de %(cnt)s selecionado",
-      "%(sel)s de %(cnt)s selecionados"
+      "%(sel)s de %(cnt)s selecionados",
+      ""
     ],
     "%(type)s Component Template Menu": "%(type)s Menu de Modelos de Componentes",
     "(Add signatories for a certificate)": "(Adicionar assinaturas para um certificado)",
     "(Required Field)": "(Campo Obrigat\u00f3rio)",
     "(contains %(student_count)s student)": [
       "(cont\u00e9m %(student_count)s aluno)",
+      "(cont\u00e9m %(student_count)s alunos)",
       "(cont\u00e9m %(student_count)s alunos)"
     ],
     "- Sortable": "- Classific\u00e1veis",
@@ -270,9 +272,7 @@
     "Double-check that your webcam is connected and working to continue.": "Certifique-se de que a sua webcam esteja conectada e funcionando para continuar.",
     "Download": "Baixar",
     "Download Transcript for Editing": "Baixar Transcri\u00e7\u00e3o para Edi\u00e7\u00e3o",
-    "Download URL": "Baixar URL ",
     "Download available encodings (.csv)": "Baixe os encodings dispon\u00edveis (.csv)",
-    "Download the user's certificate": "Baixar certificado do usu\u00e1rio",
     "Draft (Never published)": "Rascunho (Nunca publicado)",
     "Draft (Unpublished changes)": "Rascunho (altera\u00e7\u00f5es n\u00e3o publicadas)",
     "Drag to reorder": "Arraste para reordenar",
@@ -513,17 +513,18 @@
     "Not Graded": "N\u00e3o avaliado",
     "Not Selected": "N\u00e3o selecionado",
     "Not able to set passing grade to less than %(minimum_grade_cutoff)s%.": "N\u00e3o foi poss\u00edvel definir nota de aprova\u00e7\u00e3o menor que %(minimum_grade_cutoff)s%.",
-    "Not available": "N\u00e3o Dispon\u00edvel",
     "Not in Use": "N\u00e3o utilizado",
     "Not selected": "N\u00e3o selecionado",
     "Note": "Anota\u00e7\u00e3o",
     "Note: You are %s hour ahead of server time.": [
       "Nota: Voc\u00ea est\u00e1 %s hora \u00e0 frente do hor\u00e1rio do servidor.",
-      "Nota: Voc\u00ea est\u00e1 %s horas \u00e0 frente do hor\u00e1rio do servidor."
+      "Nota: Voc\u00ea est\u00e1 %s horas \u00e0 frente do hor\u00e1rio do servidor.",
+      ""
     ],
     "Note: You are %s hour behind server time.": [
       "Nota: Voc\u00ea est\u00e1 %s hora atr\u00e1s do tempo do servidor.",
-      "Nota: Voc\u00ea est\u00e1 %s horas atr\u00e1s do hor\u00e1rio do servidor."
+      "Nota: Voc\u00ea est\u00e1 %s horas atr\u00e1s do hor\u00e1rio do servidor.",
+      ""
     ],
     "Noted in:": "Anota\u00e7\u00e3o feita em:",
     "Notes": "Anota\u00e7\u00f5es",
@@ -909,6 +910,7 @@
     "View all errors": "Visualizar todos os erros",
     "Viewing %s course": [
       "Visualizando %s curso",
+      "Visualizando %s cursos",
       "Visualizando %s cursos"
     ],
     "Visible to Staff Only": "Vis\u00edvel apenas para os funcion\u00e1rios",

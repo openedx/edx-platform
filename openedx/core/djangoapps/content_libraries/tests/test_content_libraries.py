@@ -30,6 +30,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
 )
 from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY, ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.blockstore_cache import cache
+from openedx.core.lib import blockstore_api
 from common.djangoapps.student.tests.factories import UserFactory
 
 
@@ -189,10 +190,22 @@ class ContentLibrariesTestMixin:
         You can't create a library with the same slug as an existing library,
         or an invalid slug.
         """
+        assert 0 == len(blockstore_api.get_bundles(text_search='some-slug'))
         self._create_library(slug="some-slug", title="Existing Library")
-        self._create_library(slug="some-slug", title="Duplicate Library", expect_response=400)
+        assert 1 == len(blockstore_api.get_bundles(text_search='some-slug'))
 
-        self._create_library(slug="Invalid Slug!", title="Library with Bad Slug", expect_response=400)
+        # Try to create a library+bundle with a duplicate slug
+        response = self._create_library(slug="some-slug", title="Duplicate Library", expect_response=400)
+        assert response == {
+            'slug': 'A library with that ID already exists.',
+        }
+        # The second bundle created with that slug is removed when the transaction rolls back.
+        assert 1 == len(blockstore_api.get_bundles(text_search='some-slug'))
+
+        response = self._create_library(slug="Invalid Slug!", title="Library with Bad Slug", expect_response=400)
+        assert response == {
+            'slug': ['Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or hyphens.'],
+        }
 
     @ddt.data(True, False)
     @patch("openedx.core.djangoapps.content_libraries.views.LibraryApiPagination.page_size", new=2)

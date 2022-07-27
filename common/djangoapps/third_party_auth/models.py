@@ -581,55 +581,68 @@ class SAMLProviderConfig(ProviderConfig):
     prefix = 'saml'
     display_name = models.CharField(
         max_length=35, blank=True,
-        help_text=_("A configuration nickname."))
+        help_text=_("A configuration nickname.")
+    )
     backend_name = models.CharField(
         max_length=50, default='tpa-saml', blank=True,
-        help_text="Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend.")
+        help_text="Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend."
+    )
     entity_id = models.CharField(
         max_length=255, verbose_name="Entity ID", blank=True,
-        help_text="Example: https://idp.testshib.org/idp/shibboleth")
+        help_text="Example: https://idp.testshib.org/idp/shibboleth"
+    )
     metadata_source = models.CharField(
         max_length=255, blank=True,
         help_text=(
             "URL to this provider's XML metadata. Should be an HTTPS URL. "
             "Example: https://www.testshib.org/metadata/testshib-providers.xml"
-        ))
+        )
+    )
     attr_user_permanent_id = models.CharField(
         max_length=128, blank=True, verbose_name="User ID Attribute",
         help_text=(
             "URN of the SAML attribute that we can use as a unique, "
             "persistent user ID. Leave blank for default."
-        ))
+        )
+    )
     attr_full_name = models.CharField(
         max_length=128, blank=True, verbose_name="Full Name Attribute",
-        help_text="URN of SAML attribute containing the user's full name. Leave blank for default.")
+        help_text="URN of SAML attribute containing the user's full name. Leave blank for default."
+    )
     default_full_name = models.CharField(
         max_length=255, blank=True, verbose_name="Default Value for Full Name",
-        help_text="Default value for full name to be used if not present in SAML response.")
+        help_text="Default value for full name to be used if not present in SAML response."
+    )
     attr_first_name = models.CharField(
         max_length=128, blank=True, verbose_name="First Name Attribute",
-        help_text="URN of SAML attribute containing the user's first name. Leave blank for default.")
+        help_text="URN of SAML attribute containing the user's first name. Leave blank for default."
+    )
     default_first_name = models.CharField(
         max_length=255, blank=True, verbose_name="Default Value for First Name",
-        help_text="Default value for first name to be used if not present in SAML response.")
+        help_text="Default value for first name to be used if not present in SAML response."
+    )
     attr_last_name = models.CharField(
         max_length=128, blank=True, verbose_name="Last Name Attribute",
-        help_text="URN of SAML attribute containing the user's last name. Leave blank for default.")
+        help_text="URN of SAML attribute containing the user's last name. Leave blank for default."
+    )
     default_last_name = models.CharField(
         max_length=255, blank=True, verbose_name="Default Value for Last Name",
         help_text="Default value for last name to be used if not present in SAML response.")
     attr_username = models.CharField(
         max_length=128, blank=True, verbose_name="Username Hint Attribute",
-        help_text="URN of SAML attribute to use as a suggested username for this user. Leave blank for default.")
+        help_text="URN of SAML attribute to use as a suggested username for this user. Leave blank for default."
+    )
     default_username = models.CharField(
         max_length=255, blank=True, verbose_name="Default Value for Username",
-        help_text="Default value for username to be used if not present in SAML response.")
+        help_text="Default value for username to be used if not present in SAML response."
+    )
     attr_email = models.CharField(
         max_length=128, blank=True, verbose_name="Email Attribute",
         help_text="URN of SAML attribute containing the user's email address[es]. Leave blank for default.")
     default_email = models.CharField(
         max_length=255, blank=True, verbose_name="Default Value for Email",
-        help_text="Default value for email to be used if not present in SAML response.")
+        help_text="Default value for email to be used if not present in SAML response."
+    )
     automatic_refresh_enabled = models.BooleanField(
         default=True, verbose_name="Enable automatic metadata refresh",
         help_text="When checked, the SAML provider's metadata will be included "
@@ -698,7 +711,8 @@ class SAMLProviderConfig(ProviderConfig):
             'the relevant values from the SAML response. Custom provider types, as selected '
             'in the "Identity Provider Type" field, may make use of the information stored '
             'in this field for additional configuration.'
-        ))
+        )
+    )
     archived = models.BooleanField(default=False)
     saml_configuration = models.ForeignKey(
         SAMLConfiguration,
@@ -717,6 +731,26 @@ class SAMLProviderConfig(ProviderConfig):
         app_label = "third_party_auth"
         verbose_name = "Provider Configuration (SAML IdP)"
         verbose_name_plural = "Provider Configuration (SAML IdPs)"
+
+    def save(self, *args, **kwargs):
+        # Disallowing any new entries that have the same entity ID as an existing provider config unless the slug
+        # matches.
+        # This both allows for the old architecture to create new rows on save but also prevents enterprise users from
+        # creating configs that share entity ID's with other enterprises
+        # One consequence of this is that once a provider configuration is created, the slug is essentially locked in
+        # and unchangeable. But I blame that on bad old architecture.
+        existing_provider_configs = SAMLProviderConfig.objects.current_set().filter(
+            entity_id=self.entity_id,
+            archived=False,
+        ).exclude(slug=self.slug)
+        # If any exist, raise an integrity error
+        if existing_provider_configs:
+            exc_str = f'Entity ID: {self.entity_id} already in use'
+            # There are cases of preexisting configurations that share entity id's so we can't blow up if we
+            # encounter this issue. Instead just log for clarity.
+            # raise IntegrityError(exc_str)
+            log.warning(exc_str)
+        super().save(*args, **kwargs)
 
     def get_url_params(self):
         """ Get a dict of GET parameters to append to login links for this provider """
@@ -784,16 +818,23 @@ class SAMLProviderConfig(ProviderConfig):
             conf['attr_defaults'][field] = default
 
         # Now get the data fetched automatically from the metadata.xml:
-        data = SAMLProviderData.current(self.entity_id)
-        if not data or not data.is_valid():
+        data_records = SAMLProviderData.objects.filter(entity_id=self.entity_id)
+        public_keys = []
+        for record in data_records:
+            if record.is_valid():
+                public_keys.append(record.public_key)
+                sso_url = record.sso_url
+        if not public_keys:
             log.error(
                 'No SAMLProviderData found for provider "%s" with entity id "%s" and IdP slug "%s". '
                 'Run "manage.py saml pull" to fix or debug.',
                 self.name, self.entity_id, self.slug
             )
             raise AuthNotConfigured(provider_name=self.name)
-        conf['x509cert'] = data.public_key
-        conf['url'] = data.sso_url
+
+        conf['x509certMulti'] = {'signing': public_keys}
+        conf['x509cert'] = ''
+        conf['url'] = sso_url
 
         # Add SAMLConfiguration appropriate for this IdP
         conf['saml_sp_configuration'] = (

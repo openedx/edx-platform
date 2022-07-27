@@ -14,6 +14,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
             var catLoversInitialCount = 123,
                 dogLoversInitialCount = 456,
                 unknownUserMessage,
+                notAllowedUserMessage,
                 invalidEmailMessage, createMockCohort, createMockCohorts, createMockContentGroups,
                 createMockCohortSettingsJson,
                 createCohortsView, cohortsView, requests, respondToRefresh, verifyMessage, verifyNoMessage,
@@ -208,6 +209,10 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
 
             invalidEmailMessage = function(name) {
                 return 'Invalid email address: ' + name;
+            };
+
+            notAllowedUserMessage = function(email) {
+                return 'Cohort assignment not allowed: ' + email;
             };
 
             beforeEach(function() {
@@ -602,7 +607,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 respondToAdd = function(result) {
                     AjaxHelpers.respondWithJson(
                         requests,
-                        _.extend({unknown: [], added: [], present: [], changed: [],
+                        _.extend({unknown: [], added: [], present: [], changed: [], not_allowed: [],
                             success: true, preassigned: [], invalid: []}, result)
                     );
                 };
@@ -670,6 +675,19 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     );
                 });
 
+                it('shows an error when user assignment not allowed', function() {
+                    createCohortsView(this, {selectCohort: 1});
+                    addStudents('not_allowed');
+                    AjaxHelpers.expectRequest(
+                        requests, 'POST', '/mock_service/cohorts/1/add', 'users=not_allowed'
+                    );
+                    respondToAdd({not_allowed: ['not_allowed']});
+                    respondToRefresh(catLoversInitialCount, dogLoversInitialCount);
+                    verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
+                    verifyDetailedMessage('There was an error when trying to add learners:', 'error',
+                        [notAllowedUserMessage('not_allowed')]
+                    );
+                });
 
                 it('shows a "view all" button when more than 5 students do not exist', function() {
                     var sixUsers = 'unknown1, unknown2, unknown3, unknown4, unknown5, unknown6';

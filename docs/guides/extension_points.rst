@@ -140,6 +140,9 @@ Here are the different integration points that python plugins can use:
    * - Open edX Events
      - Adopt, Stable
      - Events are part of the greater Hooks Extension Framework for open extension of edx-platform. Events are a stable way for plugin developers to react to learner or author events. They are defined by a `separate events library`_ that developers can include in their requirements to develop and test the code without creating a dependency on this large repo. For more information see the `hooks guide`_.
+   * - Open edX Filters
+     - Adopt, Stable
+     - Filters are also part of Hooks Extension Framework for open extension of edx-platform. Filters are a flexible way for plugin developers to modify learner or author application flows. They are defined by a `separate filters library`_ that developers can include in their requirements to develop and test the code without creating a dependency on this large repo. For more information see the `hooks guide`_.
 
 .. _Application: https://docs.djangoproject.com/en/3.0/ref/applications/
 .. _Django app plugin documentation: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
@@ -155,6 +158,7 @@ Here are the different integration points that python plugins can use:
 .. |pluggable_override docstring| replace:: ``pluggable_override`` docstring
 .. _pluggable_override docstring: https://github.com/edx/edx-django-utils/blob/master/edx_django_utils/plugins/pluggable_override.py
 .. _separate events library: https://github.com/eduNEXT/openedx-events/
+.. _separate filters library: https://github.com/eduNEXT/openedx-filters/
 .. _hooks guide: https://github.com/edx/edx-platform/blob/master/docs/guides/hooks/index.rst
 
 Platform Look & Feel

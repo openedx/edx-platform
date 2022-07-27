@@ -81,7 +81,7 @@ class WikiAccessMiddleware(MiddlewareMixin):
                     return redirect('about_course', str(course_id))
 
                 # If we need enterprise data sharing consent for this course, then redirect to the form.
-                consent_url = get_enterprise_consent_url(request, str(course_id))
+                consent_url = get_enterprise_consent_url(request, str(course_id), source='WikiAccessMiddleware')
                 if consent_url:
                     return redirect(consent_url)
 

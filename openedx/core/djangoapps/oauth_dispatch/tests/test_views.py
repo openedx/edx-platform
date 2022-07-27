@@ -171,7 +171,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
 
         return serialized_public_keys_json, serialized_keypair_json
 
-    def _test_jwt_access_token(self, client_attr, token_type=None, headers=None):
+    def _test_jwt_access_token(self, client_attr, token_type=None, headers=None, grant_type=None):
         """
         Test response for JWT token.
         """
@@ -186,6 +186,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             data['access_token'],
             self.user,
             data['scope'].split(' '),
+            grant_type=grant_type,
             should_be_restricted=False,
             expires_in=expected_default_expires_in,
         )
@@ -217,15 +218,16 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
 
     @ddt.data('dot_app')
     def test_jwt_access_token_from_parameter(self, client_attr):
-        self._test_jwt_access_token(client_attr, token_type='jwt')
+        self._test_jwt_access_token(client_attr, token_type='jwt', grant_type='password')
 
     @ddt.data('dot_app')
     def test_jwt_access_token_from_header(self, client_attr):
-        self._test_jwt_access_token(client_attr, headers={'HTTP_X_TOKEN_TYPE': 'jwt'})
+        self._test_jwt_access_token(client_attr, headers={'HTTP_X_TOKEN_TYPE': 'jwt'}, grant_type='password')
 
     @ddt.data('dot_app')
     def test_jwt_access_token_from_parameter_not_header(self, client_attr):
-        self._test_jwt_access_token(client_attr, token_type='jwt', headers={'HTTP_X_TOKEN_TYPE': 'invalid'})
+        self._test_jwt_access_token(client_attr, token_type='jwt', grant_type='password',
+                                    headers={'HTTP_X_TOKEN_TYPE': 'invalid'})
 
     @ddt.data(
         ('jwt', 'jwt'),
@@ -274,6 +276,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             should_be_expired=False,
             should_be_asymmetric_key=True,
             should_be_restricted=True,
+            grant_type='password'
         )
 
     def test_restricted_access_token(self):
@@ -331,6 +334,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             self.user,
             scopes,
             filters=filters,
+            grant_type=grant_type,
         )
 
 
@@ -347,10 +351,14 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         super().setUp()
 
     def _post_body(self, user, client, token_type=None, scope=None):
-        return {
+        body = {
             'client_id': client.client_id,
             'access_token': self.access_token,
         }
+        if token_type:
+            body['token_type'] = token_type
+
+        return body
 
     @ddt.data('dot_app')
     def test_access_token_exchange_calls_dispatched_view(self, client_attr):
@@ -359,6 +367,31 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         self._setup_provider_response(success=True)
         response = self._post_request(self.user, client)
         assert response.status_code == 200
+
+    @ddt.data('dot_app')
+    def test_jwt_access_token_exchange_calls_dispatched_view(self, client_attr):
+        client = getattr(self, client_attr)
+        self.oauth_client = client
+        self._setup_provider_response(success=True)
+        response = self._post_request(self.user, client, token_type='jwt')
+        assert response.status_code == 200
+
+        data = json.loads(response.content.decode('utf-8'))
+        assert 'expires_in' in data
+        assert data['expires_in'] > 0
+        assert data['token_type'] == 'JWT'
+
+    @ddt.data('dot_app')
+    def test_jwt_access_token_exchange_calls_dispatched_view_with_disabled_user(self, client_attr):
+        self.user.set_unusable_password()
+        self.user.save()
+        client = getattr(self, client_attr)
+        self.oauth_client = client
+        self._setup_provider_response(success=True)
+        response = self._post_request(self.user, client, token_type='jwt')
+        assert response.status_code == 403
+        data = json.loads(response.content.decode('utf-8'))
+        assert data['error'] == 'account_disabled'
 
 
 # pylint: disable=abstract-method

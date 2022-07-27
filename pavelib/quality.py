@@ -71,10 +71,7 @@ def top_python_dirs(dirname):
             dirs = os.listdir(subdir)
             top_dirs.extend(d for d in dirs if os.path.isdir(os.path.join(subdir, d)))
 
-    # sandbox-packages module causes F0001: module-not-found error when running pylint
-    # this will exclude sandbox-packages module from pylint execution
-    # TODO: upgrade the functionality to run pylint tests on sandbox-packages module too.
-    modules_to_remove = ['sandbox-packages', '__pycache__']
+    modules_to_remove = ['__pycache__']
     for module in modules_to_remove:
         if module in top_dirs:
             top_dirs.remove(module)
@@ -206,7 +203,7 @@ def _count_pylint_violations(report_file):
     """
     num_violations_report = 0
     # An example string:
-    # common/lib/xmodule/xmodule/tests/test_conditional.py:21: [C0111(missing-docstring), DummySystem] Missing docstring
+    # xmodule/xmodule/tests/test_conditional.py:21: [C0111(missing-docstring), DummySystem] Missing docstring
     # More examples can be found in the unit tests for this method
     pylint_pattern = re.compile(r".(\d+):\ \[(\D\d+.+\]).")
 

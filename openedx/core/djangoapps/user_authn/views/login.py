@@ -483,7 +483,7 @@ def enterprise_selection_page(request, user, next_url):
 @ensure_csrf_cookie
 @require_http_methods(['POST'])
 @ratelimit(
-    key='openedx.core.djangoapps.util.ratelimit.request_post_email',
+    key='openedx.core.djangoapps.util.ratelimit.request_post_email_or_username',
     rate=settings.LOGISTRATION_PER_EMAIL_RATELIMIT_RATE,
     method='POST',
 )  # lint-amnesty, pylint: disable=too-many-statements
@@ -526,7 +526,7 @@ def login_user(request, api_version='v1'):  # pylint: disable=too-many-statement
     _parse_analytics_param_for_course_id(request)
 
     third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
-    first_party_auth_requested = bool(request.POST.get('email')) or bool(request.POST.get('password'))
+    first_party_auth_requested = any(bool(request.POST.get(p)) for p in ['email', 'email_or_username', 'password'])
     is_user_third_party_authenticated = False
 
     set_custom_attribute('login_user_course_id', request.POST.get('course_id'))

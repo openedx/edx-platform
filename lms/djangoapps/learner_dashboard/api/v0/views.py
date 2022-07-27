@@ -1,6 +1,7 @@
 """ API v0 views. """
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from enterprise.models import EnterpriseCourseEnrollment
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -8,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.track import segment
 from openedx.core.djangoapps.programs.utils import (
     ProgramProgressMeter,
     get_certificates,
@@ -15,6 +17,8 @@ from openedx.core.djangoapps.programs.utils import (
     get_program_and_course_data,
     get_program_urls
 )
+from openedx.core.djangoapps.catalog.utils import get_course_data
+from lms.djangoapps.learner_dashboard.api.utils import get_personalized_course_recommendations
 
 
 class Programs(APIView):
@@ -335,3 +339,49 @@ class ProgramProgressDetailView(APIView):
                 'credit_pathways': credit_pathways,
             }
         )
+
+
+class CourseRecommendationApiView(APIView):
+    """
+    **Example Request**
+
+    GET api/dashboard/v0/recommendation/courses/
+    """
+
+    authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        """ Retrieves course recommendations details of a user in a specified course. """
+        user_id = request.user.id
+        is_control, course_keys = get_personalized_course_recommendations(user_id)
+
+        # Emits an event to track student dashboard page visits.
+        segment.track(
+            user_id,
+            'edx.bi.user.recommendations.viewed',
+            {
+                'is_personalized_recommendation': not is_control,
+            }
+        )
+
+        if is_control:
+            return Response(status=400)
+
+        recommended_courses = []
+        for course_id in course_keys:
+            course_data = get_course_data(course_id)
+            if course_data:
+                course_run_keys = [course_run['key'] for course_run in course_data['course_runs']
+                                   if course_run['availability'] in ['Current', 'Upcoming']]
+                if course_run_keys:
+                    recommended_courses.append({
+                        'course_run_key': course_run_keys[0],
+                        'title': course_data['title'],
+                        'logo_image_url': course_data['owners'][0]['logo_image_url'],
+                        'marketing_url': course_data.get('marketing_url')
+                    })
+            else:
+                return Response(status=400)
+
+        return Response({'courses': recommended_courses, 'is_personalized_recommendation': not is_control}, status=200)

@@ -1112,10 +1112,10 @@ COURSES_WITH_UNSAFE_CODE = []
 # Cojail REST service
 ENABLE_CODEJAIL_REST_SERVICE = False
 # .. setting_name: CODE_JAIL_REST_SERVICE_REMOTE_EXEC
-# .. setting_default: 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+# .. setting_default: 'xmodule.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
 # .. setting_description: Set the python package.module.function that is reponsible of
 #   calling the remote service in charge of jailed code execution
-CODE_JAIL_REST_SERVICE_REMOTE_EXEC = 'common.lib.capa.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
+CODE_JAIL_REST_SERVICE_REMOTE_EXEC = 'xmodule.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
 # .. setting_name: CODE_JAIL_REST_SERVICE_HOST
 # .. setting_default: 'http://127.0.0.1:8550'
 # .. setting_description: Set the codejail remote service host
@@ -1652,17 +1652,11 @@ INSTALLED_APPS = [
     # Course action state
     'common.djangoapps.course_action_state',
 
-    # Additional problem types
-    'edx_jsme',    # Molecular Structure
-
     'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig',
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
 
     # edx-milestones service
     'milestones',
-
-    # Self-paced course configuration
-    'openedx.core.djangoapps.self_paced',
 
     # Coursegraph
     'cms.djangoapps.coursegraph.apps.CoursegraphConfig',
@@ -2131,6 +2125,16 @@ DEFAULT_SITE_THEME = None
 # .. toggle_creation_date: 2016-06-30
 ENABLE_COMPREHENSIVE_THEMING = False
 
+# .. setting_name: CUSTOM_RESOURCE_TEMPLATES_DIRECTORY
+# .. setting_default: None
+# .. setting_description: Path to an existing directory of YAML files containing
+#    html content to be used with the subclasses of xmodule.x_module.ResourceTemplates.
+#    Default example templates can be found in xmodule/templates/html.
+#    Note that the extension used is ".yaml" and not ".yml".
+#    See xmodule.x_module.ResourceTemplates for usage.
+#   "CUSTOM_RESOURCE_TEMPLATES_DIRECTORY" : null
+CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = None
+
 ############################ Global Database Configuration #####################
 
 DATABASE_ROUTERS = [
@@ -2282,10 +2286,13 @@ RECALCULATE_GRADES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 # Queue to use for updating grades due to grading policy change
 POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
 
+# Queue to use for individual learner course regrades
+SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = 'edx.lms.core.default'
+
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
 
 # Rate limit for regrading tasks that a grading policy change can kick off
-POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
+POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
 
 ############## Settings for CourseGraph ############################
 
@@ -2666,3 +2673,8 @@ TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
 COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_assets/course_live.html"
+
+# keys for  big blue button live provider
+COURSE_LIVE_GLOBAL_CREDENTIALS = {}
+
+PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'

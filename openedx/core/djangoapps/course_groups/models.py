@@ -13,7 +13,7 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from opaque_keys.edx.django.models import CourseKeyField
-from openedx_filters.learning.filters import CohortChangeRequested
+from openedx_filters.learning.filters import CohortAssignmentRequested, CohortChangeRequested
 
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
@@ -28,6 +28,10 @@ class CohortMembershipException(Exception):
 
 
 class CohortChangeNotAllowed(CohortMembershipException):
+    pass
+
+
+class CohortAssignmentNotAllowed(CohortMembershipException):
     pass
 
 
@@ -113,6 +117,13 @@ class CohortMembership(models.Model):
         cohort
         Returns CohortMembership, previous_cohort (if any)
         """
+        try:
+            # .. filter_implemented_name: CohortAssignmentRequested
+            # .. filter_type: org.openedx.learning.cohort.assignment.requested.v1
+            user, cohort = CohortAssignmentRequested.run_filter(user=user, target_cohort=cohort)
+        except CohortAssignmentRequested.PreventCohortAssignment as exc:
+            raise CohortAssignmentNotAllowed(str(exc)) from exc
+
         with transaction.atomic():
             membership, created = cls.objects.select_for_update().get_or_create(
                 user__id=user.id,

@@ -18,12 +18,12 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.model_data import StudentModule
 from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase

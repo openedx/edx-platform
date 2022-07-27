@@ -47,7 +47,6 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core.djangoapps.plugins.constants import ProjectType
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.features.enterprise_support.api import enterprise_enabled
@@ -192,8 +191,8 @@ urlpatterns = [
     path('api-admin/', include(('openedx.core.djangoapps.api_admin.urls', 'openedx.core.djangoapps.api_admin'),
                                namespace='api_admin')),
 
+    # Learner Dashboard
     path('dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
-    # Dashboard REST APIs
     path('api/dashboard/', include('lms.djangoapps.learner_dashboard.api.urls', namespace='dashboard_api')),
 
     path(
@@ -379,15 +378,8 @@ urlpatterns += [
         r'^courses/{}/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        courseware_views.course_info,
+        courseware_views.course_about,
         name='course_root',
-    ),
-    re_path(
-        r'^courses/{}/info$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        courseware_views.course_info,
-        name='info',
     ),
     # TODO arjun remove when custom tabs in place, see courseware/courses.py
     re_path(
@@ -892,7 +884,6 @@ if settings.FEATURES.get('ENABLE_LTI_PROVIDER'):
     ]
 
 urlpatterns += [
-    path('config/self_paced', ConfigurationModelCurrentAPIView.as_view(model=SelfPacedConfiguration)),
     path('config/programs', ConfigurationModelCurrentAPIView.as_view(model=ProgramsApiConfig)),
     path('config/catalog', ConfigurationModelCurrentAPIView.as_view(model=CatalogIntegration)),
     path('config/forums', ConfigurationModelCurrentAPIView.as_view(model=ForumsConfig)),
@@ -1030,4 +1021,9 @@ urlpatterns += [
 # Scheduled Bulk Email (Instructor Task) URLs
 urlpatterns += [
     path('api/instructor_task/', include('lms.djangoapps.instructor_task.rest_api.urls')),
+]
+
+# MFE API urls
+urlpatterns += [
+    path('api/v1/mfe_config', include(('lms.djangoapps.mfe_config_api.urls', 'lms.djangoapps.mfe_config_api'), namespace='mfe_config_api'))
 ]

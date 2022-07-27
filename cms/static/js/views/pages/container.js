@@ -187,15 +187,15 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 event.preventDefault();
 
                 if(!options || options.view !== 'visibility_view' ){
-                    var useNewTextEditor = this.$('.edit-button').attr("use-new-editor-text"),
-                        useNewVideoEditor = this.$('.edit-button').attr("use-new-editor-video"),
-                        useNewProblemEditor = this.$('.edit-button').attr("use-new-editor-problem"),
-                        blockType = xblockElement.find('.xblock').attr("data-block-type");
+                    var useNewTextEditor = this.$('.xblock-header-primary').attr("use-new-editor-text"),
+                    useNewVideoEditor = this.$('.xblock-header-primary').attr("use-new-editor-video"),
+                    useNewProblemEditor = this.$('.xblock-header-primary').attr("use-new-editor-problem"),
+                    blockType = xblockElement.find('.xblock').attr("data-block-type");
                     if( (useNewTextEditor === "True" && blockType === "html") ||
                         (useNewVideoEditor === "True" && blockType === "video") ||
                         (useNewProblemEditor === "True" && blockType === "problem")
                     ) {
-                        var destinationUrl = this.$('.edit-button').attr("authoring_MFE_base_url") + '/' + blockType + '/' + encodeURI(xblockElement.find('.xblock').attr("data-usage-id"));
+                        var destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType + '/' + encodeURI(xblockElement.find('.xblock').attr("data-usage-id"));
                         window.location.href = destinationUrl;
                         return;
                     }
@@ -322,6 +322,23 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
             },
 
             onNewXBlock: function(xblockElement, scrollOffset, is_duplicate, data) {
+                var useNewTextEditor = this.$('.xblock-header-primary').attr("use-new-editor-text"),
+                useNewVideoEditor = this.$('.xblock-header-primary').attr("use-new-editor-video"),
+                useNewProblemEditor = this.$('.xblock-header-primary').attr("use-new-editor-problem");
+
+                //find the block type in the locator if availible
+                if(data.hasOwnProperty('locator')){
+                    var matchBlockTypeFromLocator = /\@(.*?)\+/;
+                    var blockType = data.locator.match(matchBlockTypeFromLocator);
+                }
+                if((useNewTextEditor === "True" && blockType.includes("html")) ||
+                    (useNewVideoEditor === "True" && blockType.includes("video"))||
+                    (useNewProblemEditor === "True" && blockType.includes("problem"))
+                    ){
+                        var destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
+                        window.location.href = destinationUrl;
+                        return;
+                }
                 ViewUtils.setScrollOffset(xblockElement, scrollOffset);
                 xblockElement.data('locator', data.locator);
                 return this.refreshXBlock(xblockElement, true, is_duplicate);

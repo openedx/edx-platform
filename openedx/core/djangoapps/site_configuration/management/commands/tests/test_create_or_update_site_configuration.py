@@ -107,6 +107,19 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         assert not site_configuration.site_values
         assert not site_configuration.enabled
 
+    def test_site_created_when_domain_longer_than_50_characters(self):
+        """
+        Verify that a SiteConfiguration instance is created with name trimmed
+        to 50 characters when domain is longer than 50 characters
+        """
+        self.assert_site_configuration_does_not_exist()
+
+        domain = "studio.newtestserverwithlongname.development.opencraft.hosting"
+        call_command(self.command, f"{domain}")
+        site = Site.objects.filter(domain=domain)
+        assert site.exists()
+        assert site[0].name == domain[:50]
+
     def test_both_enabled_disabled_flags(self):
         """
         Verify the error on providing both the --enabled and --disabled flags.

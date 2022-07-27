@@ -2,6 +2,7 @@
 Utility methods for the account settings.
 """
 
+import logging
 import random
 import re
 import string
@@ -19,11 +20,11 @@ from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_mod
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import UserRetirementStatus
 
 ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH = 'enable_secondary_email_feature'
+LOGGER = logging.getLogger(__name__)
 
 
 def validate_social_link(platform_name, new_social_link):
@@ -170,7 +171,11 @@ def retrieve_last_sitewide_block_completed(user):
 
     try:
         item = modulestore().get_item(candidate_block_key, depth=1)
-    except ItemNotFoundError:
+    except Exception as err:  # pylint: disable=broad-except
+        LOGGER.exception(
+            '[PROD-2877] Error retrieving resume block for user %s with raw error %r',
+            user.username, err,
+        )
         item = None
 
     if not (lms_root and item):
