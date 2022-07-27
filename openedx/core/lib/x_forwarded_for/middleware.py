@@ -51,6 +51,12 @@ class XForwardedForMiddleware(MiddlewareMixin):
             # Give some observability into IP chain length and composition. Useful
             # for monitoring in case of unexpected network config changes, etc.
             ip_chain = ip.get_raw_ip_chain(request)
+            
+            # .. custom_attribute_name: ip_chain.raw
+            # .. custom_attribute_description: The actual contents of the raw IP chain. Could
+            #      be used to correlate authenticated and unauthenticated requests for the same
+            #      user.
+            set_custom_attribute('ip_chain.raw', ip_chain)
             set_custom_attribute('ip_chain.count', len(ip_chain))
             set_custom_attribute('ip_chain.types', '-'.join(_ip_type(s) for s in ip_chain))
 
