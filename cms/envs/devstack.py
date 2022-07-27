@@ -20,7 +20,7 @@ DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = DEBUG
 SITE_NAME = 'localhost:8001'
 HTTPS = 'off'
 
-CMS_BASE = 'localhost:18010'
+CMS_BASE = 'studio.launchpadlearning.ca'
 SESSION_COOKIE_NAME = 'studio_sessionid'
 
 ################################ LOGGERS ######################################
@@ -44,7 +44,7 @@ EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 
 ################################# LMS INTEGRATION #############################
 
-LMS_BASE = 'localhost:18000'
+LMS_BASE = 'student.launchpadlearning.ca'
 LMS_ROOT_URL = f'http://{LMS_BASE}'
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
@@ -263,7 +263,7 @@ WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
 SOCIAL_AUTH_EDX_OAUTH2_KEY = 'studio-sso-key'
 SOCIAL_AUTH_EDX_OAUTH2_SECRET = 'studio-sso-secret'  # in stage, prod would be high-entropy secret
 SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = 'http://edx.devstack.lms:18000'  # routed internally server-to-server
-SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT = 'http://localhost:18000'  # used in browser redirect
+SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT = 'http://student.launchpadlearning.ca'  # used in browser redirect
 
 # Don't form the return redirect URL with HTTPS on devstack
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = False

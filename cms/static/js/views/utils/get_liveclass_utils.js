@@ -19,7 +19,7 @@
 
     CreateUtilsFactory.call(this, selectors, classes);
 
-    var endpoint = "http://localhost:18010/live_class/details/";
+    var endpoint = "http://studio.launchpadlearning.ca/live_class/details/";
     var lib_info = {};
 
     //Pagination is implemented using the two buttons
@@ -37,7 +37,7 @@
     //To Delete selected Live class
     var deleteLive = (e) => {
       let id = e.target.attributes.value.value;
-      $.deleteJSON("http://localhost:18010/live_class/" + id, id, function (id) {});
+      $.deleteJSON("http://studio.launchpadlearning.ca/live_class/" + id, id, function (id) {});
       window.location.reload();
     };
 
@@ -49,7 +49,7 @@
       console.log(id);
 
       //Getting details of Live class using id
-      $.getJSON("http://localhost:18010/live_class/" + id, id, function (id) {}).then((data) => {
+      $.getJSON("http://studio.launchpadlearning.ca/live_class/" + id, id, function (id) {}).then((data) => {
         console.log(data);
 
         displayAssignedUsers(data.id);
@@ -100,7 +100,7 @@
             start_date.val() < end_date.val() ||
             (start_date.val() === end_date.val() && start_time.val() < end_time.val())
           ) {
-            $.patchJSON("http://localhost:18010/live_class/" + id, lib_info, function (id) {}).then(() => {
+            $.patchJSON("http://studio.launchpadlearning.ca/live_class/" + id, lib_info, function (id) {}).then(() => {
               console.log("Update Success");
               window.location.reload();
             });
@@ -112,7 +112,7 @@
     };
 
     var displayAssignedUsers = (id) => {
-      $.getJSON("http://localhost:18010/live_class/enroll/detail/" + id, {}).then((data) => {
+      $.getJSON("http://studio.launchpadlearning.ca/live_class/enroll/detail/" + id, {}).then((data) => {
         var assignedUsersList = document.querySelector(".assigned-liveclass-users");
         assignedUsersList.innerText = "";
         if (data.results.length !== 0) {
@@ -155,10 +155,10 @@
 
           //Assigning the values of Previous and Next buttons
           response.next === null
-            ? (nextButton.value = "http://localhost:18010/live_class/details/")
+            ? (nextButton.value = "http://studio.launchpadlearning.ca/live_class/details/")
             : (nextButton.value = response.next);
           response.previous === null
-            ? (prevButton.value = "http://localhost:18010/live_class/details/?page=" + response.num_pages)
+            ? (prevButton.value = "http://studio.launchpadlearning.ca/live_class/details/?page=" + response.num_pages)
             : (prevButton.value = response.previous);
 
           //Getting list of live classes as js object

@@ -12,7 +12,7 @@ to test other grant types if they are substituted in the appropriate places.
 
    i. Create or decide which LMS user will be associated with the OAuth2 application. In production, the user should be a "service user" that is distinct from "LMS end-users" that login to the system.
 
-   ii. Go to http://localhost:18000/admin/oauth2_provider/application/add/ to create a new Application.
+   ii. Go to http://student.launchpadlearning.ca/admin/oauth2_provider/application/add/ to create a new Application.
 
    iii. Enter a value for the "Name" field - a documentary value that uniquely describes this OAuth2 Application.
 
@@ -32,7 +32,7 @@ to test other grant types if they are substituted in the appropriate places.
 
 2. Optional. Make the new Application a `Restricted Application`_ if you are testing Restricted Application features.
 
-   i. Go to http://localhost:18000/admin/oauth_dispatch/restrictedapplication/add/
+   i. Go to http://student.launchpadlearning.ca/admin/oauth_dispatch/restrictedapplication/add/
 
    ii. Find and select the new Application you created in the dropdown.
 

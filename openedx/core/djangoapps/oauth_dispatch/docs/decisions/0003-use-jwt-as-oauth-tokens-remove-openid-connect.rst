@@ -23,7 +23,7 @@ centralized LMS.
 We have integrated our fork of DOP_ with support for OpenID Connect. So, an
 access_token request with a DOP client::
 
-    curl -X POST -d "client_id=abc&client_secret=def&grant_type=client_credentials" http://localhost:18000/oauth2/access_token/
+    curl -X POST -d "client_id=abc&client_secret=def&grant_type=client_credentials" http://student.launchpadlearning.ca/oauth2/access_token/
 
 includes an id_token field::
 
@@ -41,7 +41,7 @@ where the value of BASE64-ENCODED-ID-TOKEN decodes to::
         "family_name": "User1",
         "administrator": false,
         "sub": "foo",
-        "iss": "http://localhost:18000/oauth2",
+        "iss": "http://student.launchpadlearning.ca/oauth2",
         "user_tracking_id": 1234,
         "preferred_username": "user1",
         "name": "User 1",
@@ -114,7 +114,7 @@ Requesting JWT Tokens
 
 An OAuth2 client requesting a JWT token_type::
 
-    curl -X POST -d "client_id=abc&client_secret=def&grant_type=client_credentials&token_type=jwt" http://localhost:18000/oauth2/access_token/
+    curl -X POST -d "client_id=abc&client_secret=def&grant_type=client_credentials&token_type=jwt" http://student.launchpadlearning.ca/oauth2/access_token/
 
 would now receive::
 
@@ -132,7 +132,7 @@ access_token will now contain the data that would have been in the id_token.
 **Note:** In order to use the JWT token type to access an API, the Authorization
 header needs to specify "JWT" instead of "Bearer"::
 
-    curl -H "Authorization: JWT <BASE64-ENCODED-JWT>" http://localhost:18000/api/user/v1/me
+    curl -H "Authorization: JWT <BASE64-ENCODED-JWT>" http://student.launchpadlearning.ca/api/user/v1/me
 
 Requesting Bearer Tokens
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -140,7 +140,7 @@ Requesting Bearer Tokens
 OAuth2 Clients that are not interested in receiving JWT tokens may continue to
 use the default Bearer token type::
 
-    curl -X POST -d "client_id=abc&client_secret=def&grant_type=client_credentials" http://localhost:18000/oauth2/access_token/
+    curl -X POST -d "client_id=abc&client_secret=def&grant_type=client_credentials" http://student.launchpadlearning.ca/oauth2/access_token/
 
 which returns::
 
@@ -154,7 +154,7 @@ which returns::
 **Note:** In order to use the Bearer token type to access an API, the Authorization
 header needs to specify "Bearer"::
 
-    curl -H "Authorization: Bearer <RANDOMLY-GENERATED-ACCESS-TOKEN>" http://localhost:18000/api/user/v1/me
+    curl -H "Authorization: Bearer <RANDOMLY-GENERATED-ACCESS-TOKEN>" http://student.launchpadlearning.ca/api/user/v1/me
 
 Alternatives
 ------------

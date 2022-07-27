@@ -22,8 +22,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0270f6de40fc",
                   "display_name": "Blank HTML Page",
                   "block_id": "030e35c4756a4ddc8d40b95fbbfff4d4",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@030e35c4756a4ddc8d40b95fbbfff4d4",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@030e35c4756a4ddc8d40b95fbbfff4d4",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@030e35c4756a4ddc8d40b95fbbfff4d4",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@030e35c4756a4ddc8d40b95fbbfff4d4",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@030e35c4756a4ddc8d40b95fbbfff4d4"
                 },
@@ -31,8 +31,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0270f6de40fc",
                   "display_name": "Discussion",
                   "block_id": "236f057b15b84679a26cd8c6af34e8d4",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@236f057b15b84679a26cd8c6af34e8d4",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@236f057b15b84679a26cd8c6af34e8d4",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@236f057b15b84679a26cd8c6af34e8d4",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@236f057b15b84679a26cd8c6af34e8d4",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@236f057b15b84679a26cd8c6af34e8d4"
                 },
@@ -40,26 +40,26 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0270f6de40fc",
                   "display_name": "Welcome!",
                   "block_id": "0b9e39477cf34507a7a48f74be381fdd",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@video+block@0b9e39477cf34507a7a48f74be381fdd",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@video+block@0b9e39477cf34507a7a48f74be381fdd",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@video+block@0b9e39477cf34507a7a48f74be381fdd",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@video+block@0b9e39477cf34507a7a48f74be381fdd",
                   "type": "video",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@video+block@0b9e39477cf34507a7a48f74be381fdd"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0270f6de40fc",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0270f6de40fc",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0270f6de40fc",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0270f6de40fc",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0270f6de40fc"
             }
           ],
-          "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@edx_introduction",
-          "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@edx_introduction",
+          "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@edx_introduction",
+          "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@edx_introduction",
           "type": "sequential",
           "id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@edx_introduction"
         }
       ],
-      "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@d8a6192ade314473a78242dfeedfbf5b",
-      "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@d8a6192ade314473a78242dfeedfbf5b",
+      "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@d8a6192ade314473a78242dfeedfbf5b",
+      "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@d8a6192ade314473a78242dfeedfbf5b",
       "type": "chapter",
       "id": "block-v1:edX+DemoX+Demo_Course+type@chapter+block@d8a6192ade314473a78242dfeedfbf5b"
     },
@@ -82,14 +82,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@867dddb6f55d410caaa9c1eb9c6743ec",
                   "display_name": "Getting Started",
                   "block_id": "82d599b014b246c7a9b5dfc750dc08a9",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@82d599b014b246c7a9b5dfc750dc08a9",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@82d599b014b246c7a9b5dfc750dc08a9",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@82d599b014b246c7a9b5dfc750dc08a9",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@82d599b014b246c7a9b5dfc750dc08a9",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@82d599b014b246c7a9b5dfc750dc08a9"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@867dddb6f55d410caaa9c1eb9c6743ec",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@867dddb6f55d410caaa9c1eb9c6743ec",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@867dddb6f55d410caaa9c1eb9c6743ec",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@867dddb6f55d410caaa9c1eb9c6743ec",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@867dddb6f55d410caaa9c1eb9c6743ec"
             },
@@ -102,8 +102,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@4f6c1b4e316a419ab5b6bf30e6c708e9",
                   "display_name": "",
                   "block_id": "6bcccc2d7343416e9e03fd7325b2f232",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@6bcccc2d7343416e9e03fd7325b2f232",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@6bcccc2d7343416e9e03fd7325b2f232",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@6bcccc2d7343416e9e03fd7325b2f232",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@6bcccc2d7343416e9e03fd7325b2f232",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@6bcccc2d7343416e9e03fd7325b2f232"
                 },
@@ -111,8 +111,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@4f6c1b4e316a419ab5b6bf30e6c708e9",
                   "display_name": "Science and Cooking Chef Profile: JOSÉ ANDRÉS",
                   "block_id": "7e9b434e6de3435ab99bd3fb25bde807",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@video+block@7e9b434e6de3435ab99bd3fb25bde807",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@video+block@7e9b434e6de3435ab99bd3fb25bde807",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@video+block@7e9b434e6de3435ab99bd3fb25bde807",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@video+block@7e9b434e6de3435ab99bd3fb25bde807",
                   "type": "video",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@video+block@7e9b434e6de3435ab99bd3fb25bde807"
                 },
@@ -120,14 +120,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@4f6c1b4e316a419ab5b6bf30e6c708e9",
                   "display_name": "Working with Videos",
                   "block_id": "412dc8dbb6674014862237b23c1f643f",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@412dc8dbb6674014862237b23c1f643f",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@412dc8dbb6674014862237b23c1f643f",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@412dc8dbb6674014862237b23c1f643f",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@412dc8dbb6674014862237b23c1f643f",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@412dc8dbb6674014862237b23c1f643f"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4f6c1b4e316a419ab5b6bf30e6c708e9",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4f6c1b4e316a419ab5b6bf30e6c708e9",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4f6c1b4e316a419ab5b6bf30e6c708e9",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4f6c1b4e316a419ab5b6bf30e6c708e9",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@4f6c1b4e316a419ab5b6bf30e6c708e9"
             },
@@ -140,8 +140,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3dc16db8d14842e38324e95d4030b8a0",
                   "display_name": "Videos on edX",
                   "block_id": "0a3b4139f51a4917a3aff9d519b1eeb6",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@0a3b4139f51a4917a3aff9d519b1eeb6",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@0a3b4139f51a4917a3aff9d519b1eeb6",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@0a3b4139f51a4917a3aff9d519b1eeb6",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@0a3b4139f51a4917a3aff9d519b1eeb6",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@0a3b4139f51a4917a3aff9d519b1eeb6"
                 },
@@ -149,8 +149,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3dc16db8d14842e38324e95d4030b8a0",
                   "display_name": "Video",
                   "block_id": "5c90cffecd9b48b188cbfea176bf7fe9",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@video+block@5c90cffecd9b48b188cbfea176bf7fe9",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@video+block@5c90cffecd9b48b188cbfea176bf7fe9",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@video+block@5c90cffecd9b48b188cbfea176bf7fe9",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@video+block@5c90cffecd9b48b188cbfea176bf7fe9",
                   "type": "video",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@video+block@5c90cffecd9b48b188cbfea176bf7fe9"
                 },
@@ -158,14 +158,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3dc16db8d14842e38324e95d4030b8a0",
                   "display_name": "Videos on edX",
                   "block_id": "722085be27c84ac693cfebc8ac5da700",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@722085be27c84ac693cfebc8ac5da700",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@722085be27c84ac693cfebc8ac5da700",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@722085be27c84ac693cfebc8ac5da700",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@722085be27c84ac693cfebc8ac5da700",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@722085be27c84ac693cfebc8ac5da700"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3dc16db8d14842e38324e95d4030b8a0",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3dc16db8d14842e38324e95d4030b8a0",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3dc16db8d14842e38324e95d4030b8a0",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3dc16db8d14842e38324e95d4030b8a0",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3dc16db8d14842e38324e95d4030b8a0"
             },
@@ -178,8 +178,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76",
                   "display_name": "",
                   "block_id": "ed5dccf14ae94353961f46fa07217491",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@ed5dccf14ae94353961f46fa07217491",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@ed5dccf14ae94353961f46fa07217491",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@ed5dccf14ae94353961f46fa07217491",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@ed5dccf14ae94353961f46fa07217491",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@ed5dccf14ae94353961f46fa07217491"
                 },
@@ -187,14 +187,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76",
                   "display_name": "Video Demonstrations",
                   "block_id": "9f9e1373cc8243b985c8750cc8acec7d",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@9f9e1373cc8243b985c8750cc8acec7d",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@9f9e1373cc8243b985c8750cc8acec7d",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@9f9e1373cc8243b985c8750cc8acec7d",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@9f9e1373cc8243b985c8750cc8acec7d",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@9f9e1373cc8243b985c8750cc8acec7d"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@4a1bba2a403f40bca5ec245e945b0d76"
             },
@@ -207,8 +207,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@256f17a44983429fb1a60802203ee4e0",
                   "display_name": "",
                   "block_id": "c2f7008c9ccf4bd09d5d800c98fb0722",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@c2f7008c9ccf4bd09d5d800c98fb0722",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@c2f7008c9ccf4bd09d5d800c98fb0722",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@c2f7008c9ccf4bd09d5d800c98fb0722",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@c2f7008c9ccf4bd09d5d800c98fb0722",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@c2f7008c9ccf4bd09d5d800c98fb0722"
                 },
@@ -216,8 +216,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@256f17a44983429fb1a60802203ee4e0",
                   "display_name": "Connecting a Circuit and a Circuit Diagram",
                   "block_id": "636541acbae448d98ab484b028c9a7f6",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@video+block@636541acbae448d98ab484b028c9a7f6",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@video+block@636541acbae448d98ab484b028c9a7f6",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@video+block@636541acbae448d98ab484b028c9a7f6",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@video+block@636541acbae448d98ab484b028c9a7f6",
                   "type": "video",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@video+block@636541acbae448d98ab484b028c9a7f6"
                 },
@@ -225,14 +225,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@256f17a44983429fb1a60802203ee4e0",
                   "display_name": "Video Presentation Styles",
                   "block_id": "e2cb0e0994f84b0abfa5f4ae42ed9d44",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e2cb0e0994f84b0abfa5f4ae42ed9d44",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e2cb0e0994f84b0abfa5f4ae42ed9d44",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e2cb0e0994f84b0abfa5f4ae42ed9d44",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e2cb0e0994f84b0abfa5f4ae42ed9d44",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@e2cb0e0994f84b0abfa5f4ae42ed9d44"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@256f17a44983429fb1a60802203ee4e0",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@256f17a44983429fb1a60802203ee4e0",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@256f17a44983429fb1a60802203ee4e0",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@256f17a44983429fb1a60802203ee4e0",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@256f17a44983429fb1a60802203ee4e0"
             },
@@ -245,8 +245,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@e3601c0abee6427d8c17e6d6f8fdddd1",
                   "display_name": "Interactive Questions",
                   "block_id": "9cee77a606ea4c1aa5440e0ea5d0f618",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@9cee77a606ea4c1aa5440e0ea5d0f618",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@9cee77a606ea4c1aa5440e0ea5d0f618",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@9cee77a606ea4c1aa5440e0ea5d0f618",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@9cee77a606ea4c1aa5440e0ea5d0f618",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@9cee77a606ea4c1aa5440e0ea5d0f618"
                 },
@@ -254,14 +254,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@e3601c0abee6427d8c17e6d6f8fdddd1",
                   "display_name": "",
                   "block_id": "3169f89efde2452993f2f2d9bc74f5b2",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@3169f89efde2452993f2f2d9bc74f5b2",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@3169f89efde2452993f2f2d9bc74f5b2",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@3169f89efde2452993f2f2d9bc74f5b2",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@3169f89efde2452993f2f2d9bc74f5b2",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@3169f89efde2452993f2f2d9bc74f5b2"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@e3601c0abee6427d8c17e6d6f8fdddd1",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@e3601c0abee6427d8c17e6d6f8fdddd1",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@e3601c0abee6427d8c17e6d6f8fdddd1",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@e3601c0abee6427d8c17e6d6f8fdddd1",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@e3601c0abee6427d8c17e6d6f8fdddd1"
             },
@@ -274,8 +274,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@134df56c516a4a0dbb24dd5facef746e",
                   "display_name": "Reading Assignments",
                   "block_id": "e0254b911fa246218bd98bbdadffef06",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@e0254b911fa246218bd98bbdadffef06",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@e0254b911fa246218bd98bbdadffef06",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@e0254b911fa246218bd98bbdadffef06",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@e0254b911fa246218bd98bbdadffef06",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@e0254b911fa246218bd98bbdadffef06"
                 },
@@ -283,8 +283,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@134df56c516a4a0dbb24dd5facef746e",
                   "display_name": "Text",
                   "block_id": "2574c523e97b477a9d72fbb37bfb995f",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@2574c523e97b477a9d72fbb37bfb995f",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@2574c523e97b477a9d72fbb37bfb995f",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@2574c523e97b477a9d72fbb37bfb995f",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@2574c523e97b477a9d72fbb37bfb995f",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@2574c523e97b477a9d72fbb37bfb995f"
                 },
@@ -292,8 +292,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@134df56c516a4a0dbb24dd5facef746e",
                   "display_name": "Perchance to Dream",
                   "block_id": "932e6f2ce8274072a355a94560216d1a",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@932e6f2ce8274072a355a94560216d1a",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@932e6f2ce8274072a355a94560216d1a",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@932e6f2ce8274072a355a94560216d1a",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@932e6f2ce8274072a355a94560216d1a",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@932e6f2ce8274072a355a94560216d1a"
                 },
@@ -301,8 +301,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@134df56c516a4a0dbb24dd5facef746e",
                   "display_name": "Attributing Blame",
                   "block_id": "303034da25524878a2e66fb57c91cf85",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@303034da25524878a2e66fb57c91cf85",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@303034da25524878a2e66fb57c91cf85",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@303034da25524878a2e66fb57c91cf85",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@303034da25524878a2e66fb57c91cf85",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@303034da25524878a2e66fb57c91cf85"
                 },
@@ -310,20 +310,20 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@134df56c516a4a0dbb24dd5facef746e",
                   "display_name": "Reading Sample",
                   "block_id": "ffa5817d49e14fec83ad6187cbe16358",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ffa5817d49e14fec83ad6187cbe16358",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ffa5817d49e14fec83ad6187cbe16358",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ffa5817d49e14fec83ad6187cbe16358",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ffa5817d49e14fec83ad6187cbe16358",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@ffa5817d49e14fec83ad6187cbe16358"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@134df56c516a4a0dbb24dd5facef746e",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@134df56c516a4a0dbb24dd5facef746e",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@134df56c516a4a0dbb24dd5facef746e",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@134df56c516a4a0dbb24dd5facef746e",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@134df56c516a4a0dbb24dd5facef746e"
             }
           ],
-          "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5",
-          "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5",
+          "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5",
+          "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5",
           "type": "sequential",
           "id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@19a30717eff543078a5d94ae9d6c18a5"
         },
@@ -341,8 +341,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7",
                   "display_name": "Pointing on a Picture",
                   "block_id": "c554538a57664fac80783b99d9d6da7c",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@c554538a57664fac80783b99d9d6da7c",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@c554538a57664fac80783b99d9d6da7c",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@c554538a57664fac80783b99d9d6da7c",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@c554538a57664fac80783b99d9d6da7c",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@c554538a57664fac80783b99d9d6da7c"
                 },
@@ -350,14 +350,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7",
                   "display_name": "",
                   "block_id": "e5eac7e1a5a24f5fa7ed77bb6d136591",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e5eac7e1a5a24f5fa7ed77bb6d136591",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e5eac7e1a5a24f5fa7ed77bb6d136591",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e5eac7e1a5a24f5fa7ed77bb6d136591",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e5eac7e1a5a24f5fa7ed77bb6d136591",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@e5eac7e1a5a24f5fa7ed77bb6d136591"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7"
             },
@@ -370,8 +370,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@47dbd5f836544e61877a483c0b75606c",
                   "display_name": "Drag and Drop",
                   "block_id": "d2e35c1d294b4ba0b3b1048615605d2a",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@d2e35c1d294b4ba0b3b1048615605d2a",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@d2e35c1d294b4ba0b3b1048615605d2a",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@d2e35c1d294b4ba0b3b1048615605d2a",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@d2e35c1d294b4ba0b3b1048615605d2a",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@d2e35c1d294b4ba0b3b1048615605d2a"
                 },
@@ -379,14 +379,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@47dbd5f836544e61877a483c0b75606c",
                   "display_name": "",
                   "block_id": "5ab88e67d46049b9aa694cb240c39cef",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@5ab88e67d46049b9aa694cb240c39cef",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@5ab88e67d46049b9aa694cb240c39cef",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@5ab88e67d46049b9aa694cb240c39cef",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@5ab88e67d46049b9aa694cb240c39cef",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@5ab88e67d46049b9aa694cb240c39cef"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@47dbd5f836544e61877a483c0b75606c",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@47dbd5f836544e61877a483c0b75606c",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@47dbd5f836544e61877a483c0b75606c",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@47dbd5f836544e61877a483c0b75606c",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@47dbd5f836544e61877a483c0b75606c"
             },
@@ -399,8 +399,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@54bb9b142c6c4c22afc62bcb628f0e68",
                   "display_name": "Multiple Choice Questions",
                   "block_id": "a0effb954cca4759994f1ac9e9434bf4",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@a0effb954cca4759994f1ac9e9434bf4",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@a0effb954cca4759994f1ac9e9434bf4",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@a0effb954cca4759994f1ac9e9434bf4",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@a0effb954cca4759994f1ac9e9434bf4",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@a0effb954cca4759994f1ac9e9434bf4"
                 },
@@ -408,14 +408,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@54bb9b142c6c4c22afc62bcb628f0e68",
                   "display_name": "",
                   "block_id": "67c26b1e826e47aaa29757f62bcd1ad0",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@67c26b1e826e47aaa29757f62bcd1ad0",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@67c26b1e826e47aaa29757f62bcd1ad0",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@67c26b1e826e47aaa29757f62bcd1ad0",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@67c26b1e826e47aaa29757f62bcd1ad0",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@67c26b1e826e47aaa29757f62bcd1ad0"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@54bb9b142c6c4c22afc62bcb628f0e68",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@54bb9b142c6c4c22afc62bcb628f0e68",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@54bb9b142c6c4c22afc62bcb628f0e68",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@54bb9b142c6c4c22afc62bcb628f0e68",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@54bb9b142c6c4c22afc62bcb628f0e68"
             },
@@ -428,8 +428,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0c92347a5c00",
                   "display_name": "Mathematical Expressions",
                   "block_id": "Sample_Algebraic_Problem",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@Sample_Algebraic_Problem",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@Sample_Algebraic_Problem",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@Sample_Algebraic_Problem",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@Sample_Algebraic_Problem",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@Sample_Algebraic_Problem"
                 },
@@ -437,14 +437,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0c92347a5c00",
                   "display_name": "",
                   "block_id": "870371212ba04dcf9536d7c7b8f3109e",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@870371212ba04dcf9536d7c7b8f3109e",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@870371212ba04dcf9536d7c7b8f3109e",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@870371212ba04dcf9536d7c7b8f3109e",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@870371212ba04dcf9536d7c7b8f3109e",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@870371212ba04dcf9536d7c7b8f3109e"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0c92347a5c00",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0c92347a5c00",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0c92347a5c00",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0c92347a5c00",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0c92347a5c00"
             },
@@ -457,8 +457,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_1fef54c2b23b",
                   "display_name": "Chemical Equations",
                   "block_id": "Sample_ChemFormula_Problem",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@Sample_ChemFormula_Problem",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@Sample_ChemFormula_Problem",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@Sample_ChemFormula_Problem",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@Sample_ChemFormula_Problem",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@Sample_ChemFormula_Problem"
                 },
@@ -466,14 +466,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_1fef54c2b23b",
                   "display_name": "",
                   "block_id": "4d672c5893cb4f1dad0de67d2008522e",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4d672c5893cb4f1dad0de67d2008522e",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4d672c5893cb4f1dad0de67d2008522e",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4d672c5893cb4f1dad0de67d2008522e",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4d672c5893cb4f1dad0de67d2008522e",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@4d672c5893cb4f1dad0de67d2008522e"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_1fef54c2b23b",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_1fef54c2b23b",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_1fef54c2b23b",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_1fef54c2b23b",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_1fef54c2b23b"
             },
@@ -486,8 +486,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@2889db1677a549abb15eb4d886f95d1c",
                   "display_name": "Numerical Input",
                   "block_id": "75f9562c77bc4858b61f907bb810d974",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@75f9562c77bc4858b61f907bb810d974",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@75f9562c77bc4858b61f907bb810d974",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@75f9562c77bc4858b61f907bb810d974",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@75f9562c77bc4858b61f907bb810d974",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@75f9562c77bc4858b61f907bb810d974"
                 },
@@ -495,14 +495,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@2889db1677a549abb15eb4d886f95d1c",
                   "display_name": "",
                   "block_id": "501aed9d902349eeb2191fa505548de2",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@501aed9d902349eeb2191fa505548de2",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@501aed9d902349eeb2191fa505548de2",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@501aed9d902349eeb2191fa505548de2",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@501aed9d902349eeb2191fa505548de2",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@501aed9d902349eeb2191fa505548de2"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2889db1677a549abb15eb4d886f95d1c",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2889db1677a549abb15eb4d886f95d1c",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2889db1677a549abb15eb4d886f95d1c",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2889db1677a549abb15eb4d886f95d1c",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@2889db1677a549abb15eb4d886f95d1c"
             },
@@ -515,8 +515,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@e8a5cc2aed424838853defab7be45e42",
                   "display_name": "Text Input",
                   "block_id": "0d759dee4f9d459c8956136dbde55f02",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@0d759dee4f9d459c8956136dbde55f02",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@0d759dee4f9d459c8956136dbde55f02",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@0d759dee4f9d459c8956136dbde55f02",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@0d759dee4f9d459c8956136dbde55f02",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@0d759dee4f9d459c8956136dbde55f02"
                 },
@@ -524,26 +524,26 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@e8a5cc2aed424838853defab7be45e42",
                   "display_name": "",
                   "block_id": "6244918637ed4ff4b5f94a840a7e4b43",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@6244918637ed4ff4b5f94a840a7e4b43",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@6244918637ed4ff4b5f94a840a7e4b43",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@6244918637ed4ff4b5f94a840a7e4b43",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@6244918637ed4ff4b5f94a840a7e4b43",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@6244918637ed4ff4b5f94a840a7e4b43"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@e8a5cc2aed424838853defab7be45e42",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@e8a5cc2aed424838853defab7be45e42",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@e8a5cc2aed424838853defab7be45e42",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@e8a5cc2aed424838853defab7be45e42",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@e8a5cc2aed424838853defab7be45e42"
             }
           ],
-          "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions",
-          "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions",
+          "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions",
+          "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions",
           "type": "sequential",
           "id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions"
         }
       ],
-      "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@interactive_demonstrations",
-      "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@interactive_demonstrations",
+      "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@interactive_demonstrations",
+      "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@interactive_demonstrations",
       "type": "chapter",
       "id": "block-v1:edX+DemoX+Demo_Course+type@chapter+block@interactive_demonstrations"
     },
@@ -566,14 +566,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@d0d804e8863c4a95a659c04d8a2b2bc0",
                   "display_name": "Lesson 2: Let's Get Interactive!",
                   "block_id": "78d7d3642f3a4dbabbd1b017861aa5f2",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@78d7d3642f3a4dbabbd1b017861aa5f2",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@78d7d3642f3a4dbabbd1b017861aa5f2",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@78d7d3642f3a4dbabbd1b017861aa5f2",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@78d7d3642f3a4dbabbd1b017861aa5f2",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@78d7d3642f3a4dbabbd1b017861aa5f2"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d0d804e8863c4a95a659c04d8a2b2bc0",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d0d804e8863c4a95a659c04d8a2b2bc0",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d0d804e8863c4a95a659c04d8a2b2bc0",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d0d804e8863c4a95a659c04d8a2b2bc0",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@d0d804e8863c4a95a659c04d8a2b2bc0"
             },
@@ -586,8 +586,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_2dbb0072785e",
                   "display_name": "An Interactive Reference Table",
                   "block_id": "html_07d547513285",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@html_07d547513285",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@html_07d547513285",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@html_07d547513285",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@html_07d547513285",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@html_07d547513285"
                 },
@@ -595,14 +595,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_2dbb0072785e",
                   "display_name": "",
                   "block_id": "6f7a6670f87147149caeff6afa07a526",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@6f7a6670f87147149caeff6afa07a526",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@6f7a6670f87147149caeff6afa07a526",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@6f7a6670f87147149caeff6afa07a526",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@6f7a6670f87147149caeff6afa07a526",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@6f7a6670f87147149caeff6afa07a526"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_2dbb0072785e",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_2dbb0072785e",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_2dbb0072785e",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_2dbb0072785e",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_2dbb0072785e"
             },
@@ -615,8 +615,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_98cf62510471",
                   "display_name": "Zooming Diagrams",
                   "block_id": "700x_pathways",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@700x_pathways",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@700x_pathways",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@700x_pathways",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@700x_pathways",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@700x_pathways"
                 },
@@ -624,14 +624,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_98cf62510471",
                   "display_name": "",
                   "block_id": "e0d7423118ab432582d03e8e8dad8e36",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e0d7423118ab432582d03e8e8dad8e36",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e0d7423118ab432582d03e8e8dad8e36",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e0d7423118ab432582d03e8e8dad8e36",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@e0d7423118ab432582d03e8e8dad8e36",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@e0d7423118ab432582d03e8e8dad8e36"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_98cf62510471",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_98cf62510471",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_98cf62510471",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_98cf62510471",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_98cf62510471"
             },
@@ -644,8 +644,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_d32bf9b2242c",
                   "display_name": "Electronic Sound Experiment",
                   "block_id": "Lab_5B_Mosfet_Amplifier_Experiment",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@Lab_5B_Mosfet_Amplifier_Experiment",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@Lab_5B_Mosfet_Amplifier_Experiment",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@Lab_5B_Mosfet_Amplifier_Experiment",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@Lab_5B_Mosfet_Amplifier_Experiment",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@Lab_5B_Mosfet_Amplifier_Experiment"
                 },
@@ -653,20 +653,20 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_d32bf9b2242c",
                   "display_name": "",
                   "block_id": "03f051f9a8814881a3783d2511613aa6",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@03f051f9a8814881a3783d2511613aa6",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@03f051f9a8814881a3783d2511613aa6",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@03f051f9a8814881a3783d2511613aa6",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@03f051f9a8814881a3783d2511613aa6",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@03f051f9a8814881a3783d2511613aa6"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_d32bf9b2242c",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_d32bf9b2242c",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_d32bf9b2242c",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_d32bf9b2242c",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_d32bf9b2242c"
             }
           ],
-          "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@simulations",
-          "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@simulations",
+          "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@simulations",
+          "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@simulations",
           "type": "sequential",
           "id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@simulations"
         },
@@ -684,14 +684,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6cee45205a449369d7ef8f159b22bdf",
                   "display_name": "Labs and Demos",
                   "block_id": "2bee8c4248e842a19ba1e73ed8d426c2",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@2bee8c4248e842a19ba1e73ed8d426c2",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@2bee8c4248e842a19ba1e73ed8d426c2",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@2bee8c4248e842a19ba1e73ed8d426c2",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@2bee8c4248e842a19ba1e73ed8d426c2",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@2bee8c4248e842a19ba1e73ed8d426c2"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6cee45205a449369d7ef8f159b22bdf",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6cee45205a449369d7ef8f159b22bdf",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6cee45205a449369d7ef8f159b22bdf",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6cee45205a449369d7ef8f159b22bdf",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6cee45205a449369d7ef8f159b22bdf"
             },
@@ -704,8 +704,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0fab6aa52165",
                   "display_name": "",
                   "block_id": "2b94658d2eee4d85ae13f83bc24cfca9",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@2b94658d2eee4d85ae13f83bc24cfca9",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@2b94658d2eee4d85ae13f83bc24cfca9",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@2b94658d2eee4d85ae13f83bc24cfca9",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@2b94658d2eee4d85ae13f83bc24cfca9",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@2b94658d2eee4d85ae13f83bc24cfca9"
                 },
@@ -713,8 +713,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0fab6aa52165",
                   "display_name": "Molecule Editor",
                   "block_id": "700x_editmolB",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@700x_editmolB",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@700x_editmolB",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@700x_editmolB",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@700x_editmolB",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@700x_editmolB"
                 },
@@ -722,14 +722,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0fab6aa52165",
                   "display_name": "",
                   "block_id": "0aa7a3bdbe18427795b0c1a1d7c3cb9a",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@0aa7a3bdbe18427795b0c1a1d7c3cb9a",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@0aa7a3bdbe18427795b0c1a1d7c3cb9a",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@0aa7a3bdbe18427795b0c1a1d7c3cb9a",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@0aa7a3bdbe18427795b0c1a1d7c3cb9a",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@0aa7a3bdbe18427795b0c1a1d7c3cb9a"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0fab6aa52165",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0fab6aa52165",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0fab6aa52165",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0fab6aa52165",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_0fab6aa52165"
             },
@@ -742,8 +742,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_aae927868e55",
                   "display_name": "Code Grader",
                   "block_id": "891211e17f9a472290a5f12c7a6626d7",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@891211e17f9a472290a5f12c7a6626d7",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@891211e17f9a472290a5f12c7a6626d7",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@891211e17f9a472290a5f12c7a6626d7",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@891211e17f9a472290a5f12c7a6626d7",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@891211e17f9a472290a5f12c7a6626d7"
                 },
@@ -751,8 +751,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_aae927868e55",
                   "display_name": "",
                   "block_id": "python_grader",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@python_grader",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@python_grader",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@python_grader",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@python_grader",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@python_grader"
                 },
@@ -760,14 +760,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_aae927868e55",
                   "display_name": "",
                   "block_id": "c6cd4bea43454aaea60ad01beb0cf213",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@c6cd4bea43454aaea60ad01beb0cf213",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@c6cd4bea43454aaea60ad01beb0cf213",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@c6cd4bea43454aaea60ad01beb0cf213",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@c6cd4bea43454aaea60ad01beb0cf213",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@c6cd4bea43454aaea60ad01beb0cf213"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_aae927868e55",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_aae927868e55",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_aae927868e55",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_aae927868e55",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_aae927868e55"
             },
@@ -780,8 +780,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_c037f3757df1",
                   "display_name": "Electronic Circuit Simulator",
                   "block_id": "d5a5caaf35e84ebc9a747038465dcfb4",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@d5a5caaf35e84ebc9a747038465dcfb4",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@d5a5caaf35e84ebc9a747038465dcfb4",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@d5a5caaf35e84ebc9a747038465dcfb4",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@d5a5caaf35e84ebc9a747038465dcfb4",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@d5a5caaf35e84ebc9a747038465dcfb4"
                 },
@@ -789,8 +789,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_c037f3757df1",
                   "display_name": "",
                   "block_id": "free_form_simulation",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@free_form_simulation",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@free_form_simulation",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@free_form_simulation",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@free_form_simulation",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@free_form_simulation"
                 },
@@ -798,8 +798,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_c037f3757df1",
                   "display_name": "",
                   "block_id": "logic_gate_problem",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@logic_gate_problem",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@logic_gate_problem",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@logic_gate_problem",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@logic_gate_problem",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@logic_gate_problem"
                 },
@@ -807,14 +807,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_c037f3757df1",
                   "display_name": "",
                   "block_id": "4f06b358a96f4d1dae57d6d81acd06f2",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4f06b358a96f4d1dae57d6d81acd06f2",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4f06b358a96f4d1dae57d6d81acd06f2",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4f06b358a96f4d1dae57d6d81acd06f2",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4f06b358a96f4d1dae57d6d81acd06f2",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@4f06b358a96f4d1dae57d6d81acd06f2"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_c037f3757df1",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_c037f3757df1",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_c037f3757df1",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_c037f3757df1",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_c037f3757df1"
             },
@@ -827,8 +827,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_bc69a47c6fae",
                   "display_name": "Protein Builder",
                   "block_id": "78e3719e864e45f3bee938461f3c3de6",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@78e3719e864e45f3bee938461f3c3de6",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@78e3719e864e45f3bee938461f3c3de6",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@78e3719e864e45f3bee938461f3c3de6",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@78e3719e864e45f3bee938461f3c3de6",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@78e3719e864e45f3bee938461f3c3de6"
                 },
@@ -836,8 +836,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_bc69a47c6fae",
                   "display_name": "Designing Proteins in Two Dimensions",
                   "block_id": "700x_proteinmake",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@700x_proteinmake",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@700x_proteinmake",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@700x_proteinmake",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@700x_proteinmake",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@700x_proteinmake"
                 },
@@ -845,20 +845,20 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_bc69a47c6fae",
                   "display_name": "",
                   "block_id": "ed01bcd164e64038a78964a16eac3edc",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ed01bcd164e64038a78964a16eac3edc",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ed01bcd164e64038a78964a16eac3edc",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ed01bcd164e64038a78964a16eac3edc",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ed01bcd164e64038a78964a16eac3edc",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@ed01bcd164e64038a78964a16eac3edc"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_bc69a47c6fae",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_bc69a47c6fae",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_bc69a47c6fae",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_bc69a47c6fae",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_bc69a47c6fae"
             }
           ],
-          "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@graded_simulations",
-          "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@graded_simulations",
+          "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@graded_simulations",
+          "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@graded_simulations",
           "type": "sequential",
           "id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@graded_simulations"
         },
@@ -876,8 +876,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@fb79dcbad35b466a8c6364f8ffee9050",
                   "display_name": "Open Response Assessment",
                   "block_id": "b24c33ea35954c7889e1d2944d3fe397",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@openassessment+block@b24c33ea35954c7889e1d2944d3fe397",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@openassessment+block@b24c33ea35954c7889e1d2944d3fe397",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@openassessment+block@b24c33ea35954c7889e1d2944d3fe397",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@openassessment+block@b24c33ea35954c7889e1d2944d3fe397",
                   "type": "openassessment",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@openassessment+block@b24c33ea35954c7889e1d2944d3fe397"
                 },
@@ -885,26 +885,26 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@fb79dcbad35b466a8c6364f8ffee9050",
                   "display_name": "Peer Grading",
                   "block_id": "12ad4f3ff4c14114a6e629b00e000976",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@12ad4f3ff4c14114a6e629b00e000976",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@12ad4f3ff4c14114a6e629b00e000976",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@12ad4f3ff4c14114a6e629b00e000976",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@12ad4f3ff4c14114a6e629b00e000976",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@12ad4f3ff4c14114a6e629b00e000976"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@fb79dcbad35b466a8c6364f8ffee9050",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@fb79dcbad35b466a8c6364f8ffee9050",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@fb79dcbad35b466a8c6364f8ffee9050",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@fb79dcbad35b466a8c6364f8ffee9050",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@fb79dcbad35b466a8c6364f8ffee9050"
             }
           ],
-          "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@175e76c4951144a29d46211361266e0e",
-          "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@175e76c4951144a29d46211361266e0e",
+          "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@175e76c4951144a29d46211361266e0e",
+          "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@175e76c4951144a29d46211361266e0e",
           "type": "sequential",
           "id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@175e76c4951144a29d46211361266e0e"
         }
       ],
-      "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@graded_interactions",
-      "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@graded_interactions",
+      "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@graded_interactions",
+      "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@graded_interactions",
       "type": "chapter",
       "id": "block-v1:edX+DemoX+Demo_Course+type@chapter+block@graded_interactions"
     },
@@ -927,14 +927,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3c4b575924bf4b75a2f3542df5c354fc",
                   "display_name": "Be Social",
                   "block_id": "f9f3a25e7bab46e583fd1fbbd7a2f6a0",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@f9f3a25e7bab46e583fd1fbbd7a2f6a0",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@f9f3a25e7bab46e583fd1fbbd7a2f6a0",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@f9f3a25e7bab46e583fd1fbbd7a2f6a0",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@f9f3a25e7bab46e583fd1fbbd7a2f6a0",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@f9f3a25e7bab46e583fd1fbbd7a2f6a0"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3c4b575924bf4b75a2f3542df5c354fc",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3c4b575924bf4b75a2f3542df5c354fc",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3c4b575924bf4b75a2f3542df5c354fc",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3c4b575924bf4b75a2f3542df5c354fc",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3c4b575924bf4b75a2f3542df5c354fc"
             },
@@ -947,8 +947,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_3888db0bc286",
                   "display_name": "Discussion Forums",
                   "block_id": "html_49b4494da2f7",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@html_49b4494da2f7",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@html_49b4494da2f7",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@html_49b4494da2f7",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@html_49b4494da2f7",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@html_49b4494da2f7"
                 },
@@ -956,14 +956,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_3888db0bc286",
                   "display_name": "Discussion Forums",
                   "block_id": "discussion_5deb6081620d",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@discussion_5deb6081620d",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@discussion_5deb6081620d",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@discussion_5deb6081620d",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@discussion_5deb6081620d",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@discussion_5deb6081620d"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_3888db0bc286",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_3888db0bc286",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_3888db0bc286",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_3888db0bc286",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_3888db0bc286"
             },
@@ -976,20 +976,20 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@312cb4faed17420e82ab3178fc3e251a",
                   "display_name": "Getting Help",
                   "block_id": "8bb218cccf8d40519a971ff0e4901ccf",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@8bb218cccf8d40519a971ff0e4901ccf",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@8bb218cccf8d40519a971ff0e4901ccf",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@8bb218cccf8d40519a971ff0e4901ccf",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@8bb218cccf8d40519a971ff0e4901ccf",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@8bb218cccf8d40519a971ff0e4901ccf"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@312cb4faed17420e82ab3178fc3e251a",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@312cb4faed17420e82ab3178fc3e251a",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@312cb4faed17420e82ab3178fc3e251a",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@312cb4faed17420e82ab3178fc3e251a",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@312cb4faed17420e82ab3178fc3e251a"
             }
           ],
-          "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@48ecb924d7fe4b66a230137626bfa93e",
-          "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@48ecb924d7fe4b66a230137626bfa93e",
+          "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@48ecb924d7fe4b66a230137626bfa93e",
+          "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@48ecb924d7fe4b66a230137626bfa93e",
           "type": "sequential",
           "id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@48ecb924d7fe4b66a230137626bfa93e"
         },
@@ -1007,20 +1007,20 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@26d89b08f75d48829a63520ed8b0037d",
                   "display_name": "Find Your Study Buddy",
                   "block_id": "6018785795994726950614ce7d0f38c5",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@6018785795994726950614ce7d0f38c5",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@6018785795994726950614ce7d0f38c5",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@6018785795994726950614ce7d0f38c5",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@6018785795994726950614ce7d0f38c5",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@6018785795994726950614ce7d0f38c5"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@26d89b08f75d48829a63520ed8b0037d",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@26d89b08f75d48829a63520ed8b0037d",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@26d89b08f75d48829a63520ed8b0037d",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@26d89b08f75d48829a63520ed8b0037d",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@26d89b08f75d48829a63520ed8b0037d"
             }
           ],
-          "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@dbe8fc027bcb4fe9afb744d2e8415855",
-          "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@dbe8fc027bcb4fe9afb744d2e8415855",
+          "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@dbe8fc027bcb4fe9afb744d2e8415855",
+          "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@dbe8fc027bcb4fe9afb744d2e8415855",
           "type": "sequential",
           "id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@dbe8fc027bcb4fe9afb744d2e8415855"
         },
@@ -1038,8 +1038,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3f2c11aba9434e459676a7d7acc4d960",
                   "display_name": "Text",
                   "block_id": "d45779ad3d024a40a09ad8cc317c0970",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@d45779ad3d024a40a09ad8cc317c0970",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@d45779ad3d024a40a09ad8cc317c0970",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@d45779ad3d024a40a09ad8cc317c0970",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@d45779ad3d024a40a09ad8cc317c0970",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@d45779ad3d024a40a09ad8cc317c0970"
                 },
@@ -1047,8 +1047,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3f2c11aba9434e459676a7d7acc4d960",
                   "display_name": "Text",
                   "block_id": "55cbc99f262443d886a25cf84594eafb",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@55cbc99f262443d886a25cf84594eafb",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@55cbc99f262443d886a25cf84594eafb",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@55cbc99f262443d886a25cf84594eafb",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@55cbc99f262443d886a25cf84594eafb",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@55cbc99f262443d886a25cf84594eafb"
                 },
@@ -1056,26 +1056,26 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3f2c11aba9434e459676a7d7acc4d960",
                   "display_name": "Google Hangout",
                   "block_id": "ade92343df3d4953a40ab3adc8805390",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ade92343df3d4953a40ab3adc8805390",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ade92343df3d4953a40ab3adc8805390",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ade92343df3d4953a40ab3adc8805390",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ade92343df3d4953a40ab3adc8805390",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@ade92343df3d4953a40ab3adc8805390"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3f2c11aba9434e459676a7d7acc4d960",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3f2c11aba9434e459676a7d7acc4d960",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3f2c11aba9434e459676a7d7acc4d960",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@3f2c11aba9434e459676a7d7acc4d960",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3f2c11aba9434e459676a7d7acc4d960"
             }
           ],
-          "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@6ab9c442501d472c8ed200e367b4edfa",
-          "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@6ab9c442501d472c8ed200e367b4edfa",
+          "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@6ab9c442501d472c8ed200e367b4edfa",
+          "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@6ab9c442501d472c8ed200e367b4edfa",
           "type": "sequential",
           "id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@6ab9c442501d472c8ed200e367b4edfa"
         }
       ],
-      "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@social_integration",
-      "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@social_integration",
+      "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@social_integration",
+      "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@social_integration",
       "type": "chapter",
       "id": "block-v1:edX+DemoX+Demo_Course+type@chapter+block@social_integration"
     },
@@ -1098,14 +1098,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@934cc32c177d41b580c8413e561346b3",
                   "display_name": "EdX Exams",
                   "block_id": "8293139743f34377817d537b69911530",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@8293139743f34377817d537b69911530",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@8293139743f34377817d537b69911530",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@8293139743f34377817d537b69911530",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@8293139743f34377817d537b69911530",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@8293139743f34377817d537b69911530"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@934cc32c177d41b580c8413e561346b3",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@934cc32c177d41b580c8413e561346b3",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@934cc32c177d41b580c8413e561346b3",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@934cc32c177d41b580c8413e561346b3",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@934cc32c177d41b580c8413e561346b3"
             },
@@ -1118,8 +1118,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_f04afeac0131",
                   "display_name": "Immediate Feedback",
                   "block_id": "ex_practice_2",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_2",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_2",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_2",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_2",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_2"
                 },
@@ -1127,14 +1127,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_f04afeac0131",
                   "display_name": "",
                   "block_id": "4aba537a78774bd5a862485a8563c345",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4aba537a78774bd5a862485a8563c345",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4aba537a78774bd5a862485a8563c345",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4aba537a78774bd5a862485a8563c345",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@4aba537a78774bd5a862485a8563c345",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@4aba537a78774bd5a862485a8563c345"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_f04afeac0131",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_f04afeac0131",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_f04afeac0131",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_f04afeac0131",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_f04afeac0131"
             },
@@ -1147,8 +1147,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@b6662b497c094bcc9b870d8270c90c93",
                   "display_name": "Getting Answers",
                   "block_id": "45d46192272c4f6db6b63586520bbdf4",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@45d46192272c4f6db6b63586520bbdf4",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@45d46192272c4f6db6b63586520bbdf4",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@45d46192272c4f6db6b63586520bbdf4",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@45d46192272c4f6db6b63586520bbdf4",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@45d46192272c4f6db6b63586520bbdf4"
                 },
@@ -1156,14 +1156,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@b6662b497c094bcc9b870d8270c90c93",
                   "display_name": "",
                   "block_id": "f480df4ce91347c5ae4301ddf6146238",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@f480df4ce91347c5ae4301ddf6146238",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@f480df4ce91347c5ae4301ddf6146238",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@f480df4ce91347c5ae4301ddf6146238",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@f480df4ce91347c5ae4301ddf6146238",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@f480df4ce91347c5ae4301ddf6146238"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@b6662b497c094bcc9b870d8270c90c93",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@b6662b497c094bcc9b870d8270c90c93",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@b6662b497c094bcc9b870d8270c90c93",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@b6662b497c094bcc9b870d8270c90c93",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@b6662b497c094bcc9b870d8270c90c93"
             },
@@ -1176,8 +1176,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@f91d8d31f7cf48ce990f8d8745ae4cfa",
                   "display_name": "Answering More Than Once",
                   "block_id": "651e0945b77f42e0a4c89b8c3e6f5b3b",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@651e0945b77f42e0a4c89b8c3e6f5b3b",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@651e0945b77f42e0a4c89b8c3e6f5b3b",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@651e0945b77f42e0a4c89b8c3e6f5b3b",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@651e0945b77f42e0a4c89b8c3e6f5b3b",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@651e0945b77f42e0a4c89b8c3e6f5b3b"
                 },
@@ -1185,14 +1185,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@f91d8d31f7cf48ce990f8d8745ae4cfa",
                   "display_name": "",
                   "block_id": "b8cec2a19ebf463f90cd3544c7927b0e",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@b8cec2a19ebf463f90cd3544c7927b0e",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@b8cec2a19ebf463f90cd3544c7927b0e",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@b8cec2a19ebf463f90cd3544c7927b0e",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@b8cec2a19ebf463f90cd3544c7927b0e",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@b8cec2a19ebf463f90cd3544c7927b0e"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@f91d8d31f7cf48ce990f8d8745ae4cfa",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@f91d8d31f7cf48ce990f8d8745ae4cfa",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@f91d8d31f7cf48ce990f8d8745ae4cfa",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@f91d8d31f7cf48ce990f8d8745ae4cfa",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@f91d8d31f7cf48ce990f8d8745ae4cfa"
             },
@@ -1205,8 +1205,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_ac391cde8a91",
                   "display_name": "Limited Checks",
                   "block_id": "ex_practice_limited_checks",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_limited_checks",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_limited_checks",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_limited_checks",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_limited_checks",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_limited_checks"
                 },
@@ -1214,8 +1214,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_ac391cde8a91",
                   "display_name": "Few Checks",
                   "block_id": "d1b84dcd39b0423d9e288f27f0f7f242",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@d1b84dcd39b0423d9e288f27f0f7f242",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@d1b84dcd39b0423d9e288f27f0f7f242",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@d1b84dcd39b0423d9e288f27f0f7f242",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@d1b84dcd39b0423d9e288f27f0f7f242",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@d1b84dcd39b0423d9e288f27f0f7f242"
                 },
@@ -1223,14 +1223,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_ac391cde8a91",
                   "display_name": "",
                   "block_id": "cd177caa62444fbca48aa8f843f09eac",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@cd177caa62444fbca48aa8f843f09eac",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@cd177caa62444fbca48aa8f843f09eac",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@cd177caa62444fbca48aa8f843f09eac",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@cd177caa62444fbca48aa8f843f09eac",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@cd177caa62444fbca48aa8f843f09eac"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_ac391cde8a91",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_ac391cde8a91",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_ac391cde8a91",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_ac391cde8a91",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_ac391cde8a91"
             },
@@ -1243,8 +1243,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_36e0beb03f0a",
                   "display_name": "Randomized Questions",
                   "block_id": "ex_practice_3",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_3",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_3",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_3",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_3",
                   "type": "problem",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@problem+block@ex_practice_3"
                 },
@@ -1252,14 +1252,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_36e0beb03f0a",
                   "display_name": "",
                   "block_id": "ddede76df71045ffa16de9d1481d2119",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ddede76df71045ffa16de9d1481d2119",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ddede76df71045ffa16de9d1481d2119",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ddede76df71045ffa16de9d1481d2119",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@ddede76df71045ffa16de9d1481d2119",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@ddede76df71045ffa16de9d1481d2119"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_36e0beb03f0a",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_36e0beb03f0a",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_36e0beb03f0a",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_36e0beb03f0a",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_36e0beb03f0a"
             },
@@ -1272,8 +1272,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@1b0e2c2c84884b95b1c99fb678cc964c",
                   "display_name": "Overall Grade",
                   "block_id": "f4a39219742149f781a1dda6f43a623c",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@f4a39219742149f781a1dda6f43a623c",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@f4a39219742149f781a1dda6f43a623c",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@f4a39219742149f781a1dda6f43a623c",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@f4a39219742149f781a1dda6f43a623c",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@f4a39219742149f781a1dda6f43a623c"
                 },
@@ -1281,14 +1281,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@1b0e2c2c84884b95b1c99fb678cc964c",
                   "display_name": "",
                   "block_id": "1a810b1a3b2447b998f0917d0e5a802b",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@1a810b1a3b2447b998f0917d0e5a802b",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@1a810b1a3b2447b998f0917d0e5a802b",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@1a810b1a3b2447b998f0917d0e5a802b",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@1a810b1a3b2447b998f0917d0e5a802b",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@1a810b1a3b2447b998f0917d0e5a802b"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@1b0e2c2c84884b95b1c99fb678cc964c",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@1b0e2c2c84884b95b1c99fb678cc964c",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@1b0e2c2c84884b95b1c99fb678cc964c",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@1b0e2c2c84884b95b1c99fb678cc964c",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@1b0e2c2c84884b95b1c99fb678cc964c"
             },
@@ -1301,8 +1301,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@c7e98fd39a6944edb6b286c32e1150ff",
                   "display_name": "Passing a Course",
                   "block_id": "5e009378f0b64585baa0a14b155974b9",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@5e009378f0b64585baa0a14b155974b9",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@5e009378f0b64585baa0a14b155974b9",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@5e009378f0b64585baa0a14b155974b9",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@5e009378f0b64585baa0a14b155974b9",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@5e009378f0b64585baa0a14b155974b9"
                 },
@@ -1310,14 +1310,14 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@c7e98fd39a6944edb6b286c32e1150ff",
                   "display_name": "",
                   "block_id": "23e6eda482c04335af2bb265beacaf59",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@23e6eda482c04335af2bb265beacaf59",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@23e6eda482c04335af2bb265beacaf59",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@discussion+block@23e6eda482c04335af2bb265beacaf59",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@discussion+block@23e6eda482c04335af2bb265beacaf59",
                   "type": "discussion",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@discussion+block@23e6eda482c04335af2bb265beacaf59"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@c7e98fd39a6944edb6b286c32e1150ff",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@c7e98fd39a6944edb6b286c32e1150ff",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@c7e98fd39a6944edb6b286c32e1150ff",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@c7e98fd39a6944edb6b286c32e1150ff",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@c7e98fd39a6944edb6b286c32e1150ff"
             },
@@ -1330,8 +1330,8 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6eaa391d2be41dea20b8b1bfbcb1c45",
                   "display_name": "Getting Your edX Certificate",
                   "block_id": "148ae8fa73ea460eb6f05505da0ba6e6",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@148ae8fa73ea460eb6f05505da0ba6e6",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@148ae8fa73ea460eb6f05505da0ba6e6",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@148ae8fa73ea460eb6f05505da0ba6e6",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@148ae8fa73ea460eb6f05505da0ba6e6",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@148ae8fa73ea460eb6f05505da0ba6e6"
                 },
@@ -1339,26 +1339,26 @@
                   "parent": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6eaa391d2be41dea20b8b1bfbcb1c45",
                   "display_name": "Blank HTML Page",
                   "block_id": "6b6bee43c7c641509da71c9299cc9f5a",
-                  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@6b6bee43c7c641509da71c9299cc9f5a",
-                  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@6b6bee43c7c641509da71c9299cc9f5a",
+                  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@html+block@6b6bee43c7c641509da71c9299cc9f5a",
+                  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@html+block@6b6bee43c7c641509da71c9299cc9f5a",
                   "type": "html",
                   "id": "block-v1:edX+DemoX+Demo_Course+type@html+block@6b6bee43c7c641509da71c9299cc9f5a"
                 }
               ],
-              "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6eaa391d2be41dea20b8b1bfbcb1c45",
-              "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6eaa391d2be41dea20b8b1bfbcb1c45",
+              "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6eaa391d2be41dea20b8b1bfbcb1c45",
+              "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6eaa391d2be41dea20b8b1bfbcb1c45",
               "type": "vertical",
               "id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@d6eaa391d2be41dea20b8b1bfbcb1c45"
             }
           ],
-          "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow",
-          "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow",
+          "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow",
+          "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow",
           "type": "sequential",
           "id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow"
         }
       ],
-      "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@1414ffd5143b4b508f739b563ab468b7",
-      "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@1414ffd5143b4b508f739b563ab468b7",
+      "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@1414ffd5143b4b508f739b563ab468b7",
+      "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@1414ffd5143b4b508f739b563ab468b7",
       "type": "chapter",
       "id": "block-v1:edX+DemoX+Demo_Course+type@chapter+block@1414ffd5143b4b508f739b563ab468b7"
     },
@@ -1371,20 +1371,20 @@
           "parent": "block-v1:edX+DemoX+Demo_Course+type@chapter+block@9fca584977d04885bc911ea76a9ef29e",
           "display_name": "New Subsection",
           "block_id": "07bc32474380492cb34f76e5f9d9a135",
-          "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@07bc32474380492cb34f76e5f9d9a135",
-          "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@07bc32474380492cb34f76e5f9d9a135",
+          "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@sequential+block@07bc32474380492cb34f76e5f9d9a135",
+          "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@07bc32474380492cb34f76e5f9d9a135",
           "type": "sequential",
           "id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@07bc32474380492cb34f76e5f9d9a135"
         }
       ],
-      "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@9fca584977d04885bc911ea76a9ef29e",
-      "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@9fca584977d04885bc911ea76a9ef29e",
+      "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@chapter+block@9fca584977d04885bc911ea76a9ef29e",
+      "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@chapter+block@9fca584977d04885bc911ea76a9ef29e",
       "type": "chapter",
       "id": "block-v1:edX+DemoX+Demo_Course+type@chapter+block@9fca584977d04885bc911ea76a9ef29e"
     }
   ],
-  "student_view_url": "http://localhost:18000/xblock/block-v1:edX+DemoX+Demo_Course+type@course+block@course",
-  "lms_web_url": "http://localhost:18000/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@course+block@course",
+  "student_view_url": "http://student.launchpadlearning.ca/xblock/block-v1:edX+DemoX+Demo_Course+type@course+block@course",
+  "lms_web_url": "http://student.launchpadlearning.ca/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@course+block@course",
   "type": "course",
   "id": "block-v1:edX+DemoX+Demo_Course+type@course+block@course"
 }

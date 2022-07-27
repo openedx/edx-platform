@@ -68,7 +68,7 @@ PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 
 ENABLE_JASMINE = False
 
-LMS_ROOT_URL = 'https://localhost:18000'
+LMS_ROOT_URL = 'https://student.launchpadlearning.ca'
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 
@@ -1695,10 +1695,10 @@ DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 SHARED_COOKIE_DOMAIN = ""
 
 # CMS base
-CMS_BASE = 'localhost:18010'
+CMS_BASE = 'studio.launchpadlearning.ca'
 
 # LMS base
-LMS_BASE = 'localhost:18000'
+LMS_BASE = 'student.launchpadlearning.ca'
 
 # Studio name
 STUDIO_NAME = 'Studio'
@@ -4457,7 +4457,7 @@ INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = {}
 # These default settings are utilized by the LMS when interacting with the service,
 # and are overridden by the configuration parameter accessors defined in production.py
 
-ENTERPRISE_API_URL = 'https://localhost:18000/enterprise/api/v1'
+ENTERPRISE_API_URL = 'https://student.launchpadlearning.ca/enterprise/api/v1'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds

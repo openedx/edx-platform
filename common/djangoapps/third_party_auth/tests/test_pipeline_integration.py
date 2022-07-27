@@ -666,7 +666,7 @@ class EnsureRedirectUrlIsSafeTestCase(TestCase):
         self.strategy = mock.MagicMock()
         self.request = self.strategy.request
 
-        self.request.get_host.return_value = 'localhost:18000'
+        self.request.get_host.return_value = 'student.launchpadlearning.ca'
         self.request.is_secure.return_value = True
 
         self.strategy.session_get = self._session_get

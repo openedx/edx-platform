@@ -26,8 +26,8 @@ ORA2_FILEUPLOAD_BACKEND = 'django'
 DEBUG = True
 USE_I18N = True
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = True
-LMS_BASE = 'localhost:18000'
-CMS_BASE = 'localhost:18010'
+LMS_BASE = 'student.launchpadlearning.ca'
+CMS_BASE = 'studio.launchpadlearning.ca'
 SITE_NAME = LMS_BASE
 
 SESSION_COOKIE_NAME = 'lms_sessionid'
@@ -43,7 +43,7 @@ IDA_LOGOUT_URI_LIST = [
     'http://localhost:18130/logout/',  # ecommerce
     'http://localhost:18150/logout/',  # credentials
     'http://localhost:18381/logout/',  # discovery
-    'http://localhost:18010/logout/',  # studio
+    'http://studio.launchpadlearning.ca/logout/',  # studio
 ]
 
 ################################ LOGGERS ######################################

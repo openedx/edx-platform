@@ -24,7 +24,7 @@ class CallToActionService(PluginManager):
 
         An example of a returned list:
         [{
-            'link': 'localhost:18000/skip',  # A link to POST to when the Call To Action is taken
+            'link': 'student.launchpadlearning.ca/skip',  # A link to POST to when the Call To Action is taken
             'link_name': 'Skip this Problem',  # The name of the action
             'form_values': {  # Any parameters to include with the CTA
                 'foo': 'bar',
