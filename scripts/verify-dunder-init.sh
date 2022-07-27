@@ -27,7 +27,7 @@ exclude=''
 exclude+='^\.$'
 
 # Exclude test data that includes Python (do NOT exclude unit test source code, though).
-exclude+='|^common/lib/capa/capa/safe_exec/tests/test_files/?.*$'
+exclude+='|^xmodule/capa/safe_exec/tests/test_files/?.*$'
 exclude+='|^common/test/data/?.*$'
 
 # Exclude common/lib and its immediate child directories.
@@ -38,7 +38,6 @@ exclude+='|^common/test/data/?.*$'
 #  * common/lib/capa -> EXCLUDE from check.
 #  * common/lib/capa/capa/safe_exec -> INCLUDE in check.
 exclude+='|^common/lib$'
-exclude+='|^common/lib/capa$'
 
 # xmodule data folder
 exclude+='|^xmodule/tests/data/xml-course-root/capa$'

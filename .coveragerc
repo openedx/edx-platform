@@ -4,7 +4,6 @@ data_file = reports/${TEST_SUITE}.coverage
 source =
     cms
     common/djangoapps
-    common/lib/capa
     lms
     openedx
     pavelib

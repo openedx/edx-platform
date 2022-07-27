@@ -26,11 +26,11 @@ from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
 from xblock.scorable import ScorableXBlockMixin, Score
 
-from capa import responsetypes
-from capa.capa_problem import LoncapaProblem, LoncapaSystem
-from capa.inputtypes import Status
-from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
-from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
+from xmodule.capa import responsetypes
+from xmodule.capa.capa_problem import LoncapaProblem, LoncapaSystem
+from xmodule.capa.inputtypes import Status
+from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
+from xmodule.capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xmodule.contentstore.django import contentstore
 from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -140,7 +140,7 @@ class ProblemBlock(
     An XBlock representing a "problem".
 
     A problem contains zero or more respondable items, such as multiple choice,
-    numeric response, true/false, etc. See common/lib/capa/capa/responsetypes.py
+    numeric response, true/false, etc. See xmodule/capa/responsetypes.py
     for the full ensemble.
 
     The rendering logic of a problem is largely encapsulated within
@@ -1717,7 +1717,7 @@ class ProblemBlock(
         answers_without_files = convert_files_to_filenames(answers)
         event_info['answers'] = answers_without_files
 
-        metric_name = 'capa.check_problem.{}'.format  # lint-amnesty, pylint: disable=unused-variable
+        metric_name = 'xmodule.capa.check_problem.{}'.format  # lint-amnesty, pylint: disable=unused-variable
         # Can override current time
         current_time = datetime.datetime.now(utc)
         if override_time is not False:
