@@ -369,19 +369,20 @@ class CourseRecommendationApiView(APIView):
             return Response(status=400)
 
         recommended_courses = []
-        for course_id in course_keys:
-            course_data = get_course_data(course_id)
-            if course_data:
-                course_run_keys = [course_run['key'] for course_run in course_data['course_runs']
-                                   if course_run['availability'] in ['Current', 'Upcoming']]
-                if course_run_keys:
-                    recommended_courses.append({
-                        'course_run_key': course_run_keys[0],
-                        'title': course_data['title'],
-                        'logo_image_url': course_data['owners'][0]['logo_image_url'],
-                        'marketing_url': course_data.get('marketing_url')
-                    })
-            else:
-                return Response(status=400)
+        if course_keys is not None:
+            for course_id in course_keys:
+                course_data = get_course_data(course_id)
+                if course_data:
+                    course_run_keys = [course_run['key'] for course_run in course_data['course_runs']
+                                       if course_run['availability'] in ['Current', 'Upcoming']]
+                    if course_run_keys:
+                        recommended_courses.append({
+                            'course_run_key': course_run_keys[0],
+                            'title': course_data['title'],
+                            'logo_image_url': course_data['owners'][0]['logo_image_url'],
+                            'marketing_url': course_data.get('marketing_url')
+                        })
+                else:
+                    return Response(status=400)
 
         return Response({'courses': recommended_courses, 'is_personalized_recommendation': not is_control}, status=200)
