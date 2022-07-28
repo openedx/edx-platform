@@ -19,20 +19,18 @@ class ProgramViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         gen_user = self.request.user.gen_user
-
+        qs = Program.get_current_programs()
         if gen_user.is_student:
-            student_programs = ProgramEnrollment.objects.filter(
-                student=gen_user.student
-            ).values_list('program', flat=True)
-            qs = Program.objects.filter(id__in=student_programs)
-        elif gen_user.is_teacher:
-            qs = Program.get_current_programs()
-
+            enrollments = ProgramEnrollment.objects.filter(student=gen_user.student)
+            program_ids = enrollments.values_list('program', flat=True)
+            qs = Program.objects.filter(id__in=program_ids)
         return qs
 
     def get_serializer_context(self):
         context = super(ProgramViewSet, self).get_serializer_context()
-        context.update({"gen_user": self.request.user.gen_user})
+        context.update({
+            "gen_user": self.request.user.gen_user,
+        })
         return context
 
     def get_permissions(self):
