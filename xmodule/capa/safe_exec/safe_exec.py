@@ -28,6 +28,7 @@ from six.moves import xrange
 
 random = random_module.Random(%r)
 random.Random = random_module.Random
+random.SystemRandom = random_module.SystemRandom
 sys.modules['random'] = random
 """
 

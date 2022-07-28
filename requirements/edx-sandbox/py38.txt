@@ -42,9 +42,8 @@ nltk==3.7
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   chem
-numpy==1.16.6
+numpy==1.22.4
     # via
-    #   -r requirements/edx-sandbox/py38.in
     #   chem
     #   matplotlib
     #   openedx-calc
