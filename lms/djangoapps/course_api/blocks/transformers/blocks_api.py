@@ -24,6 +24,7 @@ class BlocksAPITransformer(BlockStructureTransformer):
         BlockCountsTransformer
         BlockDepthTransformer
         BlockNavigationTransformer
+        VideoBlockStreamPriorityTransformer
         ExtraFieldsTransformer
 
     Note:

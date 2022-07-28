@@ -15,10 +15,6 @@ class VideoBlockStreamPriorityTransformer(BlockStructureTransformer):
     If DEPRECATE_YOUTUBE waffle flag is on for a course, Youtube videos
     have highest priority i.e. 0. Else, the default priority for videos
     is as shown in DEFAULT_VIDEO_STREAM_PRIORITY below.
-
-    Dependencie(s) include:
-        BlockStructureTransformer
-        StudentViewTransformer
     """
 
     WRITE_VERSION = 1
