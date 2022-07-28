@@ -455,3 +455,25 @@ sandbox-xqueue.edx.org), you'll need to run your server on your public IP, like 
 When you connect to the LMS, you need to use the public ip. Use
 ``ifconfig`` to figure out the number, and connect e.g. to
 ``http://18.3.4.5:8000/``
+
+Fixing Frontend Test Errors
+---------------------------
+
+If you hit problems for the edx-platform JS tests, 
+you should just need to start the container that runs Firefox via "make dev.up.firefox". 
+This separate step wasn't needed before because the original "make dev.up" command started all the containers, 
+but now we typically use commands like "make.up.lms" which only bring up the containers absolutely needed to run the named service.
+
+You can follow the sequence below::
+
+    Turn on Docker
+    cd devstack
+    git pull
+    make dev.checkout
+    make dev.pull.lms
+    make dev.provision.lms
+    make dev.up.lms
+    make dev.up.firefox
+    make dev.shell.lms
+    paver test_js
+
