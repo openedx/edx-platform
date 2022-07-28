@@ -24,7 +24,7 @@ For years, edx-platform supported both content frameworks simultaneously via a F
 Fortunately, in 2021, `all remaining XModules were converted into XBlocks`_.
 Since support for the XModule framework is no longer necessary, `the BD-13 project`_ is now working to radically simplify the remaining XBlock runtime implementation.
 
-Recently, this folder was moved from ./common/lib/xmodule/xmodule to its current location, ./xmodule. The reasons that this folder (along with several others) were moved are detailed in `this ADR about the dissolution of sub-projects`_.
+This folder was moved from ./common/lib/xmodule/xmodule to its current location, ./xmodule. The reasons that this folder (along with several others) were moved are detailed in `this ADR about the dissolution of sub-projects`_.
 
 .. _all remaining XModules were converted into XBlocks: https://discuss.openedx.org/t/xmodule-xblock-conversion-complete/4555
 .. _the BD-13 project: https://openedx.atlassian.net/wiki/spaces/COMM/pages/3062333478/BD-13+xModule+--+xBlock+Conversion+Phase+2
