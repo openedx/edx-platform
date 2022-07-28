@@ -63,6 +63,8 @@ from openedx.core.djangoapps.appsembler.api.v1.serializers import (
 )
 from openedx.core.djangoapps.appsembler.api.v1.waffle import FIX_ENROLLMENT_RESULTS_BUG
 
+from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
+
 # TODO: Just move into v1 directory
 from openedx.core.djangoapps.appsembler.api.permissions import (
     TahoeAPIUserThrottle
@@ -152,6 +154,12 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
         The code here is adapted from the LMS ``appsembler_api`` bulk registration
         code. See the ``appsembler/ginkgo/master`` branch
         """
+        if tahoe_idp_helpers.is_tahoe_idp_enabled():
+            return Response(
+                dict(user_message='This API is not available for this site. Please use the Identity Provider API.'),
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+            )
+
         # Using .copy() to make the POST data mutable
         # see: https://stackoverflow.com/a/49794425/161278
         data = request.data.copy()
