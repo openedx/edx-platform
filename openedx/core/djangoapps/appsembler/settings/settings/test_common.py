@@ -25,9 +25,6 @@ def plugin_settings(settings):
     # usage: decorate the test function or class with: `@skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, '_reason_')`
     settings.TAHOE_ALWAYS_SKIP_TEST = True
     settings.CMS_UPDATE_SEARCH_INDEX_JOB_QUEUE = 'edx.cms.core.default'
-    settings.INSTALLED_APPS += [
-        'tahoe_sites',  # TODO: Move `tahoe_sites` into `common` settings after rolling out into production.
-    ]
 
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
         settings.INSTALLED_APPS += [
