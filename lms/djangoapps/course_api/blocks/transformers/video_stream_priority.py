@@ -11,14 +11,15 @@ from .student_view import StudentViewTransformer
 class VideoBlockStreamPriorityTransformer(BlockStructureTransformer):
     """
     Transformer to add stream priority for encoded_videos.
-    If DEPRECATE_YOUTUBE flag is on for a course, Youtube videos have
-    highest priority i.e. 0. Else, the default priority for videos is
-    as shown in DEFAULT_VIDEO_STREAM_PRIORITY below.
-    """
 
-    @classmethod
-    def name(cls):
-        return "video_stream_priority"
+    If DEPRECATE_YOUTUBE waffle flag is on for a course, Youtube videos
+    have highest priority i.e. 0. Else, the default priority for videos
+    is as shown in DEFAULT_VIDEO_STREAM_PRIORITY below.
+
+    Dependencie(s) include:
+        BlockStructureTransformer
+        StudentViewTransformer
+    """
 
     WRITE_VERSION = 1
     READ_VERSION = 1
@@ -38,6 +39,10 @@ class VideoBlockStreamPriorityTransformer(BlockStructureTransformer):
         'desktop_mp4': 4,
         'fallback': 5,
     }
+
+    @classmethod
+    def name(cls):
+        return "blocks_api:video_stream_priority"
 
     def transform(self, usage_info, block_structure):
         """
