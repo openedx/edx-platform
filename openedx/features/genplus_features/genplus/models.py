@@ -98,15 +98,9 @@ class Class(TimeStampedModel):
     name = models.CharField(max_length=128)
     is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
     students = models.ManyToManyField(Student, related_name='classes', blank=True)
+    program = models.ForeignKey('genplus_learning.Program', on_delete=models.CASCADE, null=True, blank=True, related_name="classes")
     objects = models.Manager()
     visible_objects = ClassManager()
-
-    @property
-    def current_program(self):
-        enrollments = self.class_enrollments.filter(program__is_current=True)
-        if enrollments.count() == 1:
-            return enrollments.first().program
-        return None
 
     def __str__(self):
         return self.name
@@ -115,8 +109,13 @@ class Class(TimeStampedModel):
 class Teacher(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
     profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True, blank=True)
-    classes = models.ManyToManyField(Class, related_name='teachers', blank=True)
-    favourite_classes = models.ManyToManyField(Class, blank=True)
+    classes = models.ManyToManyField(Class, related_name='teachers', through="genplus.TeacherClass")
 
     def __str__(self):
         return self.gen_user.user.username
+
+
+class TeacherClass(models.Model):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    gen_class = models.ForeignKey(Class, on_delete=models.CASCADE)
+    is_favorite = models.BooleanField(default=False)

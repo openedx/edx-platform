@@ -1,9 +1,7 @@
 from django.dispatch import receiver
 from django.conf import settings
-from django.db.models.signals import post_save, m2m_changed
-from .models import GenUser, Student, Teacher, TempUser
-from openedx.features.genplus_features.genplus_learning.access import change_access
-from openedx.features.genplus_features.genplus_learning.roles import ProgramInstructorRole
+from django.db.models.signals import post_save
+from .models import GenUser, Student, Teacher, TempUser, Class
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -23,23 +21,15 @@ def create_user_profile(sender, instance, created, **kwargs):
             Teacher.objects.create(gen_user=instance)
 
 
-@receiver(m2m_changed, sender=Teacher.classes.through)
-def teacher_classes_changed(sender, instance, action, **kwargs):
-    pk_set = kwargs.pop('pk_set', None)
-    if action == "post_add":
-        access_action = 'allow'
-    elif action == "pre_remove":
-        access_action = 'revoke'
-    else:
-        return
+@receiver(post_save, sender=Teacher)
+def create_teacher(sender, instance, created, **kwargs):
+    if created:
+        classes = Class.objects.filter(school=instance.gen_user.school)
+        instance.classes.add(*classes)
 
-    if isinstance(instance, Teacher) and action in ["post_add", "pre_remove"]:
-        classes = instance.classes.filter(pk__in=pk_set)
-        programs = set()
-        for gen_class in classes:
-            current_program = gen_class.current_program
-            if current_program:
-                programs.add(current_program)
 
-        for program in programs:
-            change_access(program, instance.gen_user, ProgramInstructorRole.ROLE_NAME, access_action)
+@receiver(post_save, sender=Class)
+def create_gen_class(sender, instance, created, **kwargs):
+    if created:
+        teachers = Teacher.objects.filter(gen_user__school=instance.school)
+        instance.teachers.add(*teachers)

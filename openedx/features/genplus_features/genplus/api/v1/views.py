@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.features.genplus_features.genplus.models import GenUser, Character, Class, Teacher, Student
+from openedx.features.genplus_features.genplus.models import GenUser, Character, Class, Teacher, Student, TeacherClass
 from .serializers import CharacterSerializer, ClassSerializer, FavoriteClassSerializer, UserInfoSerializer
 from .permissions import IsStudent, IsTeacher
 from openedx.features.genplus_features.genplus.display_messages import SuccessMessages, ErrorMessages
@@ -54,7 +54,7 @@ class UserInfo(GenzMixin, views.APIView):
                 student = Student.objects.get(gen_user=self.gen_user)
                 student.character = new_character
                 student.save()
-                
+
             return Response(SuccessMessages.PROFILE_IMAGE_UPDATED, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -98,7 +98,7 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
         return Class.visible_objects.filter(school=self.school)
 
     def list(self, request, *args, **kwargs):  # pylint: disable=unused-argument
-        favourite_classes = self.gen_user.teacher.favourite_classes.all()
+        favourite_classes = self.gen_user.teacher.classes.filter(teacherclass__is_favorite=True)
         favourite_classes_serializer = self.get_serializer(favourite_classes, many=True)
         class_queryset = self.filter_queryset(self.get_queryset())
         class_serializer = self.get_serializer(
@@ -118,14 +118,18 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
         serializer = FavoriteClassSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         data = serializer.data
         gen_class = self.get_object()
         teacher = Teacher.objects.get(gen_user=self.gen_user)
+        teacher_class = TeacherClass.objects.get(teacher=teacher, gen_class=gen_class)
         if data['action'] == 'add':
-            teacher.favourite_classes.add(gen_class)
+            teacher_class.is_favorite = True
+            teacher_class.save()
             return Response(SuccessMessages.CLASS_ADDED_TO_FAVORITES.format(class_name=gen_class.name),
                             status=status.HTTP_204_NO_CONTENT)
         else:
-            teacher.favourite_classes.remove(gen_class)
+            teacher_class.is_favorite = False
+            teacher_class.save()
             return Response(SuccessMessages.CLASS_REMOVED_FROM_FAVORITES.format(class_name=gen_class.name),
                             status=status.HTTP_204_NO_CONTENT)
