@@ -10,7 +10,7 @@ from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pyli
 from django.core.cache import cache
 from django.db.models import signals  # pylint: disable=unused-import
 from django.db.models.functions import Lower
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
@@ -20,12 +20,14 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
+    IS_MARKETABLE,
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,
     ManualEnrollmentAudit,
     PendingEmailChange,
     PendingNameChange,
+    UserAttribute,
     UserCelebration,
     UserProfile
 )
@@ -780,6 +782,40 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
 
         assert actual_course_enrollment.mode == 'verified'
         assert actual_student.is_active is True
+
+    @override_settings(MARKETING_EMAILS_OPT_IN=True)
+    def test_is_marketable_set_to_false_for_user_created_via_management_command(self):
+        """
+        For users that are created using manage_user.py management command, set the
+        is_marketable value to 'false'.
+        """
+        expected_traits = {
+            'email': 'some.user@example.com',
+            'username': 'some_user',
+            'name': 'Student Person',
+            'age': -1,
+            'yearOfBirth': 2022,
+            'education': None,
+            'address': None,
+            'gender': 'Male',
+            'country': '',
+            'is_marketable': False
+        }
+
+        user = UserFactory(
+            username='some_user',
+            first_name='Student',
+            last_name='Person',
+            email='some.user@example.com',
+        )
+        with mock.patch('common.djangoapps.student.models.segment') as mock_segment:
+            user._called_by_management_command = True  # pylint: disable=protected-access
+            user.save()
+
+        attribute = UserAttribute.objects.filter(user_id=user.id, name=IS_MARKETABLE)
+        assert attribute
+        assert mock_segment.identify.call_count == 1
+        assert mock_segment.identify.call_args[0] == (user.id, expected_traits)
 
     def _set_up_invited_student(self, course, active=False, enrolled=True, course_mode=''):
         """

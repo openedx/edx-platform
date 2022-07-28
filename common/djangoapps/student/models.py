@@ -132,6 +132,7 @@ TRANSITION_STATES = (
     (UNENROLLED_TO_UNENROLLED, UNENROLLED_TO_UNENROLLED),
     (DEFAULT_TRANSITION_STATE, DEFAULT_TRANSITION_STATE)
 )
+IS_MARKETABLE = 'is_marketable'
 
 
 class AnonymousUserId(models.Model):
@@ -848,10 +849,34 @@ def user_post_save_callback(sender, **kwargs):
     _called_by_management_command = getattr(user, '_called_by_management_command', None)
     if _called_by_management_command:
         try:
-            __ = user.profile
+            profile = user.profile
         except UserProfile.DoesNotExist:
-            UserProfile.objects.create(user=user)
+            profile = UserProfile.objects.create(user=user)
             log.info('Created new profile for user: %s', user)
+
+        # If user is created using management command, ensure that the user's
+        # marketable attribute is set (default: False) and an account is created
+        # on segment. By created an account on segment, it is ensured that data
+        # will be sent to relevant places like Braze.
+        if settings.MARKETING_EMAILS_OPT_IN:
+            UserAttribute.set_user_attribute(user, IS_MARKETABLE, 'false')
+
+            traits = {
+                'email': user.email,
+                'username': user.username,
+                'name': profile.name,
+                'age': profile.age or -1,
+                'yearOfBirth': profile.year_of_birth or datetime.now(UTC).year,
+                'education': profile.level_of_education_display,
+                'address': profile.mailing_address,
+                'gender': profile.gender_display,
+                'country': str(profile.country),
+                'is_marketable': False
+            }
+            # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
+            # .. pii_types: email_address, username
+            # .. pii_retirement: third_party
+            segment.identify(user.id, traits)
 
     # Because `emit_field_changed_events` removes the record of the fields that
     # were changed, wait to do that until after we've checked them as part of
