@@ -90,12 +90,20 @@ class TestVideoBlockStreamPriorityTransformer(ModuleStoreTestCase):
                     'url': 'https://1234abc.cloudfront.net/A1234abc.mp4',
                     'file_size': 0
                 },
+                'desktop_webm': {
+                    'url': 'https://123abc.cloudfront.net/A123abc.mp4',
+                    'file_size': 0
+                },
                 'fallback': {
                     'url': 'https://1234abcd.cloudfront.net/A1234abcd.mp4',
                     'file_size': 0
                 },
                 'youtube': {
                     'url': 'https://1234abcde.cloudfront.net/A1234abcde.mp4',
+                    'file_size': 0
+                },
+                'new_video_format': {
+                    'url': 'https://1234abcdef.cloudfront.net/A1234abcdef.mp4',
                     'file_size': 0
                 }
             },
@@ -110,8 +118,12 @@ class TestVideoBlockStreamPriorityTransformer(ModuleStoreTestCase):
         post_transform_data = self.change_encoded_videos_presentation(post_transform_data['encoded_videos'])
 
         for video_format, stream_priority in post_transform_data.items():
-            assert post_transform_data[video_format] == \
-                   VideoBlockStreamPriorityTransformer.DEPRECATE_YOUTUBE_VIDEO_STREAM_PRIORITY[video_format]
+            fetched_stream_priority = VideoBlockStreamPriorityTransformer.\
+                DEPRECATE_YOUTUBE_VIDEO_STREAM_PRIORITY.get(video_format)
+            if fetched_stream_priority is None:
+                assert post_transform_data[video_format] == -1
+            else:
+                assert post_transform_data[video_format] == fetched_stream_priority
 
     @mock.patch('lms.djangoapps.course_blocks.usage_info.CourseUsageInfo')
     @mock.patch('openedx.core.djangoapps.waffle_utils.CourseWaffleFlag.is_enabled')
@@ -139,12 +151,20 @@ class TestVideoBlockStreamPriorityTransformer(ModuleStoreTestCase):
                     'url': 'https://1234abc.cloudfront.net/A1234abc.mp4',
                     'file_size': 0
                 },
+                'desktop_webm': {
+                    'url': 'https://123abc.cloudfront.net/A123abc.mp4',
+                    'file_size': 0
+                },
                 'fallback': {
                     'url': 'https://1234abcd.cloudfront.net/A1234abcd.mp4',
                     'file_size': 0
                 },
                 'youtube': {
                     'url': 'https://1234abcde.cloudfront.net/A1234abcde.mp4',
+                    'file_size': 0
+                },
+                'new_video_format': {
+                    'url': 'https://1234abcdef.cloudfront.net/A1234abcdef.mp4',
                     'file_size': 0
                 }
             },
@@ -159,8 +179,12 @@ class TestVideoBlockStreamPriorityTransformer(ModuleStoreTestCase):
         post_transform_data = self.change_encoded_videos_presentation(post_transform_data['encoded_videos'])
 
         for video_format, stream_priority in post_transform_data.items():
-            assert post_transform_data[video_format] == \
-                   VideoBlockStreamPriorityTransformer.DEFAULT_VIDEO_STREAM_PRIORITY[video_format]
+            fetched_stream_priority = VideoBlockStreamPriorityTransformer.\
+                DEFAULT_VIDEO_STREAM_PRIORITY.get(video_format)
+            if fetched_stream_priority is None:
+                assert post_transform_data[video_format] == -1
+            else:
+                assert post_transform_data[video_format] == fetched_stream_priority
 
     @mock.patch('xmodule.video_module.VideoBlock.student_view_data')
     def test_no_priority_for_web_only_videos(self, mock_video_data):

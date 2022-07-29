@@ -15,6 +15,7 @@ class VideoBlockStreamPriorityTransformer(BlockStructureTransformer):
     If DEPRECATE_YOUTUBE waffle flag is on for a course, Youtube videos
     have highest priority i.e. 0. Else, the default priority for videos
     is as shown in DEFAULT_VIDEO_STREAM_PRIORITY below.
+    In case video_format not found in given, set stream_priority to -1.
     """
 
     WRITE_VERSION = 1
@@ -24,8 +25,9 @@ class VideoBlockStreamPriorityTransformer(BlockStructureTransformer):
         'mobile_low': 1,
         'mobile_high': 2,
         'desktop_mp4': 3,
-        'fallback': 4,
-        'youtube': 5,
+        'desktop_webm': 4,
+        'fallback': 5,
+        'youtube': 6,
     }
     DEPRECATE_YOUTUBE_VIDEO_STREAM_PRIORITY = {
         'youtube': 0,
@@ -33,7 +35,8 @@ class VideoBlockStreamPriorityTransformer(BlockStructureTransformer):
         'mobile_low': 2,
         'mobile_high': 3,
         'desktop_mp4': 4,
-        'fallback': 5,
+        'desktop_webm': 5,
+        'fallback': 6,
     }
 
     @classmethod
@@ -66,6 +69,6 @@ class VideoBlockStreamPriorityTransformer(BlockStructureTransformer):
             encoded_videos = student_view_data.get('encoded_videos')
             for video_format, video_data in encoded_videos.items():
                 if DEPRECATE_YOUTUBE.is_enabled(usage_info.course_key):
-                    video_data['stream_priority'] = self.DEPRECATE_YOUTUBE_VIDEO_STREAM_PRIORITY[video_format]
+                    video_data['stream_priority'] = self.DEPRECATE_YOUTUBE_VIDEO_STREAM_PRIORITY.get(video_format, -1)
                 else:
-                    video_data['stream_priority'] = self.DEFAULT_VIDEO_STREAM_PRIORITY[video_format]
+                    video_data['stream_priority'] = self.DEFAULT_VIDEO_STREAM_PRIORITY.get(video_format, -1)
