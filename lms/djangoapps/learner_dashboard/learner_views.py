@@ -17,6 +17,7 @@ from common.djangoapps.student.views.dashboard import (
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_feature_enabled
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.learner_dashboard.serializers import LearnerDashboardSerializer
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -107,6 +108,16 @@ def get_email_settings_info(user, course_enrollments):
     return show_email_settings_for, course_optouts
 
 
+def get_ecommerce_payment_page(user):
+    """Determine the ecommerce payment page URL if enabled for this user"""
+    ecommerce_service = EcommerceService()
+    return (
+        ecommerce_service.payment_page_url()
+        if ecommerce_service.is_enabled(user)
+        else None
+    )
+
+
 @login_required
 @require_GET
 def dashboard_view(request):  # pylint: disable=unused-argument
@@ -134,6 +145,9 @@ def dashboard_view(request):  # pylint: disable=unused-argument
     # Get email opt-outs for student
     show_email_settings_for, course_optouts = get_email_settings_info(user, course_enrollments)
 
+    # e-commerce info
+    ecommerce_payment_page = get_ecommerce_payment_page(user)
+
     learner_dash_data = {
         "emailConfirmation": email_confirmation,
         "enterpriseDashboards": None,
@@ -144,6 +158,7 @@ def dashboard_view(request):  # pylint: disable=unused-argument
     }
 
     context = {
+        "ecommerce_payment_page": ecommerce_payment_page,
         "course_mode_info": course_mode_info,
         "course_optouts": course_optouts,
         "show_email_settings_for": show_email_settings_for,
