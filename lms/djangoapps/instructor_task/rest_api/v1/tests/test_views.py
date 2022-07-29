@@ -166,6 +166,8 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
         This test verifies that, when a task schedule is cancelled, the data is in the correct state and that the task
         is no longer returned with GET requests.
         """
+        expected_task_output_msg = "Task revoked before running"
+
         self._create_scheduled_course_emails_for_course(self.course1.id, self.instructor_course1, SCHEDULED, 3)
         self.client.login(username=self.instructor_course1.username, password="test")
         response = self.client.get(self._build_api_url(self.course1.id))
@@ -189,6 +191,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
         # verify the task status is REVOKED for the scheduled we cancelled
         task = InstructorTask.objects.get(id=task_id)
         assert task.task_state == REVOKED
+        assert json.loads(task.task_output).get("message") == expected_task_output_msg
 
     def test_delete_schedules_schedule_does_not_exist(self):
         """
