@@ -120,6 +120,7 @@ class EnrollmentSerializer(serializers.Serializer):
     isAuditAccessExpired = serializers.SerializerMethodField()
     isEnrolled = serializers.BooleanField(source="is_active")
     isEmailEnabled = serializers.SerializerMethodField()
+    hasOptedOutOfEmail = serializers.SerializerMethodField()
     isVerified = serializers.SerializerMethodField()
     lastEnrolled = serializers.DateTimeField(source="created")
 
@@ -152,6 +153,9 @@ class EnrollmentSerializer(serializers.Serializer):
 
     def get_isEmailEnabled(self, enrollment):
         return enrollment.course_id in self.context.get("show_email_settings_for", [])
+
+    def get_hasOptedOutOfEmail(self, enrollment):
+        return enrollment.course_id in self.context.get("course_optouts", [])
 
     def get_isVerified(self, enrollment):
         return enrollment.is_verified_enrollment()

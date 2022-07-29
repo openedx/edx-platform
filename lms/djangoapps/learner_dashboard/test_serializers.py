@@ -196,9 +196,10 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
     def create_test_context(self, course):
         """Get a test context object"""
         return {
+            "course_mode_info": {course.id: {"show_upsell": False}},
+            "course_optouts": [],
             "use_ecommerce_payment_flow": True,
             "show_email_settings_for": [course.id],
-            "course_mode_info": {course.id: {"show_upsell": False}},
             "show_courseware_link": {course.id: {"has_access": True}},
         }
 
