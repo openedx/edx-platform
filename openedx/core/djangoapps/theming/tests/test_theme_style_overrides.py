@@ -124,8 +124,8 @@ class TestComprehensiveThemeLMS(TestCase):
         courses_url = reverse('courses')
         resp = self.client.get(courses_url)
         assert resp.status_code == 200
-        # The courses.html template includes the info.html file, which is overriden in the theme.
-        self.assertContains(resp, "This overrides the courseware/info.html template.")
+        # The courses.html template includes the progress.html file, which is overriden in the theme.
+        self.assertContains(resp, "This overrides the courseware/progress.html template.")
 
     @with_comprehensive_theme("test-theme")
     def test_include_custom_template(self):

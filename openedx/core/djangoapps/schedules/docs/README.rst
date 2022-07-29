@@ -236,17 +236,6 @@ Configuration Flags
 Configuring Schedule Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Self-paced Configuration
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-Schedules will only be created for a course if it is self-paced. A
-course can be configured to be self-paced by going to
-``<studio_url>/admin/self_paced/selfpacedconfiguration/`` and adding an
-enabled self paced config. Then, go to Studio settings for the course
-and change the Course Pacing value to “Self-Paced”. Note that the Course
-Start Date has to be set to sometime in the future in order to change
-the Course Pacing.
-
 Configuring Upgrade Deadline on Schedule
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

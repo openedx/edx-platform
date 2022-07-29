@@ -22,13 +22,13 @@ from django.urls import reverse
 from django.utils.timezone import now
 from submissions import api as submissions_api
 
-from capa.tests.response_xml_factory import (
+from xmodule.capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
     CustomResponseXMLFactory,
     OptionResponseXMLFactory,
     SchematicResponseXMLFactory
 )
-from capa.xqueue_interface import XQueueInterface
+from xmodule.capa.xqueue_interface import XQueueInterface
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase

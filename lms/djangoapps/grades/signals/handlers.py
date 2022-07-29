@@ -299,3 +299,4 @@ def listen_for_course_grade_passed_first_time(sender, user_id, course_id, **kwar
     Emits an event edx.course.grade.passed.first_time
     """
     events.course_grade_passed_first_time(user_id, course_id)
+    events.fire_segment_event_on_course_grade_passed_first_time(user_id, course_id)

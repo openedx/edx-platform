@@ -37,8 +37,8 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
 
     def setUp(self):
         super().setUp()
-        self.provider_hogwarts = SAMLProviderConfigFactory.create(slug='hogwarts')
-        self.provider_durmstrang = SAMLProviderConfigFactory.create(slug='durmstrang')
+        self.provider_hogwarts = SAMLProviderConfigFactory.create(slug='hogwarts', entity_id='entity-id-hogwarts')
+        self.provider_durmstrang = SAMLProviderConfigFactory.create(slug='durmstrang', entity_id='entity-id-durmstrang')
 
         self.user_fleur = UserFactory(username='fleur')      # no social auth
         self.user_harry = UserFactory(username='harry')      # social auth for Hogwarts

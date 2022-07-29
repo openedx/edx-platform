@@ -15,7 +15,8 @@ from openedx.core.djangolib.js_utils import js_escaped_string
     window.addEventListener("load", function () {
         const mfeUrl = (new URL("${discussions_mfe_url  | n, js_escaped_string}"));
         const iframe = document.querySelector('#discussions-mfe-tab-embed');
-        iframe.src = mfeUrl.href + window.location.hash.slice(1);
+        let timestamp = "?no-cache=" + Date.now();
+        iframe.src = mfeUrl.href + window.location.hash.slice(1) + timestamp;
         window.addEventListener("message", (event) => {
             const payload = event.data.payload;
             if (event.origin !== mfeUrl.origin) {

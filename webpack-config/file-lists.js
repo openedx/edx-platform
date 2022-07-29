@@ -12,7 +12,7 @@ module.exports = {
         path.resolve(__dirname, '../common/static/common/js/components/utils/view_utils.js'),
         /descriptors\/js/,
         /modules\/js/,
-        /common\/lib\/xmodule\/xmodule\/js\/src\//,
+        /xmodule\/js\/src\//,
         path.resolve(__dirname, '../openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js')
     ],
 

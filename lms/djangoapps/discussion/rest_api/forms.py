@@ -229,3 +229,4 @@ class TopicListGetForm(Form):
 class CourseActivityStatsForm(_PaginationForm):
     """Form for validating course activity stats API query parameters"""
     order_by = ChoiceField(choices=UserOrdering.choices, required=False)
+    username = CharField(required=False)

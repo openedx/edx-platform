@@ -56,7 +56,6 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
     """
     Tests for allowlisted student auto-certificate generation
     """
-
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
@@ -104,7 +103,6 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on passing grade receipt
     """
-
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(
@@ -221,7 +219,6 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
     and that the signal has no effect on the cert status if the cert has a non-passing
     status
     """
-
     def setUp(self):
         super().setUp()
         self.course = CourseFactory.create(
@@ -303,7 +300,6 @@ class LearnerIdVerificationTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on learner id verification
     """
-
     def setUp(self):
         super().setUp()
         self.course_one = CourseFactory.create(self_paced=True)

@@ -17,8 +17,12 @@ from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
+from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
 from rest_framework.request import Request
+
+from lms.djangoapps.discussion.views import is_privileged_user
 from xmodule.course_module import CourseBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTabList
@@ -26,10 +30,12 @@ from xmodule.tabs import CourseTabList
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE, \
+    ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
+from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.course import (
     get_course_commentable_counts,
@@ -42,6 +48,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     CourseDiscussionSettings,
+    Role,
 )
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
@@ -89,7 +96,13 @@ from .serializers import (
     UserStatsSerializer,
     get_context,
 )
-from .utils import discussion_open_for_user
+
+from .utils import (
+    discussion_open_for_user,
+    get_usernames_from_search_string,
+    add_stats_for_users_with_no_discussion_content,
+    set_attribute,
+)
 
 User = get_user_model()
 
@@ -184,9 +197,9 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
 
         course_discussion_settings = CourseDiscussionSettings.get(course_key)
         if (
-                not context["is_requester_privileged"] and
-                cc_thread["group_id"] and
-                is_commentable_divided(course.id, cc_thread["commentable_id"], course_discussion_settings)
+            not context["is_requester_privileged"] and
+            cc_thread["group_id"] and
+            is_commentable_divided(course.id, cc_thread["commentable_id"], course_discussion_settings)
         ):
             requester_group_id = get_group_id_for_user(request.user, course_discussion_settings)
             if requester_group_id is not None and cc_thread["group_id"] != requester_group_id:
@@ -375,7 +388,7 @@ def get_courseware_topics(
 
     for category in sorted(xblocks_by_category.keys()):
         children = []
-        for xblock in get_sorted_xblocks(category):
+        for xblock in xblocks_by_category[category]:
             if not topic_ids or xblock.discussion_id in topic_ids:
                 discussion_topic = DiscussionTopic(
                     xblock.discussion_id,
@@ -601,12 +614,14 @@ def _get_users(discussion_entity_type, discussion_entity, username_profile_dict)
     """
     users = {}
     if discussion_entity['author']:
-        users[discussion_entity['author']] = _user_profile(username_profile_dict[discussion_entity['author']])
+        user_profile = username_profile_dict.get(discussion_entity['author'])
+        if user_profile:
+            users[discussion_entity['author']] = _user_profile(user_profile)
 
     if (
-            discussion_entity_type == DiscussionEntity.comment
-            and discussion_entity['endorsed']
-            and discussion_entity['endorsed_by']
+        discussion_entity_type == DiscussionEntity.comment
+        and discussion_entity['endorsed']
+        and discussion_entity['endorsed_by']
     ):
         users[discussion_entity['endorsed_by']] = _user_profile(username_profile_dict[discussion_entity['endorsed_by']])
     return users
@@ -679,9 +694,9 @@ def _serialize_discussion_entities(request, context, discussion_entities, reques
             if serialized_entity['author'] and serialized_entity['author'] not in usernames:
                 usernames.append(serialized_entity['author'])
             if (
-                    'endorsed' in serialized_entity and serialized_entity['endorsed'] and
-                    'endorsed_by' in serialized_entity and
-                    serialized_entity['endorsed_by'] and serialized_entity['endorsed_by'] not in usernames
+                'endorsed' in serialized_entity and serialized_entity['endorsed'] and
+                'endorsed_by' in serialized_entity and
+                serialized_entity['endorsed_by'] and serialized_entity['endorsed_by'] not in usernames
             ):
                 usernames.append(serialized_entity['endorsed_by'])
 
@@ -783,12 +798,26 @@ def get_thread_list(
     if count_flagged and not context["is_requester_privileged"]:
         raise PermissionDenied("`count_flagged` can only be set by users with moderator access or higher.")
 
+    group_id = None
+    allowed_roles = [
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_MODERATOR,
+    ]
+
+    if request.GET.get("group_id", None):
+        if Role.user_has_role_for_course(request.user, course_key, allowed_roles):
+            try:
+                group_id = int(request.GET.get("group_id", None))
+            except ValueError:
+                pass
+
+    if (group_id is None) and (not context["is_requester_privileged"]):
+        group_id = get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
+
     query_params = {
         "user_id": str(request.user.id),
-        "group_id": (
-            None if context["is_requester_privileged"] else
-            get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
-        ),
+        "group_id": group_id,
         "page": page,
         "per_page": page_size,
         "text": text_search,
@@ -833,6 +862,124 @@ def get_thread_list(
     return paginator.get_paginated_response({
         "results": results,
         "text_search_rewrite": paginated_results.corrected_text,
+    })
+
+
+def get_learner_active_thread_list(request, course_key, query_params):
+    """
+    Returns a list of active threads for a particular user
+
+    Parameters:
+
+    request: The django request objects used for build_absolute_uri
+    course_key: The key of the course
+    query_params: Parameters to fetch data from comments service. It must contain
+                        user_id, course_id, page, per_page, group_id
+
+    Returns:
+
+    A paginated result containing a list of threads.
+
+    ** Sample Response
+    {
+        "results": [
+            {
+                "id": "thread_id",
+                "author": "author_username",
+                "author_label": "Staff",
+                "created_at": "2010-01-01T12:00:00Z",
+                "updated_at": "2010-01-01T12:00:00Z",
+                "raw_body": "<p></p>",
+                "rendered_body": "<p></p>",
+                "abuse_flagged": false,
+                "voted": false,
+                "vote_count": 0,
+                "editable_fields": [
+                    "abuse_flagged", "anonymous", "close_reason_code", "closed",
+                    "edit_reason_code", "following", "pinned", "raw_body", "read",
+                    "title", "topic_id", "type", "voted"
+                ],
+                "can_delete": true,
+                "anonymous": false,
+                "anonymous_to_peers": false,
+                "last_edit": {
+                    "original_body": "<p></p>",
+                    "reason_code": null,
+                    "editor_username": "author_username",
+                    "created_at": "2010-01-01T12:00:00Z"
+                },
+                "course_id": "course-v1:edX+DemoX+Demo_Course",
+                "topic_id": "i4x-edx-eiorguegnru-course-foobarbaz",
+                "group_id": null,
+                "group_name": null,
+                "type": "discussion",
+                "preview_body": "",
+                "abuse_flagged_count": null,
+                "title": "Post Title",
+                "pinned": false,
+                "closed": false,
+                "following": false,
+                "comment_count": 1,
+                "unread_comment_count": 0,
+                "comment_list_url": "http://localhost:18000/api/discussion/v1/comments/?thread_id=thread_id",
+                "endorsed_comment_list_url": null,
+                "non_endorsed_comment_list_url": null,
+                "read": true,
+                "has_endorsed": false,
+                "close_reason": null,
+                "closed_by": null,
+                "users": {
+                    "username": {
+                        "profile": {
+                            "image": {
+                                "has_image": false,
+                                "image_url_full": "http://localhost:18000/static/images/profiles/default_500.png",
+                                "image_url_large": "http://localhost:18000/static/images/profiles/default_120.png",
+                                "image_url_medium": "http://localhost:18000/static/images/profiles/default_50.png",
+                                "image_url_small": "http://localhost:18000/static/images/profiles/default_30.png"
+                            }
+                        }
+                    }
+                }
+            },
+            ...
+        ],
+        "pagination": {
+            "next": None,
+            "previous": None,
+            "count": 10,
+            "num_pages": 1
+        }
+    }
+
+    """
+
+    course = _get_course(course_key, request.user)
+    context = get_context(course, request)
+
+    group_id = query_params.get('group_id', None)
+    user_id = query_params.get('user_id', None)
+    if user_id is None:
+        return Response({'detail': 'Invalid user id'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if group_id is None:
+        comment_client_user = comment_client.User(id=user_id, course_id=course_key)
+    else:
+        comment_client_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
+
+    threads, page, num_pages = comment_client_user.active_threads(query_params)
+    threads = set_attribute(threads, "pinned", False)
+    results = _serialize_discussion_entities(
+        request, context, threads, {'profile_image'}, DiscussionEntity.thread
+    )
+    paginator = DiscussionAPIPagination(
+        request,
+        page,
+        num_pages,
+        len(threads)
+    )
+    return paginator.get_paginated_response({
+        "results": results,
     })
 
 
@@ -1019,15 +1166,19 @@ def _handle_following_field(form_value, user, cc_content):
 
 def _handle_abuse_flagged_field(form_value, user, cc_content):
     """mark or unmark thread/comment as abused"""
+    course_key = CourseKey.from_string(cc_content.course_id)
     if form_value:
         cc_content.flagAbuse(user, cc_content)
-        if reported_content_email_notification_enabled(CourseKey.from_string(cc_content.course_id)):
+        if ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key) and reported_content_email_notification_enabled(
+                course_key):
             if cc_content.type == 'thread':
                 thread_flagged.send(sender='flag_abuse_for_thread', user=user, post=cc_content)
             else:
                 comment_flagged.send(sender='flag_abuse_for_comment', user=user, post=cc_content)
     else:
-        cc_content.unFlagAbuse(user, cc_content, removeAll=False)
+        remove_all = bool(user.id != cc_content["user_id"] and is_privileged_user(course_key,
+                                                                                  User.objects.get(id=user.id)))
+        cc_content.unFlagAbuse(user, cc_content, remove_all)
 
 
 def _handle_voted_field(form_value, cc_content, api_content, request, context):
@@ -1105,8 +1256,8 @@ def create_thread(request, thread_data):
     _check_initializable_thread_fields(thread_data, context)
     discussion_settings = CourseDiscussionSettings.get(course_key)
     if (
-            "group_id" not in thread_data and
-            is_commentable_divided(course_key, thread_data.get("topic_id"), discussion_settings)
+        "group_id" not in thread_data and
+        is_commentable_divided(course_key, thread_data.get("topic_id"), discussion_settings)
     ):
         thread_data = thread_data.copy()
         thread_data["group_id"] = get_group_id_for_user(user, discussion_settings)
@@ -1463,6 +1614,7 @@ def get_course_discussion_user_stats(
     page: int,
     page_size: int,
     order_by: UserOrdering = None,
+    username_search_string: str = None,
 ) -> Dict:
     """
     Get paginated course discussion stats for users in the course.
@@ -1473,24 +1625,45 @@ def get_course_discussion_user_stats(
         page (int): Page number to fetch
         page_size (int): Number of items in each page
         order_by (UserOrdering): The ordering to use for the user stats
+        username_search_string (str): Partial string to match user names
 
     Returns:
         Paginated data of a user's discussion stats sorted based on the specified ordering.
 
     """
     course_key = CourseKey.from_string(course_key_str)
-    is_privileged = has_discussion_privileges(user=request.user, course_id=course_key)
+    is_privileged = has_discussion_privileges(user=request.user, course_id=course_key) or request.user.is_staff
     if is_privileged:
         order_by = order_by or UserOrdering.BY_FLAGS
     else:
         order_by = order_by or UserOrdering.BY_ACTIVITY
         if order_by != UserOrdering.BY_ACTIVITY:
             raise ValidationError({"order_by": "Invalid value"})
-    course_stats_response = get_course_user_stats(course_key, {
+    params = {
         'sort_key': str(order_by),
         'page': page,
         'per_page': page_size,
-    })
+    }
+    comma_separated_usernames = matched_users_count = matched_users_pages = None
+    if username_search_string:
+        comma_separated_usernames, matched_users_count, matched_users_pages = get_usernames_from_search_string(
+            course_key, username_search_string, page, page_size
+        )
+        if not comma_separated_usernames:
+            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
+                "results": [],
+            })
+        params['usernames'] = comma_separated_usernames
+
+    course_stats_response = get_course_user_stats(course_key, params)
+
+    if comma_separated_usernames:
+        updated_course_stats = add_stats_for_users_with_no_discussion_content(
+            course_stats_response["user_stats"],
+            comma_separated_usernames,
+        )
+        course_stats_response["user_stats"] = updated_course_stats
+
     serializer = UserStatsSerializer(
         course_stats_response["user_stats"],
         context={"is_privileged": is_privileged},
@@ -1500,8 +1673,8 @@ def get_course_discussion_user_stats(
     paginator = DiscussionAPIPagination(
         request,
         course_stats_response["page"],
-        course_stats_response["num_pages"],
-        course_stats_response["count"],
+        matched_users_pages if username_search_string else course_stats_response["num_pages"],
+        matched_users_count if username_search_string else course_stats_response["count"],
     )
     return paginator.get_paginated_response({
         "results": serializer.data,

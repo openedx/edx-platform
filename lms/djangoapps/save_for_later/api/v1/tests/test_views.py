@@ -39,7 +39,11 @@ class CourseSaveForLaterApiViewTest(ThirdPartyAuthTestMixin, APITestCase):
         self.course_key = CourseKey.from_string(self.course_id)
         CourseOverviewFactory.create(id=self.course_key)
 
-    @patch('lms.djangoapps.save_for_later.helper.BrazeClient', MagicMock())
+    @override_settings(
+        EDX_BRAZE_API_KEY='test-key',
+        EDX_BRAZE_API_SERVER='http://test.url'
+    )
+    @patch('lms.djangoapps.utils.BrazeClient', MagicMock())
     def test_save_course_using_email(self):
         """
         Test successfully email sent
@@ -116,7 +120,11 @@ class ProgramSaveForLaterApiViewTest(ThirdPartyAuthTestMixin, APITestCase):
         self.uuid = '587f6abe-bfa4-4125-9fbe-4789bf3f97f1'
         self.program = ProgramFactory(uuid=self.uuid)
 
-    @patch('lms.djangoapps.save_for_later.helper.BrazeClient', MagicMock())
+    @override_settings(
+        EDX_BRAZE_API_KEY='test-key',
+        EDX_BRAZE_API_SERVER='http://test.url'
+    )
+    @patch('lms.djangoapps.utils.BrazeClient', MagicMock())
     @patch('lms.djangoapps.save_for_later.api.v1.views.get_programs')
     def test_save_program_using_email(self, mock_get_programs):
         """

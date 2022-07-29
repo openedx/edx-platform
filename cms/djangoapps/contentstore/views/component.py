@@ -313,10 +313,10 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
             # this should use a cms mixed-in class. (cpennington)
             template_id = None
             display_name = xblock_type_display_name(category, _('Blank'))  # this is the Blank Advanced problem
-            # The first template that is given should be Blank Assessment Template
+            # The ORA "blank" assessment should be Peer Assessment Only
             if category == 'openassessment':
-                display_name = _("Blank Open Response Assessment")
-                template_id = "blank-assessment"
+                display_name = _("Peer Assessment Only")
+                template_id = "peer-assessment"
             templates_for_category.append(
                 create_template_dict(display_name, category, support_level_without_template, template_id, 'advanced')
             )

@@ -80,7 +80,6 @@
     "Rejected": "Respins",
     "Remove": "Elimin\u0103",
     "Remove all": "Elimin\u0103 toate",
-    "Retry Verification": "Re\u00eencerca\u021bi Verificare",
     "Saving...": "Se salveaz\u0103...",
     "September": "Septembrie",
     "Server error.": "Eroare de server.",

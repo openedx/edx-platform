@@ -25,10 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.49.5
-
-# Newer versions need a more recent version of python-dateutil
-freezegun==0.3.12
+edx-enterprise==3.54.2
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -36,17 +33,12 @@ oauthlib==3.0.1
 # django-auth-toolkit==1.3.3 requires oauthlib>=3.1.0 which is pinned because of test failures
 django-oauth-toolkit<=1.3.2
 
-# Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
-python-dateutil==2.4.0
-# matplotlib>=3.4.0 requires python-dateutil>=2.7
+# Will be updated once we update python-dateutil package
 matplotlib<3.4.0
-# pandas>0.22.0 requires python-dateutil>=2.5.0
-pandas==0.22.0
-# networkx>=2.6 requires pandas>=1.1
-networkx<2.6
 
-# tests failing for pymongo==3.11
-pymongo<3.11
+# constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
+# Major upgrade will be done in separate ticket.
+pymongo<4.0.0
 
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
@@ -65,8 +57,13 @@ edxval<2.1
 # version of py2neo will work with Neo4j 3.5.
 py2neo<2022
 
+# pylint==2.14.0 is causing test failures
+pylint==2.13.9
+
 # Sphinx requires docutils<0.18. This pin can be removed once https://github.com/sphinx-doc/sphinx/issues/9777 is closed.
 docutils<0.18
+# Sphinx docs build fails with new version. Will be fixed in https://github.com/openedx/public-engineering/issues/161
+sphinx<5.1.0
 
 # scipy version 1.8 requires numpy>=1.17.3, we've pinned numpy to <1.17.0 in requirements/edx-sandbox/py38.in
 scipy<1.8.0
@@ -80,3 +77,10 @@ scipy<1.8.0
 # See issue: https://github.com/sphinx-contrib/openapi/issues/123
 mistune<2.0.0
 
+# edx-enterprise, snowflake-connector-python require charset-normalizer==2.0.0
+# Can be removed once snowflake-connector-python>2.7.9 is released with the fix.
+charset-normalizer<2.1.0
+
+# markdown>=3.4.0 has failures due to internal refactorings which causes the tests to fail
+# pinning the version untill the issue gets resolved in the package itself
+markdown<3.4.0

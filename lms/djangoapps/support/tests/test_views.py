@@ -45,7 +45,11 @@ from common.djangoapps.student.models import (
     ManualEnrollmentAudit
 )
 from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import (
+    CourseEnrollmentFactory,
+    CourseEnrollmentAttributeFactory,
+    UserFactory,
+)
 from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from common.test.utils import disable_signal
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
@@ -299,7 +303,9 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         self.verification_deadline.save()
 
-        CourseEnrollmentFactory.create(mode=CourseMode.AUDIT, user=self.student, course_id=self.course.id)
+        self.enrollment = CourseEnrollmentFactory.create(
+            mode=CourseMode.AUDIT, user=self.student, course_id=self.course.id
+        )
 
         self.url = reverse('support:enrollment_list', kwargs={'username_or_email': self.student.username})
 
@@ -331,6 +337,27 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         assert {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.HONOR, CourseMode.NO_ID_PROFESSIONAL_MODE,
                 CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE} == {mode['slug'] for mode in data[0]['course_modes']}
         assert 'enterprise_course_enrollments' not in data[0]
+        assert data[0]['order_number'] == ''
+
+    @ddt.data(*itertools.product(['username', 'email'], [(3, 'ORD-003'), (1, 'ORD-001')]))
+    @ddt.unpack
+    def test_order_number_information(self, search_string_type, order_details):
+        for count in range(order_details[0]):
+            CourseEnrollmentAttributeFactory(
+                enrollment=self.enrollment,
+                namespace='order',
+                name='order_number',
+                value='ORD-00{}'.format(count + 1)
+            )
+        url = reverse(
+            'support:enrollment_list',
+            kwargs={'username_or_email': getattr(self.student, search_string_type)}
+        )
+        response = self.client.get(url)
+        assert response.status_code == 200
+        data = json.loads(response.content.decode('utf-8'))
+        assert len(data) == 1
+        assert data[0]['order_number'] == order_details[1]
 
     @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
     @enterprise_is_enabled()
@@ -1541,6 +1568,24 @@ class SsoRecordsTests(SupportViewTestCase):  # lint-amnesty, pylint: disable=mis
         assert response.status_code == 200
         assert len(data) == 1
         self.assertContains(response, '"uid": "test@example.com"')
+
+    def test_history_response(self):
+        '''Tests changes in SSO history for a user'''
+        user_social_auth = UserSocialAuth.objects.create(  # lint-amnesty, pylint: disable=unused-variable
+            user=self.student,
+            uid=self.student.email,
+            provider='tpa-saml'
+        )
+        sso = UserSocialAuth.objects.get(user=self.student)
+        sso.uid = self.student.email + ':' + sso.provider
+        sso.save()
+        response = self.client.get(self.url)
+        data = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == 200
+        assert len(data) == 1
+        assert len(data[0].get('history')) == 2
+        assert data[0].get('history')[0].get('uid') == "test@example.com:tpa-saml"
+        assert data[0].get('history')[1].get('uid') == "test@example.com"
 
 
 class FeatureBasedEnrollmentSupportApiViewTests(SupportViewTestCase):

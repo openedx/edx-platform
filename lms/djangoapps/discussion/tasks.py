@@ -11,6 +11,7 @@ from celery_utils.logged_task import LoggedTask
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
+from django.urls import reverse
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_ace.utils import date
@@ -18,10 +19,10 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from six.moves.urllib.parse import urljoin
+from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.track import segment
-from common.lib.xmodule.xmodule.modulestore.django import modulestore
 from lms.djangoapps.discussion.django_comment_client.utils import (
     permalink,
     get_users_with_moderator_roles,
@@ -155,9 +156,9 @@ def _should_send_message(context):
 
 
 def _is_content_still_reported(context):
-    if context.get('thread_id'):
-        return len(cc.Thread.find(context['thread_id']).abuse_flaggers) > 0
-    return len(cc.Comment.find(context['comment_id']).abuse_flaggers) > 0
+    if context.get('comment_id') is not None:
+        return len(cc.Comment.find(context['comment_id']).abuse_flaggers) > 0
+    return len(cc.Thread.find(context['thread_id']).abuse_flaggers) > 0
 
 
 def _is_not_subcomment(comment_id):
@@ -218,11 +219,24 @@ def _build_message_context(context):  # lint-amnesty, pylint: disable=missing-fu
 def _build_message_context_for_reported_content(context, moderator):  # lint-amnesty, pylint: disable=missing-function-docstring
     message_context = get_base_template_context(context['site'])
     message_context.update(context)
+
     message_context.update({
-        'post_link': _get_thread_url(context),
+        'post_link': _get_mfe_thread_url(context),
         'moderator_email': moderator.email,
     })
     return message_context
+
+
+def _get_mfe_thread_url(context):
+    """
+    Get thread url for new MFE
+    """
+    scheme = 'https' if settings.HTTPS == 'on' else 'http'
+    forum_url = reverse('forum_form_discussion', args=[context['course_id']])
+    base_url = f"{scheme}://{context['site'].domain}{forum_url}"
+    mfe_post_link = f"?discussions_experience=new#posts/{context['thread_id']}"
+    post_link = urljoin(base_url, mfe_post_link)
+    return post_link
 
 
 def _get_thread_url(context):  # lint-amnesty, pylint: disable=missing-function-docstring

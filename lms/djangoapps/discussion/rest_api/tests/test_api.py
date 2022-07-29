@@ -453,13 +453,13 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 "Z": {"id": "non-courseware-4", "sort_key": "W"},
             }
             self.store.update_item(self.course, self.user.id)
-            self.make_discussion_xblock("courseware-1", "First", "A", sort_key="D")
-            self.make_discussion_xblock("courseware-2", "First", "B", sort_key="B")
+            self.make_discussion_xblock("courseware-1", "First", "A", sort_key="B")
+            self.make_discussion_xblock("courseware-2", "First", "B", sort_key="D")
             self.make_discussion_xblock("courseware-3", "First", "C", sort_key="E")
-            self.make_discussion_xblock("courseware-4", "Second", "A", sort_key="F")
-            self.make_discussion_xblock("courseware-5", "Second", "B", sort_key="G")
+            self.make_discussion_xblock("courseware-4", "Second", "A", sort_key="A")
+            self.make_discussion_xblock("courseware-5", "Second", "B", sort_key="B")
             self.make_discussion_xblock("courseware-6", "Second", "C")
-            self.make_discussion_xblock("courseware-7", "Second", "D", sort_key="A")
+            self.make_discussion_xblock("courseware-7", "Second", "D", sort_key="D")
 
         actual = self.get_course_topics()
         expected = {
@@ -468,8 +468,8 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                     None,
                     "First",
                     [
-                        self.make_expected_tree("courseware-2", "B"),
                         self.make_expected_tree("courseware-1", "A"),
+                        self.make_expected_tree("courseware-2", "B"),
                         self.make_expected_tree("courseware-3", "C"),
                     ]
                 ),
@@ -477,10 +477,10 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                     None,
                     "Second",
                     [
-                        self.make_expected_tree("courseware-7", "D"),
-                        self.make_expected_tree("courseware-6", "C"),
                         self.make_expected_tree("courseware-4", "A"),
                         self.make_expected_tree("courseware-5", "B"),
+                        self.make_expected_tree("courseware-6", "C"),
+                        self.make_expected_tree("courseware-7", "D"),
                     ]
                 ),
             ],
@@ -522,7 +522,6 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
 
         with self.store.bulk_operations(self.course.id, emit_signals=False):
             self.store.update_item(self.course, self.user.id)
-            self.make_discussion_xblock("courseware-1", "First", "Everybody")
             self.make_discussion_xblock(
                 "courseware-2",
                 "First",
@@ -535,13 +534,14 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 "Cohort B",
                 group_access={self.partition.id: [self.partition.groups[1].id]}
             )
-            self.make_discussion_xblock("courseware-4", "Second", "Staff Only", visible_to_staff_only=True)
+            self.make_discussion_xblock("courseware-1", "First", "Everybody")
             self.make_discussion_xblock(
                 "courseware-5",
                 "Second",
                 "Future Start Date",
                 start=datetime.now(UTC) + timedelta(days=1)
             )
+            self.make_discussion_xblock("courseware-4", "Second", "Staff Only", visible_to_staff_only=True)
 
         student_actual = self.get_course_topics()
         student_expected = {
@@ -2823,6 +2823,36 @@ class UpdateThreadTest(
             assert httpretty.last_request().method == 'PUT'
             assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
 
+    @ddt.data(
+        (False, True),
+        (True, False),
+    )
+    @ddt.unpack
+    def test_thread_un_abuse_flag_for_moderator_role(self, is_author, remove_all):
+        """
+        Test un-abuse flag for moderator role.
+
+        When moderator unflags a reported thread, it should
+        pass the "all" flag to the api. This will indicate
+        to the api to clear all abuse_flaggers, and mark the
+        thread as unreported.
+        If moderator is author of a thread, we want to restrict
+        the usage of the remove_all flag, so it cant be used
+        to remove all abuse_flaggers from a moderator post
+        by the moderator itself.
+        """
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
+        self.register_get_user_response(self.user)
+        self.register_thread_flag_response("test_thread")
+        self.register_thread({"abuse_flaggers": ["11"], "user_id": str(self.user.id) if is_author else "12"})
+        data = {"abuse_flagged": False}
+        update_thread(self.request, "test_thread", data)
+        assert httpretty.last_request().method == 'PUT'
+        query_params = {'user_id': [str(self.user.id)]}
+        if remove_all:
+            query_params.update({'all': ['True']})
+        assert parsed_body(httpretty.last_request()) == query_params
+
     def test_invalid_field(self):
         self.register_thread()
         with pytest.raises(ValidationError) as assertion:
@@ -3277,6 +3307,36 @@ class UpdateCommentTest(
             assert last_request_path == (flag_url if new_flagged else unflag_url)
             assert httpretty.last_request().method == 'PUT'
             assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
+
+    @ddt.data(
+        (False, True),
+        (True, False),
+    )
+    @ddt.unpack
+    def test_comment_un_abuse_flag_for_moderator_role(self, is_author, remove_all):
+        """
+        Test un-abuse flag for moderator role.
+
+        When moderator unflags a reported comment, it should
+        pass the "all" flag to the api. This will indicate
+        to the api to clear all abuse_flaggers, and mark the
+        comment as unreported.
+        If moderator is author of a comment, we want to restrict
+        the usage of the remove_all flag, so it cant be used
+        to remove all abuse_flaggers from a moderator post
+        by the moderator itself.
+        """
+        _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
+        self.register_get_user_response(self.user)
+        self.register_comment_flag_response("test_comment")
+        self.register_comment({"abuse_flaggers": ["11"], "user_id": str(self.user.id) if is_author else "12"})
+        data = {"abuse_flagged": False}
+        update_comment(self.request, "test_comment", data)
+        assert httpretty.last_request().method == 'PUT'
+        query_params = {'user_id': [str(self.user.id)]}
+        if remove_all:
+            query_params.update({'all': ['True']})
+        assert parsed_body(httpretty.last_request()) == query_params
 
     @ddt.data(
         FORUM_ROLE_ADMINISTRATOR,

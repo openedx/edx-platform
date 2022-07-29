@@ -9,7 +9,6 @@ import crum
 import ddt
 from django.conf import settings
 from django.test import RequestFactory
-from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from freezegun import freeze_time
 from pytz import utc
@@ -19,7 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.config import AUTO_CERTIFICATE_GENERATION
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.courseware.courses import get_course_date_blocks
@@ -43,7 +42,6 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 
@@ -51,9 +49,6 @@ from openedx.features.course_experience import RELATIVE_DATES_FLAG
 @ddt.ddt
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
-    def setUp(self):
-        super().setUp()
-        SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
 
     def make_request(self, user):
         """ Creates a request """
@@ -62,17 +57,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.addCleanup(crum.set_current_request, None)
         crum.set_current_request(request)
         return request
-
-    def test_course_info_feature_flag(self):
-        SelfPacedConfiguration(enable_course_home_improvements=False).save()
-        course = create_course_run()
-        user = create_user()
-        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
-
-        self.client.login(username=user.username, password=TEST_PASSWORD)
-        url = reverse('info', args=(course.id,))
-        response = self.client.get(url)
-        self.assertNotContains(response, 'date-summary', status_code=302)
 
     # Tests for which blocks are enabled
     def assert_block_types(self, course, user, expected_blocks):

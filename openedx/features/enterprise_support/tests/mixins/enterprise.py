@@ -142,6 +142,56 @@ class EnterpriseServiceMockMixin:
             required=False,
         )
 
+    def get_mock_active_enterprise_learner_details(
+            self,
+            learner_id=1,
+            enterprise_customer_uuid='cf246b88-d5f6-4908-a522-fc307e0b0c59',
+            enable_audit_enrollment=False,
+            enable_data_sharing_consent=True,
+            slug='test-shib',
+            data_sharing_consent_records=None,
+            site_domain='example.com',
+    ):
+        """
+        Helper function to format enterprise learner API response.
+        """
+        mock_result = {
+            'id': learner_id,
+            'enterprise_customer': {
+                'uuid': enterprise_customer_uuid,
+                'name': 'TestShib',
+                'slug': slug,
+                'active': True,
+                'site': {
+                    'domain': site_domain,
+                    'name': 'example.com'
+                },
+                'enable_data_sharing_consent': enable_data_sharing_consent,
+                'enforce_data_sharing_consent': 'at_login',
+                'enable_audit_enrollment': enable_audit_enrollment,
+            },
+            'active': True,
+            'user_id': learner_id,
+            'user': {
+                'id': learner_id,
+                'username': 'verified',
+                'first_name': '',
+                'last_name': '',
+                'email': 'verified@example.com',
+                'is_staff': True,
+                'is_active': True,
+                'date_joined': '2016-09-01T19:18:26.026495Z'
+            },
+            'data_sharing_consent_records': data_sharing_consent_records or [],
+            'groups': [],
+            'created': '2016-09-01T19:18:26.026495Z',
+            'invite_key': '',
+            'role_assignments': [
+                'enterprise_learner'
+            ]
+        }
+        return mock_result
+
     def get_mock_enterprise_learner_results(
             self,
             entitlement_id=1,

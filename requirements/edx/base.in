@@ -36,6 +36,7 @@ botocore==1.8.17                    # via boto3, s3transfer
 bridgekeeper                        # Used for determining permissions for courseware.
 celery                              # Asynchronous task execution library
 chem                                # A helper library for chemistry calculations
+codejail-includes                   # CodeJail manages execution of untrusted code in secure sandboxes.
 contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
 crowdsourcehinter-xblock
 cryptography                        # Implementations of assorted cryptography algorithms
@@ -68,6 +69,7 @@ django-user-tasks
 django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework
+docopt
 done-xblock
 edx-ace
 edx-api-doc-tools
@@ -84,6 +86,7 @@ edx-drf-extensions
 edx-enterprise
 edx-milestones
 edx-name-affirmation
+edx-opaque-keys
 edx-organizations
 edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
@@ -108,7 +111,8 @@ ipaddress                           # Ip network support for Embargo feature
 jsonfield                           # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 lxml                                # XML parser
-lti-consumer-xblock>=4.1.0
+learner-pathway-progress    # A plugin for lms to track learners progress in pathays
+lti-consumer-xblock>=4.1.1
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
@@ -122,6 +126,8 @@ openedx-calc                        # Library supporting mathematical calculatio
 openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
 ora2>=4.4.0
+outcome-surveys                     # edx-platform plugin to send and track segment events needed for surveys
+path
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
 py2neo                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
@@ -161,6 +167,7 @@ staff-graded-xblock                 # An XBlock that allows for off-site bulk sc
 super-csv                           # Generic CSV processor
 unicodecsv                          # Easier support for CSV files with unicode text
 user-util                           # Functionality for retiring users (GDPR compliance)
+webob
 web-fragments                       # Provides the ability to render fragments of web pages
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock

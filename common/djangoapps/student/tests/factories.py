@@ -17,10 +17,12 @@ from common.djangoapps.student.models import (
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
+    CourseEnrollmentAttribute,
     CourseEnrollmentCelebration,
     PendingEmailChange,
     Registration,
     User,
+    UserAttribute,
     UserProfile,
     UserStanding
 )
@@ -114,6 +116,15 @@ class UserFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-
             self.groups.add(GroupFactory.simple_generate(create, name=group_name))  # lint-amnesty, pylint: disable=no-member
 
 
+class UserAttributeFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
+        model = UserAttribute
+
+    user = factory.SubFactory(UserFactory)
+    name = factory.Sequence('{}'.format)
+    value = factory.Sequence('{}'.format)
+
+
 class RequestFactoryNoCsrf(RequestFactory):
     """
     RequestFactory, which disables csrf checks.
@@ -182,6 +193,13 @@ class CourseEnrollmentFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
 class CourseEnrollmentCelebrationFactory(DjangoModelFactory):
     class Meta:
         model = CourseEnrollmentCelebration
+
+    enrollment = factory.SubFactory(CourseEnrollmentFactory)
+
+
+class CourseEnrollmentAttributeFactory(DjangoModelFactory):
+    class Meta:
+        model = CourseEnrollmentAttribute
 
     enrollment = factory.SubFactory(CourseEnrollmentFactory)
 

@@ -562,6 +562,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'CONTACT': '/help/contact-us'})
+    @patch('common.djangoapps.student.signals.signals.USER_EMAIL_CHANGED.send')
     @ddt.data(
         ('plain_text', False),
         ('plain_text', True),
@@ -569,9 +570,10 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         ('html', True)
     )
     @ddt.unpack
-    def test_successful_email_change(self, test_body_type, test_marketing_enabled):
+    def test_successful_email_change(self, test_body_type, test_marketing_enabled, mock_email_change_signal):
         with patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': test_marketing_enabled}):
             self.assertChangeEmailSent(test_body_type)
+            assert mock_email_change_signal.called
 
         meta = json.loads(UserProfile.objects.get(user=self.user).meta)
         assert 'old_emails' in meta
