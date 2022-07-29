@@ -4,6 +4,7 @@ Views for the learner dashboard.
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
+from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
 from edx_django_utils import monitoring as monitoring_utils
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -148,6 +149,9 @@ def dashboard_view(request):  # pylint: disable=unused-argument
     # e-commerce info
     ecommerce_payment_page = get_ecommerce_payment_page(user)
 
+    # Gather urls for course card resume buttons.
+    resume_button_urls = get_resume_urls_for_enrollments(user, course_enrollments)
+
     learner_dash_data = {
         "emailConfirmation": email_confirmation,
         "enterpriseDashboards": None,
@@ -161,6 +165,7 @@ def dashboard_view(request):  # pylint: disable=unused-argument
         "ecommerce_payment_page": ecommerce_payment_page,
         "course_mode_info": course_mode_info,
         "course_optouts": course_optouts,
+        "resume_course_urls": resume_button_urls,
         "show_email_settings_for": show_email_settings_for,
     }
 
