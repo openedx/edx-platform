@@ -144,6 +144,7 @@ def dashboard_view(request):  # pylint: disable=unused-argument
     }
 
     context = {
+        "course_mode_info": course_mode_info,
         "course_optouts": course_optouts,
         "show_email_settings_for": show_email_settings_for,
     }
