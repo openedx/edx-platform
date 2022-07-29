@@ -1630,6 +1630,7 @@ INSTALLED_APPS.extend(GENPLUS_INSTALLED_APPS)
 ######################### GENPLUS SETTINGS #################################
 
 GENPLUS_FRONTEND_URL = ''
+PROGRAM_ENROLLMENT_COUNTDOWN = 10
 
 ################# EDX MARKETING SITE ##################################
 

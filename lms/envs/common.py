@@ -3164,6 +3164,7 @@ RM_UNIFY_SECRET = 'rmunify-secret'
 ######################### GENPLUS SETTINGS #################################
 
 GENPLUS_FRONTEND_URL = '/'
+PROGRAM_ENROLLMENT_COUNTDOWN = 10
 
 ######################### Django Rest Framework ########################
 

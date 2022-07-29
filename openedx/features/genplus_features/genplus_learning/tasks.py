@@ -32,7 +32,7 @@ def enroll_class_students_to_program(self, class_id, program_id, class_student_i
     students = gen_class.students.select_related('gen_user').all()
 
     if program_unit_ids:
-        units = units.filter(pk__in=program_unit_ids)
+        units = units.filter(program__in=program_unit_ids)
 
     if class_student_ids:
         students = students.filter(pk__in=class_student_ids)
@@ -40,32 +40,32 @@ def enroll_class_students_to_program(self, class_id, program_id, class_student_i
     for student in students:
         try:
             program_enrollment = ProgramEnrollment.objects.get(
-                gen_user=student.gen_user,
+                student=student,
                 program=program
             )
         except ProgramEnrollment.DoesNotExist:
             program_enrollment = ProgramEnrollment.objects.create(
-                gen_user=student.gen_user,
+                student=student,
                 program=program,
-                from_class=gen_class,
+                gen_class=gen_class,
                 status=ProgramEnrollmentStatuses.ENROLLED
             )
             log.info(f"Program enrollment created for student: {student}, class: {gen_class}, program: {program}")
 
         for unit in units:
-            if CourseEnrollment.is_enrolled(student.gen_user.user, unit.id):
+            if CourseEnrollment.is_enrolled(student.gen_user.user, unit.course.id):
                 log.error(f'Student: {student} is already enrolled to course: {unit}!')
                 return
 
             unit_enrollment, created = ProgramUnitEnrollment.objects.get_or_create(
                 program_enrollment=program_enrollment,
-                unit=unit,
+                course=unit.course,
             )
 
             if created:
                 unit_enrollment.course_enrollment = CourseEnrollment.enroll(
                     user=student.gen_user.user,
-                    course_key=unit.id,
+                    course_key=unit.course.id,
                 )
                 unit_enrollment.save()
                 log.info(f"Program unit enrollment created for student: {student}, course: {unit}, program :{program}")
