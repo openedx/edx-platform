@@ -15,6 +15,8 @@ from common.djangoapps.student.views.dashboard import (
     get_org_black_and_whitelist_for_site,
 )
 from common.djangoapps.util.json_request import JsonResponse
+from lms.djangoapps.bulk_email.models import Optout
+from lms.djangoapps.bulk_email.models_api import is_bulk_email_feature_enabled
 from lms.djangoapps.learner_dashboard.serializers import LearnerDashboardSerializer
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -86,6 +88,25 @@ def get_enrollments(user, org_allow_list, org_block_list, course_limit=None):
     return course_enrollments, course_mode_info
 
 
+def get_email_settings_info(user, course_enrollments):
+    """
+    Given a user and enrollments, determine which courses allow bulk email (show_email_settings_for)
+    and which the learner has opted out from (optouts)
+    """
+    course_optouts = Optout.objects.filter(user=user).values_list(
+        "course_id", flat=True
+    )
+
+    # only show email settings for Mongo course and when bulk email is turned on
+    show_email_settings_for = frozenset(
+        enrollment.course_id
+        for enrollment in course_enrollments
+        if (is_bulk_email_feature_enabled(enrollment.course_id))
+    )
+
+    return show_email_settings_for, course_optouts
+
+
 @login_required
 @require_GET
 def dashboard_view(request):  # pylint: disable=unused-argument
@@ -110,6 +131,9 @@ def dashboard_view(request):  # pylint: disable=unused-argument
         user, site_org_whitelist, site_org_blacklist, course_limit
     )
 
+    # Get email opt-outs for student
+    show_email_settings_for, course_optouts = get_email_settings_info(user, course_enrollments)
+
     learner_dash_data = {
         "emailConfirmation": email_confirmation,
         "enterpriseDashboards": None,
@@ -119,5 +143,10 @@ def dashboard_view(request):  # pylint: disable=unused-argument
         "suggestedCourses": [],
     }
 
-    response_data = LearnerDashboardSerializer(learner_dash_data).data
+    context = {
+        "course_optouts": course_optouts,
+        "show_email_settings_for": show_email_settings_for,
+    }
+
+    response_data = LearnerDashboardSerializer(learner_dash_data, context=context).data
     return JsonResponse(response_data)

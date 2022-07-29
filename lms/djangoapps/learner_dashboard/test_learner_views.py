@@ -11,10 +11,12 @@ from uuid import uuid4
 from django.urls import reverse
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.learner_dashboard.test_serializers import random_url
 from rest_framework.test import APITestCase
 
 from lms.djangoapps.learner_dashboard.learner_views import (
+    get_email_settings_info,
     get_enrollments,
     get_platform_settings,
     get_user_account_confirmation_info,
@@ -150,6 +152,42 @@ class TestGetEnrollments(SharedModuleStoreTestCase):
         for enrollment in test_enrollments:
             assert enrollment.course_id in course_mode_info
             assert enrollment in returned_enrollments
+
+
+class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
+    """Tests for get_email_settings_info"""
+
+    def setUp(self):
+        self.user = UserFactory()
+
+    @patch(
+        "lms.djangoapps.learner_dashboard.learner_views.is_bulk_email_feature_enabled"
+    )
+    def test_get_email_settings(self, mock_is_bulk_email_enabled):
+        # Given 3 courses where bulk email is enabled for 2 and user has opted out of one
+        courses = [CourseFactory.create() for _ in range(3)]
+        enrollments = [
+            CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
+            for course in courses
+        ]
+        optouts = {Optout.objects.create(user=self.user, course_id=courses[1].id)}
+        mock_is_bulk_email_enabled.side_effect = (True, True, False)
+
+        # When I get email settings
+        show_email_settings_for, course_optouts = get_email_settings_info(
+            self.user, enrollments
+        )
+
+        # Then the email settings show for courses where bulk email is enabled
+        self.assertSetEqual(
+            {course.id for course in courses[0:2]}, show_email_settings_for
+        )
+
+        # ... and course optouts are returned
+        self.assertSetEqual(
+            {optout.course_id for optout in optouts},
+            {optout for optout in course_optouts},
+        )
 
 
 class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
