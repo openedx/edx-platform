@@ -55,7 +55,7 @@ class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-metho
             course_dir=course_dir,
             error_tracker=error_tracker,
             load_error_modules=load_error_modules,
-            field_data=KvsFieldData(DictKeyValueStore()),
+            services={'field-data': KvsFieldData(DictKeyValueStore())},
         )
 
 
