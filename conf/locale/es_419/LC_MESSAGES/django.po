@@ -31,6 +31,7 @@
 # Félix Antonio Valdez Noverola <felix@itesm.mx>, 2015
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
+# Jesica Greco, 2022
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020-2021
@@ -270,7 +271,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-17 20:43+0000\n"
+"POT-Creation-Date: 2022-07-24 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -920,7 +921,7 @@ msgstr "No se ha podido inscribir"
 
 #: common/djangoapps/student/views/management.py
 msgid "Unenrollment is currently disabled"
-msgstr ""
+msgstr "La cancelación de inscripción está actualmente deshabilitada"
 
 #: common/djangoapps/student/views/management.py
 msgid "You are not enrolled in this course"
@@ -3630,6 +3631,7 @@ msgstr ""
 "Por favor contacta el administrador de tu licenciatura o el equipo de "
 "soporte de  {platform_name} si tienes dudas."
 
+#: lms/djangoapps/course_home_api/outline/views.py
 #: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "Inscripciones cerradas"
@@ -3942,21 +3944,23 @@ msgstr ""
 
 #: lms/djangoapps/courseware/models.py
 msgid "Internal API Base URL"
-msgstr ""
+msgstr "URL base de la API interna"
 
 #: lms/djangoapps/courseware/models.py
 msgid "Financial Assistance Backend API Base URL."
-msgstr ""
+msgstr "URL base de la API de backend de asistencia financiera."
 
 #: lms/djangoapps/courseware/models.py
 msgid ""
 "Username created for Financial Assistance Backend, e.g. "
 "financial_assistance_service_user."
 msgstr ""
+"Nombre de usuario creado para el backend de asistencia financiera, por "
+"ejemplo, usuario_servicio_de_asistencia_financiera."
 
 #: lms/djangoapps/courseware/models.py
 msgid "Percentage of courses allowed to use edx-financial-assistance"
-msgstr ""
+msgstr "Porcentaje de cursos autorizados para usar edx-financial-assistance"
 
 #: lms/djangoapps/courseware/plugins.py lms/djangoapps/courseware/tabs.py
 #: lms/templates/peer_grading/peer_grading.html
@@ -4301,7 +4305,7 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 msgid "Go to Discussion"
-msgstr ""
+msgstr "Ir a la Conversación"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
 #, python-format
@@ -6494,6 +6498,8 @@ msgid ""
 "{start_anchor}%(tpa_logout_url)s{middle_anchor}Click here{end_anchor} to "
 "delete your single signed on (SSO) session."
 msgstr ""
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}Haga clic aquí{end_anchor} "
+"para eliminar su inicio de sesión único (SSO)."
 
 #: lms/templates/logout.html
 msgid "We are signing you in."
@@ -6516,6 +6522,8 @@ msgid ""
 "{start_anchor}%(target)s{middle_anchor}click here to go to the home "
 "page{end_anchor}."
 msgstr ""
+"Si no se redirige en 5 segundos, {start_anchor}%(target)s{middle_anchor}haga"
+" clic aquí para ir a la página de inicio{end_anchor}."
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -7840,11 +7848,13 @@ msgstr "La identificación del proveedor de LTI"
 #: openedx/core/djangoapps/course_live/models.py
 msgid "True, if LTI credential are provided by Org globally"
 msgstr ""
+"Verdadero, si la organización proporciona las credenciales de LTI a nivel "
+"mundial"
 
 #: openedx/core/djangoapps/course_live/plugins.py
 #: openedx/core/djangoapps/course_live/tab.py
 msgid "Live"
-msgstr ""
+msgstr "En vivo"
 
 #: openedx/core/djangoapps/course_live/plugins.py
 msgid "Enable in-platform video conferencing by configuring live"
@@ -8267,7 +8277,7 @@ msgstr "Incluir en lista negra a {country} para el curso {course}"
 
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
-msgstr ""
+msgstr "Rutas de aprendizaje"
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -8840,7 +8850,7 @@ msgstr "Escribe tu nombre completo. "
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your first name."
-msgstr ""
+msgstr "Escriba su primer nombre."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your last name."
@@ -8852,7 +8862,7 @@ msgstr "Los correos electrónicos no son iguales."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your confirm email"
-msgstr ""
+msgstr "Ingrese su correo electrónico de confirmación"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your country or region of residence."
@@ -8876,7 +8886,7 @@ msgstr "Introduce tu especialidad."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your state."
-msgstr ""
+msgstr "Ingrese su estado."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your city."
@@ -11836,6 +11846,9 @@ msgid ""
 "Determines whether a 'Reset Problems' button is shown, so users may reset "
 "their answers and reshuffle selected items."
 msgstr ""
+"Determina si se muestra un botón de &#39;Restablecer problemas&#39;, de modo"
+" que los usuarios puedan restablecer sus respuestas y reorganizar los "
+"elementos seleccionados."
 
 #: xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."

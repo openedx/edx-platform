@@ -5,7 +5,7 @@
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2021
+# Ali Işıngör <ali@artistanbul.io>, 2017-2022
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013-2014
 # baris <brscvs@gmail.com>, 2013
@@ -36,7 +36,7 @@
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2021
+# Ali Işıngör <ali@artistanbul.io>, 2017-2022
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
@@ -108,7 +108,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-17 20:43+0000\n"
+"POT-Creation-Date: 2022-07-24 20:43+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2018,2020-2021\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -366,7 +366,7 @@ msgstr "Yukarı git"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Browsing"
-msgstr ""
+msgstr "Göz atılıyor"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
@@ -922,19 +922,19 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
-msgstr ""
+msgstr "Ayrıntılar"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "the more quickly and helpfully we can respond!"
-msgstr ""
+msgstr "o kadar hızlı ve yardımcı bir şekilde yanıt verebiliriz!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
-msgstr ""
+msgstr "Destek Talebi Oluştur"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr ""
+msgstr "Sana nasıl yardımcı olabiliriz, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -944,7 +944,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Need help logging in?"
-msgstr ""
+msgstr "Oturum açmak için yardıma mı ihtiyacınız var?"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -1639,11 +1639,11 @@ msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learners were successfully added to exception list"
-msgstr ""
+msgstr " öğrenciler istisna listesine başarıyla eklendi"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid " learner was successfully added to the exception list"
-msgstr ""
+msgstr " öğrenci istisna listesine başarıyla eklendi"
 
 #: lms/static/js/certificates/views/certificate_bulk_allowlist.js
 msgid ""
@@ -1852,47 +1852,53 @@ msgstr "edX'i herkes için daha iyi bir hale getirmemize yardım edin!"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Why does edX collect this information?"
-msgstr ""
+msgstr "edX neden bu bilgiyi topluyor?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "An error occurred while attempting to retrieve or save the information "
 "below. Please try again later."
 msgstr ""
+"Aşağıdaki bilgiyi çekmeye ya da kaydetmeye çalışırken bir hata gerçekleşti. "
+"Bir süre sonra lütfen tekrar deneyin."
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What was the total combined income, during the last 12 months, of all "
 "members of your family? "
-msgstr ""
+msgstr "Tüm aile üyelerinizin son 12 aylık toplam geliri, ne kadardı?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
 "National Guard?"
 msgstr ""
+"Bugüne dek ABD Ordusu, Yedek Kuvvetler ya da Ulusal Muhafızlar'da hizmet "
+"ettiniz mi?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What is the highest level of education that you have achieved so far?"
-msgstr ""
+msgstr "Şimdiye kadar ulaştığınız en yüksek eğitim seviyesi nedir?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid ""
 "What is the highest level of education that any of your parents or guardians"
 " have achieved?"
 msgstr ""
+"Ebeveyn ya da velilerinizin şimdiye kadar ulaştığı en yüksek eğitim seviyesi"
+" nedir?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select employment status"
-msgstr ""
+msgstr "Meslek durumunu seçin"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you currently work in?"
-msgstr ""
+msgstr "Şu anda hangi sektörde çalışıyorsunuz?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What industry do you want to work in?"
-msgstr ""
+msgstr "Gelecekte hangi sektörde çalışmak istiyorsunuz?"
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -1908,19 +1914,19 @@ msgstr "anketi kapat"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "finish later"
-msgstr ""
+msgstr "sonra tamamla"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Return to my dashboard"
-msgstr ""
+msgstr "Panelime geri dön"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Finish later"
-msgstr ""
+msgstr "Sonra tamamla"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "next page"
-msgstr ""
+msgstr "sonraki sayfa"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -2987,6 +2993,8 @@ msgid ""
 "To access the courses available to you through {enterpriseName}, visit the "
 "{enterpriseName} dashboard."
 msgstr ""
+"{enterpriseName} aracılığıyla size sunulan derslere erişmek için, "
+"{enterpriseName} panelini ziyaret ediniz."
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid "Go to dashboard"
@@ -2998,11 +3006,11 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "loading"
-msgstr ""
+msgstr "yükleniyor"
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Explore courses"
-msgstr ""
+msgstr "Dersleri keşfet"
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
@@ -3191,7 +3199,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
-msgstr ""
+msgstr "İlerlemeden önce, lütfen {htmlStart}{emailMsg}{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4044,11 +4052,11 @@ msgstr "Son kütüphane içeriğiyle güncelleniyor"
 
 #: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
 msgid "Loading..."
-msgstr ""
+msgstr "Yüklüyor..."
 
 #: xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
 msgid "Selected blocks"
-msgstr ""
+msgstr "Seçili blocklar"
 
 #: xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Unable to update settings"
@@ -5475,6 +5483,7 @@ msgstr ""
 msgid ""
 "An answer option has been left blank. Please review and edit the component."
 msgstr ""
+"Cevap seçeneği boş bırakılmış. Lütfen gözden geçirin ve bileşeni düzenleyin."
 
 #: xmodule/js/src/problem/edit.js
 msgid "Explanation"
@@ -5920,27 +5929,28 @@ msgstr "Yüklemede bir sorun oluştu"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr ""
+msgstr "Kurum:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr ""
+msgstr "Ders Numarası:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr ""
+msgstr "Ders Yayını:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr ""
+msgstr "(Salt-okunur)"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
-msgstr ""
+msgstr "Dersi Yeniden Çalıştır"
 
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
-msgstr "Canlı Görüntüle"
+msgstr "Canlıda Görüntüle"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
