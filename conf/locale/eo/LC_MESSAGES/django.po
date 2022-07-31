@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-24 20:35+0000\n"
-"PO-Revision-Date: 2022-07-24 20:35:06.337666\n"
+"POT-Creation-Date: 2022-07-31 20:34+0000\n"
+"PO-Revision-Date: 2022-07-31 20:34:55.000738\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -1763,512 +1763,6 @@ msgstr "Prövïsïönällý Süppörtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 msgid "Unsupported"
 msgstr "Ûnsüppörtéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: common/lib/capa/capa/capa_problem.py
-msgid "Cannot rescore problems with possible file submissions"
-msgstr ""
-"Çännöt résçöré prößléms wïth pössïßlé fïlé süßmïssïöns Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/capa_problem.py
-msgid "Question {}"
-msgstr "Qüéstïön {} Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Incorrect"
-msgstr "Ìnçörréçt Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Correct"
-msgstr "Çörréçt Ⱡ'σяєм ιρѕυм #"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "correct"
-msgstr "çörréçt Ⱡ'σяєм ιρѕυм #"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incorrect"
-msgstr "ïnçörréçt Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr "pärtïällý çörréçt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incomplete"
-msgstr "ïnçömplété Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "unanswered"
-msgstr "ünänswéréd Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "submitted"
-msgstr "süßmïttéd Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "processing"
-msgstr "pröçéssïng Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#. Translators: these are tooltips that indicate the state of an assessment
-#. question
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is correct."
-msgstr "Thïs änswér ïs çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is incorrect."
-msgstr "Thïs änswér ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is partially correct."
-msgstr ""
-"Thïs änswér ïs pärtïällý çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is being processed."
-msgstr "Thïs änswér ïs ßéïng pröçésséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Not yet answered."
-msgstr "Nöt ýét änswéréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: common/lib/capa/capa/inputtypes.py wiki/forms.py
-msgid "Select an option"
-msgstr "Séléçt än öptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#. Translators: 'ChoiceGroup' is an input type and should not be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "ChoiceGroup: unexpected tag {tag_name}"
-msgstr ""
-"ÇhöïçéGröüp: ünéxpéçtéd täg {tag_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Answer received."
-msgstr "Ànswér réçéïvéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
-#. be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
-msgstr ""
-"Éxpéçtéd ä <choice> ör <compoundhint> täg; göt {given_tag} ïnstéäd Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your files have been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"Ýöür fïlés hävé ßéén süßmïttéd. Às söön äs ýöür süßmïssïön ïs grädéd, thïs "
-"méssägé wïll ßé répläçéd wïth thé grädér's féédßäçk. Ⱡ'σяє#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your answer has been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"Ýöür änswér häs ßéén süßmïttéd. Às söön äs ýöür süßmïssïön ïs grädéd, thïs "
-"méssägé wïll ßé répläçéd wïth thé grädér's féédßäçk. Ⱡ'σяє#"
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{programming_language} editor"
-msgstr "{programming_language} édïtör Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Press ESC then TAB or click outside of the code editor to exit"
-msgstr ""
-"Préss ÉSÇ thén TÀB ör çlïçk öütsïdé öf thé çödé édïtör tö éxït Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Submitted. As soon as a response is returned, this message will be replaced "
-"by that feedback."
-msgstr ""
-"Süßmïttéd. Às söön äs ä réspönsé ïs rétürnéd, thïs méssägé wïll ßé répläçéd "
-"ßý thät féédßäçk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
-msgstr ""
-"Nö réspönsé fröm Xqüéüé wïthïn {xqueue_timeout} séçönds. Àßörtéd. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error running code."
-msgstr "Érrör rünnïng çödé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Cannot connect to the queue"
-msgstr "Çännöt çönnéçt tö thé qüéüé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "No formula specified."
-msgstr "Nö förmülä spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Couldn't parse formula: {error_msg}"
-msgstr ""
-"Çöüldn't pärsé förmülä: {error_msg} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error while rendering preview"
-msgstr "Érrör whïlé réndérïng prévïéw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Sorry, couldn't parse formula"
-msgstr "Sörrý, çöüldn't pärsé förmülä Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{input_type}: unexpected tag {tag_name}"
-msgstr ""
-"{input_type}: ünéxpéçtéd täg {tag_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#. Translators: a "tag" is an XML element, such as "<b>" in HTML
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a {expected_tag} tag; got {given_tag} instead"
-msgstr ""
-"Éxpéçtéd ä {expected_tag} täg; göt {given_tag} ïnstéäd Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#. Translators: index here could be 1,2,3 and so on
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Question {index}"
-msgstr "Qüéstïön {index} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Correct:"
-msgstr "Çörréçt: Ⱡ'σяєм ιρѕυм ∂#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Incorrect:"
-msgstr "Ìnçörréçt: Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/lib/capa/capa/responsetypes.py xmodule/capa_module.py
-msgid "Answer"
-msgstr "Ànswér Ⱡ'σяєм ιρѕυ#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error {err} in evaluating hint function {hintfn}."
-msgstr ""
-"Érrör {err} ïn évälüätïng hïnt fünçtïön {hintfn}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "(Source code line unavailable)"
-msgstr "(Söürçé çödé lïné ünäväïläßlé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "See XML source line {sourcenum}."
-msgstr "Séé XML söürçé lïné {sourcenum}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Checkboxes"
-msgstr "Çhéçkßöxés Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Multiple Choice"
-msgstr "Mültïplé Çhöïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
-#. be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Do not use shuffle and answer-pool at the same time"
-msgstr ""
-"Dö nöt üsé shüfflé änd änswér-pööl ät thé sämé tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#. Translators: 'answer-pool' is an attribute name and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "answer-pool value should be an integer"
-msgstr ""
-"änswér-pööl välüé shöüld ßé än ïntégér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#. Translators: 'Choicegroup' is an input type and should not be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
-msgstr ""
-"Çhöïçégröüp müst ïnçlüdé ät léäst 1 çörréçt änd 1 ïnçörréçt çhöïçé Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "True/False Choice"
-msgstr "Trüé/Fälsé Çhöïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Dropdown"
-msgstr "Dröpdöwn Ⱡ'σяєм ιρѕυм ∂#"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Numerical Input"
-msgstr "Nümérïçäl Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "There was a problem with the staff answer to this problem."
-msgstr ""
-"Théré wäs ä prößlém wïth thé stäff änswér tö thïs prößlém. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{student_answer}' as a number."
-msgstr ""
-"Çöüld nöt ïntérprét '{student_answer}' äs ä nümßér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Factorial function evaluated outside its domain:'{student_answer}'"
-msgstr ""
-"Fäçtörïäl fünçtïön évälüätéd öütsïdé ïts dömäïn:'{student_answer}' Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid math syntax: '{student_answer}'"
-msgstr ""
-"Ìnvälïd mäth sýntäx: '{student_answer}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "You may not use complex numbers in range tolerance problems"
-msgstr ""
-"Ýöü mäý nöt üsé çömpléx nümßérs ïn rängé töléränçé prößléms Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. provided a
-#. boundary (end limit) for a variable that is a complex number (a + bi), this
-#. message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: complex boundary."
-msgstr ""
-"Théré wäs ä prößlém wïth thé stäff änswér tö thïs prößlém: çömpléx ßöündärý."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. did not
-#. provide a boundary (end limit) for a variable, this message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: empty boundary."
-msgstr ""
-"Théré wäs ä prößlém wïth thé stäff änswér tö thïs prößlém: émptý ßöündärý. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: Separator used in NumericalResponse to display multiple
-#. answers.
-#. Translators: Separator used in StringResponse to display multiple answers.
-#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: this is the last choice of a number of choices of how to log
-#. in
-#. to the site.
-#: common/lib/capa/capa/responsetypes.py
-#: lms/templates/course_modes/choose.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "or"
-msgstr "ör Ⱡ'σя#"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "Téxt Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr "érrör Ⱡ'σяєм ιρѕ#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Custom Evaluated Script"
-msgstr "Çüstöm Évälüätéd Sçrïpt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error getting student answer from {student_answers}"
-msgstr ""
-"érrör géttïng stüdént änswér fröm {student_answers} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυ#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer entered!"
-msgstr "Nö änswér éntéréd! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "CustomResponse: check function returned an invalid dictionary!"
-msgstr ""
-"ÇüstömRéspönsé: çhéçk fünçtïön rétürnéd än ïnvälïd dïçtïönärý! Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Symbolic Math Input"
-msgstr "Sýmßölïç Mäth Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#. Translators: 'SymbolicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
-msgstr ""
-"Àn érrör öççürréd wïth SýmßölïçRéspönsé. Thé érrör wäs: {error_msg} Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Code Input"
-msgstr "Çödé Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer provided."
-msgstr "Nö änswér prövïdéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Error: No grader has been set up for this problem."
-msgstr ""
-"Érrör: Nö grädér häs ßéén sét üp för thïs prößlém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
-"try again later."
-msgstr ""
-"Ûnäßlé tö délïvér ýöür süßmïssïön tö grädér (Réäsön: {error_msg}). Pléäsé "
-"trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#. Translators: 'grader' refers to the edX automatic code grader.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Invalid grader reply. Please contact the course staff."
-msgstr ""
-"Ìnvälïd grädér réplý. Pléäsé çöntäçt thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "External Grader"
-msgstr "Éxtérnäl Grädér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Math Expression Input"
-msgstr "Mäth Éxpréssïön Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Factorial function not permitted in answer for this problem. Provided answer"
-" was: {bad_input}"
-msgstr ""
-"Fäçtörïäl fünçtïön nöt pérmïttéd ïn änswér för thïs prößlém. Prövïdéd änswér"
-" wäs: {bad_input} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula."
-msgstr ""
-"Ìnvälïd ïnpüt: Çöüld nöt pärsé '{bad_input}' äs ä förmülä. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula"
-msgstr ""
-"Ìnvälïd ïnpüt: Çöüld nöt pärsé '{bad_input}' äs ä förmülä Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Circuit Schematic Builder"
-msgstr "Çïrçüït Sçhémätïç Büïldér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#. Translators: 'SchematicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
-msgstr ""
-"Érrör ïn évälüätïng SçhémätïçRéspönsé. Thé érrör wäs: {error_msg} Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Image Mapped Input"
-msgstr "Ìmägé Mäppéd Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error grading {image_input_id} (input={user_input})"
-msgstr ""
-"érrör grädïng {image_input_id} (ïnpüt={user_input}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢#"
-
-#. Translators: {sr_coords} are the coordinates of a rectangle
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
-msgstr ""
-"Érrör ïn prößlém spéçïfïçätïön! Çännöt pärsé réçtänglé ïn {sr_coords} Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Annotation Input"
-msgstr "Ànnötätïön Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Checkboxes With Text Input"
-msgstr "Çhéçkßöxés Wïth Téxt Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Answer not provided for {input_type}"
-msgstr ""
-"Ànswér nöt prövïdéd för {input_type} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "The Staff answer could not be interpreted as a number."
-msgstr ""
-"Thé Stäff änswér çöüld nöt ßé ïntérprétéd äs ä nümßér. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{given_answer}' as a number."
-msgstr ""
-"Çöüld nöt ïntérprét '{given_answer}' äs ä nümßér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя#"
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid ""
-"Codejail API Service is unavailable. Please try again in a few minutes."
-msgstr ""
-"Çödéjäïl ÀPÌ Sérvïçé ïs ünäväïläßlé. Pléäsé trý ägäïn ïn ä féw mïnütés. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Codejail API Service invalid response."
-msgstr ""
-"Çödéjäïl ÀPÌ Sérvïçé ïnvälïd réspönsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Invalid JSON response received from codejail api service."
-msgstr ""
-"Ìnvälïd JSÖN réspönsé réçéïvéd fröm çödéjäïl äpï sérvïçé. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
 msgstr "Ûnlöçk Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
@@ -3856,6 +3350,12 @@ msgstr ""
 msgid "You must be enrolled in the course"
 msgstr ""
 "Ýöü müst ßé énrölléd ïn thé çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must give Data Sharing Consent for the course"
+msgstr ""
+"Ýöü müst gïvé Dätä Shärïng Çönsént för thé çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be logged in to see this course"
@@ -11075,6 +10575,506 @@ msgstr ""
 msgid "Annotation"
 msgstr "Ànnötätïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
+#: xmodule/capa/capa_problem.py
+msgid "Cannot rescore problems with possible file submissions"
+msgstr ""
+"Çännöt résçöré prößléms wïth pössïßlé fïlé süßmïssïöns Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/capa_problem.py
+msgid "Question {}"
+msgstr "Qüéstïön {} Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Incorrect"
+msgstr "Ìnçörréçt Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Correct"
+msgstr "Çörréçt Ⱡ'σяєм ιρѕυм #"
+
+#: xmodule/capa/inputtypes.py
+msgid "correct"
+msgstr "çörréçt Ⱡ'σяєм ιρѕυм #"
+
+#: xmodule/capa/inputtypes.py
+msgid "incorrect"
+msgstr "ïnçörréçt Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: xmodule/capa/inputtypes.py
+msgid "partially correct"
+msgstr "pärtïällý çörréçt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: xmodule/capa/inputtypes.py
+msgid "incomplete"
+msgstr "ïnçömplété Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: xmodule/capa/inputtypes.py
+msgid "unanswered"
+msgstr "ünänswéréd Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: xmodule/capa/inputtypes.py
+msgid "submitted"
+msgstr "süßmïttéd Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: xmodule/capa/inputtypes.py
+msgid "processing"
+msgstr "pröçéssïng Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#. Translators: these are tooltips that indicate the state of an assessment
+#. question
+#: xmodule/capa/inputtypes.py
+msgid "This answer is correct."
+msgstr "Thïs änswér ïs çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is incorrect."
+msgstr "Thïs änswér ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is partially correct."
+msgstr ""
+"Thïs änswér ïs pärtïällý çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is being processed."
+msgstr "Thïs änswér ïs ßéïng pröçésséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: xmodule/capa/inputtypes.py
+msgid "Not yet answered."
+msgstr "Nöt ýét änswéréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: xmodule/capa/inputtypes.py wiki/forms.py
+msgid "Select an option"
+msgstr "Séléçt än öptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr ""
+"ÇhöïçéGröüp: ünéxpéçtéd täg {tag_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: xmodule/capa/inputtypes.py
+msgid "Answer received."
+msgstr "Ànswér réçéïvéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
+#. be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
+msgstr ""
+"Éxpéçtéd ä <choice> ör <compoundhint> täg; göt {given_tag} ïnstéäd Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"Ýöür fïlés hävé ßéén süßmïttéd. Às söön äs ýöür süßmïssïön ïs grädéd, thïs "
+"méssägé wïll ßé répläçéd wïth thé grädér's féédßäçk. Ⱡ'σяє#"
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your answer has been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"Ýöür änswér häs ßéén süßmïttéd. Às söön äs ýöür süßmïssïön ïs grädéd, thïs "
+"méssägé wïll ßé répläçéd wïth thé grädér's féédßäçk. Ⱡ'σяє#"
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{programming_language} editor"
+msgstr "{programming_language} édïtör Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: xmodule/capa/inputtypes.py
+msgid "Press ESC then TAB or click outside of the code editor to exit"
+msgstr ""
+"Préss ÉSÇ thén TÀB ör çlïçk öütsïdé öf thé çödé édïtör tö éxït Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Submitted. As soon as a response is returned, this message will be replaced "
+"by that feedback."
+msgstr ""
+"Süßmïttéd. Às söön äs ä réspönsé ïs rétürnéd, thïs méssägé wïll ßé répläçéd "
+"ßý thät féédßäçk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr ""
+"Nö réspönsé fröm Xqüéüé wïthïn {xqueue_timeout} séçönds. Àßörtéd. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/inputtypes.py
+msgid "Error running code."
+msgstr "Érrör rünnïng çödé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: xmodule/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr "Çännöt çönnéçt tö thé qüéüé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: xmodule/capa/inputtypes.py
+msgid "No formula specified."
+msgstr "Nö förmülä spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Couldn't parse formula: {error_msg}"
+msgstr ""
+"Çöüldn't pärsé förmülä: {error_msg} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: xmodule/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr "Érrör whïlé réndérïng prévïéw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: xmodule/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr "Sörrý, çöüldn't pärsé förmülä Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr ""
+"{input_type}: ünéxpéçtéd täg {tag_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+"Éxpéçtéd ä {expected_tag} täg; göt {given_tag} ïnstéäd Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#. Translators: index here could be 1,2,3 and so on
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Question {index}"
+msgstr "Qüéstïön {index} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: xmodule/capa/responsetypes.py
+msgid "Correct:"
+msgstr "Çörréçt: Ⱡ'σяєм ιρѕυм ∂#"
+
+#: xmodule/capa/responsetypes.py
+msgid "Incorrect:"
+msgstr "Ìnçörréçt: Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: xmodule/capa/responsetypes.py xmodule/capa_module.py
+msgid "Answer"
+msgstr "Ànswér Ⱡ'σяєм ιρѕυ#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error {err} in evaluating hint function {hintfn}."
+msgstr ""
+"Érrör {err} ïn évälüätïng hïnt fünçtïön {hintfn}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя #"
+
+#: xmodule/capa/responsetypes.py
+msgid "(Source code line unavailable)"
+msgstr "(Söürçé çödé lïné ünäväïläßlé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "See XML source line {sourcenum}."
+msgstr "Séé XML söürçé lïné {sourcenum}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Checkboxes"
+msgstr "Çhéçkßöxés Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Multiple Choice"
+msgstr "Mültïplé Çhöïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr ""
+"Dö nöt üsé shüfflé änd änswér-pööl ät thé sämé tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+msgid "answer-pool value should be an integer"
+msgstr ""
+"änswér-pööl välüé shöüld ßé än ïntégér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr ""
+"Çhöïçégröüp müst ïnçlüdé ät léäst 1 çörréçt änd 1 ïnçörréçt çhöïçé Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: xmodule/capa/responsetypes.py
+msgid "True/False Choice"
+msgstr "Trüé/Fälsé Çhöïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Dropdown"
+msgstr "Dröpdöwn Ⱡ'σяєм ιρѕυм ∂#"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Numerical Input"
+msgstr "Nümérïçäl Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: xmodule/capa/responsetypes.py
+msgid "There was a problem with the staff answer to this problem."
+msgstr ""
+"Théré wäs ä prößlém wïth thé stäff änswér tö thïs prößlém. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{student_answer}' as a number."
+msgstr ""
+"Çöüld nöt ïntérprét '{student_answer}' äs ä nümßér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Factorial function evaluated outside its domain:'{student_answer}'"
+msgstr ""
+"Fäçtörïäl fünçtïön évälüätéd öütsïdé ïts dömäïn:'{student_answer}' Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid math syntax: '{student_answer}'"
+msgstr ""
+"Ìnvälïd mäth sýntäx: '{student_answer}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: xmodule/capa/responsetypes.py
+msgid "You may not use complex numbers in range tolerance problems"
+msgstr ""
+"Ýöü mäý nöt üsé çömpléx nümßérs ïn rängé töléränçé prößléms Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. provided a
+#. boundary (end limit) for a variable that is a complex number (a + bi), this
+#. message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: complex boundary."
+msgstr ""
+"Théré wäs ä prößlém wïth thé stäff änswér tö thïs prößlém: çömpléx ßöündärý."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. did not
+#. provide a boundary (end limit) for a variable, this message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: empty boundary."
+msgstr ""
+"Théré wäs ä prößlém wïth thé stäff änswér tö thïs prößlém: émptý ßöündärý. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: Separator used in NumericalResponse to display multiple
+#. answers.
+#. Translators: Separator used in StringResponse to display multiple answers.
+#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+#. Translators: this is the last choice of a number of choices of how to log
+#. in
+#. to the site.
+#: xmodule/capa/responsetypes.py lms/templates/course_modes/choose.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "or"
+msgstr "ör Ⱡ'σя#"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "Téxt Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: xmodule/capa/responsetypes.py
+msgid "error"
+msgstr "érrör Ⱡ'σяєм ιρѕ#"
+
+#: xmodule/capa/responsetypes.py
+msgid "Custom Evaluated Script"
+msgstr "Çüstöm Évälüätéd Sçrïpt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error getting student answer from {student_answers}"
+msgstr ""
+"érrör géttïng stüdént änswér fröm {student_answers} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr "Nö änswér éntéréd! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: xmodule/capa/responsetypes.py
+msgid "CustomResponse: check function returned an invalid dictionary!"
+msgstr ""
+"ÇüstömRéspönsé: çhéçk fünçtïön rétürnéd än ïnvälïd dïçtïönärý! Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/responsetypes.py
+msgid "Symbolic Math Input"
+msgstr "Sýmßölïç Mäth Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
+msgstr ""
+"Àn érrör öççürréd wïth SýmßölïçRéspönsé. Thé érrör wäs: {error_msg} Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/responsetypes.py
+msgid "Code Input"
+msgstr "Çödé Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer provided."
+msgstr "Nö änswér prövïdéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: xmodule/capa/responsetypes.py
+msgid "Error: No grader has been set up for this problem."
+msgstr ""
+"Érrör: Nö grädér häs ßéén sét üp för thïs prößlém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
+"try again later."
+msgstr ""
+"Ûnäßlé tö délïvér ýöür süßmïssïön tö grädér (Réäsön: {error_msg}). Pléäsé "
+"trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#. Translators: 'grader' refers to the edX automatic code grader.
+#: xmodule/capa/responsetypes.py
+msgid "Invalid grader reply. Please contact the course staff."
+msgstr ""
+"Ìnvälïd grädér réplý. Pléäsé çöntäçt thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/responsetypes.py
+msgid "External Grader"
+msgstr "Éxtérnäl Grädér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: xmodule/capa/responsetypes.py
+msgid "Math Expression Input"
+msgstr "Mäth Éxpréssïön Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Factorial function not permitted in answer for this problem. Provided answer"
+" was: {bad_input}"
+msgstr ""
+"Fäçtörïäl fünçtïön nöt pérmïttéd ïn änswér för thïs prößlém. Prövïdéd änswér"
+" wäs: {bad_input} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula."
+msgstr ""
+"Ìnvälïd ïnpüt: Çöüld nöt pärsé '{bad_input}' äs ä förmülä. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula"
+msgstr ""
+"Ìnvälïd ïnpüt: Çöüld nöt pärsé '{bad_input}' äs ä förmülä Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/responsetypes.py
+msgid "Circuit Schematic Builder"
+msgstr "Çïrçüït Sçhémätïç Büïldér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#. Translators: 'SchematicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
+msgstr ""
+"Érrör ïn évälüätïng SçhémätïçRéspönsé. Thé érrör wäs: {error_msg} Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/responsetypes.py
+msgid "Image Mapped Input"
+msgstr "Ìmägé Mäppéd Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr ""
+"érrör grädïng {image_input_id} (ïnpüt={user_input}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢#"
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr ""
+"Érrör ïn prößlém spéçïfïçätïön! Çännöt pärsé réçtänglé ïn {sr_coords} Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/responsetypes.py
+msgid "Annotation Input"
+msgstr "Ànnötätïön Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: xmodule/capa/responsetypes.py
+msgid "Checkboxes With Text Input"
+msgstr "Çhéçkßöxés Wïth Téxt Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Answer not provided for {input_type}"
+msgstr ""
+"Ànswér nöt prövïdéd för {input_type} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: xmodule/capa/responsetypes.py
+msgid "The Staff answer could not be interpreted as a number."
+msgstr ""
+"Thé Stäff änswér çöüld nöt ßé ïntérprétéd äs ä nümßér. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{given_answer}' as a number."
+msgstr ""
+"Çöüld nöt ïntérprét '{given_answer}' äs ä nümßér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя#"
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid ""
+"Codejail API Service is unavailable. Please try again in a few minutes."
+msgstr ""
+"Çödéjäïl ÀPÌ Sérvïçé ïs ünäväïläßlé. Pléäsé trý ägäïn ïn ä féw mïnütés. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Codejail API Service invalid response."
+msgstr ""
+"Çödéjäïl ÀPÌ Sérvïçé ïnvälïd réspönsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Invalid JSON response received from codejail api service."
+msgstr ""
+"Ìnvälïd JSÖN réspönsé réçéïvéd fröm çödéjäïl äpï sérvïçé. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
 #: xmodule/capa_module.py
 msgid "Blank Advanced Problem"
 msgstr "Blänk Àdvänçéd Prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
@@ -15776,10 +15776,6 @@ msgstr "nämé Ⱡ'σяєм ι#"
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
 msgstr "Sïgn Öüt Ⱡ'σяєм ιρѕυм ∂#"
-
-#: common/lib/capa/capa/templates/codeinput.html
-msgid "Code Editor"
-msgstr "Çödé Édïtör Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
@@ -23852,6 +23848,10 @@ msgstr "Püt ýöür Hönör Çödé héré! Ⱡ'σяєм ιρѕυм ∂σłσя
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Copyright Text here!"
 msgstr "Püt ýöür Çöpýrïght Téxt héré! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: xmodule/capa/templates/codeinput.html
+msgid "Code Editor"
+msgstr "Çödé Édïtör Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
