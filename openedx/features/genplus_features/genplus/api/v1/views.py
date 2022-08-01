@@ -6,6 +6,8 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import GenUser, Character, Class, Teacher, Student, TeacherClass
@@ -22,6 +24,10 @@ class UserInfo(GenzMixin, views.APIView):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={200: UserInfoSerializer},
+        tags=['Users'],
+    )
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
         get user's basic info
@@ -33,6 +39,20 @@ class UserInfo(GenzMixin, views.APIView):
 
         return Response(status=status.HTTP_200_OK, data=user_info.data)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'Image',
+                openapi.IN_QUERY,
+                description='Profile image (should be in body, it shows\
+                 query because only serializers or schema are allowed)',
+                type=openapi.TYPE_STRING,
+                format=openapi.FORMAT_BASE64,
+            ),
+        ],
+        responses={200: SuccessMessages.PROFILE_IMAGE_UPDATED},
+        tags=['Users'],
+    )
     def post(self, *args, **kwargs):  # pylint: disable=unused-argument
         """
         update user's profile image
