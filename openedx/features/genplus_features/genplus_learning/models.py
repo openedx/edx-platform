@@ -78,6 +78,12 @@ class Unit(models.Model):
     def banner_image_url(self):
         return f"{settings.LMS_ROOT_URL}{self.course.course_image_url}"
 
+    def is_locked(self, gen_class):
+        class_unit = self.class_units.filter(gen_class=gen_class).first()
+        if class_unit:
+            return class_unit.is_locked
+        return True
+
     def __str__(self):
         return str(self.course.id)
 

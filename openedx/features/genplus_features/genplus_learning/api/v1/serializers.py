@@ -2,11 +2,8 @@ from rest_framework import serializers
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.genplus_features.genplus_learning.models import (
-    YearGroup,
     Program,
     ProgramEnrollment,
-    ProgramUnitEnrollment,
-    ClassUnit,
     Unit,
 )
 from openedx.features.genplus_features.genplus_learning.utils import (
@@ -30,28 +27,16 @@ class UnitSerializer(serializers.ModelSerializer):
         return str(obj.course.id)
 
     def get_is_locked(self, obj):
-        gen_user = self.context.get("gen_user")
-        is_locked = True
-        if gen_user.is_student:
-            gen_class = ProgramEnrollment.objects.get(
-                student=gen_user.student,
-                program=obj.program,
-            ).gen_class
-            is_locked = ClassUnit.objects.get(gen_class=gen_class, unit=obj).is_locked
-        elif gen_user.is_teacher:
-            is_locked = False
-
-        return is_locked
+        units_context = self.context.get("units_context")
+        return units_context[obj.pk]['is_locked']
 
     def get_progress(self, obj):
-        gen_user = self.context.get("gen_user")
-        if gen_user.is_student:
-            return get_unit_progress(obj.course.id, gen_user.user)
-        return None
+        units_context = self.context.get("units_context")
+        return units_context[obj.pk]['progress']
 
 
 class ProgramSerializer(serializers.ModelSerializer):
-    units = UnitSerializer(many=True, read_only=True)
+    units = serializers.SerializerMethodField()
     year_group_name = serializers.CharField(source='year_group.name')
     program_name = serializers.CharField(source='year_group.program_name')
 
@@ -59,6 +44,23 @@ class ProgramSerializer(serializers.ModelSerializer):
         model = Program
         fields = ('program_name', 'year_group_name', 'units')
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['units'].context.update(self.context)
+    def get_units(self, obj):
+        gen_user = self.context.get('gen_user')
+        units = obj.units.all()
+        units_context = {}
+
+        for unit in units:
+            units_context[unit.pk] = {}
+            if gen_user.is_student:
+                enrollment = gen_user.student.program_enrollments.get(program=obj)
+                units_context[unit.pk] = {
+                    'is_locked': unit.is_locked(enrollment.gen_class),
+                    'progress': get_unit_progress(unit.course.id, gen_user.user),
+                }
+            else:
+                units_context[unit.pk] = {
+                    'is_locked': False,
+                    'progress': None,
+                }
+
+        return UnitSerializer(units, many=True, read_only=True, context={'units_context': units_context}).data
