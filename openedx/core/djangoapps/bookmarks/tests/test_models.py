@@ -27,9 +27,8 @@ from .factories import BookmarkFactory
 EXAMPLE_USAGE_KEY_1 = 'i4x://org.15/course_15/chapter/Week_1'
 EXAMPLE_USAGE_KEY_2 = 'i4x://org.15/course_15/chapter/Week_2'
 
-# noqa: E275
-noop_contextmanager = contextmanager(lambda x: (yield)) # noqa: E275  # pylint: disable=invalid-name
-# noqa: E275
+noop_contextmanager = contextmanager(lambda x: (yield))  # noqa: E275
+
 
 class BookmarksTestsBase(ModuleStoreTestCase):
     """
