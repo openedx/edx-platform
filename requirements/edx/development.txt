@@ -12,7 +12,7 @@
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
     # via -r requirements/edx/testing.txt
--e file:///home/runner/work/edx-platform/edx-platform
+-e .
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx/RateXBlock.git@2.0.1#egg=rate-xblock
     # via -r requirements/edx/testing.txt
