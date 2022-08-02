@@ -12,6 +12,8 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from xmodule.modulestore.django import modulestore
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
 from openedx.features.genplus_features.genplus.models import Student, Class
+from openedx.features.genplus_features.genplus_learning.utils import (get_class_unit_progress,
+                                                                      get_class_lesson_progress)
 
 
 class YearGroup(models.Model):
@@ -40,7 +42,6 @@ class Program(TimeStampedModel):
             )
         )
         super(Program, self).save(*args, **kwargs)
-
 
     @classmethod
     def get_current_programs(cls):
@@ -105,7 +106,8 @@ class ProgramUnitEnrollment(TimeStampedModel):
     class Meta:
         unique_together = ('program_enrollment', 'course',)
 
-    program_enrollment = models.ForeignKey(ProgramEnrollment, on_delete=models.CASCADE, related_name="program_unit_enrollments")
+    program_enrollment = models.ForeignKey(ProgramEnrollment, on_delete=models.CASCADE,
+                                           related_name="program_unit_enrollments")
     course_enrollment = models.ForeignKey(CourseEnrollment, null=True, blank=True, on_delete=models.CASCADE)
     course = models.ForeignKey(CourseOverview, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
@@ -126,6 +128,10 @@ class ClassUnit(models.Model):
     def __str__(self):
         return f"{self.gen_class.name}-{self.unit.course.display_name}"
 
+    @property
+    def class_unit_progress(self):
+        return get_class_unit_progress(self.unit.course.id, self.gen_class)
+
 
 class ClassLesson(models.Model):
     class Meta:
@@ -135,3 +141,11 @@ class ClassLesson(models.Model):
     course_key = CourseKeyField(max_length=255)
     usage_key = UsageKeyField(max_length=255)
     is_locked = models.BooleanField(default=True)
+
+    @property
+    def class_lesson_progress(self):
+        return get_class_lesson_progress(self.usage_key, self.class_unit.gen_class)
+
+    @property
+    def lms_url(self):
+        return f"{settings.LMS_ROOT_URL}/courses/{str(self.course_key)}/jump_to/{str(self.usage_key)}"

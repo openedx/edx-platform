@@ -21,7 +21,7 @@ def _listen_for_course_publish(sender, course_key, **kwargs):
     class_units = ClassUnit.objects.filter(unit__course__id=course_key)
 
     course = modulestore().get_course(course_key)
-    new_lesson_usage_keys = set(course.children) # children has list of section usage keys
+    new_lesson_usage_keys = set(course.children)  # children has list of section usage keys
 
     old_lessons = ClassLesson.objects.filter(course_key=course_key)
     old_lesson_usage_keys = set(old_lessons.values_list('usage_key', flat=True))
@@ -75,7 +75,7 @@ def program_unit_added(sender, instance, created, **kwargs):
             genplus_learning_tasks.enroll_class_students_to_program.apply_async(
                 args=[class_id, instance.program.pk],
                 kwargs={
-                    'program_unit_ids': [str(unit.course.id)]
+                    'program_unit_ids': [str(instance.course.id)]
                 },
                 countdown=settings.PROGRAM_ENROLLMENT_COUNTDOWN
             )
