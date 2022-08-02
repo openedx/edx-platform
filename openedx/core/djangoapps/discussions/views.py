@@ -11,10 +11,10 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from lms.djangoapps.discussion.toggles import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import validate_course_key
+from .config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from .models import AVAILABLE_PROVIDER_MAP, DiscussionsConfiguration, Features, Provider
 from .permissions import IsStaffOrCourseTeam, check_course_permissions
 from .serializers import (
@@ -155,15 +155,17 @@ class DiscussionsProvidersView(APIView):
         """
         Handle HTTP/GET requests
         """
-        data = self.get_provider_data(course_key_string)
+        # Return all providers always, if the user is staff
+        data = self.get_provider_data(course_key_string, show_all=request.user.is_staff)
         return Response(data)
 
     @staticmethod
-    def get_provider_data(course_key_string: str) -> Dict:
+    def get_provider_data(course_key_string: str, show_all: bool = False) -> Dict:
         """
         Get provider data for specified course
         Args:
             course_key_string (str): course key string
+            show_all (bool): don't hide any providers
 
         Returns:
             Dict: course discussion providers
@@ -171,18 +173,17 @@ class DiscussionsProvidersView(APIView):
         course_key = validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
         hidden_providers = []
-        # If the user is currently using the legacy provider, don't show the new provider
-        # TODO: Allow switching between legacy and new providers
-        if configuration.provider_type == Provider.LEGACY:
-            hidden_providers.append(Provider.OPEN_EDX)
-        # If the user is currently using the new provider, don't show the legacy provider
-        elif configuration.provider_type == Provider.OPEN_EDX:
-            hidden_providers.append(Provider.LEGACY)
-        else:
-            # If this is a new course, or some other provider is selected, the new provider
-            # should only show up if the new structure for in context discussions flag is enabled
-            if not ENABLE_NEW_STRUCTURE_DISCUSSIONS.is_enabled(course_key):
-                hidden_providers.append(Provider.OPEN_EDX)
+
+        if not show_all:
+            # If the new style discussions are enabled, then hide the legacy provider unless it's already in use.
+            if ENABLE_NEW_STRUCTURE_DISCUSSIONS.is_enabled(course_key):
+                if configuration.provider_type != Provider.LEGACY:
+                    hidden_providers.append(Provider.LEGACY)
+            # If new discussions is not enabled, hide the new provider
+            else:
+                if configuration.provider_type != Provider.OPEN_EDX:
+                    hidden_providers.append(Provider.OPEN_EDX)
+
         serializer = DiscussionsProvidersSerializer(
             {
                 'features': [
@@ -214,7 +215,7 @@ class CombinedDiscussionsConfigurationView(DiscussionsConfigurationSettingsView)
         Handle HTTP/GET requests
         """
         config_data = self.get_configuration_data(request, course_key_string)
-        provider_data = DiscussionsProvidersView.get_provider_data(course_key_string)
+        provider_data = DiscussionsProvidersView.get_provider_data(course_key_string, show_all=request.user.is_staff)
         return Response({
             **config_data,
             "features": provider_data["features"],
@@ -229,7 +230,7 @@ class CombinedDiscussionsConfigurationView(DiscussionsConfigurationSettingsView)
         Handle HTTP/POST requests
         """
         config_data = self.update_configuration_data(request, course_key_string)
-        provider_data = DiscussionsProvidersView.get_provider_data(course_key_string)
+        provider_data = DiscussionsProvidersView.get_provider_data(course_key_string, request.user.is_staff)
         return Response(
             {
                 **config_data,
