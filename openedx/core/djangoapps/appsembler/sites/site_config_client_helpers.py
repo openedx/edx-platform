@@ -47,9 +47,9 @@ def is_enabled_for_site(site):
     return is_feature_enabled_for_site(uuid)
 
 
-def enable_for_site(site):
+def enable_for_site(site, note=''):
     uuid = tahoe_sites.api.get_uuid_by_site(site)
-    enable_feature_for_site(uuid)
+    enable_feature_for_site(uuid, note=note)
 
 
 def get_active_site_uuids_from_site_config_service():

@@ -2,11 +2,12 @@
 Tests for Platform 2.0 Site Creation serializers view.
 """
 import pytest
-from unittest.mock import patch
 
 from django.db import IntegrityError
 
 from openedx.core.djangoapps.appsembler.sites.serializers_v2 import TahoeSiteCreationSerializer
+
+from site_config_client.models import SiteConfigClientEnabled
 
 
 @pytest.mark.django_db
@@ -18,22 +19,21 @@ def test_create_site_serializer_with_uuid():
     serializer = TahoeSiteCreationSerializer(data={
         'site_uuid': site_uuid,
         'domain': 'blue-site.localhost',
-        'short_name': 'blue-site',
+        'short_name': 'blue-site-org',
     })
 
     assert serializer.is_valid()
 
-    with patch(
-        'openedx.core.djangoapps.appsembler.sites.site_config_client_helpers.enable_for_site'
-    ) as mocked_enabled_for_site:
-        site_data = serializer.save()
-
-    assert mocked_enabled_for_site.call_count == 1, 'Should enable the site configuration service for new sites.'
+    site_data = serializer.save()
 
     assert site_data, 'Site should be created'
     assert site_data['site'].domain == 'blue-site.localhost', 'Site domain should be set correctly'
     assert site_data['site_configuration'], 'Site config should be created'
     assert str(site_data['site_uuid']) == site_uuid, 'Should not generate different site UUID'
+
+    config_flag = SiteConfigClientEnabled.objects.get(site_uuid=site_uuid)
+    assert 'blue-site.localhost' in config_flag.note, 'Add the domain name in the notes for easy search.'
+    assert 'blue-site-org' in config_flag.note, 'Add the organization name in the notes for easy search.'
 
 
 @pytest.mark.django_db

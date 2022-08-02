@@ -68,7 +68,12 @@ class TahoeSiteCreationSerializer(serializers.Serializer):
 
         sass_status = site_config.compile_microsite_sass()
 
-        site_config_client_helpers.enable_for_site(site)
+        site_config_client_helpers.enable_for_site(
+            site=site,
+            note='domain = {domain} , organization name = {short_name} -- (system generated note).'.format(
+                **validated_data,
+            ),
+        )
         course_creation_task_scheduled = import_course_on_site_creation_after_transaction(organization)
 
         return {
