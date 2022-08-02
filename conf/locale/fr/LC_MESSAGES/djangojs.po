@@ -3615,8 +3615,8 @@ msgstr "Créer un compte"
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 #: lms/templates/student_account/form_field.underscore
-msgid "Need help logging in?"
-msgstr "Besoin d'aide pour vous connecter ?"
+msgid "Forgot Password"
+msgstr "Mot de passe oublié?"
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx

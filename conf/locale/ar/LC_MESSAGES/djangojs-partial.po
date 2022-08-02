@@ -3617,8 +3617,8 @@ msgstr "إنشاء حساب"
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid "Need help logging in?"
-msgstr "هل تحتاج مساعدة في تسجيل الدخول؟"
+msgid "Forgot Password?"
+msgstr "هل نسيت كلمة السر؟"
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
