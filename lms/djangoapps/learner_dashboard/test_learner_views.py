@@ -248,8 +248,8 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
     @patch(
         "lms.djangoapps.learner_dashboard.learner_views.get_user_account_confirmation_info"
     )
-    def test_mocked(self, mock_user_conf_info):
-        """High level tests with mocked data"""
+    def test_email_confirmation(self, mock_user_conf_info):
+        """Test that email confirmation info passes through correctly"""
 
         # Given I am logged in
         self.log_in()
