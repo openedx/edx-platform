@@ -914,7 +914,7 @@ class MatlabInput(CodeInput):
             nothing
         """
         # check the queuekey against the saved queuekey
-        if('queuestate' in self.input_state and self.input_state['queuestate'] == 'queued'
+        if ('queuestate' in self.input_state and self.input_state['queuestate'] == 'queued'
                 and self.input_state['queuekey'] == queuekey):
             msg = self._parse_data(queue_msg)
             # save the queue message so that it can be rendered later

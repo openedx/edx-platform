@@ -28,7 +28,7 @@ EXAMPLE_USAGE_KEY_1 = 'i4x://org.15/course_15/chapter/Week_1'
 EXAMPLE_USAGE_KEY_2 = 'i4x://org.15/course_15/chapter/Week_2'
 
 
-noop_contextmanager = contextmanager(lambda x: (yield))  # pylint: disable=invalid-name
+noop_contextmanager = contextmanager(lambda x: (yield))  # pylint: disable=invalid-name # nopep8
 
 
 class BookmarksTestsBase(ModuleStoreTestCase):

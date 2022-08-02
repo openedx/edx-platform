@@ -327,7 +327,7 @@ class EnterpriseTestConsentRequired(SimpleTestCase):
         # Ensure that when consent is necessary, the user is redirected to the consent page.
         mock_consent_necessary.return_value = True
         response = client.get(url)
-        while(response.status_code == 302 and 'grant_data_sharing_permissions' not in response.url):
+        while (response.status_code == 302 and 'grant_data_sharing_permissions' not in response.url):
             response = client.get(response.url)
         assert response.status_code == 302
         assert 'grant_data_sharing_permissions' in response.url

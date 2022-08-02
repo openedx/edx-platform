@@ -378,7 +378,7 @@ class TeamMembershipImportManager:
         with other enrollment modes on a single team.
         Masters track students can't be added to existing non-protected teams
         """
-        if(teamset_id, team_name) not in self.user_enrollment_by_team:
+        if (teamset_id, team_name) not in self.user_enrollment_by_team:
             self.user_enrollment_by_team[teamset_id, team_name] = set()
         self.user_enrollment_by_team[teamset_id, team_name].add(self.user_to_actual_enrollment_mode[user.id])
         if self.is_FERPA_bubble_breached(teamset_id, team_name) or \

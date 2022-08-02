@@ -45,7 +45,7 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
 
 def _should_update_date(verified_mode):
     """ Returns whether or not the verified mode should be updated. """
-    return not(verified_mode is None or verified_mode.expiration_datetime_is_explicit)
+    return not (verified_mode is None or verified_mode.expiration_datetime_is_explicit)
 
 
 @receiver(post_save, sender=CourseMode)

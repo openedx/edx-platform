@@ -107,6 +107,7 @@ class Randomization(String):
     """
     Define a field to store how to randomize a problem.
     """
+
     def from_json(self, value):
         if value in ("", "true"):
             return RANDOMIZATION.ALWAYS
@@ -945,7 +946,7 @@ class ProblemBlock(
     def handle_fatal_lcp_error(self, error):  # lint-amnesty, pylint: disable=missing-function-docstring
         log.exception(f"LcpFatalError Encountered for {str(self.location)}")
         if error:
-            return(
+            return (
                 HTML('<p>Error formatting HTML for problem:</p><p><pre style="color:red">{msg}</pre></p>').format(
                     msg=str(error))
             )
@@ -1665,7 +1666,7 @@ class ProblemBlock(
                     try:
                         val = json.loads(data[key])
                     # If the submission wasn't deserializable, raise an error.
-                    except(KeyError, ValueError):
+                    except (KeyError, ValueError):
                         raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
                             f"Invalid submission: {data[key]} for {key}"
                         )
@@ -2254,6 +2255,7 @@ class ComplexEncoder(json.JSONEncoder):
     """
     Extend the JSON encoder to correctly handle complex numbers
     """
+
     def default(self, obj):  # lint-amnesty, pylint: disable=arguments-differ, method-hidden
         """
         Print a nicely formatted complex number, or default to the JSON encoder

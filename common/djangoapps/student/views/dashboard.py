@@ -820,7 +820,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'show_dashboard_tabs': True,
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
-        'display_sidebar_account_activation_message': not(user.is_active or hide_dashboard_courses_until_activated),
+        'display_sidebar_account_activation_message': not (user.is_active or hide_dashboard_courses_until_activated),
         'display_dashboard_courses': (user.is_active or not hide_dashboard_courses_until_activated),
         'empty_dashboard_message': empty_dashboard_message,
         'enrollments_fbe_is_on': enrollments_fbe_is_on,

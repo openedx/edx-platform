@@ -682,7 +682,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
     @staticmethod
     def _get_html_for_entitlement_button(course_key: CourseKey):
-        return'''
+        return '''
             <div class="course-info">
             <span class="info-university">{org} - </span>
             <span class="info-course-id">{course}</span>

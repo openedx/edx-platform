@@ -121,7 +121,7 @@ class PytestWorkerManager():
             deleted_ips = 0
             for num in range(0, len(results)):
                 if results[num] == 0:
-                    del(not_ready_ip_addresses[num - deleted_ips])
+                    del (not_ready_ip_addresses[num - deleted_ips])
                     deleted_ips += 1
 
             if len(not_ready_ip_addresses) == 0:

@@ -157,7 +157,7 @@ def remove_users(caller, role, *users):
     :param role: an AccessRole
     """
     # can always remove self (at this layer)
-    if not(len(users) == 1 and caller == users[0]):
+    if not (len(users) == 1 and caller == users[0]):
         _check_caller_authority(caller, role)
     role.remove_users(*users)
 
