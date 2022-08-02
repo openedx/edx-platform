@@ -84,6 +84,9 @@ def plugin_settings(settings):
     settings.TAHOE_DEFAULT_COURSE_GITHUB_ORG = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_ORG', '')
     settings.TAHOE_DEFAULT_COURSE_GITHUB_NAME = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_NAME', '')
     settings.TAHOE_DEFAULT_COURSE_VERSION = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_VERSION', '')
+    settings.TAHOE_DEFAULT_COURSE_CMS_TASK_DELAY = int(settings.ENV_TOKENS.get(
+        'TAHOE_DEFAULT_COURSE_CMS_TASK_DELAY', 0
+    ))
     settings.CMS_UPDATE_SEARCH_INDEX_JOB_QUEUE = settings.ENV_TOKENS.get(
         'CMS_UPDATE_SEARCH_INDEX_JOB_QUEUE', 'edx.cms.core.default'
     )
