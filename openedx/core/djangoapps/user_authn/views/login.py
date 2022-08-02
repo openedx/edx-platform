@@ -27,6 +27,7 @@ from edx_django_utils.monitoring import set_custom_metric
 from eventtracking import tracker
 from ratelimitbackend.exceptions import RateLimitException
 from rest_framework.views import APIView
+from tahoe_sites.api import get_organization_user_by_email
 
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
@@ -49,7 +50,6 @@ from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password
 
 from django.core.exceptions import MultipleObjectsReturned
-from organizations.models import UserOrganizationMapping
 from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
 
 
@@ -119,8 +119,8 @@ def _get_user_by_email(request):
         # level.
         try:
             current_org = get_current_organization()
-            return current_org.userorganizationmapping_set.get(user__email=email).user
-        except UserOrganizationMapping.DoesNotExist:
+            return get_organization_user_by_email(email=email, organization=current_org)
+        except User.DoesNotExist:
             _log_failed_get_user_by_email(email)
         except MultipleObjectsReturned:
             log.exception(

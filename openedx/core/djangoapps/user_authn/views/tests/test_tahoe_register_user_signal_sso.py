@@ -1,5 +1,5 @@
 """
-Tests for to ensure the REGISTER_USER signal is sent with User that has `UserOrganizationMapping`.
+Tests for to ensure the REGISTER_USER signal is sent with User that is linked to an organization
 
 This is needed for Open edX plugins that uses this signal.
 """
@@ -8,10 +8,9 @@ from unittest.mock import patch
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from tahoe_sites.api import get_organization_for_user
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from organizations.models import UserOrganizationMapping
-
 
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER
 
@@ -34,13 +33,12 @@ class MultiTenantRegistrationViewTest(APITestCase):
 
         def assert_active_user_sent_with_signal(sender, user, registration):
             """
-            Mock REGISTER_USER receiver to ensure user has `UserOrganizationMapping`.
+            Mock REGISTER_USER receiver to ensure user is linked to an organization
 
-            In Juniper the function which adds UserOrganizationMapping is `create_account_with_params` in the
+            In Juniper the function which adds the link is `create_account_with_params` in the
             `openedx.core.djangoapps.user_authn.views.register` package.
             """
-            mappings = UserOrganizationMapping.objects.filter(user=user)
-            assert mappings.count() == 1, 'REGISTER_USER should be sent with user that has UserOrganizationMapping'
+            assert get_organization_for_user(user=user), 'REGISTER_USER sent for a user without an organization!'
 
         signal_send.side_effect = assert_active_user_sent_with_signal
 

@@ -25,6 +25,7 @@ from edx_ace import ace
 from edx_ace.recipient import Recipient
 from eventtracking import tracker
 from rest_framework.views import APIView
+from tahoe_sites.api import get_organization_user_by_email
 
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
@@ -47,8 +48,6 @@ from util.password_policy_validators import normalize_password, validate_passwor
 from util.request_rate_limiter import PasswordResetEmailRateLimiter
 
 from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
-
-from organizations.models import UserOrganizationMapping
 
 from tahoe_idp import api as tahoe_idp_api
 
@@ -169,12 +168,13 @@ class PasswordResetFormNoActive(PasswordResetForm):
         if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
             from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
             current_org = get_current_organization()
-            found_mappings = UserOrganizationMapping.objects.filter(
-                user__email__iexact=email,
-                organization=current_org,
-                is_active=True,
-            )
-            self.users_cache = [mapping.user for mapping in found_mappings]
+            try:
+                # The following will raise an exception if many records found in the organization for this email
+                one_user = get_organization_user_by_email(email=email, organization=current_org, fail_if_inactive=True)
+            except User.DoesNotExist:
+                self.users_cache = []
+            else:
+                self.users_cache = [one_user]
         else:
             self.users_cache = User.objects.filter(email__iexact=email)
 
@@ -540,7 +540,7 @@ def _get_user_from_email(email):
     """
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
         current_org = get_current_organization()
-        return current_org.userorganizationmapping_set.get(user__email=email).user
+        return get_organization_user_by_email(email=email, organization=current_org)
 
     try:
         return User.objects.get(email=email)

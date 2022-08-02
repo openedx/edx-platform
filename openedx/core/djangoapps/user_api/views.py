@@ -27,7 +27,6 @@ from openedx.core.djangoapps.appsembler.sites.utils import (
     is_request_for_amc_admin,
     get_current_organization,
 )
-from organizations.models import UserOrganizationMapping
 
 from openedx.core.lib.api.view_utils import require_post_params
 from openedx.core.djangoapps.user_api.models import UserPreference
