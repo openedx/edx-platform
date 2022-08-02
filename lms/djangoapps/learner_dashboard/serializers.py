@@ -208,16 +208,14 @@ class EntitlementSerializer(serializers.Serializer):
 class RelatedProgramSerializer(serializers.Serializer):
     """Related programs information"""
 
-    provider = serializers.CharField()
-    programUrl = serializers.URLField()
     bannerUrl = serializers.URLField()
-    logoUrl = serializers.URLField()
-    title = serializers.CharField()
-    # Note - this should probably be a choice, eventually
-    programType = serializers.CharField()
-    programTypeUrl = serializers.URLField()
-    numberOfCourses = serializers.IntegerField()
     estimatedNumberOfWeeks = serializers.IntegerField()
+    logoUrl = serializers.URLField()
+    numberOfCourses = serializers.IntegerField()
+    programType = serializers.CharField()
+    programUrl = serializers.URLField()
+    provider = serializers.CharField()
+    title = serializers.CharField()
 
 
 class ProgramsSerializer(serializers.Serializer):

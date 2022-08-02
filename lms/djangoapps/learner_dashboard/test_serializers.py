@@ -363,15 +363,14 @@ class TestProgramsSerializer(TestCase):
     def generate_test_related_program(cls):
         """Generate a program with random test data"""
         return {
-            "provider": f"{uuid4()} Inc.",
-            "programUrl": random_url(),
             "bannerUrl": random_url(),
-            "logoUrl": random_url(),
-            "title": f"{uuid4()}",
-            "programType": f"{uuid4()}",
-            "programTypeUrl": random_url(),
-            "numberOfCourses": randint(0, 100),
             "estimatedNumberOfWeeks": randint(0, 45),
+            "logoUrl": random_url(),
+            "numberOfCourses": randint(0, 100),
+            "programType": f"{uuid4()}",
+            "programUrl": random_url(),
+            "provider": f"{uuid4()} Inc.",
+            "title": f"{uuid4()}",
         }
 
     @classmethod
@@ -392,15 +391,14 @@ class TestProgramsSerializer(TestCase):
         for i, related_program in enumerate(related_programs):
             input_program = input_data["relatedPrograms"][i]
             assert related_program == {
-                "provider": input_program["provider"],
-                "programUrl": input_program["programUrl"],
                 "bannerUrl": input_program["bannerUrl"],
-                "logoUrl": input_program["logoUrl"],
-                "title": input_program["title"],
-                "programType": input_program["programType"],
-                "programTypeUrl": input_program["programTypeUrl"],
-                "numberOfCourses": input_program["numberOfCourses"],
                 "estimatedNumberOfWeeks": input_program["estimatedNumberOfWeeks"],
+                "logoUrl": input_program["logoUrl"],
+                "numberOfCourses": input_program["numberOfCourses"],
+                "programType": input_program["programType"],
+                "programUrl": input_program["programUrl"],
+                "provider": input_program["provider"],
+                "title": input_program["title"],
             }
 
         self.assertDictEqual(output_data, {})
