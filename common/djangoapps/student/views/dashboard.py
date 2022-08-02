@@ -268,6 +268,7 @@ def complete_course_mode_info(course_id, enrollment, modes=None):
         if modes['verified'].expiration_datetime:
             today = datetime.datetime.now(UTC).date()
             mode_info['days_for_upsell'] = (modes['verified'].expiration_datetime.date() - today).days
+            mode_info['expiration_datetime'] = modes['verified'].expiration_datetime.date()
 
     return mode_info
 
