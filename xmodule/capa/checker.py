@@ -133,7 +133,7 @@ def check_that_suggested_answers_work(problem):
                                 if answer_id in real_answers)
             log.debug(real_results)
             assert (all(result == 'correct'
-                       for answer_id, result in real_results.items()))
+                        for answer_id, result in real_results.items()))
         except UndefinedVariable as uv_exc:
             log.error("The variable \"{0}\" specified in the ".format(uv_exc) +  # lint-amnesty, pylint: disable=logging-not-lazy
                       "solution isn't recognized (is it a units measure?).")

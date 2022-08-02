@@ -12,13 +12,13 @@ import pytz
 from freezegun import freeze_time
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-
-from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 
 from .. import DEFAULT_FIELDS, OPTIONAL_FIELDS, PathItem
 from ..models import Bookmark, XBlockCache, parse_path_data
@@ -28,7 +28,7 @@ EXAMPLE_USAGE_KEY_1 = 'i4x://org.15/course_15/chapter/Week_1'
 EXAMPLE_USAGE_KEY_2 = 'i4x://org.15/course_15/chapter/Week_2'
 
 
-noop_contextmanager = contextmanager(lambda x: (yield))  # pylint: disable=invalid-name # nopep8
+noop_contextmanager = contextmanager(lambda x: (yield))  # pylint: disable=invalid-name # noqa
 
 
 class BookmarksTestsBase(ModuleStoreTestCase):
