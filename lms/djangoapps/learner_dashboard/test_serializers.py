@@ -232,7 +232,7 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
         serializer = EnrollmentSerializer(input_data, context=input_context)
         output = serializer.data
 
-        assert output["isAuditAccessExpired"] == True
+        assert output["isAuditAccessExpired"] is True
 
     def test_user_can_upgrade(self):
         input_data = self.create_test_enrollment()
@@ -248,7 +248,7 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
         )
 
         output = EnrollmentSerializer(input_data, context=input_context).data
-        assert output["canUpgrade"] == True
+        assert output["canUpgrade"] is True
 
 
 class TestGradeDataSerializer(TestCase):
