@@ -20,8 +20,6 @@ class CourseProviderSerializer(serializers.Serializer):
     """Info about a course provider (institution/business)"""
 
     name = serializers.CharField()
-    website = serializers.URLField()
-    email = serializers.EmailField()
 
 
 class CourseSerializer(serializers.Serializer):

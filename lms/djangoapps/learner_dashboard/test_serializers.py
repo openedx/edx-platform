@@ -135,8 +135,6 @@ class TestCourseProviderSerializer(TestCase):
         """Util to generate test provider info"""
         return {
             "name": f"{uuid4()}",
-            "website": f"{uuid4()}.example.com",
-            "email": f"{uuid4()}@example.com",
         }
 
     def test_happy_path(self):
@@ -145,8 +143,6 @@ class TestCourseProviderSerializer(TestCase):
 
         assert output_data == {
             "name": input_data["name"],
-            "website": input_data["website"],
-            "email": input_data["email"],
         }
 
 
