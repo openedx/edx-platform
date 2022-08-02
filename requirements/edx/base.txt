@@ -12,7 +12,7 @@
     # via -r requirements/edx/github.in
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
     # via -r requirements/edx/github.in
--e .
+-e file:///home/runner/work/edx-platform/edx-platform
     # via -r requirements/edx/local.in
 -e git+https://github.com/edx/RateXBlock.git@2.0.1#egg=rate-xblock
     # via -r requirements/edx/github.in
@@ -42,7 +42,7 @@ async-timeout==4.0.2
     # via
     #   aiohttp
     #   redis
-attrs==21.4.0
+attrs==22.1.0
     # via
     #   -r requirements/edx/base.in
     #   aiohttp
@@ -340,7 +340,7 @@ django-ratelimit==3.0.1
     # via -r requirements/edx/base.in
 django-require @ git+https://github.com/edx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
     # via -r requirements/edx/github.in
-django-sekizai==3.0.1
+django-sekizai==4.0.0
     # via
     #   -r requirements/edx/base.in
     #   django-wiki
@@ -561,7 +561,7 @@ event-tracking==2.1.0
     #   -r requirements/edx/base.in
     #   edx-proctoring
     #   edx-search
-fastavro==1.5.3
+fastavro==1.5.4
     # via openedx-events
 frozenlist==1.3.0
     # via
@@ -661,7 +661,6 @@ lti-consumer-xblock==4.3.2
 lxml==4.9.1
     # via
     #   -r requirements/edx/base.in
-    #   capa
     #   edxval
     #   lti-consumer-xblock
     #   olxcleaner
@@ -745,13 +744,13 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/base.in
-openedx-events==0.11.0
+openedx-events==0.11.1
     # via -r requirements/edx/base.in
 openedx-filters==0.7.0
     # via
     #   -r requirements/edx/base.in
     #   lti-consumer-xblock
-ora2==4.4.4
+ora2==4.4.5
     # via -r requirements/edx/base.in
 oscrypto==1.3.0
     # via snowflake-connector-python
@@ -895,7 +894,6 @@ pytz==2022.1
     #   -r requirements/edx/base.in
     #   babel
     #   blockstore
-    #   capa
     #   celery
     #   django
     #   django-ses
@@ -1021,7 +1019,7 @@ slumber==0.7.1
     #   edx-bulk-grades
     #   edx-enterprise
     #   edx-rest-api-client
-snowflake-connector-python==2.7.10
+snowflake-connector-python==2.7.11
     # via edx-enterprise
 social-auth-app-django==5.0.0
     # via
@@ -1160,7 +1158,7 @@ xmlsec==1.3.12
     # via python3-saml
 xss-utils==0.4.0
     # via -r requirements/edx/base.in
-yarl==1.7.2
+yarl==1.8.0
     # via aiohttp
 zipp==3.8.1
     # via importlib-metadata
