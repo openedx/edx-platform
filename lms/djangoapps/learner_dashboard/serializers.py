@@ -29,6 +29,7 @@ class CourseSerializer(serializers.Serializer):
 
     bannerImgSrc = serializers.URLField(source="banner_image_url")
     courseName = serializers.CharField(source="display_name_with_default")
+    courseNumber = serializers.CharField(source="display_number_with_default")
 
 
 class CourseRunSerializer(serializers.Serializer):

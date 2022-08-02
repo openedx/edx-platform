@@ -162,6 +162,7 @@ class TestCourseSerializer(LearnerDashboardBaseTest):
         assert output_data == {
             "bannerImgSrc": test_enrollment.course_overview.banner_image_url,
             "courseName": test_enrollment.course_overview.display_name_with_default,
+            "courseNumber": test_enrollment.course_overview.display_number_with_default,
         }
 
 
