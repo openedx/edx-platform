@@ -1326,7 +1326,7 @@ slumber==0.7.1
     #   edx-rest-api-client
 sniffio==1.2.0
     # via anyio
-snowflake-connector-python==2.7.10
+snowflake-connector-python==2.7.11
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise

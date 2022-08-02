@@ -1412,7 +1412,7 @@ sniffio==1.2.0
     #   anyio
 snowballstemmer==2.2.0
     # via sphinx
-snowflake-connector-python==2.7.10
+snowflake-connector-python==2.7.11
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
