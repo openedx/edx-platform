@@ -193,7 +193,12 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
     def create_test_context(self, course):
         """Get a test context object"""
         return {
-            "course_mode_info": {course.id: {"show_upsell": False}},
+            "course_mode_info": {
+                course.id: {
+                    "expiration_datetime": random_date(),
+                    "show_upsell": True,
+                }
+            },
             "course_optouts": [],
             "use_ecommerce_payment_flow": True,
             "show_email_settings_for": [course.id],
@@ -242,13 +247,7 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
             }
         )
 
-        serializer = EnrollmentSerializer(input_data, context=input_context)
-        output = serializer.data
-
-        # Serializaiton set up so all fields will have values to make testing easy
-        for key in output:
-            assert output[key] is not None
-
+        output = EnrollmentSerializer(input_data, context=input_context).data
         assert output["canUpgrade"] == True
 
 

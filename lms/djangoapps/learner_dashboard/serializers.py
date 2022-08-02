@@ -96,6 +96,7 @@ class EnrollmentSerializer(serializers.Serializer):
     - "use_ecommerce_payment_flow" (bool): whether or not we use an ecommerce flow to
       upsell.
     - "course_mode_info" (dict): keyed by course ID with the following values:
+        - "expiration_datetime" (int): when the verified mode will expire.
         - "show_upsell" (bool): whether or not we offer an upsell for this course.
         - "verified_sku" (uuid): ID for the verified mode for upgrade.
     - "show_courseware_link": keyed by course ID with added metadata.
@@ -103,15 +104,38 @@ class EnrollmentSerializer(serializers.Serializer):
        show email settings.
     """
 
-    canUpgrade = serializers.SerializerMethodField()
-    hasFinished = serializers.SerializerMethodField()
+    accessExpirationDate = serializers.SerializerMethodField()
     isAudit = serializers.SerializerMethodField()
+    hasStarted = serializers.SerializerMethodField()
+    hasFinished = serializers.SerializerMethodField()
+    isVerified = serializers.SerializerMethodField()
+    canUpgrade = serializers.SerializerMethodField()
     isAuditAccessExpired = serializers.SerializerMethodField()
-    isEnrolled = serializers.BooleanField(source="is_active")
     isEmailEnabled = serializers.SerializerMethodField()
     hasOptedOutOfEmail = serializers.SerializerMethodField()
-    isVerified = serializers.SerializerMethodField()
     lastEnrolled = serializers.DateTimeField(source="created")
+    isEnrolled = serializers.BooleanField(source="is_active")
+
+    def get_accessExpirationDate(self, instance):
+        return (
+            self.context.get("course_mode_info", {})
+            .get(instance.course_id)
+            .get("expiration_datetime")
+        )
+
+    def get_isAudit(self, enrollment):
+        return enrollment.mode in CourseMode.AUDIT_MODES
+
+    def get_hasStarted(self, enrollment):
+        # TODO
+        return False
+
+    def get_hasFinished(self, enrollment):
+        # TODO
+        return False
+
+    def get_isVerified(self, enrollment):
+        return enrollment.is_verified_enrollment()
 
     def get_canUpgrade(self, enrollment):
         use_ecommerce_payment_flow = self.context.get(
@@ -127,13 +151,6 @@ class EnrollmentSerializer(serializers.Serializer):
             and course_mode_info.get("verified_sku", False)
         )
 
-    def get_hasFinished(self, enrollment):
-        # TODO
-        return False
-
-    def get_isAudit(self, enrollment):
-        return enrollment.mode in CourseMode.AUDIT_MODES
-
     def get_isAuditAccessExpired(self, enrollment):
         show_courseware_link = self.context.get("show_courseware_link", {}).get(
             enrollment.course.id, {}
@@ -145,9 +162,6 @@ class EnrollmentSerializer(serializers.Serializer):
 
     def get_hasOptedOutOfEmail(self, enrollment):
         return enrollment.course_id in self.context.get("course_optouts", [])
-
-    def get_isVerified(self, enrollment):
-        return enrollment.is_verified_enrollment()
 
 
 class GradeDataSerializer(serializers.Serializer):
