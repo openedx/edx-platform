@@ -140,7 +140,7 @@ def dashboard_view(request):  # pylint: disable=unused-argument
 
     # Get enrollments
     course_enrollments, course_mode_info = get_enrollments(
-        user, site_org_whitelist, site_org_blacklist, course_limit
+        user, site_org_whitelist, site_org_blacklist, course_limit=course_limit
     )
 
     # Get email opt-outs for student
