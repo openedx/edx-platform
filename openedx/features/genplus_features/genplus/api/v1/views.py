@@ -1,3 +1,4 @@
+import statistics
 from django.middleware import csrf
 from django.utils.decorators import method_decorator
 from django.db import IntegrityError
@@ -8,9 +9,12 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from django.shortcuts import get_object_or_404
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import GenUser, Character, Class, Teacher, Student, TeacherClass
+from openedx.features.genplus_features.genplus_learning.models import ClassUnit
+from openedx.features.genplus_features.genplus_learning.api.v1.serializers import ClassSummarySerializer
 from .serializers import CharacterSerializer, ClassSerializer, FavoriteClassSerializer, UserInfoSerializer
 from .permissions import IsStudent, IsTeacher
 from openedx.features.genplus_features.genplus.display_messages import SuccessMessages, ErrorMessages
@@ -128,6 +132,22 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
             'favourite_classes': favourite_classes_serializer.data,
             'classes': class_serializer.data
         }
+        return Response(data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, group_id=None):  # pylint: disable=unused-argument
+        """
+        Returns the summary for a Class
+        """
+        gen_class = get_object_or_404(Class, pk=group_id)
+        class_units = ClassUnit.objects.select_related('gen_class', 'unit').prefetch_related('class_lessons')
+        class_units = class_units.filter(gen_class=gen_class)
+        data = ClassSummarySerializer(class_units, many=True).data
+
+        for i in range(len(data)):
+            lessons = data[i]['class_lessons']
+            data[i]['unit_progress'] = round(statistics.fmean([lesson['class_lesson_progress']
+                                                               for lesson in lessons])) if lessons else 0
+
         return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'])

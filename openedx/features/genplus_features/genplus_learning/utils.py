@@ -5,7 +5,7 @@ from django.apps import apps
 from openedx.core.lib.gating.api import get_subsection_completion_percentage
 from lms.djangoapps.courseware.courses import get_course_blocks_completion_summary
 from openedx.features.course_experience.utils import get_course_outline_block_tree
-
+from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 

@@ -5,6 +5,8 @@ from openedx.features.genplus_features.genplus_learning.models import (
     Program,
     ProgramEnrollment,
     Unit,
+    ClassLesson,
+    ClassUnit,
 )
 from openedx.features.genplus_features.genplus_learning.utils import (
     get_unit_progress,
@@ -64,3 +66,18 @@ class ProgramSerializer(serializers.ModelSerializer):
                 }
 
         return UnitSerializer(units, many=True, read_only=True, context={'units_context': units_context}).data
+
+
+class ClassLessonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClassLesson
+        fields = ('id', 'is_locked', 'class_lesson_progress', 'lms_url')
+
+
+class ClassSummarySerializer(serializers.ModelSerializer):
+    class_lessons = ClassLessonSerializer(many=True, read_only=True)
+    display_name = serializers.CharField(source="unit.display_name")
+
+    class Meta:
+        model = ClassUnit
+        fields = ('id', 'display_name', 'is_locked', 'class_lessons')
