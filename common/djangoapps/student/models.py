@@ -1598,7 +1598,8 @@ class CourseEnrollment(models.Model):
                 segment_properties['course_start'] = self.course.start
                 segment_properties['course_pacing'] = self.course.pacing
 
-                is_personalized_recommendation = is_personalized_recommendation_for_user(str(self.course_id))
+                course_key = f'{self.course_id.org}+{self.course_id.course}'
+                is_personalized_recommendation = is_personalized_recommendation_for_user(course_key)
                 if is_personalized_recommendation is not None:
                     segment_properties['is_personalized_recommendation'] = is_personalized_recommendation
 
