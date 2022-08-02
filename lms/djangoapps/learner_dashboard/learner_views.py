@@ -146,6 +146,14 @@ def dashboard_view(request):  # pylint: disable=unused-argument
     # Get email opt-outs for student
     show_email_settings_for, course_optouts = get_email_settings_info(user, course_enrollments)
 
+    # TODO - Get verification status by course (do we still need this?)
+
+    # TODO - Determine view access for courses (for showing courseware link or not)
+
+    # TODO - Get related programs
+
+    # TODO - Get user verification status
+
     # e-commerce info
     ecommerce_payment_page = get_ecommerce_payment_page(user)
 
