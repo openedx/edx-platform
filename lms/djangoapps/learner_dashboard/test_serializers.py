@@ -312,7 +312,7 @@ class TestEntitlementSerializer(TestCase):
         return {
             "startDate": random_date(),
             "endDate": random_date(),
-            "courseNumber": f"{uuid4()}-101",
+            "courseId": f"{uuid4()}",
         }
 
     @classmethod

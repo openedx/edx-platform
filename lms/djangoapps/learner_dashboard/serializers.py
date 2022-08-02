@@ -188,7 +188,7 @@ class AvailableEntitlementSessionSerializer(serializers.Serializer):
 
     startDate = serializers.DateTimeField()
     endDate = serializers.DateTimeField()
-    courseNumber = serializers.CharField()
+    courseId = serializers.CharField()
 
 
 class EntitlementSerializer(serializers.Serializer):
