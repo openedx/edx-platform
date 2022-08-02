@@ -45,10 +45,7 @@ class CourseRunSerializer(serializers.Serializer):
 
     isStarted = serializers.SerializerMethodField()
     isArchived = serializers.SerializerMethodField()
-    courseNumber = serializers.CharField(
-        source="course_overview.display_number_with_default"
-    )
-    accessExpirationDate = serializers.SerializerMethodField()
+    courseId = serializers.CharField(source="course_id")
     minPassingGrade = serializers.DecimalField(
         max_digits=5, decimal_places=2, source="course_overview.lowest_passing_grade"
     )
@@ -67,13 +64,6 @@ class CourseRunSerializer(serializers.Serializer):
 
     def get_isArchived(self, instance):
         return instance.course_overview.has_ended()
-
-    def get_accessExpirationDate(self, instance):
-        return (
-            self.context.get("course_mode_info", {})
-            .get(instance.course_id)
-            .get("days_for_upsell")
-        )
 
     def get_homeUrl(self, instance):
         return course_home_url(instance.course_id)
