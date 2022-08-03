@@ -1,0 +1,33 @@
+---
+metadata:
+    display_name: GenZ String Responses
+    markdown: !!null
+data: |
+    <div class="journals-xblock theme-dark">
+      <problem>
+        <div class="journals-xblock-wapper">
+          <div class="journals-info">
+            <img width="240" src="https://dev.genplus.co.uk/asset-v1:genplus+GP741+2022_T1+type@asset+block@a797f98edda60ebed5b29f4b4a6b82d8.png" alt="Your Turn" />
+            <h2>Your Turn</h2>
+            <p>Identify an event, project, opportunity or problem within the school locally or globally.</p>
+            <p>Use the decision-making process to create a plan to help you acheive this goal.</p>
+          </div>
+          <div class="journals-form">
+            <stringresponse answer="\w" type="regexp ci">
+              <label>Describe the opportunity/problem.</label>
+              <additional_answer answer="Please type a response"/>
+              <div class="text-wrapper">
+                <textline multiline="true" size="20" placeholder="Type in your answer here..." />
+              </div>
+            </stringresponse>
+            <stringresponse answer="\w" type="regexp ci">
+              <label>Why do you want to do something about this? </label>
+              <additional_answer answer="Please type a response"/>
+              <div class="text-wrapper">
+                <textline multiline="true" size="20" placeholder="Type in your answer here..." />
+              </div>
+            </stringresponse>
+          </div>
+        </div>
+      </problem>
+    </div>
