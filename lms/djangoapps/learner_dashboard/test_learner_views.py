@@ -1,30 +1,28 @@
 """Test for learner views and related functions"""
 
 import json
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-import ddt
-
 from unittest import TestCase
 from unittest.mock import patch
 from uuid import uuid4
 
+import ddt
 from django.urls import reverse
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.bulk_email.models import Optout
-from lms.djangoapps.learner_dashboard.test_serializers import random_url
 from rest_framework.test import APITestCase
 
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import (
+    CourseEnrollmentFactory,
+    UserFactory,
+)
+from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.learner_dashboard.learner_views import (
     get_email_settings_info,
     get_enrollments,
     get_platform_settings,
     get_user_account_confirmation_info,
 )
-from common.djangoapps.student.tests.factories import (
-    CourseEnrollmentFactory,
-    UserFactory,
-)
+from lms.djangoapps.learner_dashboard.test_serializers import random_url
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
@@ -70,7 +68,7 @@ class TestGetUserAccountConfirmationInfo(SharedModuleStoreTestCase):
     }
 
     @classmethod
-    def mock_response(self):
+    def mock_response(cls):
         return {
             "isNeeded": False,
             "sendEmailUrl": random_url(),
@@ -107,7 +105,7 @@ class TestGetUserAccountConfirmationInfo(SharedModuleStoreTestCase):
 
     @patch("lms.djangoapps.learner_dashboard.learner_views.configuration_helpers")
     @patch("django.conf.settings.SUPPORT_SITE_LINK", "example.com/support")
-    def test_email_url_support_link(self, mock_config_helpers):
+    def test_email_url_support_fallback_link(self, mock_config_helpers):
         # Given an ACTIVATION_EMAIL_SUPPORT_LINK is NOT supplied
         mock_config_helpers.get_value.return_value = None
 
@@ -122,6 +120,7 @@ class TestGetEnrollments(SharedModuleStoreTestCase):
     """Tests for get_enrollments"""
 
     def setUp(self):
+        super().setUp()
         self.user = UserFactory()
 
     def create_test_enrollment(self, course_mode=CourseMode.AUDIT):
@@ -158,6 +157,7 @@ class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
     """Tests for get_email_settings_info"""
 
     def setUp(self):
+        super.setUp()
         self.user = UserFactory()
 
     @patch(
@@ -186,7 +186,7 @@ class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
         # ... and course optouts are returned
         self.assertSetEqual(
             {optout.course_id for optout in optouts},
-            {optout for optout in course_optouts},
+            course_optouts,
         )
 
 

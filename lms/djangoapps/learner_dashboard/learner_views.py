@@ -4,11 +4,11 @@ Views for the learner dashboard.
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
-from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
 from edx_django_utils import monitoring as monitoring_utils
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import marketing_link
+from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
 from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
     get_course_enrollments,

@@ -3,9 +3,10 @@ Serializers for the Learner Dashboard
 """
 
 from django.urls import reverse
+from rest_framework import serializers
+
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import course_home_url
-from rest_framework import serializers
 
 
 class PlatformSettingsSerializer(serializers.Serializer):
@@ -75,6 +76,7 @@ class CourseRunSerializer(serializers.Serializer):
         return reverse("course_run_refund_status", args=[instance.course_id])
 
     def get_upgradeUrl(self, instance):
+        """If the enrollment mode has a verified upgrade through ecommerce, return the link"""
         ecommerce_payment_page = self.context.get("ecommerce_payment_page")
         verified_sku = (
             self.context.get("course_mode_info", {})
@@ -138,6 +140,7 @@ class EnrollmentSerializer(serializers.Serializer):
         return enrollment.is_verified_enrollment()
 
     def get_canUpgrade(self, enrollment):
+        """Determine if a user can upgrade this enrollment to verified track"""
         use_ecommerce_payment_flow = self.context.get(
             "use_ecommerce_payment_flow", False
         )

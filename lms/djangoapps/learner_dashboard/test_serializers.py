@@ -86,6 +86,7 @@ class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
         cls.user = UserFactory()
 
     def create_test_enrollment(self):
+        """Create a test user, course, and enrollment. Return the enrollment."""
         course = CourseFactory(self_paced=True)
         CourseModeFactory(
             course_id=course.id,
