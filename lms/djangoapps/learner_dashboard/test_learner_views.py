@@ -186,7 +186,7 @@ class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
         # ... and course optouts are returned
         self.assertSetEqual(
             {optout.course_id for optout in optouts},
-            course_optouts,
+            set(course_optouts),
         )
 
 
