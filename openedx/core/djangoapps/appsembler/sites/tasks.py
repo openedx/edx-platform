@@ -18,6 +18,8 @@ from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 
 from organizations.models import Organization, OrganizationCourse
+
+from student.models import CourseEnrollmentAllowed
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore, SignalHandler
@@ -34,7 +36,7 @@ def current_year():
     return datetime.datetime.now().year
 
 
-def import_course_on_site_creation_after_transaction(organization):
+def import_course_on_site_creation_after_transaction(organization, enrollment_emails=None):
     """
     Clone the course after Database transaction is committed, only if the import feature is enabled.
 
@@ -48,7 +50,7 @@ def import_course_on_site_creation_after_transaction(organization):
             """
             Run the import task after the commit to avoid Organization.DoesNotExist error on the Celery.
             """
-            import_course_on_site_creation_apply_async(organization)
+            import_course_on_site_creation_apply_async(organization, enrollment_emails)
 
         transaction.on_commit(import_task_on_commit)
         return True
@@ -56,30 +58,33 @@ def import_course_on_site_creation_after_transaction(organization):
     return False
 
 
-def import_course_on_site_creation_apply_async(organization):
+def import_course_on_site_creation_apply_async(organization, enrollment_emails=None):
     """
     Apply the `import_course_on_site_creation` task async. with proper call and configurations.
 
     This helper ensures that the configuration is tested properly even if
     the `RegistrationSerializer` has no tests.
 
-    :param organization:
+    :param organization: Organization to create the course for
+    :param enrollment_emails: Emails to enroll.
     :return: ResultBase.
     """
     return import_course_on_site_creation.apply_async(
-        kwargs={'organization_id': organization.id},
+        kwargs={'organization_id': organization.id, 'enrollment_emails': enrollment_emails},
         retry=False,  # The task is not expected to be able to recover after a failure.
     )
 
 
 @task()
-def import_course_on_site_creation(organization_id):
+def import_course_on_site_creation(organization_id, enrollment_emails=None):
     """
     Celery task to copy the template course for new sites.
 
     :param organization_id: The integer ID for the organization object in database.
+    :param enrollment_emails: Emails to enroll.
     """
     log.info('Starting importing course for organization_id %s', organization_id)
+    enrollment_emails = enrollment_emails or []
     try:
         organization = Organization.objects.get(pk=organization_id)
         log.info('Importing course for organization %s', organization)
@@ -146,6 +151,10 @@ def import_course_on_site_creation(organization_id):
                 course_id=str(course_target_id),
                 active=True
             )
+
+            for email in enrollment_emails:
+                log.info('Enrolling %s in course %s', email, course_target_id)
+                CourseEnrollmentAllowed.objects.create(course_id=course_target_id, email=email, auto_enroll=True)
 
             SignalHandler.course_published.send(
                 sender=__name__,

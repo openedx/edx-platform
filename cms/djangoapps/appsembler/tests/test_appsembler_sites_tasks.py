@@ -12,6 +12,8 @@ from django.test import override_settings
 from organizations.tests.factories import OrganizationFactory
 
 from opaque_keys.edx.keys import CourseKey
+
+from student.models import CourseEnrollmentAllowed
 from openedx.core.djangoapps.appsembler.sites.tasks import (
     import_course_on_site_creation,
     import_course_on_site_creation_apply_async,
@@ -52,7 +54,7 @@ class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
 
         :param use_new_format: Use the new `course-v1:Org+Course+Run` format.
 
-        # TODO: (Juniper??) Fix this and ONLY use new course format once Open edX test modulestore fix it
+        # TODO: (Nutmeg??) Fix this and ONLY use new course format once Open edX test modulestore fix it
         """
         this_year = datetime.datetime.now().year
         if use_new_format:
@@ -86,13 +88,25 @@ class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
         Ensure the task run properly.
         """
         with LogCapture(level=logging.INFO) as log:
-            result = import_course_on_site_creation_apply_async(self.organization)
+            result = import_course_on_site_creation_apply_async(
+                organization=self.organization,
+                enrollment_emails=['admin@example.com', 'my_staff@example.com'],
+            )
         assert not result.failed(), 'Task should succeed instead of returning: "{}"'.format(result.result)
 
         courses = self.m_store.get_courses()
         assert len(courses) == 1, 'Should import just one course'
         assert self.m_store.get_course(self.course_key), (
             'Should use the correct ID "{}"'.format(str(courses[0].id))
+        )
+
+        assert CourseEnrollmentAllowed.objects.filter(
+            course_id=self.get_course_id(use_new_format=True),
+            email__in=['admin@example.com', 'my_staff@example.com'],
+            auto_enroll=True,
+        ), 'Should create enrollment records for {}. [debug: all courses enrollments found: {}]\n\n'.format(
+            self.course_key,
+            CourseEnrollmentAllowed.objects.all(),
         )
 
         assert 'Starting importing course for organization_id' in str(log)

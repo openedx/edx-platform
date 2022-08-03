@@ -34,13 +34,17 @@ class TahoeSiteCreationSerializer(serializers.Serializer):
         required=True,
         help_text='Full domain name for the Tahoe site e.g. academy.tahoe.appsembler.com or courses.example.com',
     )
+    welcome_course_enrollment_emails = serializers.ListField(
+        default=[],
+        help_text='A list of learner/admin emails to enroll in the Tahoe Welcome Course',
+        child=serializers.EmailField()
+    )
 
     class Meta:
-        fields = ('site_uuid', 'short_name', 'domain',)
+        fields = ('site_uuid', 'short_name', 'domain', 'welcome_course_enrollment_emails',)
 
     @beeline.traced(name='TahoeSiteCreationSerializer.create')
     def create(self, validated_data):
-        # assert False, validated_data
         beeline.add_context_field('validated_data', validated_data)
         created_site_data = tahoe_sites.api.create_tahoe_site(
             domain=validated_data['domain'],
@@ -50,6 +54,7 @@ class TahoeSiteCreationSerializer(serializers.Serializer):
 
         site = created_site_data['site']
         organization = created_site_data['organization']
+        welcome_course_enrollment_emails = validated_data['welcome_course_enrollment_emails']
 
         tahoe_custom_site_config_params = {}
         if hasattr(SiteConfiguration, 'sass_variables'):
@@ -74,12 +79,16 @@ class TahoeSiteCreationSerializer(serializers.Serializer):
                 **validated_data,
             ),
         )
-        course_creation_task_scheduled = import_course_on_site_creation_after_transaction(organization)
+        course_creation_task_scheduled = import_course_on_site_creation_after_transaction(
+            organization,
+            enrollment_emails=welcome_course_enrollment_emails,
+        )
 
         return {
             'site_configuration': site_config,
             'course_creation_task_scheduled': course_creation_task_scheduled,
             'site_configuration_client_enabled': True,
+            'welcome_course_enrollment_emails': welcome_course_enrollment_emails,
             **sass_status,
             **created_site_data,
         }
