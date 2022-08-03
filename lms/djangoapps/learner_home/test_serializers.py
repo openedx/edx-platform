@@ -13,7 +13,7 @@ from common.djangoapps.student.tests.factories import (
     UserFactory,
 )
 
-from lms.djangoapps.learner_dashboard.serializers import (
+from lms.djangoapps.learner_home.serializers import (
     CertificateSerializer,
     CourseProviderSerializer,
     CourseRunSerializer,
@@ -693,22 +693,22 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         assert serialized_enrollments is not None
 
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.serializers.SuggestedCourseSerializer.to_representation"
+        "lms.djangoapps.learner_home.serializers.SuggestedCourseSerializer.to_representation"
     )
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.serializers.UnfulfilledEntitlementSerializer.to_representation"
+        "lms.djangoapps.learner_home.serializers.UnfulfilledEntitlementSerializer.to_representation"
     )
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.serializers.LearnerEnrollmentSerializer.to_representation"
+        "lms.djangoapps.learner_home.serializers.LearnerEnrollmentSerializer.to_representation"
     )
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.serializers.PlatformSettingsSerializer.to_representation"
+        "lms.djangoapps.learner_home.serializers.PlatformSettingsSerializer.to_representation"
     )
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.serializers.EnterpriseDashboardsSerializer.to_representation"
+        "lms.djangoapps.learner_home.serializers.EnterpriseDashboardsSerializer.to_representation"
     )
     @mock.patch(
-        "lms.djangoapps.learner_dashboard.serializers.EmailConfirmationSerializer.to_representation"
+        "lms.djangoapps.learner_home.serializers.EmailConfirmationSerializer.to_representation"
     )
     def test_linkage(
         self,

@@ -35,6 +35,7 @@ common/djangoapps/enrollment/              @edx/platform-discovery
 lms/djangoapps/commerce/                   @edx/rev-team
 lms/djangoapps/experiments/                @edx/rev-team
 lms/djangoapps/learner_dashboard/          @edx/platform-discovery
+lms/djangoapps/learner_home/               @edx/content-aurora
 openedx/features/content_type_gating/      @edx/rev-team
 openedx/features/course_duration_limits/   @edx/rev-team
 openedx/features/discounts/                @edx/rev-team

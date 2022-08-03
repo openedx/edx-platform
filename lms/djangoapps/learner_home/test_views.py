@@ -16,13 +16,13 @@ from common.djangoapps.student.tests.factories import (
     UserFactory,
 )
 from lms.djangoapps.bulk_email.models import Optout
-from lms.djangoapps.learner_dashboard.learner_views import (
+from lms.djangoapps.learner_home.views import (
     get_email_settings_info,
     get_enrollments,
     get_platform_settings,
     get_user_account_confirmation_info,
 )
-from lms.djangoapps.learner_dashboard.test_serializers import random_url
+from lms.djangoapps.learner_home.test_serializers import random_url
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
@@ -39,7 +39,7 @@ class TestGetPlatformSettings(TestCase):
     }
 
     @patch.multiple("django.conf.settings", **MOCK_SETTINGS)
-    @patch("lms.djangoapps.learner_dashboard.learner_views.marketing_link")
+    @patch("lms.djangoapps.learner_home.views.marketing_link")
     def test_happy_path(self, mock_marketing_link):
         # Given email/search info exists
         mock_marketing_link.return_value = mock_search_url = f"/{uuid4()}"
@@ -103,7 +103,7 @@ class TestGetUserAccountConfirmationInfo(SharedModuleStoreTestCase):
             == "example.com/activate-email"
         )
 
-    @patch("lms.djangoapps.learner_dashboard.learner_views.configuration_helpers")
+    @patch("lms.djangoapps.learner_home.views.configuration_helpers")
     @patch("django.conf.settings.SUPPORT_SITE_LINK", "example.com/support")
     def test_email_url_support_fallback_link(self, mock_config_helpers):
         # Given an ACTIVATION_EMAIL_SUPPORT_LINK is NOT supplied
@@ -161,7 +161,7 @@ class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
         self.user = UserFactory()
 
     @patch(
-        "lms.djangoapps.learner_dashboard.learner_views.is_bulk_email_feature_enabled"
+        "lms.djangoapps.learner_home.views.is_bulk_email_feature_enabled"
     )
     def test_get_email_settings(self, mock_is_bulk_email_enabled):
         # Given 3 courses where bulk email is enabled for 2 and user has opted out of one
@@ -200,7 +200,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         super().setUpClass()
 
         # Get view URL
-        cls.view_url = reverse("dashboard_view")
+        cls.view_url = reverse("learner_home:dashboard_view")
 
         # Set up a course
         cls.course = CourseFactory.create()
@@ -246,7 +246,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         assert expected_keys == response_data.keys()
 
     @patch(
-        "lms.djangoapps.learner_dashboard.learner_views.get_user_account_confirmation_info"
+        "lms.djangoapps.learner_home.views.get_user_account_confirmation_info"
     )
     def test_email_confirmation(self, mock_user_conf_info):
         """Test that email confirmation info passes through correctly"""

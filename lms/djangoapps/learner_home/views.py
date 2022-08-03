@@ -19,7 +19,7 @@ from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_feature_enabled
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.learner_dashboard.serializers import LearnerDashboardSerializer
+from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
