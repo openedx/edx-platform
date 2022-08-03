@@ -84,3 +84,7 @@ charset-normalizer<2.1.0
 # markdown>=3.4.0 has failures due to internal refactorings which causes the tests to fail
 # pinning the version untill the issue gets resolved in the package itself
 markdown<3.4.0
+
+# pycodestyle==2.9.0 generates false positive error E275. 
+# Constraint can be removed once the issue https://github.com/PyCQA/pycodestyle/issues/1090 is fixed.
+pycodestyle<2.9.0
