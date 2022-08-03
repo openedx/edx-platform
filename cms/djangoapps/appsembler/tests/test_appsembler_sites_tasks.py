@@ -7,8 +7,10 @@ import datetime
 from opaque_keys.edx.locator import CourseLocator
 from unittest.mock import patch, Mock
 from testfixtures import LogCapture
-
-from django.test import override_settings
+from django.test import (
+    TransactionTestCase,
+    override_settings,
+)
 from organizations.tests.factories import OrganizationFactory
 
 from opaque_keys.edx.keys import CourseKey
@@ -17,9 +19,13 @@ from student.models import CourseEnrollmentAllowed
 from openedx.core.djangoapps.appsembler.sites.tasks import (
     import_course_on_site_creation,
     import_course_on_site_creation_apply_async,
+    import_course_on_site_creation_after_transaction,
 )
+from openedx.core.djangolib.testing.utils import FilteredQueryCountMixin
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase, ModuleStoreTestUsersMixin, ModuleStoreIsolationMixin,
+)
 
 
 COURSE_NAME = 'TahoeWelcome'
@@ -160,4 +166,32 @@ class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
         mock_listen_for_course_publish.assert_called_once_with(
             sender='openedx.core.djangoapps.appsembler.sites.tasks',
             course_key=course_key,
+        )
+
+
+@override_settings(**IMPORT_SETTINGS)
+class SchedulingTasksAfterCommitTestCase(
+    ModuleStoreTestUsersMixin, FilteredQueryCountMixin, ModuleStoreIsolationMixin, TransactionTestCase
+):
+    """
+    Test case for import_course_on_site_creation_after_transaction.
+
+    The base class is similar to ModuleStoreTestCase but uses TransactionTestCase to make the `on_commit` work.
+
+    See the https://docs.djangoproject.com/en/2.2/topics/testing/tools/#django.test.TransactionTestCase doc
+    """
+    @patch.dict('django.conf.settings.FEATURES', {'APPSEMBLER_IMPORT_DEFAULT_COURSE_ON_SITE_CREATION': True})
+    @patch('openedx.core.djangoapps.appsembler.sites.tasks.import_course_on_site_creation')
+    def test_import_course_on_site_creation_after_transaction_helper(self, import_function):
+        """
+        Test that the task is created with the right params.
+        """
+        organization = OrganizationFactory.create()
+        import_course_on_site_creation_after_transaction(organization, ['test@example.com'])
+        import_function.apply_async.assert_called_once_with(
+            kwargs={
+                'organization_id': organization.id,
+                'enrollment_emails': ['test@example.com'],
+            },
+            retry=False,  # Attempting to import the course after a failure is unlikely to be helpful.
         )
