@@ -157,7 +157,7 @@ class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
     """Tests for get_email_settings_info"""
 
     def setUp(self):
-        super.setUp()
+        super().setUp()
         self.user = UserFactory()
 
     @patch(
