@@ -1,6 +1,8 @@
 """
 Tests for the Apppsembler Platform 2.0 API views.
 """
+import json
+
 import inspect
 
 import logging
@@ -18,7 +20,8 @@ from rest_framework.authtoken.models import Token
 
 import tahoe_sites.api
 
-from common.djangoapps.student.tests.factories import UserFactory
+from student.models import CourseEnrollmentAllowed
+from student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.appsembler.sites import api_v2
 
@@ -112,11 +115,13 @@ def test_tahoe_site_create_view(client, site_params, superuser_with_token):
     _, api_token = superuser_with_token
     res = client.post(
         reverse('tahoe_site_creation_v2'),
-        data={
+        data=json.dumps({
             'domain': 'blue-site.localhost',
             'short_name': 'blue-site',
+            'welcome_course_enrollment_emails': ['admin@example.com', 'another_admin@example.com'],
             **site_params,
-        },
+        }),
+        content_type='application/json',
         HTTP_AUTHORIZATION='Token {}'.format(api_token),
     )
 
@@ -129,6 +134,8 @@ def test_tahoe_site_create_view(client, site_params, superuser_with_token):
     assert 'sass_compile_message' in site_data
 
     assert uuid.UUID(site_data['site_uuid']), 'Should return a correct uuid'
+
+    assert len(site_data['welcome_course_enrollment_emails']) == 2, 'Should read the email list properly'
 
     if 'site_uuid' in site_params:
         assert site_data['site_uuid'] == site_params['site_uuid'], 'Should use the explicit UUID if provided.'
