@@ -1,21 +1,21 @@
 """
 Tests for appsembler.sites.tasks.
 """
+import logging
+
 import datetime
 from opaque_keys.edx.locator import CourseLocator
 from unittest.mock import patch, Mock
+from testfixtures import LogCapture
 
 from django.test import override_settings
 from organizations.tests.factories import OrganizationFactory
-from tahoe_sites.tests.utils import create_organization_mapping
 
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.appsembler.sites.tasks import (
     import_course_on_site_creation,
     import_course_on_site_creation_apply_async,
 )
-from student.roles import CourseAccessRole
-from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -29,6 +29,7 @@ IMPORT_SETTINGS = {
     'TAHOE_DEFAULT_COURSE_GITHUB_ORG': 'appsembler',
     'TAHOE_DEFAULT_COURSE_GITHUB_NAME': 'first-course',
     'TAHOE_DEFAULT_COURSE_VERSION': 'v0.0.1',
+    'TAHOE_DEFAULT_COURSE_CMS_TASK_DELAY': 0,
 }
 
 
@@ -41,15 +42,9 @@ class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
     organization_name = 'blue'
 
     def setUp(self):
-        super(ImportCourseOnSiteCreationTestCase, self).setUp()
+        super().setUp()
         self.m_store = modulestore()
-        self.user = UserFactory.create()
         self.organization = OrganizationFactory.create(short_name=self.organization_name)
-        create_organization_mapping(
-            user=self.user,
-            organization=self.organization,
-            is_admin=True,
-        )
 
     def get_course_id(self, use_new_format=False):
         """
@@ -85,13 +80,13 @@ class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
         """
         assert not self.m_store.get_course(self.course_key), 'The course is not created yet!'
         assert not self.m_store.get_courses(), 'An empty module store on every test.'
-        assert not CourseAccessRole.objects.count(), 'No course staff roles yet.'
 
     def test_import_course_on_site_creation(self):
         """
         Ensure the task run properly.
         """
-        result = import_course_on_site_creation_apply_async(self.organization)
+        with LogCapture(level=logging.INFO) as log:
+            result = import_course_on_site_creation_apply_async(self.organization)
         assert not result.failed(), 'Task should succeed instead of returning: "{}"'.format(result.result)
 
         courses = self.m_store.get_courses()
@@ -100,24 +95,48 @@ class ImportCourseOnSiteCreationTestCase(ModuleStoreTestCase):
             'Should use the correct ID "{}"'.format(str(courses[0].id))
         )
 
-        access_role = CourseAccessRole.objects.get(
-            user=self.user,
-        )
+        assert 'Starting importing course for organization_id' in str(log)
+        assert 'course_published import signal emitted for course' in str(log)
 
-        assert access_role.role == 'instructor', 'Set the permission to instructor (aka Course Admin).'
-        assert access_role.org == self.organization_name, 'Correct org is used'  # TODO: Not sure if that's needed
-        assert str(access_role.course_id) == self.get_course_id(use_new_format=True)
+    @override_settings(TAHOE_DEFAULT_COURSE_VERSION='non-existing-version')
+    def test_import_invalid_course_url(self):
+        """
+        Ensure the task fails okay when using invalid GitHub configs.
+        """
+        with LogCapture() as log:
+            import_course_on_site_creation_apply_async(self.organization)
 
-    @patch('xmodule.modulestore.django.SignalHandler.course_published')
+        assert len(self.m_store.get_courses()) == 0, 'course should not be imported'
+
+        assert 'Course Clone Error' in str(log)
+        assert 'Deleting tahoe welcome course' in str(log)
+
+    def test_import_invalid_course_id(self):
+        """
+        Ensure the task fails okay when using invalid Course ID.
+        """
+        self.organization.short_name = 'invalid+org+id'
+        self.organization.save()
+
+        with LogCapture() as log:
+            import_course_on_site_creation_apply_async(self.organization)
+
+        assert len(self.m_store.get_courses()) == 0, 'course should not be imported'
+
+        assert 'Course Clone Error' in str(log)
+        assert 'course_published import signal emitted for course' not in str(log), \
+            'Should not finish the task due to invalid course ID'
+
     @patch('openedx.core.djangoapps.appsembler.sites.tasks.current_year', Mock(return_value=2020))
     @patch('cms.djangoapps.contentstore.signals.handlers.listen_for_course_publish')
-    def test_import_course_indexed(self, mock_listen_for_course_publish, mock_course_published):
+    def test_import_course_indexed(self, mock_listen_for_course_publish):
         """
         Ensure the task indexes the course.
         """
-        assert not mock_course_published.send.called, 'Sanity check: signal should not be called.'
+        with patch('xmodule.modulestore.django.SignalHandler.course_published') as mock_course_published:
+            assert not mock_course_published.send.called, 'Sanity check: signal should not be called.'
+            task_exception = import_course_on_site_creation(self.organization.id)
 
-        task_exception = import_course_on_site_creation(self.organization.id)
         assert not task_exception, 'Should not fail'
         course_key = CourseLocator.from_string('course-v1:blue+TahoeWelcome+2020')
         mock_course_published.send.assert_called_once_with(
