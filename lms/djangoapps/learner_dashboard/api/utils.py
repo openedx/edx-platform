@@ -22,10 +22,12 @@ def get_personalized_course_recommendations(user_id):
         response = requests.get(settings.AMPLITUDE_URL, params=params, headers=headers)
         if response.status_code == 200:
             response = response.json()
-            is_control = response['userData']['recommendations'][0]['is_control']
-            course_keys = response['userData']['recommendations'][0]['items']
-            return is_control, course_keys
+            recommendations = response.get('userData', {}).get('recommendations', [])
+            if recommendations:
+                is_control = recommendations[0].get('is_control')
+                recommended_course_keys = recommendations[0].get('items')
+                return is_control, recommended_course_keys
     except Exception as ex:  # pylint: disable=broad-except
-        log.exception(f'Cannot get recommendations from Amplitude: {ex}')
+        log.warning(f'Cannot get recommendations from Amplitude: {ex}')
 
     return True, []
