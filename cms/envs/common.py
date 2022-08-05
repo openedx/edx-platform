@@ -1074,6 +1074,18 @@ PIPELINE = {
     'UGLIFYJS_BINARY': 'node_modules/.bin/uglifyjs',
     'COMPILERS': (),
     'YUI_BINARY': 'yui-compressor',
+
+    #    This fix is useless in the Maple release.
+    #    The upstream Open edX fix is https://github.com/edx/edx-platform/pull/25957
+    #    For more details see: https://github.com/jazzband/django-pipeline/pull/715
+    #
+    'MIMETYPES': (
+        (str('text/coffeescript'), str('.coffee')),
+        (str('text/less'), str('.less')),
+        (str('text/javascript'), str('.js')),
+        (str('text/x-sass'), str('.sass')),
+        (str('text/x-scss'), str('.scss')),
+    )
 }
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
