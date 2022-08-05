@@ -5171,8 +5171,10 @@ ENABLE_MFE_CONFIG_API = False
 # .. setting_name: MFE_CONFIG
 # .. setting_implementation: DjangoSetting
 # .. setting_default: {}
-# .. setting_description: Is a configuration that will be exposed by the MFE Config API to be consumed by the mfes
-#     Example: {
+# .. setting_description: Is a configuration that will be exposed by the MFE Config API to be consumed by the MFEs.
+#   Contains configuration common to all MFEs. When a specific MFE's configuration is requested, these values
+#   will be treated as a base and then overriden/supplemented by those in `MFE_CONFIG_OVERRIDES`.
+#   Example: {
 #     "BASE_URL": "https://name_of_mfe.example.com",
 #     "LANGUAGE_PREFERENCE_COOKIE_NAME": "example-language-preference",
 #     "CREDENTIALS_BASE_URL": "https://credentials.example.com",
@@ -5182,10 +5184,29 @@ ENABLE_MFE_CONFIG_API = False
 #     "LOGOUT_URL": "https://courses.example.com/logout",
 #     "STUDIO_BASE_URL": "https://studio.example.com",
 #     "LOGO_URL": "https://courses.example.com/logo.png"
-# }
+#   }
 # .. setting_use_cases: open_edx
-# .. setting_creation_date: 2022-07-08
+# .. setting_creation_date: 2022-08-05
 MFE_CONFIG = {}
+
+# .. setting_name: MFE_CONFIG_OVERRIDES
+# .. setting_implementation: DjangoSetting
+# .. setting_default: {}
+# .. setting_description: Overrides or additions to `MFE_CONFIG` for when a specific MFE is requested
+#   by the MFE Config API. Top-level keys are APP_IDs, a.k.a. the name of the MFE (for example,
+#   for an MFE named "frontend-app-xyz", the top-level key would be "xyz").
+#   Example: {
+#     "gradebook": {
+#        "BASE_URL": "https://gradebook.example.com",
+#     },
+#     "profile": {
+#        "BASE_URL": "https://profile.example.com",
+#        "ENABLE_LEARNER_RECORD_MFE": "true",
+#     },
+#   }
+# .. setting_use_cases: open_edx
+# .. setting_creation_date: 2022-08-05
+MFE_CONFIG_OVERRIDES = {}
 
 # .. setting_name: MFE_CONFIG_API_CACHE_TIMEOUT
 # .. setting_default: 60*5

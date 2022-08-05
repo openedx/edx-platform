@@ -656,7 +656,13 @@ MFE_CONFIG = {
     "LOGO_URL": "https://courses.example.com/logo.png"
 }
 
-MFE_CONFIG_MYMFE = {
-    "LANGUAGE_PREFERENCE_COOKIE_NAME": "mymfe-language-preference",
-    "LOGO_URL": "https://courses.example.com/mymfe-logo.png"
+MFE_CONFIG_OVERRIDES = {
+    "mymfe": {
+        "LANGUAGE_PREFERENCE_COOKIE_NAME": "mymfe-language-preference",
+        "LOGO_URL": "https://courses.example.com/mymfe-logo.png",
+    },
+    "yourmfe": {
+        "LANGUAGE_PREFERENCE_COOKIE_NAME": "yourmfe-language-preference",
+        "LOGO_URL": "https://courses.example.com/yourmfe-logo.png",
+    },
 }
