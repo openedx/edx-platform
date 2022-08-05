@@ -1663,8 +1663,19 @@ PIPELINE = {
     'DISABLE_WRAPPER': True,
     # Specify the UglifyJS binary to use
     'UGLIFYJS_BINARY': 'node_modules/.bin/uglifyjs',
-}
 
+    #    This fix is useless in the Maple release.
+    #    The upstream Open edX fix is https://github.com/edx/edx-platform/pull/25957
+    #    For more details see: https://github.com/jazzband/django-pipeline/pull/715
+    #
+    'MIMETYPES': (
+        (str('text/coffeescript'), str('.coffee')),
+        (str('text/less'), str('.less')),
+        (str('text/javascript'), str('.js')),
+        (str('text/x-sass'), str('.sass')),
+        (str('text/x-scss'), str('.scss')),
+    )
+}
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 STATICFILES_STORAGE_KWARGS = {}
 
