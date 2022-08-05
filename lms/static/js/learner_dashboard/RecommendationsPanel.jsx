@@ -40,12 +40,7 @@ class RecommendationsPanel extends React.Component {
         if (response.status === 400) {
           return this.props.generalRecommendations;
         } else {
-          const recommendationsData = response.json();
-          if (recommendationsData.courses.length > 0) {
-            return recommendationsData
-          } else {
-            return this.props.generalRecommendations;
-          }
+          return response.json();
           
         }
       }).catch(() => {
