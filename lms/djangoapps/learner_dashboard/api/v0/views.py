@@ -365,21 +365,18 @@ class CourseRecommendationApiView(APIView):
             }
         )
 
-        if is_control:
+        if is_control or not course_keys:
             return Response(status=400)
 
         recommended_courses = []
-        if course_keys is not None:
-            for course_id in course_keys:
-                course_data = get_course_data(course_id)
-                if course_data:
-                    recommended_courses.append({
-                        'course_key': course_id,
-                        'title': course_data['title'],
-                        'logo_image_url': course_data['owners'][0]['logo_image_url'],
-                        'marketing_url': course_data.get('marketing_url')
-                    })
-                else:
-                    return Response(status=400)
+        for course_id in course_keys:
+            course_data = get_course_data(course_id)
+            if course_data:
+                recommended_courses.append({
+                    'course_key': course_id,
+                    'title': course_data['title'],
+                    'logo_image_url': course_data['owners'][0]['logo_image_url'],
+                    'marketing_url': course_data.get('marketing_url')
+                })
 
         return Response({'courses': recommended_courses, 'is_personalized_recommendation': not is_control}, status=200)
