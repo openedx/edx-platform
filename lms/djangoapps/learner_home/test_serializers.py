@@ -609,8 +609,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
                 "emailConfirmation": None,
                 "enterpriseDashboards": None,
                 "platformSettings": None,
-                "enrollments": [],
-                "unfulfilledEntitlements": [],
+                "courses": [],
                 "suggestedCourses": [],
             },
         )
@@ -650,17 +649,17 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         output_data = LearnerDashboardSerializer(input_data, context=input_context).data
 
         # Right now just make sure nothing broke
-        serialized_enrollments = output_data.pop("enrollments")
-        assert serialized_enrollments is not None
+        courses = output_data.pop("courses")
+        assert courses is not None
 
     @mock.patch(
         "lms.djangoapps.learner_home.serializers.SuggestedCourseSerializer.to_representation"
     )
     @mock.patch(
-        "lms.djangoapps.learner_home.serializers.UnfulfilledEntitlementSerializer.to_representation"
+        "lms.djangoapps.learner_home.serializers.UnfulfilledEntitlementSerializer.data"
     )
     @mock.patch(
-        "lms.djangoapps.learner_home.serializers.LearnerEnrollmentSerializer.to_representation"
+        "lms.djangoapps.learner_home.serializers.LearnerEnrollmentSerializer.data"
     )
     @mock.patch(
         "lms.djangoapps.learner_home.serializers.PlatformSettingsSerializer.to_representation"
@@ -711,8 +710,10 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
                 "emailConfirmation": mock_email_confirmation_serializer,
                 "enterpriseDashboards": mock_enterprise_dashboards_serializer,
                 "platformSettings": mock_platform_settings_serializer,
-                "enrollments": [mock_learner_enrollment_serializer],
-                "unfulfilledEntitlements": [mock_entitlements_serializer],
+                "courses": [
+                    mock_learner_enrollment_serializer,
+                    mock_entitlements_serializer,
+                ],
                 "suggestedCourses": [mock_suggestions_serializer],
             },
         )

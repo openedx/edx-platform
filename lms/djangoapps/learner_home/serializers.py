@@ -297,12 +297,25 @@ class LearnerDashboardSerializer(serializers.Serializer):
     emailConfirmation = EmailConfirmationSerializer()
     enterpriseDashboards = EnterpriseDashboardsSerializer()
     platformSettings = PlatformSettingsSerializer()
-    enrollments = serializers.ListField(
-        child=LearnerEnrollmentSerializer(), allow_empty=True
-    )
-    unfulfilledEntitlements = serializers.ListField(
-        child=UnfulfilledEntitlementSerializer(), allow_empty=True
-    )
+    courses = serializers.SerializerMethodField()
     suggestedCourses = serializers.ListField(
         child=SuggestedCourseSerializer(), allow_empty=True
     )
+
+    def get_courses(self, instance):
+        """
+        Get a list of course cards by serializing enrollments and entitlements into
+        a single list.
+        """
+        courses = []
+
+        for enrollment in instance.get("enrollments", []):
+            courses.append(
+                LearnerEnrollmentSerializer(enrollment, context=self.context).data
+            )
+        for entitlement in instance.get("unfulfilledEntitlements", []):
+            courses.append(
+                UnfulfilledEntitlementSerializer(entitlement, context=self.context).data
+            )
+
+        return courses
