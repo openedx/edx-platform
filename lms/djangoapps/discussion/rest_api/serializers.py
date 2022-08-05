@@ -258,7 +258,8 @@ class _ContentSerializer(serializers.Serializer):
         Returns information about the last edit for this content for
         privileged users.
         """
-        if not _validate_privileged_access(self.context):
+        is_user_author = str(obj['user_id']) == str(self.context['request'].user.id)
+        if not (_validate_privileged_access(self.context) or is_user_author):
             return None
         edit_history = obj.get("edit_history")
         if not edit_history:
@@ -398,7 +399,8 @@ class ThreadSerializer(_ContentSerializer):
         """
         Returns the reason for which the thread was closed.
         """
-        if not _validate_privileged_access(self.context):
+        is_user_author = str(obj['user_id']) == str(self.context['request'].user.id)
+        if not (_validate_privileged_access(self.context) or is_user_author):
             return None
         reason_code = obj.get("close_reason_code")
         return CLOSE_REASON_CODES.get(reason_code)
@@ -406,9 +408,10 @@ class ThreadSerializer(_ContentSerializer):
     def get_closed_by(self, obj):
         """
         Returns the username of the moderator who closed this thread,
-        only to other privileged users.
+        only to other privileged users and author.
         """
-        if _validate_privileged_access(self.context):
+        is_user_author = str(obj['user_id']) == str(self.context['request'].user.id)
+        if _validate_privileged_access(self.context) or is_user_author:
             return obj.get("closed_by")
 
     def create(self, validated_data):
