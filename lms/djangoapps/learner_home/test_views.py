@@ -237,8 +237,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
                 "emailConfirmation",
                 "enterpriseDashboards",
                 "platformSettings",
-                "enrollments",
-                "unfulfilledEntitlements",
+                "courses",
                 "suggestedCourses",
             ]
         )
