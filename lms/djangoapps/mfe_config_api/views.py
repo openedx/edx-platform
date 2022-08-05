@@ -35,10 +35,10 @@ class MFEConfigView(APIView):
         **Usage**
 
           Get common config:
-          GET /api/v1/mfe_config
+          GET /api/mfe_config/v1
 
           Get app config (common + app-specific overrides):
-          GET /api/v1/mfe_config?mfe=name_of_mfe
+          GET /api/mfe_config/v1?mfe=name_of_mfe
 
         **GET Response Values**
         ```
