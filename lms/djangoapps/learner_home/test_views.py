@@ -160,9 +160,7 @@ class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
         super().setUp()
         self.user = UserFactory()
 
-    @patch(
-        "lms.djangoapps.learner_home.views.is_bulk_email_feature_enabled"
-    )
+    @patch("lms.djangoapps.learner_home.views.is_bulk_email_feature_enabled")
     def test_get_email_settings(self, mock_is_bulk_email_enabled):
         # Given 3 courses where bulk email is enabled for 2 and user has opted out of one
         courses = [CourseFactory.create() for _ in range(3)]
@@ -244,9 +242,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
 
         assert expected_keys == response_data.keys()
 
-    @patch(
-        "lms.djangoapps.learner_home.views.get_user_account_confirmation_info"
-    )
+    @patch("lms.djangoapps.learner_home.views.get_user_account_confirmation_info")
     def test_email_confirmation(self, mock_user_conf_info):
         """Test that email confirmation info passes through correctly"""
 
