@@ -43,14 +43,12 @@ msgstr ""
 "POT-Creation-Date: 2022-05-19 13:32+0000\n"
 "PO-Revision-Date: 2014-01-21 20:16+0000\n"
 "Last-Translator: Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021\n"
-"Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/"
-"language/ar/)\n"
+"Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #: cms/djangoapps/api/v1/serializers/course_runs.py
 msgid "Course team user does not exist"
@@ -114,13 +112,12 @@ msgstr ""
 "إنشاؤه، أو ضبط إعدادات مسار آخر مع دليل GIT_REPO_EXPORT_DIR."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
-#, fuzzy
 msgid ""
-"Non writable git url provided. Expecting something like: git@github.com:edx/"
-"edx4edx_lite.git"
+"Non writable git url provided. Expecting something like: "
+"git@github.com:edx/edx4edx_lite.git"
 msgstr ""
-"تم توفير عنوان URL git غير قابل للكتابة. توقع شيء مثل: git@github.com: "
-"openx / openx-demo-course.git"
+"تم توفير عنوان URL git غير قابل للكتابة. توقع شيء مثل: git@github.com: openx"
+" / openx-demo-course.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -148,8 +145,8 @@ msgstr "تعذّر ضبط إعدادات اسم المستخدم وكلمة ال
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
-"Unable to commit changes. This is usually because there are no changes to be "
-"committed"
+"Unable to commit changes. This is usually because there are no changes to be"
+" committed"
 msgstr ""
 "تعذّر إلزام التغييرات. ويُعزى هذا عادةً إلى عدم وجود تغييرات واجب إلزامها."
 
@@ -172,12 +169,10 @@ msgstr "هناك فرع ناقص على النسخة الجديدة"
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
-". Course directory must already be a git repository. Usage:  git_export "
-"<course_loc> <git_url>"
+". Course directory must already be a git repository. Usage:  git_export <course_loc> <git_url>"
 msgstr ""
 "خذ المساق المحدّد وحاول أن تصدّره إلى مستودع git\n"
-". يجب أن يكون دليل المساق هو أصلًا مستودع git. الاستخدام: git_export "
-"<course_loc> <git_url>"
+". يجب أن يكون دليل المساق هو أصلًا مستودع git. الاستخدام: git_export <course_loc> <git_url>"
 
 #: cms/djangoapps/contentstore/tasks.py
 #, python-brace-format
@@ -194,7 +189,6 @@ msgid "We only support uploading a .tar.gz file."
 msgstr "ندعم تحميل ملفّات بصيغة .tar.gz فقط."
 
 #: cms/djangoapps/contentstore/tasks.py
-#, fuzzy
 msgid "Tar file not found"
 msgstr "ملف Tar الذي تم تحميله غير موجود. حاول مجددا."
 
@@ -250,17 +244,18 @@ msgstr "هناك مشكلة في ملف الصورة هذا. حاول تحميل
 #: cms/djangoapps/contentstore/video_utils.py
 #, python-brace-format
 msgid ""
-"Recommended image resolution is {image_file_max_width}"
-"x{image_file_max_height}. The minimum resolution is {image_file_min_width}"
-"x{image_file_min_height}."
+"Recommended image resolution is "
+"{image_file_max_width}x{image_file_max_height}. The minimum resolution is "
+"{image_file_min_width}x{image_file_min_height}."
 msgstr ""
-"دقة الصورة الموصى بها {image_file_max_width} x {image_file_max_height}. الحد "
-"الأدنى للدقة هو {image_file_min_width} x {image_file_min_height}."
+"دقة الصورة الموصى بها {image_file_max_width} x {image_file_max_height}. الحد"
+" الأدنى للدقة هو {image_file_min_width} x {image_file_min_height}."
 
 #: cms/djangoapps/contentstore/video_utils.py
 #, python-brace-format
 msgid ""
-"This image file must have an aspect ratio of {video_image_aspect_ratio_text}."
+"This image file must have an aspect ratio of "
+"{video_image_aspect_ratio_text}."
 msgstr ""
 "يجب أن تكون نسبة العرض إلى الارتفاع لملف الصورة "
 "{video_image_aspect_ratio_text}."
@@ -270,7 +265,8 @@ msgid ""
 "The image file name can only contain letters, numbers, hyphens (-), and "
 "underscores (_)."
 msgstr ""
-"يجب أن يحتوي اسم ملف الصورة فقط على أحرف وأرقام وواصلات (-) وشرطات سفلية (_)."
+"يجب أن يحتوي اسم ملف الصورة فقط على أحرف وأرقام وواصلات (-) وشرطات سفلية "
+"(_)."
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
@@ -278,7 +274,8 @@ msgstr "استُكمل التحميل "
 
 #: cms/djangoapps/contentstore/views/assets.py
 #, python-brace-format
-msgid "File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
+msgid ""
+"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
 msgstr ""
 "يتجاوز الملف {filename} الحد الأقصى لحجم {maximum_size_in_megabytes} "
 "ميغابايت."
@@ -338,8 +335,8 @@ msgid ""
 "There is already a course defined with the same organization and course "
 "number. Please change either organization or course number to be unique."
 msgstr ""
-"يوجد من قبل مساق يحمل اسم المؤسّسة ورقم المساق نفسهما. يُرجى تغيير إمّا المؤسّسة "
-"أو رقم المساق ليكون فريدًا.  "
+"يوجد من قبل مساق يحمل اسم المؤسّسة ورقم المساق نفسهما. يُرجى تغيير إمّا "
+"المؤسّسة أو رقم المساق ليكون فريدًا.  "
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -360,11 +357,11 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "You must link this course to an organization in order to continue. "
-"Organization you selected does not exist in the system, you will need to add "
-"it to the system"
+"Organization you selected does not exist in the system, you will need to add"
+" it to the system"
 msgstr ""
-"يجب ربط هذا المساق بمؤسّسة لتتمكّن من المتابعة. إن المؤسّسة التي اخترتها غير "
-"موجودة ضمن النظام وهو ما سيتطلّب منك إضافتها إلى النظام."
+"يجب ربط هذا المساق بمؤسّسة لتتمكّن من المتابعة. إن المؤسّسة التي اخترتها غير"
+" موجودة ضمن النظام وهو ما سيتطلّب منك إضافتها إلى النظام."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Invalid prerequisite course key"
@@ -411,7 +408,6 @@ msgid "Subsection"
 msgstr "قسم فرعي"
 
 #: cms/djangoapps/contentstore/views/import_export.py
-#, fuzzy
 msgid "File upload corrupted. Please try again"
 msgstr "فشل تحميل الملف. حاول مرة اخرى"
 
@@ -479,8 +475,8 @@ msgstr "نسخة مطابقة لـ ’{0}‘"
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
 msgstr ""
-"يجب أن يحصل الطلّاب على درجة {score}{pct_sign} أو ما فوق ليتمكّنوا من الوصول "
-"إلى مواد المساق."
+"يجب أن يحصل الطلّاب على درجة {score}{pct_sign} أو ما فوق ليتمكّنوا من الوصول"
+" إلى مواد المساق."
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
@@ -591,7 +587,7 @@ msgid "No `role` specified."
 msgstr "ليس هناك من ’دور‘ محدَّد "
 
 #: cms/djangoapps/contentstore/views/user.py
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr "قام المستخدم {email} بالتسجيل ولكن لم يفعّل حسابه بعد"
 
@@ -768,8 +764,8 @@ msgid ""
 msgstr ""
 "في بعض الأحيان، تكون الفروع المنشورة ومسودات الدورة التدريبية غير متزامنة. "
 "يقوم أمر التنفيذ بنشر الدورة التدريبية بإعادة تعيين الفرع المنشور للدورة "
-"التدريبية للإشارة إلى فرع المسودة، مما ينفذ النشر للدورة بشكل فعال. يقدم هذا "
-"العرض اختبارًا تجريبيًا لأمر تنفيذ النشر"
+"التدريبية للإشارة إلى فرع المسودة، مما ينفذ النشر للدورة بشكل فعال. يقدم هذا"
+" العرض اختبارًا تجريبيًا لأمر تنفيذ النشر"
 
 #: cms/djangoapps/maintenance/views.py
 msgid "Edit Announcements"
@@ -817,8 +813,7 @@ msgid "Studio Administration"
 msgstr "إدارة الإستوديو"
 
 #~ msgid ""
-#~ "Number of course outline regenerations successfully requested: "
-#~ "{regenerates}"
+#~ "Number of course outline regenerations successfully requested: {regenerates}"
 #~ msgstr ""
 #~ "عدد عمليات إعادة إنشاء مخطط الدورة التدريبية المطلوبة بنجاح: {regenerates}"
 
@@ -909,11 +904,11 @@ msgstr "إدارة الإستوديو"
 #~ msgstr "تقييم الإجابات المفتوحة الفارغ"
 
 #~ msgid ""
-#~ "User does not have the permission to create courses in this organization "
-#~ "or course creation is disabled"
+#~ "User does not have the permission to create courses in this organization or "
+#~ "course creation is disabled"
 #~ msgstr ""
-#~ "لا يمتلك المستخدم إذنًا بإنشاء دورات في هذه المؤسسة أو تم تعطيل إنشاء "
-#~ "الدورة التدريبية"
+#~ "لا يمتلك المستخدم إذنًا بإنشاء دورات في هذه المؤسسة أو تم تعطيل إنشاء الدورة"
+#~ " التدريبية"
 
 #~ msgid "Some chunks missed during file upload. Please try again"
 #~ msgstr "فقدت بعض الأجزاء أثناء تحميل الملف. حاول مرة اخرى"
@@ -922,11 +917,11 @@ msgstr "إدارة الإستوديو"
 #~ msgstr "لا يمكن أن تحتوي المكتبات على أكثر من {limit} من العناصر"
 
 #~ msgid ""
-#~ "User does not have the permission to create library in this organization "
-#~ "or course creation is disabled"
+#~ "User does not have the permission to create library in this organization or "
+#~ "course creation is disabled"
 #~ msgstr ""
-#~ "لا يمتلك المستخدم إذنًا بإنشاء مكتبة في هذه المؤسسة أو تم تعطيل إنشاء "
-#~ "الدورة التدريبية"
+#~ "لا يمتلك المستخدم إذنًا بإنشاء مكتبة في هذه المؤسسة أو تم تعطيل إنشاء الدورة"
+#~ " التدريبية"
 
 #~ msgid "'{organization_key}' is not a valid organization identifier."
 #~ msgstr "'{organization_key}' ليس بمعرف مؤسسة صحيح"
@@ -954,8 +949,7 @@ msgstr "إدارة الإستوديو"
 #~ msgstr "تم تخطي جميع {} الدورات التدريبية ، لأنها لم تتغير."
 
 #~ msgid "Dump courses to CourseGraph (override cache)"
-#~ msgstr ""
-#~ "تفريغ الدورات التدريبية إلى CourseGraph (تجاوز ذاكرة التخزين المؤقت)"
+#~ msgstr "تفريغ الدورات التدريبية إلى CourseGraph (تجاوز ذاكرة التخزين المؤقت)"
 
 #~ msgid "Enqueued dumps for {} course(s)."
 #~ msgstr "قائمة التفريغ لـ {} دورة (دورات)."

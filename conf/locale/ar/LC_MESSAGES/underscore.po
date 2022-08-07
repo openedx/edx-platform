@@ -1810,7 +1810,7 @@ msgstr "استكشاف برامج"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
-"Browse recently launched courses and see what\\'s new in your favorite "
+"Browse recently launched courses and see what's new in your favorite "
 "subjects"
 msgstr "تصفح الفصول حديثة الإنشاء وشاهد الجديد في مواضيعك المفضلة."
 

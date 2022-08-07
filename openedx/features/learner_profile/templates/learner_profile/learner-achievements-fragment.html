@@ -11,7 +11,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <div class="learner-achievements">
     % if course_certificates or own_profile:
-        <h3 class="u-field-title">Course Certificates</h3>
+        <h3 class="u-field-title">${_("Course Certificates")}</h3>
         % if course_certificates:
             % for certificate in course_certificates:
                 <%

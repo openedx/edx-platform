@@ -3205,7 +3205,7 @@ msgstr ""
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "If you proceed, you cannot use it to take courses on this site."
-msgstr ""
+msgstr "إذا تابعت ، فلا يمكنك استخدامه لأخذ دورات على هذا الموقع."
 
 #: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
 #: common/static/bundles/StudentAccountDeletion.js
