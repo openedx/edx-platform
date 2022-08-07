@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-24 20:43+0000\n"
+"POT-Creation-Date: 2022-07-31 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -1481,454 +1481,6 @@ msgstr "დროებით მხარდაჭერილია"
 msgid "Unsupported"
 msgstr "მხარდაუჭერელი"
 
-#: common/lib/capa/capa/capa_problem.py
-msgid "Cannot rescore problems with possible file submissions"
-msgstr ""
-"ფაილების შესაძლო გაგზავნებით პრობლემების ხელახლა შეფასება ვერ მოხერხდა"
-
-#: common/lib/capa/capa/capa_problem.py
-msgid "Question {}"
-msgstr ""
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Incorrect"
-msgstr "არასწორი"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Correct"
-msgstr "შეასწორეთ"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "correct"
-msgstr "სწორი"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incorrect"
-msgstr "არასწორი"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr "სანახევროდ სწორი"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incomplete"
-msgstr "დაუსრულებელი"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "unanswered"
-msgstr "პასუხგაუცემელი"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "submitted"
-msgstr ""
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "processing"
-msgstr "დამუშავება"
-
-#. Translators: these are tooltips that indicate the state of an assessment
-#. question
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is correct."
-msgstr "პასუხი სწორია."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is incorrect."
-msgstr "პასუხი არასწორია."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is partially correct."
-msgstr "პასუხი ნაწილობრივ სწორია."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is being processed."
-msgstr "მიმდინარეობს პასუხის დამუშავება."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Not yet answered."
-msgstr "ჯერ პასუხგაუცემელია."
-
-#: common/lib/capa/capa/inputtypes.py wiki/forms.py
-msgid "Select an option"
-msgstr "აირჩიეთ ვარიანტი"
-
-#. Translators: 'ChoiceGroup' is an input type and should not be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "ChoiceGroup: unexpected tag {tag_name}"
-msgstr "არჩევანის ჯგუფი: მოულოდნელი ტეგი {tag_name}"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Answer received."
-msgstr "პასუხი მიღებულია."
-
-#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
-#. be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
-msgstr ""
-"მოსალოდნელი <choice> ან <compoundhint> ტეგი; მიღებულია {given_tag}-ის "
-"ნაცვლად"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your files have been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"თქვენი ფაილები გაიგზავნა. მათი შეფასებისთანავე, ამ შეტყობინებას შემფასებლის "
-"უკუკავშირი ჩაანაცვლებს."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your answer has been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"თქვენი პასუხი გაიგზავნა. მისი შეფასებისთანავე, ამ შეტყობინებას შემფასებლის "
-"უკუკავშირი ჩაანაცვლებს."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{programming_language} editor"
-msgstr "{programming_language} რედაქტორი"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Press ESC then TAB or click outside of the code editor to exit"
-msgstr ""
-"გამოსასვლელად დააჭირეთ ESC-ს შემდეგ TAB-ს ან დააწკაპუნეთ კოდის რედაქტირების "
-"გარეთ."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Submitted. As soon as a response is returned, this message will be replaced "
-"by that feedback."
-msgstr ""
-"გაიგზავნა. პასუხის მიღებისთანავე, ამ შეტყობინებას მიღებული უკუკავშირი "
-"ჩაანაცვლებს."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
-msgstr "Xqueue-დან პასუხი {xqueue_timeout} წამში არ მოსულა. შეწყვეტილია."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error running code."
-msgstr "კოდის გაშვების შეცდომა."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Cannot connect to the queue"
-msgstr "რიგთან დაკავშირება ვერ მოხერხდა"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "No formula specified."
-msgstr "ფორმულა მითითებული არ არის."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Couldn't parse formula: {error_msg}"
-msgstr "ვერ ვარჩევთ ფორმულას: {error_msg}"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error while rendering preview"
-msgstr "წინასწარი დათვალიერების ფორმირებისას წარმოიშვა შეცდომა."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Sorry, couldn't parse formula"
-msgstr "ვწუხვართ, ვერ ვარჩევთ ფორმულას"
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{input_type}: unexpected tag {tag_name}"
-msgstr "{input_type}: მოულოდნელი ტეგი {tag_name}"
-
-#. Translators: a "tag" is an XML element, such as "<b>" in HTML
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a {expected_tag} tag; got {given_tag} instead"
-msgstr "მოსალოდნელი იყო {expected_tag}ტეგი; ნაცვლად მივიღეთ {given_tag}"
-
-#. Translators: index here could be 1,2,3 and so on
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Question {index}"
-msgstr "კითხვა {index}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Correct:"
-msgstr "სწორი:"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Incorrect:"
-msgstr "არასწორი:"
-
-#: common/lib/capa/capa/responsetypes.py xmodule/capa_module.py
-msgid "Answer"
-msgstr "პასუხი"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error {err} in evaluating hint function {hintfn}."
-msgstr "ფუნქციის {hintfn} შეფასებაში დაფიქსირდა შეცდომა {err}.  "
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "(Source code line unavailable)"
-msgstr "(წყაროს კოდური ზოლი მიუწვდომელია)"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "See XML source line {sourcenum}."
-msgstr "იხილეთ XML წყაროს ზოლი {sourcenum}."
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Checkboxes"
-msgstr "მოსანიშნები"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Multiple Choice"
-msgstr "მრავლობითი არჩევანი"
-
-#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
-#. be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Do not use shuffle and answer-pool at the same time"
-msgstr "არევისა და  პასუხის პული ერთდროულად არ გამოიყენოთ"
-
-#. Translators: 'answer-pool' is an attribute name and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "answer-pool value should be an integer"
-msgstr "პასუხის პულის მნიშვნელობა მთელი რიცხვი უნდა იყოს"
-
-#. Translators: 'Choicegroup' is an input type and should not be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
-msgstr "არჩევის ჯგუფი სულ მცირე 1 სწორ და 1 მცდარ არჩევანს უნდა მოიცავდეს"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "True/False Choice"
-msgstr "სწორი/მცდარი არჩევანი"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Dropdown"
-msgstr "ჩამოსაშლელი"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Numerical Input"
-msgstr "რიცხვითი ველი"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "There was a problem with the staff answer to this problem."
-msgstr "პრობლემა დაფიქსირდა პერსონალის მიერ ამ ამოცანის პასუხის გაცემაზე."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{student_answer}' as a number."
-msgstr "'{student_answer}'-ის რიცხვად ინტერპრეტაცია ვერ მოხერხდა."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Factorial function evaluated outside its domain:'{student_answer}'"
-msgstr ""
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid math syntax: '{student_answer}'"
-msgstr "არასწორი მათემატიკური სინტაქსი: '{student_answer}'"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "You may not use complex numbers in range tolerance problems"
-msgstr "დაშვების ამოცანებზე კომპლექსური რიცხვები შეგიძლიათ არ გამოიყენოთ"
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. provided a
-#. boundary (end limit) for a variable that is a complex number (a + bi), this
-#. message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: complex boundary."
-msgstr ""
-"პრობლემა დაფიქსირდა პერსონალის პასუხზე ამ ამოცანაზე: კომპლექსური ზღვარი."
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. did not
-#. provide a boundary (end limit) for a variable, this message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: empty boundary."
-msgstr "პრობლემა დაფიქსირდა პერსონალის პასუხზე ამ ამოცანაზე: ცარიელი ზღვარი."
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: Separator used in NumericalResponse to display multiple
-#. answers.
-#. Translators: Separator used in StringResponse to display multiple answers.
-#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is the last choice of a number of choices of how to log
-#. in
-#. to the site.
-#: common/lib/capa/capa/responsetypes.py
-#: lms/templates/course_modes/choose.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "or"
-msgstr "ან"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "ტექსტური ველი"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr "შეცდომა"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Custom Evaluated Script"
-msgstr "მორგებული შეფასებული სკრიპტი"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error getting student answer from {student_answers}"
-msgstr "{student_answers}-დან სტუდენტის პასუხის მიღების შეცდომა"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer entered!"
-msgstr "პასუხი არ არის შეყვანილი!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "CustomResponse: check function returned an invalid dictionary!"
-msgstr "მორგებულიპასუხი: შემოწმების ფუნქციამ დააბრუნა არასწორი ლექსიკონი!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Symbolic Math Input"
-msgstr "სიმბოლური მათემატიკის ველი"
-
-#. Translators: 'SymbolicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
-msgstr "დაფიქსირდა SymbolicResponse-ის შეცდომა. შეცდომა იყო: {error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Code Input"
-msgstr "კოდის ველი"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer provided."
-msgstr "პასუხი არ არის."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Error: No grader has been set up for this problem."
-msgstr "შეცდომა: ამოცანის შემფასებელი არ არის განსაზღვრული."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
-"try again later."
-msgstr ""
-"შემფასებლისთვის თქვენი გაგზავნის მიწოდება ვერ ხერხდება (Reason: "
-"{error_msg}). გთხოვთ, კიდევ სცადოთ მოგვიანებით."
-
-#. Translators: 'grader' refers to the edX automatic code grader.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Invalid grader reply. Please contact the course staff."
-msgstr "არასწორი შემფასებლის პასუხი. გთხოვთ, დაუკავშირდეთ კურსის პერსონალს."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "External Grader"
-msgstr "გარე შემფასებელი"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Math Expression Input"
-msgstr "მათემატიკური ტერმინების ველი"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Factorial function not permitted in answer for this problem. Provided answer"
-" was: {bad_input}"
-msgstr ""
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula."
-msgstr ""
-"არასწორი ველი: '{bad_input}'-ის, როგორც ფორმულის გარჩევა ვერ ხერხდება."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula"
-msgstr ""
-"არასწორი ველი: '{bad_input}'-ის, როგორც ფორმულის გარჩევა ვერ ხერხდება."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Circuit Schematic Builder"
-msgstr "წრიული სქემის მშენებელი"
-
-#. Translators: 'SchematicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
-msgstr "SchematicResponse-is შეფასებისშეცდომა. შეცდომა იყო: {error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Image Mapped Input"
-msgstr "გამოსახულების კარტოგრაფული ველი"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error grading {image_input_id} (input={user_input})"
-msgstr " {image_input_id} (input={user_input}) შეფასების შეცდომა"
-
-#. Translators: {sr_coords} are the coordinates of a rectangle
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
-msgstr ""
-"პრობლემის განსაზღვრის შეცდომა! ვერ ხერხდება ოთკუთხედის {sr_coords}-ში "
-"გარჩევა"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Annotation Input"
-msgstr "ანოტაციის ველი"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Checkboxes With Text Input"
-msgstr "მოსანიშნი ტექსტური ველით"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Answer not provided for {input_type}"
-msgstr "{input_type}-ისთვის პასუხი არ არის მითითებული"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "The Staff answer could not be interpreted as a number."
-msgstr "პერსონალის პასუხის რიცხვად ინტერპრეტაცია ვერ ხერხდება."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{given_answer}' as a number."
-msgstr "'{given_answer}'-ის რიცხვად ინტერპრეტაცია ვერ ხერხდება."
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid ""
-"Codejail API Service is unavailable. Please try again in a few minutes."
-msgstr ""
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Codejail API Service invalid response."
-msgstr ""
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Invalid JSON response received from codejail api service."
-msgstr ""
-
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
 msgstr ""
@@ -3190,6 +2742,10 @@ msgstr "ამ კურსზე თქვენ არ გაქვთ და�
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be enrolled in the course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must give Data Sharing Consent for the course"
 msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
@@ -8975,6 +8531,448 @@ msgstr ""
 msgid "Annotation"
 msgstr "ანოტაცია"
 
+#: xmodule/capa/capa_problem.py
+msgid "Cannot rescore problems with possible file submissions"
+msgstr ""
+"ფაილების შესაძლო გაგზავნებით პრობლემების ხელახლა შეფასება ვერ მოხერხდა"
+
+#: xmodule/capa/capa_problem.py
+msgid "Question {}"
+msgstr ""
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Incorrect"
+msgstr "არასწორი"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Correct"
+msgstr "შეასწორეთ"
+
+#: xmodule/capa/inputtypes.py
+msgid "correct"
+msgstr "სწორი"
+
+#: xmodule/capa/inputtypes.py
+msgid "incorrect"
+msgstr "არასწორი"
+
+#: xmodule/capa/inputtypes.py
+msgid "partially correct"
+msgstr "სანახევროდ სწორი"
+
+#: xmodule/capa/inputtypes.py
+msgid "incomplete"
+msgstr "დაუსრულებელი"
+
+#: xmodule/capa/inputtypes.py
+msgid "unanswered"
+msgstr "პასუხგაუცემელი"
+
+#: xmodule/capa/inputtypes.py
+msgid "submitted"
+msgstr ""
+
+#: xmodule/capa/inputtypes.py
+msgid "processing"
+msgstr "დამუშავება"
+
+#. Translators: these are tooltips that indicate the state of an assessment
+#. question
+#: xmodule/capa/inputtypes.py
+msgid "This answer is correct."
+msgstr "პასუხი სწორია."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is incorrect."
+msgstr "პასუხი არასწორია."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is partially correct."
+msgstr "პასუხი ნაწილობრივ სწორია."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is being processed."
+msgstr "მიმდინარეობს პასუხის დამუშავება."
+
+#: xmodule/capa/inputtypes.py
+msgid "Not yet answered."
+msgstr "ჯერ პასუხგაუცემელია."
+
+#: xmodule/capa/inputtypes.py wiki/forms.py
+msgid "Select an option"
+msgstr "აირჩიეთ ვარიანტი"
+
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr "არჩევანის ჯგუფი: მოულოდნელი ტეგი {tag_name}"
+
+#: xmodule/capa/inputtypes.py
+msgid "Answer received."
+msgstr "პასუხი მიღებულია."
+
+#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
+#. be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
+msgstr ""
+"მოსალოდნელი <choice> ან <compoundhint> ტეგი; მიღებულია {given_tag}-ის "
+"ნაცვლად"
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"თქვენი ფაილები გაიგზავნა. მათი შეფასებისთანავე, ამ შეტყობინებას შემფასებლის "
+"უკუკავშირი ჩაანაცვლებს."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your answer has been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"თქვენი პასუხი გაიგზავნა. მისი შეფასებისთანავე, ამ შეტყობინებას შემფასებლის "
+"უკუკავშირი ჩაანაცვლებს."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{programming_language} editor"
+msgstr "{programming_language} რედაქტორი"
+
+#: xmodule/capa/inputtypes.py
+msgid "Press ESC then TAB or click outside of the code editor to exit"
+msgstr ""
+"გამოსასვლელად დააჭირეთ ESC-ს შემდეგ TAB-ს ან დააწკაპუნეთ კოდის რედაქტირების "
+"გარეთ."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Submitted. As soon as a response is returned, this message will be replaced "
+"by that feedback."
+msgstr ""
+"გაიგზავნა. პასუხის მიღებისთანავე, ამ შეტყობინებას მიღებული უკუკავშირი "
+"ჩაანაცვლებს."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr "Xqueue-დან პასუხი {xqueue_timeout} წამში არ მოსულა. შეწყვეტილია."
+
+#: xmodule/capa/inputtypes.py
+msgid "Error running code."
+msgstr "კოდის გაშვების შეცდომა."
+
+#: xmodule/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr "რიგთან დაკავშირება ვერ მოხერხდა"
+
+#: xmodule/capa/inputtypes.py
+msgid "No formula specified."
+msgstr "ფორმულა მითითებული არ არის."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Couldn't parse formula: {error_msg}"
+msgstr "ვერ ვარჩევთ ფორმულას: {error_msg}"
+
+#: xmodule/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr "წინასწარი დათვალიერების ფორმირებისას წარმოიშვა შეცდომა."
+
+#: xmodule/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr "ვწუხვართ, ვერ ვარჩევთ ფორმულას"
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr "{input_type}: მოულოდნელი ტეგი {tag_name}"
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr "მოსალოდნელი იყო {expected_tag}ტეგი; ნაცვლად მივიღეთ {given_tag}"
+
+#. Translators: index here could be 1,2,3 and so on
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Question {index}"
+msgstr "კითხვა {index}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Correct:"
+msgstr "სწორი:"
+
+#: xmodule/capa/responsetypes.py
+msgid "Incorrect:"
+msgstr "არასწორი:"
+
+#: xmodule/capa/responsetypes.py xmodule/capa_module.py
+msgid "Answer"
+msgstr "პასუხი"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error {err} in evaluating hint function {hintfn}."
+msgstr "ფუნქციის {hintfn} შეფასებაში დაფიქსირდა შეცდომა {err}.  "
+
+#: xmodule/capa/responsetypes.py
+msgid "(Source code line unavailable)"
+msgstr "(წყაროს კოდური ზოლი მიუწვდომელია)"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "See XML source line {sourcenum}."
+msgstr "იხილეთ XML წყაროს ზოლი {sourcenum}."
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Checkboxes"
+msgstr "მოსანიშნები"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Multiple Choice"
+msgstr "მრავლობითი არჩევანი"
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr "არევისა და  პასუხის პული ერთდროულად არ გამოიყენოთ"
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+msgid "answer-pool value should be an integer"
+msgstr "პასუხის პულის მნიშვნელობა მთელი რიცხვი უნდა იყოს"
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr "არჩევის ჯგუფი სულ მცირე 1 სწორ და 1 მცდარ არჩევანს უნდა მოიცავდეს"
+
+#: xmodule/capa/responsetypes.py
+msgid "True/False Choice"
+msgstr "სწორი/მცდარი არჩევანი"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Dropdown"
+msgstr "ჩამოსაშლელი"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Numerical Input"
+msgstr "რიცხვითი ველი"
+
+#: xmodule/capa/responsetypes.py
+msgid "There was a problem with the staff answer to this problem."
+msgstr "პრობლემა დაფიქსირდა პერსონალის მიერ ამ ამოცანის პასუხის გაცემაზე."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{student_answer}' as a number."
+msgstr "'{student_answer}'-ის რიცხვად ინტერპრეტაცია ვერ მოხერხდა."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Factorial function evaluated outside its domain:'{student_answer}'"
+msgstr ""
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid math syntax: '{student_answer}'"
+msgstr "არასწორი მათემატიკური სინტაქსი: '{student_answer}'"
+
+#: xmodule/capa/responsetypes.py
+msgid "You may not use complex numbers in range tolerance problems"
+msgstr "დაშვების ამოცანებზე კომპლექსური რიცხვები შეგიძლიათ არ გამოიყენოთ"
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. provided a
+#. boundary (end limit) for a variable that is a complex number (a + bi), this
+#. message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: complex boundary."
+msgstr ""
+"პრობლემა დაფიქსირდა პერსონალის პასუხზე ამ ამოცანაზე: კომპლექსური ზღვარი."
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. did not
+#. provide a boundary (end limit) for a variable, this message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: empty boundary."
+msgstr "პრობლემა დაფიქსირდა პერსონალის პასუხზე ამ ამოცანაზე: ცარიელი ზღვარი."
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: Separator used in NumericalResponse to display multiple
+#. answers.
+#. Translators: Separator used in StringResponse to display multiple answers.
+#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this is the last choice of a number of choices of how to log
+#. in
+#. to the site.
+#: xmodule/capa/responsetypes.py lms/templates/course_modes/choose.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "or"
+msgstr "ან"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "ტექსტური ველი"
+
+#: xmodule/capa/responsetypes.py
+msgid "error"
+msgstr "შეცდომა"
+
+#: xmodule/capa/responsetypes.py
+msgid "Custom Evaluated Script"
+msgstr "მორგებული შეფასებული სკრიპტი"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error getting student answer from {student_answers}"
+msgstr "{student_answers}-დან სტუდენტის პასუხის მიღების შეცდომა"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr "პასუხი არ არის შეყვანილი!"
+
+#: xmodule/capa/responsetypes.py
+msgid "CustomResponse: check function returned an invalid dictionary!"
+msgstr "მორგებულიპასუხი: შემოწმების ფუნქციამ დააბრუნა არასწორი ლექსიკონი!"
+
+#: xmodule/capa/responsetypes.py
+msgid "Symbolic Math Input"
+msgstr "სიმბოლური მათემატიკის ველი"
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
+msgstr "დაფიქსირდა SymbolicResponse-ის შეცდომა. შეცდომა იყო: {error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Code Input"
+msgstr "კოდის ველი"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer provided."
+msgstr "პასუხი არ არის."
+
+#: xmodule/capa/responsetypes.py
+msgid "Error: No grader has been set up for this problem."
+msgstr "შეცდომა: ამოცანის შემფასებელი არ არის განსაზღვრული."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
+"try again later."
+msgstr ""
+"შემფასებლისთვის თქვენი გაგზავნის მიწოდება ვერ ხერხდება (Reason: "
+"{error_msg}). გთხოვთ, კიდევ სცადოთ მოგვიანებით."
+
+#. Translators: 'grader' refers to the edX automatic code grader.
+#: xmodule/capa/responsetypes.py
+msgid "Invalid grader reply. Please contact the course staff."
+msgstr "არასწორი შემფასებლის პასუხი. გთხოვთ, დაუკავშირდეთ კურსის პერსონალს."
+
+#: xmodule/capa/responsetypes.py
+msgid "External Grader"
+msgstr "გარე შემფასებელი"
+
+#: xmodule/capa/responsetypes.py
+msgid "Math Expression Input"
+msgstr "მათემატიკური ტერმინების ველი"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Factorial function not permitted in answer for this problem. Provided answer"
+" was: {bad_input}"
+msgstr ""
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula."
+msgstr ""
+"არასწორი ველი: '{bad_input}'-ის, როგორც ფორმულის გარჩევა ვერ ხერხდება."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula"
+msgstr ""
+"არასწორი ველი: '{bad_input}'-ის, როგორც ფორმულის გარჩევა ვერ ხერხდება."
+
+#: xmodule/capa/responsetypes.py
+msgid "Circuit Schematic Builder"
+msgstr "წრიული სქემის მშენებელი"
+
+#. Translators: 'SchematicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
+msgstr "SchematicResponse-is შეფასებისშეცდომა. შეცდომა იყო: {error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Image Mapped Input"
+msgstr "გამოსახულების კარტოგრაფული ველი"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr " {image_input_id} (input={user_input}) შეფასების შეცდომა"
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr ""
+"პრობლემის განსაზღვრის შეცდომა! ვერ ხერხდება ოთკუთხედის {sr_coords}-ში "
+"გარჩევა"
+
+#: xmodule/capa/responsetypes.py
+msgid "Annotation Input"
+msgstr "ანოტაციის ველი"
+
+#: xmodule/capa/responsetypes.py
+msgid "Checkboxes With Text Input"
+msgstr "მოსანიშნი ტექსტური ველით"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Answer not provided for {input_type}"
+msgstr "{input_type}-ისთვის პასუხი არ არის მითითებული"
+
+#: xmodule/capa/responsetypes.py
+msgid "The Staff answer could not be interpreted as a number."
+msgstr "პერსონალის პასუხის რიცხვად ინტერპრეტაცია ვერ ხერხდება."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{given_answer}' as a number."
+msgstr "'{given_answer}'-ის რიცხვად ინტერპრეტაცია ვერ ხერხდება."
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid ""
+"Codejail API Service is unavailable. Please try again in a few minutes."
+msgstr ""
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Codejail API Service invalid response."
+msgstr ""
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Invalid JSON response received from codejail api service."
+msgstr ""
+
 #: xmodule/capa_module.py
 msgid "Blank Advanced Problem"
 msgstr "ცარიელი დამატებითი პამოცანა"
@@ -12915,10 +12913,6 @@ msgstr ""
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
 msgstr "გასვლა"
-
-#: common/lib/capa/capa/templates/codeinput.html
-msgid "Code Editor"
-msgstr "კოდის რედაქტორი"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
@@ -19674,6 +19668,10 @@ msgstr "განათავსეთ თქვენი ღირსები�
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Copyright Text here!"
 msgstr "განათავსეთ თქვენი საავტორო უფლების მქონე ტექსტი აქ!"
+
+#: xmodule/capa/templates/codeinput.html
+msgid "Code Editor"
+msgstr "კოდის რედაქტორი"
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
