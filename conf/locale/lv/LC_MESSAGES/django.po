@@ -49,7 +49,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-24 20:43+0000\n"
+"POT-Creation-Date: 2022-07-31 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Latvian (https://www.transifex.com/open-edx/teams/6205/lv/)\n"
@@ -1515,458 +1515,6 @@ msgstr "Provizorisks atbalsts"
 msgid "Unsupported"
 msgstr "Nav atbalsta"
 
-#: common/lib/capa/capa/capa_problem.py
-msgid "Cannot rescore problems with possible file submissions"
-msgstr "Nevar atkārtoti novērtēt problēmas ar iespējamo datņu iesniegšanu."
-
-#: common/lib/capa/capa/capa_problem.py
-msgid "Question {}"
-msgstr ""
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Incorrect"
-msgstr "Nepareizi"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Correct"
-msgstr "Pareizi"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "correct"
-msgstr "pareizi"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incorrect"
-msgstr "nepareizi"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr "daļēji pareizi"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incomplete"
-msgstr "nepilnīgi"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "unanswered"
-msgstr "neatbildēts"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "submitted"
-msgstr "iesniegts"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "processing"
-msgstr "apstrādē"
-
-#. Translators: these are tooltips that indicate the state of an assessment
-#. question
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is correct."
-msgstr "Šī atbilde ir pareiza."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is incorrect."
-msgstr "Šī atbilde ir nepareiza."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is partially correct."
-msgstr "Šī atbilde ir daļēji pareiza."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is being processed."
-msgstr "Šī atbilde tiek apstrādāta."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Not yet answered."
-msgstr "Vēl nav atbildēts."
-
-#: common/lib/capa/capa/inputtypes.py wiki/forms.py
-msgid "Select an option"
-msgstr "Izvēlieties opciju"
-
-#. Translators: 'ChoiceGroup' is an input type and should not be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "ChoiceGroup: unexpected tag {tag_name}"
-msgstr "ChoiceGroup: neparedzēts tags {tag_name}"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Answer received."
-msgstr "Atbilde saņemta."
-
-#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
-#. be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
-msgstr ""
-"Tika sagaidīts <choice> vai <compoundhint> tags; tika saņemts {given_tag} tā"
-" vietā"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your files have been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"Jūsu faili tika iesniegti. Tiklīdz iesniegtie materiāli tiks novērtēti, šis "
-"ziņojums tiks nomainīts ar novērtētāja atsauksmēm."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your answer has been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"Jūsu atbilde tika iesniegta. Tiklīdz iesniegtais tiks novērtēts, šis "
-"ziņojums tiks nomainīts ar novērtētāja atsauksmēm."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{programming_language} editor"
-msgstr "{programming_language} redaktors"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Press ESC then TAB or click outside of the code editor to exit"
-msgstr ""
-"Nospiediet ESC, pēc tam TAB vai klikšķiniet ārpus koda redaktora, lai "
-"izietu."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Submitted. As soon as a response is returned, this message will be replaced "
-"by that feedback."
-msgstr ""
-"Iesniegts. Tiklīdz tiks saņemta atbilde, šis ziņojums tiks nomainīts "
-"nomainīts ar attiecīgo atbildi."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
-msgstr ""
-"Nav atbildes no Xqueue {xqueue_timeout} sekunžu laikā. Priekšlaicīgi "
-"pārtraukts."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error running code."
-msgstr "Kļūda izpildot kodu."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Cannot connect to the queue"
-msgstr "Nevar pieslēgties rindai"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "No formula specified."
-msgstr "Nav norādīta neviena formula."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Couldn't parse formula: {error_msg}"
-msgstr "Nebija iespējams parsēt formulu: {error_msg}"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error while rendering preview"
-msgstr "Kļūda renderējot priekšskatījumu"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Sorry, couldn't parse formula"
-msgstr "Atvainojiet, nebija iespējams parsēt formulu"
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{input_type}: unexpected tag {tag_name}"
-msgstr "{input_type}: neparedzēts tags {tag_name}"
-
-#. Translators: a "tag" is an XML element, such as "<b>" in HTML
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a {expected_tag} tag; got {given_tag} instead"
-msgstr "Tika sagaidīts {expected_tag} tags; tika saņemts {given_tag} tā vietā"
-
-#. Translators: index here could be 1,2,3 and so on
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Question {index}"
-msgstr "Jautājums {index}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Correct:"
-msgstr "Pareizi:"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Incorrect:"
-msgstr "Nepareizi:"
-
-#: common/lib/capa/capa/responsetypes.py xmodule/capa_module.py
-msgid "Answer"
-msgstr "Atbilde"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error {err} in evaluating hint function {hintfn}."
-msgstr "Kļūda {err} novērtējot ieteikuma funkciju {hintfn}."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "(Source code line unavailable)"
-msgstr "(Pirmkoda rinda ir nepieejama)"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "See XML source line {sourcenum}."
-msgstr "Skatiet XML avota rindu {sourcenum}."
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Checkboxes"
-msgstr "Izvēles rūtiņas"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Multiple Choice"
-msgstr "Vairākas izvēles"
-
-#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
-#. be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Do not use shuffle and answer-pool at the same time"
-msgstr "Neizmantojiet jaukšanu un atbilžu kopu vienlaicīgi"
-
-#. Translators: 'answer-pool' is an attribute name and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "answer-pool value should be an integer"
-msgstr "atbilžu kopas vērtībai ir jābūt veselam skaitlim"
-
-#. Translators: 'Choicegroup' is an input type and should not be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
-msgstr "Choicegroup ir jāiekļauj vismaz viena pareiza un 1 nepareiza izvēle"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "True/False Choice"
-msgstr "Patiesa/nepatiesa izvēle"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Dropdown"
-msgstr "Nolaižams(-a)"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Numerical Input"
-msgstr "Skaitliskā ievade"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "There was a problem with the staff answer to this problem."
-msgstr "Notika problēma saistībā ar personāla atbildi uz šo problēmu."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{student_answer}' as a number."
-msgstr "Nebija iespējams interpretēt '{student_answer}' kā skaitli."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Factorial function evaluated outside its domain:'{student_answer}'"
-msgstr ""
-"Faktoriālā funkcija novērtēta ārpus tās vērtību apgabala:'{student_answer}'"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid math syntax: '{student_answer}'"
-msgstr "Nederīga matemātiskā sintakse: '{student_answer}'"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "You may not use complex numbers in range tolerance problems"
-msgstr ""
-"Jūs nedrīkstat izmantot kompleksus skaitļus diapazona tolerances problēmās"
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. provided a
-#. boundary (end limit) for a variable that is a complex number (a + bi), this
-#. message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: complex boundary."
-msgstr ""
-"Notika problēma saistībā ar personāla atbildi uz šo problēmu: kompleksa "
-"robeža."
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. did not
-#. provide a boundary (end limit) for a variable, this message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: empty boundary."
-msgstr ""
-"Notika problēma saistībā ar personāla atbildi uz šo problēmu: tukša robeža."
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: Separator used in NumericalResponse to display multiple
-#. answers.
-#. Translators: Separator used in StringResponse to display multiple answers.
-#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is the last choice of a number of choices of how to log
-#. in
-#. to the site.
-#: common/lib/capa/capa/responsetypes.py
-#: lms/templates/course_modes/choose.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "or"
-msgstr "vai"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "Teksta ievade"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr "kļūda"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Custom Evaluated Script"
-msgstr "Pielāgots novērtētais skripts"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error getting student answer from {student_answers}"
-msgstr "kļūda, iegūstot studenta atbildi no {student_answers}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer entered!"
-msgstr "Nav ievadīta neviena atbilde!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "CustomResponse: check function returned an invalid dictionary!"
-msgstr "CustomResponse: nederīga vārdnīca tika atgriezta pārbaudes funkcijā!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Symbolic Math Input"
-msgstr "Simboliskās matemātikas ievade"
-
-#. Translators: 'SymbolicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
-msgstr "Notika kļūda ar SymbolicResponse. Kļūda bija: {error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Code Input"
-msgstr "Koda ievade"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer provided."
-msgstr "Nav sniegta neviena atbilde."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Error: No grader has been set up for this problem."
-msgstr "Kļūda: Šai problēmai nav uzstādīts neviens vērtētājs."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
-"try again later."
-msgstr ""
-"Nebija iespējams nogādāt Jūsu iesniegto vērtētājam (Iemesls: {error_msg}). "
-"Lūdzu, vēlāk mēģiniet vēlreiz."
-
-#. Translators: 'grader' refers to the edX automatic code grader.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Invalid grader reply. Please contact the course staff."
-msgstr "Nederīga vērtētāja atbilde. Lūdzu, sazinieties ar kursa personālu."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "External Grader"
-msgstr "Ārējais vērtētājs"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Math Expression Input"
-msgstr "Matemātiskās izteiksmes ievade"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Factorial function not permitted in answer for this problem. Provided answer"
-" was: {bad_input}"
-msgstr ""
-"Faktoriālā funkcija nav atļauta šīs problēmas atbildē. Sniegtā atbilde bija:"
-" {bad_input}"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula."
-msgstr "Nederīga ievade: Nebija iespējams parsēt '{bad_input}' kā formulu."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula"
-msgstr "Nederīga ievade: Nebija iespējams parsēt '{bad_input}' kā formulu"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Circuit Schematic Builder"
-msgstr "Principshēmu veidotājs"
-
-#. Translators: 'SchematicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
-msgstr "Kļūda novērtējot SchematicResponse. Kļūda bija: {error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Image Mapped Input"
-msgstr "Attēlu kartēšanas ievade"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error grading {image_input_id} (input={user_input})"
-msgstr "kļūdu novērtēšana {image_input_id} (input={user_input})"
-
-#. Translators: {sr_coords} are the coordinates of a rectangle
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
-msgstr ""
-"Kļūda problēmas specifikācijā! Nav iespējams parsēt taisnstūri {sr_coords}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Annotation Input"
-msgstr "Anotācijas ievade"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Checkboxes With Text Input"
-msgstr "Izvēles rūtiņas ar teksta ievadi"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Answer not provided for {input_type}"
-msgstr "Nav sniegta atbilde uz {input_type}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "The Staff answer could not be interpreted as a number."
-msgstr "Personāla atbildi nebija iespējams interpretēt kā skaitli."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{given_answer}' as a number."
-msgstr "Nebija iespējams interpretēt '{given_answer}' kā skaitli."
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid ""
-"Codejail API Service is unavailable. Please try again in a few minutes."
-msgstr ""
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Codejail API Service invalid response."
-msgstr ""
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Invalid JSON response received from codejail api service."
-msgstr ""
-
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
 msgstr ""
@@ -3245,6 +2793,10 @@ msgstr "Jums nav pieejas šim kursam uz mobilās ierīces"
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be enrolled in the course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must give Data Sharing Consent for the course"
 msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
@@ -9179,6 +8731,452 @@ msgstr "Šī komponenta parādāmais vārds."
 msgid "Annotation"
 msgstr "Anotācija"
 
+#: xmodule/capa/capa_problem.py
+msgid "Cannot rescore problems with possible file submissions"
+msgstr "Nevar atkārtoti novērtēt problēmas ar iespējamo datņu iesniegšanu."
+
+#: xmodule/capa/capa_problem.py
+msgid "Question {}"
+msgstr ""
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Incorrect"
+msgstr "Nepareizi"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Correct"
+msgstr "Pareizi"
+
+#: xmodule/capa/inputtypes.py
+msgid "correct"
+msgstr "pareizi"
+
+#: xmodule/capa/inputtypes.py
+msgid "incorrect"
+msgstr "nepareizi"
+
+#: xmodule/capa/inputtypes.py
+msgid "partially correct"
+msgstr "daļēji pareizi"
+
+#: xmodule/capa/inputtypes.py
+msgid "incomplete"
+msgstr "nepilnīgi"
+
+#: xmodule/capa/inputtypes.py
+msgid "unanswered"
+msgstr "neatbildēts"
+
+#: xmodule/capa/inputtypes.py
+msgid "submitted"
+msgstr "iesniegts"
+
+#: xmodule/capa/inputtypes.py
+msgid "processing"
+msgstr "apstrādē"
+
+#. Translators: these are tooltips that indicate the state of an assessment
+#. question
+#: xmodule/capa/inputtypes.py
+msgid "This answer is correct."
+msgstr "Šī atbilde ir pareiza."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is incorrect."
+msgstr "Šī atbilde ir nepareiza."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is partially correct."
+msgstr "Šī atbilde ir daļēji pareiza."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is being processed."
+msgstr "Šī atbilde tiek apstrādāta."
+
+#: xmodule/capa/inputtypes.py
+msgid "Not yet answered."
+msgstr "Vēl nav atbildēts."
+
+#: xmodule/capa/inputtypes.py wiki/forms.py
+msgid "Select an option"
+msgstr "Izvēlieties opciju"
+
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr "ChoiceGroup: neparedzēts tags {tag_name}"
+
+#: xmodule/capa/inputtypes.py
+msgid "Answer received."
+msgstr "Atbilde saņemta."
+
+#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
+#. be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
+msgstr ""
+"Tika sagaidīts <choice> vai <compoundhint> tags; tika saņemts {given_tag} tā"
+" vietā"
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"Jūsu faili tika iesniegti. Tiklīdz iesniegtie materiāli tiks novērtēti, šis "
+"ziņojums tiks nomainīts ar novērtētāja atsauksmēm."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your answer has been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"Jūsu atbilde tika iesniegta. Tiklīdz iesniegtais tiks novērtēts, šis "
+"ziņojums tiks nomainīts ar novērtētāja atsauksmēm."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{programming_language} editor"
+msgstr "{programming_language} redaktors"
+
+#: xmodule/capa/inputtypes.py
+msgid "Press ESC then TAB or click outside of the code editor to exit"
+msgstr ""
+"Nospiediet ESC, pēc tam TAB vai klikšķiniet ārpus koda redaktora, lai "
+"izietu."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Submitted. As soon as a response is returned, this message will be replaced "
+"by that feedback."
+msgstr ""
+"Iesniegts. Tiklīdz tiks saņemta atbilde, šis ziņojums tiks nomainīts "
+"nomainīts ar attiecīgo atbildi."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr ""
+"Nav atbildes no Xqueue {xqueue_timeout} sekunžu laikā. Priekšlaicīgi "
+"pārtraukts."
+
+#: xmodule/capa/inputtypes.py
+msgid "Error running code."
+msgstr "Kļūda izpildot kodu."
+
+#: xmodule/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr "Nevar pieslēgties rindai"
+
+#: xmodule/capa/inputtypes.py
+msgid "No formula specified."
+msgstr "Nav norādīta neviena formula."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Couldn't parse formula: {error_msg}"
+msgstr "Nebija iespējams parsēt formulu: {error_msg}"
+
+#: xmodule/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr "Kļūda renderējot priekšskatījumu"
+
+#: xmodule/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr "Atvainojiet, nebija iespējams parsēt formulu"
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr "{input_type}: neparedzēts tags {tag_name}"
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr "Tika sagaidīts {expected_tag} tags; tika saņemts {given_tag} tā vietā"
+
+#. Translators: index here could be 1,2,3 and so on
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Question {index}"
+msgstr "Jautājums {index}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Correct:"
+msgstr "Pareizi:"
+
+#: xmodule/capa/responsetypes.py
+msgid "Incorrect:"
+msgstr "Nepareizi:"
+
+#: xmodule/capa/responsetypes.py xmodule/capa_module.py
+msgid "Answer"
+msgstr "Atbilde"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error {err} in evaluating hint function {hintfn}."
+msgstr "Kļūda {err} novērtējot ieteikuma funkciju {hintfn}."
+
+#: xmodule/capa/responsetypes.py
+msgid "(Source code line unavailable)"
+msgstr "(Pirmkoda rinda ir nepieejama)"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "See XML source line {sourcenum}."
+msgstr "Skatiet XML avota rindu {sourcenum}."
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Checkboxes"
+msgstr "Izvēles rūtiņas"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Multiple Choice"
+msgstr "Vairākas izvēles"
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr "Neizmantojiet jaukšanu un atbilžu kopu vienlaicīgi"
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+msgid "answer-pool value should be an integer"
+msgstr "atbilžu kopas vērtībai ir jābūt veselam skaitlim"
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr "Choicegroup ir jāiekļauj vismaz viena pareiza un 1 nepareiza izvēle"
+
+#: xmodule/capa/responsetypes.py
+msgid "True/False Choice"
+msgstr "Patiesa/nepatiesa izvēle"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Dropdown"
+msgstr "Nolaižams(-a)"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Numerical Input"
+msgstr "Skaitliskā ievade"
+
+#: xmodule/capa/responsetypes.py
+msgid "There was a problem with the staff answer to this problem."
+msgstr "Notika problēma saistībā ar personāla atbildi uz šo problēmu."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{student_answer}' as a number."
+msgstr "Nebija iespējams interpretēt '{student_answer}' kā skaitli."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Factorial function evaluated outside its domain:'{student_answer}'"
+msgstr ""
+"Faktoriālā funkcija novērtēta ārpus tās vērtību apgabala:'{student_answer}'"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid math syntax: '{student_answer}'"
+msgstr "Nederīga matemātiskā sintakse: '{student_answer}'"
+
+#: xmodule/capa/responsetypes.py
+msgid "You may not use complex numbers in range tolerance problems"
+msgstr ""
+"Jūs nedrīkstat izmantot kompleksus skaitļus diapazona tolerances problēmās"
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. provided a
+#. boundary (end limit) for a variable that is a complex number (a + bi), this
+#. message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: complex boundary."
+msgstr ""
+"Notika problēma saistībā ar personāla atbildi uz šo problēmu: kompleksa "
+"robeža."
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. did not
+#. provide a boundary (end limit) for a variable, this message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: empty boundary."
+msgstr ""
+"Notika problēma saistībā ar personāla atbildi uz šo problēmu: tukša robeža."
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: Separator used in NumericalResponse to display multiple
+#. answers.
+#. Translators: Separator used in StringResponse to display multiple answers.
+#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this is the last choice of a number of choices of how to log
+#. in
+#. to the site.
+#: xmodule/capa/responsetypes.py lms/templates/course_modes/choose.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "or"
+msgstr "vai"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "Teksta ievade"
+
+#: xmodule/capa/responsetypes.py
+msgid "error"
+msgstr "kļūda"
+
+#: xmodule/capa/responsetypes.py
+msgid "Custom Evaluated Script"
+msgstr "Pielāgots novērtētais skripts"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error getting student answer from {student_answers}"
+msgstr "kļūda, iegūstot studenta atbildi no {student_answers}"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr "Nav ievadīta neviena atbilde!"
+
+#: xmodule/capa/responsetypes.py
+msgid "CustomResponse: check function returned an invalid dictionary!"
+msgstr "CustomResponse: nederīga vārdnīca tika atgriezta pārbaudes funkcijā!"
+
+#: xmodule/capa/responsetypes.py
+msgid "Symbolic Math Input"
+msgstr "Simboliskās matemātikas ievade"
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
+msgstr "Notika kļūda ar SymbolicResponse. Kļūda bija: {error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Code Input"
+msgstr "Koda ievade"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer provided."
+msgstr "Nav sniegta neviena atbilde."
+
+#: xmodule/capa/responsetypes.py
+msgid "Error: No grader has been set up for this problem."
+msgstr "Kļūda: Šai problēmai nav uzstādīts neviens vērtētājs."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
+"try again later."
+msgstr ""
+"Nebija iespējams nogādāt Jūsu iesniegto vērtētājam (Iemesls: {error_msg}). "
+"Lūdzu, vēlāk mēģiniet vēlreiz."
+
+#. Translators: 'grader' refers to the edX automatic code grader.
+#: xmodule/capa/responsetypes.py
+msgid "Invalid grader reply. Please contact the course staff."
+msgstr "Nederīga vērtētāja atbilde. Lūdzu, sazinieties ar kursa personālu."
+
+#: xmodule/capa/responsetypes.py
+msgid "External Grader"
+msgstr "Ārējais vērtētājs"
+
+#: xmodule/capa/responsetypes.py
+msgid "Math Expression Input"
+msgstr "Matemātiskās izteiksmes ievade"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Factorial function not permitted in answer for this problem. Provided answer"
+" was: {bad_input}"
+msgstr ""
+"Faktoriālā funkcija nav atļauta šīs problēmas atbildē. Sniegtā atbilde bija:"
+" {bad_input}"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula."
+msgstr "Nederīga ievade: Nebija iespējams parsēt '{bad_input}' kā formulu."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula"
+msgstr "Nederīga ievade: Nebija iespējams parsēt '{bad_input}' kā formulu"
+
+#: xmodule/capa/responsetypes.py
+msgid "Circuit Schematic Builder"
+msgstr "Principshēmu veidotājs"
+
+#. Translators: 'SchematicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
+msgstr "Kļūda novērtējot SchematicResponse. Kļūda bija: {error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Image Mapped Input"
+msgstr "Attēlu kartēšanas ievade"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr "kļūdu novērtēšana {image_input_id} (input={user_input})"
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr ""
+"Kļūda problēmas specifikācijā! Nav iespējams parsēt taisnstūri {sr_coords}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Annotation Input"
+msgstr "Anotācijas ievade"
+
+#: xmodule/capa/responsetypes.py
+msgid "Checkboxes With Text Input"
+msgstr "Izvēles rūtiņas ar teksta ievadi"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Answer not provided for {input_type}"
+msgstr "Nav sniegta atbilde uz {input_type}"
+
+#: xmodule/capa/responsetypes.py
+msgid "The Staff answer could not be interpreted as a number."
+msgstr "Personāla atbildi nebija iespējams interpretēt kā skaitli."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{given_answer}' as a number."
+msgstr "Nebija iespējams interpretēt '{given_answer}' kā skaitli."
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid ""
+"Codejail API Service is unavailable. Please try again in a few minutes."
+msgstr ""
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Codejail API Service invalid response."
+msgstr ""
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Invalid JSON response received from codejail api service."
+msgstr ""
+
 #: xmodule/capa_module.py
 msgid "Blank Advanced Problem"
 msgstr "Tukša padziļinātā problēma"
@@ -13092,10 +13090,6 @@ msgstr "nosaukums"
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
 msgstr "Izrakstīties"
-
-#: common/lib/capa/capa/templates/codeinput.html
-msgid "Code Editor"
-msgstr "Koda redaktors"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
@@ -19938,6 +19932,10 @@ msgstr "Ievietojiet Jūsu goda kodeksu šeit!"
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Copyright Text here!"
 msgstr "Ievietojiet Jūsu autortiesību tekstu šeit!"
+
+#: xmodule/capa/templates/codeinput.html
+msgid "Code Editor"
+msgstr "Koda redaktors"
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."

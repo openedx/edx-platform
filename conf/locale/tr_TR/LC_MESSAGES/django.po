@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-24 20:43+0000\n"
+"POT-Creation-Date: 2022-07-31 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -832,6 +832,8 @@ msgid ""
 "{html_start}Success{html_end} You have {activated_or_confirmed} your "
 "{account_or_email}."
 msgstr ""
+"{html_start}Kutlarız!{html_end} {account_or_email} hesabınızı "
+"{activated_or_confirmed}"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -1613,458 +1615,6 @@ msgstr "Geçici Destek"
 #: common/djangoapps/xblock_django/models.py
 msgid "Unsupported"
 msgstr "Desteklenmiyor"
-
-#: common/lib/capa/capa/capa_problem.py
-msgid "Cannot rescore problems with possible file submissions"
-msgstr "Olası dosya yüklemeleri olan problemler yeniden notlandırılamaz"
-
-#: common/lib/capa/capa/capa_problem.py
-msgid "Question {}"
-msgstr "Soru {}"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Incorrect"
-msgstr "Yanlış"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Correct"
-msgstr "Doğru"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "correct"
-msgstr "doğru"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incorrect"
-msgstr "yanlış"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr "kısmen doğru"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incomplete"
-msgstr "eksik"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "unanswered"
-msgstr "cevaplanmamış"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "submitted"
-msgstr "gönderildi"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "processing"
-msgstr "işlem devam ediyor"
-
-#. Translators: these are tooltips that indicate the state of an assessment
-#. question
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is correct."
-msgstr "Bu cevap doğru."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is incorrect."
-msgstr "Bu cevap yanlış."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is partially correct."
-msgstr "Bu cevap kısmen doğru."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is being processed."
-msgstr "Bu cevap işleniyor."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Not yet answered."
-msgstr "Henüz cevaplandırılmadı."
-
-#: common/lib/capa/capa/inputtypes.py wiki/forms.py
-msgid "Select an option"
-msgstr "Lütfen bir seçenek seçiniz"
-
-#. Translators: 'ChoiceGroup' is an input type and should not be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "ChoiceGroup: unexpected tag {tag_name}"
-msgstr "GrupSeçimi: beklenmeyen etiket {tag_name}"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Answer received."
-msgstr "Cevap alındı."
-
-#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
-#. be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
-msgstr ""
-"<choice> veya <compoundhint> etiketi beklendi; onun yerine {given_tag} "
-"etiketi alındı."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your files have been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"Dosyalarınız yüklendi. Yüklemeniz notlandırılır notlandırılmaz, bu iletinin "
-"yerine notlandıran kişinin verdiği geri besleme konulacak."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your answer has been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"Yanıtınız teslim edildi. Yanıtınız notlandırılır notlandırılmaz, bu iletinin"
-" yerine notlandıran kişinin verdiği geri besleme konulacak."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{programming_language} editor"
-msgstr "{programming_language} editörü"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Press ESC then TAB or click outside of the code editor to exit"
-msgstr ""
-"Kod editöründen çıkmak için ESC ve hemen ardından TAB'a basabilir veya "
-"dışına tıklayabilirsiniz"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Submitted. As soon as a response is returned, this message will be replaced "
-"by that feedback."
-msgstr ""
-"Yüklendi. Ne zaman bir cevap dönerse, bu ileti o geri bildirimle yer "
-"değiştirecektir."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
-msgstr "Xqueue {xqueue_timeout} saniye içinde yanıt vermedi. Durduruldu."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error running code."
-msgstr "Çalışan kodda hata var."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Cannot connect to the queue"
-msgstr "Kuyruğa bağlanılamadı"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "No formula specified."
-msgstr "Herhangi bir formül tanımlanmadı."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Couldn't parse formula: {error_msg}"
-msgstr "Formül okunamadı: {error_msg}"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error while rendering preview"
-msgstr "Önizleme oluşturulurken hata oluştu"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Sorry, couldn't parse formula"
-msgstr "Üzgünüz, formül okunamadı."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{input_type}: unexpected tag {tag_name}"
-msgstr "{input_type}: beklenmeyen etiket {tag_name}"
-
-#. Translators: a "tag" is an XML element, such as "<b>" in HTML
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a {expected_tag} tag; got {given_tag} instead"
-msgstr ""
-"{expected_tag} etiketi beklendi; onun yerine {given_tag} etiketi alındı."
-
-#. Translators: index here could be 1,2,3 and so on
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Question {index}"
-msgstr "Soru {index}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Correct:"
-msgstr "Doğru:"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Incorrect:"
-msgstr "Yanlış:"
-
-#: common/lib/capa/capa/responsetypes.py xmodule/capa_module.py
-msgid "Answer"
-msgstr "Cevap"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error {err} in evaluating hint function {hintfn}."
-msgstr "Tavsiye fonksiyonunda {hintfn} hata {err} "
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "(Source code line unavailable)"
-msgstr "(Kaynak kodu satırı bilinmiyor)"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "See XML source line {sourcenum}."
-msgstr "XML kaynak satırına {sourcenum} bakınız."
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Checkboxes"
-msgstr "Onay Kutucukları"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Multiple Choice"
-msgstr "Çoktan Seçmeli"
-
-#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
-#. be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Do not use shuffle and answer-pool at the same time"
-msgstr "Aynı anda shuffle ve answer-pool değerlerini kullanmayın"
-
-#. Translators: 'answer-pool' is an attribute name and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "answer-pool value should be an integer"
-msgstr "answer-pool değeri tamsayı olmalı"
-
-#. Translators: 'Choicegroup' is an input type and should not be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
-msgstr "Choicegroup en az 1 doğru ve 1 yanlış seçenek içermeli"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "True/False Choice"
-msgstr "Doğru/Yanlış Seçmeli"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Dropdown"
-msgstr "Açılır Liste"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Numerical Input"
-msgstr "Nümerik Girdi"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "There was a problem with the staff answer to this problem."
-msgstr "Bu probleme personelin verdiği yanıtta bir sorun vardı."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{student_answer}' as a number."
-msgstr " '{student_answer}' bir sayı olarak algılanamadı."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Factorial function evaluated outside its domain:'{student_answer}'"
-msgstr ""
-"Faktöriyel fonksiyonu etki alanı dışında hesaplandı:'{student_answer}'"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid math syntax: '{student_answer}'"
-msgstr "geçersiz matematik yazımı: '{student_answer}'"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "You may not use complex numbers in range tolerance problems"
-msgstr "Aralık tolerans problemlerinde kompleks sayı kullanamazsınız"
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. provided a
-#. boundary (end limit) for a variable that is a complex number (a + bi), this
-#. message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: complex boundary."
-msgstr ""
-"Bu problemin çalışanlar tarafından yanıtlanmasında hata oldu: kompleks "
-"sınır."
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. did not
-#. provide a boundary (end limit) for a variable, this message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: empty boundary."
-msgstr "Çalışanların bu soruya cevap vermesinde sorun yaşandı: boş sınır"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: Separator used in NumericalResponse to display multiple
-#. answers.
-#. Translators: Separator used in StringResponse to display multiple answers.
-#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is the last choice of a number of choices of how to log
-#. in
-#. to the site.
-#: common/lib/capa/capa/responsetypes.py
-#: lms/templates/course_modes/choose.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "or"
-msgstr "veya"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "Metin Girişi"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr "hata"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Custom Evaluated Script"
-msgstr "Özel Değerlendirilmiş Senaryo"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error getting student answer from {student_answers}"
-msgstr "{student_answers}'dan öğrenci cevabı alırken hata"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer entered!"
-msgstr "Hiç cevap girilmedi!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "CustomResponse: check function returned an invalid dictionary!"
-msgstr "ÖzelYanıt: kontrol fonksiyonu geçersiz sözlük döndü!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Symbolic Math Input"
-msgstr "Sembolik Matematiksel Girdi"
-
-#. Translators: 'SymbolicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
-msgstr "SymbolicResponse ile oluşan bir hata. Hata şöyleydi: {error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Code Input"
-msgstr "Kod Girişi"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer provided."
-msgstr "Cevap verilmedi."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Error: No grader has been set up for this problem."
-msgstr "Hata: Bu problem için herhangi bir puanlayıcı atanmadı."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
-"try again later."
-msgstr ""
-"Notlandırıcıya yanıt iletilemedi (Neden: {error_msg}). Lütfen daha sonra "
-"tekrar deneyin."
-
-#. Translators: 'grader' refers to the edX automatic code grader.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Invalid grader reply. Please contact the course staff."
-msgstr ""
-"Geçersiz notlandırıcı yanıtı. Lütfen ders personeliyle iletişime geçiniz."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "External Grader"
-msgstr "Harici Notlayıcı"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Math Expression Input"
-msgstr "Matematiksel İfade Girdisi"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Factorial function not permitted in answer for this problem. Provided answer"
-" was: {bad_input}"
-msgstr ""
-"Bu problemin sonucu için faktöriyel fonksiyonunun kullanımına izin "
-"verilmedi. Sağlanan cevap: {bad_input}"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula."
-msgstr "Geçersiz giriş: '{bad_input}' formül olarak okunamadı."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula"
-msgstr "Geçersiz giriş: '{bad_input}' formül olarak okunamadı"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Circuit Schematic Builder"
-msgstr "Devre Şeması Oluşturucusu"
-
-#. Translators: 'SchematicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
-msgstr ""
-"SchematicResponse değerlendirmesinde oluşan hata. Hata şöyleydi: {error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Image Mapped Input"
-msgstr "Eşlenmiş Görüntü Girdisi"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error grading {image_input_id} (input={user_input})"
-msgstr "notlamada hata {image_input_id} (girdi={user_input})"
-
-#. Translators: {sr_coords} are the coordinates of a rectangle
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
-msgstr "Problem belirlemede hata! {sr_coords} dikdörtgen ayrıştırılamıyor."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Annotation Input"
-msgstr "Bilgi Notu Girdisi"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Checkboxes With Text Input"
-msgstr "Metin Girişli Onay Kutucukları"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Answer not provided for {input_type}"
-msgstr "{input_type} için cevap sağlanmadı."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "The Staff answer could not be interpreted as a number."
-msgstr "Personelin cevabı bir sayı olarak algılanamadı."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{given_answer}' as a number."
-msgstr "'{given_answer}' bir sayı olarak algılanamadı."
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid ""
-"Codejail API Service is unavailable. Please try again in a few minutes."
-msgstr ""
-"CodeJail API Servisi kullanılabilir değil. Lütfen birkaç dakika içinde "
-"tekrar deneyin."
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Codejail API Service invalid response."
-msgstr "Codejail API Servisi geçersiz cevap."
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Invalid JSON response received from codejail api service."
-msgstr "Codejail api servisinden geçersiz JSON cevabı alındı."
 
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
@@ -3334,9 +2884,10 @@ msgid ""
 "have questions."
 msgstr ""
 
+#: lms/djangoapps/course_home_api/outline/views.py
 #: lms/templates/courseware/course_about.html
 msgid "Course is full"
-msgstr "Ders Dolu"
+msgstr "Ders dolu"
 
 #: lms/djangoapps/course_home_api/outline/views.py
 msgid "'course_id' is required."
@@ -3415,13 +2966,17 @@ msgid "You must be enrolled in the course"
 msgstr "Derse kayıt olmalısınız"
 
 #: lms/djangoapps/courseware/access_response.py
+msgid "You must give Data Sharing Consent for the course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
 msgid "You must be logged in to see this course"
 msgstr "Dersi görmek için önce giriş yapmalısınız"
 
 #: lms/djangoapps/courseware/access_response.py
 #, python-brace-format
 msgid "{course_name} is no longer available."
-msgstr ""
+msgstr "{course_name} artık mevcut değil."
 
 #: lms/djangoapps/courseware/course_tools.py
 msgid "Financial Assistance"
@@ -5651,12 +5206,14 @@ msgstr "burada"
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 msgid "unsubscribe"
-msgstr ""
+msgstr "abonelik iptali"
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.txt
 #, python-format
 msgid "This email was automatically sent from %(platform_name)s."
 msgstr ""
+"Bu e-posta %(platform_name)s platformu tarafından otomatik olarak "
+"gönderilmiştir."
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.txt
 #, python-format
@@ -6829,7 +6386,7 @@ msgstr "Dersler"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 msgid "My Account"
-msgstr ""
+msgstr "Hesabım"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -6873,7 +6430,7 @@ msgstr "Google Play Mağazası'ndan Android uygulamasını indir"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is:"
-msgstr ""
+msgstr "E-posta adresimiz şöyle: "
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 msgid "Unsubscribe from these emails."
@@ -6882,7 +6439,7 @@ msgstr "Bu e-postaların aboneliğinden ayrıl."
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 #, python-format
 msgid "%(platform_name)s Email"
-msgstr ""
+msgstr "%(platform_name)s E-postası"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
@@ -7275,7 +6832,7 @@ msgstr "Görev başarıyla tamamlandı."
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "state"
-msgstr ""
+msgstr "durum"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "The state of the block import task."
@@ -7283,7 +6840,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "progress"
-msgstr ""
+msgstr "ilerleme"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "A float from 0.0 to 1.0 representing the task progress."
@@ -7291,7 +6848,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "course ID"
-msgstr ""
+msgstr "ders Kimliği"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "ID of the imported course."
@@ -7396,12 +6953,12 @@ msgstr ""
 #: openedx/core/djangoapps/course_live/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "LTI provider"
-msgstr ""
+msgstr "LTI sağlayıcısı"
 
 #: openedx/core/djangoapps/course_live/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "The LTI provider's id"
-msgstr ""
+msgstr "LTI sağlayıcısı kimliği"
 
 #: openedx/core/djangoapps/course_live/models.py
 msgid "True, if LTI credential are provided by Org globally"
@@ -7410,7 +6967,7 @@ msgstr ""
 #: openedx/core/djangoapps/course_live/plugins.py
 #: openedx/core/djangoapps/course_live/tab.py
 msgid "Live"
-msgstr ""
+msgstr "Canlı"
 
 #: openedx/core/djangoapps/course_live/plugins.py
 msgid "Enable in-platform video conferencing by configuring live"
@@ -8424,11 +7981,11 @@ msgstr "Bitirdiğiniz en yüksek eğitim seviyesini seçin."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your year of birth"
-msgstr ""
+msgstr "Doğum yılınızı seçin"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your gender"
-msgstr ""
+msgstr "Cinsiyetinizi seçin"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your mailing address."
@@ -9592,6 +9149,452 @@ msgstr "Bu bileşen için gösterilecek ad."
 msgid "Annotation"
 msgstr "İpucu"
 
+#: xmodule/capa/capa_problem.py
+msgid "Cannot rescore problems with possible file submissions"
+msgstr "Olası dosya yüklemeleri olan problemler yeniden notlandırılamaz"
+
+#: xmodule/capa/capa_problem.py
+msgid "Question {}"
+msgstr "Soru {}"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Incorrect"
+msgstr "Yanlış"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Correct"
+msgstr "Doğru"
+
+#: xmodule/capa/inputtypes.py
+msgid "correct"
+msgstr "doğru"
+
+#: xmodule/capa/inputtypes.py
+msgid "incorrect"
+msgstr "yanlış"
+
+#: xmodule/capa/inputtypes.py
+msgid "partially correct"
+msgstr "kısmen doğru"
+
+#: xmodule/capa/inputtypes.py
+msgid "incomplete"
+msgstr "eksik"
+
+#: xmodule/capa/inputtypes.py
+msgid "unanswered"
+msgstr "cevaplanmamış"
+
+#: xmodule/capa/inputtypes.py
+msgid "submitted"
+msgstr "gönderildi"
+
+#: xmodule/capa/inputtypes.py
+msgid "processing"
+msgstr "işlem devam ediyor"
+
+#. Translators: these are tooltips that indicate the state of an assessment
+#. question
+#: xmodule/capa/inputtypes.py
+msgid "This answer is correct."
+msgstr "Bu cevap doğru."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is incorrect."
+msgstr "Bu cevap yanlış."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is partially correct."
+msgstr "Bu cevap kısmen doğru."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is being processed."
+msgstr "Bu cevap işleniyor."
+
+#: xmodule/capa/inputtypes.py
+msgid "Not yet answered."
+msgstr "Henüz cevaplandırılmadı."
+
+#: xmodule/capa/inputtypes.py wiki/forms.py
+msgid "Select an option"
+msgstr "Lütfen bir seçenek seçiniz"
+
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr "GrupSeçimi: beklenmeyen etiket {tag_name}"
+
+#: xmodule/capa/inputtypes.py
+msgid "Answer received."
+msgstr "Cevap alındı."
+
+#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
+#. be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
+msgstr ""
+"<choice> veya <compoundhint> etiketi beklendi; onun yerine {given_tag} "
+"etiketi alındı."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"Dosyalarınız yüklendi. Yüklemeniz notlandırılır notlandırılmaz, bu iletinin "
+"yerine notlandıran kişinin verdiği geri besleme konulacak."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your answer has been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"Yanıtınız teslim edildi. Yanıtınız notlandırılır notlandırılmaz, bu iletinin"
+" yerine notlandıran kişinin verdiği geri besleme konulacak."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{programming_language} editor"
+msgstr "{programming_language} editörü"
+
+#: xmodule/capa/inputtypes.py
+msgid "Press ESC then TAB or click outside of the code editor to exit"
+msgstr ""
+"Kod editöründen çıkmak için ESC ve hemen ardından TAB'a basabilir veya "
+"dışına tıklayabilirsiniz"
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Submitted. As soon as a response is returned, this message will be replaced "
+"by that feedback."
+msgstr ""
+"Yüklendi. Ne zaman bir cevap dönerse, bu ileti o geri bildirimle yer "
+"değiştirecektir."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr "Xqueue {xqueue_timeout} saniye içinde yanıt vermedi. Durduruldu."
+
+#: xmodule/capa/inputtypes.py
+msgid "Error running code."
+msgstr "Çalışan kodda hata var."
+
+#: xmodule/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr "Kuyruğa bağlanılamadı"
+
+#: xmodule/capa/inputtypes.py
+msgid "No formula specified."
+msgstr "Herhangi bir formül tanımlanmadı."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Couldn't parse formula: {error_msg}"
+msgstr "Formül okunamadı: {error_msg}"
+
+#: xmodule/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr "Önizleme oluşturulurken hata oluştu"
+
+#: xmodule/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr "Üzgünüz, formül okunamadı."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr "{input_type}: beklenmeyen etiket {tag_name}"
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+"{expected_tag} etiketi beklendi; onun yerine {given_tag} etiketi alındı."
+
+#. Translators: index here could be 1,2,3 and so on
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Question {index}"
+msgstr "Soru {index}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Correct:"
+msgstr "Doğru:"
+
+#: xmodule/capa/responsetypes.py
+msgid "Incorrect:"
+msgstr "Yanlış:"
+
+#: xmodule/capa/responsetypes.py xmodule/capa_module.py
+msgid "Answer"
+msgstr "Cevap"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error {err} in evaluating hint function {hintfn}."
+msgstr "Tavsiye fonksiyonunda {hintfn} hata {err} "
+
+#: xmodule/capa/responsetypes.py
+msgid "(Source code line unavailable)"
+msgstr "(Kaynak kodu satırı bilinmiyor)"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "See XML source line {sourcenum}."
+msgstr "XML kaynak satırına {sourcenum} bakınız."
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Checkboxes"
+msgstr "Onay Kutucukları"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Multiple Choice"
+msgstr "Çoktan Seçmeli"
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr "Aynı anda shuffle ve answer-pool değerlerini kullanmayın"
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+msgid "answer-pool value should be an integer"
+msgstr "answer-pool değeri tamsayı olmalı"
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr "Choicegroup en az 1 doğru ve 1 yanlış seçenek içermeli"
+
+#: xmodule/capa/responsetypes.py
+msgid "True/False Choice"
+msgstr "Doğru/Yanlış Seçmeli"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Dropdown"
+msgstr "Açılır Liste"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Numerical Input"
+msgstr "Nümerik Girdi"
+
+#: xmodule/capa/responsetypes.py
+msgid "There was a problem with the staff answer to this problem."
+msgstr "Bu probleme personelin verdiği yanıtta bir sorun vardı."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{student_answer}' as a number."
+msgstr " '{student_answer}' bir sayı olarak algılanamadı."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Factorial function evaluated outside its domain:'{student_answer}'"
+msgstr ""
+"Faktöriyel fonksiyonu etki alanı dışında hesaplandı:'{student_answer}'"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid math syntax: '{student_answer}'"
+msgstr "geçersiz matematik yazımı: '{student_answer}'"
+
+#: xmodule/capa/responsetypes.py
+msgid "You may not use complex numbers in range tolerance problems"
+msgstr "Aralık tolerans problemlerinde kompleks sayı kullanamazsınız"
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. provided a
+#. boundary (end limit) for a variable that is a complex number (a + bi), this
+#. message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: complex boundary."
+msgstr ""
+"Bu problemin çalışanlar tarafından yanıtlanmasında hata oldu: kompleks "
+"sınır."
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. did not
+#. provide a boundary (end limit) for a variable, this message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: empty boundary."
+msgstr "Çalışanların bu soruya cevap vermesinde sorun yaşandı: boş sınır"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: Separator used in NumericalResponse to display multiple
+#. answers.
+#. Translators: Separator used in StringResponse to display multiple answers.
+#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this is the last choice of a number of choices of how to log
+#. in
+#. to the site.
+#: xmodule/capa/responsetypes.py lms/templates/course_modes/choose.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "or"
+msgstr "veya"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "Metin Girişi"
+
+#: xmodule/capa/responsetypes.py
+msgid "error"
+msgstr "hata"
+
+#: xmodule/capa/responsetypes.py
+msgid "Custom Evaluated Script"
+msgstr "Özel Değerlendirilmiş Senaryo"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error getting student answer from {student_answers}"
+msgstr "{student_answers}'dan öğrenci cevabı alırken hata"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr "Hiç cevap girilmedi!"
+
+#: xmodule/capa/responsetypes.py
+msgid "CustomResponse: check function returned an invalid dictionary!"
+msgstr "ÖzelYanıt: kontrol fonksiyonu geçersiz sözlük döndü!"
+
+#: xmodule/capa/responsetypes.py
+msgid "Symbolic Math Input"
+msgstr "Sembolik Matematiksel Girdi"
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
+msgstr "SymbolicResponse ile oluşan bir hata. Hata şöyleydi: {error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Code Input"
+msgstr "Kod Girişi"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer provided."
+msgstr "Cevap verilmedi."
+
+#: xmodule/capa/responsetypes.py
+msgid "Error: No grader has been set up for this problem."
+msgstr "Hata: Bu problem için herhangi bir puanlayıcı atanmadı."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
+"try again later."
+msgstr ""
+"Notlandırıcıya yanıt iletilemedi (Neden: {error_msg}). Lütfen daha sonra "
+"tekrar deneyin."
+
+#. Translators: 'grader' refers to the edX automatic code grader.
+#: xmodule/capa/responsetypes.py
+msgid "Invalid grader reply. Please contact the course staff."
+msgstr ""
+"Geçersiz notlandırıcı yanıtı. Lütfen ders personeliyle iletişime geçiniz."
+
+#: xmodule/capa/responsetypes.py
+msgid "External Grader"
+msgstr "Harici Notlayıcı"
+
+#: xmodule/capa/responsetypes.py
+msgid "Math Expression Input"
+msgstr "Matematiksel İfade Girdisi"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Factorial function not permitted in answer for this problem. Provided answer"
+" was: {bad_input}"
+msgstr ""
+"Bu problemin sonucu için faktöriyel fonksiyonunun kullanımına izin "
+"verilmedi. Sağlanan cevap: {bad_input}"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula."
+msgstr "Geçersiz giriş: '{bad_input}' formül olarak okunamadı."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula"
+msgstr "Geçersiz giriş: '{bad_input}' formül olarak okunamadı"
+
+#: xmodule/capa/responsetypes.py
+msgid "Circuit Schematic Builder"
+msgstr "Devre Şeması Oluşturucusu"
+
+#. Translators: 'SchematicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
+msgstr ""
+"SchematicResponse değerlendirmesinde oluşan hata. Hata şöyleydi: {error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Image Mapped Input"
+msgstr "Eşlenmiş Görüntü Girdisi"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr "notlamada hata {image_input_id} (girdi={user_input})"
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr "Problem belirlemede hata! {sr_coords} dikdörtgen ayrıştırılamıyor."
+
+#: xmodule/capa/responsetypes.py
+msgid "Annotation Input"
+msgstr "Bilgi Notu Girdisi"
+
+#: xmodule/capa/responsetypes.py
+msgid "Checkboxes With Text Input"
+msgstr "Metin Girişli Onay Kutucukları"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Answer not provided for {input_type}"
+msgstr "{input_type} için cevap sağlanmadı."
+
+#: xmodule/capa/responsetypes.py
+msgid "The Staff answer could not be interpreted as a number."
+msgstr "Personelin cevabı bir sayı olarak algılanamadı."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{given_answer}' as a number."
+msgstr "'{given_answer}' bir sayı olarak algılanamadı."
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid ""
+"Codejail API Service is unavailable. Please try again in a few minutes."
+msgstr ""
+"CodeJail API Servisi kullanılabilir değil. Lütfen birkaç dakika içinde "
+"tekrar deneyin."
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Codejail API Service invalid response."
+msgstr "Codejail API Servisi geçersiz cevap."
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Invalid JSON response received from codejail api service."
+msgstr "Codejail api servisinden geçersiz JSON cevabı alındı."
+
 #: xmodule/capa_module.py
 msgid "Blank Advanced Problem"
 msgstr "Boş Gelişmiş Problem"
@@ -9896,7 +9899,7 @@ msgstr "Eğer hata devam ederse, lütfen dersin personeliyle temasa geçiniz."
 #: xmodule/capa_module.py
 #, python-brace-format
 msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
-msgstr ""
+msgstr "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
 
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
@@ -12447,7 +12450,7 @@ msgstr ""
 
 #: xmodule/video_module/video_xfields.py
 msgid "Public Access"
-msgstr ""
+msgstr "Genel Erişim"
 
 #: xmodule/word_cloud_module.py lms/templates/annotatable.html
 #: lms/templates/peer_grading/peer_grading.html
@@ -13618,10 +13621,6 @@ msgstr "isim"
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
 msgstr "Çıkış Yap"
-
-#: common/lib/capa/capa/templates/codeinput.html
-msgid "Code Editor"
-msgstr "Kod Düzenleyicisi"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
@@ -15556,7 +15555,7 @@ msgstr "Ekler"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Percent sign (%)"
-msgstr ""
+msgstr "Yüzde simgesi (%)"
 
 #. Translators: This refers to basic mathematical functions such as "square
 #. root"
@@ -16138,11 +16137,11 @@ msgstr ""
 
 #: lms/templates/course_modes/error.html
 msgid "Explore all courses on edX"
-msgstr ""
+msgstr "edX'teki tüm dersleri keşfedin"
 
 #: lms/templates/course_modes/error.html
 msgid "Explore all courses"
-msgstr ""
+msgstr "Tüm dersleri keşfedin"
 
 #: lms/templates/course_modes/fbe.html lms/templates/course_modes/unfbe.html
 msgid ""
@@ -18123,11 +18122,11 @@ msgstr "Yönetici Eğitimi"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Unpaid Executive Education"
-msgstr ""
+msgstr "Ödenmemiş Yönetici Eğitimi"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Paid Executive Education"
-msgstr ""
+msgstr "Ödenmiş Yönetici Eğitimi"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Master's"
@@ -20137,7 +20136,7 @@ msgstr "Yaklaşan Tarihler"
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
 msgid "View all course dates"
-msgstr ""
+msgstr "Tüm ders tarihlerini görüntüle"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Learn About Verified Certificates"
@@ -20570,6 +20569,10 @@ msgstr "Etik Kuralları'nızı buraya koyun!"
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Copyright Text here!"
 msgstr "Telif Hakları metninizi buraya koyun!"
+
+#: xmodule/capa/templates/codeinput.html
+msgid "Code Editor"
+msgstr "Kod Düzenleyicisi"
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."

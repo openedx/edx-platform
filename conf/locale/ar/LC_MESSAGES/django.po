@@ -252,7 +252,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-07-24 20:43+0000\n"
+"POT-Creation-Date: 2022-07-31 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -1807,452 +1807,6 @@ msgstr "مدعوم مؤقتاً"
 msgid "Unsupported"
 msgstr "غير مدعوم"
 
-#: common/lib/capa/capa/capa_problem.py
-msgid "Cannot rescore problems with possible file submissions"
-msgstr "لا يمكن إعادة تقييم المسائل التي يُحتمل تقديم ملفّات فيها."
-
-#: common/lib/capa/capa/capa_problem.py
-msgid "Question {}"
-msgstr "سؤال {}"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Incorrect"
-msgstr "خاطئ"
-
-#: common/lib/capa/capa/capa_problem.py xmodule/capa_module.py
-msgid "Correct"
-msgstr "صحيح"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "correct"
-msgstr "صحيح"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incorrect"
-msgstr "خاطئ"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "partially correct"
-msgstr "صحيح جزئياً"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "incomplete"
-msgstr "غير مكتمل."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "unanswered"
-msgstr "لا توجد إجابة "
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "submitted"
-msgstr "تم الإرسال"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "processing"
-msgstr "قيد المعالجة"
-
-#. Translators: these are tooltips that indicate the state of an assessment
-#. question
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is correct."
-msgstr "هذه الإجابة صحيحة."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is incorrect."
-msgstr "هذه الإجابة خاطئة."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is partially correct."
-msgstr "هذه الإجابة صحيحة جزئيًا"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "This answer is being processed."
-msgstr "هذه الإجابة قيد المعالجة."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Not yet answered."
-msgstr "لم تتم الإجابة بعد."
-
-#: common/lib/capa/capa/inputtypes.py wiki/forms.py
-msgid "Select an option"
-msgstr "تحديد خيار"
-
-#. Translators: 'ChoiceGroup' is an input type and should not be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "ChoiceGroup: unexpected tag {tag_name}"
-msgstr "ChoiceGroup: وسم {tag_name} غير متوقّع."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Answer received."
-msgstr "جرى تلقّي الإجابة."
-
-#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
-#. be translated.
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
-msgstr ""
-"كان من المتوقَّع استلام أحد وسمي <choice> أو <compoundhint>؛ لكن جرى تلقّي "
-"وسم {given_tag} بدلًا منه."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your files have been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"جرى  استلام الملفّات التي قدّمتها. ستُستبدل هذه الرسالة، بمجرّد تقييم ملفاتك"
-" المُقدّمة، برسالة آخرى تحوي تعليقات الأستاذ الذي أجرى التقييم."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Your answer has been submitted. As soon as your submission is graded, this "
-"message will be replaced with the grader's feedback."
-msgstr ""
-"جرى تقديم إجابتك. ستُستبدل هذه الرسالة، بمجرّد تقييم ملفاتك المُقدّمة، "
-"برسالة آخرى تحوي تعليقات الأستاذ الذي أجرى التقييم."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{programming_language} editor"
-msgstr "مُحرّر {programming_language} "
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Press ESC then TAB or click outside of the code editor to exit"
-msgstr "انقر فوق ESC ثم TAB أو انقر خارج مُحرر الرموز للخروج"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid ""
-"Submitted. As soon as a response is returned, this message will be replaced "
-"by that feedback."
-msgstr ""
-"تمّت عملية التقديم. ستُستبدل هذه الرسالةبرسالة آخرى تحوي تعليقات الأستاذ "
-"بمجرّد استلام الردّ."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
-msgstr ""
-"لا استجابة من ’Xqueue‘ في غضون {xqueue_timeout} ثوانٍ. أُوقِفت العملية."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error running code."
-msgstr "حدث خطأ في تشغيل الكود."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Cannot connect to the queue"
-msgstr "لا يمكن الاتصال بقائمة الانتظار."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "No formula specified."
-msgstr "لم يجري تحديد صيغة."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Couldn't parse formula: {error_msg}"
-msgstr "تعذّر إعراب الصيغة: {error_msg}"
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Error while rendering preview"
-msgstr "نعتذر لحدوث خطأ أثناء الإعداد لعرض المعاينة."
-
-#: common/lib/capa/capa/inputtypes.py
-msgid "Sorry, couldn't parse formula"
-msgstr "عذراً، تعذّر إعراب الصيغة."
-
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "{input_type}: unexpected tag {tag_name}"
-msgstr "{input_type}: وسم {tag_name} غير متوقَّع."
-
-#. Translators: a "tag" is an XML element, such as "<b>" in HTML
-#: common/lib/capa/capa/inputtypes.py
-#, python-brace-format
-msgid "Expected a {expected_tag} tag; got {given_tag} instead"
-msgstr ""
-"كان من المتوقَّع استلام وسم {expected_tag}؛ جرى تلقّي وسم {given_tag} بدلًا "
-"منه."
-
-#. Translators: index here could be 1,2,3 and so on
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Question {index}"
-msgstr "سؤال {index}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Correct:"
-msgstr "صحيح:"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Incorrect:"
-msgstr "غير صحيح:"
-
-#: common/lib/capa/capa/responsetypes.py xmodule/capa_module.py
-msgid "Answer"
-msgstr "إجابة"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error {err} in evaluating hint function {hintfn}."
-msgstr "نعتذر لحدوث الخطأ {err} في تقييم وظيفة التلميح {hintfn}."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "(Source code line unavailable)"
-msgstr "(سطر الكود المصدري غير متوفّر) "
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "See XML source line {sourcenum}."
-msgstr "يُرجى الاطّلاع على السطر الأصلي بلغة XML {sourcenum}. "
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Checkboxes"
-msgstr "مربّعات تأشير"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Multiple Choice"
-msgstr "اختيارات متعدّدة"
-
-#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
-#. be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Do not use shuffle and answer-pool at the same time"
-msgstr "يُرجى عدم استخدام ’shuffle‘ و’answer-pool‘ في الوقت ذاته."
-
-#. Translators: 'answer-pool' is an attribute name and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "answer-pool value should be an integer"
-msgstr "يجب أن تكون قيمة ’answer-pool‘ عددًا صحيحًا."
-
-#. Translators: 'Choicegroup' is an input type and should not be translated.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
-msgstr ""
-"لا بدّ أن تتضمّن ’Choicegroup‘ خيارين،  1 صحيح وخيار 1 خاطئ، على الأقل."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "True/False Choice"
-msgstr "خيار صحيح/خاطئ"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Dropdown"
-msgstr "قائمة منسدلة"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Numerical Input"
-msgstr "قيم دخل عدديّة."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "There was a problem with the staff answer to this problem."
-msgstr "حدثت مشكلة في إجابة طاقم المساق على هذه المسألة."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{student_answer}' as a number."
-msgstr "تعذّر تفسير ’{student_answer}‘ كرقم."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Factorial function evaluated outside its domain:'{student_answer}'"
-msgstr "تم تقييم الدالة مضروب العدية الوضعية خارج نطاقها: '{student_answer}'"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid math syntax: '{student_answer}'"
-msgstr "تركيب رياضي غير صحيحة: ’{student_answer}‘"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "You may not use complex numbers in range tolerance problems"
-msgstr "لا يجوز استخدام الأعداد المركّبة في مسائل نطاق التحمّل"
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. provided a
-#. boundary (end limit) for a variable that is a complex number (a + bi), this
-#. message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: complex boundary."
-msgstr "نعتذر لحدوث مشكلة في إجابة طاقم المساق عن هذه المسألة: حدود مركّبة."
-
-#. Translators: This is an error message for a math problem. If the instructor
-#. did not
-#. provide a boundary (end limit) for a variable, this message displays.
-#: common/lib/capa/capa/responsetypes.py
-msgid ""
-"There was a problem with the staff answer to this problem: empty boundary."
-msgstr "نعتذر لحدوث مشكلة في إجابة طاقم المساق عن هذه المسألة: حدود خالية."
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: Separator used in NumericalResponse to display multiple
-#. answers.
-#. Translators: Separator used in StringResponse to display multiple answers.
-#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is the last choice of a number of choices of how to log
-#. in
-#. to the site.
-#: common/lib/capa/capa/responsetypes.py
-#: lms/templates/course_modes/choose.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "or"
-msgstr "أو"
-
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "قيم دخَل نصّية"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr "حدث خطأ"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Custom Evaluated Script"
-msgstr "نصّ مقيّم حسب الطلب"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error getting student answer from {student_answers}"
-msgstr "نعتذر لحدوث خطأ عند جلب إجابة الطالب من {student_answers}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer entered!"
-msgstr "لم تُدخَّل أي إجابة!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "CustomResponse: check function returned an invalid dictionary!"
-msgstr "CustomResponse: أرجعت وظيفة التحقّق قاموس غير صالح!"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Symbolic Math Input"
-msgstr "قيم دخل رياضيّة رمزيّة"
-
-#. Translators: 'SymbolicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
-msgstr "حدث خطأ في ’SymbolicResponse‘. رسالة الخطأ: {error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Code Input"
-msgstr "إدخال الكود"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "No answer provided."
-msgstr "لم تُقدَّم أي إجابة."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Error: No grader has been set up for this problem."
-msgstr "خطأ: لم يجري تحديد مقيّم هذه المسألة بعد."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
-"try again later."
-msgstr ""
-"تعذّر إيصال تقديمك إلى المقيّم (السبب: {error_msg}). يُرجى إعادة المحاولة "
-"لاحقًا."
-
-#. Translators: 'grader' refers to the edX automatic code grader.
-#: common/lib/capa/capa/responsetypes.py
-msgid "Invalid grader reply. Please contact the course staff."
-msgstr "إجابة مُقيّم غير صحيحة. يُرجى الاتصال بطاقم المساق."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "External Grader"
-msgstr "مُقيّم خارجي"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Math Expression Input"
-msgstr "إدخال تعبير رياضي"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid ""
-"Factorial function not permitted in answer for this problem. Provided answer"
-" was: {bad_input}"
-msgstr ""
-"دالة مضروب العدية الوضعية غير مسموحة في الإجابة على هذه المسألة. الإجابة "
-"المقدَّمة كانت: {bad_input}"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula."
-msgstr "دخل غير صحيح: تعذّر إعراب ’{bad_input}‘ كمعادلة."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: Could not parse '{bad_input}' as a formula"
-msgstr "دخل غير صحيح: تعذّر إعراب ’{bad_input}‘ كمعادلة."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Circuit Schematic Builder"
-msgstr "باني مخطّطات الدارات"
-
-#. Translators: 'SchematicResponse' is a problem type and should not be
-#. translated.
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
-msgstr "حدوث خطأ في تقييم ’SchematicResponse‘. رسالة الخطأ: {error_msg}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Image Mapped Input"
-msgstr "دخل مربوط بصور"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "error grading {image_input_id} (input={user_input})"
-msgstr "خطأ في تقييم {image_input_id} (input={user_input})"
-
-#. Translators: {sr_coords} are the coordinates of a rectangle
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
-msgstr "حدث خطأ في توصيف المسألة! لا يمكن إعراب المستطيل في {sr_coords}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Annotation Input"
-msgstr "قيم دخل توضيحية"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Checkboxes With Text Input"
-msgstr "مربّعات تأشير ذات قيم دخل نصّية"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Answer not provided for {input_type}"
-msgstr "لم تُقدَّم إجابة لأجل {input_type}"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "The Staff answer could not be interpreted as a number."
-msgstr "تعذّر تفسير إجابة طاقم المساق كعدد."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Could not interpret '{given_answer}' as a number."
-msgstr "تعذّر تفسير ’{given_answer}‘ كعدد."
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid ""
-"Codejail API Service is unavailable. Please try again in a few minutes."
-msgstr ""
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Codejail API Service invalid response."
-msgstr ""
-
-#: common/lib/capa/capa/safe_exec/remote_exec.py
-msgid "Invalid JSON response received from codejail api service."
-msgstr ""
-
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
 msgstr "فتح الحساب"
@@ -3576,6 +3130,10 @@ msgstr "عذرًا، لا تملك صلاحية دخول هذا المساق م�
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be enrolled in the course"
 msgstr "يجب أن تكون ملتحقًا بالمساق"
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "You must give Data Sharing Consent for the course"
+msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be logged in to see this course"
@@ -9672,6 +9230,446 @@ msgstr "اسم العرض لهذا العنصر."
 msgid "Annotation"
 msgstr "ملاحظة توضيحية"
 
+#: xmodule/capa/capa_problem.py
+msgid "Cannot rescore problems with possible file submissions"
+msgstr "لا يمكن إعادة تقييم المسائل التي يُحتمل تقديم ملفّات فيها."
+
+#: xmodule/capa/capa_problem.py
+msgid "Question {}"
+msgstr "سؤال {}"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Incorrect"
+msgstr "خاطئ"
+
+#: xmodule/capa/capa_problem.py xmodule/capa_module.py
+msgid "Correct"
+msgstr "صحيح"
+
+#: xmodule/capa/inputtypes.py
+msgid "correct"
+msgstr "صحيح"
+
+#: xmodule/capa/inputtypes.py
+msgid "incorrect"
+msgstr "خاطئ"
+
+#: xmodule/capa/inputtypes.py
+msgid "partially correct"
+msgstr "صحيح جزئياً"
+
+#: xmodule/capa/inputtypes.py
+msgid "incomplete"
+msgstr "غير مكتمل."
+
+#: xmodule/capa/inputtypes.py
+msgid "unanswered"
+msgstr "لا توجد إجابة "
+
+#: xmodule/capa/inputtypes.py
+msgid "submitted"
+msgstr "تم الإرسال"
+
+#: xmodule/capa/inputtypes.py
+msgid "processing"
+msgstr "قيد المعالجة"
+
+#. Translators: these are tooltips that indicate the state of an assessment
+#. question
+#: xmodule/capa/inputtypes.py
+msgid "This answer is correct."
+msgstr "هذه الإجابة صحيحة."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is incorrect."
+msgstr "هذه الإجابة خاطئة."
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is partially correct."
+msgstr "هذه الإجابة صحيحة جزئيًا"
+
+#: xmodule/capa/inputtypes.py
+msgid "This answer is being processed."
+msgstr "هذه الإجابة قيد المعالجة."
+
+#: xmodule/capa/inputtypes.py
+msgid "Not yet answered."
+msgstr "لم تتم الإجابة بعد."
+
+#: xmodule/capa/inputtypes.py wiki/forms.py
+msgid "Select an option"
+msgstr "تحديد خيار"
+
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr "ChoiceGroup: وسم {tag_name} غير متوقّع."
+
+#: xmodule/capa/inputtypes.py
+msgid "Answer received."
+msgstr "جرى تلقّي الإجابة."
+
+#. Translators: '<choice>' and '<compoundhint>' are tag names and should not
+#. be translated.
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
+msgstr ""
+"كان من المتوقَّع استلام أحد وسمي <choice> أو <compoundhint>؛ لكن جرى تلقّي "
+"وسم {given_tag} بدلًا منه."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"جرى  استلام الملفّات التي قدّمتها. ستُستبدل هذه الرسالة، بمجرّد تقييم ملفاتك"
+" المُقدّمة، برسالة آخرى تحوي تعليقات الأستاذ الذي أجرى التقييم."
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Your answer has been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+"جرى تقديم إجابتك. ستُستبدل هذه الرسالة، بمجرّد تقييم ملفاتك المُقدّمة، "
+"برسالة آخرى تحوي تعليقات الأستاذ الذي أجرى التقييم."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{programming_language} editor"
+msgstr "مُحرّر {programming_language} "
+
+#: xmodule/capa/inputtypes.py
+msgid "Press ESC then TAB or click outside of the code editor to exit"
+msgstr "انقر فوق ESC ثم TAB أو انقر خارج مُحرر الرموز للخروج"
+
+#: xmodule/capa/inputtypes.py
+msgid ""
+"Submitted. As soon as a response is returned, this message will be replaced "
+"by that feedback."
+msgstr ""
+"تمّت عملية التقديم. ستُستبدل هذه الرسالةبرسالة آخرى تحوي تعليقات الأستاذ "
+"بمجرّد استلام الردّ."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr ""
+"لا استجابة من ’Xqueue‘ في غضون {xqueue_timeout} ثوانٍ. أُوقِفت العملية."
+
+#: xmodule/capa/inputtypes.py
+msgid "Error running code."
+msgstr "حدث خطأ في تشغيل الكود."
+
+#: xmodule/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr "لا يمكن الاتصال بقائمة الانتظار."
+
+#: xmodule/capa/inputtypes.py
+msgid "No formula specified."
+msgstr "لم يجري تحديد صيغة."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Couldn't parse formula: {error_msg}"
+msgstr "تعذّر إعراب الصيغة: {error_msg}"
+
+#: xmodule/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr "نعتذر لحدوث خطأ أثناء الإعداد لعرض المعاينة."
+
+#: xmodule/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr "عذراً، تعذّر إعراب الصيغة."
+
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr "{input_type}: وسم {tag_name} غير متوقَّع."
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: xmodule/capa/inputtypes.py
+#, python-brace-format
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+"كان من المتوقَّع استلام وسم {expected_tag}؛ جرى تلقّي وسم {given_tag} بدلًا "
+"منه."
+
+#. Translators: index here could be 1,2,3 and so on
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Question {index}"
+msgstr "سؤال {index}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Correct:"
+msgstr "صحيح:"
+
+#: xmodule/capa/responsetypes.py
+msgid "Incorrect:"
+msgstr "غير صحيح:"
+
+#: xmodule/capa/responsetypes.py xmodule/capa_module.py
+msgid "Answer"
+msgstr "إجابة"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error {err} in evaluating hint function {hintfn}."
+msgstr "نعتذر لحدوث الخطأ {err} في تقييم وظيفة التلميح {hintfn}."
+
+#: xmodule/capa/responsetypes.py
+msgid "(Source code line unavailable)"
+msgstr "(سطر الكود المصدري غير متوفّر) "
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "See XML source line {sourcenum}."
+msgstr "يُرجى الاطّلاع على السطر الأصلي بلغة XML {sourcenum}. "
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Checkboxes"
+msgstr "مربّعات تأشير"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Multiple Choice"
+msgstr "اختيارات متعدّدة"
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr "يُرجى عدم استخدام ’shuffle‘ و’answer-pool‘ في الوقت ذاته."
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+msgid "answer-pool value should be an integer"
+msgstr "يجب أن تكون قيمة ’answer-pool‘ عددًا صحيحًا."
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: xmodule/capa/responsetypes.py
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr ""
+"لا بدّ أن تتضمّن ’Choicegroup‘ خيارين،  1 صحيح وخيار 1 خاطئ، على الأقل."
+
+#: xmodule/capa/responsetypes.py
+msgid "True/False Choice"
+msgstr "خيار صحيح/خاطئ"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Dropdown"
+msgstr "قائمة منسدلة"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Numerical Input"
+msgstr "قيم دخل عدديّة."
+
+#: xmodule/capa/responsetypes.py
+msgid "There was a problem with the staff answer to this problem."
+msgstr "حدثت مشكلة في إجابة طاقم المساق على هذه المسألة."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{student_answer}' as a number."
+msgstr "تعذّر تفسير ’{student_answer}‘ كرقم."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Factorial function evaluated outside its domain:'{student_answer}'"
+msgstr "تم تقييم الدالة مضروب العدية الوضعية خارج نطاقها: '{student_answer}'"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid math syntax: '{student_answer}'"
+msgstr "تركيب رياضي غير صحيحة: ’{student_answer}‘"
+
+#: xmodule/capa/responsetypes.py
+msgid "You may not use complex numbers in range tolerance problems"
+msgstr "لا يجوز استخدام الأعداد المركّبة في مسائل نطاق التحمّل"
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. provided a
+#. boundary (end limit) for a variable that is a complex number (a + bi), this
+#. message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: complex boundary."
+msgstr "نعتذر لحدوث مشكلة في إجابة طاقم المساق عن هذه المسألة: حدود مركّبة."
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. did not
+#. provide a boundary (end limit) for a variable, this message displays.
+#: xmodule/capa/responsetypes.py
+msgid ""
+"There was a problem with the staff answer to this problem: empty boundary."
+msgstr "نعتذر لحدوث مشكلة في إجابة طاقم المساق عن هذه المسألة: حدود خالية."
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: Separator used in NumericalResponse to display multiple
+#. answers.
+#. Translators: Separator used in StringResponse to display multiple answers.
+#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this is the last choice of a number of choices of how to log
+#. in
+#. to the site.
+#: xmodule/capa/responsetypes.py lms/templates/course_modes/choose.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "or"
+msgstr "أو"
+
+#: xmodule/capa/responsetypes.py cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "قيم دخَل نصّية"
+
+#: xmodule/capa/responsetypes.py
+msgid "error"
+msgstr "حدث خطأ"
+
+#: xmodule/capa/responsetypes.py
+msgid "Custom Evaluated Script"
+msgstr "نصّ مقيّم حسب الطلب"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error getting student answer from {student_answers}"
+msgstr "نعتذر لحدوث خطأ عند جلب إجابة الطالب من {student_answers}"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer entered!"
+msgstr "لم تُدخَّل أي إجابة!"
+
+#: xmodule/capa/responsetypes.py
+msgid "CustomResponse: check function returned an invalid dictionary!"
+msgstr "CustomResponse: أرجعت وظيفة التحقّق قاموس غير صالح!"
+
+#: xmodule/capa/responsetypes.py
+msgid "Symbolic Math Input"
+msgstr "قيم دخل رياضيّة رمزيّة"
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
+msgstr "حدث خطأ في ’SymbolicResponse‘. رسالة الخطأ: {error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Code Input"
+msgstr "إدخال الكود"
+
+#: xmodule/capa/responsetypes.py
+msgid "No answer provided."
+msgstr "لم تُقدَّم أي إجابة."
+
+#: xmodule/capa/responsetypes.py
+msgid "Error: No grader has been set up for this problem."
+msgstr "خطأ: لم يجري تحديد مقيّم هذه المسألة بعد."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
+"try again later."
+msgstr ""
+"تعذّر إيصال تقديمك إلى المقيّم (السبب: {error_msg}). يُرجى إعادة المحاولة "
+"لاحقًا."
+
+#. Translators: 'grader' refers to the edX automatic code grader.
+#: xmodule/capa/responsetypes.py
+msgid "Invalid grader reply. Please contact the course staff."
+msgstr "إجابة مُقيّم غير صحيحة. يُرجى الاتصال بطاقم المساق."
+
+#: xmodule/capa/responsetypes.py
+msgid "External Grader"
+msgstr "مُقيّم خارجي"
+
+#: xmodule/capa/responsetypes.py
+msgid "Math Expression Input"
+msgstr "إدخال تعبير رياضي"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid ""
+"Factorial function not permitted in answer for this problem. Provided answer"
+" was: {bad_input}"
+msgstr ""
+"دالة مضروب العدية الوضعية غير مسموحة في الإجابة على هذه المسألة. الإجابة "
+"المقدَّمة كانت: {bad_input}"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula."
+msgstr "دخل غير صحيح: تعذّر إعراب ’{bad_input}‘ كمعادلة."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Invalid input: Could not parse '{bad_input}' as a formula"
+msgstr "دخل غير صحيح: تعذّر إعراب ’{bad_input}‘ كمعادلة."
+
+#: xmodule/capa/responsetypes.py
+msgid "Circuit Schematic Builder"
+msgstr "باني مخطّطات الدارات"
+
+#. Translators: 'SchematicResponse' is a problem type and should not be
+#. translated.
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
+msgstr "حدوث خطأ في تقييم ’SchematicResponse‘. رسالة الخطأ: {error_msg}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Image Mapped Input"
+msgstr "دخل مربوط بصور"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr "خطأ في تقييم {image_input_id} (input={user_input})"
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr "حدث خطأ في توصيف المسألة! لا يمكن إعراب المستطيل في {sr_coords}"
+
+#: xmodule/capa/responsetypes.py
+msgid "Annotation Input"
+msgstr "قيم دخل توضيحية"
+
+#: xmodule/capa/responsetypes.py
+msgid "Checkboxes With Text Input"
+msgstr "مربّعات تأشير ذات قيم دخل نصّية"
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Answer not provided for {input_type}"
+msgstr "لم تُقدَّم إجابة لأجل {input_type}"
+
+#: xmodule/capa/responsetypes.py
+msgid "The Staff answer could not be interpreted as a number."
+msgstr "تعذّر تفسير إجابة طاقم المساق كعدد."
+
+#: xmodule/capa/responsetypes.py
+#, python-brace-format
+msgid "Could not interpret '{given_answer}' as a number."
+msgstr "تعذّر تفسير ’{given_answer}‘ كعدد."
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid ""
+"Codejail API Service is unavailable. Please try again in a few minutes."
+msgstr ""
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Codejail API Service invalid response."
+msgstr ""
+
+#: xmodule/capa/safe_exec/remote_exec.py
+msgid "Invalid JSON response received from codejail api service."
+msgstr ""
+
 #: xmodule/capa_module.py
 msgid "Blank Advanced Problem"
 msgstr "مسألة متقدِّمة فارغة"
@@ -13669,10 +13667,6 @@ msgstr "الاسم"
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
-
-#: common/lib/capa/capa/templates/codeinput.html
-msgid "Code Editor"
-msgstr "محرر الرمز"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
@@ -20690,6 +20684,10 @@ msgstr "ضع ميثاق الشرف الخاص بك هنا!"
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Copyright Text here!"
 msgstr "ضع نصّ حقوق النشر والطبع الخاصة بك هنا!"
+
+#: xmodule/capa/templates/codeinput.html
+msgid "Code Editor"
+msgstr "محرر الرمز"
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
