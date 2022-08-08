@@ -48,11 +48,10 @@ from student.auth import has_studio_write_access
 from student.roles import GlobalStaff
 from util.db import MYSQL_MAX_INT, generate_int_id
 from util.json_request import JsonResponse
-
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 
-from cms.djangoapps.appsembler.certificates_helpers import is_certificates_enabled_for_course_site
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 CERTIFICATE_SCHEMA_VERSION = 1
 CERTIFICATE_MINIMUM_ID = 100
@@ -164,7 +163,7 @@ class CertificateManager(object):
             raise CertificateValidationError(_("must have name of the certificate"))
 
     @staticmethod
-    def is_activated(course):
+    def is_activated(request, course):
         """
         Returns whether certificates are activated for the given course,
         along with the certificates.
@@ -172,7 +171,12 @@ class CertificateManager(object):
         is_active = False
         certificates = None
 
-        if is_certificates_enabled_for_course_site(course.id):
+        current_organization = request.user.organizations.first()
+        if configuration_helpers.get_value_for_org(
+                current_organization.name,
+                'CERTIFICATES_HTML_VIEW',
+                False
+        ):
             certificates = CertificateManager.get_certificates(course)
             # we are assuming only one certificate in certificates collection.
             for certificate in certificates:
@@ -417,7 +421,7 @@ def certificates_list_handler(request, course_key_string):
             else:
                 certificate_web_view_url = None
 
-            is_active, certificates = CertificateManager.is_activated(course)
+            is_active, certificates = CertificateManager.is_activated(request, course)
 
             return render_to_response('certificates.html', {
                 'context_course': course,

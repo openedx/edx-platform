@@ -181,8 +181,7 @@ def test_get_current_configuration_adapter_with_site_config():
     """
     with with_site_configuration_context() as site:
         mock_api_adapter = Mock()
-        site.configuration._api_adapter = mock_api_adapter
-        site.configuration._api_adapter_initialization_attempted = True
+        site.configuration.api_adapter = mock_api_adapter
         assert get_current_configuration_adapter() == mock_api_adapter, "Return current site\'s api adapter"
 
 
@@ -205,8 +204,7 @@ def test_get_current_site_config_tier_info():
         'tier': 'trial',
     }
     with with_site_configuration_context() as site:
-        site.configuration._api_adapter = mock_api_adapter
-        site.configuration._api_adapter_initialization_attempted = True
+        site.configuration.api_adapter = mock_api_adapter
         tier_info = get_current_site_config_tier_info()
 
     assert not tier_info.has_subscription_ended(), 'Should return valid TierInfo object'

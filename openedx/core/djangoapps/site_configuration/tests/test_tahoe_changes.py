@@ -298,8 +298,7 @@ class SiteConfigAPIClientTests(TestCase):
             site=self.site,
             site_values={},
         )
-        site_configuration._api_adapter = self.api_adapter
-        site_configuration._api_adapter_initialization_attempted = True
+        site_configuration.api_adapter = self.api_adapter
         site_configuration.save()
         assert site_configuration.get_value('platform_name') == 'API Adapter Platform'
 
@@ -346,8 +345,7 @@ class SiteConfigAPIClientTests(TestCase):
             site_values={},
             sass_variables={},
         )
-        site_configuration._api_adapter = self.api_adapter
-        site_configuration._api_adapter_initialization_attempted = True
+        site_configuration.api_adapter = self.api_adapter
         assert site_configuration._get_theme_v2_variables_overrides()
 
     def test_page_content_without_adapter(self):
@@ -378,8 +376,7 @@ class SiteConfigAPIClientTests(TestCase):
                 },
             },
         )
-        site_configuration._api_adapter = self.api_adapter
-        site_configuration._api_adapter_initialization_attempted = True
+        site_configuration.api_adapter = self.api_adapter
         assert site_configuration.get_page_content('about') == {
             'title': 'About page from site configuration service',
         }
@@ -403,8 +400,7 @@ class SiteConfigAPIClientTests(TestCase):
         site_configuration = SiteConfigurationFactory.create(
             site=self.site,
         )
-        site_configuration._api_adapter = self.api_adapter
-        site_configuration._api_adapter_initialization_attempted = True
+        site_configuration.api_adapter = self.api_adapter
         assert site_configuration.get_secret_value('SEGMENT_KEY') == 'test-secret-from-service'
 
     def test_admin_config_without_adapter(self):
@@ -426,6 +422,5 @@ class SiteConfigAPIClientTests(TestCase):
         site_configuration = SiteConfigurationFactory.create(
             site=self.site,
         )
-        site_configuration._api_adapter = self.api_adapter
-        site_configuration._api_adapter_initialization_attempted = True
+        site_configuration.api_adapter = self.api_adapter
         assert site_configuration.get_admin_setting('IDP_TENANT_ID') == 'dummy-tenant-id'
