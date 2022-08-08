@@ -231,12 +231,22 @@ def anonymous_id_for_user(user, course_id, save='DEPRECATED'):
         # function: Rotate at will, since the hashes are stored and
         # will not change.
         # include the secret key as a salt, and to make the ids unique across different LMS installs.
-        hasher = hashlib.shake_128()
+        legacy_hash_enabled = settings.FEATURES.get('ENABLE_LEGACY_MD5_HASH_FOR_ANONYMOUS_USER_ID', False)
+        if legacy_hash_enabled:
+            # Use legacy MD5 algorithm if flag enabled
+            hasher = hashlib.md5()
+        else:
+            hasher = hashlib.shake_128()
+
         hasher.update(settings.SECRET_KEY.encode('utf8'))
         hasher.update(str(user.id).encode('utf8'))
         if course_id:
             hasher.update(str(course_id).encode('utf-8'))
-        anonymous_user_id = hasher.hexdigest(16)  # pylint: disable=too-many-function-args
+
+        if legacy_hash_enabled:
+            anonymous_user_id = hasher.hexdigest()
+        else:
+            anonymous_user_id = hasher.hexdigest(16)  # pylint: disable=too-many-function-args
 
         try:
             AnonymousUserId.objects.create(

@@ -1057,6 +1057,17 @@ class AnonymousLookupTable(ModuleStoreTestCase):
             assert anonymous_id != new_anonymous_id
             assert self.user == user_by_anonymous_id(new_anonymous_id)
 
+    def test_enable_legacy_hash_flag(self):
+        """Test that different anonymous id returned if ENABLE_LEGACY_MD5_HASH_FOR_ANONYMOUS_USER_ID enabled."""
+        CourseEnrollment.enroll(self.user, self.course.id)
+        anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+        with patch.dict(settings.FEATURES, ENABLE_LEGACY_MD5_HASH_FOR_ANONYMOUS_USER_ID=True):
+            # Recreate user object to clear cached anonymous id.
+            self.user = User.objects.get(pk=self.user.id)
+            AnonymousUserId.objects.filter(user=self.user).filter(course_id=self.course.id).delete()
+            new_anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+            assert anonymous_id != new_anonymous_id
+
 
 @skip_unless_lms
 @patch('openedx.core.djangoapps.programs.utils.get_programs')
