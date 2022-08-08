@@ -25,7 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.55.1
+edx-enterprise==3.55.2
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -85,6 +85,6 @@ charset-normalizer<2.1.0
 # pinning the version untill the issue gets resolved in the package itself
 markdown<3.4.0
 
-# pycodestyle==2.9.0 generates false positive error E275. 
+# pycodestyle==2.9.0 generates false positive error E275.
 # Constraint can be removed once the issue https://github.com/PyCQA/pycodestyle/issues/1090 is fixed.
 pycodestyle<2.9.0
