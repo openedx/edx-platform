@@ -152,6 +152,15 @@ class TestGetEnrollments(SharedModuleStoreTestCase):
             assert enrollment.course_id in course_mode_info
             assert enrollment in returned_enrollments
 
+    def test_empty(self):
+        # Given a user has no enrollments
+        # When they request enrollments
+        returned_enrollments, course_mode_info = get_enrollments(self.user, None, None)
+
+        # Then I return an empty list and dict
+        self.assertEqual(returned_enrollments, [])
+        self.assertEqual(course_mode_info, {})
+
 
 class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
     """Tests for get_email_settings_info"""
