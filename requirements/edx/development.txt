@@ -980,7 +980,7 @@ openedx-calc==3.0.1
     # via -r requirements/edx/testing.txt
 openedx-events==0.8.1
     # via -r requirements/edx/testing.txt
-openedx-filters==0.6.1
+openedx-filters==0.7.0
     # via -r requirements/edx/testing.txt
 ora2==4.1.2
     # via -r requirements/edx/testing.txt

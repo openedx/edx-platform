@@ -11,6 +11,7 @@ from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.generation_handler import (
+    CertificateGenerationNotAllowed,
     generate_allowlist_certificate_task,
     generate_certificate_task,
     is_on_certificate_allowlist
@@ -79,7 +80,15 @@ def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disa
         return
     log.info(f'Attempt will be made to generate a course certificate for {user.id} : {course_id} as a passing grade '
              f'was received.')
-    return generate_certificate_task(user, course_id)
+    try:
+        return generate_certificate_task(user, course_id)
+    except CertificateGenerationNotAllowed as e:
+        log.exception(
+            "Certificate generation not allowed for user %s in course %s",
+            str(user),
+            course_id,
+        )
+        return False
 
 
 @receiver(COURSE_GRADE_NOW_FAILED, dispatch_uid="new_failing_learner")
@@ -117,7 +126,14 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
     for enrollment in user_enrollments:
         log.info(f'Attempt will be made to generate a course certificate for {user.id} : {enrollment.course_id}. Id '
                  f'verification status is {expected_verification_status}')
-        generate_certificate_task(user, enrollment.course_id)
+        try:
+            generate_certificate_task(user, enrollment.course_id)
+        except CertificateGenerationNotAllowed as e:
+            log.exception(
+                "Certificate generation not allowed for user %s in course %s",
+                str(user),
+                enrollment.course_id,
+            )
 
 
 @receiver(ENROLLMENT_TRACK_UPDATED)
@@ -131,4 +147,12 @@ def _listen_for_enrollment_mode_change(sender, user, course_key, mode, **kwargs)
     if modes_api.is_eligible_for_certificate(mode):
         log.info(f'Attempt will be made to generate a course certificate for {user.id} : {course_key} since the '
                  f'enrollment mode is now {mode}.')
-        generate_certificate_task(user, course_key)
+        try:
+            return generate_certificate_task(user, course_key)
+        except CertificateGenerationNotAllowed as e:
+            log.exception(
+                "Certificate generation not allowed for user %s in course %s",
+                str(user),
+                course_key,
+            )
+            return False
