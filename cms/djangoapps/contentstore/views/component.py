@@ -331,7 +331,6 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
                     support_level_with_template = component_support_level(
                         authorable_variations, category, template_id
                     )
-                    print("PRINTING TEMPLATE ID", template_id)
                     if support_level_with_template:
                         # Tab can be 'common' 'advanced'
                         # Default setting is common/advanced depending on the presence of markdown
