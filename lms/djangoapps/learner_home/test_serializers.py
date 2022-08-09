@@ -1,5 +1,6 @@
 """Tests for serializers for the Learner Dashboard"""
 
+import ddt
 from random import randint
 from unittest import TestCase
 from unittest import mock
@@ -149,6 +150,7 @@ class TestCourseRunSerializer(LearnerDashboardBaseTest):
             assert output[key] is not None
 
 
+@ddt.ddt
 class TestEnrollmentSerializer(LearnerDashboardBaseTest):
     """Tests for the EnrollmentSerializer"""
 
@@ -162,9 +164,10 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
                 }
             },
             "course_optouts": [],
-            "use_ecommerce_payment_flow": True,
             "show_email_settings_for": [course.id],
             "show_courseware_link": {course.id: {"has_access": True}},
+            "resume_course_urls": {course.id: "some_url"},
+            "use_ecommerce_payment_flow": True,
         }
 
     def test_with_data(self):
@@ -211,6 +214,29 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
 
         output = EnrollmentSerializer(input_data, context=input_context).data
         assert output["canUpgrade"] is True
+
+    @ddt.data(None, "some_url")
+    def test_has_started(self, resume_url):
+        # Given the presence or lack of a resume_course_url
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
+
+        input_context.update(
+            {
+                "resume_course_urls": {
+                    input_data.course.id: resume_url,
+                }
+            }
+        )
+
+        # When I get "hasStarted"
+        output = EnrollmentSerializer(input_data, context=input_context).data
+
+        # If I have a resume URL, "hasStarted" should be True, otherwise False
+        if resume_url:
+            self.assertTrue(output["hasStarted"])
+        else:
+            self.assertFalse(output["hasStarted"])
 
 
 class TestGradeDataSerializer(TestCase):

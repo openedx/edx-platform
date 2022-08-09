@@ -129,8 +129,11 @@ class EnrollmentSerializer(serializers.Serializer):
         return enrollment.mode in CourseMode.AUDIT_MODES
 
     def get_hasStarted(self, enrollment):
-        # TODO
-        return False
+        """Determined based on whether there's a 'resume' link on the course"""
+        resume_button_url = self.context.get("resume_course_urls", {}).get(
+            enrollment.course_id
+        )
+        return resume_button_url is not None
 
     def get_hasFinished(self, enrollment):
         # TODO
