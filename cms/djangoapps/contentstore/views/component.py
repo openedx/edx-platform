@@ -20,6 +20,7 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
+from cms.djangoapps.contentstore.toggles import use_new_text_editor
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xblocks
@@ -181,7 +182,6 @@ def container_handler(request, usage_key_string):
                 if child.location == unit.location:
                     break
                 index += 1
-
             return render_to_response('container.html', {
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
@@ -339,16 +339,21 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
                             tab = 'advanced'
                         hinted = template.get('hinted', False)
 
-                        templates_for_category.append(
-                            create_template_dict(
-                                _(template['metadata'].get('display_name')),  # lint-amnesty, pylint: disable=translation-of-non-string
-                                category,
-                                support_level_with_template,
-                                template_id,
-                                tab,
-                                hinted,
+                        if use_new_text_editor() and template_id == 'raw.yaml':
+                            continue
+                        elif not use_new_text_editor() and template_id == 'react-raw.yaml':
+                            continue
+                        else:
+                            templates_for_category.append(
+                                create_template_dict(
+                                    _(template['metadata'].get('display_name')),  # lint-amnesty, pylint: disable=translation-of-non-string
+                                    category,
+                                    support_level_with_template,
+                                    template_id,
+                                    tab,
+                                    hinted,
+                                )
                             )
-                        )
 
         # Add any advanced problem types. Note that these are different xblocks being stored as Advanced Problems,
         # currently not supported in libraries .
