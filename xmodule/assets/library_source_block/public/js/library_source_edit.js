@@ -43,6 +43,10 @@ window.LibrarySourceAuthorView = function(runtime, element) {
                     $loader.addClass('is-hidden');
                     $xblockHeader.removeClass('is-hidden');
                     clearInterval(timer);
+                    runtime.notify('save', {
+                        state: 'end',
+                        element: element
+                    });
                 }
             })
         }, 1000);
