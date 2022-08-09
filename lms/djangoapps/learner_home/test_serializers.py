@@ -1,10 +1,11 @@
 """Tests for serializers for the Learner Dashboard"""
 
-import ddt
 from random import randint
 from unittest import TestCase
 from unittest import mock
 from uuid import uuid4
+
+import ddt
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
