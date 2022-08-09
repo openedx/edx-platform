@@ -1235,7 +1235,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                     )
 
             return render_to_response('settings.html', settings_context)
-        elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+        elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):  # pylint: disable=too-many-nested-blocks
             if request.method == 'GET':
                 course_details = CourseDetails.fetch(course_key)
                 return JsonResponse(
@@ -1259,11 +1259,11 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                             relationship="requires",
                         )
                         for milestone in course_milestones:
-                            ee_milestone_namespace = generate_milestone_namespace(
+                            entrance_exam_namespace = generate_milestone_namespace(
                                 get_namespace_choices().get('ENTRANCE_EXAM'),
                                 course_key
                             )
-                            if not milestone["namespace"] == ee_milestone_namespace:
+                            if milestone["namespace"] != entrance_exam_namespace:
                                 remove_prerequisite_course(course_key, milestone)
 
                 # If the entrance exams feature has been enabled, we'll need to check for some

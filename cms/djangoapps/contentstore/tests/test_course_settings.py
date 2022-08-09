@@ -486,21 +486,15 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_entrance_after_changing_other_setting(self):
         """
-       Test entrance exam is not deactivated when prerequisites removed.
+        Test entrance exam is not deactivated when prerequisites removed.
 
         This test ensures that the entrance milestone is not deactivated after
-        course details are saves without pre requisite courses active.
+        course details are saves without pre-requisite courses active.
 
         The test was implemented after a bug fixing, correcting the behaviour
         that every time course details were saved,
-        if there wasn't any pre requisite course in the POST
-        the view just deleted all the pre requisite courses, including entrance exam,
-        despite the fact that the entrance_exam_enabled was True.
-        This test ensures that the entrance milestone is not deactivated after
-        course details are saves without pre requisite courses active. The test was
-        implemented after a bug fixing, correcting the behaviour that every time
-        course details were saved, if there wasn't any pre requisite course in the POST
-        the view just deleted all the pre requisite courses, including entrance exam,
+        if there wasn't any pre-requisite course in the POST
+        the view just deleted all the pre-requisite courses, including entrance exam,
         despite the fact that the entrance_exam_enabled was True.
         """
         assert not milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id), \
