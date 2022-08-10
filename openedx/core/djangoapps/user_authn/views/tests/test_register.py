@@ -17,6 +17,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import UTC
 from social_django.models import Partial, UserSocialAuth
+from testfixtures import LogCapture
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -2284,6 +2285,37 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             HTTP_ACCEPT='*/*',
         )
         self._assert_redirect_url(response, expected_redirect)
+
+    @mock.patch('openedx.core.djangoapps.user_authn.views.register._record_is_marketable_attribute')
+    def test_logs_for_error_when_setting_is_marketable_attribute(self, set_is_marketable_attr):
+        """
+        Test that if some error occurs while setting is_marketable attribute, error
+        is logged and that it doesn't affect the user registration workflow.
+        """
+        set_is_marketable_attr.side_effect = Exception('BOOM!')
+        post_params = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        }
+
+        with LogCapture() as logger:
+            response = self.client.post(
+                self.url,
+                post_params,
+                HTTP_ACCEPT='*/*',
+            )
+            logger.check_present(
+                (
+                    'edx.student',
+                    'ERROR',
+                    'Error while setting is_marketable attribute.'
+                )
+            )
+
+            assert response.status_code == 200
 
 
 @httpretty.activate
