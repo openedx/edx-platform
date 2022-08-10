@@ -12,7 +12,6 @@ from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
 from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
     get_course_enrollments,
-    get_dashboard_course_limit,
     get_org_black_and_whitelist_for_site,
 )
 from common.djangoapps.util.json_request import JsonResponse
