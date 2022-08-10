@@ -236,6 +236,7 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     Info for displaying an enrollment on the learner dashboard.
     Derived from a CourseEnrollment with added context.
     """
+
     course = CourseSerializer()
     courseRun = CourseRunSerializer(source="*")
     enrollment = EnrollmentSerializer(source="*")
