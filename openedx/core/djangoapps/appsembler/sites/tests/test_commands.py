@@ -13,6 +13,7 @@ from tahoe_sites.api import (
     create_tahoe_site_by_link,
     get_organization_for_user,
     get_users_of_organization,
+    get_uuid_by_organization,
 )
 from tahoe_sites.tests.utils import create_organization_mapping
 
@@ -316,7 +317,7 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
             'description': organization.description,
             'logo': '',
             'active': organization.active,
-            'UUID': organization.edx_uuid,
+            'UUID': get_uuid_by_organization(organization=organization),
             'created': organization.created,
             'users': ['user1', 'user2']
         }

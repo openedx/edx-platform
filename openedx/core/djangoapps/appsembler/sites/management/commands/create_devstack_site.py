@@ -105,7 +105,7 @@ class Command(BaseCommand):
             'organization': {
                 'name': name,
                 'short_name': name,
-                'edx_uuid': uuid.uuid4(),
+                'edx_uuid': uuid.uuid4(),  # TODO: RED-2845 Remove this line when AMC is migrated
             },
             'initial_values': {
                 'SITE_NAME': site_name,

@@ -10,8 +10,8 @@ from django.test import RequestFactory
 from django.utils import timezone
 from mock import Mock
 
-from organizations.tests.factories import OrganizationFactory
 from site_config_client.exceptions import SiteConfigurationError
+from tahoe_sites.api import create_tahoe_site, get_uuid_by_organization
 
 from lms.djangoapps.courseware.access_utils import in_preview_mode
 from openedx.core.djangoapps.appsembler.sites import (
@@ -29,11 +29,8 @@ User = get_user_model()
 
 @pytest.fixture
 def site_with_org():
-    org = OrganizationFactory.create()
-    assert org.edx_uuid, 'Should have valid uuid'
-    site = Site.objects.create(domain='fake-site')
-    site.organizations.add(org)
-    return site, org
+    site_info = create_tahoe_site(domain='fake-site', short_name='FS')
+    return site_info['site'], site_info['organization']
 
 
 @pytest.mark.django_db
@@ -45,7 +42,8 @@ def test_is_enabled_for_site(monkeypatch, site_with_org):
 
     is_enabled = client_helpers.is_enabled_for_site(site)
     assert is_enabled, 'Enabled if client is installed'
-    helper.assert_called_with(org.edx_uuid)
+    uuid = get_uuid_by_organization(organization=org)
+    helper.assert_called_with(uuid)
 
 
 @pytest.mark.django_db
@@ -75,7 +73,7 @@ def test_get_configuration_adapter(site_with_org):
     with patch('crum.get_current_request', return_value=request):
         adapter = client_helpers.init_site_configuration_adapter(site)
     assert adapter, 'Should return if client package is installed'
-    assert adapter.site_uuid == org.edx_uuid, 'Should set the correct ID'
+    assert adapter.site_uuid == get_uuid_by_organization(organization=org), 'Should set the correct ID'
     assert adapter.status == 'draft', 'can be set to draft based on current request parameters'
 
 
@@ -85,7 +83,7 @@ def test_get_configuration_adapter(site_with_org):
 
     adapter = client_helpers.init_site_configuration_adapter(site)
     assert adapter, 'Should return if client package is installed'
-    assert adapter.site_uuid == org.edx_uuid, 'Should set the correct ID'
+    assert adapter.site_uuid == get_uuid_by_organization(organization=org), 'Should set the correct ID'
     assert adapter.status == 'live', 'by default should be live status'
 
 

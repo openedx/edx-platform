@@ -3,6 +3,7 @@ from django.contrib.sites.models import Site
 from rest_framework import serializers
 from organizations import api as organizations_api
 from organizations.models import Organization
+from tahoe_sites.zd_helpers import should_site_use_org_models
 
 from openedx.core.djangoapps.user_authn.views.registration_form import validate_username
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -87,7 +88,7 @@ class SiteSerializer(serializers.ModelSerializer):
 class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
-        fields = ('id', 'name', 'short_name', 'edx_uuid')
+        fields = ('id', 'name', 'short_name') + ('edx_uuid',) if should_site_use_org_models() else ()
 
     @beeline.traced(name="OrganizationSerializer.create")
     def create(self, validated_data):

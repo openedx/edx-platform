@@ -39,6 +39,7 @@ from tahoe_sites.api import (
     add_user_to_organization,
     create_tahoe_site_by_link,
     get_organization_for_user,
+    get_organizations_queryset_from_uuids,
     update_admin_role_in_organization,
 )
 
@@ -93,10 +94,7 @@ def get_active_organizations():
     """
     active_tiers_uuids = get_active_organizations_uuids()
 
-    # Now back to the LMS MySQL database
-    return Organization.objects.filter(
-        edx_uuid__in=[str(edx_uuid) for edx_uuid in active_tiers_uuids],
-    )
+    return get_organizations_queryset_from_uuids(uuids=active_tiers_uuids)
 
 
 def get_active_sites(order_by='domain'):
@@ -481,7 +479,7 @@ def bootstrap_site(site, org_data=None, username=None):
         organization_data = org_api.add_organization({
             'name': organization_slug,
             'short_name': organization_slug,
-            'edx_uuid': org_data.get('edx_uuid')
+            'edx_uuid': org_data.get('edx_uuid')  # TODO: RED-2845 Remove this line when AMC is migrated
         })
         organization = org_models.Organization.objects.get(id=organization_data.get('id'))
         create_tahoe_site_by_link(organization=organization, site=site)
