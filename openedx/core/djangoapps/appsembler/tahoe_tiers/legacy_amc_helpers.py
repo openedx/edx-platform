@@ -25,6 +25,8 @@ def get_amc_tier_info(site_uuid):  # pragma: no cover
     Hack: This queries the django-tier database in a rather hacky way.
 
     WARNING: !! This function is _not_ covered with tests. Please edit with caution and test manually. !!
+
+    :return TierInfo
     """
     try:
         # Query the AMC Postgres database directly
