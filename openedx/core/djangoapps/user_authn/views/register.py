@@ -213,6 +213,7 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
         tos_required=tos_required,
     )
     custom_form = get_registration_extension_form(data=params)
+    is_marketable = params.get('marketing_emails_opt_in') in ['true', '1']
 
     # Perform operations within a transaction that are critical to account creation
     with outer_atomic():
@@ -224,6 +225,7 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
         )
 
         new_user = authenticate_new_user(request, user.username, form.cleaned_data['password'])
+        _record_is_marketable_attribute(is_marketable, new_user)
         django_login(request, new_user)
         request.session.set_expiry(0)
 
@@ -253,7 +255,6 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
         except Exception:  # pylint: disable=broad-except
             log.exception(f"Enable discussion notifications failed for user {user.id}.")
 
-    is_marketable = params.get('marketing_emails_opt_in') in ['true', '1']
     _track_user_registration(user, profile, params, third_party_provider, registration, is_marketable)
 
     # Announce registration
@@ -276,7 +277,6 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
 
     try:
         _record_registration_attributions(request, new_user)
-        _record_is_marketable_attribute(is_marketable, new_user)
     # Don't prevent a user from registering due to attribution errors.
     except Exception:   # pylint: disable=broad-except
         log.exception('Error while attributing cookies to user registration.')
