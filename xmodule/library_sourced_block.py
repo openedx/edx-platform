@@ -266,6 +266,17 @@ class LibrarySourcedBlock(
             )
             return validation
 
+        if not self.children:
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.NOT_CONFIGURED,
+                    _("There are no problem types in the specified libraries."),
+                    action_class='edit-button',
+                    action_label=_("Select another Library.")
+                )
+            )
+            return validation
+
         self._validate_library_version(validation, self.tools, self.source_library_version, self.source_library_key)
         return validation
 
