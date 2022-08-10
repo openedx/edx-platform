@@ -136,7 +136,7 @@ class EnrollmentSerializer(serializers.Serializer):
         return resume_button_url is not None
 
     def get_hasFinished(self, enrollment):
-        # TODO
+        # TODO - AU-796
         return False
 
     def get_isVerified(self, enrollment):
@@ -237,14 +237,12 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     Info for displaying an enrollment on the learner dashboard.
     Derived from a CourseEnrollment with added context.
     """
-
-    courseProvider = CourseProviderSerializer(allow_null=True)
     course = CourseSerializer()
     courseRun = CourseRunSerializer(source="*")
     enrollment = EnrollmentSerializer(source="*")
 
-    # The below temporarily allow null for integration testing
-    # TODO - to be removed in final implementaitno
+    # TODO - remove "allow_null" as each of these are implemented, temp for testing.
+    courseProvider = CourseProviderSerializer(allow_null=True)
     gradeData = GradeDataSerializer(allow_null=True)
     certificate = CertificateSerializer(allow_null=True)
     entitlements = EntitlementSerializer(allow_null=True)
