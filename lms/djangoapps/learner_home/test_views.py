@@ -90,7 +90,7 @@ class TestGetUserAccountConfirmationInfo(SharedModuleStoreTestCase):
 
     @patch(
         "django.conf.settings.ACTIVATION_EMAIL_SUPPORT_LINK",
-        "example.com/activate-email",
+        MOCK_SETTINGS["ACTIVATION_EMAIL_SUPPORT_LINK"],
     )
     def test_email_url_support_link(self):
         # Given an ACTIVATION_EMAIL_SUPPORT_LINK is supplied
@@ -98,13 +98,13 @@ class TestGetUserAccountConfirmationInfo(SharedModuleStoreTestCase):
         user_account_confirmation_info = get_user_account_confirmation_info(self.user)
 
         # Then that link should be returned as the sendEmailUrl
-        assert (
-            user_account_confirmation_info["sendEmailUrl"]
-            == "example.com/activate-email"
+        self.assertEqual(
+            user_account_confirmation_info["sendEmailUrl"],
+            self.MOCK_SETTINGS["ACTIVATION_EMAIL_SUPPORT_LINK"],
         )
 
     @patch("lms.djangoapps.learner_home.views.configuration_helpers")
-    @patch("django.conf.settings.SUPPORT_SITE_LINK", "example.com/support")
+    @patch("django.conf.settings.SUPPORT_SITE_LINK", MOCK_SETTINGS["SUPPORT_SITE_LINK"])
     def test_email_url_support_fallback_link(self, mock_config_helpers):
         # Given an ACTIVATION_EMAIL_SUPPORT_LINK is NOT supplied
         mock_config_helpers.get_value.return_value = None
@@ -113,7 +113,10 @@ class TestGetUserAccountConfirmationInfo(SharedModuleStoreTestCase):
         user_account_confirmation_info = get_user_account_confirmation_info(self.user)
 
         # Then sendEmailUrl falls back to SUPPORT_SITE_LINK
-        assert user_account_confirmation_info["sendEmailUrl"] == "example.com/support"
+        self.assertEqual(
+            user_account_confirmation_info["sendEmailUrl"],
+            self.MOCK_SETTINGS["SUPPORT_SITE_LINK"],
+        )
 
 
 class TestGetEnrollments(SharedModuleStoreTestCase):
