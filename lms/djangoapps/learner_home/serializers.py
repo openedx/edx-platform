@@ -153,7 +153,6 @@ class EnrollmentSerializer(serializers.Serializer):
         return bool(
             use_ecommerce_payment_flow
             and course_mode_info.get("show_upsell", False)
-            # and not entitlement - don't think we need this any more
             and course_mode_info.get("verified_sku", False)
         )
 

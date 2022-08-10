@@ -58,7 +58,7 @@ def get_enrollments(user, org_allow_list, org_block_list, course_limit=None):
         get_course_enrollments(user, org_allow_list, org_block_list, course_limit)
     )
 
-    # Sort the enrollment pairs by the enrollment date
+    # Sort the enrollments by enrollment date
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
 
     # Record how many courses there are so that we can get a better
@@ -99,7 +99,7 @@ def get_email_settings_info(user, course_enrollments):
         "course_id", flat=True
     )
 
-    # only show email settings for Mongo course and when bulk email is turned on
+    # only show email settings for course where bulk email is turned on
     show_email_settings_for = frozenset(
         enrollment.course_id
         for enrollment in course_enrollments
