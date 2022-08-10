@@ -128,10 +128,6 @@ def dashboard_view(request):  # pylint: disable=unused-argument
     user = request.user
     email_confirmation = get_user_account_confirmation_info(user)
 
-    # Determine number of courses to show on dashboard
-    disable_course_limit = request and "course_limit" in request.GET
-    course_limit = get_dashboard_course_limit() if not disable_course_limit else None
-
     # Get the org whitelist or the org blacklist for the current site
     site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
 
@@ -140,7 +136,7 @@ def dashboard_view(request):  # pylint: disable=unused-argument
 
     # Get enrollments
     course_enrollments, course_mode_info = get_enrollments(
-        user, site_org_whitelist, site_org_blacklist, course_limit=course_limit
+        user, site_org_whitelist, site_org_blacklist
     )
 
     # Get email opt-outs for student
