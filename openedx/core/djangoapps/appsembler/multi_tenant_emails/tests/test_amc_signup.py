@@ -77,6 +77,7 @@ class MultiTenantAMCSignupTest(APITestCase):
                 'domain': color,
             },
             'organization': {
+                'edx_uuid': str(uuid.uuid4()),
                 'name': color,
                 'short_name': color,
             },
