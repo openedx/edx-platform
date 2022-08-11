@@ -5,9 +5,12 @@ from __future__ import annotations
 
 import itertools
 from collections import defaultdict
+
+from analytics import page
 from enum import Enum
 from typing import Dict, Iterable, List, Literal, Optional, Set, Tuple
 from urllib.parse import urlencode, urlunparse
+from django.db.models.functions import Length
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -42,7 +45,8 @@ from openedx.core.djangoapps.django_comment_common.comment_client.course import 
     get_course_user_stats,
 )
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
-from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
+from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError, \
+    CommentClient500Error
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -64,6 +68,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
+from ..config.waffle import DISABLE_LEARNERS_STATS
 
 from ..django_comment_client.base.views import (
     track_comment_created_event,
@@ -101,7 +106,7 @@ from .utils import (
     discussion_open_for_user,
     get_usernames_from_search_string,
     add_stats_for_users_with_no_discussion_content,
-    set_attribute,
+    set_attribute, get_usernames_for_course,
 )
 
 User = get_user_model()
@@ -538,9 +543,9 @@ def get_course_topics_v2(
     _get_course(course_key, user=user, check_tab=False)
     course_blocks = get_course_blocks(user, store.make_course_usage_key(course_key))
     accessible_vertical_keys = [
-        block for block in course_blocks.get_block_keys()
-        if block.category == 'vertical'
-    ] + [None]
+                                   block for block in course_blocks.get_block_keys()
+                                   if block.category == 'vertical'
+                               ] + [None]
     topics_query = DiscussionTopicLink.objects.filter(
         context_key=course_key,
         provider_id=provider_type,
@@ -967,20 +972,29 @@ def get_learner_active_thread_list(request, course_key, query_params):
     else:
         comment_client_user = comment_client.User(id=user_id, course_id=course_key, group_id=group_id)
 
-    threads, page, num_pages = comment_client_user.active_threads(query_params)
-    threads = set_attribute(threads, "pinned", False)
-    results = _serialize_discussion_entities(
-        request, context, threads, {'profile_image'}, DiscussionEntity.thread
-    )
-    paginator = DiscussionAPIPagination(
-        request,
-        page,
-        num_pages,
-        len(threads)
-    )
-    return paginator.get_paginated_response({
-        "results": results,
-    })
+    try:
+        threads, page, num_pages = comment_client_user.active_threads(query_params)
+        threads = set_attribute(threads, "pinned", False)
+        results = _serialize_discussion_entities(
+            request, context, threads, {'profile_image'}, DiscussionEntity.thread
+        )
+        paginator = DiscussionAPIPagination(
+            request,
+            page,
+            num_pages,
+            len(threads)
+        )
+        return paginator.get_paginated_response({
+            "results": results,
+        })
+    except CommentClient500Error:
+        return DiscussionAPIPagination(
+            request,
+            page_num=1,
+            num_pages=0,
+        ).get_paginated_response({
+            "results": [],
+        })
 
 
 def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=False, requested_fields=None):
@@ -1170,7 +1184,7 @@ def _handle_abuse_flagged_field(form_value, user, cc_content):
     if form_value:
         cc_content.flagAbuse(user, cc_content)
         if ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key) and reported_content_email_notification_enabled(
-                course_key):
+            course_key):
             if cc_content.type == 'thread':
                 thread_flagged.send(sender='flag_abuse_for_thread', user=user, post=cc_content)
             else:
@@ -1639,6 +1653,17 @@ def get_course_discussion_user_stats(
         order_by = order_by or UserOrdering.BY_ACTIVITY
         if order_by != UserOrdering.BY_ACTIVITY:
             raise ValidationError({"order_by": "Invalid value"})
+
+    if DISABLE_LEARNERS_STATS.is_enabled():
+        return get_users_without_stats(
+            username_search_string,
+            course_key,
+            page,
+            page_size,
+            request,
+            is_privileged
+        )
+
     params = {
         'sort_key': str(order_by),
         'page': page,
@@ -1679,3 +1704,44 @@ def get_course_discussion_user_stats(
     return paginator.get_paginated_response({
         "results": serializer.data,
     })
+
+
+def get_users_without_stats(
+    username_search_string,
+    course_key,
+    page_number,
+    page_size,
+    request,
+    is_privileged
+):
+    """
+    This return users with no user stats.
+    This function will be deprecated when this ticket is resolved
+    """
+    if username_search_string:
+        comma_separated_usernames, matched_users_count, matched_users_pages = get_usernames_from_search_string(
+            course_key, username_search_string, page_number, page_size
+        )
+        if not comma_separated_usernames:
+            return DiscussionAPIPagination(request, 0, 1).get_paginated_response({
+                "results": [],
+            })
+
+    else:
+        comma_separated_usernames, matched_users_count, matched_users_pages = get_usernames_for_course(
+            course_key, page_number, page_size
+        )
+
+    if comma_separated_usernames:
+        updated_course_stats = add_stats_for_users_with_no_discussion_content([], comma_separated_usernames)
+
+        serializer = UserStatsSerializer(updated_course_stats, context={"is_privileged": is_privileged}, many=True)
+        paginator = DiscussionAPIPagination(
+            request,
+            1,
+            matched_users_pages,
+            matched_users_count,
+        )
+        return paginator.get_paginated_response({
+            "results": serializer.data,
+        })

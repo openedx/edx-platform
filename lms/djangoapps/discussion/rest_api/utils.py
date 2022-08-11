@@ -69,6 +69,32 @@ def get_usernames_from_search_string(course_id, search_string, page_number, page
     return ','.join(page_matched_users), matched_users_count, matched_users_pages
 
 
+def get_usernames_for_course(course_id, page_number, page_size):
+    """
+    Gets usernames for all users in course.
+
+    Args:
+            course_id (CourseKey): Course to check discussions for
+            page_number (int): Page numbers to fetch
+            page_size (int): Number of items in each page
+
+    Returns:
+            page_matched_users (str): comma seperated usernames for the page
+            matched_users_count (int): count of matched users in course
+            matched_users_pages (int): pages of matched users in course
+    """
+    matched_users_in_course = User.objects.filter(
+        courseenrollment__course_id=course_id,
+       ).order_by(Length('username').asc()).values_list('username', flat=True)
+    if not matched_users_in_course:
+        return '', 0, 0
+    matched_users_count = len(matched_users_in_course)
+    paginator = Paginator(matched_users_in_course, page_size)
+    page_matched_users = paginator.page(page_number)
+    matched_users_pages = int(matched_users_count / page_size)
+    return ','.join(page_matched_users), matched_users_count, matched_users_pages
+
+
 def add_stats_for_users_with_no_discussion_content(course_stats, users_in_course):
     """
     Update users stats for users with no discussion stats available in course
