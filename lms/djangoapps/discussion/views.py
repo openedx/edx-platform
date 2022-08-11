@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404, HttpResponseForbidden, HttpResponseServerError
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -307,9 +307,34 @@ def forum_form_discussion(request, course_key):
             'corrected_text': query_params['corrected_text'],
         })
     else:
+        discussions_mfe_enabled_for_everyone = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key)
+        privileged_user = is_privileged_user(course_key, request.user)
+        if discussions_mfe_enabled_for_everyone and (not privileged_user):
+            discussion_experience = request.GET.get('discussions_experience', None)
+            banner_enabled = ENABLE_DISCUSSIONS_MFE_BANNER.is_enabled(course_key)
+            redirect_to_mfe = (discussion_experience is None) or (not banner_enabled)
+            if redirect_to_mfe and discussion_experience == "legacy":
+                mfe_context = _discussions_mfe_context(request.GET, course_key, True, False, False)
+                return redirect(mfe_context['mfe_url'])
+
         course_id = str(course.id)
         tab_view = CourseTabView()
         return tab_view.get(request, course_id, 'discussion')
+
+
+def redirect_url_to_new_mfe(request, course_id, thread_id):
+    """
+    Returns MFE url of the thread if the user is not privileged
+    """
+    course_key = CourseKey.from_string(course_id)
+    discussions_mfe_enabled_for_everyone = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key)
+    if discussions_mfe_enabled_for_everyone and (not is_privileged_user(course_key, request.user)):
+        discussion_experience = request.GET.get('discussions_experience', None)
+        if (discussion_experience is None) and (thread_id is not None):
+            mfe_context = _discussions_mfe_context(request.GET, course_key, True, False, False)
+            redirect_url = f"{mfe_context['mfe_url']}#posts/{thread_id}"
+            return redirect_url
+    return None
 
 
 @require_GET
@@ -361,6 +386,10 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'annotated_content_info': annotated_content_info,
         })
     else:
+        redirect_url = redirect_url_to_new_mfe(request, str(course.id), thread_id)
+        if redirect_url:
+            return redirect(redirect_url)
+
         course_id = str(course.id)
         tab_view = CourseTabView()
         return tab_view.get(request, course_id, 'discussion', discussion_id=discussion_id, thread_id=thread_id)
@@ -620,6 +649,12 @@ def user_profile(request, course_key, user_id):
                 'annotated_content_info': context['annotated_content_info'],
             })
         else:
+            discussions_mfe_enabled_for_everyone = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key)
+            privileged_user = is_privileged_user(course_key, request.user)
+            if discussions_mfe_enabled_for_everyone and (not privileged_user):
+                mfe_context = _discussions_mfe_context(request.GET, course_key, True, False, False)
+                return redirect(mfe_context['mfe_url'])
+
             tab_view = CourseTabView()
 
             # To avoid mathjax loading from 'mathjax_include.html'
