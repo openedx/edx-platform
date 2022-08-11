@@ -51,7 +51,7 @@ class MFEContextView(APIView):
         request_params = request.GET
         redirect_to = get_next_url_for_login_page(request)
         third_party_auth_hint = request_params.get('tpa_hint')
-        is_register_page = request_params.get('is_registered')
+        is_register_page = request_params.get('is_register_page')
         context = {
             'context_data': get_mfe_context(request, redirect_to, third_party_auth_hint),
             'registration_fields': {},

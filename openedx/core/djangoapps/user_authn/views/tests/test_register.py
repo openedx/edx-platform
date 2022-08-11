@@ -837,7 +837,7 @@ class RegistrationViewTestV1(
                     "options": country_options,
                     "instructions": "The country or region where you live.",
                     "errorMessages": {
-                        "required": "Select your country or region of residence."
+                        "required": "Select your country or region of residence"
                     },
                 }
             )
@@ -863,7 +863,7 @@ class RegistrationViewTestV1(
                     {"value": "other", "name": "Other education", "default": False},
                 ],
                 "errorMessages": {
-                    "required": "Select the highest level of education you have completed."
+                    "required": "Select the highest level of education you have completed"
                 }
             }
         )
@@ -892,7 +892,7 @@ class RegistrationViewTestV1(
                     {"value": "other", "name": "Other education TRANSLATED", "default": False},
                 ],
                 "errorMessages": {
-                    "required": "Select the highest level of education you have completed."
+                    "required": "Select the highest level of education you have completed"
                 }
             }
         )
@@ -990,7 +990,7 @@ class RegistrationViewTestV1(
                 "required": True,
                 "label": "Profession",
                 "errorMessages": {
-                    "required": "Enter your profession."
+                    "required": "Enter your profession"
                 }
             }
         )
@@ -1010,7 +1010,7 @@ class RegistrationViewTestV1(
                 "label": "Profession",
                 "options": self.PROFESSION_OPTIONS,
                 "errorMessages": {
-                    "required": "Select your profession."
+                    "required": "Select your profession"
                 },
             }
         )
@@ -1024,7 +1024,7 @@ class RegistrationViewTestV1(
                 "required": True,
                 "label": "Specialty",
                 "errorMessages": {
-                    "required": "Enter your specialty."
+                    "required": "Enter your specialty"
                 }
             }
         )
@@ -1044,7 +1044,7 @@ class RegistrationViewTestV1(
                 "label": "Specialty",
                 "options": self.SPECIALTY_OPTIONS,
                 "errorMessages": {
-                    "required": "Select your specialty."
+                    "required": "Select your specialty"
                 },
             }
         )
@@ -1058,7 +1058,7 @@ class RegistrationViewTestV1(
                 "required": False,
                 "label": "Mailing address",
                 "errorMessages": {
-                    "required": "Enter your mailing address."
+                    "required": "Enter your mailing address"
                 }
             }
         )
@@ -1074,7 +1074,7 @@ class RegistrationViewTestV1(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "errorMessages": {
-                    "required": "Tell us your goals."
+                    "required": "Tell us your goals"
                 }
             }
         )
@@ -1088,7 +1088,7 @@ class RegistrationViewTestV1(
                 "required": False,
                 "label": "City",
                 "errorMessages": {
-                    "required": "Enter your city."
+                    "required": "Enter your city"
                 }
             }
         )
@@ -1131,7 +1131,7 @@ class RegistrationViewTestV1(
                 "required": True,
                 "options": country_options,
                 "errorMessages": {
-                    "required": "Select your country or region of residence."
+                    "required": "Select your country or region of residence"
                 },
             }
         )
@@ -2194,7 +2194,7 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
                 "required": True,
                 "label": "Confirm Email",
                 "errorMessages": {
-                    "required": "The email addresses do not match.",
+                    "required": "The email addresses do not match",
                 }
             }
         )
