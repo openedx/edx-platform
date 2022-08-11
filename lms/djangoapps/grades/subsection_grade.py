@@ -27,7 +27,7 @@ class SubsectionGradeBase(metaclass=ABCMeta):
         self.display_name = block_metadata_utils.display_name_with_default(subsection)
         self.url_name = block_metadata_utils.url_name_for_block(subsection)
 
-        self.due = getattr(subsection, 'due', None)
+        self.due = block_metadata_utils.get_datetime_field(subsection, 'due', None)
         self.end = getattr(subsection, 'end', None)
         self.format = getattr(subsection, 'format', '')
         self.graded = getattr(subsection, 'graded', False)
