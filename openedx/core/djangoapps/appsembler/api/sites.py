@@ -9,6 +9,7 @@ from organizations.models import (
     Organization,
     OrganizationCourse,
 )
+from tahoe_sites.api import get_site_by_organization
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -66,13 +67,7 @@ def get_site_for_course(course_id):
         # Keep until this assumption analyzed
         msg = 'Multiple orgs found for course: {}'
         assert org_courses.count() == 1, msg.format(course_id)
-        first_org = org_courses.first().organization
-        if hasattr(first_org, 'sites'):
-            msg = 'Must have one and only one site. Org is "{}"'
-            assert first_org.sites.count() == 1, msg.format(first_org.name)
-            site = first_org.sites.first()
-        else:
-            site = None
+        site = get_site_by_organization(organization=org_courses.get().organization)
     else:
         # We don't want to make assumptions of who our consumers are
         # TODO: handle no organizations found for the course

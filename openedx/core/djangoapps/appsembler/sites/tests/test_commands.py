@@ -309,7 +309,9 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
 
     @patch('openedx.core.djangoapps.appsembler.sites.management.commands.offboard.Command.process_organization_users', return_value=['user1', 'user2'])
     def test_process_organization(self, mock_process_organization_users):
+        site = SiteFactory(domain='test')
         organization = OrganizationFactory.create(name='test')
+        create_tahoe_site_by_link(organization=organization, site=site)
         data = self.command.process_organization(organization)
         assert data == {
             'name': organization.name,

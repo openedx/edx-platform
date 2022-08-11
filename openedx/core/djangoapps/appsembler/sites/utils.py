@@ -39,7 +39,8 @@ from tahoe_sites.api import (
     add_user_to_organization,
     create_tahoe_site_by_link,
     get_organization_for_user,
-    get_organizations_queryset_from_uuids,
+    get_organizations_from_uuids,
+    get_sites_from_organizations,
     update_admin_role_in_organization,
 )
 
@@ -94,7 +95,7 @@ def get_active_organizations():
     """
     active_tiers_uuids = get_active_organizations_uuids()
 
-    return get_organizations_queryset_from_uuids(uuids=active_tiers_uuids)
+    return get_organizations_from_uuids(uuids=active_tiers_uuids)
 
 
 def get_active_sites(order_by='domain'):
@@ -106,9 +107,7 @@ def get_active_sites(order_by='domain'):
 
     TODO: This helper should live in a future Tahoe Sites package.
     """
-    return Site.objects.filter(
-        organizations__in=get_active_organizations()
-    ).order_by(order_by)
+    return get_sites_from_organizations(organizations=get_active_organizations()).order_by(order_by)
 
 
 @beeline.traced(name="get_amc_oauth_app")
