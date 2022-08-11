@@ -1,0 +1,228 @@
+# edX translation file
+# Copyright (C) 2022 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1a\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2022-08-10 19:21+0000\n"
+"PO-Revision-Date: 2022-02-01 12:34:16.892435\n"
+"Last-Translator: \n"
+"Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Please provide valid type in the query params."
+msgstr ""
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Please provide valid report request type in the query params."
+msgstr ""
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Please provide valid quarter and year"
+msgstr ""
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Please provide valid start and end date."
+msgstr ""
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Please provide valid year."
+msgstr ""
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Please specify the valid date ranges."
+msgstr ""
+
+#: edly_panel_app/api/v1/constants.py
+msgid "No user record found."
+msgstr ""
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Users status update completed."
+msgstr ""
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Users status update failed."
+msgstr ""
+
+#: edly_panel_app/api/v1/constants.py
+msgid "User cannot change its status."
+msgstr ""
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Site theme directory not provided."
+msgstr ""
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Site theme update completed."
+msgstr "Mise à jour du thème du site terminée."
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Site theme update failed."
+msgstr "La mise à jour du thème du site a échoué."
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Client sites setup successful."
+msgstr "Configuration des sites clients réussie."
+
+#: edly_panel_app/api/v1/constants.py
+msgid "Client sites setup failed."
+msgstr "La configuration des sites clients a échoué."
+
+#: edly_panel_app/api/v1/helpers.py
+msgid "Copy Rights. All rights reserved."
+msgstr "Droits de copie. Tous les droits sont réservés."
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/passwordset/email/body.html
+msgid "Invitation to Join "
+msgstr "Invitation à rejoindre"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/passwordset/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/passwordset/email/body.txt
+#, python-format
+msgid ""
+"An account has been created for you in %(platform_name)s. Please use the "
+"link below to set your password and log in."
+msgstr ""
+"Un compte a été créé pour vous dans %(platform_name)s. Veuillez utiliser le "
+"lien ci-dessous pour définir votre mot de passe et vous connecter."
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/passwordset/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/passwordset/email/body.txt
+msgid "If you don't want to join, you can ignore this email."
+msgstr ""
+"Si vous ne souhaitez pas vous inscrire, vous pouvez ignorer cet e-mail."
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/passwordset/email/body.html
+msgid "Set Password"
+msgstr "Définir le mot de passe"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/passwordset/email/body.txt
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+"Veuillez vous rendre sur la page suivante et choisir un nouveau mot de passe"
+" :"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/passwordset/email/body.txt
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/body.txt
+msgid "Thanks for using our site!"
+msgstr "Merci d'utiliser notre site!"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/passwordset/email/body.txt
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/body.txt
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/body.txt
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusunblocked/email/body.txt
+#, python-format
+msgid "The %(platform_name)s Team"
+msgstr "L'équipe %(platform_name)s"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/passwordset/email/subject.txt
+#, python-format
+msgid "Password set on %(platform_name)s"
+msgstr "Mot de passe défini sur %(platform_name)s"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusactivated/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusactivated/email/body.txt
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusunblocked/email/body.html
+#, python-format
+msgid "Hi %(user)s,"
+msgstr "Salut %(user)s,"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusactivated/email/body.html
+#, python-format
+msgid ""
+"Thank you for activating your %(platform_name)s account. To start exploring,"
+" visit: %(homepage_url)s. Enjoy your learning journey!"
+msgstr ""
+"Merci d'avoir activé votre compte %(platform_name)s. Pour commencer à "
+"explorer, visitez : %(homepage_url)s. Profitez de votre voyage "
+"d'apprentissage!"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusactivated/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusactivated/email/body.txt
+#, python-format
+msgid "The %(platform_name)s team."
+msgstr "L'équipe %(platform_name)s."
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusactivated/email/body.txt
+#, python-format
+msgid ""
+"Thank you for activating your %(platform_name)s account. To start exploring,"
+" visit: %(homepage_url)s. Enjoy your learning journey!."
+msgstr ""
+"Merci d'avoir activé votre compte %(platform_name)s. Pour commencer à "
+"explorer, visitez : %(homepage_url)s. Profitez de votre voyage "
+"d'apprentissage!."
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusactivated/email/subject.txt
+#, python-format
+msgid "Your account has been activated | %(platform_name)s"
+msgstr "Votre compte a été activé | %(platform_name)s"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/body.txt
+#, python-format
+msgid ""
+"Your account on %(platform_name)s has been blocked. If you think this was "
+"done in error, please reach out to us at %(contact_email)s."
+msgstr ""
+"Votre compte sur %(platform_name)s a été bloqué. Si vous pensez que cela "
+"aété fait par erreur, veuillez nous contacter à %(contact_email)s."
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/body.txt
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusunblocked/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusunblocked/email/body.txt
+msgid "Best,"
+msgstr "Meilleur,"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusblocked/email/subject.txt
+#, python-format
+msgid "Your account has been blocked | %(platform_name)s"
+msgstr "Votre compte a été bloqué | %(platform_name)s"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/body.html
+msgid "Hi"
+msgstr "Salut"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/body.txt
+#, python-format
+msgid ""
+"Your account on %(platform_name)s has been deactivated. If you think this "
+"was done in error, please reach out to us at %(contact_email)s."
+msgstr ""
+"Votre compte sur %(platform_name)s a été désactivé. Si vous pensez que cela "
+"a été fait par erreur, veuillez nous contacter à %(contact_email)s."
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusdeactivated/email/subject.txt
+#, python-format
+msgid "Your account has been deactivated | %(platform_name)s"
+msgstr "Votre compte a été désactivé | %(platform_name)s"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusunblocked/email/body.html
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusunblocked/email/body.txt
+#, python-format
+msgid ""
+"Your account has been unblocked. Please reset your password to continue your"
+" learning. To reset password, visit: %(password_reset_url)s"
+msgstr ""
+"notre compte a été débloqué. Veuillez réinitialiser votre mot de passe pour "
+"continuer votreapprentissage. Pour réinitialiser le mot de passe, visitez : "
+"%(password_reset_url)s"
+
+#: edly_panel_app/templates/edly_panel_app/edx_ace/userstatusunblocked/email/subject.txt
+#, python-format
+msgid "Your account has been unblocked | %(platform_name)s"
+msgstr "Votre compte a été débloqué | %(platform_name)s"
