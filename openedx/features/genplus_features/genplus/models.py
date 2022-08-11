@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
-from .constants import GenUserRoles, ClassColors
+from .constants import GenUserRoles, ClassColors, JournalTypes
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -18,6 +18,7 @@ class School(TimeStampedModel):
 
 class Skill(models.Model):
     name = models.CharField(max_length=128, unique=True)
+    image = models.ImageField(upload_to='skill_images', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -119,3 +120,13 @@ class TeacherClass(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     gen_class = models.ForeignKey(Class, on_delete=models.CASCADE)
     is_favorite = models.BooleanField(default=False)
+
+
+class JournalPost(TimeStampedModel):
+    JOURNAL_TYPE_CHOICES = JournalTypes.__MODEL_CHOICES__
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="journal_posts")
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True, related_name="journal_feedbacks")
+    title = models.CharField(max_length=128)
+    skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True)
+    description = models.TextField()
+    type = models.CharField(max_length=32, choices=JOURNAL_TYPE_CHOICES)

@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.middleware import csrf
 from rest_framework import serializers
-from openedx.features.genplus_features.genplus.models import Character, Skill, Class
+from common.djangoapps.student.models import UserProfile
+from openedx.features.genplus_features.genplus.models import Teacher, Character, Skill, Class, JournalPost
 from openedx.features.genplus_features.genplus.display_messages import ErrorMessages
 from django.contrib.auth import get_user_model
 
@@ -48,11 +49,23 @@ class UserInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'username', 'csrf_token', 'role',
                   'first_name', 'last_name', 'email', 'school')
 
+class TeacherSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    class Meta:
+        model = Teacher
+        fields = ('id', 'name', 'profile_image')
+
+    def get_name(self, obj):
+        profile = UserProfile.objects.filter(user=obj.gen_user.user).first()
+        if profile:
+            return profile.name
+        return None
+
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
-        fields = ('name',)
+        fields = '__all__'
 
 
 class CharacterSerializer(serializers.ModelSerializer):
@@ -87,3 +100,26 @@ class FavoriteClassSerializer(serializers.Serializer):
                 ErrorMessages.ACTION_VALIDATION_ERROR
             )
         return data
+
+
+class JournalListSerializer(serializers.ModelSerializer):
+    skill = SkillSerializer(read_only=True)
+    teacher = TeacherSerializer(read_only=True)
+    created = serializers.DateTimeField(format="%d/%m/%Y")
+    class Meta:
+        model = JournalPost
+        fields = ('title', 'skill', 'description', 'teacher', 'type', 'created')
+
+
+class StudentPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JournalPost
+        fields = ('student', 'title', 'skill', 'description', 'type')
+        extra_kwargs = {'skill': {'required': True, 'allow_null': False}}
+
+
+class TeacherFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JournalPost
+        fields = ('teacher', 'student', 'title', 'description', 'type')
+        extra_kwargs = {'teacher': {'required': True, 'allow_null': False}}

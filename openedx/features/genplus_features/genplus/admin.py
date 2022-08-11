@@ -72,3 +72,5 @@ class TeacherAdmin(admin.ModelAdmin):
     filter_horizontal = ('classes',)
 
 admin.site.register(Student)
+
+admin.site.register(JournalPost)

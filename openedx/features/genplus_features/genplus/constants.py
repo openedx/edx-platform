@@ -34,6 +34,15 @@ class ClassColors:
     )
 
 
+class JournalTypes:
 
+    """
+    color choices for the classes
+    """
+    TEACHER_FEEDBACK = 'TeacherFeedback'
+    STUDENT_POST = 'StudentReflection'
 
-
+    __ALL__ = (TEACHER_FEEDBACK, STUDENT_POST)
+    __MODEL_CHOICES__ = (
+        (journal_type, journal_type) for journal_type in __ALL__
+    )

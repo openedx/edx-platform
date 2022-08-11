@@ -15,6 +15,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
     Viewset for Lessons APIs
     """
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsStudentOrTeacher]
     serializer_class = ProgramSerializer
 
     def get_queryset(self):

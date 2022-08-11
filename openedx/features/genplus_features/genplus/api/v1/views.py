@@ -1,5 +1,6 @@
 import statistics
 from django.middleware import csrf
+from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.db import IntegrityError
 from rest_framework import generics, status, views, viewsets
@@ -7,17 +8,29 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework import filters
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.shortcuts import get_object_or_404
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.features.genplus_features.genplus.models import GenUser, Character, Class, Teacher, Student, TeacherClass
+from openedx.features.genplus_features.genplus.models import (
+    GenUser, Character, Class, Teacher, Student, TeacherClass, JournalPost
+)
+from openedx.features.genplus_features.genplus.constants import JournalTypes
+from openedx.features.genplus_features.genplus.display_messages import SuccessMessages, ErrorMessages
 from openedx.features.genplus_features.genplus_learning.models import ClassUnit
 from openedx.features.genplus_features.genplus_learning.api.v1.serializers import ClassSummarySerializer
-from .serializers import CharacterSerializer, ClassSerializer, FavoriteClassSerializer, UserInfoSerializer
-from .permissions import IsStudent, IsTeacher
-from openedx.features.genplus_features.genplus.display_messages import SuccessMessages, ErrorMessages
+from .serializers import (
+    CharacterSerializer,
+    ClassSerializer,
+    FavoriteClassSerializer,
+    UserInfoSerializer,
+    JournalListSerializer,
+    StudentPostSerializer,
+    TeacherFeedbackSerializer,
+)
+from .permissions import IsStudent, IsTeacher, IsStudentOrTeacher
 from .mixins import GenzMixin
 
 
@@ -173,3 +186,88 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
             teacher_class.save()
             return Response(SuccessMessages.CLASS_REMOVED_FROM_FAVORITES.format(class_name=gen_class.name),
                             status=status.HTTP_204_NO_CONTENT)
+
+
+class JournalViewSet(GenzMixin, viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsStudentOrTeacher]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'description']
+    ordering = ['-created']
+
+    def get_queryset(self):
+        query_params = self.request.query_params
+        journal_posts = JournalPost.objects.select_related('student', 'teacher', 'skill')
+        if self.gen_user.is_student:
+            journal_posts = journal_posts.filter(student=self.gen_user.student)
+        else:
+            student_id = query_params.get('student_id')
+            if student_id:
+                journal_posts = journal_posts.filter(student__id=student_id)
+            else:
+                journal_posts = JournalPost.objects.none()
+
+        skill = query_params.get('skill')
+        if skill:
+            journal_posts = journal_posts.filter(skill__name__iexact=skill)
+
+        return journal_posts.order_by(*self.ordering)
+
+    def create(self, request, *args, **kwargs):
+        if self.gen_user.is_student:
+            data = self._create_journal_post_data(request.data, JournalTypes.STUDENT_POST)
+            success_message = SuccessMessages.STUDENT_POST_CREATED
+            error_message = ErrorMessages.STUDENT_POST_ENTRY_FAILED
+        elif self.gen_user.is_teacher:
+            data = self._create_journal_post_data(request.data, JournalTypes.TEACHER_FEEDBACK)
+            success_message = SuccessMessages.TEACHER_FEEDBACK_ADDED
+            error_message = ErrorMessages.TEACHER_FEEDBACK_ENTRY_FAILED
+
+        serializer = self.get_serializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(success_message, status=status.HTTP_201_CREATED)
+
+        return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
+
+    def _create_journal_post_data(self, request_data, entry_type):
+        data = {
+            'title': request_data.get('title'),
+            'description': request_data.get('description'),
+            'type': entry_type,
+        }
+        if entry_type == JournalTypes.STUDENT_POST:
+            data['student'] = self.gen_user.student.id
+            data['skill'] = request_data.get('skill')
+        elif entry_type == JournalTypes.TEACHER_FEEDBACK:
+            data['student'] = self.request.query_params.get('student_id')
+            data['teacher'] = self.gen_user.teacher.id
+
+        return data
+
+    def partial_update(self, request, *args, **kwargs):
+        journal_post = self.get_object()
+
+        if self.gen_user.is_student:
+            success_message = SuccessMessages.STUDENT_POST_UPDATED
+            error_message = ErrorMessages.STUDENT_POST_UPDATE_FAILED
+        elif self.gen_user.is_teacher:
+            success_message = SuccessMessages.TEACHER_FEEDBACK_UPDATED
+            error_message = ErrorMessages.TEACHER_FEEDBACK_UPDATE_FAILED
+
+        serializer = self.get_serializer(journal_post, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(success_message, status=status.HTTP_200_OK)
+
+        return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'partial_update']:
+            if self.gen_user.is_student:
+                return StudentPostSerializer
+            elif self.gen_user.is_teacher:
+                return TeacherFeedbackSerializer
+
+        return JournalListSerializer
