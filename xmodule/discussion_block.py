@@ -8,6 +8,7 @@ import urllib
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from django.utils.translation import get_language_bidi
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -162,8 +163,13 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         Renders student view for LMS.
         """
         fragment = Fragment()
-        self.add_resource_urls(fragment)
 
+        # Discussion Xblock does not support new OPEN_EDX provider
+        provider = DiscussionsConfiguration.get(self.course_key)
+        if provider.provider_type == Provider.OPEN_EDX:
+            return fragment
+
+        self.add_resource_urls(fragment)
         login_msg = ''
 
         if not self.django_user.is_authenticated:
