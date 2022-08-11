@@ -23,7 +23,7 @@ from django.core.files.storage import get_storage_class
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.exceptions import ImproperlyConfigured, FieldError
+from django.core.exceptions import ImproperlyConfigured
 
 from oauth2_provider.models import AccessToken, RefreshToken, Application
 from oauth2_provider.generators import generate_client_id
@@ -32,13 +32,14 @@ from django.utils.text import slugify
 
 from organizations import api as org_api
 from organizations import models as org_models
-from organizations.models import Organization, OrganizationCourse
+from organizations.models import OrganizationCourse
 
 from organizations.models import Organization
 from tahoe_sites.api import (
     add_user_to_organization,
     create_tahoe_site_by_link,
     get_organization_for_user,
+    update_admin_role_in_organization,
 )
 
 from common.djangoapps.util.organizations_helpers import get_organization_courses
@@ -210,18 +211,22 @@ def make_amc_admin(user, org_name):
       - Reset access and reset tokens, and set the expire one year ahead.
       - Return the recent tokens.
     """
-    org = Organization.objects.get(Q(name=org_name) | Q(short_name=org_name))
+    expected_org = Organization.objects.get(Q(name=org_name) | Q(short_name=org_name))
 
     try:
-        get_organization_for_user(user=user)
+        real_org = get_organization_for_user(user=user)
     except Organization.DoesNotExist:
-        add_user_to_organization(user=user, organization=org, is_admin=True)
+        add_user_to_organization(user=user, organization=expected_org, is_admin=True)
+        real_org = expected_org
+
+    if real_org == expected_org:
+        update_admin_role_in_organization(user=user, organization=expected_org, set_as_admin=True)
     else:
         raise Exception('make_amc_admin, user already member of another organization')
 
     return {
         'user_email': user.email,
-        'organization_name': org.name,
+        'organization_name': expected_org.name,
         'tokens': reset_amc_tokens(user),
     }
 
