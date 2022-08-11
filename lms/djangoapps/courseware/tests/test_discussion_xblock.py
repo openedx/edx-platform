@@ -14,7 +14,6 @@ from unittest import mock
 import ddt
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 from xmodule.discussion_block import DiscussionXBlock, loader
@@ -25,6 +24,7 @@ from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
 from lms.djangoapps.course_api.blocks.tests.helpers import deserialize_usage_key
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.courseware.tests.helpers import XModuleRenderingTestBase
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
@@ -427,12 +427,13 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
                 discussion_target='Target Discussion',
             ))
 
-        # 4 queries are required to do first discussion xblock render:
+        # 5 queries are required to do first discussion xblock render:
         # * split_modulestore_django_splitmodulestorecourseindex x2
         # * waffle_utils_waffleorgoverridemodel
         # * django_comment_client_role
+        # * DiscussionsConfiguration
 
-        num_queries = 4
+        num_queries = 5
 
         for discussion in discussions:
             discussion_xblock = get_module_for_descriptor_internal(
@@ -448,7 +449,8 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
 
             # Permissions are cached, so no queries required for subsequent renders
 
-            num_queries = 0
+            # Only query to check for provider_type
+            num_queries = 1
 
             html = fragment.content
             assert 'data-user-create-comment="false"' in html
