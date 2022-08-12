@@ -310,14 +310,32 @@ ul.fa-ul{
     margin: ($baseline/2) 0 0 0;
 
 
-    &.select-year_of_birth {
-      @include margin-left(15px);
+    // &.select-year_of_birth {
+    //   @include margin-left(15px);
+    // }
+
+    // &.select-gender,
+    // &.select-year_of_birth {
+    //   display: inline-block;
+    //   width: calc(50% - 10px);
+    // }
+
+    &.select-level_of_education {
+      select#register-level_of_education {
+        height: 60px !important;
+      }
     }
 
-    &.select-gender,
-    &.select-year_of_birth {
-      display: inline-block;
-      width: calc(50% - 10px);
+    &.select-ethnicity {
+      select#register-ethnicity {
+        height: 60px !important;
+      }
+    }
+
+    &.select-local_community_living {
+      select#register-local_community_living {
+        height: 80px !important;
+      }
     }
 
     &.checkbox-marketing_emails_opt_in {

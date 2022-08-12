@@ -609,7 +609,7 @@ class RegistrationFormFactory:
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's highest completed level of education.
-        education_level_label = _("Highest level of education completed")
+        education_level_label = _("What is the highest level of education you have completed?")
         error_msg = accounts.REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG
 
         # The labels are marked for translation in UserProfile model definition.
@@ -639,7 +639,7 @@ class RegistrationFormFactory:
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's gender.
-        gender_label = _("Gender")
+        gender_label = _("How do you describe yourself?")
 
         # The labels are marked for translation in UserProfile model definition.
         # pylint: disable=translation-of-non-string
@@ -662,7 +662,7 @@ class RegistrationFormFactory:
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's year of birth.
-        yob_label = _("Year of birth")
+        yob_label = _("What year were you born?")
 
         options = [(str(year), str(year)) for year in UserProfile.VALID_YEARS]
         form_desc.add_field(
