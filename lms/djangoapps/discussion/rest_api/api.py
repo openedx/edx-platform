@@ -66,7 +66,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
-from ..config.waffle import DISABLE_LEARNERS_STATS
+from ..config.waffle import ENABLE_LEARNERS_STATS
 
 from ..django_comment_client.base.views import (
     track_comment_created_event,
@@ -1651,8 +1651,8 @@ def get_course_discussion_user_stats(
         order_by = order_by or UserOrdering.BY_ACTIVITY
         if order_by != UserOrdering.BY_ACTIVITY:
             raise ValidationError({"order_by": "Invalid value"})
-
-    if DISABLE_LEARNERS_STATS.is_enabled():
+    breakpoint()
+    if not ENABLE_LEARNERS_STATS.is_enabled(course_key):
         return get_users_without_stats(
             username_search_string,
             course_key,
@@ -1736,7 +1736,7 @@ def get_users_without_stats(
         serializer = UserStatsSerializer(updated_course_stats, context={"is_privileged": is_privileged}, many=True)
         paginator = DiscussionAPIPagination(
             request,
-            1,
+            page_number,
             matched_users_pages,
             matched_users_count,
         )
