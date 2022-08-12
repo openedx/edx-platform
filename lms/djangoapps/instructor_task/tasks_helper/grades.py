@@ -797,6 +797,7 @@ class ProblemGradeReport(GradeReportBase):
             course_key=context.course_id,
         ):
             context.task_progress.attempted += 1
+            self.log_additional_info_for_testing(context, f'ProblemGradeReport: Attempt {context.task_progress.attempted}')
             if not course_grade:
                 err_msg = str(error)
                 # There was an error grading this student.
@@ -807,8 +808,10 @@ class ProblemGradeReport(GradeReportBase):
                     [err_msg]
                 )
                 context.task_progress.failed += 1
+                self.log_additional_info_for_testing(context, f'ProblemGradeReport: Failed {context.task_progress.failed}')
                 continue
 
+            self.log_additional_info_for_testing(context, 'ProblemGradeReport: Succeeded in reading grade')
             earned_possible_values = []
             for block_location in context.graded_scorable_blocks_header:
                 try:
@@ -821,13 +824,16 @@ class ProblemGradeReport(GradeReportBase):
                     else:
                         earned_possible_values.append(['Not Attempted', problem_score.possible])
 
+            self.log_additional_info_for_testing(context, 'ProblemGradeReport: earned possible values done')
             context.task_progress.succeeded += 1
             enrollment_status = _user_enrollment_status(student, context.course_id)
+            self.log_additional_info_for_testing(context, f'ProblemGradeReport: Succeeded {context.task_progress.succeeded}')
             success_rows.append(
                 [student.id, student.email, student.username] +
                 [enrollment_status, course_grade.percent] +
                 _flatten(earned_possible_values)
             )
+            self.log_additional_info_for_testing(context, 'ProblemGradeReport: Added rows')
 
         return success_rows, error_rows
 
