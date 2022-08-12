@@ -14,11 +14,14 @@ import httpretty
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
+
+from lms.djangoapps.discussion.config.waffle import ENABLE_LEARNERS_STATS
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -2890,6 +2893,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
 
 @ddt.ddt
 @httpretty.activate
+@override_waffle_flag(ENABLE_LEARNERS_STATS, True)
 class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceMockMixin, APITestCase,
                               SharedModuleStoreTestCase):
     """
