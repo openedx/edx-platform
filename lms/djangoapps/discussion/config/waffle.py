@@ -13,7 +13,7 @@ WAFFLE_NAMESPACE = 'discussions'
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2022-08-12
 # .. toggle_target_removal_date: 2022-10-02
-# .. toggle_warning: When the flag is ON, API will return learners stats with null values.
+# .. toggle_warning: When the flag is ON, API will return learners stats with original values.
 # .. This is temporary fix for performance issue in API.
 # .. toggle_tickets: INF-444
 ENABLE_LEARNERS_STATS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_learners_stats', __name__)
