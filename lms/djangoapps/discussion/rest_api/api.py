@@ -1714,7 +1714,7 @@ def get_users_without_stats(
 ):
     """
     This return users with no user stats.
-    This function will be deprecated when this ticket is resolved
+    This function will be deprecated when this ticket DOS-3414 is resolved
     """
     if username_search_string:
         comma_separated_usernames, matched_users_count, matched_users_pages = get_usernames_from_search_string(
