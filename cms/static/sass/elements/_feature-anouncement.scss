@@ -1,0 +1,43 @@
+// studio - elements - announcement bar
+// ====================================
+
+.announcement-bar {
+    position: relative;
+    background: #03c7e8;
+    text-align: center;
+    color: $black;
+    padding: ($baseline*0.3) ($baseline*2.2);
+    font: 500 1.4rem/2rem $font-family-sans-serif;
+}
+
+.announcement-bar-link {
+    color: inherit;
+    text-decoration: underline;
+
+    &:hover,
+    &:focus {
+        color: inherit;
+        text-decoration: none;
+    }
+}
+
+.announcement-bar-icon {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.announcement-bar-close {
+    @include right(0);
+
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent url('#{$static-path}/images/close-icon.svg') center;
+    width: ($baseline*1.2);
+    height: ($baseline*1.2);
+    border: none;
+
+    &:hover {
+        opacity: 0.7;
+    }
+}

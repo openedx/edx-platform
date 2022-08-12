@@ -1,0 +1,44 @@
+<!-- Feature Announcement bar -->
+<%page args="course=None" expression_filter="h" />
+<%namespace name='static' file='../static_content.html'/>
+<%! from django.utils.translation import gettext as _ %>
+
+<div class="announcement-bar is-hidden">
+    <div class="announcement-bar-content">
+        ${_("We’ve updated the library authoring experience with a fresh new look!")}
+        <a href="https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_components/libraries.html"
+           class="announcement-bar-link"
+           target="_blank">${_("Learn more")}</a>
+        <img class="announcement-bar-icon" src="${static.url('images/external-link-icon.svg')}" alt="${_('External link icon')}">
+    </div>
+    <button type="button" class="announcement-bar-close">
+        <span class="sr-only">${_("Close")}</span>
+    </button>
+</div>
+
+<script>
+    var $announcementBar = $('.announcement-bar');
+    var onLearnMoreAnalyticEvent = 'Learn more about the Studio announcement bar';
+    var onCloseAnalyticEvent = 'Close the Studio announcement bar';
+
+    $.cookie('openedx-studio-announcement')
+        ? $announcementBar.remove()
+        : $announcementBar.removeClass('is-hidden');
+
+    function closeBarAndFireAnalyticsEvent(message) {
+        $announcementBar.hide();
+        $.cookie('openedx-studio-announcement', 'false');
+
+        % if settings.CMS_SEGMENT_KEY:
+            window.analytics.track(message);
+        % endif
+    }
+
+    $('.announcement-bar-link').on('click', function () {
+        closeBarAndFireAnalyticsEvent(onLearnMoreAnalyticEvent);
+    });
+
+    $('.announcement-bar-close').on('click', function () {
+        closeBarAndFireAnalyticsEvent(onCloseAnalyticEvent);
+    });
+</script>
