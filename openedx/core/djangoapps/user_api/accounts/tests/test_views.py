@@ -757,7 +757,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
 
     @ddt.data(
         ("gender", "f", "not a gender", '"not a gender" is not a valid choice.'),
-        ("level_of_education", "none", "ȻħȺɍłɇs", '"ȻħȺɍłɇs" is not a valid choice.'),
+        ("level_of_education", "prefer-not-to-say", "ȻħȺɍłɇs", '"ȻħȺɍłɇs" is not a valid choice.'),
         ("country", "GB", "XY", '"XY" is not a valid choice.'),
         ("state", "MA", "PY", '"PY" is not a valid choice.'),
         ("year_of_birth", 2009, "not_an_int", "A valid integer is required."),

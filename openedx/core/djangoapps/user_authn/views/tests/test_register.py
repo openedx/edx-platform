@@ -848,18 +848,23 @@ class RegistrationViewTestV1(
                 "name": "level_of_education",
                 "type": "select",
                 "required": False,
-                "label": "Highest level of education completed",
+                "label": "What is the highest level of education you have completed?",
                 "options": [
                     {"value": "", "name": "--", "default": True},
+                    {"value": "some-hs", "name": "Some high school", "default": False},
+                    {"value": "hs", "name": "High School or GED", "default": False},
+                    {"value": "some-college", "name": "Some college", "default": False},
+                    {"value": "a", "name": "2-year degree", "default": False},
+                    {"value": "b", "name": "4-year degree", "default": False},
+                    {"value": "m", "name": "Master's", "default": False},
                     {"value": "p", "name": "Doctorate", "default": False},
-                    {"value": "m", "name": "Master's or professional degree", "default": False},
-                    {"value": "b", "name": "Bachelor's degree", "default": False},
-                    {"value": "a", "name": "Associate degree", "default": False},
-                    {"value": "hs", "name": "Secondary/high school", "default": False},
-                    {"value": "jhs", "name": "Junior secondary/junior high/middle school", "default": False},
-                    {"value": "el", "name": "Elementary/primary school", "default": False},
-                    {"value": "none", "name": "No formal education", "default": False},
-                    {"value": "other", "name": "Other education", "default": False},
+                    {"value": "jd-md", "name": "Professional degree (J.D., M.D.)", "default": False},
+                    {"value": "prefer-not-to-say", "name": "Prefer not to say", "default": False},
+                    # {"value": "hs", "name": "Secondary/high school", "default": False},
+                    # {"value": "jhs", "name": "Junior secondary/junior high/middle school", "default": False},
+                    # {"value": "el", "name": "Elementary/primary school", "default": False},
+                    # {"value": "none", "name": "No formal education", "default": False},
+                    # {"value": "other", "name": "Other education", "default": False},
                 ],
                 "errorMessages": {
                     "required": "Select the highest level of education you have completed."
@@ -877,18 +882,23 @@ class RegistrationViewTestV1(
                 "name": "level_of_education",
                 "type": "select",
                 "required": False,
-                "label": "Highest level of education completed TRANSLATED",
+                "label": "What is the highest level of education you have completed? TRANSLATED",
                 "options": [
                     {"value": "", "name": "--", "default": True},
+                    {"value": "some-hs", "name": "Some high school TRANSLATED", "default": False},
+                    {"value": "hs", "name": "High School or GED TRANSLATED", "default": False},
+                    {"value": "some-college", "name": "Some college TRANSLATED", "default": False},
+                    {"value": "a", "name": "2-year degree TRANSLATED", "default": False},
+                    {"value": "b", "name": "4-year degree TRANSLATED", "default": False},
+                    {"value": "m", "name": "Master's TRANSLATED", "default": False},
                     {"value": "p", "name": "Doctorate TRANSLATED", "default": False},
-                    {"value": "m", "name": "Master's or professional degree TRANSLATED", "default": False},
-                    {"value": "b", "name": "Bachelor's degree TRANSLATED", "default": False},
-                    {"value": "a", "name": "Associate degree TRANSLATED", "default": False},
-                    {"value": "hs", "name": "Secondary/high school TRANSLATED", "default": False},
-                    {"value": "jhs", "name": "Junior secondary/junior high/middle school TRANSLATED", "default": False},
-                    {"value": "el", "name": "Elementary/primary school TRANSLATED", "default": False},
-                    {"value": "none", "name": "No formal education TRANSLATED", "default": False},
-                    {"value": "other", "name": "Other education TRANSLATED", "default": False},
+                    {"value": "jd-md", "name": "Professional degree (J.D., M.D.) TRANSLATED", "default": False},
+                    {"value": "prefer-not-to-say", "name": "Prefer not to say TRANSLATED", "default": False},
+                    # {"value": "hs", "name": "Secondary/high school TRANSLATED", "default": False},
+                    # {"value": "jhs", "name": "Junior secondary/junior high/middle school TRANSLATED", "default": False},  # pylint: disable=line-too-long
+                    # {"value": "el", "name": "Elementary/primary school TRANSLATED", "default": False},
+                    # {"value": "none", "name": "No formal education TRANSLATED", "default": False},
+                    # {"value": "other", "name": "Other education TRANSLATED", "default": False},
                 ],
                 "errorMessages": {
                     "required": "Select the highest level of education you have completed."
@@ -903,12 +913,14 @@ class RegistrationViewTestV1(
                 "name": "gender",
                 "type": "select",
                 "required": False,
-                "label": "Gender",
+                "label": "How do you describe yourself?",
                 "options": [
                     {"value": "", "name": "--", "default": True},
                     {"value": "m", "name": "Male", "default": False},
                     {"value": "f", "name": "Female", "default": False},
-                    {"value": "o", "name": "Other/Prefer Not to Say", "default": False},
+                    {"value": "nbtg", "name": "Non-binary / third gender", "default": False},
+                    # {"value": "o", "name": "Self-describe/other", "default": False},
+                    {"value": "prefer-not-to-say", "name": "Prefer not to say", "default": False},
                 ],
             }
         )
@@ -923,12 +935,14 @@ class RegistrationViewTestV1(
                 "name": "gender",
                 "type": "select",
                 "required": False,
-                "label": "Gender TRANSLATED",
+                "label": "How do you describe yourself? TRANSLATED",
                 "options": [
                     {"value": "", "name": "--", "default": True},
                     {"value": "m", "name": "Male TRANSLATED", "default": False},
                     {"value": "f", "name": "Female TRANSLATED", "default": False},
-                    {"value": "o", "name": "Other/Prefer Not to Say TRANSLATED", "default": False},
+                    {"value": "nbtg", "name": "Non-binary / third gender TRANSLATED", "default": False},
+                    # {"value": "o", "name": "Self-describe/other TRANSLATED", "default": False},
+                    {"value": "prefer-not-to-say", "name": "Prefer not to say TRANSLATED", "default": False},
                 ],
             }
         )
@@ -938,6 +952,7 @@ class RegistrationViewTestV1(
         #     but is failing for you locally, you probably did not cause the problem if you
         #     are not working on registration. See VAN-900 for more details.
         this_year = datetime.now(UTC).year
+        starting_year = 1923
         year_options = (
             [
                 {
@@ -951,7 +966,7 @@ class RegistrationViewTestV1(
                     "name": str(year),
                     "default": False
                 }
-                for year in range(this_year, this_year - 120, -1)
+                for year in range(starting_year, this_year + 1)
             ]
         )
         self._assert_reg_field(
@@ -960,7 +975,7 @@ class RegistrationViewTestV1(
                 "name": "year_of_birth",
                 "type": "select",
                 "required": False,
-                "label": "Year of birth",
+                "label": "What year were you born?",
                 "options": year_options,
             }
         )

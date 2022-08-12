@@ -62,11 +62,11 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         Verify that we emit one event per field when many fields change on the
         user profile in one transaction.
         """
-        self.profile.gender = 'o'
+        self.profile.gender = 'prefer-not-to-say'
         self.profile.bio = 'test bio'
         self.profile.save()
         self.assert_user_setting_event_emitted(setting='bio', old=None, new=self.profile.bio)
-        self.assert_user_setting_event_emitted(setting='gender', old='m', new='o')
+        self.assert_user_setting_event_emitted(setting='gender', old='m', new='prefer-not-to-say')
 
     def test_unicode(self):
         """

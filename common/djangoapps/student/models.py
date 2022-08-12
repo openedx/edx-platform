@@ -12,7 +12,6 @@ file and check it in at the same time as your model changes. To do that,
 """
 
 
-from gettext import gettext
 import crum
 import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
 import json  # lint-amnesty, pylint: disable=wrong-import-order
@@ -532,8 +531,7 @@ class UserProfile(models.Model):
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now(UTC).year
     starting_year = 1923
-    VALID_YEARS = list(range(this_year, this_year - 120, -1))
-    VALID_YEARS = list(range(starting_year, this_year+1))
+    VALID_YEARS = list(range(starting_year, this_year + 1))
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (
         ('m', gettext_noop('Male')),
@@ -553,7 +551,7 @@ class UserProfile(models.Model):
     # ('p_oth', 'Doctorate in another field'),
     LEVEL_OF_EDUCATION_CHOICES = (
         ('some-hs', gettext_noop("Some high school")),
-        ('hs', gettext_noop("High School or GED")),   
+        ('hs', gettext_noop("High School or GED")),
         ('some-college', gettext_noop("Some college")),
         ('a', gettext_noop("2-year degree")),
         ('b', gettext_noop("4-year degree")),
