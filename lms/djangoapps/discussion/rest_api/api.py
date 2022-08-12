@@ -1651,7 +1651,7 @@ def get_course_discussion_user_stats(
         order_by = order_by or UserOrdering.BY_ACTIVITY
         if order_by != UserOrdering.BY_ACTIVITY:
             raise ValidationError({"order_by": "Invalid value"})
-    breakpoint()
+
     if not ENABLE_LEARNERS_STATS.is_enabled(course_key):
         return get_users_without_stats(
             username_search_string,
