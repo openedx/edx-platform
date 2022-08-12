@@ -23,7 +23,6 @@ from django.core.files.storage import get_storage_class
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.exceptions import ImproperlyConfigured
 
 from oauth2_provider.models import AccessToken, RefreshToken, Application
 from oauth2_provider.generators import generate_client_id
@@ -38,6 +37,7 @@ from organizations.models import Organization
 from tahoe_sites.api import (
     add_user_to_organization,
     create_tahoe_site_by_link,
+    get_organization_by_site,
     get_organization_for_user,
     get_organizations_from_uuids,
     get_sites_from_organizations,
@@ -305,22 +305,8 @@ def _get_current_organization(failure_return_none=False):
                     )
             else:
                 try:
-                    if settings.FEATURES.get('TAHOE_ENABLE_MULTI_ORGS_PER_SITE', False):
-                        if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
-                            raise ImproperlyConfigured(
-                                'TAHOE_ENABLE_MULTI_ORGS_PER_SITE and '
-                                'APPSEMBLER_MULTI_TENANT_EMAILS are incompatible as '
-                                'we are not able to determine the exact Org when more than one '
-                                'is associated with a Site.')
-                        current_org = current_site.organizations.first()
-                        if not current_org:
-                            raise Organization.DoesNotExist(
-                                'TAHOE_ENABLE_MULTI_ORGS_PER_SITE: Could not find current '
-                                'organization for site `{}`'.format(repr(current_site))
-                            )
-                    else:
-                        current_org = current_site.organizations.get()
-                except (Organization.DoesNotExist, ImproperlyConfigured):
+                    current_org = get_organization_by_site(site=current_site)
+                except Organization.DoesNotExist:
                     if not failure_return_none:
                         raise  # Re-raise the exception
         else:
