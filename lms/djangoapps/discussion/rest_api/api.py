@@ -6,11 +6,9 @@ from __future__ import annotations
 import itertools
 from collections import defaultdict
 
-from analytics import page
 from enum import Enum
 from typing import Dict, Iterable, List, Literal, Optional, Set, Tuple
 from urllib.parse import urlencode, urlunparse
-from django.db.models.functions import Length
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
