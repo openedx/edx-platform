@@ -17,6 +17,3 @@ WAFFLE_NAMESPACE = 'discussions'
 # .. This is temporary fix for performance issue in API.
 # .. toggle_tickets: INF-444
 DISABLE_LEARNERS_STATS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.disable_learners_stats', __name__)
-
-
-

@@ -543,9 +543,9 @@ def get_course_topics_v2(
     _get_course(course_key, user=user, check_tab=False)
     course_blocks = get_course_blocks(user, store.make_course_usage_key(course_key))
     accessible_vertical_keys = [
-                                   block for block in course_blocks.get_block_keys()
-                                   if block.category == 'vertical'
-                               ] + [None]
+        block for block in course_blocks.get_block_keys()
+        if block.category == 'vertical'
+    ] + [None]
     topics_query = DiscussionTopicLink.objects.filter(
         context_key=course_key,
         provider_id=provider_type,
@@ -1184,7 +1184,7 @@ def _handle_abuse_flagged_field(form_value, user, cc_content):
     if form_value:
         cc_content.flagAbuse(user, cc_content)
         if ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key) and reported_content_email_notification_enabled(
-            course_key):
+                course_key):
             if cc_content.type == 'thread':
                 thread_flagged.send(sender='flag_abuse_for_thread', user=user, post=cc_content)
             else:

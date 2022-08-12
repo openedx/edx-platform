@@ -83,9 +83,8 @@ def get_usernames_for_course(course_id, page_number, page_size):
             matched_users_count (int): count of matched users in course
             matched_users_pages (int): pages of matched users in course
     """
-    matched_users_in_course = User.objects.filter(
-        courseenrollment__course_id=course_id,
-       ).order_by(Length('username').asc()).values_list('username', flat=True)
+    matched_users_in_course = User.objects.filter(courseenrollment__course_id=course_id,)\
+        .order_by(Length('username').asc()).values_list('username', flat=True)
     if not matched_users_in_course:
         return '', 0, 0
     matched_users_count = len(matched_users_in_course)
