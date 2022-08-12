@@ -224,6 +224,9 @@ def login_and_registration_form(request, initial_mode="login"):
         } for message in messages.get_messages(request) if 'account-recovery' in message.tags
     ]
 
+    frontend_url = settings.GENPLUS_FRONTEND_URL
+    redirect_to = frontend_url if frontend_url else redirect_to
+
     # Otherwise, render the combined login/registration page
     context = {
         'data': {

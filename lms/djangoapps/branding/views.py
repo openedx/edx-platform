@@ -42,7 +42,11 @@ def index(request):
         if configuration_helpers.get_value(
                 'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER',
                 settings.FEATURES.get('ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER', True)):
-            return redirect('dashboard')
+            dashboard_url = 'dashboard'
+            # redirect to custom dashboard of genplus if authenticated
+            frontend_url = settings.GENPLUS_FRONTEND_URL
+            dashboard_url = frontend_url if frontend_url else dashboard_url
+            return redirect(dashboard_url)
 
     enable_mktg_site = configuration_helpers.get_value(
         'ENABLE_MKTG_SITE',
