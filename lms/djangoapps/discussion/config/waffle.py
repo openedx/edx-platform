@@ -11,8 +11,8 @@ WAFFLE_NAMESPACE = 'discussions'
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to enable learners stats
 # .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2022-03-02
-# .. toggle_target_removal_date: 2022-06-02
+# .. toggle_creation_date: 2022-08-12
+# .. toggle_target_removal_date: 2022-10-02
 # .. toggle_warning: When the flag is ON, API will return learners stats with null values.
 # .. This is temporary fix for performance issue in API.
 # .. toggle_tickets: INF-444
