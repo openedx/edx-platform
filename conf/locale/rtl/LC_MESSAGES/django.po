@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-08-07 20:34+0000\n"
-"PO-Revision-Date: 2022-08-07 20:34:51.349689\n"
+"POT-Creation-Date: 2022-08-14 20:34+0000\n"
+"PO-Revision-Date: 2022-08-14 20:34:50.269446\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -7915,60 +7915,60 @@ msgstr "Ɇnʇǝɹ ɐ ʌɐlᴉd ǝɯɐᴉl ɐddɹǝss ʇɥɐʇ ɔønʇɐᴉns ɐ�
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your full name."
-msgstr "Ɇnʇǝɹ ʎønɹ ɟnll nɐɯǝ."
+msgid "Enter your full name"
+msgstr "Ɇnʇǝɹ ʎønɹ ɟnll nɐɯǝ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your first name."
-msgstr "Ɇnʇǝɹ ʎønɹ ɟᴉɹsʇ nɐɯǝ."
+msgid "Enter your first name"
+msgstr "Ɇnʇǝɹ ʎønɹ ɟᴉɹsʇ nɐɯǝ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your last name."
-msgstr "Ɇnʇǝɹ ʎønɹ lɐsʇ nɐɯǝ."
+msgid "Enter your last name"
+msgstr "Ɇnʇǝɹ ʎønɹ lɐsʇ nɐɯǝ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "The email addresses do not match."
-msgstr "Ŧɥǝ ǝɯɐᴉl ɐddɹǝssǝs dø nøʇ ɯɐʇɔɥ."
+msgid "The email addresses do not match"
+msgstr "Ŧɥǝ ǝɯɐᴉl ɐddɹǝssǝs dø nøʇ ɯɐʇɔɥ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your confirm email"
 msgstr "Ɇnʇǝɹ ʎønɹ ɔønɟᴉɹɯ ǝɯɐᴉl"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your country or region of residence."
-msgstr "Sǝlǝɔʇ ʎønɹ ɔønnʇɹʎ øɹ ɹǝƃᴉøn øɟ ɹǝsᴉdǝnɔǝ."
+msgid "Select your country or region of residence"
+msgstr "Sǝlǝɔʇ ʎønɹ ɔønnʇɹʎ øɹ ɹǝƃᴉøn øɟ ɹǝsᴉdǝnɔǝ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your profession."
-msgstr "Sǝlǝɔʇ ʎønɹ dɹøɟǝssᴉøn."
+msgid "Select your profession"
+msgstr "Sǝlǝɔʇ ʎønɹ dɹøɟǝssᴉøn"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your specialty."
-msgstr "Sǝlǝɔʇ ʎønɹ sdǝɔᴉɐlʇʎ."
+msgid "Select your specialty"
+msgstr "Sǝlǝɔʇ ʎønɹ sdǝɔᴉɐlʇʎ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your profession."
-msgstr "Ɇnʇǝɹ ʎønɹ dɹøɟǝssᴉøn."
+msgid "Enter your profession"
+msgstr "Ɇnʇǝɹ ʎønɹ dɹøɟǝssᴉøn"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your specialty."
-msgstr "Ɇnʇǝɹ ʎønɹ sdǝɔᴉɐlʇʎ."
+msgid "Enter your specialty"
+msgstr "Ɇnʇǝɹ ʎønɹ sdǝɔᴉɐlʇʎ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your state."
-msgstr "Ɇnʇǝɹ ʎønɹ sʇɐʇǝ."
+msgid "Enter your state"
+msgstr "Ɇnʇǝɹ ʎønɹ sʇɐʇǝ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your city."
-msgstr "Ɇnʇǝɹ ʎønɹ ɔᴉʇʎ."
+msgid "Enter your city"
+msgstr "Ɇnʇǝɹ ʎønɹ ɔᴉʇʎ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Tell us your goals."
-msgstr "Ŧǝll ns ʎønɹ ƃøɐls."
+msgid "Tell us your goals"
+msgstr "Ŧǝll ns ʎønɹ ƃøɐls"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select the highest level of education you have completed."
-msgstr "Sǝlǝɔʇ ʇɥǝ ɥᴉƃɥǝsʇ lǝʌǝl øɟ ǝdnɔɐʇᴉøn ʎøn ɥɐʌǝ ɔøɯdlǝʇǝd."
+msgid "Select the highest level of education you have completed"
+msgstr "Sǝlǝɔʇ ʇɥǝ ɥᴉƃɥǝsʇ lǝʌǝl øɟ ǝdnɔɐʇᴉøn ʎøn ɥɐʌǝ ɔøɯdlǝʇǝd"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your year of birth"
@@ -7979,8 +7979,8 @@ msgid "Select your gender"
 msgstr "Sǝlǝɔʇ ʎønɹ ƃǝndǝɹ"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your mailing address."
-msgstr "Ɇnʇǝɹ ʎønɹ ɯɐᴉlᴉnƃ ɐddɹǝss."
+msgid "Enter your mailing address"
+msgstr "Ɇnʇǝɹ ʎønɹ ɯɐᴉlᴉnƃ ɐddɹǝss"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
