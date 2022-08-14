@@ -151,7 +151,7 @@ from six import string_types
       % endif
 
       <div class="inner-wrapper">
-        ${clean_dangerous_html(get_course_about_section(request, course, "overview"))}
+        ${HTML(get_course_about_section(request, course, "overview"))}
       </div>
     </div>
     </%block>
@@ -258,7 +258,7 @@ from six import string_types
     % if sidebar_html_enabled:
       % if get_course_about_section(request, course, "about_sidebar_html"):
         <section class="about-sidebar-html">
-          ${get_course_about_section(request, course, "about_sidebar_html")}
+          ${HTML(get_course_about_section(request, course, "about_sidebar_html"))}
         </section>
       % endif
     %endif
