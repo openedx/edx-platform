@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-08-07 20:34+0000\n"
-"PO-Revision-Date: 2022-08-07 20:34:51.189580\n"
+"POT-Creation-Date: 2022-08-14 20:34+0000\n"
+"PO-Revision-Date: 2022-08-14 20:34:50.282559\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -7657,6 +7657,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "Generate Exception Certificates"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Certificate exceptions group selection"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
