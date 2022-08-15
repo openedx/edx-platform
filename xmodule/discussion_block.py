@@ -83,6 +83,15 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         return getattr(self.scope_ids.usage_id, 'course_key', None)
 
     @property
+    def is_visible(self):
+        """
+        Discussion Xblock does not support new OPEN_EDX provider
+        """
+        provider = DiscussionsConfiguration.get(self.course_key)
+        return provider.provider_type == Provider.LEGACY
+
+
+    @property
     def django_user(self):
         """
         Returns django user associated with user currently interacting
@@ -164,9 +173,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         """
         fragment = Fragment()
 
-        # Discussion Xblock does not support new OPEN_EDX provider
-        provider = DiscussionsConfiguration.get(self.course_key)
-        if provider.provider_type == Provider.OPEN_EDX:
+        if not self.is_visible:
             return fragment
 
         self.add_resource_urls(fragment)
@@ -216,7 +223,10 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         fragment = Fragment()
         fragment.add_content(self.runtime.service(self, 'mako').render_template(
             'discussion/_discussion_inline_studio.html',
-            {'discussion_id': self.discussion_id}
+            {
+                'discussion_id': self.discussion_id,
+                'is_visible': self.is_visible,
+            }
         ))
         return fragment
 

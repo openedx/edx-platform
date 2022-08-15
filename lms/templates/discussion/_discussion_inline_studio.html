@@ -7,6 +7,9 @@
             <span class="icon fa fa-comment"/>
             ${_("To view live discussions, click Preview or View Live in Unit Settings.")}<br />
             ${_("Discussion ID: {discussion_id}").format(discussion_id=discussion_id)}
+            % if not is_visible:
+            <br /><b>${_('Due to the discussion provider not being set to "legacy", this block will not be visible.')}</b>
+            % endif
         </span>
     </p>
 </div>

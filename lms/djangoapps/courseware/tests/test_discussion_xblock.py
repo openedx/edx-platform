@@ -162,7 +162,10 @@ class TestViews(TestDiscussionXBlock):
         assert fragment.content == self.template_canary
         self.render_template.assert_called_once_with(
             'discussion/_discussion_inline_studio.html',
-            {'discussion_id': self.discussion_id}
+            {
+                'discussion_id': self.discussion_id,
+                'is_visible': True,
+            }
         )
 
     @ddt.data(
