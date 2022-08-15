@@ -2,6 +2,7 @@
 Mock implementation of the Learner Home.
 Returns statically authored JSON data
 """
+# pylint: disable=line-too-long
 
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
