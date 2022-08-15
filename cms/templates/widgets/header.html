@@ -266,7 +266,7 @@
           </li>
           % if static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
               <li class="nav-item nav-not-signedin-signup">
-                <a class="action action-signup" href="${settings.FRONTEND_REGISTER_URL}?next=${current_url}">${_("Sign Up")}</a>
+                <a class="action action-signup" href="${settings.FRONTEND_REGISTER_URL}?next=${request.build_absolute_uri(settings.LOGIN_URL)}">${_("Sign Up")}</a>
               </li>
           % endif
           <li class="nav-item nav-not-signedin-signin">

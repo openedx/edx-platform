@@ -176,8 +176,8 @@ class AuthTestCase(ContentStoreTestCase):
             assertion_method = getattr(self, assertion_method_name)
             assertion_method(
                 response,
-                '<a class="action action-signup" href="{}/register?next=http%3A%2F%2Ftestserver%2F">Sign Up</a>'.format
-                (settings.LMS_ROOT_URL)
+                f'<a class="action action-signup" href="{settings.LMS_ROOT_URL}/register'
+                f'?next=http://testserver{settings.LOGIN_URL}">Sign Up</a>'
             )
             self.assertContains(
                 response,
