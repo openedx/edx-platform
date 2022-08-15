@@ -2426,7 +2426,7 @@ def strip_if_string(value):
     return value
 
 
-def get_user_by_username_or_email(username_or_email):
+def get_user_by_username_or_email(username_or_email, organization=None):
     """
     Return a User object by looking up a user against username_or_email.
 
@@ -2445,7 +2445,7 @@ def get_user_by_username_or_email(username_or_email):
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
         # Tahoe: Use custom `get_user_by_username_or_email_inside_organization` helper to only get user in the
         #        current organization.
-        user = get_user_by_username_or_email_inside_organization(username_or_email)
+        user = get_user_by_username_or_email_inside_organization(username_or_email, organization)
     else:
         user = User.objects.get(Q(email=username_or_email) | Q(username=username_or_email))
     if user.username == username_or_email:
@@ -2455,7 +2455,7 @@ def get_user_by_username_or_email(username_or_email):
     return user
 
 
-def get_user_by_username_or_email_inside_organization(username_or_email):
+def get_user_by_username_or_email_inside_organization(username_or_email, organization=None):
     """
     Return a User object by looking up a user against username_or_email but
     inside a certain organization.
@@ -2470,12 +2470,14 @@ def get_user_by_username_or_email_inside_organization(username_or_email):
         MultipleObjectsReturned if more than one user has same email or
         username
     """
-    site = theming_helpers.get_current_site()
+    if not organization:
+        site = theming_helpers.get_current_site()
 
-    if not site:
-        raise User.DoesNotExist('Tahoe: Cannot get a current organization user without a site')
+        if not site:
+            raise User.DoesNotExist('Tahoe: Cannot get a current organization user without a site')
 
-    organization = get_organization_by_site(site)
+        organization = get_organization_by_site(site)
+
     return get_organization_user_by_username_or_email(
         username_or_email=username_or_email,
         organization=organization
