@@ -90,7 +90,6 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         provider = DiscussionsConfiguration.get(self.course_key)
         return provider.provider_type == Provider.LEGACY
 
-
     @property
     def django_user(self):
         """
