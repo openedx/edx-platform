@@ -77,7 +77,10 @@ class ClassLessonSerializer(serializers.ModelSerializer):
 class ClassSummarySerializer(serializers.ModelSerializer):
     class_lessons = ClassLessonSerializer(many=True, read_only=True)
     display_name = serializers.CharField(source="unit.display_name")
+    school_name = serializers.CharField(source="gen_class.school.name")
+    class_image = serializers.CharField(source="gen_class.image")
+    class_name = serializers.CharField(source="gen_class.name")
 
     class Meta:
         model = ClassUnit
-        fields = ('id', 'display_name', 'is_locked', 'class_lessons')
+        fields = ('id', 'display_name', 'is_locked', 'class_lessons', 'school_name', 'class_image', 'class_name')
