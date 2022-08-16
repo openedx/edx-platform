@@ -108,7 +108,7 @@ class JournalListSerializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(format="%d/%m/%Y")
     class Meta:
         model = JournalPost
-        fields = ('title', 'skill', 'description', 'teacher', 'type', 'created')
+        fields = ('id', 'title', 'skill', 'description', 'teacher', 'type', 'created')
 
 
 class StudentPostSerializer(serializers.ModelSerializer):
