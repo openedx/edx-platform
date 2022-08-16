@@ -1157,8 +1157,7 @@
                 "isEarned": true,
                 "isDownloadable": true,
                 "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true,
-                "certDownloadUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg"
+                "isAvailable": true
             },
             "provider": {
                 "name": "edX Course Provider",
@@ -1232,8 +1231,7 @@
                 "isEarned": true,
                 "isDownloadable": true,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview",
-                "isAvailable": true,
-                "certDownloadUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg"
+                "isAvailable": true
             },
             "provider": {
                 "name": "MIT",
@@ -1296,8 +1294,7 @@
                 "isEarned": true,
                 "isDownloadable": true,
                 "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true,
-                "certDownloadUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg"
+                "isAvailable": true
             },
             "provider": null,
             "course": {
@@ -1820,8 +1817,7 @@
                 "isEarned": true,
                 "isDownloadable": true,
                 "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true,
-                "certDownloadUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg"
+                "isAvailable": true
             },
             "provider": null,
             "course": {
@@ -1960,8 +1956,7 @@
                 "isEarned": true,
                 "isDownloadable": true,
                 "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true,
-                "certDownloadUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg"
+                "isAvailable": true
             },
             "provider": {
                 "name": "MIT",
