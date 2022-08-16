@@ -336,29 +336,30 @@ class TestEnterpriseUtils(TestCase):
         Test that only an enabled enterprise portal is returned,
         and that it matches the customer UUID provided in the request.
         """
-        enterprise_customer_user = EnterpriseCustomerUserFactory(active=True, user_id=self.user.id)
+        old_active_enterprise_customer_user = EnterpriseCustomerUserFactory(active=True, user_id=self.user.id)
+        old_active_enterprise_customer_user.enable_learner_portal = True
+        old_active_enterprise_customer_user.save()
+
+        current_active_enterprise_customer_user = EnterpriseCustomerUserFactory(active=True, user_id=self.user.id)
+        current_active_enterprise_customer = current_active_enterprise_customer_user.enterprise_customer
         EnterpriseCustomerBrandingConfigurationFactory(
-            enterprise_customer=enterprise_customer_user.enterprise_customer,
+            enterprise_customer=current_active_enterprise_customer,
         )
-        enterprise_customer_user.enterprise_customer.enable_learner_portal = True
-        enterprise_customer_user.enterprise_customer.save()
+        current_active_enterprise_customer.enable_learner_portal = True
+        current_active_enterprise_customer.save()
 
         request = mock.MagicMock(session={}, user=self.user)
-        # Indicate the "preferred" customer in the request
-        request.GET = {'enterprise_customer': enterprise_customer_user.enterprise_customer.uuid}
-
         # Create another enterprise customer association for the same user.
-        # There should be no data returned for this customer's portal,
-        # because we filter for only the enterprise customer uuid found in the request.
-        other_enterprise_customer_user = EnterpriseCustomerUserFactory(active=True, user_id=self.user.id)
-        other_enterprise_customer_user.enable_learner_portal = True
-        other_enterprise_customer_user.save()
-
-        portal = get_enterprise_learner_portal(request)
+        # There should be data returned for the latest enterprise association.
+        with mock.patch(
+                'openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request',
+                return_value=str(current_active_enterprise_customer.uuid),
+        ):
+            portal = get_enterprise_learner_portal(request)
         self.assertDictEqual(portal, {
-            'name': enterprise_customer_user.enterprise_customer.name,
-            'slug': enterprise_customer_user.enterprise_customer.slug,
-            'logo': enterprise_customer_user.enterprise_customer.safe_branding_configuration.safe_logo_url,
+            'name': current_active_enterprise_customer.name,
+            'slug': current_active_enterprise_customer.slug,
+            'logo': current_active_enterprise_customer.safe_branding_configuration.safe_logo_url,
         })
 
     @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
@@ -425,10 +426,46 @@ class TestEnterpriseUtils(TestCase):
             'logo': 'https://logo.url',
         }
         request = mock.MagicMock(session={
-            'enterprise_learner_portal': json.dumps(enterprise_customer_data)
+            'enterprise_learner_portal': json.dumps(enterprise_customer_data),
+            'enterprise_customer': enterprise_customer_data,
         }, user=self.user)
         portal = get_enterprise_learner_portal(request)
         self.assertDictEqual(portal, enterprise_customer_data)
+
+    @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
+    def test_get_enterprise_learner_portal_of_updated_enterprise(self):
+        """
+        Test that when active enterprise changes, only current active enterprise portal is returned.
+        """
+        current_active_enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)
+        current_active_enterprise_customer = current_active_enterprise_customer_user.enterprise_customer
+        EnterpriseCustomerBrandingConfigurationFactory(
+            enterprise_customer=current_active_enterprise_customer,
+        )
+        current_active_enterprise_customer.enable_learner_portal = True
+        current_active_enterprise_customer.save()
+
+        old_active_enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=self.user.id)
+        old_active_enterprise_customer_data = {
+            'name': old_active_enterprise_customer_user.enterprise_customer.name,
+            'slug': old_active_enterprise_customer_user.enterprise_customer.slug,
+            'logo': 'https://logo.url',
+        }
+        current_active_enterprise_customer_data_updated = {
+            'name': current_active_enterprise_customer.name,
+            'slug': current_active_enterprise_customer.slug,
+            'logo': current_active_enterprise_customer.safe_branding_configuration.safe_logo_url,
+        }
+        request = mock.MagicMock(session={
+            'enterprise_learner_portal': json.dumps(old_active_enterprise_customer_data),
+            'enterprise_customer': current_active_enterprise_customer_data_updated,
+        }, user=self.user)
+        portal = get_enterprise_learner_portal(request)
+        self.assertDictEqual(portal, {
+            'name': current_active_enterprise_customer.name,
+            'slug': current_active_enterprise_customer.slug,
+            'logo': current_active_enterprise_customer.safe_branding_configuration.safe_logo_url,
+        })
 
     @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
     def test_get_enterprise_learner_portal_no_enterprise_user(self):
