@@ -18,7 +18,7 @@ MOCK_DATA_FILE = "mock_data.json"
 @login_required
 @require_GET
 def dashboard_view(request):  # pylint: disable=unused-argument
-
+    """Mock dashboard view, returns static JSON authored in MOCK_DATA_FILE"""
     with open(path.join(LEARNER_HOME_DIR, MOCK_DATA_FILE), "r") as mock_data_file:
 
         # Edit me to change response data
