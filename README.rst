@@ -1,6 +1,32 @@
-This is the core repository of the Open edX software. It includes the LMS
-(student-facing, delivering courseware), and Studio (course authoring)
-components.
+############
+edX Platform
+############
+| |License: AGPL v3| |Status| |Python CI| |Publish package to PyPi|
+
+.. |License: AGPL v3| image:: https://img.shields.io/badge/License-AGPL_v3-blue.svg
+  :target: https://www.gnu.org/licenses/agpl-3.0
+
+.. |Python CI| image:: https://github.com/openedx/edx-platform/actions/workflows/ci.yml/badge.svg
+  :target: https://github.com/openedx/edx-platform/actions/workflows/ci.yml
+
+.. |Publish package to PyPi| image:: https://github.com/openedx/edx-platform/actions/workflows/pypi-release.yml/badge.svg
+  :target: https://github.com/openedx/edx-platform/actions/workflows/pypi-release.yml
+
+.. |Status| image:: https://img.shields.io/badge/status-maintained-31c653
+
+Purpose
+=======
+The Open edX platform is a service oriented platform for authoring and
+delivering online learning at any scale.  The platform is written in
+Python and JavaScript and makes extensive use of the Django
+framework. At the highest level, the platform is composed of a
+monolith, some independently deployable applications (IDAs), and
+micro-frontends (MFEs) based on the ReactJS.
+
+This repository hosts the monolith at the center of the Open edX
+platform.  Functionally, the edx-platform repository provides the
+environment for authoring courses, Open edX Studio, also called the
+CMS, and the course delivery service, called the LMS.
 
 Installation
 ------------
