@@ -38,3 +38,6 @@ class SessionAuthenticationCrossDomainCsrf(authentication.SessionAuthentication)
                 return self._process_enforce_csrf(request)
         else:
             return self._process_enforce_csrf(request)
+
+    def authenticate_header(self, request):
+        return 'Session'
