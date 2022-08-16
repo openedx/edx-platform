@@ -1975,6 +1975,17 @@ ADVANCED_PROBLEM_TYPES = [
     }
 ]
 
+LIBRARY_BLOCK_TYPES = [
+    {
+        'component': 'library_sourced',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'library_content',
+        'boilerplate_name': None
+    }
+]
+
 ############### Settings for Retirement #####################
 # See annotations in lms/envs/common.py for details.
 RETIRED_USERNAME_PREFIX = 'retired__user_'
