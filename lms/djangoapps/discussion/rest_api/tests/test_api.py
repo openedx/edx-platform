@@ -199,7 +199,8 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'enable_in_context': True,
             'group_at_subsection': False,
             'provider': 'legacy',
-            'user_is_privileged': False,
+            'has_moderation_privileges': False,
+            'is_group_ta': False,
             'is_user_admin': False,
             'user_roles': {'Student'},
             'learners_tab_enabled': False,
@@ -219,7 +220,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role)
         course_meta = get_course(self.request, self.course.id)
-        assert course_meta["user_is_privileged"]
+        assert course_meta["has_moderation_privileges"]
         assert course_meta["user_roles"] == {FORUM_ROLE_STUDENT} | {role}
 
     @ddt.data(True, False)
