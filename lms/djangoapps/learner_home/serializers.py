@@ -50,6 +50,7 @@ class CourseRunSerializer(serializers.Serializer):
     minPassingGrade = serializers.DecimalField(
         max_digits=5, decimal_places=2, source="course_overview.lowest_passing_grade"
     )
+    startDate = serializers.DateTimeField(source="course_overview.start")
     endDate = serializers.DateTimeField(source="course_overview.end")
     homeUrl = serializers.SerializerMethodField()
     marketingUrl = serializers.URLField(
