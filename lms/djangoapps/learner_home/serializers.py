@@ -50,6 +50,7 @@ class CourseRunSerializer(serializers.Serializer):
     minPassingGrade = serializers.DecimalField(
         max_digits=5, decimal_places=2, source="course_overview.lowest_passing_grade"
     )
+    startDate = serializers.DateTimeField(source="course_overview.start")
     endDate = serializers.DateTimeField(source="course_overview.end")
     homeUrl = serializers.SerializerMethodField()
     marketingUrl = serializers.URLField(
@@ -180,12 +181,9 @@ class CertificateSerializer(serializers.Serializer):
 
     availableDate = serializers.DateTimeField(allow_null=True)
     isRestricted = serializers.BooleanField()
-    isAvailable = serializers.BooleanField()
     isEarned = serializers.BooleanField()
     isDownloadable = serializers.BooleanField()
     certPreviewUrl = serializers.URLField(allow_null=True)
-    certDownloadUrl = serializers.URLField(allow_null=True)
-    honorCertDownloadUrl = serializers.URLField(allow_null=True)
 
 
 class AvailableEntitlementSessionSerializer(serializers.Serializer):
