@@ -3,12 +3,12 @@
 import logging
 import sys
 
-from crum import get_current_user
 from fs.osfs import OSFS
 from lazy import lazy
 from opaque_keys.edx.locator import BlockUsageLocator, DefinitionLocator, LocalId
 from xblock.fields import ScopeIds
 from xblock.runtime import KeyValueStore, KvsFieldData
+
 from xmodule.error_module import ErrorBlock
 from xmodule.errortracker import exc_info_to_str
 from xmodule.library_tools import LibraryToolsService
@@ -74,10 +74,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         self.module_data = module_data
         self.default_class = default_class
         self.local_modules = {}
-
-        user = get_current_user()
-        user_id = user.id if user else None
-        self._services['library_tools'] = LibraryToolsService(modulestore, user_id=user_id)
+        self._services['library_tools'] = LibraryToolsService(modulestore, user_id=None)
 
     @lazy
     def _parent_map(self):  # lint-amnesty, pylint: disable=missing-function-docstring
