@@ -12,6 +12,7 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.instructor.enrollment import reset_student_attempts
 from lms.djangoapps.instructor_task.api import submit_rescore_problem_for_student
+from openedx.core.djangoapps.appsembler.api.tests.factories import OrganizationFactory, OrganizationCourseFactory
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -65,6 +66,8 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 data=problem_xml,
                 metadata={'weight': 2}
             )
+
+        OrganizationCourseFactory(organization=OrganizationFactory(), course_id=str(cls.course.id))
 
     def setUp(self):
         self.reset_course()

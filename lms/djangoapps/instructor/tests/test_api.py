@@ -3,7 +3,6 @@
 Unit tests for instructor.api methods.
 """
 
-
 import datetime
 import functools
 import io
@@ -62,6 +61,7 @@ from lms.djangoapps.instructor_task.api_helper import (
     QueueConnectionError,
     generate_already_running_error_message
 )
+from openedx.core.djangoapps.appsembler.api.tests.factories import OrganizationFactory, OrganizationCourseFactory
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
@@ -3710,6 +3710,8 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
                 category="problem",
                 display_name="Exam Problem - Problem 2"
             )
+
+            OrganizationCourseFactory(organization=OrganizationFactory(), course_id=str(cls.course.id))
 
     def setUp(self):
         super(TestEntranceExamInstructorAPIRegradeTask, self).setUp()
