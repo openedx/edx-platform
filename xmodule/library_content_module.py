@@ -8,6 +8,7 @@ import logging
 import random
 from copy import copy
 from gettext import ngettext
+from rest_framework import status
 
 import bleach
 from django.conf import settings
@@ -15,10 +16,8 @@ from django.utils.functional import classproperty
 from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocator
 from pkg_resources import resource_string
-from rest_framework import status
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
@@ -30,15 +29,16 @@ from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
+from xmodule.xml_module import XmlMixin
 from xmodule.x_module import (
-    STUDENT_VIEW,
     HTMLSnippet,
     ResourceTemplates,
+    shim_xmodule_js,
+    STUDENT_VIEW,
     XModuleMixin,
     XModuleToXBlockMixin,
-    shim_xmodule_js,
 )
-from xmodule.xml_module import XmlMixin
+
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -189,14 +189,9 @@ class LibraryContentBlock(
     @property
     def source_library_key(self):
         """
-        Convenience method to get the library ID as a LibraryLocator and not just a string.
-
-        Supports either library v1 or library v2 locators.
+        Convenience method to get the library ID as a LibraryLocator and not just a string
         """
-        try:
-            return LibraryLocator.from_string(self.source_library_id)
-        except InvalidKeyError:
-            return LibraryLocatorV2.from_string(self.source_library_id)
+        return LibraryLocator.from_string(self.source_library_id)
 
     @classmethod
     def make_selection(cls, selected, children, max_count, mode):
@@ -461,7 +456,6 @@ class LibraryContentBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit_helpers.js'))
         add_webpack_to_fragment(fragment, 'LibraryContentBlockStudio')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
@@ -522,22 +516,6 @@ class LibraryContentBlock(
             return Response("Library Tools unavailable in current runtime.", status=400)
         self.tools.update_children(self, user_perms)
         return Response()
-
-    @XBlock.json_handler
-    def is_v2_library(self, data, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
-        """
-        Check the library version by library_id.
-
-        This is a temporary handler needed for hiding the Problem Type xblock editor field for V2 libraries.
-        """
-        lib_key = data.get('library_key')
-        try:
-            LibraryLocatorV2.from_string(lib_key)
-        except InvalidKeyError:
-            is_v2 = False
-        else:
-            is_v2 = True
-        return {'is_v2': is_v2}
 
     # Copy over any overridden settings the course author may have applied to the blocks.
     def _copy_overrides(self, store, user_id, source, dest):
