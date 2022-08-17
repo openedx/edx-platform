@@ -329,22 +329,17 @@ def get_enterprise_learner_portal(request):
     # Only cache this if a learner is authenticated (AnonymousUser exists and should not be tracked)
 
     learner_portal_session_key = 'enterprise_learner_portal'
-    enterprise_customer_session_key = 'enterprise_customer'
+
     if enterprise_enabled() and ENTERPRISE_HEADER_LINKS.is_enabled() and user and user.id:
         # If the key exists return that value
-        if learner_portal_session_key in request.session and enterprise_customer_session_key in request.session:
-            learner_portal_session = json.loads(request.session[learner_portal_session_key])
-            if request.session[enterprise_customer_session_key].get('slug') == learner_portal_session.get('slug'):
-                return learner_portal_session
+        if learner_portal_session_key in request.session:
+            return json.loads(request.session[learner_portal_session_key])
 
         kwargs = {
             'user_id': user.id,
             'enterprise_customer__enable_learner_portal': True,
         }
-        if enterprise_customer_session_key in request.session:
-            enterprise_customer_uuid = request.session[enterprise_customer_session_key].get('uuid')
-        else:
-            enterprise_customer_uuid = enterprise_customer_uuid_for_request(request)
+        enterprise_customer_uuid = enterprise_customer_uuid_for_request(request)
         if enterprise_customer_uuid:
             kwargs['enterprise_customer__uuid'] = enterprise_customer_uuid
 
