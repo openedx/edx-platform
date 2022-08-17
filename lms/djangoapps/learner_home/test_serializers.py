@@ -283,12 +283,9 @@ class TestCertificateSerializer(TestCase):
         assert output_data == {
             "availableDate": datetime_to_django_format(input_data["availableDate"]),
             "isRestricted": input_data["isRestricted"],
-            "isAvailable": input_data["isAvailable"],
             "isEarned": input_data["isEarned"],
             "isDownloadable": input_data["isDownloadable"],
             "certPreviewUrl": input_data["certPreviewUrl"],
-            "certDownloadUrl": input_data["certDownloadUrl"],
-            "honorCertDownloadUrl": input_data["honorCertDownloadUrl"],
         }
 
 

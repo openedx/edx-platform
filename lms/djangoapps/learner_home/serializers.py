@@ -181,12 +181,9 @@ class CertificateSerializer(serializers.Serializer):
 
     availableDate = serializers.DateTimeField(allow_null=True)
     isRestricted = serializers.BooleanField()
-    isAvailable = serializers.BooleanField()
     isEarned = serializers.BooleanField()
     isDownloadable = serializers.BooleanField()
     certPreviewUrl = serializers.URLField(allow_null=True)
-    certDownloadUrl = serializers.URLField(allow_null=True)
-    honorCertDownloadUrl = serializers.URLField(allow_null=True)
 
 
 class AvailableEntitlementSessionSerializer(serializers.Serializer):
