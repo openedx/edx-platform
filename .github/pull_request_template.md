@@ -47,4 +47,4 @@ Please provide detailed step-by-step instructions for testing this change.
 Include anything else that will help reviewers and consumers understand the change.
 - Does this change depend on other changes elsewhere?
 - Any special concerns or limitations? For example: deprecations, migrations, security, or accessibility.
-- If your [database migration]([url](https://openedx.atlassian.net/wiki/spaces/AC/pages/23003228/Everything+About+Database+Migrations)) can't be rolled back easily.
+- If your [database migration](https://openedx.atlassian.net/wiki/spaces/AC/pages/23003228/Everything+About+Database+Migrations) can't be rolled back easily.
