@@ -22,6 +22,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
 
 from lms.djangoapps.discussion.config.waffle import ENABLE_LEARNERS_STATS
+from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -3021,3 +3022,17 @@ class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, CommentsServiceM
         data = response.json()
         self.assertFalse(data['results'])
         assert data['pagination']['count'] == 0
+
+    @ddt.data(
+        'user-0',
+        'USER-1',
+        'User-2',
+        'UsEr-3'
+    )
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param_case(self, username_search_string):
+        """
+        Test user search function is case-insensitive.
+        """
+        response = get_usernames_from_search_string(self.course_key, username_search_string, 1, 1)
+        assert response == (username_search_string.lower(), 1, 1)

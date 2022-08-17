@@ -59,7 +59,7 @@ def get_usernames_from_search_string(course_id, search_string, page_number, page
     """
     matched_users_in_course = User.objects.filter(
         courseenrollment__course_id=course_id,
-        username__contains=search_string).order_by(Length('username').asc()).values_list('username', flat=True)
+        username__icontains=search_string).order_by(Length('username').asc()).values_list('username', flat=True)
     if not matched_users_in_course:
         return '', 0, 0
     matched_users_count = len(matched_users_in_course)
