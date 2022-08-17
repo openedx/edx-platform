@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 from django.db import IntegrityError
 from rest_framework import generics, status, views, viewsets
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -15,7 +16,7 @@ from django.shortcuts import get_object_or_404
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import (
-    GenUser, Character, Class, Teacher, Student, TeacherClass, JournalPost
+    GenUser, Character, Class, Teacher, Student, TeacherClass, JournalPost, Skill
 )
 from openedx.features.genplus_features.genplus.constants import JournalTypes
 from openedx.features.genplus_features.genplus.display_messages import SuccessMessages, ErrorMessages
@@ -29,6 +30,7 @@ from .serializers import (
     JournalListSerializer,
     StudentPostSerializer,
     TeacherFeedbackSerializer,
+    SkillSerializer
 )
 from .permissions import IsStudent, IsTeacher, IsStudentOrTeacher
 from .mixins import GenzMixin
@@ -212,6 +214,21 @@ class JournalViewSet(GenzMixin, viewsets.ModelViewSet):
             journal_posts = journal_posts.filter(skill__name__iexact=skill)
 
         return journal_posts.order_by(*self.ordering)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        skill_qs = Skill.objects.all()
+        skills = SkillSerializer(skill_qs, many=True).data
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            data = self.get_serializer(page, many=True).data
+            response = self.get_paginated_response(data)
+            response.data['skills'] = skills
+            return response
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         if self.gen_user.is_student:
