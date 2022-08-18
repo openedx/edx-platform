@@ -624,7 +624,7 @@ edx-search==3.4.0
     # via -r requirements/edx/base.txt
 edx-sga==0.18.0
     # via -r requirements/edx/base.txt
-edx-submissions==3.5.2
+edx-submissions==3.5.3
     # via
     #   -r requirements/edx/base.txt
     #   ora2
