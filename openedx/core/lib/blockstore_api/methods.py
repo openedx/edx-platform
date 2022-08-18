@@ -33,7 +33,9 @@ from blockstore.apps.api.exceptions import (
 import blockstore.apps.api.methods as blockstore_api_methods
 
 from .config import use_blockstore_app
+import logging
 
+log = logging.getLogger(__name__)
 
 def toggle_blockstore_api(func):
     """
@@ -44,7 +46,11 @@ def toggle_blockstore_api(func):
     def wrapper(*args, **kwargs):
         if use_blockstore_app():
             return getattr(blockstore_api_methods, func.__name__)(*args, **kwargs)
-        return func(*args, **kwargs)
+        joined_args = " "
+        log.Info('blockstore ' + func.__name__ + ' API call called with ' + joined_args.join(args) + ' arguments')
+        ret_object = func(*args, **kwargs)
+        log.Info('blockstore ' + func.__name__ + ' API call is done')
+        return ret_object
     return wrapper
 
 
