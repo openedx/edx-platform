@@ -65,10 +65,6 @@ class SiteConfiguration(models.Model):
 
     .. no_pii:
     """
-
-    _api_adapter = None  # Tahoe: Placeholder for `site_config_client`'s `SiteConfigAdapter`
-    _api_adapter_initialization_attempted = False
-
     tahoe_config_modifier = None  # Tahoe: Placeholder for `TahoeConfigurationValueModifier` instance
 
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
@@ -93,15 +89,18 @@ class SiteConfiguration(models.Model):
 
     @property
     def api_adapter(self):
+        if hasattr(self, '_api_adapter'):
+            # Avoid re-initializing a `None`/disabled adapter.
+            return self._api_adapter
+
+        self._api_adapter = None
         with beeline.tracer('site_config.init_api_client_adapter'):
-            if not self._api_adapter_initialization_attempted:
-                # Tahoe: Import is placed here to avoid model import at project startup
-                from openedx.core.djangoapps.appsembler.sites import (
-                    site_config_client_helpers as site_helpers,
-                )
-                if site_helpers.is_enabled_for_site(self.site):
-                    self._api_adapter = site_helpers.init_site_configuration_adapter(self.site)
-                self._api_adapter_initialization_attempted = True
+            # Tahoe: Import is placed here to avoid model import at project startup
+            from openedx.core.djangoapps.appsembler.sites import (
+                site_config_client_helpers as site_helpers,
+            )
+            if site_helpers.is_enabled_for_site(self.site):
+                self._api_adapter = site_helpers.init_site_configuration_adapter(self.site)
 
         return self._api_adapter
 
