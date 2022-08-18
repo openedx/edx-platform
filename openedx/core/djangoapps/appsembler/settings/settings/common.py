@@ -78,3 +78,6 @@ def plugin_settings(settings):
 
     # Appsembler allows generating honor certs
     settings.FEATURES['TAHOE_AUTO_GENERATE_HONOR_CERTS'] = True
+
+    # Off by default. See the `site_configuration.tahoe_organization_helpers.py` module.
+    settings.FEATURES['TAHOE_SITE_CONFIG_CLIENT_ORGANIZATIONS_SUPPORT'] = False
