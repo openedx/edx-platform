@@ -750,7 +750,7 @@ openedx-filters==0.7.0
     # via
     #   -r requirements/edx/base.in
     #   lti-consumer-xblock
-ora2==4.4.5
+ora2==4.4.6
     # via -r requirements/edx/base.in
 oscrypto==1.3.0
     # via snowflake-connector-python
