@@ -12,6 +12,7 @@ from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import UsageKey
 from xblock.runtime import KvsFieldData
 from xblock.scorable import Score
+from tahoe_sites.api import get_organization_by_course
 
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from lms.djangoapps.courseware.courses import get_course_by_id, get_problems_in_section
@@ -410,7 +411,8 @@ def _get_modules_to_update(course_id, usage_keys, student_identifier, filter_fcn
     """
     def get_student():
         """ Fetches student instance if an identifier is provided, else return None """
-        return None if not student_identifier else get_user_by_username_or_email(student_identifier)
+        organization = get_organization_by_course(course_id)  # RED-3247 problem with multi-tenant and celery tasks
+        return None if not student_identifier else get_user_by_username_or_email(student_identifier, organization)
 
     module_query_params = {'course_id': course_id, 'module_state_keys': usage_keys}
 
