@@ -52,7 +52,7 @@ class SiteConfigurationFactory(factory.DjangoModelFactory):
 
     site = factory.SubFactory(SiteFactory)
     enabled = True
-    values = {
+    site_values = {
         'PLATFORM_NAME': factory.SelfAttribute('site.name'),
         'SITE_NAME': factory.SelfAttribute('site.domain'),
     }

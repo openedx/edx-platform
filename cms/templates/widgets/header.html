@@ -7,7 +7,6 @@
   from django.urls import reverse
   from django.utils.translation import ugettext as _
   from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
-  from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 %>
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
@@ -23,7 +22,6 @@
       <%
             course_key = context_course.id
             url_encoded_course_key = quote(six.text_type(course_key).encode('utf-8'), safe='')
-            current_organization = request.user.organizations.first()
             index_url = reverse('course_handler', kwargs={'course_key_string': six.text_type(course_key)})
             course_team_url = reverse('course_team_handler', kwargs={'course_key_string': six.text_type(course_key)})
             assets_url = reverse('assets_handler', kwargs={'course_key_string': six.text_type(course_key)})
@@ -37,9 +35,10 @@
             advanced_settings_url = reverse('advanced_settings_handler', kwargs={'course_key_string': six.text_type(course_key)})
             tabs_url = reverse('tabs_handler', kwargs={'course_key_string': six.text_type(course_key)})
             certificates_url = ''
-            if current_organization and configuration_helpers.get_value_for_org(current_organization.name, "CERTIFICATES_HTML_VIEW", False) and context_course.cert_html_view_enabled:
+            if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
                 certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': six.text_type(course_key)})
             checklists_url = reverse('checklists_handler', kwargs={'course_key_string': six.text_type(course_key)})
+
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
