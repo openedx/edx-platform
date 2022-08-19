@@ -112,3 +112,13 @@ def plugin_settings(settings):
     settings.TAHOE_COURSE_OUTLINE_COMPLETABLE_BLOCK_TYPES = settings.ENV_TOKENS.get(
         'TAHOE_COURSE_OUTLINE_COMPLETABLE_BLOCK_TYPES', []
     )
+
+    settings.CELERY_ROUTES = (
+        settings.CELERY_ROUTES,
+        {
+            'lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3': {
+                'queue': settings.ENV_TOKENS.get('RECALCULATE_GRADES_ROUTING_KEY', settings.DEFAULT_PRIORITY_QUEUE),
+                'routing_key': settings.ENV_TOKENS.get('RECALCULATE_GRADES_ROUTING_KEY', settings.DEFAULT_PRIORITY_QUEUE)
+            }
+        }
+    )
