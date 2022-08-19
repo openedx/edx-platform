@@ -13,6 +13,7 @@ from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
     get_course_enrollments,
     get_org_black_and_whitelist_for_site,
+    get_filtered_course_entitlements,
 )
 from common.djangoapps.util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
@@ -94,6 +95,33 @@ def get_enrollments(user, org_allow_list, org_block_list, course_limit=None):
     }
 
     return course_enrollments, course_mode_info
+
+
+def get_entitlements(user, org_allow_list, org_block_list):
+    """Get entitlments for the user"""
+    (
+        filtered_entitlements,
+        course_entitlement_available_sessions,
+        unfulfilled_entitlement_pseudo_sessions
+    ) = get_filtered_course_entitlements(
+        user, org_allow_list, org_block_list
+    )
+    fulfilled_entitlements_by_course_key = {}
+    unfulfulled_entitlements = []
+
+    for course_entitlement in filtered_entitlements:
+        if course_entitlement.enrollment_course_run:
+            course_id = str(course_entitlement.enrollment_course_run.course.id)
+            fulfilled_entitlements_by_course_key[course_id] = course_entitlement
+        else:
+            unfulfulled_entitlements.append(course_entitlement)
+
+    return (
+        fulfilled_entitlements_by_course_key,
+        unfulfulled_entitlements,
+        course_entitlement_available_sessions,
+        unfulfilled_entitlement_pseudo_sessions,
+    )
 
 
 def get_email_settings_info(user, course_enrollments):
@@ -203,8 +231,13 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         # Get the org whitelist or the org blacklist for the current site
         site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
 
-        # TODO - Get entitlements (moving before enrollments because we use this to filter the enrollments)
-        course_entitlements = []
+        # Get entitlements
+        (
+            fulfilled_entitlements_by_course_key,
+            unfulfulled_entitlements,
+            course_entitlement_available_sessions,
+            unfulfilled_entitlement_pseudo_sessions
+        ) = get_entitlements(user, site_org_whitelist, site_org_blacklist)
 
         # Get enrollments
         course_enrollments, course_mode_info = get_enrollments(
@@ -235,7 +268,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "enterpriseDashboard": enterprise_customer,
             "platformSettings": get_platform_settings(),
             "enrollments": course_enrollments,
-            "unfulfilledEntitlements": [],
+            "unfulfilledEntitlements": unfulfulled_entitlements,
             "suggestedCourses": [],
         }
 
@@ -247,6 +280,9 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "course_access_checks": course_access_checks,
             "resume_course_urls": resume_button_urls,
             "show_email_settings_for": show_email_settings_for,
+            "fulfilled_entitlements": fulfilled_entitlements_by_course_key,
+            "course_entitlement_available_sessions": course_entitlement_available_sessions,
+            "unfulfilled_entitlement_pseudo_sessions": unfulfilled_entitlement_pseudo_sessions,
         }
 
         response_data = LearnerDashboardSerializer(

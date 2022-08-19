@@ -1,5 +1,6 @@
 """Test for learner views and related functions"""
 
+from contextlib import contextmanager
 import json
 from unittest import TestCase
 from unittest.mock import patch
@@ -8,10 +9,12 @@ from uuid import uuid4
 import ddt
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APITestCase
 
 from lms.djangoapps.learner_home.test_utils import create_test_enrollment
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
@@ -22,8 +25,10 @@ from lms.djangoapps.learner_home.views import (
     get_enrollments,
     get_platform_settings,
     get_user_account_confirmation_info,
+    get_entitlements,
 )
 from lms.djangoapps.learner_home.test_serializers import random_url
+from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory as CatalogCourseRunFactory
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
@@ -154,6 +159,102 @@ class TestGetEnrollments(SharedModuleStoreTestCase):
         # Then I return an empty list and dict
         self.assertEqual(returned_enrollments, [])
         self.assertEqual(course_mode_info, {})
+
+
+class TestGetEntitlements(SharedModuleStoreTestCase):
+    """Tests for get_entitlements"""
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+
+    @contextmanager
+    def mock_get_filtered_course_entitlements(
+        self,
+        filtered_entitlements,
+        course_entitlement_available_sessions,
+        unfulfilled_entitlement_pseudo_sessions
+    ):
+        """
+        Context manager utility for mocking get_filtered_course_entitlements.
+        This function calls out to multiple external services and is tested elsewhere.
+        """
+        return_value = (
+            filtered_entitlements,
+            course_entitlement_available_sessions,
+            unfulfilled_entitlement_pseudo_sessions,
+        )
+        with patch('lms.djangoapps.learner_home.views.get_filtered_course_entitlements', return_value=return_value):
+            yield
+
+    def create_test_fulfilled_entitlement(self):
+        enrollment = CourseEnrollmentFactory(user=self.user, is_active=True)
+        return CourseEntitlementFactory.create(
+            user=self.user, enrollment_course_run=enrollment
+        )
+
+    def create_test_unfulfilled_entitlement(self):
+        return CourseEntitlementFactory.create(user=self.user)
+
+    def create_test_entitlement(self):
+        """create an entitlement course for the user"""
+        enrollment = CourseEnrollmentFactory(user=self.user, is_active=True)
+        return CourseEntitlementFactory.create(
+            user=self.user, enrollment_course_run=enrollment, expired_at=timezone.now()
+        )
+
+    def test_basic(self):
+        fulfilled_test_entitlements = [
+            self.create_test_fulfilled_entitlement() for _ in range(2)
+        ]
+        unfulfilled_test_entitlements = [
+            self.create_test_unfulfilled_entitlement() for _ in range(3)
+        ]
+
+        available_sessions = {}
+        for entitlement in fulfilled_test_entitlements + unfulfilled_test_entitlements:
+            available_sessions[str(entitlement.uuid)] = CatalogCourseRunFactory.create_batch(3)
+
+        pseudo_sessions = {}
+        for entitlement in unfulfilled_test_entitlements:
+            pseudo_sessions[str(entitlement.uuid)] = CatalogCourseRunFactory.create()
+
+        with self.mock_get_filtered_course_entitlements(
+            fulfilled_test_entitlements + unfulfilled_test_entitlements,
+            available_sessions,
+            pseudo_sessions
+        ):
+            (
+                fulfilled_entitlements_by_course_key,
+                unfulfilled_entitlements,
+                course_entitlement_available_sessions,
+                unfulfilled_entitlement_pseudo_sessions,
+            ) = get_entitlements(self.user, None, None)
+
+        assert len(fulfilled_entitlements_by_course_key) == len(fulfilled_test_entitlements)
+        assert len(unfulfilled_entitlements) == len(unfulfilled_test_entitlements)
+        assert set(unfulfilled_entitlements) == set(unfulfilled_test_entitlements)
+        assert course_entitlement_available_sessions is available_sessions
+        assert unfulfilled_entitlement_pseudo_sessions is pseudo_sessions
+
+        for fulfilled_entitlement in fulfilled_test_entitlements:
+            course_id = str(fulfilled_entitlement.enrollment_course_run.course.id)
+            entitlement = fulfilled_entitlements_by_course_key[course_id]
+            assert entitlement is fulfilled_entitlement
+
+    def test_empty(self):
+        with self.mock_get_filtered_course_entitlements([], {}, {}):
+            (
+                fulfilled_entitlements_by_course_key,
+                unfulfulled_entitlements,
+                course_entitlement_available_sessions,
+                unfulfilled_entitlement_pseudo_sessions,
+            ) = get_entitlements(self.user, None, None)
+
+        assert not fulfilled_entitlements_by_course_key
+        assert not unfulfulled_entitlements
+        assert not course_entitlement_available_sessions
+        assert not unfulfilled_entitlement_pseudo_sessions
 
 
 class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
