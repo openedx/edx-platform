@@ -80,6 +80,11 @@ def plugin_settings(settings):
             'openedx.core.djangoapps.appsembler.multi_tenant_emails',
         ]
 
+    # On by default on production. See the `site_configuration.tahoe_organization_helpers.py` module.
+    settings.FEATURES['TAHOE_SITE_CONFIG_CLIENT_ORGANIZATIONS_SUPPORT'] = settings.ENV_TOKENS['FEATURES'].get(
+        'TAHOE_SITE_CONFIG_CLIENT_ORGANIZATIONS_SUPPORT', True
+    )
+
     settings.TAHOE_DEFAULT_COURSE_NAME = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_NAME', '')
     settings.TAHOE_DEFAULT_COURSE_GITHUB_ORG = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_ORG', '')
     settings.TAHOE_DEFAULT_COURSE_GITHUB_NAME = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_NAME', '')

@@ -20,7 +20,6 @@ from model_utils.models import TimeStampedModel
 
 from ..appsembler.preview.helpers import is_preview_mode
 
-
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
@@ -217,12 +216,11 @@ class SiteConfiguration(models.Model):
             org (str): Org to use to filter SiteConfigurations
             select_related (list or None): A list of values to pass as arguments to select_related
         """
-        query = cls.objects.filter(site_values__contains=org, enabled=True)
+        if settings.FEATURES.get('TAHOE_SITE_CONFIG_CLIENT_ORGANIZATIONS_SUPPORT', False):
+            from .tahoe_organization_helpers import get_configuration_for_org  # Local import mitigating import errors
+            return get_configuration_for_org(org)
 
-        if hasattr(SiteConfiguration, 'sass_variables'):
-            # TODO: Clean up Site Configuration hacks: https://github.com/appsembler/edx-platform/issues/329
-            query = query.defer('page_elements', 'sass_variables')
-
+        query = cls.objects.filter(site_values__contains=org, enabled=True).all()
         if select_related is not None:
             query = query.select_related(*select_related)
         for configuration in query:
@@ -264,14 +262,13 @@ class SiteConfiguration(models.Model):
         Returns:
             A set of all organizations present in site configuration.
         """
+        if settings.FEATURES.get('TAHOE_SITE_CONFIG_CLIENT_ORGANIZATIONS_SUPPORT', False):
+            from .tahoe_organization_helpers import get_all_orgs  # Local import mitigating import errors
+            return get_all_orgs()
+
         org_filter_set = set()
 
-        query = cls.objects.filter(site_values__contains='course_org_filter', enabled=True)
-        if hasattr(SiteConfiguration, 'sass_variables'):
-            # TODO: Clean up Site Configuration hacks: https://github.com/appsembler/edx-platform/issues/329
-            query = query.defer('page_elements', 'sass_variables')
-
-        for configuration in query:
+        for configuration in cls.objects.filter(site_values__contains='course_org_filter', enabled=True).all():
             course_org_filter = configuration.get_value('course_org_filter', [])
             if not isinstance(course_org_filter, list):
                 course_org_filter = [course_org_filter]
