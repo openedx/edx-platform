@@ -900,7 +900,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         if display_name is not None:
             duplicate_metadata['display_name'] = display_name
         else:
-            if source_item.display_name is None:
+            if not source_item.display_name:
                 duplicate_metadata['display_name'] = (u"(1) {0}").format(source_item.category)
             else:
                 if source_item.display_name[0] == '(' and source_item.display_name.find(')') != -1:
