@@ -295,6 +295,11 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     log.warning(
                         "Modulestore %s have duplicate courses %s; skipping from result.", store, course_id
                     )
+                # Skip course if it's from old mongo modulestore.
+                elif course_id.deprecated:
+                    log.warning(
+                        "Course %s from %s; skipping from result.", course_id, store 
+                    )
                 else:
                     course_summaries[course_id] = course_summary
         return list(course_summaries.values())

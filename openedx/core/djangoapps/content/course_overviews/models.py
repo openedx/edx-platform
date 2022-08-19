@@ -673,6 +673,10 @@ class CourseOverview(TimeStampedModel):
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
 
+        # Exclude old mongo courses
+        deprecated_course_ids = [id for id in course_overviews.values_list('id', flat=True) if id.deprecated]
+        course_overviews = course_overviews.exclude(id__in=deprecated_course_ids)
+
         return course_overviews
 
     @classmethod
