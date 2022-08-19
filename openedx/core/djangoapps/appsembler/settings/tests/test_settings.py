@@ -30,6 +30,7 @@ def fake_production_settings(settings):
         'FEATURES': {}
     }
     settings.MAIN_SITE_REDIRECT_WHITELIST = []
+    settings.CELERY_ROUTES = ()
     return settings
 
 
