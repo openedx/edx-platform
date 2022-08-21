@@ -635,6 +635,10 @@ DJFS = {
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
 
+######################## OPTIMIZELY ###########################
+OPTIMIZELY_PROJECT_ID = None
+OPTIMIZELY_FULLSTACK_SDK_KEY = None
+
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
 
