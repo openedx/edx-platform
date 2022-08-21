@@ -185,7 +185,11 @@ class TestCourseListing(ModuleStoreTestCase):
 
         # Fetch accessible courses list & verify their count
         courses_list_by_staff, __ = get_courses_accessible_to_user(self.request)
-        self.assertEqual(len(list(courses_list_by_staff)), TOTAL_COURSES_COUNT)
+
+        if default_store is ModuleStoreEnum.Type.mongo:
+            self.assertEqual(len(list(courses_list_by_staff)), 0)
+        else:
+            self.assertEqual(len(list(courses_list_by_staff)), TOTAL_COURSES_COUNT)
 
         # Verify fetched accessible courses list is a list of CourseSummery instances
         self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_list_by_staff))
@@ -194,7 +198,7 @@ class TestCourseListing(ModuleStoreTestCase):
         with check_mongo_calls(mongo_calls):
             list(_accessible_courses_summary_iter(self.request))
 
-    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_get_course_list_with_invalid_course_location(self, store):
         """
         Test getting courses with invalid course location (course deleted from modulestore).
@@ -246,8 +250,7 @@ class TestCourseListing(ModuleStoreTestCase):
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 1, 2),
-        (ModuleStoreEnum.Type.mongo, 1, 2),
+        (ModuleStoreEnum.Type.split, 2, 3),
     )
     @ddt.unpack
     def test_course_listing_performance(self, store, courses_list_from_group_calls, courses_list_calls):
