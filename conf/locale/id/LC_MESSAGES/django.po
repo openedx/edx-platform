@@ -7536,60 +7536,60 @@ msgstr "Masukkan alamat email anda minimal {min} karakter."
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your full name."
-msgstr "Masukkan nama lengkap anda."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your first name."
+msgid "Enter your full name"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your last name."
+msgid "Enter your first name"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "The email addresses do not match."
-msgstr "Alamat email tidak sesuai."
+msgid "Enter your last name"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "The email addresses do not match"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your confirm email"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your country or region of residence."
-msgstr "Pilih negara atau daerah tempat tinggal."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your profession."
-msgstr "Pilih profesi anda."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select your specialty."
-msgstr "Pilih keahlian anda."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your profession."
-msgstr "Masukkan profesi anda."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your specialty."
-msgstr "Masukkan keahlian anda."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your state."
+msgid "Select your country or region of residence"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your city."
-msgstr "Masukkan kota anda."
+msgid "Select your profession"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Tell us your goals."
-msgstr "Ceritakan tujuan anda."
+msgid "Select your specialty"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Select the highest level of education you have completed."
-msgstr "Pilih jenjang pendidikan tertinggi yang anda selesaikan."
+msgid "Enter your profession"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your specialty"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your state"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter your city"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Tell us your goals"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Select the highest level of education you have completed"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your year of birth"
@@ -7600,8 +7600,8 @@ msgid "Select your gender"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter your mailing address."
-msgstr "Alamat pengiriman anda."
+msgid "Enter your mailing address"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""

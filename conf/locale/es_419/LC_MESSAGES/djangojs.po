@@ -8478,6 +8478,10 @@ msgid "Generate Exception Certificates"
 msgstr "Generar excepciones de certificados"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Certificate exceptions group selection"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
 msgstr ""
 "Todos los usuarios en la Lista de Excepción quienes aun no tienen un "
