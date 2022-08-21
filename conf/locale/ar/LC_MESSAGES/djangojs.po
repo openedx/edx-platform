@@ -8392,6 +8392,10 @@ msgid "Generate Exception Certificates"
 msgstr "إنشاء شهادات استثنائية"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Certificate exceptions group selection"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
 msgstr "كافة المستخدمين على قائمة الاستثناء ليس لديهم شهادة بعد "
 

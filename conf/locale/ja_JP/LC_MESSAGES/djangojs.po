@@ -7653,6 +7653,10 @@ msgid "Generate Exception Certificates"
 msgstr "例外修了証を生成"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Certificate exceptions group selection"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
 msgstr "修了証を持っていない例外リスト内の全ユーザー"
 

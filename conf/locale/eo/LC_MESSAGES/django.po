@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-08-14 20:34+0000\n"
-"PO-Revision-Date: 2022-08-14 20:34:50.269446\n"
+"POT-Creation-Date: 2022-08-21 20:34+0000\n"
+"PO-Revision-Date: 2022-08-21 20:34:36.420873\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -14940,6 +14940,10 @@ msgstr "{platform_name} Süppört Lévéls: Ⱡ'σяєм ιρѕυм ∂σłσя 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"
 msgstr "Öpén Réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Library Content"
+msgstr "Lïßrärý Çöntént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
