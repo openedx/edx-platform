@@ -37,6 +37,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+
 def toggle_blockstore_api(func):
     """
     Decorator function to toggle usage of the Blockstore service
