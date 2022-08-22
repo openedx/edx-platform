@@ -29,7 +29,7 @@ RUN echo "Installing pip packages:" \
     && echo \
     && pip install course-access-groups==0.5.4 \
     && pip install figures==0.4.1 \
-    && pip install tahoe-figures-plugins==0.1.0  \
+    && pip install tahoe-figures-plugins==0.1.1  \
     && pip install tahoe-lti==0.3.0 \
     && pip install tahoe-scorm==0.1.2 \
     && echo \
