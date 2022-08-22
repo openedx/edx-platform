@@ -1,5 +1,5 @@
 """ Tests for auto auth. """
-
+import unittest
 
 import json
 
@@ -23,6 +23,7 @@ from student.models import CourseAccessRole, CourseEnrollment, UserProfile, anon
 from util.testing import UrlResetMixin
 
 
+@unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Broken upstream test, fixed in d7dc8de0537 commit of Lilac')
 class AutoAuthTestCase(UrlResetMixin, TestCase):
     """
     Base class for AutoAuth Tests that properly resets the urls.py
