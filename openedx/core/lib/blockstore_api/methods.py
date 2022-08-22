@@ -3,6 +3,7 @@ API Client methods for working with Blockstore bundles and drafts
 """
 
 import base64
+import logging
 from functools import wraps
 from urllib.parse import urlencode
 from uuid import UUID
@@ -33,7 +34,6 @@ from blockstore.apps.api.exceptions import (
 import blockstore.apps.api.methods as blockstore_api_methods
 
 from .config import use_blockstore_app
-import logging
 
 log = logging.getLogger(__name__)
 
