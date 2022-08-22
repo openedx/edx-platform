@@ -3,7 +3,6 @@ API Client methods for working with Blockstore bundles and drafts
 """
 
 import base64
-import logging
 from functools import wraps
 from urllib.parse import urlencode
 from uuid import UUID
@@ -35,8 +34,6 @@ import blockstore.apps.api.methods as blockstore_api_methods
 
 from .config import use_blockstore_app
 
-log = logging.getLogger(__name__)
-
 
 def toggle_blockstore_api(func):
     """
@@ -47,11 +44,7 @@ def toggle_blockstore_api(func):
     def wrapper(*args, **kwargs):
         if use_blockstore_app():
             return getattr(blockstore_api_methods, func.__name__)(*args, **kwargs)
-        joined_args = " "
-        log.Info('blockstore ' + func.__name__ + ' API call called with ' + joined_args.join(args) + ' arguments')
-        ret_object = func(*args, **kwargs)
-        log.Info('blockstore ' + func.__name__ + ' API call is done')
-        return ret_object
+        return func(*args, **kwargs)
     return wrapper
 
 
