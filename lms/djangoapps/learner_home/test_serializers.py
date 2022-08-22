@@ -259,7 +259,7 @@ class TestGradeDataSerializer(TestCase):
         }
 
 
-class TestCertificateSerializer(TestCase):
+class TestCertificateSerializer(LearnerDashboardBaseTest):
     """Tests for the CertificateSerializer"""
 
     @classmethod
@@ -276,17 +276,47 @@ class TestCertificateSerializer(TestCase):
             "honorCertDownloadUrl": random_url(allow_null=True),
         }
 
-    def test_happy_path(self):
-        input_data = self.generate_test_certificate_info()
-        output_data = CertificateSerializer(input_data).data
-
-        assert output_data == {
-            "availableDate": datetime_to_django_format(input_data["availableDate"]),
-            "isRestricted": input_data["isRestricted"],
-            "isEarned": input_data["isEarned"],
-            "isDownloadable": input_data["isDownloadable"],
-            "certPreviewUrl": input_data["certPreviewUrl"],
+    def create_test_context(self, course):
+        """Get a test context object with an available certificate"""
+        return {
+            "cert_statuses": {
+                course.id: {
+                    "cert_web_view_url": random_url(),
+                    "status": "downloadable",
+                    "show_cert_web_view": True,
+                }
+            }
         }
+
+    def test_with_data(self):
+        """Simple mappings test for a course with an available certificate"""
+        # Given a verified enrollment
+        input_data = self.create_test_enrollment()  # course_mode=CourseMode.VERIFIED)
+
+        # ... with a certificate
+        input_context = self.create_test_context(input_data.course)
+
+        # ... and some data preemptively gathered
+        available_date = random_date()
+        input_data.course.certificate_available_date = available_date
+        cert_url = input_context["cert_statuses"][input_data.course.id][
+            "cert_web_view_url"
+        ]
+
+        # When I get certificate info
+        output_data = CertificateSerializer(input_data, context=input_context).data
+
+        # Then all the info is provided correctly
+        self.assertDictEqual(
+            output_data,
+            {
+                "availableDate": datetime_to_django_format(available_date),
+                "isRestricted": False,
+                "isEarned": True,
+                "isDownloadable": True,
+                "certPreviewUrl": cert_url,
+            },
+        )
 
 
 class TestEntitlementSerializer(TestCase):
