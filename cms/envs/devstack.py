@@ -291,6 +291,10 @@ SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
 # Devstack is directly exposed to the caller
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
 
+#################### Credentials Settings ####################
+CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
+CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
+
 ################# New settings must go ABOVE this line #################
 ########################################################################
 # See if the developer has any local overrides.
