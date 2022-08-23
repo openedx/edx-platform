@@ -40,7 +40,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
                 date_added: 'date',
                 thumbnail: null,
                 locked: false,
-                id: 'id_1'
+                id: 'id_1',
+                static_full_url: 'static_full_url',
             };
 
             mockEmptyAssetsResponse = {
@@ -64,7 +65,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
                         portable_url: '/static/test.jpg',
                         thumbnail: '/c4x/A/CS102/thumbnail/test.jpg',
                         locked: false,
-                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.jpg'
+                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.jpg',
+                        static_full_url: '/c4x/A/CS102/asset/test.jpg',
                     },
                     {
                         display_name: 'test.pdf',
@@ -74,7 +76,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
                         portable_url: '/static/test.pdf',
                         thumbnail: null,
                         locked: false,
-                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.pdf'
+                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.pdf',
+                        static_full_url: '/c4x/A/CS102/asset/test.pdf',
                     },
                     {
                         display_name: 'test.odt',
@@ -84,7 +87,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
                         portable_url: '/static/test.odt',
                         thumbnail: null,
                         locked: false,
-                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.odt'
+                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.odt',
+                        static_full_url: '/c4x/A/CS102/asset/test.odt',
                     }
                 ],
                 pageSize: 2,
@@ -105,7 +109,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
                         portable_url: '/static/test.jpg',
                         thumbnail: '/c4x/A/CS102/thumbnail/test.jpg',
                         locked: false,
-                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.jpg'
+                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.jpg',
+                        static_full_url: '/c4x/A/CS102/asset/test.jpg'
                     }
                 ],
                 pageSize: 1,
@@ -373,7 +378,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
                                     portable_url: '/static/test.jpg',
                                     thumbnail: '/c4x/A/CS102/thumbnail/test.jpg',
                                     locked: false,
-                                    external_url: 'localhost:8000/c4x/A/CS102/asset/test.jpg'
+                                    external_url: 'localhost:8000/c4x/A/CS102/asset/test.jpg',
+                                    static_full_url: '/c4x/A/CS102/asset/test.jpg'
                                 },
                                 {
                                     display_name: 'test.pdf',
@@ -383,7 +389,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
                                     portable_url: '/static/test.pdf',
                                     thumbnail: null,
                                     locked: false,
-                                    external_url: 'localhost:8000/c4x/A/CS102/asset/test.pdf'
+                                    external_url: 'localhost:8000/c4x/A/CS102/asset/test.pdf',
+                                    static_full_url: '/c4x/A/CS102/asset/test.pdf',
                                 }
                             ],
                             pageSize: 2,
@@ -403,7 +410,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
                                     portable_url: '/static/test.odt',
                                     thumbnail: null,
                                     locked: false,
-                                    external_url: 'localhost:8000/c4x/A/CS102/asset/test.odt'
+                                    external_url: 'localhost:8000/c4x/A/CS102/asset/test.odt',
+                                    static_full_url: '/c4x/A/CS102/asset/test.odt',
                                 }
                             ],
                             pageSize: 2,
