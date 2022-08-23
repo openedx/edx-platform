@@ -420,7 +420,8 @@ class AssetToJsonTestCase(AssetsTestCase):
         thumbnail_location = course_key.make_asset_key('thumbnail', 'my_file_name_thumb.jpg')
 
         # pylint: disable=protected-access
-        output = assets._get_asset_json("my_file", content_type, upload_date, location, thumbnail_location, True, course_key)
+        output = assets._get_asset_json("my_file", content_type, upload_date, location,
+                                        thumbnail_location, True, course_key)
 
         self.assertEqual(output["display_name"], "my_file")
         self.assertEqual(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
