@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Cookies from 'js-cookie';
-import { Button, InputText, TextArea, StatusAlert } from '@edx/paragon-new';
+import { Button, InputText, TextArea, StatusAlert } from '@edx/paragon';
 
 export const LinkProgramEnrollmentsSupportPage = props => (
   <form method="post">
@@ -36,7 +36,7 @@ export const LinkProgramEnrollmentsSupportPage = props => (
       value={props.text}
       placeholder="external_student_key,lms_username"
     />
-    <Button type="submit" className={['btn', 'btn-primary']}>Submit</Button>
+    <Button type="submit" className={['btn', 'btn-primary']} label='Submit' />
   </form>
 );
 

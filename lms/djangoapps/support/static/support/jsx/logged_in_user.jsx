@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, StatusAlert } from '@edx/paragon-new';
+import { Button, StatusAlert } from '@edx/paragon';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarning, showDiscussionButton, reDirectUser, errorList }) {
@@ -60,9 +60,8 @@ function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarn
           <Button
             className={['btn', 'btn-primary', 'btn-submit']}
             onClick={reDirectUser}
-          >
-            {gettext('Course Discussion Forum')}
-          </Button>
+            label={gettext('Course Discussion Forum')}
+          />
         </div>
       </div>
     );
@@ -106,9 +105,8 @@ function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarn
               className={['btn', 'btn-primary', 'btn-submit']}
               type="button"
               onClick={handleClick}
-            >
-              {gettext('Create Support Ticket')}
-            </Button>
+              label={gettext('Create Support Ticket')}
+            />
           </div>
         </div>
       </div>

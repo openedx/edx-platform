@@ -3,7 +3,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { InputText } from '@edx/paragon-new';
+import { InputText } from '@edx/paragon';
 
 function PasswordResetInput(props) {
   return (

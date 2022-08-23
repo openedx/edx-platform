@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import { Button } from '@edx/paragon-new';
+import { Button } from '@edx/paragon';
 import $ from 'jquery';
 
 
@@ -95,9 +95,8 @@ class AnnouncementList extends React.Component {
           <Button
             className={["announcement-button", "prev"]}
             onClick={() => this.renderPrevPage()}
-          >
-            ← previous
-          </Button>
+            label="← previous"
+          />
           <span className="sr-only">{this.state.start_index + " - " + this.state.end_index + ") of " + this.state.count}</span>
         </div>
       );
@@ -109,9 +108,8 @@ class AnnouncementList extends React.Component {
           <Button
             className={["announcement-button", "next"]}
             onClick={() => this.renderNextPage()}
-          >
-            next →
-          </Button>
+            label="next →"
+          />
           <span className="sr-only">{this.state.start_index + " - " + this.state.end_index + ") of " + this.state.count}</span>
         </div>
       );

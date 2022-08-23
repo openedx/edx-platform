@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
-import { Button, Hyperlink, Table } from '@edx/paragon-new';
+import { Button, Hyperlink, Table } from '@edx/paragon';
 
 const entitlementColumns = [
   {
@@ -60,9 +60,8 @@ const parseEntitlementData = (entitlements, ecommerceUrl, openReissueForm) =>
         disabled={!enrollmentCourseRun}
         className={['btn', 'btn-primary']}
         onClick={() => openReissueForm(entitlement)}
-      >
-        Reissue
-      </Button>,
+        label='Reissue'
+      />,
     });
   });
 

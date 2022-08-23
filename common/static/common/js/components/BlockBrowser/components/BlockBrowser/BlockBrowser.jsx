@@ -1,5 +1,5 @@
 /* global gettext */
-import { Button, Icon } from '@edx/paragon-new';
+import { Button, Icon } from '@edx/paragon';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -43,15 +43,13 @@ export const BlockList = ({ blocks, selectedBlock, onSelectBlock, onChangeRoot }
         <Button
           className={['block-name']}
           onClick={() => onSelectBlock(block.id)}
-        >
-          {block.display_name}
-        </Button>
+          label={block.display_name}
+        />
         {block.children &&
         <Button
           onClick={() => onChangeRoot(block.id)}
-        >
-          {RightIcon}
-        </Button>
+          label={RightIcon}
+        />
         }
       </li>
     ))}
@@ -78,9 +76,8 @@ export const BlockBrowser = ({ blocks, selectedBlock, onSelectBlock, onChangeRoo
         <Button
           disabled={!blocks.parent}
           onClick={() => blocks.parent && onChangeRoot(blocks.parent)}
-        >
-          {UpIcon}
-        </Button>
+          label={UpIcon}
+        />
         <span className="title">
           {gettext('Browsing')} {gettext(BLOCK_TYPE_NAME[blocks.type])} &quot;
           <a

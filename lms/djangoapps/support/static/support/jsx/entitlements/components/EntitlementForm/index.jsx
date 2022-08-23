@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, InputSelect, InputText, TextArea } from '@edx/paragon-new';
+import { Button, InputSelect, InputText, TextArea } from '@edx/paragon';
 import { formTypes } from '../../data/constants/formTypes';
 
 class EntitlementForm extends React.Component {
@@ -108,15 +108,13 @@ class EntitlementForm extends React.Component {
           <Button
             className={['btn', 'btn-secondary']}
             onClick={this.onClose}
-          >
-            Close
-          </Button>
+            label='Close'
+          />
           <Button
             className={['btn', 'btn-primary']}
             onClick={this.submitForm}
-          >
-            Submit
-          </Button>
+            label='Submit'
+          />
         </div>
       </div>
     );

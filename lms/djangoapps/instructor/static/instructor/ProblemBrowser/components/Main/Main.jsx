@@ -1,5 +1,5 @@
 /* global gettext */
-import { Button, Icon } from '@edx/paragon-new';
+import { Button, Icon } from '@edx/paragon';
 import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
@@ -35,9 +35,7 @@ export default class Main extends React.Component {
 
   render() {
     const { selectedBlock, onSelectBlock } = this.props;
-    let selectorType = <Button onClick={this.handleToggleDropdown}>
-      {gettext('Select a section or problem')}
-    </Button>;
+    let selectorType = <Button onClick={this.handleToggleDropdown} label={gettext('Select a section or problem')}/>;
     if (this.props.showBtnUi === 'false') {
       selectorType =
           // eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -76,9 +74,8 @@ export default class Main extends React.Component {
           <Button
             onClick={this.initiateReportGeneration}
             name="list-problem-responses-csv"
-          >
-            {gettext('Create a report of problem responses')}
-          </Button>
+            label={gettext('Create a report of problem responses')}
+          />
           <ReportStatusContainer />
         </div>
 

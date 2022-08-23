@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, InputText } from '@edx/paragon-new';
+import { Button, InputText } from '@edx/paragon';
 import PropTypes from 'prop-types';
 
 
@@ -32,9 +32,7 @@ class Search extends React.Component {
           value={this.state.username}
           onChange={this.handleUsernameChange}
           inputGroupAppend={(
-            <Button className={['btn', 'btn-primary', 'ml-2', 'search-button']} type="submit">
-              Search
-            </Button>
+            <Button className={['btn', 'btn-primary', 'ml-2', 'search-button']} type="submit" label="Search" />
           )}
         />
       </form>

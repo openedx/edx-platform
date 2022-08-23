@@ -2,7 +2,7 @@
 /* eslint-disable react/no-danger, import/prefer-default-export */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Icon, StatusAlert } from '@edx/paragon-new';
+import { Button, Icon, StatusAlert } from '@edx/paragon';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import StudentAccountDeletionModal from './StudentAccountDeletionModal';
 
@@ -131,9 +131,8 @@ export class StudentAccountDeletion extends React.Component {
           disabled={showError}
           inputRef={(input) => { this.modalTrigger = input; }}
           onClick={this.loadDeletionModal}
-        >
-          {gettext('Delete My Account')}
-        </Button>
+          label={gettext('Delete My Account')}
+        />
         {showError &&
           <StatusAlert
             dialog={(

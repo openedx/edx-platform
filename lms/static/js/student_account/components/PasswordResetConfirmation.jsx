@@ -4,7 +4,7 @@ import 'whatwg-fetch';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, StatusAlert } from '@edx/paragon-new';
+import { Button, StatusAlert } from '@edx/paragon';
 
 import PasswordResetInput from './PasswordResetInput';
 
@@ -121,9 +121,8 @@ class PasswordResetConfirmation extends React.Component {
             <Button
               type="submit"
               className={['action', 'action-primary', 'action-update', 'js-reset']}
-            >
-              {this.props.primaryActionButtonLabel}
-            </Button>
+              label={this.props.primaryActionButtonLabel}
+            />
           </form>
         </div>
       </section>
