@@ -22,7 +22,6 @@ def plugin_settings(settings):
         'openedx.core.djangoapps.appsembler.html_certificates',
         'openedx.core.djangoapps.appsembler.api',
         'openedx.core.djangoapps.appsembler.auth.apps.AppsemblerAuthConfig',
-        'openedx.core.djangoapps.appsembler.tahoe2_migration',
     ]
 
     # insert at beginning because it needs to be earlier in the list than various
