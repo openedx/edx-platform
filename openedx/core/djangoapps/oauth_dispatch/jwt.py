@@ -10,6 +10,7 @@ from edx_django_utils.monitoring import set_custom_attribute
 from edx_rbac.utils import create_role_auth_claim_for_user
 from jwkest import jwk
 from jwkest.jws import JWS
+from rest_framework.exceptions import AuthenticationFailed
 
 from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
 
@@ -65,6 +66,10 @@ def create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=None):
     """
     access_token = oauth_adapter.get_access_token(token_dict['access_token'])
     client = oauth_adapter.get_client_for_token(access_token)
+
+    user = access_token.user
+    if not user.has_usable_password():
+        raise AuthenticationFailed()
 
     jwt_expires_in = _get_jwt_access_token_expire_seconds()
     try:

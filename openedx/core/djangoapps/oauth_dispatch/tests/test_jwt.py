@@ -6,6 +6,8 @@ import ddt
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
+from django.contrib.auth import get_user_model
+from rest_framework.exceptions import AuthenticationFailed
 
 from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
@@ -114,6 +116,13 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         assert jwt_token_dict["token_type"] == "JWT"
         assert jwt_token_dict["expires_in"] == expected_expires_in
         assert jwt_token_dict["scope"] == token_dict["scope"]
+
+    def test_create_jwt_token_dict_for_disabled_user(self):
+        oauth_adapter = DOTAdapter()
+        token_dict = self._get_token_dict(client_restricted=False, oauth_adapter=oauth_adapter)
+        with patch.object(get_user_model(), 'has_usable_password', return_value=False):
+            with self.assertRaises(AuthenticationFailed):
+                jwt_api.create_jwt_token_dict(token_dict, oauth_adapter, use_asymmetric_key=False)
 
     @ddt.data((True, False))
     def test_create_jwt_for_client_restricted(self, client_restricted):

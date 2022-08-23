@@ -13,6 +13,7 @@ from edx_django_utils import monitoring as monitoring_utils
 from oauth2_provider import views as dot_views
 from ratelimit import ALL
 from ratelimit.decorators import ratelimit
+from rest_framework.exceptions import AuthenticationFailed
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.djangoapps.oauth_dispatch import adapters
@@ -106,7 +107,10 @@ class AccessTokenView(_DispatchingView):
         token_type = _get_token_type(request)
 
         if response.status_code == 200 and token_type == 'jwt':
-            response.content = self._get_jwt_content_from_access_token_content(request, response)
+            try:
+                response.content = self._get_jwt_content_from_access_token_content(request, response)
+            except AuthenticationFailed:
+                response.content = '' # TODO: Add appropriate response content
 
         return response
 
