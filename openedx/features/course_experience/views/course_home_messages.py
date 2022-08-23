@@ -16,7 +16,11 @@ from pytz import UTC
 from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
-from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
+from lms.djangoapps.courseware.courses import (
+    course_open_for_self_enrollment,
+    get_course_date_blocks,
+    get_course_with_access,
+)
 from lms.djangoapps.course_goals.api import (
     get_course_goal,
     get_course_goal_options,
@@ -146,7 +150,7 @@ def _register_course_home_messages(request, course, user_access, course_start_da
                        'Please contact your degree administrator or edX Support if you have questions.')),
                 title=title
             )
-        elif not course.invitation_only:
+        elif not course.invitation_only and course_open_for_self_enrollment(course.id):
             CourseHomeMessages.register_info_message(
                 request,
                 Text(_(
