@@ -1509,7 +1509,7 @@ tqdm==4.64.0
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
-transifex-client==0.14.4
+transifex-client==0.14.3
     # via -r requirements/edx/testing.txt
 typing-extensions==4.1.1
     # via
