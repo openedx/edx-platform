@@ -59,6 +59,7 @@ from simple_history.models import HistoricalRecords
 from user_util import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from common.djangoapps.student.email_helpers import (
     generate_proctoring_requirements_email_context,
@@ -76,6 +77,7 @@ from lms.djangoapps.courseware.models import (
     OrgDynamicUpgradeDeadlineConfiguration,
 )
 from lms.djangoapps.courseware.toggles import streak_celebration_is_active
+from lms.djangoapps.utils import OptimizelyClient
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import (
@@ -1557,7 +1559,10 @@ class CourseEnrollment(models.Model):
         Emits an event to explicitly track course enrollment and unenrollment.
         """
         from openedx.core.djangoapps.schedules.config import set_up_external_updates_for_enrollment
+        from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+        from openedx.features.enterprise_support.utils import is_enterprise_learner
 
+        optimizely_client = OptimizelyClient.get_optimizely_client()
         try:
             context = contexts.course_context_from_course_id(self.course_id)
             if enterprise_uuid:
@@ -1602,6 +1607,24 @@ class CourseEnrollment(models.Model):
                 is_personalized_recommendation = is_personalized_recommendation_for_user(course_key)
                 if is_personalized_recommendation is not None:
                     segment_properties['is_personalized_recommendation'] = is_personalized_recommendation
+
+                # TODO: VAN-1052 - This is Optimizely's A/B experimentation block to test welcome email redesign.
+                #  Remove this temporary block after pausing the experiment.
+                optimizely_experiment_variation = None
+                if optimizely_client:
+                    optimizely_experiment_variation = optimizely_client.activate(
+                        'welcome_email_redesign_experiment',
+                        str(self.user.id),
+                        {
+                            'lang_preference': get_user_preference(self.user, LANGUAGE_KEY),
+                            'is_enterprise_user': is_enterprise_learner(self.user),
+                        }
+                    )
+                    optimizely_client.track('welcome_email_sent', str(self.user.id))
+
+                # Set this property to True only if the welcome email redesign Optimizely experiment is running
+                # and user_id falls in required variation.
+                segment_properties['redesign_email'] = optimizely_experiment_variation == 'redesign_email_enabled'
 
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)

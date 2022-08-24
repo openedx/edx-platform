@@ -275,6 +275,8 @@ LOGIN_REDIRECT_WHITELIST.extend([
     #   BASE_URL=http://localhost:$PORT
     # as opposed to:
     #   BASE_URL=localhost:$PORT
+    'localhost:18000',  # lms
+    'localhost:18130',  # ecommerce
     'localhost:1997',  # frontend-app-account
     'localhost:1976',  # frontend-app-program-console
     'localhost:1994',  # frontend-app-gradebook

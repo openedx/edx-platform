@@ -7820,6 +7820,10 @@ msgid "Generate Exception Certificates"
 msgstr "დააგენერირეთ გამონაკლისი შემთხვევების სერტიფიკატი"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
+msgid "Certificate exceptions group selection"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
 msgstr ""
 "გამონაკლისების სიაში შეყვანილი ყველა მომხმარებელი, რომელთაც ჯერ არ აქვთ "

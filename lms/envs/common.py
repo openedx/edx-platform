@@ -1509,6 +1509,7 @@ BRANCH_IO_KEY = ''
 
 ######################## OPTIMIZELY ###########################
 OPTIMIZELY_PROJECT_ID = None
+OPTIMIZELY_FULLSTACK_SDK_KEY = None
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
