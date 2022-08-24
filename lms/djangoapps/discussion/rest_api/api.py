@@ -48,6 +48,7 @@ from openedx.core.djangoapps.django_comment_common.comment_client.utils import C
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR,
     CourseDiscussionSettings,
     Role,
@@ -322,11 +323,12 @@ def get_course(request, course_key):
         "allow_anonymous": course.allow_anonymous,
         "allow_anonymous_to_peers": course.allow_anonymous_to_peers,
         "user_roles": user_roles,
-        "user_is_privileged": bool(user_roles & {
+        "has_moderation_privileges": bool(user_roles & {
             FORUM_ROLE_ADMINISTRATOR,
             FORUM_ROLE_MODERATOR,
             FORUM_ROLE_COMMUNITY_TA,
         }),
+        "is_group_ta": bool(user_roles & {FORUM_ROLE_GROUP_MODERATOR}),
         "is_user_admin": request.user.is_staff,
         "provider": course_config.provider_type,
         "enable_in_context": course_config.enable_in_context,

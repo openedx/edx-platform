@@ -356,7 +356,8 @@ def _get_assets_in_json_format(assets, course_key):
             asset['uploadDate'],
             asset['asset_key'],
             thumbnail_asset_key,
-            asset_is_locked
+            asset_is_locked,
+            course_key,
         )
 
         assets_in_json_format.append(asset_in_json)
@@ -426,7 +427,8 @@ def _upload_asset(request, course_key):
             readback.last_modified_at,
             content.location,
             content.thumbnail_location,
-            locked
+            locked,
+            course_key,
         ),
         'msg': _('Upload completed')
     })
@@ -588,21 +590,23 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
             logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
 
-def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked):
+def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key):
     '''
     Helper method for formatting the asset information to send to client.
     '''
     asset_url = StaticContent.serialize_asset_key_with_slash(location)
     external_url = urljoin(configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL), asset_url)
+    portable_url = StaticContent.get_static_path_from_location(location)
     return {
         'display_name': display_name,
         'content_type': content_type,
         'date_added': get_default_time_display(date),
         'url': asset_url,
         'external_url': external_url,
-        'portable_url': StaticContent.get_static_path_from_location(location),
+        'portable_url': portable_url,
         'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,
+        'static_full_url': StaticContent.get_canonicalized_asset_path(course_key, portable_url, '', []),
         # needed for Backbone delete/update.
         'id': str(location)
     }
