@@ -48,17 +48,15 @@ class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
         super().setUpClass()
         cls.user = UserFactory()
 
-    def create_test_enrollment(self):
+    def create_test_enrollment(self, course_mode=CourseMode.AUDIT):
         """Create a test user, course, and enrollment. Return the enrollment."""
         course = CourseFactory(self_paced=True)
         CourseModeFactory(
             course_id=course.id,
-            mode_slug=CourseMode.AUDIT,
+            mode_slug=course_mode,
         )
 
-        test_enrollment = CourseEnrollmentFactory(
-            course_id=course.id, mode=CourseMode.AUDIT
-        )
+        test_enrollment = CourseEnrollmentFactory(course_id=course.id, mode=course_mode)
 
         # Add extra info to exercise serialization
         test_enrollment.course_overview.marketing_url = random_url()
