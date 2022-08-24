@@ -210,7 +210,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         super().setUpClass()
 
         # Get view URL
-        cls.view_url = reverse("learner_home:dashboard_view")
+        cls.view_url = reverse("learner_home:initialize")
 
         # Set up a course
         cls.course = CourseFactory.create()
