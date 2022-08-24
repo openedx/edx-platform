@@ -1,8 +1,6 @@
 """
 Views for the learner dashboard.
 """
-import json
-
 from django.conf import settings
 from edx_django_utils import monitoring as monitoring_utils
 from rest_framework.response import Response
