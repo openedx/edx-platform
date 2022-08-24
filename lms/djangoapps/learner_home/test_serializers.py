@@ -64,6 +64,7 @@ class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
         # Add extra info to exercise serialization
         test_enrollment.course_overview.marketing_url = random_url()
         test_enrollment.course_overview.end = random_date()
+        test_enrollment.course_overview.certificate_available_date = random_date()
 
         return test_enrollment
 
@@ -364,7 +365,7 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
 
         # Then the available date is the course end date
         expected_available_date = datetime_to_django_format(
-            input_data.course.certificate_available_date
+            input_data.course.end
         )
         self.assertEqual(output_data["availableDate"], expected_available_date)
 
