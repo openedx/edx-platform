@@ -3,11 +3,13 @@ Test cases for tabs.
 """
 
 from unittest.mock import MagicMock, Mock, patch
+import ddt
 import pytest
 from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from lms.djangoapps.courseware.tabs import (
@@ -20,6 +22,8 @@ from lms.djangoapps.courseware.tabs import (
 )
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
+from lms.djangoapps.discussion.toggles import ENABLE_VIEW_MFE_IN_IFRAME
+from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import get_course_by_id
 from common.djangoapps.student.models import CourseEnrollment
@@ -735,6 +739,7 @@ class StaticTabTestCase(TabTestCase):
         self.check_get_and_set_method_for_key(tab, 'url_slug')
 
 
+@ddt.ddt
 class DiscussionLinkTestCase(TabTestCase):
     """Test cases for discussion link tab."""
 
@@ -747,15 +752,6 @@ class DiscussionLinkTestCase(TabTestCase):
         self.tabs_without_discussion = [
         ]
 
-    @staticmethod
-    def _reverse(course):
-        """Custom reverse function"""
-        def reverse_discussion_link(viewname, args):
-            """reverse lookup for discussion link"""
-            if viewname == "forum_form_discussion" and args == [str(course.id)]:
-                return "default_discussion_link"
-        return reverse_discussion_link
-
     def check_discussion(
             self, tab_list,
             expected_discussion_link,
@@ -763,17 +759,19 @@ class DiscussionLinkTestCase(TabTestCase):
             discussion_link_in_course="",
             is_staff=True,
             is_enrolled=True,
+            in_iframe_flag=True,
     ):
         """Helper function to verify whether the discussion tab exists and can be displayed"""
-        self.course.tabs = tab_list
-        self.course.discussion_link = discussion_link_in_course
-        discussion_tab = xmodule_tabs.CourseTabList.get_discussion(self.course)
-        user = self.create_mock_user(is_staff=is_staff, is_enrolled=is_enrolled)
         with patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled') as check_is_enrolled:
-            check_is_enrolled.return_value = is_enrolled
-            assert ((discussion_tab is not None) and self.is_tab_enabled(discussion_tab, self.course, user) and
-                    (discussion_tab.link_func(self.course, self._reverse(self.course))
-                     == expected_discussion_link)) == expected_can_display_value
+            with override_waffle_flag(ENABLE_VIEW_MFE_IN_IFRAME, in_iframe_flag):
+                self.course.tabs = tab_list
+                self.course.discussion_link = discussion_link_in_course
+                discussion_tab = xmodule_tabs.CourseTabList.get_discussion(self.course)
+                user = self.create_mock_user(is_staff=is_staff, is_enrolled=is_enrolled)
+                check_is_enrolled.return_value = is_enrolled
+                assert ((discussion_tab is not None) and self.is_tab_enabled(discussion_tab, self.course, user) and
+                        (discussion_tab.link_func(self.course, reverse)
+                         == expected_discussion_link)) == expected_can_display_value
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": False})
     def test_explicit_discussion_link(self):
@@ -800,7 +798,7 @@ class DiscussionLinkTestCase(TabTestCase):
         """Test a course with a discussion tab configured"""
         self.check_discussion(
             tab_list=self.tabs_with_discussion,
-            expected_discussion_link="default_discussion_link",
+            expected_discussion_link=reverse("forum_form_discussion", args=[str(self.course.id)]),
             expected_can_display_value=True,
         )
 
@@ -818,7 +816,7 @@ class DiscussionLinkTestCase(TabTestCase):
         for is_enrolled, is_staff in [(True, False), (False, True)]:
             self.check_discussion(
                 tab_list=self.tabs_with_discussion,
-                expected_discussion_link="default_discussion_link",
+                expected_discussion_link=reverse("forum_form_discussion", args=[str(self.course.id)]),
                 expected_can_display_value=True,
                 is_enrolled=is_enrolled,
                 is_staff=is_staff
@@ -829,11 +827,26 @@ class DiscussionLinkTestCase(TabTestCase):
         is_enrolled = is_staff = False
         self.check_discussion(
             tab_list=self.tabs_with_discussion,
-            expected_discussion_link="default_discussion_link",
+            expected_discussion_link=reverse("forum_form_discussion", args=[str(self.course.id)]),
             expected_can_display_value=False,
             is_enrolled=is_enrolled,
             is_staff=is_staff
         )
+
+    @ddt.data(True, False)
+    def test_tab_link(self, toggle_enabled):
+        if toggle_enabled:
+            expected_link = reverse("forum_form_discussion", args=[str(self.course.id)])
+        else:
+            expected_link = get_discussions_mfe_url(course_key=self.course.id)
+
+        with self.settings(FEATURES={'ENABLE_DISCUSSION_SERVICE': True}):
+            self.check_discussion(
+                tab_list=self.tabs_with_discussion,
+                expected_discussion_link=expected_link,
+                expected_can_display_value=True,
+                in_iframe_flag=toggle_enabled,
+            )
 
 
 class DatesTabTestCase(TabListTestCase):
