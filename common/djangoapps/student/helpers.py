@@ -11,6 +11,7 @@ from collections import OrderedDict
 from datetime import datetime
 
 from completion.exceptions import UnavailableCompletionData
+from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
 from django.contrib.auth import load_backend
 from django.contrib.auth.models import User
@@ -26,15 +27,12 @@ import third_party_auth
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
 from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
-from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
-from openedx.core.djangoapps.appsembler.future_releases_hacks.helpers import get_key_to_last_completed_block
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
-from openedx.core.djangoapps.content.block_structure.exceptions import UsageKeyNotInBlockStructure
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
@@ -694,18 +692,10 @@ def get_resume_urls_for_enrollments(user, enrollments):
     for enrollment in enrollments:
         try:
             block_key = get_key_to_last_completed_block(user, enrollment.course_id)
-            try:
-                block_data = get_course_blocks(user, block_key)
-            except UsageKeyNotInBlockStructure:
-                url_to_block = ''
-            else:
-                if block_key in block_data:
-                    url_to_block = reverse(
-                        'jump_to',
-                        kwargs={'course_id': enrollment.course_id, 'location': block_key}
-                    )
-                else:
-                    url_to_block = ''
+            url_to_block = reverse(
+                'jump_to',
+                kwargs={'course_id': enrollment.course_id, 'location': block_key}
+            )
         except UnavailableCompletionData:
             url_to_block = ''
         resume_course_urls[enrollment.course_id] = url_to_block
