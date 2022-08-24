@@ -369,7 +369,7 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
         self.assertEqual(output_data["availableDate"], expected_available_date)
 
     @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=True)
-    def test_available_date_course_end(self):
+    def test_available_date_specific_end(self):
         # Given new cert display settings are enabled
         input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
         input_context = self.create_test_context(input_data.course)
