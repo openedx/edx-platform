@@ -154,3 +154,7 @@ def update_class_lessons(course_key):
 
     for order, usage_key in enumerate(new_lesson_usage_keys, start=1):
         ClassLesson.objects.filter(course_key=course_key, usage_key=usage_key).update(order=order)
+
+
+def get_absolute_url(request, file):
+    return request.build_absolute_uri(file.url) if file else None
