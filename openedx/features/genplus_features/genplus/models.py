@@ -81,8 +81,12 @@ class Student(models.Model):
     character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True, blank=True)
     onboarded = models.BooleanField(default=False)
 
+    @property
+    def user(self):
+        return self.gen_user.user
+
     def __str__(self):
-        return self.gen_user.user.username
+        return self.user.username
 
 
 class ClassManager(models.Manager):
@@ -112,8 +116,12 @@ class Teacher(models.Model):
     profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True, blank=True)
     classes = models.ManyToManyField(Class, related_name='teachers', through="genplus.TeacherClass")
 
+    @property
+    def user(self):
+        return self.gen_user.user
+
     def __str__(self):
-        return self.gen_user.user.username
+        return self.user.username
 
 
 class TeacherClass(models.Model):

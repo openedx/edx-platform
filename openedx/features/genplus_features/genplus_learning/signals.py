@@ -1,14 +1,15 @@
 import logging
-
 from django.conf import settings
 from django.dispatch import receiver
-from xmodule.modulestore.django import SignalHandler, modulestore
 from django.db.models.signals import post_save, m2m_changed, pre_save
 
+from completion.models import BlockCompletion
+from xmodule.modulestore.django import SignalHandler, modulestore
 from openedx.features.genplus_features.genplus.models import Class, Teacher
-from .models import ClassLesson, Program, Unit, ClassUnit
-from .constants import ProgramEnrollmentStatuses
 import openedx.features.genplus_features.genplus_learning.tasks as genplus_learning_tasks
+from openedx.features.genplus_features.genplus_learning.models import (
+    ClassLesson, Program, Unit, ClassUnit
+)
 from openedx.features.genplus_features.genplus_learning.access import allow_access
 from openedx.features.genplus_features.genplus_learning.roles import ProgramInstructorRole
 
@@ -93,3 +94,11 @@ def class_students_changed(sender, instance, action, **kwargs):
                 },
                 countdown=settings.PROGRAM_ENROLLMENT_COUNTDOWN
             )
+
+
+@receiver(post_save, sender=BlockCompletion)
+def set_unit_and_block_completions(sender, instance, created, **kwargs):
+    if created:
+        genplus_learning_tasks.update_unit_and_lesson_completions.apply_async(
+            args=[instance.pk]
+        )

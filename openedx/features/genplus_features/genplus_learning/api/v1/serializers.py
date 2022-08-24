@@ -7,12 +7,10 @@ from openedx.features.genplus_features.genplus_learning.models import (
     Unit,
     ClassLesson,
     ClassUnit,
-)
-from openedx.features.genplus_features.genplus_learning.utils import (
-    get_unit_progress,
+    UnitCompletion,
 )
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
-
+from openedx.features.genplus_features.genplus_learning.utils import calculate_class_lesson_progress
 
 class UnitSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
@@ -49,15 +47,20 @@ class ProgramSerializer(serializers.ModelSerializer):
     def get_units(self, obj):
         gen_user = self.context.get('gen_user')
         units = obj.units.all()
+        completions = UnitCompletion.objects.filter(
+            user=gen_user.user,
+            course_key__in=units.values_list('course', flat=True)
+        )
         units_context = {}
 
         for unit in units:
             units_context[unit.pk] = {}
             if gen_user.is_student:
                 enrollment = gen_user.student.program_enrollments.get(program=obj)
+                completion = completions.filter(user=gen_user.user, course_key=unit.course.id).first()
                 units_context[unit.pk] = {
                     'is_locked': unit.is_locked(enrollment.gen_class),
-                    'progress': get_unit_progress(unit.course.id, gen_user.user),
+                    'progress': completion.progress if completion else 0,
                 }
             else:
                 units_context[unit.pk] = {
@@ -69,9 +72,13 @@ class ProgramSerializer(serializers.ModelSerializer):
 
 
 class ClassLessonSerializer(serializers.ModelSerializer):
+    class_lesson_progress = serializers.SerializerMethodField()
     class Meta:
         model = ClassLesson
         fields = ('id', 'is_locked', 'class_lesson_progress', 'lms_url')
+
+    def get_class_lesson_progress(self, obj):
+        return calculate_class_lesson_progress(obj.course_key, obj.usage_key, obj.class_unit.gen_class)
 
 
 class ClassSummarySerializer(serializers.ModelSerializer):

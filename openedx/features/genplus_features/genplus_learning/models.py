@@ -1,4 +1,5 @@
 import uuid
+
 from django.conf import settings
 from django.db import models
 from django.template.defaultfilters import slugify
@@ -7,13 +8,19 @@ from django_extensions.db.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from simple_history.models import HistoricalRecords
 
+from openedx.core.djangoapps.signals.signals import COURSE_COMPLETED
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
 from openedx.features.genplus_features.genplus.models import Student, Class
-from openedx.features.genplus_features.genplus_learning.utils import (get_class_unit_progress,
-                                                                      get_class_lesson_progress)
+
+USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+
+
+def validate_percent(value):
+    if (value is None) or (not 0 <= value <= 100):
+        raise ValidationError(_('{value} must be between 0 and 100').format(value=value))
 
 
 class YearGroup(models.Model):
@@ -116,7 +123,7 @@ class ProgramUnitEnrollment(TimeStampedModel):
 
 class ClassUnit(models.Model):
     class Meta:
-        unique_together = ("gen_class", "unit")
+        unique_together = ("gen_class", "unit",)
 
     gen_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="class_units")
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="class_units")
@@ -128,14 +135,10 @@ class ClassUnit(models.Model):
     def __str__(self):
         return f"{self.gen_class.name}-{self.unit.course.display_name}"
 
-    @property
-    def class_unit_progress(self):
-        return get_class_unit_progress(self.unit.course.id, self.gen_class)
-
 
 class ClassLesson(models.Model):
     class Meta:
-        unique_together = ("class_unit", "usage_key")
+        unique_together = ("class_unit", "usage_key",)
 
     class_unit = models.ForeignKey(ClassUnit, on_delete=models.CASCADE, related_name="class_lessons")
     course_key = CourseKeyField(max_length=255)
@@ -143,9 +146,38 @@ class ClassLesson(models.Model):
     is_locked = models.BooleanField(default=True)
 
     @property
-    def class_lesson_progress(self):
-        return get_class_lesson_progress(self.usage_key, self.class_unit.gen_class)
-
-    @property
     def lms_url(self):
         return f"{settings.LMS_ROOT_URL}/courses/{str(self.course_key)}/jump_to/{str(self.usage_key)}"
+
+
+class UnitCompletion(models.Model):
+    class Meta:
+        unique_together = ('user', 'course_key',)
+
+    user = models.ForeignKey(USER_MODEL, on_delete=models.CASCADE)
+    course_key = CourseKeyField(max_length=255, db_index=True)
+    is_complete = models.BooleanField(default=False)
+    completion_date = models.DateTimeField(blank=True, null=True)
+    progress = models.FloatField(validators=[validate_percent])
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.is_complete:
+            COURSE_COMPLETED.send_robust(
+                sender=self.__class__,
+                user=self.user,
+                course_key=self.course_key
+            )
+
+
+class UnitBlockCompletion(models.Model):
+    class Meta:
+        unique_together = ('user', 'course_key', 'usage_key',)
+
+    user = models.ForeignKey(USER_MODEL, on_delete=models.CASCADE)
+    course_key = CourseKeyField(max_length=255, db_index=True)
+    usage_key = UsageKeyField(max_length=255, db_index=True)
+    block_type = models.CharField(max_length=64)
+    is_complete = models.BooleanField(default=False)
+    completion_date = models.DateTimeField(blank=True, null=True)
+    progress = models.FloatField(validators=[validate_percent])

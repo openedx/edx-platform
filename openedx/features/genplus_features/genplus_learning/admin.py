@@ -61,3 +61,7 @@ class UnitAdmin(admin.ModelAdmin):
 class ClassUnitAdmin(admin.ModelAdmin):
     list_display = ('gen_class', 'unit',)
     readonly_fields = ('gen_class', 'unit',)
+
+
+admin.site.register(UnitCompletion)
+admin.site.register(UnitBlockCompletion)

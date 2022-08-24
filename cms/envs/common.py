@@ -1623,6 +1623,9 @@ GENPLUS_INSTALLED_APPS = [
 
     # genplus teach app
     'openedx.features.genplus_features.genplus_teach',
+
+    # genplus badges app
+    'openedx.features.genplus_features.genplus_badges',
 ]
 
 INSTALLED_APPS.extend(GENPLUS_INSTALLED_APPS)
