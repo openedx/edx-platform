@@ -120,7 +120,7 @@ def get_ecommerce_payment_page(user):
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
-    def get(self, request,  *args, **kwargs):  # pylint: disable=unused-argument
+    def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         # Get user, determine if user needs to confirm email account
         user = request.user
         email_confirmation = get_user_account_confirmation_info(user)
