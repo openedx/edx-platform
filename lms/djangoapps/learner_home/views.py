@@ -1,10 +1,12 @@
 """
 Views for the learner dashboard.
 """
+import json
+
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_GET
 from edx_django_utils import monitoring as monitoring_utils
+from rest_framework.response import Response
+from rest_framework.generics import RetrieveAPIView
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import marketing_link
@@ -118,61 +120,62 @@ def get_ecommerce_payment_page(user):
     )
 
 
-@login_required
-@require_GET
-def dashboard_view(request):  # pylint: disable=unused-argument
+class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
-    # Get user, determine if user needs to confirm email account
-    user = request.user
-    email_confirmation = get_user_account_confirmation_info(user)
+    def get(self, request):  # pylint: disable=unused-argument
+        # Get user, determine if user needs to confirm email account
+        user = request.user
+        email_confirmation = get_user_account_confirmation_info(user)
 
-    # Get the org whitelist or the org blacklist for the current site
-    site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
+        # Get the org whitelist or the org blacklist for the current site
+        site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
 
-    # TODO - Get entitlements (moving before enrollments because we use this to filter the enrollments)
-    course_entitlements = []
+        # TODO - Get entitlements (moving before enrollments because we use this to filter the enrollments)
+        course_entitlements = []
 
-    # Get enrollments
-    course_enrollments, course_mode_info = get_enrollments(
-        user, site_org_whitelist, site_org_blacklist
-    )
+        # Get enrollments
+        course_enrollments, course_mode_info = get_enrollments(
+            user, site_org_whitelist, site_org_blacklist
+        )
 
-    # Get email opt-outs for student
-    show_email_settings_for, course_optouts = get_email_settings_info(
-        user, course_enrollments
-    )
+        # Get email opt-outs for student
+        show_email_settings_for, course_optouts = get_email_settings_info(
+            user, course_enrollments
+        )
 
-    # TODO - Get verification status by course (do we still need this?)
+        # TODO - Get verification status by course (do we still need this?)
 
-    # TODO - Determine view access for courses (for showing courseware link or not)
+        # TODO - Determine view access for courses (for showing courseware link or not)
 
-    # TODO - Get related programs
+        # TODO - Get related programs
 
-    # TODO - Get user verification status
+        # TODO - Get user verification status
 
-    # e-commerce info
-    ecommerce_payment_page = get_ecommerce_payment_page(user)
+        # e-commerce info
+        ecommerce_payment_page = get_ecommerce_payment_page(user)
 
-    # Gather urls for course card resume buttons.
-    resume_button_urls = get_resume_urls_for_enrollments(user, course_enrollments)
+        # Gather urls for course card resume buttons.
+        resume_button_urls = get_resume_urls_for_enrollments(user, course_enrollments)
 
-    learner_dash_data = {
-        "emailConfirmation": email_confirmation,
-        "enterpriseDashboards": None,
-        "platformSettings": get_platform_settings(),
-        "enrollments": course_enrollments,
-        "unfulfilledEntitlements": [],
-        "suggestedCourses": [],
-    }
+        learner_dash_data = {
+            "emailConfirmation": email_confirmation,
+            "enterpriseDashboards": None,
+            "platformSettings": get_platform_settings(),
+            "enrollments": course_enrollments,
+            "unfulfilledEntitlements": [],
+            "suggestedCourses": [],
+        }
 
-    context = {
-        "ecommerce_payment_page": ecommerce_payment_page,
-        "course_mode_info": course_mode_info,
-        "course_optouts": course_optouts,
-        "resume_course_urls": resume_button_urls,
-        "show_email_settings_for": show_email_settings_for,
-    }
+        context = {
+            "ecommerce_payment_page": ecommerce_payment_page,
+            "course_mode_info": course_mode_info,
+            "course_optouts": course_optouts,
+            "resume_course_urls": resume_button_urls,
+            "show_email_settings_for": show_email_settings_for,
+        }
 
-    response_data = LearnerDashboardSerializer(learner_dash_data, context=context).data
-    return JsonResponse(response_data)
+        response_data = LearnerDashboardSerializer(
+            learner_dash_data, context=context
+        ).data
+        return Response(response_data)

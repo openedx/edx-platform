@@ -20,10 +20,10 @@ MOCK_DATA_FILE = "mock_data.json"
 
 class InitializeView(RetrieveAPIView):
     """Returns static JSON authored in MOCK_DATA_FILE"""
-    def get(self, request):
+
+    def get(self, request):  # pylint: disable=unused-argument
         with open(path.join(LEARNER_HOME_DIR, MOCK_DATA_FILE), "r") as mock_data_file:
 
             # Edit me to change response data
             mock_data = json.load(mock_data_file)
         return Response(mock_data)
-
