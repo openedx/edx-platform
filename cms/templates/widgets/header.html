@@ -6,6 +6,7 @@
   from django.conf import settings
   from django.urls import reverse
   from django.utils.translation import gettext as _
+  from urllib.parse import quote_plus
   from cms.djangoapps.contentstore import toggles
   from cms.djangoapps.contentstore.utils import get_pages_and_resources_url
   from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
@@ -266,7 +267,7 @@
           </li>
           % if static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
               <li class="nav-item nav-not-signedin-signup">
-                <a class="action action-signup" href="${settings.FRONTEND_REGISTER_URL}?next=${request.build_absolute_uri(settings.LOGIN_URL)}">${_("Sign Up")}</a>
+                <a class="action action-signup" href="${settings.FRONTEND_REGISTER_URL}?next=${quote_plus(request.build_absolute_uri(settings.LOGIN_URL))}">${_("Sign Up")}</a>
               </li>
           % endif
           <li class="nav-item nav-not-signedin-signin">
