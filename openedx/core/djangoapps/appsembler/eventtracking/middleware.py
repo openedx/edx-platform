@@ -2,6 +2,10 @@
 Event-tracking middleware for Tahoe.
 
 Adds additional tracking event context specific to Tahoe.
+By adding the context via middleware, at least where there is a request, we can pass the user
+metadata to all tracked requests.
+
+TODO:  probably delete this file
 """
 
 from eventtracking import tracker
@@ -35,4 +39,8 @@ class TahoeUserEventContextMiddleware:
         tracker.get_tracker().enter_context(self.CONTEXT_NAME, context)
 
         response = self.get_response(request)
+
+        # I think we need to exit here
+        tracker.get_tracker().exit_context(self.CONTEXT_NAME)
+
         return response

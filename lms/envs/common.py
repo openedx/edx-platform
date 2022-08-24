@@ -966,7 +966,12 @@ EVENT_TRACKING_BACKENDS = {
         }
     }
 }
-EVENT_TRACKING_PROCESSORS = []
+EVENT_TRACKING_PROCESSORS = [
+    {
+        'ENGINE': 'openedx.core.djangoapps.appsembler.eventtracking.tahoeprocessors.TahoeUserMetadataProcessor'
+    }
+]
+
 EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST = []
 
 TRACKING_SEGMENTIO_WEBHOOK_SECRET = None

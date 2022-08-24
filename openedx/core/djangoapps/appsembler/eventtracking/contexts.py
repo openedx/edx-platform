@@ -6,6 +6,8 @@ Call these via middleware or an event-tracking Processor to add custom context t
 TODO: Consider whether we should use `openedx.core.djangoapps.user_api.models.UserOrgTag`
 to store these instead of UserProfile.meta.  There is an existing UserCourseTagContext middleware
 that does a similar thing to here.
+
+TODO: probably delete this file.
 """
 
 import logging
