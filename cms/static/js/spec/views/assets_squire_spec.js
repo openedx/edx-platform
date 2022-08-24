@@ -38,7 +38,8 @@ function($, AjaxHelpers, Squire) {
                         portable_url: 'portable_url',
                         date_added: 'date',
                         thumbnail: null,
-                        id: 'id'
+                        id: 'id',
+                        static_full_url: 'static_full_url',
                     });
                     spyOn(this.model, "destroy").and.callThrough();
                     spyOn(this.model, "save").and.callThrough();
@@ -175,7 +176,8 @@ function($, AjaxHelpers, Squire) {
                 portable_url: 'portable_url_1',
                 date_added: 'date_1',
                 thumbnail: null,
-                id: 'id_1'
+                id: 'id_1',
+                static_full_url: 'static_full_url_1',
             };
             this.mockAsset2 = {
                 display_name: "test asset 2",
@@ -183,7 +185,8 @@ function($, AjaxHelpers, Squire) {
                 portable_url: 'portable_url_2',
                 date_added: 'date_2',
                 thumbnail: null,
-                id: 'id_2'
+                id: 'id_2',
+                static_full_url: 'static_full_url_2',
             };
             this.mockAssetsResponse = {
                 assets: [ this.mockAsset1, this.mockAsset2 ],
@@ -229,7 +232,8 @@ function($, AjaxHelpers, Squire) {
                 portable_url: 'portable_url',
                 date_added: 'date',
                 thumbnail: null,
-                id: 'idx'
+                id: 'idx',
+                static_full_url: 'static_full_url',
             });
             this.view.addAsset(model);
             return AjaxHelpers.respondWithJson(requests,
@@ -242,7 +246,8 @@ function($, AjaxHelpers, Squire) {
                             portable_url: 'portable_url',
                             date_added: 'date',
                             thumbnail: null,
-                            id: 'idx'
+                            id: 'idx',
+                            static_full_url: 'static_full_url',
                         }
                     ],
                     start: 0,
