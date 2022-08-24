@@ -11,7 +11,6 @@ from lms.djangoapps.learner_home.test_utils import create_test_enrollment
 from rest_framework.test import APITestCase
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,

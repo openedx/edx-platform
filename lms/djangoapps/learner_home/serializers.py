@@ -4,7 +4,6 @@ Serializers for the Learner Dashboard
 
 from django.conf import settings
 from django.urls import reverse
-from common.djangoapps.student.helpers import cert_info
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
