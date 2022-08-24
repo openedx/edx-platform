@@ -269,3 +269,43 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
                 "sendEmailUrl": mock_user_conf_info_response["sendEmailUrl"],
             },
         )
+
+    @patch("lms.djangoapps.learner_home.views.cert_info")
+    def test_get_cert_statuses(self, mock_get_cert_info):
+        """Test that cert information gets loaded correctly"""
+
+        # Given I am logged in
+        self.log_in()
+
+        # (and we have tons of mocks to avoid integration tests)
+        mock_enrollment = create_test_enrollment(
+            self.user, course_mode=CourseMode.VERIFIED
+        )
+        mock_cert_info = {
+            "status": "downloadable",
+            "mode": "verified",
+            "linked_in_url": None,
+            "show_survey_button": False,
+            "can_unenroll": True,
+            "show_cert_web_view": True,
+            "cert_web_view_url": random_url(),
+        }
+        mock_get_cert_info.return_value = mock_cert_info
+
+        # When I request the dashboard
+        response = self.client.get(self.view_url)
+
+        # Then I get the expected success response
+        assert response.status_code == 200
+        response_data = json.loads(response.content)
+
+        self.assertDictEqual(
+            response_data["courses"][0]["certificate"],
+            {
+                "availableDate": mock_enrollment.course.certificate_available_date,
+                "isRestricted": False,
+                "isEarned": True,
+                "isDownloadable": True,
+                "certPreviewUrl": mock_cert_info["cert_web_view_url"],
+            },
+        )
