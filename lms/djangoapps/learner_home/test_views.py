@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import ddt
 from django.urls import reverse
+from lms.djangoapps.learner_home.test_utils import create_test_enrollment
 from rest_framework.test import APITestCase
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -126,22 +127,9 @@ class TestGetEnrollments(SharedModuleStoreTestCase):
         super().setUp()
         self.user = UserFactory()
 
-    def create_test_enrollment(self, course_mode=CourseMode.AUDIT):
-        """Create a course and enrollment for the test user. Returns a CourseEnrollment"""
-        course = CourseFactory(self_paced=True)
-
-        CourseModeFactory(
-            course_id=course.id,
-            mode_slug=course_mode,
-        )
-
-        return CourseEnrollmentFactory(
-            course_id=course.id, mode=course_mode, user_id=self.user.id
-        )
-
     def test_basic(self):
         # Given a set of enrollments
-        test_enrollments = [self.create_test_enrollment() for i in range(3)]
+        test_enrollments = [create_test_enrollment(self.user) for i in range(3)]
 
         # When I request my enrollments
         returned_enrollments, course_mode_info = get_enrollments(self.user, None, None)
