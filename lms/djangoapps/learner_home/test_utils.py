@@ -9,6 +9,9 @@ from uuid import uuid4
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import (
+    CourseOverviewFactory,
+)
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -56,7 +59,7 @@ def datetime_to_django_format(datetime_obj):
 
 
 def create_test_enrollment(user, course_mode=CourseMode.AUDIT):
-    """Create a course and enrollment for the test user. Returns a CourseEnrollment"""
+    """Create a test user, course, course overview, and enrollment. Return the enrollment."""
     course = CourseFactory(self_paced=True)
 
     CourseModeFactory(
@@ -64,6 +67,16 @@ def create_test_enrollment(user, course_mode=CourseMode.AUDIT):
         mode_slug=course_mode,
     )
 
-    return CourseEnrollmentFactory(
+    course_overview = CourseOverviewFactory(id=course.id)
+
+    # extra info for exercising serializers
+    course_overview.certificate_available_date = random_date()
+
+    test_enrollment = CourseEnrollmentFactory(
         course_id=course.id, mode=course_mode, user_id=user.id
     )
+
+    test_enrollment.course_overview.marketing_url = random_url()
+    test_enrollment.course_overview.end = random_date()
+
+    return test_enrollment
