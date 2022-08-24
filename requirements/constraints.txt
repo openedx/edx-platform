@@ -27,6 +27,11 @@ django-storages<1.9
 # for them.
 edx-enterprise==3.56.5
 
+# As of 2022-08-24, Arch-BOM (at 2U) is changing event-bus-kafka rapidly, with breaking changes.
+# As long as that is happening, Arch-BOM will manually bump this dependency to ensure
+# that any necessary code changes can happen in lockstep.
+edx-event-bus-kafka==0.4.3
+
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
 
