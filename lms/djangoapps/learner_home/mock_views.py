@@ -10,10 +10,6 @@ from os import path
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
 
-import logging
-
-log = logging.getLogger(__name__)
-
 LEARNER_HOME_DIR = "/edx/app/edxapp/edx-platform/lms/djangoapps/learner_home"
 MOCK_DATA_FILE = "mock_data.json"
 
