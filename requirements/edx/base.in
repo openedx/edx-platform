@@ -84,7 +84,7 @@ edx-django-sites-extensions
 edx-django-utils>=5.0.0            # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
 edx-enterprise
-edx-event-bus-kafka>=0.4.1          # Kafka implementation of event bus
+edx-event-bus-kafka                 # Kafka implementation of event bus
 edx-milestones
 edx-name-affirmation
 edx-opaque-keys

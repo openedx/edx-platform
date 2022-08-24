@@ -601,8 +601,10 @@ edx-enterprise==3.56.5
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   learner-pathway-progress
-edx-event-bus-kafka==0.4.1
-    # via -r requirements/edx/testing.txt
+edx-event-bus-kafka==0.4.3
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/testing.txt
 edx-i18n-tools==0.9.1
     # via
     #   -r requirements/edx/testing.txt
