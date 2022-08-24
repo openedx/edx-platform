@@ -95,3 +95,8 @@ openedx-events==0.13.0
 # docutils==0.19 has removed the docutils.core.ErrorString which is required by the sphinxcontrib-openapi
 # This constraint can be removed once sphinxcontrib-openapi is updated to resolve this issue.
 docutils<0.19
+
+# libsass avoid duplicate selectors and throws errors when compiling Sass files on 3.6.5.
+# This constraint is needed to be able to build for edx-themes.
+# see https://github.com/sass/libsass/commit/8f1a5d90f7e04487e893e701f8636634b6b7da77
+libsass==0.20.0
