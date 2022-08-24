@@ -93,8 +93,8 @@ class SwitchedSignal(django.dispatch.Signal):
         """
         Set signal handling to be on or off for the duration of the context.
         """
+        old_state = self._allow_signals
         try:
-            old_state = self._allow_signals
             self._allow_signals = is_enabled
             yield
         finally:
