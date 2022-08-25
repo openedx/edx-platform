@@ -59,7 +59,7 @@ jobs:
     - name: Install Required Python Dependencies
       run: |
         pip install -r requirements/pip.txt
-        pip install -r requirements/edx/development.txt --src ${{ runner.temp }}
+        make dev-requirements
         pip uninstall -y mysqlclient
         pip install --no-binary mysqlclient mysqlclient
 

@@ -280,7 +280,6 @@ enable =
 	too-many-statements,
 
 	wildcard-import,
-	wrong-import-order,
 	wrong-import-position,
 
 	missing-final-newline,
@@ -406,6 +405,7 @@ disable =
 	unused-argument,
 	unsubscriptable-object,
 	abstract-method,
+	wrong-import-order,
 
 [REPORTS]
 output-format = text
