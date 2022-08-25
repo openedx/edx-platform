@@ -131,7 +131,7 @@ glob2==0.7                # via -r requirements/edx/base.in
 gunicorn==20.0.4          # via -r requirements/edx/base.in
 help-tokens==1.1.2        # via -r requirements/edx/base.in
 html5lib==1.0.1           # via -r requirements/edx/base.in, ora2
-h5p-xblock==0.2.1
+h5p-xblock==0.2.2
 icalendar==4.0.6          # via -r requirements/edx/base.in
 idna==2.9                 # via -r requirements/edx/paver.txt, requests
 importlib-metadata==1.6.0  # via -r requirements/edx/paver.txt, path
