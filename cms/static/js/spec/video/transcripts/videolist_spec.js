@@ -226,7 +226,7 @@ function($, _, Backbone, AjaxHelpers, Utils, Editor, VideoList, MetadataModel, A
                     expect(view.$el).toHandle('input');
                     callArgs = view.$el.on.calls.mostRecent().args;
                     expect(callArgs[0]).toEqual('input');
-                    expect(callArgs[1]).toEqual('.videolist-settings-item input');
+                    expect(callArgs[1]).toEqual('.action-secondary');
                 }).always(done);
         });
 
