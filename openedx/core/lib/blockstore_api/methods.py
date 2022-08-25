@@ -45,12 +45,15 @@ def toggle_blockstore_api(func):
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if use_blockstore_app():
-            return getattr(blockstore_api_methods, func.__name__)(*args, **kwargs)
         joined_args = " "
-        log.Info('blockstore ' + func.__name__ + ' API call called with ' + joined_args.join(args) + ' arguments')
-        ret_object = func(*args, **kwargs)
-        log.Info('blockstore ' + func.__name__ + ' API call is done')
+        log.info('blockstore ' + func.__name__ + ' API call called with ' + joined_args.join(args) + ' arguments')
+        if use_blockstore_app():
+            blockstore_selection = 'Django app'
+            ret_object = getattr(blockstore_api_methods, func.__name__)(*args, **kwargs)
+        else:
+            blockstore_selection = 'IDA'
+            ret_object = func(*args, **kwargs)
+        log.info(blockstore_selection + ' blockstore ' + func.__name__ + ' API call is done')
         return ret_object
     return wrapper
 
