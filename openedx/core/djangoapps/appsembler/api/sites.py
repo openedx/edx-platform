@@ -100,6 +100,6 @@ def get_users_for_site(site):
     except Organization.DoesNotExist:
         result = get_user_model().objects.none()
     else:
-        result = get_users_of_organization(organization=organization)
+        result = get_users_of_organization(organization=organization, without_inactive_users=False)
 
     return result

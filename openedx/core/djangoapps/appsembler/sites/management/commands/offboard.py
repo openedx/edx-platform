@@ -425,7 +425,7 @@ class Command(BaseCommand):
         return [{
             'username': user.username,
             'active': user.is_active,
-        } for user in get_users_of_organization(organization=organization).all()]
+        } for user in get_users_of_organization(organization=organization, without_inactive_users=False)]
 
     def process_site_configurations(self, site):
         """
