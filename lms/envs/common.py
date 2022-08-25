@@ -5241,3 +5241,6 @@ MFE_CONFIG_API_CACHE_TIMEOUT = 60 * 5
 
 ######################## Settings for Outcome Surveys plugin ########################
 OUTCOME_SURVEYS_EVENTS_ENABLED = True
+
+######################## Settings for cancel retirement in Support Tools ########################
+COOL_OFF_DAYS = 14
