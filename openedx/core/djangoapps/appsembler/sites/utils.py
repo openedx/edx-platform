@@ -546,7 +546,7 @@ def delete_site(site):
 
     organization = tahoe_sites.api.get_organization_by_site(site)
 
-    users = tahoe_sites.api.get_users_of_organization(organization)
+    users = tahoe_sites.api.get_users_of_organization(organization, without_inactive_users=False)
 
     print('Deleting users of', site)
     users.delete()
