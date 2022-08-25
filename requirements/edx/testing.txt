@@ -940,7 +940,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
-openedx-events==0.12.0
+openedx-events==0.13.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
