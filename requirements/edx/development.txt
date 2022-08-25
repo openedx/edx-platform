@@ -869,7 +869,7 @@ lazy-object-proxy==1.7.1
     #   astroid
 learner-pathway-progress==1.3.0
     # via -r requirements/edx/testing.txt
-libsass==0.10.0
+libsass==0.20.0
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
