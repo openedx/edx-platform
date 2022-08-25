@@ -260,7 +260,7 @@ class SystemTestSuite(PytestSuite):
 
 class LibTestSuite(PytestSuite):
     """
-    TestSuite for edx-platform/common/lib python unit tests
+    TestSuite for edx-platform/pavelib/paver_tests python unit tests
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -321,11 +321,7 @@ class LibTestSuite(PytestSuite):
             for rsync_dir in Env.rsync_dirs():
                 cmd.append(f'--rsyncdir {rsync_dir}')
             # "--rsyncdir" throws off the configuration root, set it explicitly
-            if 'common/lib' in self.test_id:
-                cmd.append('--rootdir=common/lib')
-                cmd.append('-c common/lib/pytest.ini')
-            elif 'pavelib/paver_tests' in self.test_id:
-                cmd.append('--rootdir=pavelib/paver_tests')
+            cmd.append('--rootdir=pavelib/paver_tests')
         else:
             if self.processes == -1:
                 cmd.append('-n auto')

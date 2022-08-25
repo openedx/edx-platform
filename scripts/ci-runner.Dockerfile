@@ -42,7 +42,6 @@ FROM base as build
 
 # Install Python requirements
 COPY setup.py setup.py
-COPY common/lib/ common/lib/
 COPY openedx/core/lib openedx/core/lib
 COPY lms lms
 COPY cms cms
