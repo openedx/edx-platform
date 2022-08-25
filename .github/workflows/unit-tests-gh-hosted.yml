@@ -67,6 +67,8 @@ jobs:
         run: |
             pip install -r requirements/pip.txt
             pip install -r requirements/edx/development.txt --src ${{ runner.temp }}
+#            edx-platform installs some Python projects from within the edx-platform repo itself.
+            pip install -e .
             pip install "django~=${{ matrix.django-version }}.0"
 
       - name: Setup and run tests
@@ -106,7 +108,7 @@ jobs:
       - name: Install Required Python Dependencies
         run: |
             pip install -r requirements/pip.txt
-            pip install -r requirements/edx/development.txt --src ${{ runner.temp }}
+            make dev-requirements
             pip install "django~=${{ matrix.django-version }}.0"
 
       - name: verify unit tests count

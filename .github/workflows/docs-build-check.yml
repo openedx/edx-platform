@@ -41,7 +41,7 @@ jobs:
           restore-keys: ${{ runner.os }}-pip-
 
       - name: Install python dependencies
-        run: pip install -r requirements/edx/development.txt
+        run: make dev-requirements
 
       - name: Install docs requirements
         run: pip install -r requirements/edx/doc.txt

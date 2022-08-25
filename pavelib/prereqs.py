@@ -164,6 +164,8 @@ def python_prereqs_installation():
     """
     Installs Python prerequisites
     """
+    # 	edx-platform installs some Python projects from within the edx-platform repo itself.
+    sh(f"pip install -e .")
     for req_file in PYTHON_REQ_FILES:
         pip_install_req_file(req_file)
 

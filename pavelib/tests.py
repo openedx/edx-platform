@@ -34,7 +34,7 @@ __test__ = False  # do not collect
     ("fasttest", "a", "Run without collectstatic"),
     make_option(
         "--django_version", dest="django_version",
-        help="Run against which Django version (1.8, 1.9, 1.10, -or- 1.11)."
+        help="Run against which Django version (3.2)."
     ),
     make_option(
         "--eval-attr", dest="eval_attr",
@@ -109,7 +109,7 @@ def test_system(options, passthrough_options):
     django_version = getattr(options, 'django_version', None)
 
     assert system in (None, 'lms', 'cms')
-    assert django_version in (None, '1.8', '1.9', '1.10', '1.11')
+    assert django_version in (None, '3.2')
 
     if hasattr(options.test_system, 'with_wtw'):
         call_task('fetch_coverage_test_selection_data', options={
@@ -163,7 +163,7 @@ def test_system(options, passthrough_options):
     ("fail-fast", "x", "Run only failed tests"),
     make_option(
         "--django_version", dest="django_version",
-        help="Run against which Django version (1.8, 1.9, 1.10, -or- 1.11)."
+        help="Run against which Django version (3.2)."
     ),
     make_option(
         "--eval-attr", dest="eval_attr",
@@ -197,20 +197,20 @@ def test_system(options, passthrough_options):
 @timed
 def test_lib(options, passthrough_options):
     """
-    Run tests for common/lib/ and pavelib/ (paver-tests)
+    Run tests for pavelib/ (paver-tests)
     """
     lib = getattr(options, 'lib', None)
     test_id = getattr(options, 'test_id', lib)
     django_version = getattr(options, 'django_version', None)
 
-    assert django_version in (None, '1.8', '1.9', '1.10', '1.11')
+    assert django_version in (None, '3.2')
 
     if test_id:
         # Testing a single test id.
         if '/' in test_id:
             lib = '/'.join(test_id.split('/')[0:3])
         else:
-            lib = 'common/lib/' + test_id.split('.')[0]
+            lib = 'pavelib/paver_tests' + test_id.split('.')[0]
         options.test_lib['test_id'] = test_id
         lib_tests = [suites.LibTestSuite(
             lib,
@@ -218,7 +218,7 @@ def test_lib(options, passthrough_options):
             **options.test_lib
         )]
     else:
-        # Testing all common/lib test dirs - plus pavelib.
+        # Testing all tests within pavelib/paver_tests dir.
         lib_tests = [
             suites.LibTestSuite(
                 d,
