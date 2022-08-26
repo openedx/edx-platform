@@ -23,6 +23,7 @@ def plugin_settings(settings):
         'openedx.core.djangoapps.appsembler.api',
         'openedx.core.djangoapps.appsembler.auth.apps.AppsemblerAuthConfig',
         'openedx.core.djangoapps.appsembler.tahoe2_migration',
+        'openedx.core.djangoapps.appsembler.eventtracking.apps.EventTrackingConfig',
     ]
 
     # insert at beginning because it needs to be earlier in the list than various
@@ -76,6 +77,13 @@ def plugin_settings(settings):
     settings.CUSTOM_DOMAINS_REDIRECT_CACHE_KEY_PREFIX = 'custom_domains_redirects'
 
     settings.COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL = False
+
+    settings.EVENT_TRACKING_PROCESSORS += [{
+        'ENGINE': 'openedx.core.djangoapps.appsembler.eventtracking.tahoeusermetadata.TahoeUserMetadataProcessor'
+    }]
+
+    # during prefetch at startup, worker queries all UserProfile meta so we might reassign
+    settings.PREFETCH_TAHOE_USERMETADATA_CACHE_QUEUE = settings.DEFAULT_PRIORITY_QUEUE
 
     # Appsembler allows generating honor certs
     settings.FEATURES['TAHOE_AUTO_GENERATE_HONOR_CERTS'] = True

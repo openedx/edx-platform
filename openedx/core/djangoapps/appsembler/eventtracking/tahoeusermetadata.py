@@ -4,51 +4,65 @@ Event-tracking additions for Tahoe customer-specific metadata.
 Custom event-tracking Processor to add properties to events.
 """
 
-from collections import defaultdict
 import logging
 
+# from celery import signals as celery_signals,
+from celery import task
 from crum import get_current_user
-from django.db.models.signals import post_save, post_delete
-
-from openedx.core.lib import cache_utils
-
+from django.conf import settings
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
 
-class TahoeUserProfileIdpMetadataCache(object):
-    """Cache user Tahoe IDP Metadata from UserProfile."""
+class TahoeUserProfileMetadataCache(object):
+    """Cache metadata from UserProfile."""
 
-    # we want to initialize the cache at startup time but we can't do this
-    # until appregistry is ready
-    # we also don't want to do this in the ready() every time
+    # TODO: rework as a singleton.
 
-    CACHE_NAMESPACE = "appsembler.eventtracking.userprofile.tahoe_idp_metadata"
-    CACHE_KEY = "idp_metadata_by_user_id"
+    CACHE_KEY_PREFIX = "appsembler_eventtracking_user_metadata_by_user_id"
+    READY = False
 
-    def __init__(self):
-        from student.models import UserProfile
-
-        # we can do this in an AppConfig.ready
-        post_save.connect(self.invalidate, sender=UserProfile)
-        post_delete.connect(self.invalidate, sender=UserProfile)
-
-    def prefetch(self):
-        """Populate user tahoe_idp_metadata."""
-        metadata_by_user_id = defaultdict(set)
-        cache_utils.get_cache(self.CACHE_NAMESPACE)[self.CACHE_KEY] = metadata_by_user_id
-
-        # for up in UserProfile.objects.all().select_related('user'):
-        #     metadata_by_user_id[up.user.id].add(up.meta.get('tahoe_idp_metadata', {}))
+    def _make_key_by_user_id(self, user_id):
+        return '{}-{}'.format(self.CACHE_KEY_PREFIX, user_id)
 
     def get_by_user_id(self, user_id):
-        return cache_utils.get_cache(self.CACHE_NAMESPACE)[self.CACHE_KEY][user_id]
+        if not self.READY:
+            return None
+        return cache.get(self._make_key_by_user_id(user_id))
 
     def set_by_user_id(self, user_id, val):
-        cache_utils.get_cache(self.CACHE_NAMESPACE)[self.CACHE_KEY][user_id] = val
+        key = self._make_key_by_user_id(user_id)
+        cache.add(key, val)
+        logger.info('Set and retrieved {} with value {}'.format(key, cache.get(key)))
 
     def invalidate(self, sender, instance):
-        del cache_utils.get_cache(self.CACHE_NAMESPACE)[self.CACHE_KEY][instance.id]
+        # called by signal handler on post_save, post_delete of UserProfile
+        key = self._make_key_by_user_id(instance.id)
+        if not self.READY:
+            logger.info('Tried to delete {} before cache was done prefetching'.format(key))
+            return
+        cache.delete(key)
+
+
+@task(routing_key=settings.PREFETCH_TAHOE_USERMETADATA_CACHE_QUEUE, bind=True)
+def prefetch_tahoe_usermetadata_cache(self, cache_instance):
+    """Celery task to prefetch UserProfile metadata for all users."""
+    from student.models import UserProfile
+
+    for up in UserProfile.objects.all().select_related('user'):
+        cache_instance.set_by_user_id(up.user.id, up.get_meta().get('tahoe_idp_metadata', {}))
+
+    cache_instance.READY = True
+    return True  # TODO: not sure what we want to return here for the task_success signal
+
+
+# @celery_signals.task_success.connect(
+#     sender='openedx.core.djangoapps.appsembler.eventtracking.tahoeusermetadata.prefetch_tahoe_usermetadata_cache'
+# )
+# def _set_usermetadata_cache_to_ready(result):
+#     import pdb; pdb.set_trace()
+#     userprofile_metadata_cache.READY = True
 
 
 class TahoeUserMetadataProcessor(object):
@@ -58,14 +72,12 @@ class TahoeUserMetadataProcessor(object):
     Always returns the event for continued processing.
     """
 
-    def __init__(self):
-        # prefetch the tahoe_idp_metadata at instantiation to fill cache
-        # self.cache = TahoeUserProfileIdpMetadataCache()
-        # self.cache.prefetch()
-        pass
-
     def _get_reg_metadata_from_cache(self, user_id):
-        self.cache.get_by_user_id(user_id)
+        cached = userprofile_metadata_cache.get_by_user_id(user_id)
+        if cached:
+            return cached
+        else:
+            return {}
 
     def _get_custom_registration_metadata(self, user_id):
         """
@@ -75,19 +87,19 @@ class TahoeUserMetadataProcessor(object):
         Returns a dictionary.
         """
         # look in cache first
-        # cached_reg_additional = self._get_reg_metadata_from_cache().get("registration_additional")
-        # if cached_reg_additional:
-        #     return cached_reg_additional
+        cached_metadata = self._get_reg_metadata_from_cache(user_id)
+        reg_additional = cached_metadata.get('registration_additional')
+        if reg_additional:
+            return reg_additional
 
-        # janky, but for now
+        # local import as module is loaded at startup via eventtracking.django for Processor init
         from student.models import UserProfile
         try:
-            # TODO: retrieve from cache first, if available
             profile = UserProfile.objects.get(user__id=user_id)
             meta = profile.get_meta()
             idp_metadata = meta.get("tahoe_idp_metadata", {})
             custom_reg_data = idp_metadata.get("registration_additional")
-            # self.cache.set_by_user_id(user_id, idp_metadata)
+            userprofile_metadata_cache.set_by_user_id(user_id, idp_metadata)
             return custom_reg_data
         except UserProfile.DoesNotExist:
             logger.info("User {user_id} has no UserProfile".format(user_id=user_id))
@@ -96,7 +108,6 @@ class TahoeUserMetadataProcessor(object):
     def _get_user_tahoe_metadata(self, user_id):
         """Build additional tracking context from Tahoe IDP metadata about the user."""
         # for now we only get custom registration field values
-
         return {"registration_extra": self._get_custom_registration_metadata(user_id)}
 
         # there may eventually be others we want to add as event context
@@ -119,3 +130,6 @@ class TahoeUserMetadataProcessor(object):
             event['context']['tahoe_user_metadata'] = tahoe_user_metadata
 
         return event
+
+
+userprofile_metadata_cache = TahoeUserProfileMetadataCache()
