@@ -38,6 +38,5 @@ class EventTrackingConfig(AppConfig):
         metadatacache = tahoeusermetadata.userprofile_metadata_cache
 
         # TODO: we don't want to do this for every management command
-        # TODO: we also want to make sure this is shared across worker and app instances
-        if not metadatacache.READY:
+        if not metadatacache.READY and not metadatacache.PREFILLING:
             tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)

@@ -22,6 +22,7 @@ class TahoeUserProfileMetadataCache(object):
 
     CACHE_KEY_PREFIX = "appsembler_eventtracking_user_metadata_by_user_id"
     READY = False
+    PREFILLING = False
 
     def _make_key_by_user_id(self, user_id):
         return '{}-{}'.format(self.CACHE_KEY_PREFIX, user_id)
@@ -34,11 +35,11 @@ class TahoeUserProfileMetadataCache(object):
     def set_by_user_id(self, user_id, val):
         key = self._make_key_by_user_id(user_id)
         cache.add(key, val)
-        logger.info('Set and retrieved {} with value {}'.format(key, cache.get(key)))
+        logger.debug('Set and retrieved {} with value {}'.format(key, cache.get(key)))
 
-    def invalidate(self, sender, instance):
+    def invalidate(self, instance):
         # called by signal handler on post_save, post_delete of UserProfile
-        key = self._make_key_by_user_id(instance.id)
+        key = self._make_key_by_user_id(instance.user_id)
         if not self.READY:
             logger.info('Tried to delete {} before cache was done prefetching'.format(key))
             return
@@ -48,12 +49,19 @@ class TahoeUserProfileMetadataCache(object):
 @task(routing_key=settings.PREFETCH_TAHOE_USERMETADATA_CACHE_QUEUE, bind=True)
 def prefetch_tahoe_usermetadata_cache(self, cache_instance):
     """Celery task to prefetch UserProfile metadata for all users."""
+    cache_instance.PREFILLING = True
+
+    logger.info("START Prefilling Tahoe UserMetadata Cache...")
+
     from student.models import UserProfile
 
     for up in UserProfile.objects.all().select_related('user'):
         cache_instance.set_by_user_id(up.user.id, up.get_meta().get('tahoe_idp_metadata', {}))
 
+    cache_instance.PREFILLING = False
     cache_instance.READY = True
+    logger.info("FINISH Prefilling Tahoe UserMetadata Cache")
+
     return True  # TODO: not sure what we want to return here for the task_success signal
 
 
@@ -61,7 +69,6 @@ def prefetch_tahoe_usermetadata_cache(self, cache_instance):
 #     sender='openedx.core.djangoapps.appsembler.eventtracking.tahoeusermetadata.prefetch_tahoe_usermetadata_cache'
 # )
 # def _set_usermetadata_cache_to_ready(result):
-#     import pdb; pdb.set_trace()
 #     userprofile_metadata_cache.READY = True
 
 
