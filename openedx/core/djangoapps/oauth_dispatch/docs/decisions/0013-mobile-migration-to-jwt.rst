@@ -57,5 +57,6 @@ For migrating the mobile authentication flow from opaque Bearer access tokens to
 
   * We need to check if the JWT was asymmetrically signed by the LMS. We want to ensure that a symmetrically signed JWT, created (signed) by another IDA, could not be compromised and used by an attacker to exchange for a session cookie, which would allow for full compromise of the user.
   * Implementation will involve adding a method to ``edx-drf-extensions`` like ``get_decoded_jwt_from_auth``, but that will decode only asymmetric JWTs.
+  * Auth token endpoints that return a JWT will now take a request parameter that will enable Mobile to request asymmetric JWTs. This will enable old symmetric JWTs to continue to work until they are fully deprecated/removed, but enable Mobile to request asymmetric JWTs for this new case where they are required.
 
 .. _ADR to add grant type in JWT payload: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0014-add-grant-type-in-jwt-payload.rst
