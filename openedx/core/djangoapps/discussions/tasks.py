@@ -80,7 +80,7 @@ def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDisc
         provider = course.discussions_settings.get('provider', provider_type)
         enable_in_context = course.discussions_settings.get('enable_in_context', True)
         provider_config = course.discussions_settings.get(provider, {})
-        unit_level_visibility = course.discussions_settings.get('unit_level_visibility', False)
+        unit_level_visibility = course.discussions_settings.get('unit_level_visibility', True)
         enable_graded_units = course.discussions_settings.get('enable_graded_units', False)
         contexts = []
         if supports_in_context:
