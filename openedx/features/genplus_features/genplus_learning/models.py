@@ -2,7 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
-from django.template.defaultfilters import slugify
+from slugify import slugify
 from django.core.exceptions import ValidationError
 from django_extensions.db.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
@@ -12,8 +12,8 @@ from openedx.core.djangoapps.signals.signals import COURSE_COMPLETED
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
-from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
-from openedx.features.genplus_features.genplus.models import Student, Class
+from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses, ProgramStatuses
+from openedx.features.genplus_features.genplus.models import Student, Class, Skill
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -32,35 +32,52 @@ class YearGroup(models.Model):
 
 
 class Program(TimeStampedModel):
+    STATUS_CHOICES = ProgramStatuses.__MODEL_CHOICES__
+
     uuid = models.UUIDField(default=uuid.uuid4)
-    slug = models.SlugField(max_length=64, unique=True)
+    slug = models.SlugField(max_length=64, unique=True, blank=True)
     year_group = models.ForeignKey(YearGroup, on_delete=models.CASCADE, related_name='programs')
     start_date = models.DateField()
     end_date = models.DateField()
-    is_current = models.BooleanField(default=False)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=ProgramStatuses.UNPUBLISHED)
     history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(
-            "{} {} {}".format(
-                self.year_group.name,
-                self.start_date.year,
-                self.end_date.year,
+        if not self.slug:
+            self.slug = slugify(
+                "{} {} {} {}".format(
+                    self.year_group.name,
+                    self.year_group.program_name,
+                    self.start_date.year,
+                    self.end_date.year,
+                ), separator="_"
             )
-        )
         super(Program, self).save(*args, **kwargs)
 
+    @property
+    def is_active(self):
+        return self.status == ProgramStatuses.ACTIVE
+
+    @property
+    def is_unpublished(self):
+        return self.status == ProgramStatuses.UNPUBLISHED
+
     @classmethod
-    def get_current_programs(cls):
-        return cls.objects.filter(is_current=True)
+    def get_active_programs(cls):
+        return cls.objects.filter(status=ProgramStatuses.ACTIVE)
 
     def __str__(self):
         return self.year_group.name
 
 
 class Unit(models.Model):
+    order = models.PositiveIntegerField(default=0, blank=False, null=False)
     course = models.OneToOneField(CourseOverview, on_delete=models.CASCADE)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="units")
+    skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        ordering = ['order']
 
     @property
     def display_name(self):
@@ -127,6 +144,7 @@ class ClassUnit(models.Model):
 
     gen_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="class_units")
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="class_units")
+    course_key = CourseKeyField(max_length=255)
 
     @property
     def is_locked(self):
@@ -141,6 +159,7 @@ class ClassLesson(models.Model):
         unique_together = ("class_unit", "usage_key",)
 
     class_unit = models.ForeignKey(ClassUnit, on_delete=models.CASCADE, related_name="class_lessons")
+    order = models.PositiveIntegerField(default=0, blank=False, null=False)
     course_key = CourseKeyField(max_length=255)
     usage_key = UsageKeyField(max_length=255)
     is_locked = models.BooleanField(default=True)

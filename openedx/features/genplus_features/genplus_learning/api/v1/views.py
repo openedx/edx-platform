@@ -20,7 +20,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         gen_user = self.request.user.gen_user
-        qs = Program.get_current_programs()
+        qs = Program.get_active_programs()
         if gen_user.is_student:
             enrollments = ProgramEnrollment.objects.filter(student=gen_user.student)
             program_ids = enrollments.values_list('program', flat=True)

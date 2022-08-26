@@ -61,6 +61,7 @@ django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r req
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-enterprise
 django-crum==0.7.9        # via -r requirements/edx/base.in, edx-django-utils, edx-enterprise, edx-proctoring, edx-rbac, edx-toggles, super-csv
 django-extensions==3.1.2  # via -r requirements/edx/base.in
+django-admin-sortable2==1.0.4  # via -r requirements/edx/base.in
 django-fernet-fields==0.6  # via -r requirements/edx/base.in, edx-enterprise, edx-event-routing-backends, edxval
 django-filter==2.4.0      # via -r requirements/edx/base.in, edx-enterprise, lti-consumer-xblock
 django-ipware==3.0.2      # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring

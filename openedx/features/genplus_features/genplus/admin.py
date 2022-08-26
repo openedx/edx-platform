@@ -57,7 +57,7 @@ class ClassAdmin(admin.ModelAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "program":
-            kwargs["queryset"] = Program.get_current_programs()
+            kwargs["queryset"] = Program.get_active_programs()
         return super(ClassAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 

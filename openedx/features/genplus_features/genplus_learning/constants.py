@@ -12,3 +12,17 @@ class ProgramEnrollmentStatuses:
     __MODEL_CHOICES__ = (
         (status, status) for status in __ALL__
     )
+
+
+class ProgramStatuses:
+    """
+    Status of a program.
+    """
+    UNPUBLISHED = 'unpublished'
+    ACTIVE = 'active'
+    RETIRED = 'retired'
+
+    __ALL__ = (UNPUBLISHED, ACTIVE, RETIRED)
+    __MODEL_CHOICES__ = (
+        (status, status) for status in __ALL__
+    )
