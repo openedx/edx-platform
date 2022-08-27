@@ -741,7 +741,7 @@ def get_programs_for_organization(organization):
     return cache.get(PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL.format(org_key=organization))
 
 
-def get_course_data(course_key_str):
+def get_course_data(course_key_str, fields):
     """
     Retrieve information about the course with the given course key.
 
@@ -766,6 +766,7 @@ def get_course_data(course_key_str):
                 cache_key=course_cache_key if catalog_integration.is_cache_enabled else None,
                 long_term_cache=True,
                 many=False,
+                fields=fields
             )
             if data:
                 return data
