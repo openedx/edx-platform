@@ -181,3 +181,7 @@ well as the trigger location in this same repository.
    * - `DashboardRenderStarted <https://github.com/openedx/openedx-filters/blob/main/openedx_filters/learning/filters.py#L354>`_
      - org.openedx.learning.dashboard.render.started.v1
      - `2022-06-14 <https://github.com/eduNEXT/edx-platform/blob/master/common/djangoapps/student/views/dashboard.py#L878>`_
+
+   * - `VerticalChildRenderStarted <https://github.com/openedx/openedx-filters/blob/main/openedx_filters/learning/filters.py#L427>`_
+     - org.openedx.learning.veritical_child_block.render.started.v1
+     - `2022-08-18 <https://github.com/openedx/edx-platform/blob/master/xmodule/vertical_block.py#L122>`_

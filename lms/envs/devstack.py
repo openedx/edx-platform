@@ -258,6 +258,9 @@ WRITABLE_GRADEBOOK_URL = 'http://localhost:1994'
 ########################## ORA STAFF GRADING APP ##############################
 ORA_GRADING_MICROFRONTEND_URL = 'http://localhost:1993'
 
+########################## LEARNER HOME APP ##############################
+LEARNER_HOME_MICROFRONTEND_URL = 'http://localhost:1996'
+
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
@@ -285,6 +288,7 @@ LOGIN_REDIRECT_WHITELIST.extend([
     'localhost:3001',  # frontend-app-library-authoring
     'localhost:18400',  # frontend-app-publisher
     'localhost:1993',  # frontend-app-ora-grading
+    'localhost:1996',  # frontend-app-learner-dashboard
     ENTERPRISE_LEARNER_PORTAL_NETLOC,  # frontend-app-learner-portal-enterprise
     ENTERPRISE_ADMIN_PORTAL_NETLOC,  # frontend-app-admin-portal
 ])

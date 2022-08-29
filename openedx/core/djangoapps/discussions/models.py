@@ -20,6 +20,7 @@ from opaque_keys.edx.django.models import LearningContextKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey
 from simple_history.models import HistoricalRecords
 
+from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -45,8 +46,19 @@ class Provider:
     OPEN_EDX = 'openedx'
 
 
-DEFAULT_PROVIDER_TYPE = Provider.LEGACY
 DEFAULT_CONFIG_ENABLED = True
+
+
+def get_default_provider_type() -> str:
+    """
+    Returns the default provider type to use for new courses.
+    Returns:
+        (str) default provider type to use
+    """
+    if ENABLE_NEW_STRUCTURE_DISCUSSIONS.is_enabled():
+        return Provider.OPEN_EDX
+    else:
+        return Provider.LEGACY
 
 
 class Features(Enum):
@@ -433,7 +445,7 @@ class DiscussionsConfiguration(TimeStampedModel):
         max_length=100,
         verbose_name=_("Discussion provider"),
         help_text=_("The discussion tool/provider's id"),
-        default=DEFAULT_PROVIDER_TYPE,
+        default=get_default_provider_type,
     )
     history = HistoricalRecords()
 
@@ -492,7 +504,7 @@ class DiscussionsConfiguration(TimeStampedModel):
             configuration = cls(
                 context_key=context_key,
                 enabled=DEFAULT_CONFIG_ENABLED,
-                provider_type=DEFAULT_PROVIDER_TYPE,
+                provider_type=get_default_provider_type(),
             )
         return configuration
 

@@ -312,6 +312,7 @@ django==3.2.15
     #   edx-django-utils
     #   edx-drf-extensions
     #   edx-enterprise
+    #   edx-event-bus-kafka
     #   edx-i18n-tools
     #   edx-milestones
     #   edx-name-affirmation
@@ -573,6 +574,7 @@ edx-django-utils==5.0.0
     #   django-config-models
     #   edx-drf-extensions
     #   edx-enterprise
+    #   edx-event-bus-kafka
     #   edx-name-affirmation
     #   edx-rest-api-client
     #   edx-toggles
@@ -594,11 +596,15 @@ edx-drf-extensions==8.0.1
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.56.5
+edx-enterprise==3.56.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   learner-pathway-progress
+edx-event-bus-kafka==0.4.3
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/testing.txt
 edx-i18n-tools==0.9.1
     # via
     #   -r requirements/edx/testing.txt
@@ -662,6 +668,7 @@ edx-toggles==5.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-completion
+    #   edx-event-bus-kafka
     #   edx-name-affirmation
     #   edxval
     #   learner-pathway-progress
@@ -870,7 +877,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==4.3.3
+lti-consumer-xblock==4.5.0
     # via -r requirements/edx/testing.txt
 lxml==4.9.1
     # via
@@ -982,9 +989,11 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==3.0.1
     # via -r requirements/edx/testing.txt
-openedx-events==0.11.1
-    # via -r requirements/edx/testing.txt
-openedx-filters==0.7.0
+openedx-events==0.12.0
+    # via
+    #   -r requirements/edx/testing.txt
+    #   edx-event-bus-kafka
+openedx-filters==0.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock

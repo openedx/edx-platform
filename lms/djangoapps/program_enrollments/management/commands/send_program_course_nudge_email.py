@@ -14,6 +14,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.management import BaseCommand
 from django.utils import timezone
+from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.track import segment
 from lms.djangoapps.grades.models import PersistentCourseGrade
@@ -84,11 +85,13 @@ class Command(BaseCommand):
 
         Returns: Suggested program and course_run dicts
         """
+        completed_course = CourseLocator.from_string(completed_course_id)
         for program in programs_progress:
             for not_started_course in program['not_started']:
-                for course_run in not_started_course['course_runs']:
-                    if self.valid_course_run(course_run) and course_run['key'] != completed_course_id:
-                        return program, course_run, not_started_course
+                if completed_course.course != not_started_course['key']:
+                    for course_run in not_started_course['course_runs']:
+                        if self.valid_course_run(course_run) and course_run['key'] != completed_course_id:
+                            return program, course_run, not_started_course
         return None, None, None
 
     def sort_programs(self, programs):

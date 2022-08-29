@@ -9,9 +9,9 @@ from django.db import transaction
 from openedx_events.learning.data import CourseDiscussionConfigurationData
 from openedx_events.learning.signals import COURSE_DISCUSSIONS_CHANGED
 from openedx.core.djangoapps.discussions.models import (
-    DEFAULT_PROVIDER_TYPE,
     DiscussionTopicLink,
     DiscussionsConfiguration,
+    get_default_provider_type,
 )
 
 log = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
         configuration (CourseDiscussionConfigurationData): configuration data for the course
     """
     course_key = configuration.course_key
-    provider_id = configuration.provider_type or DEFAULT_PROVIDER_TYPE
+    provider_id = configuration.provider_type or get_default_provider_type()
     new_topic_map = {
         (topic_context.usage_key or topic_context.external_id): topic_context
         for topic_context in configuration.contexts
