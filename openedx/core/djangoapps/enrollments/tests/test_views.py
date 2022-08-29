@@ -42,6 +42,7 @@ from openedx.core.djangoapps.user_api.models import RetirementState, UserOrgTag,
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
+from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
@@ -103,6 +104,12 @@ class EnrollmentTestMixin:
         if as_server:
             extra['HTTP_X_EDX_API_KEY'] = self.API_KEY
 
+        course_run = self._create_course_run(course_id)
+        patch_course_data = patch('openedx.core.djangoapps.catalog.api.get_course_run_details')
+        course_data = patch_course_data.start()
+        course_data.return_value = course_run
+        self.addCleanup(patch_course_data.stop)
+
         # Verify that the modulestore is queried as expected.
         with check_mongo_calls_range(min_finds=min_mongo_calls, max_finds=max_mongo_calls):
             with patch('openedx.core.djangoapps.enrollments.views.audit_log') as mock_audit_log:
@@ -150,6 +157,22 @@ class EnrollmentTestMixin:
         resp = self.client.get(reverse("courseenrollments"))
         return json.loads(resp.content.decode('utf-8'))
 
+    @staticmethod
+    def _create_course_run(course_id):
+        """
+        Discovery course run
+        """
+        course_run = CourseRunFactory.create(key=course_id)
+        course_run.update({
+            'title': None,
+            'short_description': None,
+            'marketing_url': 'http://www.morales.com/',
+            'pacing_type': 'self_paced',
+            'min_effort': 1,
+            'enrollment_count': 12345
+        })
+        return course_run
+
 
 @override_settings(EDX_API_KEY="i am a key")
 @ddt.ddt
@@ -194,6 +217,10 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             password=self.PASSWORD,
         )
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        patch_context = patch('common.djangoapps.student.helpers.get_course_dates_for_email')
+        get_course = patch_context.start()
+        get_course.return_value = []
+        self.addCleanup(patch_context.stop)
 
     @ddt.data(
         # Default (no course modes in the database)
@@ -1167,6 +1194,11 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.url = reverse('courseenrollments')
 
+        patch_context = patch('common.djangoapps.student.helpers.get_course_dates_for_email')
+        get_course = patch_context.start()
+        get_course.return_value = []
+        self.addCleanup(patch_context.stop)
+
     def _generate_data(self):
         return json.dumps({
             'course_details': {
@@ -1378,8 +1410,13 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
             password=self.PASSWORD,
         )
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        patch_context = patch('common.djangoapps.student.helpers.get_course_dates_for_email')
+        get_course = patch_context.start()
+        get_course.return_value = []
         for course in self.courses:
             self.assert_enrollment_status(course_id=str(course.id), username=self.USERNAME, is_active=True)
+
+        self.addCleanup(patch_context.stop)
 
     def _create_test_retirement(self, user=None):
         """
@@ -1517,6 +1554,10 @@ class UserRoleTest(ModuleStoreTestCase):
             is_staff=True,
         )
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        patch_context = patch('common.djangoapps.student.helpers.get_course_dates_for_email')
+        get_course = patch_context.start()
+        get_course.return_value = []
+        self.addCleanup(patch_context.stop)
 
     def _create_expected_role_dict(self, course, role):
         """ Creates the expected role dict object that the view should return """

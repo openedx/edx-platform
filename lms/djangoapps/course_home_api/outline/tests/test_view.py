@@ -46,6 +46,10 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     def setUp(self):
         super().setUp()
         self.url = reverse('course-home:outline-tab', args=[self.course.id])
+        patch_context = patch('common.djangoapps.student.helpers.get_course_dates_for_email')
+        get_course = patch_context.start()
+        get_course.return_value = []
+        self.addCleanup(patch_context.stop)
 
     def update_course_and_overview(self):
         self.update_course(self.course, self.user.id)

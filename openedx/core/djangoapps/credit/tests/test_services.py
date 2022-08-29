@@ -7,6 +7,8 @@ from unittest.mock import patch
 from datetime import datetime
 import ddt
 
+from edx_django_utils.cache import RequestCache
+
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api.eligibility import set_credit_requirements
@@ -61,10 +63,10 @@ class CreditServiceTests(ModuleStoreTestCase):
         Makes sure that get_credit_state returns None if the user's enrollment is
         inactive
         """
-
         enrollment = self.enroll()
         enrollment.is_active = False
         enrollment.save()
+        RequestCache.clear_all_namespaces()
 
         assert self.service.get_credit_state(self.user.id, self.course.id) is None
 
