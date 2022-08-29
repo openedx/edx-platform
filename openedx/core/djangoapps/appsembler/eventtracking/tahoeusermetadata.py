@@ -122,9 +122,6 @@ class TahoeUserMetadataProcessor(object):
     def __call__(self, event):
         """
         Process the event.
-
-        If need be to handle cases without a request, we can check:
-        os.environ.get('CELERY_WORKER_RUNNING', False))
         """
         user = get_current_user()
         if not user.pk:

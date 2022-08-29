@@ -1,4 +1,7 @@
 """Configuration for the appsembler.eventtracking Django app."""
+import os
+import sys
+
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
@@ -35,8 +38,17 @@ class EventTrackingConfig(AppConfig):
     }
 
     def ready(self):
+        # only want to prefill the cache on lms runserver...
+        is_not_lms = os.getenv("SERVICE_VARIANT") != 'lms'
+        is_celery_worker = os.getenv('CELERY_WORKER_RUNNING', False)
+        is_not_runserver = 'runserver' not in sys.argv
+        if is_not_runserver or is_not_lms or is_celery_worker:
+            return
+
+        # ...and don't want every LMS instance calling this either, but
+        # the first one to start should set PREFILLING
+
         metadatacache = tahoeusermetadata.userprofile_metadata_cache
 
-        # TODO: we don't want to do this for every management command
         if not metadatacache.READY and not metadatacache.PREFILLING:
             tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)
