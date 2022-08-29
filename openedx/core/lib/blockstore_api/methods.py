@@ -3,6 +3,7 @@ API Client methods for working with Blockstore bundles and drafts
 """
 
 import base64
+import logging
 from functools import wraps
 from urllib.parse import urlencode
 from uuid import UUID
@@ -35,6 +36,9 @@ import blockstore.apps.api.methods as blockstore_api_methods
 from .config import use_blockstore_app
 
 
+log = logging.getLogger(__name__)
+
+
 def toggle_blockstore_api(func):
     """
     Decorator function to toggle usage of the Blockstore service
@@ -43,7 +47,7 @@ def toggle_blockstore_api(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         joined_args = " "
-        log.info('blockstore ' + func.__name__ + ' API call called with ' + joined_args.join(args) + ' arguments')
+        log.info('blockstore ' + func.__name__ + ' API call called with ' + joined_args.join(str(args)) + ' arguments')
         if use_blockstore_app():
             blockstore_selection = 'Django app'
             ret_object = getattr(blockstore_api_methods, func.__name__)(*args, **kwargs)
