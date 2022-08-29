@@ -616,7 +616,7 @@ edx-opaque-keys[django]==2.3.0
     #   outcome-surveys
 edx-organizations==6.11.1
     # via -r requirements/edx/base.txt
-edx-proctoring==4.12.0
+edx-proctoring==4.10.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
