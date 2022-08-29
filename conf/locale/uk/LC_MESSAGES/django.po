@@ -12608,6 +12608,10 @@ msgid "Open Response"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Library Content"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Порожній"
 

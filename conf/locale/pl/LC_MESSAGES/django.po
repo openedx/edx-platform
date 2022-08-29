@@ -133,6 +133,7 @@
 # 2cdc55bf3a20ff25d939c7db7de19147_3ae98f5, 2014
 # Piotr Jańczuk <piotr.janczuk@gmail.com>, 2015
 # Radek <d.exax@hotmail.com>, 2014
+# Zuzia Basińska, 2022
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (https://www.transifex.com/open-edx/teams/6205/pl/)
 # Copyright (C) 2022 edX
@@ -12538,6 +12539,10 @@ msgstr "Poziomy wsparcia {platform_name}:"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Open Response"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Library Content"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py

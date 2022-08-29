@@ -13518,6 +13518,10 @@ msgid "Open Response"
 msgstr "Respuesta Abierta"
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Library Content"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Sin responder"
 
