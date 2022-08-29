@@ -102,13 +102,12 @@ def user_track(request):
     #  Remove it after the experiment has been paused.
     if (
         name == 'edx.course.home.resume_course.clicked' and
-        data.get('from_email') and
         data.get('event_type') == 'start' and
         request.user
     ):
         optimizely_client = OptimizelyClient.get_optimizely_client()
         if optimizely_client:
-            optimizely_client.track('user_start_course_click', str(request.user.id))
+            optimizely_client.track('course_started', str(request.user.id))
 
     return HttpResponse('success')
 
