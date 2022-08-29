@@ -6,7 +6,6 @@ Custom event-tracking Processor to add properties to events.
 
 import logging
 
-# from celery import signals as celery_signals,
 from celery import task
 from crum import get_current_user
 from django.conf import settings
@@ -63,13 +62,6 @@ def prefetch_tahoe_usermetadata_cache(self, cache_instance):
     logger.info("FINISH Prefilling Tahoe UserMetadata Cache")
 
     return True  # TODO: not sure what we want to return here for the task_success signal
-
-
-# @celery_signals.task_success.connect(
-#     sender='openedx.core.djangoapps.appsembler.eventtracking.tahoeusermetadata.prefetch_tahoe_usermetadata_cache'
-# )
-# def _set_usermetadata_cache_to_ready(result):
-#     userprofile_metadata_cache.READY = True
 
 
 class TahoeUserMetadataProcessor(object):
