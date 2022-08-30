@@ -11,6 +11,8 @@ from crum import get_current_user
 from django.conf import settings
 from django.core.cache import cache
 
+from . import utils
+
 logger = logging.getLogger(__name__)
 
 
@@ -115,6 +117,13 @@ class TahoeUserMetadataProcessor(object):
 
     def __call__(self, event):
         """Process the event and return the event."""
+        # WARNING:
+        # We have to be careful to not add SQL queries that would require updating upstream tests
+        # which count SQL queries; e.g., `cms.djangoapps.contentstore.views.tests.test_course_index)
+        # currently we can do this by only enabling the event processor for LMS
+        if utils.is_not_lms():  # we don't care about user metadata for Studio, at this point
+            return event
+
         user = get_current_user()
         if not user or not user.pk:
             # should be an AnonymousUser or in tests
