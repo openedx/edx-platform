@@ -47,11 +47,6 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         super().setUp()
         self.url = reverse('course-home:progress-tab', args=[self.course.id])
 
-        patch_context = patch('common.djangoapps.student.helpers.get_course_dates_for_email')
-        get_course = patch_context.start()
-        get_course.return_value = []
-        self.addCleanup(patch_context.stop)
-
     def add_subsection_with_problem(self, **kwargs):
         """Makes a chapter -> problem chain, and sets up the subsection as requested, returning the problem"""
         chapter = ItemFactory(parent=self.course, category='chapter')

@@ -4,7 +4,7 @@ Tests for schedules resolvers
 
 
 import datetime
-from unittest.mock import patch, Mock
+from unittest.mock import Mock
 
 import crum
 import ddt
@@ -35,7 +35,6 @@ from openedx.core.djangoapps.schedules.resolvers import (
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, skip_unless_lms
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 
 
 class SchedulesResolverTestMixin(CacheIsolationMixin):
@@ -65,22 +64,6 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
             day_offset=3,
             bin_num=2,
         )
-
-    @staticmethod
-    def _course_run(course_id, course_overview):
-        """
-        Discovery course run
-        """
-        course_run = CourseRunFactory.create(key=course_id)
-        course_run.update({
-            'course_title': course_overview.display_name,
-            'short_description': course_overview.short_description,
-            'marketing_url': 'http://www.morales.com/',
-            'pacing_type': 'self_paced',
-            'min_effort': 1,
-            'enrollment_count': 12345
-        })
-        return course_run
 
     @ddt.data(
         'course1'
@@ -121,25 +104,11 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         assert result == mock_query.exclude.return_value
 
     @ddt.data(0, 1)
-    @patch('common.djangoapps.student.helpers.get_course_dates_for_email')
-    def test_external_course_updates(self, bucket, mock_course_dates_for_email):
+    def test_external_course_updates(self, bucket):
         """Confirm that we exclude enrollments in the external course updates experiment"""
-        mock_course_dates_for_email.return_value = []
-
         user = UserFactory()
         overview1 = CourseOverviewFactory(has_highlights=False)  # set has_highlights just to avoid a modulestore lookup
         overview2 = CourseOverviewFactory(has_highlights=False)
-
-        course1 = self._course_run(overview1.id, overview1)
-        course2 = self._course_run(overview2.id, overview2)
-
-        patch_course_data = patch('openedx.core.djangoapps.catalog.api.get_course_run_details')
-        course_data = patch_course_data.start()
-        course_data.return_value = course1
-
-        patch_course_data = patch('openedx.core.djangoapps.catalog.api.get_course_run_details')
-        course_data = patch_course_data.start()
-        course_data.return_value = course2
 
         # We need to enroll with a request, because our specific experiment code expects it
         self.addCleanup(crum.set_current_request, None)
@@ -164,7 +133,6 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         else:
             assert len(schedules) == 2
             assert {s.enrollment for s in schedules} == {enrollment1, enrollment2}
-        self.addCleanup(patch_course_data.stop)
 
 
 @skip_unless_lms

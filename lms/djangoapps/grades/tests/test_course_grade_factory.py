@@ -31,16 +31,6 @@ class TestCourseGradeFactory(GradeTestBase):
     """
     Test that CourseGrades are calculated properly
     """
-    def setUp(self):
-        """
-        setup tests
-        """
-        patch_context = patch('common.djangoapps.student.helpers.get_course_dates_for_email')
-        get_course = patch_context.start()
-        get_course.return_value = []
-        super().setUp()
-        self.addCleanup(patch_context.stop)
-
     def _assert_zero_grade(self, course_grade, expected_grade_class):
         """
         Asserts whether the given course_grade is as expected with
