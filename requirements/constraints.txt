@@ -93,3 +93,7 @@ markdown<3.4.0
 # pycodestyle==2.9.0 generates false positive error E275.
 # Constraint can be removed once the issue https://github.com/PyCQA/pycodestyle/issues/1090 is fixed.
 pycodestyle<2.9.0
+
+# pinned 8/30/22
+# proctoring 4.11.0 breaks collect static stage of AMI building, can be removed once MST-1622 is resolved
+edx-proctoring==4.10.3
