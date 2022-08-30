@@ -643,13 +643,10 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):  # pyli
         (True, False),
     )
     @ddt.unpack
-    @patch('common.djangoapps.student.helpers.get_course_dates_for_email')
-    def test_content_gating_holdback(self, put_user_in_holdback, is_gated, mock_course_dates_for_email):
+    def test_content_gating_holdback(self, put_user_in_holdback, is_gated):
         """
         Test that putting a user in the content gating holdback disables content gating.
         """
-        mock_course_dates_for_email.return_value = []
-
         user = UserFactory.create()
         enrollment = CourseEnrollment.enroll(user, self.course.id)
         if put_user_in_holdback:

@@ -374,9 +374,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         (ModuleStoreEnum.Type.split, 2, 48),
     )
     @ddt.unpack
-    @patch('common.djangoapps.student.helpers.get_course_dates_for_email')
-    def test_query_counts(self, store_type, mongo_count, expected_query_count, mock_course_dates_for_email):
-        mock_course_dates_for_email.return_value = []
+    def test_query_counts(self, store_type, mongo_count, expected_query_count):
         with self.store.default_store(store_type):
             experiment_group_a = Group(2, 'Expériment Group A')
             experiment_group_b = Group(3, 'Expériment Group B')

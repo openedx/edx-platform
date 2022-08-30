@@ -20,7 +20,7 @@ from django.core.validators import ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
-from pytz import UTC, timezone
+from pytz import UTC
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.course_modes.models import CourseMode
@@ -50,15 +50,10 @@ from lms.djangoapps.instructor import access
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
-from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
-from lms.djangoapps.courseware.date_summary import TodaysDate
-from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
-from lms.djangoapps.course_home_api.dates.serializers import DateSummarySerializer
 from openedx.core.djangoapps.content.block_structure.exceptions import UsageKeyNotInBlockStructure
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
-from openedx.core.lib.time_zone_utils import get_time_zone_offset
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
 # Enumeration of per-course verification statuses
@@ -819,89 +814,3 @@ def user_has_passing_grade_in_course(enrollment):
     except AttributeError:
         pass
     return False
-
-
-def get_instructors(course_run, marketing_root_url):
-    """
-    Get course instructors.
-    """
-    instructors = []
-    staff = course_run.get('staff', [])
-    for instructor in staff:
-        instructor = {
-            'name': f"{instructor.get('given_name')} {instructor.get('family_name')}",
-            'profile_image_url': instructor.get('profile_image_url'),
-            'organization_name': (instructor.get('position').get('organization_name')
-                                  if instructor.get('position') else ''),
-            'bio_url': f"{marketing_root_url}/bio/{instructor.get('slug')}"
-        }
-        instructors.append(instructor)
-
-    return instructors
-
-
-def _prepare_date_block(block, block_date, user_timezone):
-    """
-    Prepare date block which include assignment related data for this date
-    """
-    timezone_offset = get_time_zone_offset(user_timezone, block_date)
-    block = {
-        'title': block.get('title', ''),
-        'assignment_type': block.get('assignment_type', ''),
-        'assignment_count': 0,
-        'link': block.get('link', ''),
-        'date': block_date,
-        'due_date': block_date.strftime("%a, %b %d, %Y"),
-        'due_time': (f'{block_date.strftime("%H:%M %p")} GMT{timezone_offset}' if block.get('assignment_type') else '')
-    }
-    return block
-
-
-def get_course_dates_for_email(user, course_id, request):
-    """
-    Getting nearest dates from today one would be before today and one
-    would be after today.
-    """
-    user_timezone_locale = user_timezone_locale_prefs(request)
-    user_timezone = timezone(user_timezone_locale['user_timezone'] or str(UTC))
-
-    course = get_course_with_access(user, 'load', course_id)
-    date_blocks = get_course_date_blocks(course, user, request, include_access=True, include_past_dates=True)
-    date_blocks = [block for block in date_blocks if not isinstance(block, TodaysDate)]
-    blocks = DateSummarySerializer(date_blocks, many=True).data
-
-    today = datetime.now(user_timezone)
-    course_date = {
-        'title': '',
-        'assignment_type': '',
-        'link': '',
-        'assignment_count': 0,
-        'date': '',
-        'due_date': today.strftime("%a, %b %d, %Y"),
-        'due_time': ''
-    }
-    course_date_list = [{**course_date, }, {**course_date, 'date': today}, {**course_date}]
-    for block in blocks:
-        block_date = datetime.strptime(block.get('date')[:19], '%Y-%m-%dT%H:%M:%S')
-        block_date = block_date.replace(tzinfo=UTC)
-        block_date = block_date.astimezone(user_timezone)
-
-        if block_date < today:
-            if block_date == course_date_list[0]['date'] and block.get('assignment_type'):
-                course_date_list[0]['assignment_count'] += 1
-            else:
-                course_date_list[0].update(_prepare_date_block(block, block_date, user_timezone))
-
-        if block_date == today:
-            if block.get('assignment_type') and course_date_list[1]['assignment_type'] != '':
-                course_date_list[1]['assignment_count'] += 1
-            else:
-                course_date_list[1].update(_prepare_date_block(block, block_date, user_timezone))
-
-        if block_date > today:
-            if block_date == course_date_list[2]['date'] and block.get('assignment_type'):
-                course_date_list[2]['assignment_count'] += 1
-            if course_date_list[2]['date'] == '':
-                course_date_list[2].update(_prepare_date_block(block, block_date, user_timezone))
-
-    return course_date_list
