@@ -885,7 +885,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             request.session = {}
             request.user.real_user = GlobalStaffFactory.create()
             request.user.real_user.masquerade_settings = CourseMasquerade(course.id, user_name="jem")
-            with patch('lms.djangoapps.courseware.module_render.is_masquerading_as_specific_student') as mock_masq:
+            with patch('xmodule.services.is_masquerading_as_specific_student') as mock_masq:
                 mock_masq.return_value = True
                 response = render.handle_xblock_callback(
                     request,
@@ -900,7 +900,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
 
     @XBlock.register_temp_plugin(GradedStatelessXBlock, identifier='stateless_scorer')
-    @patch('lms.djangoapps.courseware.module_render.grades_signals.SCORE_PUBLISHED.send')
+    @patch('xmodule.services.grades_signals.SCORE_PUBLISHED.send')
     def test_anonymous_user_not_be_graded(self, mock_score_signal):
         course = CourseFactory.create()
         descriptor_kwargs = {
@@ -2022,7 +2022,10 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             descriptor_kwargs['display_name'] = problem_display_name
 
         descriptor = ItemFactory.create(**descriptor_kwargs)
-        with patch('lms.djangoapps.courseware.module_render.tracker') as mock_tracker_for_context:
+        mock_tracker_for_context = MagicMock()
+        with patch('lms.djangoapps.courseware.module_render.tracker', mock_tracker_for_context), patch(
+            'xmodule.services.tracker', mock_tracker_for_context
+        ):
             render.handle_xblock_callback(
                 self.request,
                 str(self.course.id),
@@ -2032,12 +2035,10 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             )
 
             assert len(mock_tracker.emit.mock_calls) == 1
-            # lint-amnesty, pylint: disable=deprecated-method
             mock_call = mock_tracker.emit.mock_calls[0]
             event = mock_call[2]
 
             assert event['name'] == 'problem_check'
-            # lint-amnesty, pylint: disable=deprecated-method
 
             # for different operations, there are different number of context calls.
             # We are sending this `call_idx` to get the mock call that we are interested in.

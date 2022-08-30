@@ -1721,7 +1721,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         self,
         get_module,
         descriptor_runtime,
-        publish=None,
         **kwargs,
     ):
         """
@@ -1732,8 +1731,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
                          access to that location, returns None.
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
-
-        publish(event) - A function that allows XModules to publish events (such as grade changes)
         """
 
         kwargs.setdefault('id_reader', getattr(descriptor_runtime, 'id_reader', OpaqueKeyReader()))
@@ -1742,8 +1739,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         self.get_module = get_module
 
-        if publish:
-            self.publish = publish
         self.xmodule_instance = None
 
         self.descriptor_runtime = descriptor_runtime
@@ -1779,7 +1774,12 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
     def publish(self, block, event_type, event):  # lint-amnesty, pylint: disable=arguments-differ
-        pass
+        """
+        Publish events through the `EventPublishingService`.
+        This ensures that the correct track method is used for Instructor tasks.
+        """
+        if publish_service := self._services.get('publish'):
+            publish_service.publish(block, event_type, event)
 
     def service(self, block, service_name):
         """
