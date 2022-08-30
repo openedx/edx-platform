@@ -329,22 +329,13 @@ class EnterpriseDashboardSerializer(serializers.Serializer):
     url = serializers.URLField()
 
 
-class EnterpriseDashboardsSerializer(serializers.Serializer):
-    """Listing of available enterprise dashboards"""
-
-    availableDashboards = serializers.ListField(
-        child=EnterpriseDashboardSerializer(), allow_empty=True
-    )
-    mostRecentDashboard = EnterpriseDashboardSerializer()
-
-
 class LearnerDashboardSerializer(serializers.Serializer):
     """Serializer for all info required to render the Learner Dashboard"""
 
     requires_context = True
 
     emailConfirmation = EmailConfirmationSerializer()
-    enterpriseDashboards = EnterpriseDashboardsSerializer()
+    enterpriseDashboard = EnterpriseDashboardSerializer()
     platformSettings = PlatformSettingsSerializer()
     courses = serializers.SerializerMethodField()
     suggestedCourses = serializers.ListField(
