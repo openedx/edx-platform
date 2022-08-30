@@ -32,8 +32,10 @@ class TahoeUserProfileMetadataCache(object):
         return cache.get(self._make_key_by_user_id(user_id))
 
     def set_by_user_id(self, user_id, val):
+        if not self.READY:
+            return None
         key = self._make_key_by_user_id(user_id)
-        cache.add(key, val)
+        cache.set(key, val)
         logger.debug('Set and retrieved {} with value {}'.format(key, cache.get(key)))
 
     def invalidate(self, instance):
@@ -91,7 +93,7 @@ class TahoeUserMetadataProcessor(object):
         if reg_additional:
             return reg_additional
 
-        # local import as module is loaded at startup via eventtracking.django for Processor init
+        # local import, as module is loaded at startup via eventtracking.django for Processor init
         from student.models import UserProfile
         try:
             profile = UserProfile.objects.get(user__id=user_id)
