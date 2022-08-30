@@ -114,12 +114,10 @@ class TahoeUserMetadataProcessor(object):
         # there may eventually be others we want to add as event context
 
     def __call__(self, event):
-        """
-        Process the event.
-        """
+        """Process the event and return the event."""
         user = get_current_user()
-        if not user.pk:
-            # should be an AnonymousUser
+        if not user or not user.pk:
+            # should be an AnonymousUser or in tests
             return event
 
         # Add any Tahoe metadata context
