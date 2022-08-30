@@ -112,7 +112,6 @@ class EnrollmentSerializer(serializers.Serializer):
     accessExpirationDate = serializers.SerializerMethodField()
     isAudit = serializers.SerializerMethodField()
     hasStarted = serializers.SerializerMethodField()
-    hasFinished = serializers.SerializerMethodField()
     isVerified = serializers.SerializerMethodField()
     canUpgrade = serializers.SerializerMethodField()
     isAuditAccessExpired = serializers.SerializerMethodField()
@@ -137,10 +136,6 @@ class EnrollmentSerializer(serializers.Serializer):
             enrollment.course_id
         )
         return resume_button_url is not None
-
-    def get_hasFinished(self, enrollment):
-        # TODO - AU-796
-        return False
 
     def get_isVerified(self, enrollment):
         return enrollment.is_verified_enrollment()
