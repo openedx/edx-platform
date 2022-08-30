@@ -22,7 +22,7 @@ from lms.djangoapps.learner_home.serializers import (
     CourseSerializer,
     EmailConfirmationSerializer,
     EnrollmentSerializer,
-    EnterpriseDashboardsSerializer,
+    EnterpriseDashboardSerializer,
     EntitlementSerializer,
     GradeDataSerializer,
     LearnerEnrollmentSerializer,
@@ -759,36 +759,25 @@ class TestEmailConfirmationSerializer(TestCase):
         )
 
 
-class TestEnterpriseDashboardsSerializer(TestCase):
-    """High-level tests for EnterpriseDashboardsSerializer"""
-
-    @classmethod
-    def generate_test_dashboard(cls):
-        return {
-            "label": f"{uuid4()}",
-            "url": random_url(),
-        }
+class TestEnterpriseDashboardSerializer(TestCase):
+    """High-level tests for EnterpriseDashboardSerializer"""
 
     @classmethod
     def generate_test_data(cls):
         return {
-            "availableDashboards": [
-                cls.generate_test_dashboard() for _ in range(randint(0, 3))
-            ],
-            "mostRecentDashboard": cls.generate_test_dashboard()
-            if random_bool()
-            else None,
+            "label": f"{uuid4()}",
+            "url": random_url(),
         }
 
     def test_structure(self):
         """Test that nothing breaks and the output fields look correct"""
         input_data = self.generate_test_data()
 
-        output_data = EnterpriseDashboardsSerializer(input_data).data
+        output_data = EnterpriseDashboardSerializer(input_data).data
 
         expected_keys = [
-            "availableDashboards",
-            "mostRecentDashboard",
+            "label",
+            "url",
         ]
         assert output_data.keys() == set(expected_keys)
 
@@ -797,13 +786,13 @@ class TestEnterpriseDashboardsSerializer(TestCase):
 
         input_data = self.generate_test_data()
 
-        output_data = EnterpriseDashboardsSerializer(input_data).data
+        output_data = EnterpriseDashboardSerializer(input_data).data
 
         self.assertDictEqual(
             output_data,
             {
-                "availableDashboards": input_data["availableDashboards"],
-                "mostRecentDashboard": input_data["mostRecentDashboard"],
+                "label": input_data["label"],
+                "url": input_data["url"],
             },
         )
 
@@ -819,7 +808,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
         input_data = {
             "emailConfirmation": None,
-            "enterpriseDashboards": None,
+            "enterpriseDashboard": None,
             "platformSettings": None,
             "enrollments": [],
             "unfulfilledEntitlements": [],
@@ -831,7 +820,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             output_data,
             {
                 "emailConfirmation": None,
-                "enterpriseDashboards": None,
+                "enterpriseDashboard": None,
                 "platformSettings": None,
                 "courses": [],
                 "suggestedCourses": [],
@@ -857,7 +846,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
         input_data = {
             "emailConfirmation": None,
-            "enterpriseDashboards": None,
+            "enterpriseDashboard": None,
             "platformSettings": None,
             "enrollments": enrollments,
             "unfulfilledEntitlements": [],
@@ -889,7 +878,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         "lms.djangoapps.learner_home.serializers.PlatformSettingsSerializer.to_representation"
     )
     @mock.patch(
-        "lms.djangoapps.learner_home.serializers.EnterpriseDashboardsSerializer.to_representation"
+        "lms.djangoapps.learner_home.serializers.EnterpriseDashboardSerializer.to_representation"
     )
     @mock.patch(
         "lms.djangoapps.learner_home.serializers.EmailConfirmationSerializer.to_representation"
@@ -897,7 +886,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
     def test_linkage(
         self,
         mock_email_confirmation_serializer,
-        mock_enterprise_dashboards_serializer,
+        mock_enterprise_dashboard_serializer,
         mock_platform_settings_serializer,
         mock_learner_enrollment_serializer,
         mock_entitlements_serializer,
@@ -906,8 +895,8 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         mock_email_confirmation_serializer.return_value = (
             mock_email_confirmation_serializer
         )
-        mock_enterprise_dashboards_serializer.return_value = (
-            mock_enterprise_dashboards_serializer
+        mock_enterprise_dashboard_serializer.return_value = (
+            mock_enterprise_dashboard_serializer
         )
         mock_platform_settings_serializer.return_value = (
             mock_platform_settings_serializer
@@ -920,7 +909,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
         input_data = {
             "emailConfirmation": {},
-            "enterpriseDashboards": [{}],
+            "enterpriseDashboard": {},
             "platformSettings": {},
             "enrollments": [{}],
             "unfulfilledEntitlements": [{}],
@@ -932,7 +921,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             output_data,
             {
                 "emailConfirmation": mock_email_confirmation_serializer,
-                "enterpriseDashboards": mock_enterprise_dashboards_serializer,
+                "enterpriseDashboard": mock_enterprise_dashboard_serializer,
                 "platformSettings": mock_platform_settings_serializer,
                 "courses": [
                     mock_learner_enrollment_serializer,
