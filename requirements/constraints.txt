@@ -25,7 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.56.7
+edx-enterprise==3.56.8
 
 # As of 2022-08-24, Arch-BOM (at 2U) is changing event-bus-kafka rapidly, with breaking changes.
 # As long as that is happening, Arch-BOM will manually bump this dependency to ensure
