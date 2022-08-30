@@ -5,6 +5,7 @@ import sys
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
+from common.djangoapps.track.shim import is_celery_worker
 from openedx.core.djangoapps.plugins.constants import ProjectType, PluginSignals
 
 from . import tahoeusermetadata
@@ -40,9 +41,8 @@ class EventTrackingConfig(AppConfig):
     def ready(self):
         # only want to prefill the cache on lms runserver...
         is_not_lms = os.getenv("SERVICE_VARIANT") != 'lms'
-        is_celery_worker = os.getenv('CELERY_WORKER_RUNNING', False)
         is_not_runserver = 'runserver' not in sys.argv
-        if is_not_runserver or is_not_lms or is_celery_worker:
+        if is_not_runserver or is_not_lms or is_celery_worker():
             return
 
         # ...and don't want every LMS instance calling this either, but
