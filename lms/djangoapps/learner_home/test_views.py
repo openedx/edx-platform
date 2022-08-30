@@ -232,7 +232,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         expected_keys = set(
             [
                 "emailConfirmation",
-                "enterpriseDashboards",
+                "enterpriseDashboard",
                 "platformSettings",
                 "courses",
                 "suggestedCourses",
