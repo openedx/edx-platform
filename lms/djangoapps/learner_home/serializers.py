@@ -330,7 +330,7 @@ class LearnerDashboardSerializer(serializers.Serializer):
     requires_context = True
 
     emailConfirmation = EmailConfirmationSerializer()
-    enterpriseDashboard = EnterpriseDashboardSerializer()
+    enterpriseDashboard = EnterpriseDashboardSerializer(allow_null=True)
     platformSettings = PlatformSettingsSerializer()
     courses = serializers.SerializerMethodField()
     suggestedCourses = serializers.ListField(
