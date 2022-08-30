@@ -32,7 +32,8 @@ from lms.djangoapps.courseware.access_response import (
     OldMongoAccessError,
     StartDateError
 )
-from lms.djangoapps.courseware.access_utils import check_authentication, check_data_sharing_consent, check_enrollment
+from lms.djangoapps.courseware.access_utils import check_authentication, check_data_sharing_consent, check_enrollment, \
+    check_correct_active_enterprise_customer, is_priority_access_error
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
@@ -137,7 +138,7 @@ def check_course_access(
     check_if_enrolled=False,
     check_survey_complete=True,
     check_if_authenticated=False,
-    check_if_dsc_required=False,
+    apply_enterprise_checks=False,
 ):
     """
     Check that the user has the access to perform the specified action
@@ -164,8 +165,12 @@ def check_course_access(
             if not enrollment_access_response:
                 return enrollment_access_response
 
-        if check_if_dsc_required:
-            data_sharing_consent_response = check_data_sharing_consent(course)
+        if apply_enterprise_checks:
+            correct_active_enterprise_response = check_correct_active_enterprise_customer(user, course.id)
+            if not correct_active_enterprise_response:
+                return correct_active_enterprise_response
+
+            data_sharing_consent_response = check_data_sharing_consent(course.id)
             if not data_sharing_consent_response:
                 return data_sharing_consent_response
 
@@ -178,15 +183,18 @@ def check_course_access(
         # This access_response will be ACCESS_GRANTED
         return access_response
 
-    # Allow staff full access to the course even if other checks fail
-    nonstaff_access_response = _check_nonstaff_access()
-    if not nonstaff_access_response:
-        staff_access_response = has_access(user, 'staff', course.id)
-        if staff_access_response:
-            return staff_access_response
+    non_staff_access_response = _check_nonstaff_access()
 
-    # This access_response will be ACCESS_GRANTED
-    return nonstaff_access_response
+    # User has course access OR access error is a priority error
+    if non_staff_access_response or is_priority_access_error(non_staff_access_response):
+        return non_staff_access_response
+
+    # Allow staff full access to the course even if other checks fail
+    staff_access_response = has_access(user, 'staff', course.id)
+    if staff_access_response:
+        return staff_access_response
+
+    return non_staff_access_response
 
 
 def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
