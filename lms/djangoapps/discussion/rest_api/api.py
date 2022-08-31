@@ -198,12 +198,12 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
         course = _get_course(course_key, request.user)
         context = get_context(course, request, cc_thread)
 
-        if retrieve_kwargs.get("flagged_comments") and not context["is_requester_privileged"]:
+        if retrieve_kwargs.get("flagged_comments") and not context["has_moderation_privilege"]:
             raise ValidationError("Only privileged users can request flagged comments")
 
         course_discussion_settings = CourseDiscussionSettings.get(course_key)
         if (
-            not context["is_requester_privileged"] and
+            not context["has_moderation_privilege"] and
             cc_thread["group_id"] and
             is_commentable_divided(course.id, cc_thread["commentable_id"], course_discussion_settings)
         ):
@@ -241,7 +241,7 @@ def _is_user_author_or_privileged(cc_content, context):
         Boolean
     """
     return (
-        context["is_requester_privileged"] or
+        context["has_moderation_privilege"] or
         context["cc_requester"]["id"] == cc_content["user_id"]
     )
 
@@ -819,7 +819,7 @@ def get_thread_list(
                 "text_search_rewrite": None,
             })
 
-    if count_flagged and not context["is_requester_privileged"]:
+    if count_flagged and not context["has_moderation_privilege"]:
         raise PermissionDenied("`count_flagged` can only be set by users with moderator access or higher.")
 
     group_id = None
@@ -836,7 +836,7 @@ def get_thread_list(
             except ValueError:
                 pass
 
-    if (group_id is None) and (not context["is_requester_privileged"]):
+    if (group_id is None) and not context["has_moderation_privilege"]:
         group_id = get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
 
     query_params = {
@@ -1559,7 +1559,7 @@ def get_user_comments(
     course = _get_course(course_key, request.user)
     context = get_context(course, request)
 
-    if flagged and not context["is_requester_privileged"]:
+    if flagged and not context["has_moderation_privilege"]:
         raise ValidationError("Only privileged users can filter comments by flagged status")
 
     try:

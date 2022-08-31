@@ -73,7 +73,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         (FORUM_ROLE_MODERATOR, True, False, True),
         (FORUM_ROLE_MODERATOR, False, True, False),
         (FORUM_ROLE_COMMUNITY_TA, True, False, True),
-        (FORUM_ROLE_COMMUNITY_TA, False, True, True),
+        (FORUM_ROLE_COMMUNITY_TA, False, True, False),
         (FORUM_ROLE_STUDENT, True, False, True),
         (FORUM_ROLE_STUDENT, False, True, True),
     )

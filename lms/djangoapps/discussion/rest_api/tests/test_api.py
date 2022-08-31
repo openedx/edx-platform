@@ -1894,7 +1894,6 @@ class CreateThreadTest(
                 "close_reason_code",
                 "closed",
                 "copy_link",
-                "edit_reason_code",
                 "following",
                 "pinned",
                 "raw_body",
@@ -2249,14 +2248,13 @@ class CreateCommentTest(
         editable_fields = [
             "abuse_flagged",
             "anonymous",
-            "edit_reason_code",
             "raw_body",
             "voted",
         ]
         if parent_id:
             data["parent_id"] = parent_id
         else:
-            editable_fields.insert(3, "endorsed")
+            editable_fields.insert(2, "endorsed")
 
         _set_course_discussion_blackout(course=self.course, user_id=self.user.id)
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_MODERATOR)
@@ -2871,7 +2869,7 @@ class UpdateThreadTest(
         Test editing comments, specifying and retrieving edit reason codes.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
-        self.register_thread()
+        self.register_thread({"user_id": str(self.user.id + 1)})
         try:
             result = update_thread(self.request, "test_thread", {
                 "raw_body": "Edited body",
@@ -2888,7 +2886,8 @@ class UpdateThreadTest(
             assert request_body["edit_reason_code"] == ["test-edit-reason"]
         except ValidationError as error:
             assert role_name == FORUM_ROLE_STUDENT
-            assert error.message_dict == {"edit_reason_code": ["This field is not editable."]}
+            assert error.message_dict == {"edit_reason_code": ["This field is not editable."],
+                                          "raw_body": ["This field is not editable."]}
 
     @ddt.data(
         *itertools.product(
@@ -3371,7 +3370,7 @@ class UpdateCommentTest(
         Test editing comments, specifying and retrieving edit reason codes.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
-        self.register_comment()
+        self.register_comment({"user_id": str(self.user.id + 1)})
         try:
             result = update_comment(self.request, "test_comment", {
                 "raw_body": "Edited body",
