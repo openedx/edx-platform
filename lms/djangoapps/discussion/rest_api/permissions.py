@@ -35,7 +35,7 @@ def _is_author_or_privileged(cc_content, context):
     Return True if the requester authored the given content or is a privileged
     user, False otherwise
     """
-    return context["is_requester_privileged"] or _is_author(cc_content, context)
+    return context["has_moderation_privilege"] or _is_author(cc_content, context)
 
 
 NON_UPDATABLE_THREAD_FIELDS = {"course_id"}
@@ -92,7 +92,7 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
     # no edits, except 'abuse_flagged' is allowed for comment
     is_thread = cc_content["type"] == "thread"
     is_comment = cc_content["type"] == "comment"
-    is_privileged = context["is_requester_privileged"]
+    has_moderation_privilege = context["has_moderation_privilege"]
 
     if is_thread:
         is_thread_closed = cc_content["closed"]
@@ -105,9 +105,9 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
     # Map each field to the condition in which it's editable.
     editable_fields = {
         "abuse_flagged": True,
-        "closed": is_thread and is_privileged,
-        "close_reason_code": is_thread and is_privileged,
-        "pinned": is_thread and is_privileged,
+        "closed": is_thread and has_moderation_privilege,
+        "close_reason_code": is_thread and has_moderation_privilege,
+        "pinned": is_thread and has_moderation_privilege,
         "read": is_thread,
     }
     if is_thread:
@@ -120,16 +120,16 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
     is_author = _is_author(cc_content, context)
     editable_fields.update({
         "voted": True,
-        "raw_body": is_privileged or is_author,
-        "edit_reason_code": is_privileged,
+        "raw_body": has_moderation_privilege or is_author,
+        "edit_reason_code": has_moderation_privilege and not is_author,
         "following": is_thread,
-        "topic_id": is_thread and (is_author or is_privileged),
-        "type": is_thread and (is_author or is_privileged),
-        "title": is_thread and (is_author or is_privileged),
-        "group_id": is_thread and is_privileged and context["discussion_division_enabled"],
+        "topic_id": is_thread and (is_author or has_moderation_privilege),
+        "type": is_thread and (is_author or has_moderation_privilege),
+        "title": is_thread and (is_author or has_moderation_privilege),
+        "group_id": is_thread and has_moderation_privilege and context["discussion_division_enabled"],
         "endorsed": (
             (is_comment and cc_content.get("parent_id", None) is None) and
-            (is_privileged or
+            (has_moderation_privilege or
              (_is_author(context["thread"], context) and context["thread"]["thread_type"] == "question"))
         ),
         "anonymous": is_author and context["course"].allow_anonymous,

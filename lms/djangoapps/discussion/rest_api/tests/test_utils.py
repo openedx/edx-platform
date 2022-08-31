@@ -14,8 +14,9 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from lms.djangoapps.discussion.rest_api.utils import (
     discussion_open_for_user,
-    get_course_staff_users_list,
     get_course_ta_users_list,
+    get_course_staff_users_list,
+    get_moderator_users_list,
 )
 
 
@@ -62,7 +63,11 @@ class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
         self.assertTrue(discussion_open_for_user(self.course, self.community_ta))
 
     def test_course_staff_users_list(self):
-        assert len(get_course_staff_users_list(self.course.id)) == 3
+        assert len(get_course_staff_users_list(self.course.id)) == 2
+
+    def test_course_moderator_users_list(self):
+        assert len(get_moderator_users_list(self.course.id)) == 1
 
     def test_course_ta_users_list(self):
-        assert len(get_course_ta_users_list(self.course.id)) == 2
+        ta_user_list = get_course_ta_users_list(self.course.id)
+        assert len(ta_user_list) == 2
