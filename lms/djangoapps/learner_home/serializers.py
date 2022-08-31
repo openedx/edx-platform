@@ -104,23 +104,28 @@ class HasAccessSerializer(serializers.Serializer):
     isTooEarly = serializers.SerializerMethodField()
     isStaff = serializers.SerializerMethodField()
 
+    def _get_course_access_checks(self, enrollment):
+        """Internal helper to unpack access object for this particular enrollment"""
+        return self.context.get("course_access_checks", {}).get(
+            enrollment.course_id, {}
+        )
+
     def get_hasUnmetPrerequisites(self, enrollment):
         """Whether or not a course has unmet prerequisites"""
-
-        return enrollment.course_id in self.context.get(
-            "courses_requirements_not_met", []
+        return self._get_course_access_checks(enrollment).get(
+            "has_unmet_prerequisites", False
         )
 
     def get_isTooEarly(self, enrollment):
         """Determine if the course is open to a learner (course has started or user has early beta access)"""
-        return not self.context.get("courses_open_for_learner", {}).get(
-            enrollment.course_id, False
+        return self._get_course_access_checks(enrollment).get(
+            "is_too_early_to_view", False
         )
 
     def get_isStaff(self, enrollment):
         """Determine whether a user has staff access to this course"""
-        return self.context.get("courses_with_staff_access", {}).get(
-            enrollment.course_id, False
+        return self._get_course_access_checks(enrollment).get(
+            "user_has_staff_access", False
         )
 
 

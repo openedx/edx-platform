@@ -132,8 +132,16 @@ def get_cert_statuses(user, course_enrollments):
     }
 
 
-def get_courses_with_unmet_prerequisites(user, course_enrollments):
-    """Determine which courses have unmetprerequisites"""
+def _get_courses_with_unmet_prerequisites(user, course_enrollments):
+    """
+    Determine which courses have unmet prerequisites.
+    NOTE: that courses w/out prerequisites, or with met prerequisites are not returned
+    in the output dict. That way we can do a simple "course_id in dict" check.
+
+    Returns: {
+        <course_id>: { "courses": [listing of unmet prerequisites] }
+    }
+    """
 
     courses_having_prerequisites = frozenset(
         enrollment.course_id
@@ -144,42 +152,40 @@ def get_courses_with_unmet_prerequisites(user, course_enrollments):
     return get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
 
 
-def get_courses_with_staff_access(user, course_enrollments):
+def check_course_access(user, course_enrollments):
     """
-    Determine if the user has staff access to any courses.
-    Adapted from has_access to get just the info we want.
+    Wrapper for checks surrounding user ability to view courseware
 
     Returns: {
-        <course_id>: True if the user has staff access to course, False if not
+        <course_enrollment.id>: {
+            "has_unmet_prerequisites": True/False,
+            "is_too_early_to_view": True/False,
+            "user_has_staff_access": True/False
+        }
     }
     """
 
-    return {
-        course_enrollment.course_id: any(
-            administrative_accesses_to_course_for_user(
-                user, course_enrollment.course_id
-            )
-        )
-        for course_enrollment in course_enrollments
-    }
+    course_access_dict = {}
 
+    courses_with_unmet_prerequisites = _get_courses_with_unmet_prerequisites(
+        user, course_enrollments
+    )
 
-def get_courses_open_for_learner(user, course_enrollments):
-    """
-    Determine if the course is currently open for learner access (course has started
-    or user has early beta access). Adapted from has_access.
+    for course_enrollment in course_enrollments:
+        course_access_dict[course_enrollment.course_id] = {
+            "has_unmet_prerequisites": course_enrollment.course_id
+            in courses_with_unmet_prerequisites,
+            "is_too_early_to_view": not check_course_open_for_learner(
+                user, course_enrollment.course
+            ),
+            "user_has_staff_access": any(
+                administrative_accesses_to_course_for_user(
+                    user, course_enrollment.course_id
+                )
+            ),
+        }
 
-    Returns: {
-        <course_id>: True if the user has staff access to course, False if not
-    }
-    """
-
-    return {
-        course_enrollment.course_id: check_course_open_for_learner(
-            user, course_enrollment.course
-        )
-        for course_enrollment in course_enrollments
-    }
+    return course_access_dict
 
 
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
@@ -210,18 +216,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         cert_statuses = get_cert_statuses(user, course_enrollments)
 
         # Determine view access for course, (for showing courseware link) involves:
-        # ... blocking for enrollments with unmet prerequisites
-        courses_requirements_not_met = get_courses_with_unmet_prerequisites(
-            user, course_enrollments
-        )
-        # ... allowing for users with staff access
-        courses_with_staff_access = get_courses_with_staff_access(
-            user, course_enrollments
-        )
-        # ... and checking if the course is started or contains an early beta access
-        courses_open_for_learner = get_courses_open_for_learner(
-            user, course_enrollments
-        )
+        course_access_checks = check_course_access(user, course_enrollments)
 
         # TODO - Get related programs
 
@@ -245,9 +240,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "cert_statuses": cert_statuses,
             "course_mode_info": course_mode_info,
             "course_optouts": course_optouts,
-            "courses_requirements_not_met": courses_requirements_not_met,
-            "courses_with_staff_access": courses_with_staff_access,
-            "courses_open_for_learner": courses_open_for_learner,
+            "course_access_checks": course_access_checks,
             "resume_course_urls": resume_button_urls,
             "show_email_settings_for": show_email_settings_for,
         }

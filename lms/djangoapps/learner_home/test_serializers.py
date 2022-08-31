@@ -159,7 +159,15 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
     """Tests for the HasAccessSerializer"""
 
     def create_test_context(self, course):
-        return {"courses_requirements_not_met": {}}
+        return {
+            "course_access_checks": {
+                course.id: {
+                    "has_unmet_prerequisites": False,
+                    "is_too_early_to_view": False,
+                    "user_has_staff_access": False,
+                }
+            }
+        }
 
     @ddt.data(True, False)
     def test_unmet_prerequisites(self, has_unmet_prerequisites):
@@ -173,14 +181,9 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
             prerequisite_course = CourseFactory()
             input_context.update(
                 {
-                    "courses_requirements_not_met": {
+                    "course_access_checks": {
                         input_data.course.id: {
-                            "courses": [
-                                {
-                                    "key": prerequisite_course.id,
-                                    "display": prerequisite_course.display_name,
-                                }
-                            ]
+                            "has_unmet_prerequisites": has_unmet_prerequisites,
                         }
                     }
                 }
@@ -201,8 +204,10 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
         # Where user has/hasn't staff access
         input_context.update(
             {
-                "courses_with_staff_access": {
-                    input_data.course.id: is_staff,
+                "course_access_checks": {
+                    input_data.course.id: {
+                        "user_has_staff_access": is_staff,
+                    }
                 }
             }
         )
@@ -222,8 +227,10 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
         # Where the course is/n't yet open for a learner
         input_context.update(
             {
-                "courses_open_for_learner": {
-                    input_data.course.id: not is_too_early,
+                "course_access_checks": {
+                    input_data.course.id: {
+                        "is_too_early_to_view": is_too_early,
+                    }
                 }
             }
         )
