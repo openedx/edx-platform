@@ -49,10 +49,5 @@ class EventTrackingConfig(AppConfig):
             logger.debug("Not initializing metadatacache. This is Studio, Celery, other command.")
             return
 
-        # ...and don't want every LMS instance calling this either, but
-        # the first one to start should set PREFILLING
-
         metadatacache = tahoeusermetadata.userprofile_metadata_cache
-
-        if not metadatacache.READY and not metadatacache.PREFILLING:
-            tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)
+        tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)

@@ -27,20 +27,40 @@ class TahoeUserProfileMetadataCache(object):
     # TODO: rework as a singleton.
 
     CACHE_KEY_PREFIX = "appsembler_eventtracking_user_metadata_by_user_id"
+    CACHE_PREFILLING_KEY = "TahoeUserProfileMetadataCache_PREFILLING"
     READY = False
-    PREFILLING = False
 
     def _make_key_by_user_id(self, user_id):
         return '{}-{}'.format(self.CACHE_KEY_PREFIX, user_id)
+
+    def prefill(self):
+        """Prefill if not already prefilling."""
+        if cache.get(self.CACHE_PREFILLING_KEY):
+            # don't allow more than one prefill!
+            logger.info("TahoeUserProfileMetadataCache already prefilling")
+            return
+
+        cache.set(self.CACHE_PREFILLING_KEY, True)
+        logger.info("START Prefilling Tahoe UserMetadata Cache...")
+
+        from student.models import UserProfile
+
+        for up in UserProfile.objects.all().select_related('user'):
+            self.set_by_user_id(up.user.id, up.get_meta().get('tahoe_idp_metadata', {}), True)
+
+        cache.set(self.CACHE_PREFILLING_KEY, False)
+        self.READY = True
+        logger.info("FINISH Prefilling Tahoe UserMetadata Cache")
 
     def get_by_user_id(self, user_id):
         if not self.READY:
             return None
         return cache.get(self._make_key_by_user_id(user_id))
 
-    def set_by_user_id(self, user_id, val):
-        if not self.READY:
-            return None
+    def set_by_user_id(self, user_id, val, is_prefill=False):
+        if not self.READY and not is_prefill:
+            # we can set as part of the prefill before done, but not otherwise
+            return
         key = self._make_key_by_user_id(user_id)
         cache.set(key, val)
         logger.debug('Set and retrieved {} with value {}'.format(key, cache.get(key)))
@@ -54,22 +74,13 @@ class TahoeUserProfileMetadataCache(object):
 
 # import of settings is a problem when setting this via plugin architecture
 @task(routing_key=PREFETCH_TAHOE_USERMETADATA_CACHE_QUEUE)
-def prefetch_tahoe_usermetadata_cache(self, cache_instance):
-    """Celery task to prefetch UserProfile metadata for all users."""
-    cache_instance.PREFILLING = True
+def prefetch_tahoe_usermetadata_cache(cache_instance):
+    """Celery task to prefill the TahoeUserProfileMetadataCache.
 
-    logger.info("START Prefilling Tahoe UserMetadata Cache...")
-
-    from student.models import UserProfile
-
-    for up in UserProfile.objects.all().select_related('user'):
-        cache_instance.set_by_user_id(up.user.id, up.get_meta().get('tahoe_idp_metadata', {}))
-
-    cache_instance.PREFILLING = False
-    cache_instance.READY = True
-    logger.info("FINISH Prefilling Tahoe UserMetadata Cache")
-
-    return True  # TODO: not sure what we want to return here for the task_success signal
+    Will run on the worker's instance of the cache.
+    Designed to work with a shared cache like memcached.
+    """
+    cache_instance.prefill()
 
 
 class TahoeUserMetadataProcessor(object):
