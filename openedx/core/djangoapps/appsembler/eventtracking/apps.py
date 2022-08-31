@@ -35,6 +35,21 @@ class EventTrackingConfig(AppConfig):
                         PluginSignals.SENDER_PATH: 'student.models.UserProfile',
                     }
                 ]
+            },
+            ProjectType.CMS: {
+                PluginSignals.RECEIVERS: [
+                    # just to invalidate cache if UserProfile changed, maybe in Django admin
+                    {
+                        PluginSignals.RECEIVER_FUNC_NAME: 'invalidate_user_metadata_cache_entry',
+                        PluginSignals.SIGNAL_PATH: 'django.db.models.signals.post_save',
+                        PluginSignals.SENDER_PATH: 'student.models.UserProfile',
+                    },
+                    {
+                        PluginSignals.RECEIVER_FUNC_NAME: 'invalidate_user_metadata_cache_entry',
+                        PluginSignals.SIGNAL_PATH: 'django.db.models.signals.post_delete',
+                        PluginSignals.SENDER_PATH: 'student.models.UserProfile',
+                    }
+                ]
             }
         }
     }
