@@ -14,6 +14,9 @@ from common.djangoapps.student.views.dashboard import (
     get_course_enrollments,
     get_org_black_and_whitelist_for_site,
 )
+from common.djangoapps.util.milestones_helpers import (
+    get_pre_requisite_courses_not_completed,
+)
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_feature_enabled
 from lms.djangoapps.commerce.utils import EcommerceService
