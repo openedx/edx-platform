@@ -4,6 +4,7 @@ Event-tracking additions for Tahoe customer-specific metadata.
 Custom event-tracking Processor to add properties to events.
 """
 
+from json.decoder import JSONDecodeError
 import logging
 
 from celery import task
@@ -99,19 +100,25 @@ class TahoeUserMetadataProcessor(object):
         from student.models import UserProfile
         try:
             profile = UserProfile.objects.get(user__id=user_id)
-            meta = profile.get_meta()
-            idp_metadata = meta.get("tahoe_idp_metadata", {})
-            custom_reg_data = idp_metadata.get("registration_additional")
-            userprofile_metadata_cache.set_by_user_id(user_id, idp_metadata)
-            return custom_reg_data
         except UserProfile.DoesNotExist:
             logger.info("User {user_id} has no UserProfile".format(user_id=user_id))
             return {}
+        meta = profile.get_meta()
+        idp_metadata = meta.get("tahoe_idp_metadata", {})
+        custom_reg_data = idp_metadata.get("registration_additional")
+        userprofile_metadata_cache.set_by_user_id(user_id, idp_metadata)
+        return custom_reg_data
 
     def _get_user_tahoe_metadata(self, user_id):
         """Build additional tracking context from Tahoe IDP metadata about the user."""
         # for now we only get custom registration field values
-        return {"registration_extra": self._get_custom_registration_metadata(user_id)}
+        try:
+            custom_reg_data = self._get_custom_registration_metadata(user_id)
+        except JSONDecodeError:
+            logger.info("Bad JSON in UserProfile.meta for user id {}".format(user_id))
+            return {"ERROR": "Bad JSON in User's metadata"}
+
+        return {"registration_extra": custom_reg_data}
 
         # there may eventually be others we want to add as event context
 
