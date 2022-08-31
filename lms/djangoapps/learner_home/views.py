@@ -21,6 +21,9 @@ from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_feature_enabled
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
+from lms.djangoapps.courseware.access_utils import (
+    check_course_open_for_learner,
+)
 from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -161,6 +164,24 @@ def get_courses_with_staff_access(user, course_enrollments):
     }
 
 
+def get_courses_open_for_learner(user, course_enrollments):
+    """
+    Determine if the course is currently open for learner access (course has started
+    or user has early beta access). Adapted from has_access.
+
+    Returns: {
+        <course_id>: True if the user has staff access to course, False if not
+    }
+    """
+
+    return {
+        course_enrollment.course_id: check_course_open_for_learner(
+            user, course_enrollment.course
+        )
+        for course_enrollment in course_enrollments
+    }
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
@@ -193,9 +214,12 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         courses_requirements_not_met = get_courses_with_unmet_prerequisites(
             user, course_enrollments
         )
-
         # ... allowing for users with staff access
         courses_with_staff_access = get_courses_with_staff_access(
+            user, course_enrollments
+        )
+        # ... and checking if the course is started or contains an early beta access
+        courses_open_for_learner = get_courses_open_for_learner(
             user, course_enrollments
         )
 
@@ -223,6 +247,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "course_optouts": course_optouts,
             "courses_requirements_not_met": courses_requirements_not_met,
             "courses_with_staff_access": courses_with_staff_access,
+            "courses_open_for_learner": courses_open_for_learner,
             "resume_course_urls": resume_button_urls,
             "show_email_settings_for": show_email_settings_for,
         }

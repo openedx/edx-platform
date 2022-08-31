@@ -112,7 +112,10 @@ class HasAccessSerializer(serializers.Serializer):
         )
 
     def get_isTooEarly(self, enrollment):
-        pass
+        """Determine if the course is open to a learner (course has started or user has early beta access)"""
+        return not self.context.get("courses_open_for_learner", {}).get(
+            enrollment.course_id, False
+        )
 
     def get_isStaff(self, enrollment):
         """Determine whether a user has staff access to this course"""

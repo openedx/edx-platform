@@ -225,6 +225,27 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
         # Then "isStaff" serializes properly
         self.assertEqual(output_data["isStaff"], is_staff)
 
+    @ddt.data(True, False)
+    def test_is_too_early(self, is_too_early):
+        # Given an enrollment
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
+
+        # Where the course is/n't yet open for a learner
+        input_context.update(
+            {
+                "courses_open_for_learner": {
+                    input_data.course.id: not is_too_early,
+                }
+            }
+        )
+
+        # When I serialize
+        output_data = HasAccessSerializer(input_data, context=input_context).data
+
+        # Then "isTooEarly" serializes properly
+        self.assertEqual(output_data["isTooEarly"], is_too_early)
+
 
 @ddt.ddt
 class TestEnrollmentSerializer(LearnerDashboardBaseTest):
