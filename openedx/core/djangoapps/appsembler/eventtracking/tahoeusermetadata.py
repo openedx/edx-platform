@@ -121,9 +121,12 @@ class TahoeUserMetadataProcessor(object):
             logger.info("Bad JSON in UserProfile.meta for user id {}".format(user_id))
             return {"ERROR": "Cannot return User metadata due to invalid JSON."}
 
-        return {"registration_extra": custom_reg_data}
-
-        # there may eventually be others we want to add as event context
+        # there may eventually be others we want to add as event context,
+        # in which case any value should be returned
+        if custom_reg_data:
+            return {"registration_extra": custom_reg_data}
+        else:
+            return {}
 
     def __call__(self, event):
         """Process the event and return the event."""
