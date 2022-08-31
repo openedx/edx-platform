@@ -25,6 +25,7 @@ from lms.djangoapps.learner_home.serializers import (
     EnterpriseDashboardSerializer,
     EntitlementSerializer,
     GradeDataSerializer,
+    HasAccessSerializer,
     LearnerEnrollmentSerializer,
     PlatformSettingsSerializer,
     ProgramsSerializer,
@@ -163,6 +164,45 @@ class TestCourseRunSerializer(LearnerDashboardBaseTest):
         # Serializaiton set up so all fields will have values to make testing easy
         for key in output:
             assert output[key] is not None
+
+
+@ddt.ddt
+class TestHasAccessSerializer(LearnerDashboardBaseTest):
+    """Tests for the HasAccessSerializer"""
+
+    def create_test_context(self, course):
+        return {"courses_requirements_not_met": {}}
+
+    @ddt.data(True, False)
+    def test_unmet_prerequisites(self, has_unmet_prerequisites):
+        # Given an enrollment
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
+
+        # ... without unmet prerequisites
+        if has_unmet_prerequisites:
+            # ... or with unmet prerequisites
+            prerequisite_course = CourseFactory()
+            input_context.update(
+                {
+                    "courses_requirements_not_met": {
+                        input_data.course.id: {
+                            "courses": [
+                                {
+                                    "key": prerequisite_course.id,
+                                    "display": prerequisite_course.display_name,
+                                }
+                            ]
+                        }
+                    }
+                }
+            )
+
+        # When I serialize
+        output_data = HasAccessSerializer(input_data, context=input_context).data
+
+        # Then "hasUnmetPrerequisites" is outputs correctly
+        self.assertEqual(output_data["hasUnmetPrerequisites"], has_unmet_prerequisites)
 
 
 @ddt.ddt
@@ -364,9 +404,7 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
         output_data = CertificateSerializer(input_data, context=input_context).data
 
         # Then the available date is the course end date
-        expected_available_date = datetime_to_django_format(
-            input_data.course.end
-        )
+        expected_available_date = datetime_to_django_format(input_data.course.end)
         self.assertEqual(output_data["availableDate"], expected_available_date)
 
     @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=True)

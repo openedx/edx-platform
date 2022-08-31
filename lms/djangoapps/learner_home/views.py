@@ -125,6 +125,18 @@ def get_cert_statuses(user, course_enrollments):
     }
 
 
+def get_courses_with_unmet_prerequisites(user, course_enrollments):
+    """Determine which courses have unmetprerequisites"""
+
+    courses_having_prerequisites = frozenset(
+        enrollment.course_id
+        for enrollment in course_enrollments
+        if enrollment.course_overview.pre_requisite_courses
+    )
+
+    return get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
@@ -152,6 +164,13 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         # Get cert status by course
         cert_statuses = get_cert_statuses(user, course_enrollments)
 
+        # Get enrollments with unmet prerequisites
+        courses_requirements_not_met = get_courses_with_unmet_prerequisites(
+            user, course_enrollments
+        )
+
+        # TODO - Get verification status by course (do we still need this?)
+
         # TODO - Determine view access for courses (for showing courseware link or not)
 
         # TODO - Get related programs
@@ -178,6 +197,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "cert_statuses": cert_statuses,
             "course_mode_info": course_mode_info,
             "course_optouts": course_optouts,
+            "courses_requirements_not_met": courses_requirements_not_met,
             "resume_course_urls": resume_button_urls,
             "show_email_settings_for": show_email_settings_for,
         }
