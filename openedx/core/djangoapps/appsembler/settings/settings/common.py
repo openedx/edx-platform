@@ -23,7 +23,6 @@ def plugin_settings(settings):
         'openedx.core.djangoapps.appsembler.api',
         'openedx.core.djangoapps.appsembler.auth.apps.AppsemblerAuthConfig',
         'openedx.core.djangoapps.appsembler.tahoe2_migration',
-        'openedx.core.djangoapps.appsembler.eventtracking.apps.EventTrackingConfig',
     ]
 
     # insert at beginning because it needs to be earlier in the list than various
