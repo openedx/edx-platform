@@ -69,18 +69,6 @@ class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
 
         return test_enrollment
 
-    @classmethod
-    def generate_base_test_context(cls):
-        """Base context object that can be used across tests"""
-        return {
-            "ecommerce_payment_page": random_url(),
-            "cert_statuses": {},
-            "course_mode_info": {},
-            "course_optouts": {},
-            "resume_course_urls": {},
-            "show_email_settings_for": {},
-        }
-
 
 class TestPlatformSettingsSerializer(TestCase):
     """Tests for the PlatformSettingsSerializer"""
