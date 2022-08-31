@@ -77,6 +77,17 @@ def plugin_settings(settings):
 
     settings.COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL = False
 
+    settings.EVENT_TRACKING_PROCESSORS += [
+        # This processor does nothing outside of LMS but it's easier to keep this in common settings
+        # but we could look at just putting this in the `_lms` modules, too.
+        {
+            'ENGINE': 'openedx.core.djangoapps.appsembler.eventtracking.tahoeusermetadata.TahoeUserMetadataProcessor'
+        }
+    ]
+
+    # during prefetch at startup, worker queries all UserProfile meta so we might reassign
+    settings.PREFETCH_TAHOE_USERMETADATA_CACHE_QUEUE = settings.DEFAULT_PRIORITY_QUEUE
+
     # Appsembler allows generating honor certs
     settings.FEATURES['TAHOE_AUTO_GENERATE_HONOR_CERTS'] = True
 

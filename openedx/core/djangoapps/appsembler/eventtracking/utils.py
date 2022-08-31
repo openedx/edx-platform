@@ -17,6 +17,7 @@ Where? appsembler.eventracking.sites is a likely candidate as the purpose of the
 """
 
 import logging
+
 from django.core.exceptions import MultipleObjectsReturned
 
 from openedx.core.djangoapps.site_configuration.helpers import (

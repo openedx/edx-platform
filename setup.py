@@ -74,6 +74,7 @@ setup(
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "appsembler_settings = openedx.core.djangoapps.appsembler.settings.apps:SettingsConfig",
+            "appsembler_eventtracking = openedx.core.djangoapps.appsembler.eventtracking.apps:EventTrackingConfig",
             "credentials = openedx.core.djangoapps.credentials.apps:CredentialsConfig",
             "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
