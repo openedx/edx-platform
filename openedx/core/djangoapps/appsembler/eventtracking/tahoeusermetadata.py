@@ -119,7 +119,7 @@ class TahoeUserMetadataProcessor(object):
             custom_reg_data = self._get_custom_registration_metadata(user_id)
         except JSONDecodeError:
             logger.info("Bad JSON in UserProfile.meta for user id {}".format(user_id))
-            return {"ERROR": "Bad JSON in User's metadata"}
+            return {"ERROR": "Cannot return User metadata due to invalid JSON."}
 
         return {"registration_extra": custom_reg_data}
 
