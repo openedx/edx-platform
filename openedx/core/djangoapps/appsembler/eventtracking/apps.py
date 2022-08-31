@@ -1,11 +1,16 @@
 """Configuration for the appsembler.eventtracking Django app."""
 
+import logging
+
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, PluginSignals
 
 from . import app_variant, tahoeusermetadata
+
+
+logger = logging.getLogger(__name__)
 
 
 class EventTrackingConfig(AppConfig):
@@ -41,6 +46,7 @@ class EventTrackingConfig(AppConfig):
             app_variant.is_not_lms() or
             app_variant.is_celery_worker()
         ):
+            logger.debug("Not initializing metadatacache. This is Studio, Celery, other command.")
             return
 
         # ...and don't want every LMS instance calling this either, but
