@@ -17,6 +17,10 @@ from . import app_variant
 logger = logging.getLogger(__name__)
 
 
+# can't set this via settings because of plugin signals init prior to settings availability
+PREFETCH_TAHOE_USERMETADATA_CACHE_QUEUE = 'edx.core.high_mem'
+
+
 class TahoeUserProfileMetadataCache(object):
     """Cache metadata from UserProfile."""
 
@@ -50,7 +54,8 @@ class TahoeUserProfileMetadataCache(object):
         cache.delete(key)
 
 
-@task(routing_key=settings.PREFETCH_TAHOE_USERMETADATA_CACHE_QUEUE, bind=True)
+# import of settings is a problem when setting this via plugin architecture
+@task(routing_key=PREFETCH_TAHOE_USERMETADATA_CACHE_QUEUE)
 def prefetch_tahoe_usermetadata_cache(self, cache_instance):
     """Celery task to prefetch UserProfile metadata for all users."""
     cache_instance.PREFILLING = True
