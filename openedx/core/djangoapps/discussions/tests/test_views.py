@@ -424,7 +424,10 @@ class DataTest(AuthorizedApiTest, DataTestMixin):
         with override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, new_structure_enabled):
             response = self._get()
             data = response.json()
-            for visible_provider in [Provider.OPEN_EDX, Provider.LEGACY]:
+            visible_providers = [Provider.OPEN_EDX, Provider.LEGACY]
+            if not new_structure_enabled:
+                visible_providers = [Provider.LEGACY]
+            for visible_provider in visible_providers:
                 assert visible_provider in data['providers']['available'].keys()
 
     @ddt.data(
