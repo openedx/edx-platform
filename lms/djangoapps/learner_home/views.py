@@ -8,7 +8,7 @@ from rest_framework.generics import RetrieveAPIView
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import marketing_link
-from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
+from common.djangoapps.student.helpers import cert_info, get_resume_urls_for_enrollments
 from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
     get_course_enrollments,
@@ -117,6 +117,14 @@ def get_ecommerce_payment_page(user):
     )
 
 
+def get_cert_statuses(user, course_enrollments):
+    """Get cert status by course for user enrollments"""
+    return {
+        enrollment.course_id: cert_info(user, enrollment)
+        for enrollment in course_enrollments
+    }
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
@@ -141,7 +149,8 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             user, course_enrollments
         )
 
-        # TODO - Get verification status by course (do we still need this?)
+        # Get cert status by course
+        cert_statuses = get_cert_statuses(user, course_enrollments)
 
         # TODO - Determine view access for courses (for showing courseware link or not)
 
@@ -166,6 +175,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
 
         context = {
             "ecommerce_payment_page": ecommerce_payment_page,
+            "cert_statuses": cert_statuses,
             "course_mode_info": course_mode_info,
             "course_optouts": course_optouts,
             "resume_course_urls": resume_button_urls,

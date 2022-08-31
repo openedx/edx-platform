@@ -2,11 +2,13 @@
 Serializers for the Learner Dashboard
 """
 
+from django.conf import settings
 from django.urls import reverse
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import course_home_url
+from xmodule.data import CertificatesDisplayBehaviors
 
 
 class PlatformSettingsSerializer(serializers.Serializer):
@@ -179,11 +181,59 @@ class GradeDataSerializer(serializers.Serializer):
 class CertificateSerializer(serializers.Serializer):
     """Certificate availability info"""
 
-    availableDate = serializers.DateTimeField(allow_null=True)
-    isRestricted = serializers.BooleanField()
-    isEarned = serializers.BooleanField()
-    isDownloadable = serializers.BooleanField()
-    certPreviewUrl = serializers.URLField(allow_null=True)
+    availableDate = serializers.SerializerMethodField()
+    isRestricted = serializers.SerializerMethodField()
+    isEarned = serializers.SerializerMethodField()
+    isDownloadable = serializers.SerializerMethodField()
+    certPreviewUrl = serializers.SerializerMethodField()
+
+    def get_cert_info(self, enrollment):
+        """Utility to grab certificate info for this enrollment or empty object"""
+        return self.context.get("cert_statuses", {}).get(enrollment.course.id, {})
+
+    def get_availableDate(self, enrollment):
+        """Available date changes based off of Certificate display behavior"""
+        course_overview = enrollment.course_overview
+        available_date = course_overview.certificate_available_date
+
+        if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False):
+            if (
+                course_overview.certificates_display_behavior
+                == CertificatesDisplayBehaviors.END_WITH_DATE
+                and course_overview.certificate_available_date
+            ):
+                available_date = course_overview.certificate_available_date
+            elif (
+                course_overview.certificates_display_behavior
+                == CertificatesDisplayBehaviors.END
+                and course_overview.end
+            ):
+                available_date = course_overview.end
+        else:
+            available_date = course_overview.certificate_available_date
+
+        return serializers.DateTimeField().to_representation(available_date)
+
+    def get_isRestricted(self, enrollment):
+        """Cert is considered restricted based on certificate status"""
+        return self.get_cert_info(enrollment).get("status") == "restricted"
+
+    def get_isEarned(self, enrollment):
+        """Cert is considered earned based on certificate status"""
+        is_earned_states = ("downloadable", "certificate_earned_but_not_available")
+        return self.get_cert_info(enrollment).get("status") in is_earned_states
+
+    def get_isDownloadable(self, enrollment):
+        """Cert is considered downloadable based on certificate status"""
+        return self.get_cert_info(enrollment).get("status") == "downloadable"
+
+    def get_certPreviewUrl(self, enrollment):
+        """Cert preview URL comes from certificate info"""
+        cert_info = self.get_cert_info(enrollment)
+        if not cert_info.get("show_cert_web_view", False):
+            return None
+        else:
+            return cert_info.get("cert_web_view_url")
 
 
 class AvailableEntitlementSessionSerializer(serializers.Serializer):
@@ -238,11 +288,11 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     course = CourseSerializer()
     courseRun = CourseRunSerializer(source="*")
     enrollment = EnrollmentSerializer(source="*")
+    certificate = CertificateSerializer(source="*")
 
     # TODO - remove "allow_null" as each of these are implemented, temp for testing.
     courseProvider = CourseProviderSerializer(allow_null=True)
     gradeData = GradeDataSerializer(allow_null=True)
-    certificate = CertificateSerializer(allow_null=True)
     entitlements = EntitlementSerializer(allow_null=True)
     programs = ProgramsSerializer(allow_null=True)
 
