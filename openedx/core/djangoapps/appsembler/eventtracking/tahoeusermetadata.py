@@ -47,10 +47,8 @@ class TahoeUserProfileMetadataCache(object):
 
     def invalidate(self, instance):
         # called by signal handler on post_save, post_delete of UserProfile
+        # we can invalidate even while prefilling as long as key is found
         key = self._make_key_by_user_id(instance.user_id)
-        if not self.READY:
-            logger.info('Tried to delete {} before cache was done prefetching'.format(key))
-            return
         cache.delete(key)
 
 
