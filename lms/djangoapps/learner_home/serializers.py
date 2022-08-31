@@ -115,7 +115,10 @@ class HasAccessSerializer(serializers.Serializer):
         pass
 
     def get_isStaff(self, enrollment):
-        pass
+        """Determine whether a user has staff access to this course"""
+        return self.context.get("courses_with_staff_access", {}).get(
+            enrollment.course_id, False
+        )
 
 
 class EnrollmentSerializer(serializers.Serializer):

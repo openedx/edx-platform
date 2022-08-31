@@ -20,6 +20,7 @@ from common.djangoapps.util.milestones_helpers import (
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_feature_enabled
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
 from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -140,6 +141,26 @@ def get_courses_with_unmet_prerequisites(user, course_enrollments):
     return get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
 
 
+def get_courses_with_staff_access(user, course_enrollments):
+    """
+    Determine if the user has staff access to any courses.
+    Adapted from has_access to get just the info we want.
+
+    Returns: {
+        <course_id>: True if the user has staff access to course, False if not
+    }
+    """
+
+    return {
+        course_enrollment.course_id: any(
+            administrative_accesses_to_course_for_user(
+                user, course_enrollment.course_id
+            )
+        )
+        for course_enrollment in course_enrollments
+    }
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
@@ -167,18 +188,18 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         # Get cert status by course
         cert_statuses = get_cert_statuses(user, course_enrollments)
 
-        # Get enrollments with unmet prerequisites
+        # Determine view access for course, (for showing courseware link) involves:
+        # ... blocking for enrollments with unmet prerequisites
         courses_requirements_not_met = get_courses_with_unmet_prerequisites(
             user, course_enrollments
         )
 
-        # TODO - Get verification status by course (do we still need this?)
-
-        # TODO - Determine view access for courses (for showing courseware link or not)
+        # ... allowing for users with staff access
+        courses_with_staff_access = get_courses_with_staff_access(
+            user, course_enrollments
+        )
 
         # TODO - Get related programs
-
-        # TODO - Get user verification status
 
         # e-commerce info
         ecommerce_payment_page = get_ecommerce_payment_page(user)
@@ -201,6 +222,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "course_mode_info": course_mode_info,
             "course_optouts": course_optouts,
             "courses_requirements_not_met": courses_requirements_not_met,
+            "courses_with_staff_access": courses_with_staff_access,
             "resume_course_urls": resume_button_urls,
             "show_email_settings_for": show_email_settings_for,
         }

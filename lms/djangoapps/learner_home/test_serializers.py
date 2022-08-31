@@ -204,6 +204,27 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
         # Then "hasUnmetPrerequisites" is outputs correctly
         self.assertEqual(output_data["hasUnmetPrerequisites"], has_unmet_prerequisites)
 
+    @ddt.data(True, False)
+    def test_is_staff(self, is_staff):
+        # Given an enrollment
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
+
+        # Where user has/hasn't staff access
+        input_context.update(
+            {
+                "courses_with_staff_access": {
+                    input_data.course.id: is_staff,
+                }
+            }
+        )
+
+        # When I serialize
+        output_data = HasAccessSerializer(input_data, context=input_context).data
+
+        # Then "isStaff" serializes properly
+        self.assertEqual(output_data["isStaff"], is_staff)
+
 
 @ddt.ddt
 class TestEnrollmentSerializer(LearnerDashboardBaseTest):
