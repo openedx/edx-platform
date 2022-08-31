@@ -8,16 +8,18 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     ProgramViewSet,
     ClassStudentViewSet,
+    ClassSummaryViewSet,
 )
 
-lesson_viewset_router = DefaultRouter()
-lesson_viewset_router.register('lessons', ProgramViewSet, basename='lessons')
+router = DefaultRouter()
+router.register('lessons', ProgramViewSet, basename='lessons')
+router.register('class-summary', ClassSummaryViewSet, basename='class-summary')
 
 
 app_name = 'genplus_learning_api_v1'
 
 urlpatterns = [
-    url(r'^lessons/unlock/(?P<pk>\d+)/$', ProgramViewSet.as_view({"put": "unlock_lesson"})),
     url(r'^class-students/(?P<group_id>\w+)/$', ClassStudentViewSet.as_view({'get': 'list'})),
-    path('', include(lesson_viewset_router.urls)),
+    url(r'^class-summary/lesson/unlock/(?P<lesson_id>\d+)/$', ClassSummaryViewSet.as_view({"put": "unlock_lesson"})),
+    path('', include(router.urls)),
 ]

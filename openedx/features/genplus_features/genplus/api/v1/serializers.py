@@ -3,7 +3,7 @@ from django.middleware import csrf
 from rest_framework import serializers
 from common.djangoapps.student.models import UserProfile
 from openedx.features.genplus_features.genplus.models import Teacher, Character, Skill, Class, JournalPost
-from openedx.features.genplus_features.genplus.display_messages import ErrorMessages
+from openedx.features.genplus_features.common.display_messages import ErrorMessages
 from django.contrib.auth import get_user_model
 
 
