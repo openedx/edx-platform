@@ -8,10 +8,10 @@ import logging
 
 from celery import task
 from crum import get_current_user
-from django.conf import settings
 from django.core.cache import cache
 
-from . import utils
+from . import app_variant
+
 
 logger = logging.getLogger(__name__)
 
@@ -121,7 +121,7 @@ class TahoeUserMetadataProcessor(object):
         # We have to be careful to not add SQL queries that would require updating upstream tests
         # which count SQL queries; e.g., `cms.djangoapps.contentstore.views.tests.test_course_index)
         # currently we can do this by only enabling the event processor for LMS
-        if utils.is_not_lms():  # we don't care about user metadata for Studio, at this point
+        if app_variant.is_not_lms():  # we don't care about user metadata for Studio, at this point
             return event
 
         user = get_current_user()

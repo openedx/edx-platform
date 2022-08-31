@@ -17,8 +17,6 @@ Where? appsembler.eventracking.sites is a likely candidate as the purpose of the
 """
 
 import logging
-import os
-import sys
 
 from django.core.exceptions import MultipleObjectsReturned
 
@@ -32,16 +30,6 @@ from openedx.core.djangoapps.appsembler.eventtracking.exceptions import (
 
 
 log = logging.getLogger(__name__)
-
-
-def is_not_lms():
-    """Utility function: return False if not running in the LMS."""
-    return os.getenv("SERVICE_VARIANT") != 'lms'
-
-
-def is_not_runserver():
-    """Utility function: return False if not runserver command."""
-    return 'runserver' not in sys.argv
 
 
 def get_site_config_for_event(event_props):

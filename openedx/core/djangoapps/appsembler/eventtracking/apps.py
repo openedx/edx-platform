@@ -3,10 +3,9 @@
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
-from common.djangoapps.track.shim import is_celery_worker
 from openedx.core.djangoapps.plugins.constants import ProjectType, PluginSignals
 
-from . import tahoeusermetadata, utils
+from . import app_variant, tahoeusermetadata
 
 
 class EventTrackingConfig(AppConfig):
@@ -16,7 +15,6 @@ class EventTrackingConfig(AppConfig):
     name = 'openedx.core.djangoapps.appsembler.eventtracking'
     verbose_name = _('Appsembler Event Tracking')
 
-    # TODO: signal receiver from tahoe_userprofile_metadata_cache task
     plugin_app = {
         PluginSignals.CONFIG: {
             ProjectType.LMS: {
@@ -38,7 +36,11 @@ class EventTrackingConfig(AppConfig):
 
     def ready(self):
         # only want to prefill the cache on lms runserver...
-        if utils.is_not_runserver() or utils.is_not_lms() or is_celery_worker():
+        if (
+            app_variant.is_not_runserver() or
+            app_variant.is_not_lms() or
+            app_variant.is_celery_worker()
+        ):
             return
 
         # ...and don't want every LMS instance calling this either, but
