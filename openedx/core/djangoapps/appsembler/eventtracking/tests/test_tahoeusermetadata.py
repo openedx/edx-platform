@@ -22,7 +22,8 @@ BASE_EVENT_WITH_CONTEXT = {
 
 
 class UserProfileWithMetadataFactory(UserProfileFactory):
-
+    """Factory for UserProfile sequence with some tahoe_user_metadata."""
+    # TODO: a Sequence is a bit of a silly way to set things up.
     meta = factory.Sequence(lambda n: {
         "tahoe_user_metadata": {
             "some_other_key": "some_other_val",
@@ -38,7 +39,7 @@ class UserWithTahoeMetadataFactory(UserFactory):
 
 @pytest.fixture(autouse=True)
 def users():
-    return [UserWithTahoeMetadataFactory() for i in range(1, 2)]
+    return [UserWithTahoeMetadataFactory() for i in range(2)]
 
 
 @pytest.fixture(autouse=True)
@@ -59,8 +60,17 @@ def test_for_metadata_no_cache(users, base_event, processor):
         base_event.update(context={
             "tahoe_user_metadata": {
                 "some_other_key": "some_other_val",
-                "registration_extra": {"custom_reg_field": "value1"}
+                "registration_extra": {"custom_reg_field": "value0"}
             }
         })
+        event = processor(base_event)
+        assert event == base_event
+
+
+@pytest.mark.django_db
+def test_no_context_added_if_no_metadata_of_interest(users, base_event, processor):
+    """Test happy path, Processor returns the event with user metadata in `context`."""
+    with patch(EVENTTRACKING_MODULE + '.tahoeusermetadata.get_current_user', MagicMock()) as mocked:
+        mocked.return_value = users[1]
         event = processor(base_event)
         assert event == base_event
