@@ -1,11 +1,16 @@
 """Configuration for the appsembler.eventtracking Django app."""
 
+import logging
+
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, PluginSignals
 
 from . import app_variant, tahoeusermetadata
+
+
+logger = logging.getLogger(__name__)
 
 
 class EventTrackingConfig(AppConfig):
@@ -30,6 +35,21 @@ class EventTrackingConfig(AppConfig):
                         PluginSignals.SENDER_PATH: 'student.models.UserProfile',
                     }
                 ]
+            },
+            ProjectType.CMS: {
+                PluginSignals.RECEIVERS: [
+                    # just to invalidate cache if UserProfile changed, maybe in Django admin
+                    {
+                        PluginSignals.RECEIVER_FUNC_NAME: 'invalidate_user_metadata_cache_entry',
+                        PluginSignals.SIGNAL_PATH: 'django.db.models.signals.post_save',
+                        PluginSignals.SENDER_PATH: 'student.models.UserProfile',
+                    },
+                    {
+                        PluginSignals.RECEIVER_FUNC_NAME: 'invalidate_user_metadata_cache_entry',
+                        PluginSignals.SIGNAL_PATH: 'django.db.models.signals.post_delete',
+                        PluginSignals.SENDER_PATH: 'student.models.UserProfile',
+                    }
+                ]
             }
         }
     }
@@ -41,12 +61,8 @@ class EventTrackingConfig(AppConfig):
             app_variant.is_not_lms() or
             app_variant.is_celery_worker()
         ):
+            logger.debug("Not initializing metadatacache. This is Studio, Celery, other command.")
             return
 
-        # ...and don't want every LMS instance calling this either, but
-        # the first one to start should set PREFILLING
-
         metadatacache = tahoeusermetadata.userprofile_metadata_cache
-
-        if not metadatacache.READY and not metadatacache.PREFILLING:
-            tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)
+        tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)
