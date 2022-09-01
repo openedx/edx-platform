@@ -2686,3 +2686,12 @@ COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-s
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
 
 PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
+
+######################## Registration ########################
+
+# Social-core setting that allows inactive users to be able to
+# log in. The only case it's used is when user registering a new account through the LMS.
+INACTIVE_USER_LOGIN = True
+
+# Redirect URL for inactive user. If not set, user will be redirected to /login after the login itself (loop)
+INACTIVE_USER_URL = f'http://{CMS_BASE}'
