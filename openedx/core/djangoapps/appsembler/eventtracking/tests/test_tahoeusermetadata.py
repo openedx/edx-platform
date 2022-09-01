@@ -36,25 +36,31 @@ class UserWithTahoeMetadataFactory(UserFactory):
     profile = factory.RelatedFactory(UserProfileWithMetadataFactory, 'user')
 
 
-@pytest.mark.django_db
-class TahoeUserMetadataProcessorTests():
-    """"""
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        """Create Users and UserProfiles to test with."""
-        self.users = [UserWithTahoeMetadataFactory() for i in range(1, 2)]
-        self.base_event = BASE_EVENT_WITH_CONTEXT
-        self.processor = TahoeUserMetadataProcessor()
+@pytest.fixture(autouse=True)
+def users():
+    return [UserWithTahoeMetadataFactory() for i in range(1, 2)]
 
-    @patch(EVENTTRACKING_MODULE + '.tahoeusermetadata.get_current_user', MagicMock())
-    def test_for_metadata_no_cache(self, mocked_get_current_user):
-        """Test happy path, Processor returns the event with user metadata in `context`."""
-        mocked_get_current_user.return_value = self.users[0]
-        expected = BASE_EVENT_WITH_CONTEXT.update(context={
+
+@pytest.fixture(autouse=True)
+def base_event():
+    return BASE_EVENT_WITH_CONTEXT
+
+
+@pytest.fixture(autouse=True)
+def processor():
+    return TahoeUserMetadataProcessor()
+
+
+@pytest.mark.django_db
+def test_for_metadata_no_cache(users, base_event, processor):
+    """Test happy path, Processor returns the event with user metadata in `context`."""
+    with patch(EVENTTRACKING_MODULE + '.tahoeusermetadata.get_current_user', MagicMock()) as mocked:
+        mocked.return_value = users[0]
+        base_event.update(context={
             "tahoe_user_metadata": {
                 "some_other_key": "some_other_val",
                 "registration_extra": {"custom_reg_field": "value1"}
             }
         })
-        event = self.processor(self.base_event)
-        assert event == expected
+        event = processor(base_event)
+        assert event == base_event
