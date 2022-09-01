@@ -269,6 +269,29 @@ def inline_discussion(request, course_key, discussion_id):
     })
 
 
+def redirect_forum_url_to_new_mfe(request, course_id):
+    """
+    Returns the redirect link when user opens default discussion homepage
+    """
+    course_key = CourseKey.from_string(course_id)
+    discussions_mfe_enabled_for_everyone = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key)
+    view_mfe_in_iframe = ENABLE_VIEW_MFE_IN_IFRAME.is_enabled(course_key)
+    privileged_user = is_privileged_user(course_key, request.user)
+
+    redirect_url = None
+    if discussions_mfe_enabled_for_everyone and (not view_mfe_in_iframe):
+        mfe_base_url = settings.DISCUSSIONS_MICROFRONTEND_URL
+        redirect_url = f"{mfe_base_url}/{str(course_key)}"
+    elif discussions_mfe_enabled_for_everyone and (not privileged_user):
+        discussion_experience = request.GET.get('discussions_experience', None)
+        banner_enabled = ENABLE_DISCUSSIONS_MFE_BANNER.is_enabled(course_key)
+        redirect_to_mfe = (discussion_experience is None) or (not banner_enabled)
+        if redirect_to_mfe and discussion_experience == "legacy":
+            mfe_context = _discussions_mfe_context(request.GET, course_key, True, False, False)
+            redirect_url = mfe_context['mfe_url']
+    return redirect_url
+
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @login_required
 @use_bulk_ops
@@ -307,34 +330,33 @@ def forum_form_discussion(request, course_key):
             'corrected_text': query_params['corrected_text'],
         })
     else:
-        discussions_mfe_enabled_for_everyone = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key)
-        privileged_user = is_privileged_user(course_key, request.user)
-        if discussions_mfe_enabled_for_everyone and (not privileged_user):
-            discussion_experience = request.GET.get('discussions_experience', None)
-            banner_enabled = ENABLE_DISCUSSIONS_MFE_BANNER.is_enabled(course_key)
-            redirect_to_mfe = (discussion_experience is None) or (not banner_enabled)
-            if redirect_to_mfe and discussion_experience == "legacy":
-                mfe_context = _discussions_mfe_context(request.GET, course_key, True, False, False)
-                return redirect(mfe_context['mfe_url'])
+        redirect_url = redirect_forum_url_to_new_mfe(request, str(course.id))
+        if redirect_url:
+            return redirect(redirect_url)
 
         course_id = str(course.id)
         tab_view = CourseTabView()
         return tab_view.get(request, course_id, 'discussion')
 
 
-def redirect_url_to_new_mfe(request, course_id, thread_id):
+def redirect_thread_url_to_new_mfe(request, course_id, thread_id):
     """
     Returns MFE url of the thread if the user is not privileged
     """
     course_key = CourseKey.from_string(course_id)
     discussions_mfe_enabled_for_everyone = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key)
-    if discussions_mfe_enabled_for_everyone and (not is_privileged_user(course_key, request.user)):
+    view_mfe_in_iframe = ENABLE_VIEW_MFE_IN_IFRAME.is_enabled(course_key)
+    redirect_url = None
+    if discussions_mfe_enabled_for_everyone and (not view_mfe_in_iframe):
+        mfe_base_url = settings.DISCUSSIONS_MICROFRONTEND_URL
+        if thread_id:
+            redirect_url = f"{mfe_base_url}/{str(course_key)}/posts/{thread_id}"
+    elif discussions_mfe_enabled_for_everyone and (not is_privileged_user(course_key, request.user)):
         discussion_experience = request.GET.get('discussions_experience', None)
         if (discussion_experience is None) and (thread_id is not None):
             mfe_context = _discussions_mfe_context(request.GET, course_key, True, False, False)
             redirect_url = f"{mfe_context['mfe_url']}#posts/{thread_id}"
-            return redirect_url
-    return None
+    return redirect_url
 
 
 @require_GET
@@ -386,7 +408,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'annotated_content_info': annotated_content_info,
         })
     else:
-        redirect_url = redirect_url_to_new_mfe(request, str(course.id), thread_id)
+        redirect_url = redirect_thread_url_to_new_mfe(request, str(course.id), thread_id)
         if redirect_url:
             return redirect(redirect_url)
 
@@ -650,8 +672,12 @@ def user_profile(request, course_key, user_id):
             })
         else:
             discussions_mfe_enabled_for_everyone = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key)
+            view_mfe_in_iframe = ENABLE_VIEW_MFE_IN_IFRAME.is_enabled(course_key)
             privileged_user = is_privileged_user(course_key, request.user)
-            if discussions_mfe_enabled_for_everyone and (not privileged_user):
+            if discussions_mfe_enabled_for_everyone and (not view_mfe_in_iframe):
+                mfe_base_url = settings.DISCUSSIONS_MICROFRONTEND_URL
+                return redirect(f"{mfe_base_url}/{str(course_key)}/learners")
+            elif discussions_mfe_enabled_for_everyone and (not privileged_user):
                 mfe_context = _discussions_mfe_context(request.GET, course_key, True, False, False)
                 return redirect(mfe_context['mfe_url'])
 
