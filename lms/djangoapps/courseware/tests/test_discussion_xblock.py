@@ -430,13 +430,14 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
                 discussion_target='Target Discussion',
             ))
 
-        # 5 queries are required to do first discussion xblock render:
+        # 6 queries are required to do first discussion xblock render:
         # * split_modulestore_django_splitmodulestorecourseindex x2
-        # * waffle_utils_waffleorgoverridemodel
+        # * waffle_flag.discussions.enable_new_structure_discussions
+        # * lms_xblock_xblockasidesconfig
         # * django_comment_client_role
         # * DiscussionsConfiguration
 
-        num_queries = 5
+        num_queries = 6
 
         for discussion in discussions:
             discussion_xblock = get_module_for_descriptor_internal(
@@ -452,8 +453,9 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
 
             # Permissions are cached, so no queries required for subsequent renders
 
-            # Only query to check for provider_type
-            num_queries = 1
+            # query to check for provider_type
+            # query to check waffle flag discussions.enable_new_structure_discussions
+            num_queries = 2
 
             html = fragment.content
             assert 'data-user-create-comment="false"' in html
