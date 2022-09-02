@@ -33,8 +33,7 @@ def plugin_settings(settings):
 
     settings.CACHES.update({
         'tahoe_userprofile_metadata_cache': {
-            'KEY_PREFIX': 'tahoe_userprofile_metadata_',
-            # 'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            'KEY_PREFIX': 'tahoe_userprofile_metadata',
             'LOCATION': 'edx_loc_mem_cache',
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         }
