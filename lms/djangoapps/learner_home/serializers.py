@@ -297,6 +297,7 @@ class EntitlementSerializer(serializers.Serializer):
     requires_context = True
 
     availableSessions = serializers.SerializerMethodField()
+    uuid = serializers.UUIDField()
     isRefundable = serializers.BooleanField(source='is_entitlement_refundable')
     isFulfilled = serializers.SerializerMethodField()
     changeDeadline = serializers.SerializerMethodField()
