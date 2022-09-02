@@ -8,7 +8,6 @@ import copy
 
 import analytics
 from analytics.client import Client
-from django.conf import settings
 
 from openedx.core.djangoapps.site_configuration import helpers
 from openedx.core.djangoapps.appsembler.eventtracking import exceptions, utils
@@ -131,6 +130,7 @@ def is_celery_worker():
 
     :return: <True> if the execution is for Celery; and <False> otherwise
     """
+    from django.conf import settings
     return getattr(settings, 'IS_CELERY_WORKER', False) or False
 
 
