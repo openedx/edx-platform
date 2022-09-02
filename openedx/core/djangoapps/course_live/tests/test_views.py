@@ -271,6 +271,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         Create and test POST request response data
         """
+        self.create_course_live_config()
         providers = ProviderManager().get_enabled_providers()
         if providers.get(provider).requires_pii_sharing():
             CourseAllowPIISharingInLTIFlag.objects.create(course_id=self.course.id, enabled=True)

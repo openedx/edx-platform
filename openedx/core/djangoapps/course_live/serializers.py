@@ -140,6 +140,8 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         instance = self._update_course_live_instance(instance, validated_data)
         if not validated_data.get('free_tier', False):
             instance = self._update_lti(instance, lti_config)
+        else:
+            instance.lti_configuration = None
         instance.save()
         return instance
 
@@ -151,6 +153,8 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
         instance = self._update_course_live_instance(instance, validated_data)
         if not validated_data.get('free_tier', False):
             instance = self._update_lti(instance, lti_config)
+        else:
+            instance.lti_configuration = None
         instance.save()
         return instance
 
