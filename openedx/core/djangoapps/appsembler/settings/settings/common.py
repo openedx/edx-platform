@@ -84,9 +84,6 @@ def plugin_settings(settings):
         }
     ]
 
-    # during prefetch at startup, worker queries all UserProfile meta so we might reassign
-    settings.PREFETCH_TAHOE_USERMETADATA_CACHE_QUEUE = settings.DEFAULT_PRIORITY_QUEUE
-
     # Appsembler allows generating honor certs
     settings.FEATURES['TAHOE_AUTO_GENERATE_HONOR_CERTS'] = True
 
