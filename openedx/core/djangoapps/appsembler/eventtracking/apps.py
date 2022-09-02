@@ -6,6 +6,7 @@ from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, PluginSignals
+from track.shim import is_celery_worker
 
 from . import app_variant, tahoeusermetadata
 
@@ -63,7 +64,7 @@ class EventTrackingConfig(AppConfig):
         if (
             app_variant.is_not_runserver() or
             app_variant.is_not_lms() or
-            app_variant.is_celery_worker()
+            is_celery_worker()
         ):
             logger.debug("Not initializing metadatacache. This is Studio, Celery, other command.")
             return
