@@ -47,6 +47,19 @@ class HelperMixin:
 
     provider = None
 
+    def _check_registration_form_username(self, form_data, test_username, expected):
+        """
+        DRY method to check the username in the registration form.
+
+        Args:
+            form_data (dict): data to initialize form with.
+            test_username (str): username to check the form initialization with.
+            expected (str): expected cleaned username after the form initialization.
+        """
+        form_data['username'] = test_username
+        form_field_data = self.provider.get_register_form_data(form_data)
+        assert form_field_data['username'] == expected
+
     def assert_redirect_to_provider_looks_correct(self, response):
         """Asserts the redirect to the provider's site looks correct.
 
@@ -85,6 +98,25 @@ class HelperMixin:
         for prepopulated_form_data in form_field_data:
             if prepopulated_form_data in required_fields:
                 self.assertContains(response, form_field_data[prepopulated_form_data])
+
+    def assert_register_form_populates_unicode_username_correctly(self, request):  # lint-amnesty, pylint: disable=invalid-name
+        """
+        Check the registration form username field behaviour with unicode values.
+
+        The field could be empty or prefilled depending on whether ENABLE_UNICODE_USERNAME feature is disabled/enabled.
+        """
+        unicode_username = 'Червона_Калина'
+        ascii_substring = 'untouchable'
+        partial_unicode_username = unicode_username + ascii_substring
+        pipeline_kwargs = pipeline.get(request)['kwargs']
+
+        assert settings.FEATURES['ENABLE_UNICODE_USERNAME'] is False
+
+        self._check_registration_form_username(pipeline_kwargs, unicode_username, '')
+        self._check_registration_form_username(pipeline_kwargs, partial_unicode_username, ascii_substring)
+
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_UNICODE_USERNAME': True}):
+            self._check_registration_form_username(pipeline_kwargs, unicode_username, unicode_username)
 
     # pylint: disable=invalid-name
     def assert_account_settings_context_looks_correct(self, context, duplicate=False, linked=None):
@@ -860,6 +892,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         # At this point we know the pipeline has resumed correctly. Next we
         # fire off the view that displays the registration form.
         with self._patch_edxmako_current_request(request):
+            self.assert_register_form_populates_unicode_username_correctly(request)
             self.assert_register_response_in_pipeline_looks_correct(
                 login_and_registration_form(strategy.request, initial_mode='register'),
                 pipeline.get(request)['kwargs'],
