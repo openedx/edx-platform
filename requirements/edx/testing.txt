@@ -831,7 +831,7 @@ lazy==1.4
     #   ora2
 lazy-object-proxy==1.7.1
     # via astroid
-learner-pathway-progress==1.3.0
+learner-pathway-progress==1.3.1
     # via -r requirements/edx/base.txt
 libsass==0.10.0
     # via
