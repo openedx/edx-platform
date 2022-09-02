@@ -13,7 +13,7 @@ from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticati
 from openedx.features.genplus_features.genplus_teach.models import MediaType, Gtcs, Article, ArticleRating, FavoriteArticle, ReflectionAnswer, Reflection, ArticleViewLog
 from openedx.features.genplus_features.genplus.api.v1.mixins import GenzMixin
 from openedx.features.genplus_features.genplus.models import Teacher, Skill
-from openedx.features.genplus_features.genplus.display_messages import SuccessMessages, ErrorMessages
+from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from .serializers import ArticleSerializer, FavoriteArticleSerializer, ArticleRatingSerializer, ReflectionAnswerSerializer,\
     PortfolioSerializer, ArticleViewLogSerializer, GtcsSerializer, MediaTypeSerializer
 from openedx.features.genplus_features.genplus.api.v1.serializers import SkillSerializer
