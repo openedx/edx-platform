@@ -26,6 +26,7 @@ from lms.djangoapps.courseware.access_utils import (
 )
 from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.features.enterprise_support.api import enterprise_customer_from_session_or_learner_data
 
 
 def get_platform_settings():
@@ -196,6 +197,9 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         user = request.user
         email_confirmation = get_user_account_confirmation_info(user)
 
+        # Gather info for enterprise dashboard
+        enterprise_customer = enterprise_customer_from_session_or_learner_data(request)
+
         # Get the org whitelist or the org blacklist for the current site
         site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
 
@@ -228,7 +232,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
 
         learner_dash_data = {
             "emailConfirmation": email_confirmation,
-            "enterpriseDashboards": None,
+            "enterpriseDashboard": enterprise_customer,
             "platformSettings": get_platform_settings(),
             "enrollments": course_enrollments,
             "unfulfilledEntitlements": [],
@@ -243,6 +247,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "course_access_checks": course_access_checks,
             "resume_course_urls": resume_button_urls,
             "show_email_settings_for": show_email_settings_for,
+            'enterprise_learner_portal_base_url': settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL,
         }
 
         response_data = LearnerDashboardSerializer(

@@ -6,6 +6,7 @@ from unittest.mock import patch
 from uuid import uuid4
 
 import ddt
+from django.conf import settings
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
@@ -28,6 +29,9 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+
+
+ENTERPRISE_ENABLED = 'ENABLE_ENTERPRISE_INTEGRATION'
 
 
 class TestGetPlatformSettings(TestCase):
@@ -216,6 +220,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         super().setUp()
         self.log_in()
 
+    @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
     def test_response_structure(self):
         """Basic test for correct response structure"""
 
@@ -241,6 +246,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
 
         assert expected_keys == response_data.keys()
 
+    @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
     @patch("lms.djangoapps.learner_home.views.get_user_account_confirmation_info")
     def test_email_confirmation(self, mock_user_conf_info):
         """Test that email confirmation info passes through correctly"""
@@ -269,6 +275,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
             },
         )
 
+    @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
     @patch("lms.djangoapps.learner_home.views.cert_info")
     def test_get_cert_statuses(self, mock_get_cert_info):
         """Test that cert information gets loaded correctly"""

@@ -840,15 +840,22 @@ class TestEnterpriseDashboardSerializer(TestCase):
     @classmethod
     def generate_test_data(cls):
         return {
-            "label": f"{uuid4()}",
-            "url": random_url(),
+            "uuid": str(uuid4()),
+            "name": str(uuid4()),
+        }
+
+    @classmethod
+    def generate_test_context(cls):
+        return {
+            'enterprise_learner_portal_base_url': random_url()
         }
 
     def test_structure(self):
         """Test that nothing breaks and the output fields look correct"""
         input_data = self.generate_test_data()
+        input_context = self.generate_test_context()
 
-        output_data = EnterpriseDashboardSerializer(input_data).data
+        output_data = EnterpriseDashboardSerializer(input_data, context=input_context).data
 
         expected_keys = [
             "label",
@@ -860,14 +867,15 @@ class TestEnterpriseDashboardSerializer(TestCase):
         """Test that data serializes correctly"""
 
         input_data = self.generate_test_data()
+        input_context = self.generate_test_context()
 
-        output_data = EnterpriseDashboardSerializer(input_data).data
+        output_data = EnterpriseDashboardSerializer(input_data, context=input_context).data
 
         self.assertDictEqual(
             output_data,
             {
-                "label": input_data["label"],
-                "url": input_data["url"],
+                "label": input_data["name"],
+                "url": input_context['enterprise_learner_portal_base_url'] + '/' + input_data["uuid"],
             },
         )
 

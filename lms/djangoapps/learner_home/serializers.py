@@ -356,8 +356,13 @@ class EmailConfirmationSerializer(serializers.Serializer):
 class EnterpriseDashboardSerializer(serializers.Serializer):
     """Serializer for individual enterprise dashboard data"""
 
-    label = serializers.CharField()
-    url = serializers.URLField()
+    requires_context = True
+
+    label = serializers.CharField(source='name')
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, instance):
+        return f"{self.context['enterprise_learner_portal_base_url']}/{instance['uuid']}"
 
 
 class LearnerDashboardSerializer(serializers.Serializer):
