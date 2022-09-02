@@ -149,7 +149,7 @@ class HelperMixin:
         assert 409 == response.status_code
         payload = json.loads(response.content.decode('utf-8'))
         assert not payload.get('success')
-        assert 'belongs to an existing account' in payload['username'][0]['user_message']
+        assert 'It looks like this username is already taken' == payload['username'][0]['user_message']
 
     def assert_json_success_response_looks_correct(self, response, verify_redirect_url):
         """Asserts the json response indicates success and redirection."""

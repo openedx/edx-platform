@@ -25,16 +25,14 @@ from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (
     AUTHN_EMAIL_CONFLICT_MSG,
+    AUTHN_EMAIL_INVALID_MSG,
     AUTHN_USERNAME_CONFLICT_MSG,
     EMAIL_BAD_LENGTH_MSG,
-    EMAIL_CONFLICT_MSG,
-    EMAIL_INVALID_MSG,
     EMAIL_MAX_LENGTH,
     EMAIL_MIN_LENGTH,
     NAME_MAX_LENGTH,
     REQUIRED_FIELD_CONFIRM_EMAIL_MSG,
     USERNAME_BAD_LENGTH_MSG,
-    USERNAME_CONFLICT_MSG,
     USERNAME_INVALID_CHARS_ASCII,
     USERNAME_INVALID_CHARS_UNICODE,
     USERNAME_MAX_LENGTH,
@@ -158,12 +156,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email"
             }
@@ -205,12 +198,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "username": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
-                    ).format(
-                        self.USERNAME
-                    )
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-username"
             }
@@ -243,12 +231,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email"
             }
@@ -285,12 +268,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        account_recovery.secondary_email
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email"
             }
@@ -344,12 +322,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email"
             }
@@ -383,12 +356,7 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "username": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
-                    ).format(
-                        self.USERNAME
-                    )
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-username"
             }
@@ -422,58 +390,10 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "username": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
-                    ).format(
-                        self.USERNAME
-                    )
-                }],
-                "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
-                }],
-                "error_code": "duplicate-email-username"
-            }
-        )
-
-    def test_duplicate_email_username_error_with_is_authn_check(self):
-        # Register the first user
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
-            "name": self.NAME,
-            "username": self.USERNAME,
-            "password": self.PASSWORD,
-            "honor_code": "true",
-        })
-        self.assertHttpOK(response)
-
-        # Try to create a second user with the same username and email
-        response = self.client.post(self.url, {
-            "is_authn_mfe": True,
-            "email": self.EMAIL,
-            "name": "Someone Else",
-            "username": self.USERNAME,
-            "password": self.PASSWORD,
-            "honor_code": "true",
-        })
-
-        response_json = json.loads(response.content.decode('utf-8'))
-        assert response.status_code == 409
-        username_suggestions = response_json.pop('username_suggestions')
-        assert len(username_suggestions) == 3
-        self.assertDictEqual(
-            response_json,
-            {
-                "username": [{
                     "user_message": AUTHN_USERNAME_CONFLICT_MSG,
                 }],
                 "email": [{
-                    "user_message": AUTHN_EMAIL_CONFLICT_MSG
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email-username"
             }
@@ -1651,12 +1571,7 @@ class RegistrationViewTestV1(
             response_json,
             {
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email"
             }
@@ -1690,12 +1605,7 @@ class RegistrationViewTestV1(
             response_json,
             {
                 "username": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
-                    ).format(
-                        self.USERNAME
-                    )
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-username"
             }
@@ -1729,20 +1639,10 @@ class RegistrationViewTestV1(
             response_json,
             {
                 "username": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different username."
-                    ).format(
-                        self.USERNAME
-                    )
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
                 }],
                 "email": [{
-                    "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
-                    ).format(
-                        self.EMAIL
-                    )
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email-username"
             }
@@ -2371,8 +2271,12 @@ class ThirdPartyRegistrationTestMixin(
         assert response.status_code == 409
         errors = json.loads(response.content.decode('utf-8'))
         for conflict_attribute in ["username", "email"]:
+            if conflict_attribute == 'username':
+                error_message = AUTHN_USERNAME_CONFLICT_MSG
+            else:
+                error_message = AUTHN_EMAIL_CONFLICT_MSG
             assert conflict_attribute in errors
-            assert "belongs to an existing account" in errors[conflict_attribute][0]["user_message"]
+            assert error_message == errors[conflict_attribute][0]["user_message"]
 
     def _assert_access_token_error(self, response, expected_error_message, error_code):
         """Assert that the given response was an error for the access_token field with the given error message."""
@@ -2665,13 +2569,9 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             },
             {
                 # pylint: disable=no-member
-                "username": USERNAME_CONFLICT_MSG.format(
-                    username=user.username
-                ) if username == user.username else '',
+                "username": AUTHN_USERNAME_CONFLICT_MSG if username == user.username else '',
                 # pylint: disable=no-member
-                "email": EMAIL_CONFLICT_MSG.format(
-                    email_address=user.email
-                ) if email == user.email else ''
+                "email": AUTHN_EMAIL_CONFLICT_MSG if email == user.email else ''
             },
             validate_suggestions
         )
@@ -2684,11 +2584,10 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
         )
 
     def test_email_generically_invalid_validation_decision(self):
-        email = 'email'
         self.assertValidationDecision(
-            {'email': email},
+            {'email': 'email'},
             # pylint: disable=no-member
-            {'email': EMAIL_INVALID_MSG.format(email=email)}
+            {'email': AUTHN_EMAIL_INVALID_MSG}
         )
 
     def test_confirm_email_matches_email(self):
