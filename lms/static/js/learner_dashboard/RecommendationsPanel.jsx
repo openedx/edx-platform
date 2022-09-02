@@ -40,8 +40,11 @@ class RecommendationsPanel extends React.Component {
         if (response.status === 400) {
           return this.props.generalRecommendations;
         } else {
+          if (window.hj) {
+              window.hj('event', 'van_1046_show_recommendations_survey');
+          }
           return response.json();
-          
+
         }
       }).catch(() => {
         return this.props.generalRecommendations;
