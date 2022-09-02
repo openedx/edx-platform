@@ -57,7 +57,14 @@ class TahoeUserProfileMetadataCache(object):
     def get_by_user_id(self, user_id):
         if not self.READY:
             return None
-        return self.cache.get(user_id)
+        val = self.cache.get(user_id)
+        if val:
+            logger.debug(
+                'Retrieved UserProfile metadata from cache for user id {} with value {}'.format(
+                    user_id, val
+                )
+            )
+        return val
 
     def set_by_user_id(self, user_id, val, is_prefill=False):
         if not self.READY and not is_prefill:
