@@ -76,6 +76,7 @@ django-fernet-fields==0.6  # via -r requirements/edx/testing.txt, edx-enterprise
 django-filter==2.4.0      # via -r requirements/edx/testing.txt, edx-enterprise, lti-consumer-xblock
 django-ipware==3.0.2      # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
 django-js-asset==1.2.2    # via -r requirements/edx/testing.txt, django-mptt
+django-tinymce==3.4.0
 django-method-override==1.0.4  # via -r requirements/edx/testing.txt
 django-model-utils==4.1.1  # via -r requirements/edx/testing.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
 django-mptt==0.12.0       # via -r requirements/edx/testing.txt, django-wiki
@@ -326,7 +327,8 @@ xblock==1.4.0             # via -r requirements/edx/testing.txt, acid-xblock, cr
 xmlsec==1.3.9             # via -r requirements/edx/testing.txt, python3-saml
 xss-utils==0.2.0          # via -r requirements/edx/testing.txt
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, importlib-metadata
-
+youtube-dl==2020.12.2
+pafy==0.5.5
 # The following packages are considered to be unsafe in a requirements file:
 # pip
 # setuptools

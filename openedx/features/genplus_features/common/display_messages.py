@@ -8,6 +8,10 @@ class SuccessMessages:
     TEACHER_FEEDBACK_ADDED = 'Your feedback has been added successfully.'
     STUDENT_POST_UPDATED = 'Your journal post has been updated successfully.'
     TEACHER_FEEDBACK_UPDATED = 'Your feedback has been updated successfully.'
+    # genplus teach
+    ARTICLE_ADDED_TO_FAVORITES = '{title} has been added to your favorite articles.'
+    ARTICLE_REMOVED_FROM_FAVORITES = '{title} has been removed from your favorite articles.'
+    ARTICLE_RATED = "Thanks for the rating."
 
 
 class ErrorMessages:
@@ -19,3 +23,6 @@ class ErrorMessages:
     TEACHER_FEEDBACK_ENTRY_FAILED = 'Your feedback could not be added to this journal.'
     STUDENT_POST_UPDATE_FAILED = 'Your journal post could not be updated.'
     TEACHER_FEEDBACK_UPDATE_FAILED = 'Your feedback could not be updated.'
+    # genplus_teach messages
+    ARTICLE_ALREADY_ADDED = 'This article is already added to your favorite.'
+    ARTICLE_ALREADY_RATED = 'You have already rated this article.'
