@@ -2826,7 +2826,7 @@ class UpdateThreadTest(
 
     @ddt.data(
         (False, True),
-        (True, False),
+        (True, True),
     )
     @ddt.unpack
     def test_thread_un_abuse_flag_for_moderator_role(self, is_author, remove_all):
@@ -2837,10 +2837,6 @@ class UpdateThreadTest(
         pass the "all" flag to the api. This will indicate
         to the api to clear all abuse_flaggers, and mark the
         thread as unreported.
-        If moderator is author of a thread, we want to restrict
-        the usage of the remove_all flag, so it cant be used
-        to remove all abuse_flaggers from a moderator post
-        by the moderator itself.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
         self.register_get_user_response(self.user)
@@ -3311,7 +3307,7 @@ class UpdateCommentTest(
 
     @ddt.data(
         (False, True),
-        (True, False),
+        (True, True),
     )
     @ddt.unpack
     def test_comment_un_abuse_flag_for_moderator_role(self, is_author, remove_all):
@@ -3322,10 +3318,6 @@ class UpdateCommentTest(
         pass the "all" flag to the api. This will indicate
         to the api to clear all abuse_flaggers, and mark the
         comment as unreported.
-        If moderator is author of a comment, we want to restrict
-        the usage of the remove_all flag, so it cant be used
-        to remove all abuse_flaggers from a moderator post
-        by the moderator itself.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
         self.register_get_user_response(self.user)
