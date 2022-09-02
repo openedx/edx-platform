@@ -127,3 +127,14 @@ def plugin_settings(settings):
             }
         }
     )
+
+    # add a cache for user profile metadata for use by the TahoeUserMetadataProcessor
+    # must be done here as lms/envs/production sets via ENV_TOKENS['CACHES']
+    settings.CACHES.update({
+        'tahoe_userprofile_metadata_cache': {
+            'KEY_PREFIX': 'tahoe_userprofile_metadata_',
+            'LOCATION': settings.ENV_TOKENS.get('MEMCACHE_LOCATION', ['localhost:11211']),
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'MAX_ENTRIES': 100000  # estimated at 30Mb. See BLACK-2636
+        }
+    })

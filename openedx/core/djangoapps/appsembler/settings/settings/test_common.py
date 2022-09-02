@@ -30,3 +30,12 @@ def plugin_settings(settings):
         settings.INSTALLED_APPS += [
             'openedx.core.djangoapps.appsembler.multi_tenant_emails',
         ]
+
+    settings.CACHES.update({
+        'tahoe_userprofile_metadata_cache': {
+            'KEY_PREFIX': 'tahoe_userprofile_metadata_',
+            # 'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            'LOCATION': 'edx_loc_mem_cache',
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    })

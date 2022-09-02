@@ -55,6 +55,10 @@ class EventTrackingConfig(AppConfig):
     }
 
     def ready(self):
+
+        metadatacache = tahoeusermetadata.userprofile_metadata_cache
+        metadatacache.ready()
+
         # only want to prefill the cache on lms runserver...
         if (
             app_variant.is_not_runserver() or
@@ -63,6 +67,5 @@ class EventTrackingConfig(AppConfig):
         ):
             logger.debug("Not initializing metadatacache. This is Studio, Celery, other command.")
             return
-
-        metadatacache = tahoeusermetadata.userprofile_metadata_cache
-        tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)
+        else:
+            tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)
