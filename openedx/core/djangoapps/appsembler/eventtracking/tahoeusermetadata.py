@@ -10,6 +10,7 @@ import logging
 from celery import task
 from crum import get_current_user
 from django.core.cache import caches
+from django.core.cache.backends.base import InvalidCacheBackendError
 
 from . import app_variant
 
@@ -33,10 +34,21 @@ class TahoeUserProfileMetadataCache(object):
 
     def ready(self):
         """Finish initializing once cache is created via appsembler.settings plugin_settings."""
-        self.cache = caches[self.CACHE_NAME]
+        try:
+            self.cache = caches[self.CACHE_NAME]
+            self.READY = True
+        except (KeyError, InvalidCacheBackendError):
+            logger.warning(
+                "Could not find tahoe_userprofile_metadata_cache."
+                "Could be using settings like tutor_staticassets."
+            )
+            self.READY = False
 
     def prefill(self):
         """Prefill if not already prefilling."""
+        if not self.READY:
+            logger.info("Cannot prefill Tahoe UserProfile metadata cache, cache not ready.")
+            return
         if self.cache.get(self.CACHE_PREFILLING_KEY):
             # don't allow more than one prefill!
             logger.info("TahoeUserProfileMetadataCache already prefilling")
@@ -51,7 +63,6 @@ class TahoeUserProfileMetadataCache(object):
             self.cache.set(up.user.id, up.get_meta().get('tahoe_idp_metadata', {}), True)
 
         self.cache.set(self.CACHE_PREFILLING_KEY, False)
-        self.READY = True
         logger.info("FINISH Prefilling Tahoe UserProfile Metadata Cache")
 
     def get_by_user_id(self, user_id):
@@ -79,7 +90,8 @@ class TahoeUserProfileMetadataCache(object):
         # called by signal handler on post_save, post_delete of UserProfile
         # we can invalidate even while prefilling as long as key is found
         # TODO: if this is a save and not delete, we should set the new value
-        self.cache.delete(instance.user_id)
+        if self.READY:
+            self.cache.delete(instance.user_id)
 
 
 # import of settings is a problem when creating this via plugin architecture
