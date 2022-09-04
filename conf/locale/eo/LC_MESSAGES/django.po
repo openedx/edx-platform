@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-08-28 20:34+0000\n"
-"PO-Revision-Date: 2022-08-28 20:34:49.087264\n"
+"POT-Creation-Date: 2022-09-04 20:34+0000\n"
+"PO-Revision-Date: 2022-09-04 20:34:49.138307\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -20010,6 +20010,14 @@ msgstr ""
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "Dïsçüssïön ÌD: {discussion_id} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/discussion/_discussion_inline_studio.html
+msgid ""
+"The discussion block is disabled for this course as it is not using a "
+"compatible discussion provider."
+msgstr ""
+"Thé dïsçüssïön ßlöçk ïs dïsäßléd för thïs çöürsé äs ït ïs nöt üsïng ä "
+"çömpätïßlé dïsçüssïön prövïdér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Discussion topics list"
