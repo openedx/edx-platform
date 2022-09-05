@@ -32,7 +32,7 @@ class LtiSerializer(serializers.ModelSerializer):
         """
         Validates if lti_config contains all required data i.e. custom_instructor_email
         """
-        additional_parameters = value.get('additional_parameters', None)
+        additional_parameters = value.get('additional_parameters', {})
         custom_instructor_email = additional_parameters.get('custom_instructor_email', None)
         requires_email = self.context.get('provider').requires_custom_email()
 

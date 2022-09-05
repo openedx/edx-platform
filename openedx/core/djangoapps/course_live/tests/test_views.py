@@ -63,6 +63,9 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
                 }
             },
         }
+        if not providers.get(provider).additional_parameters:
+            lti_config.pop('lti_config')
+
         course_live_config_data = {
             'enabled': True,
             'provider_type': provider,
@@ -125,8 +128,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         lti_config, data, response = self.create_course_live_config(provider)
         course_live_configurations = CourseLiveConfiguration.get(self.course.id)
-        lti_configuration = CourseLiveConfiguration.get(self.course.id).lti_configuration
-
+        lti_configuration = course_live_configurations.get(self.course.id).lti_configuration
         self.assertEqual(self.course.id, course_live_configurations.course_key)
         self.assertEqual(data['enabled'], course_live_configurations.enabled)
         self.assertEqual(data['provider_type'], course_live_configurations.provider_type)
@@ -134,10 +136,16 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         self.assertEqual(lti_config['lti_1p1_client_key'], lti_configuration.lti_1p1_client_key)
         self.assertEqual(lti_config['lti_1p1_client_secret'], lti_configuration.lti_1p1_client_secret)
         self.assertEqual(lti_config['lti_1p1_launch_url'], lti_configuration.lti_1p1_launch_url)
+
+        provider_instance = ProviderManager().get_enabled_providers().get(provider)
+        additional_param = {'additional_parameters': {}}
+        if provider_instance.additional_parameters:
+            additional_param = {'additional_parameters': {'custom_instructor_email': 'email@example.com'}}
+
         self.assertEqual({
             'pii_share_username': share_username,
             'pii_share_email': share_email,
-            'additional_parameters': {'custom_instructor_email': 'email@example.com'}
+            **additional_param
         }, lti_configuration.lti_config)
 
         self.assertEqual(response.status_code, 200)
@@ -149,6 +157,12 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         Create and test POST request response data
         """
         lti_config, course_live_config_data, response = self.create_course_live_config(provider)
+
+        provider_instance = ProviderManager().get_enabled_providers().get(provider)
+        additional_param = {'additional_parameters': {}}
+        if provider_instance.additional_parameters:
+            additional_param = {'additional_parameters': {'custom_instructor_email': 'email@example.com'}}
+
         expected_data = {
             'course_key': str(self.course.id),
             'enabled': True,
@@ -163,9 +177,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
                 'lti_config': {
                     'pii_share_email': share_email,
                     'pii_share_username': share_username,
-                    'additional_parameters': {
-                        'custom_instructor_email': 'email@example.com'
-                    },
+                    **additional_param
                 },
             },
         }
@@ -198,6 +210,12 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         response = self._post(updated_data)
         content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 200)
+
+        provider_instance = ProviderManager().get_enabled_providers().get(provider)
+        additional_param = {'additional_parameters': {}}
+        if provider_instance.additional_parameters:
+            additional_param = {'additional_parameters': {'custom_instructor_email': 'new_email@example.com'}}
+
         expected_data = {
             'course_key': str(self.course.id),
             'provider_type': provider,
@@ -211,10 +229,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
                 'lti_config': {
                     'pii_share_username': share_username,
                     'pii_share_email': share_email,
-                    'additional_parameters': {
-                        'custom_instructor_email':
-                            'new_email@example.com'
-                    }
+                    **additional_param
                 }
             },
             'pii_sharing_allowed': share_email or share_username
