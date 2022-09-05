@@ -118,9 +118,12 @@ class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
             self.context['provider_type'] = self.data.get('provider_type', '')
 
     def validate_free_tier(self, value):
-        if value and value == self.context['provider'].has_free_tier:
+        if value:
+            if value == self.context['provider'].has_free_tier:
+                return value
+            raise serializers.ValidationError('Provider does not support free tier')
+        else:
             return value
-        raise serializers.ValidationError('Provider does not support free tier')
 
     def get_pii_sharing_allowed(self, instance):
         return self.context['pii_sharing_allowed']
