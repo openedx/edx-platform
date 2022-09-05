@@ -20,6 +20,7 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.student.signals import UNENROLL_DONE
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -54,7 +55,8 @@ class TestTransferStudents(ModuleStoreTestCase):
         assert skip_refund
         self.signal_fired = True
 
-    def test_transfer_students(self):
+    @patch('openedx.core.djangoapps.catalog.api.get_course_run_details')
+    def test_transfer_students(self, mock_get_course_run_details):
         """
         Verify the transfer student command works as intended.
         """
@@ -65,6 +67,12 @@ class TestTransferStudents(ModuleStoreTestCase):
         # Original Course
         original_course_location = locator.CourseLocator('Org0', 'Course0', 'Run0')
         course = self._create_course(original_course_location)
+
+        course_run = CourseRunFactory.create(key=course.id)
+        course_run['min_effort'] = 1
+        course_run['enrollment_count'] = 12345
+
+        mock_get_course_run_details.return_value = course_run
         # Enroll the student in 'verified'
         CourseEnrollment.enroll(student, course.id, mode='verified')
 
