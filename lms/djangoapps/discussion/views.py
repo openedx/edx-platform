@@ -829,7 +829,8 @@ def is_course_staff(course_key: CourseKey, user: User):
 def is_privileged_user(course_key: CourseKey, user: User):
     """
     Returns True if user has one of following course role
-    Administrator, Moderator, Group Moderator, Community TA
+    Administrator, Moderator, Group Moderator, Community TA,
+    Global Staff, Course Instructor or Course Staff.
     """
     forum_roles = [
         FORUM_ROLE_COMMUNITY_TA,
@@ -839,6 +840,21 @@ def is_privileged_user(course_key: CourseKey, user: User):
     ]
     has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
     return GlobalStaff().has_user(user) or is_course_staff(course_key, user) or has_course_role
+
+
+def is_user_moderator(course_key: CourseKey, user: User):
+    """
+    Returns True if user has one of following course role
+    Administrator, Moderator, Group Moderator, Community TA.
+    """
+    forum_roles = [
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_GROUP_MODERATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_ADMINISTRATOR
+    ]
+    has_course_role = Role.user_has_role_for_course(user, course_key, forum_roles)
+    return has_course_role
 
 
 class DiscussionBoardFragmentView(EdxFragmentView):
