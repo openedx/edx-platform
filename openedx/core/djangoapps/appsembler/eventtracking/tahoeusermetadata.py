@@ -9,7 +9,8 @@ import logging
 
 from celery import task
 from crum import get_current_user
-from django.core.cache import cache
+from django.core.cache import caches
+from django.core.cache.backends.base import InvalidCacheBackendError
 
 from . import app_variant
 
@@ -26,53 +27,74 @@ class TahoeUserProfileMetadataCache(object):
 
     # TODO: rework as a singleton.
 
-    CACHE_KEY_PREFIX = "appsembler_eventtracking_user_metadata_by_user_id"
-    CACHE_PREFILLING_KEY = "TahoeUserProfileMetadataCache_PREFILLING"
+    CACHE_NAME = "tahoe_userprofile_metadata_cache"  # can't get from settings here
+    CACHE_PREFILLING_KEY = "PREFILLING"
     READY = False
+    cache = None
 
-    def _make_key_by_user_id(self, user_id):
-        return '{}-{}'.format(self.CACHE_KEY_PREFIX, user_id)
+    def ready(self):
+        """Finish initializing once cache is created via appsembler.settings plugin_settings."""
+        try:
+            self.cache = caches[self.CACHE_NAME]
+            self.READY = True
+        except (KeyError, InvalidCacheBackendError):
+            logger.warning(
+                "Could not find tahoe_userprofile_metadata_cache."
+                "Could be using settings like tutor_staticassets."
+            )
+            self.READY = False
 
     def prefill(self):
         """Prefill if not already prefilling."""
-        if cache.get(self.CACHE_PREFILLING_KEY):
+        if not self.READY:
+            logger.info("Cannot prefill Tahoe UserProfile metadata cache, cache not ready.")
+            return
+        if self.cache.get(self.CACHE_PREFILLING_KEY):
             # don't allow more than one prefill!
             logger.info("TahoeUserProfileMetadataCache already prefilling")
             return
 
-        cache.set(self.CACHE_PREFILLING_KEY, True)
-        logger.info("START Prefilling Tahoe UserMetadata Cache...")
+        self.cache.set(self.CACHE_PREFILLING_KEY, True)
+        logger.info("START Prefilling Tahoe UserProfile Metadata Cache...")
 
         from student.models import UserProfile
 
         for up in UserProfile.objects.all().select_related('user'):
-            self.set_by_user_id(up.user.id, up.get_meta().get('tahoe_idp_metadata', {}), True)
+            self.cache.set(up.user.id, up.get_meta().get('tahoe_idp_metadata', {}), True)
 
-        cache.set(self.CACHE_PREFILLING_KEY, False)
-        self.READY = True
-        logger.info("FINISH Prefilling Tahoe UserMetadata Cache")
+        self.cache.set(self.CACHE_PREFILLING_KEY, False)
+        logger.info("FINISH Prefilling Tahoe UserProfile Metadata Cache")
 
     def get_by_user_id(self, user_id):
         if not self.READY:
             return None
-        return cache.get(self._make_key_by_user_id(user_id))
+        val = self.cache.get(user_id)
+        if val:
+            logger.debug(
+                'Retrieved UserProfile metadata from cache for user id {} with value {}'.format(
+                    user_id, val
+                )
+            )
+        return val
 
     def set_by_user_id(self, user_id, val, is_prefill=False):
         if not self.READY and not is_prefill:
             # we can set as part of the prefill before done, but not otherwise
             return
-        key = self._make_key_by_user_id(user_id)
-        cache.set(key, val)
-        logger.debug('Set and retrieved {} with value {}'.format(key, cache.get(key)))
+        self.cache.set(user_id, val)
+        logger.debug('Set and retrieved for user id {} with value {}'.format(
+            user_id, self.cache.get(user_id)
+        ))
 
     def invalidate(self, instance):
         # called by signal handler on post_save, post_delete of UserProfile
         # we can invalidate even while prefilling as long as key is found
-        key = self._make_key_by_user_id(instance.user_id)
-        cache.delete(key)
+        # TODO: if this is a save and not delete, we should set the new value
+        if self.READY:
+            self.cache.delete(instance.user_id)
 
 
-# import of settings is a problem when setting this via plugin architecture
+# import of settings is a problem when creating this via plugin architecture
 @task(routing_key=PREFETCH_TAHOE_USERMETADATA_CACHE_QUEUE)
 def prefetch_tahoe_usermetadata_cache(cache_instance):
     """Celery task to prefill the TahoeUserProfileMetadataCache.

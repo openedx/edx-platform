@@ -11,14 +11,6 @@ import os
 import sys
 
 
-def is_celery_worker():
-    """Utility function: return False if not a Celery worker."""
-    # Use this instead of common.djangoapps.track.shim.is_celery_worker
-    # ... as that relies on settings which is only lazy-loaded when
-    # ... plugin apps are instantiated.
-    return os.getenv('CELERY_WORKER_RUNNING', False)
-
-
 def is_not_lms():
     """Utility function: return False if not running in the LMS."""
     return os.getenv("SERVICE_VARIANT") != 'lms'

@@ -6,6 +6,7 @@ from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, PluginSignals
+from track.shim import is_celery_worker
 
 from . import app_variant, tahoeusermetadata
 
@@ -55,14 +56,17 @@ class EventTrackingConfig(AppConfig):
     }
 
     def ready(self):
+
+        metadatacache = tahoeusermetadata.userprofile_metadata_cache
+        metadatacache.ready()
+
         # only want to prefill the cache on lms runserver...
         if (
             app_variant.is_not_runserver() or
             app_variant.is_not_lms() or
-            app_variant.is_celery_worker()
+            is_celery_worker()
         ):
             logger.debug("Not initializing metadatacache. This is Studio, Celery, other command.")
             return
-
-        metadatacache = tahoeusermetadata.userprofile_metadata_cache
-        tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)
+        else:
+            tahoeusermetadata.prefetch_tahoe_usermetadata_cache.delay(metadatacache)
