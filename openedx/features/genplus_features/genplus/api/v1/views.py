@@ -268,3 +268,12 @@ class JournalViewSet(GenzMixin, viewsets.ModelViewSet):
                 return TeacherFeedbackSerializer
 
         return JournalListSerializer
+
+
+class SkillViewSet(GenzMixin, viewsets.ReadOnlyModelViewSet):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsStudentOrTeacher]
+    serializer_class = SkillSerializer
+    queryset = Skill.objects.all()
+    pagination_class = None
+    ordering = ['name']
