@@ -110,6 +110,8 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
         "pinned": is_thread and is_privileged,
         "read": is_thread,
     }
+    if is_thread:
+        editable_fields.update({"copy_link": True})
 
     if is_thread_closed:
         # Return only editable fields

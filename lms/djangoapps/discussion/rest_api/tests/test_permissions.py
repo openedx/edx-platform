@@ -63,7 +63,8 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         )
         actual = get_initializable_thread_fields(context)
         expected = {
-            "abuse_flagged", "course_id", "following", "raw_body", "read", "title", "topic_id", "type", "voted"
+            "abuse_flagged", "copy_link", "course_id", "following", "raw_body",
+            "read", "title", "topic_id", "type", "voted"
         }
         if is_privileged:
             expected |= {"closed", "pinned", "close_reason_code", "edit_reason_code"}
@@ -116,7 +117,7 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
             allow_anonymous_to_peers=allow_anonymous_to_peers,
         )
         actual = get_editable_fields(thread, context)
-        expected = {"abuse_flagged", "following", "read", "voted"}
+        expected = {"abuse_flagged", "copy_link", "following", "read", "voted"}
         if is_privileged:
             expected |= {"closed", "pinned", "close_reason_code", "edit_reason_code"}
         if is_author or is_privileged:
