@@ -303,6 +303,7 @@ class EntitlementSerializer(serializers.Serializer):
     changeDeadline = serializers.SerializerMethodField()
     isExpired = serializers.SerializerMethodField()
     expirationDate = serializers.SerializerMethodField()
+    enrollmentUrl = serializers.SerializerMethodField()
 
     # For some reason BooleanField won't cast None values to False so I'm hacking this
     # fix until I can figure out why
@@ -324,6 +325,9 @@ class EntitlementSerializer(serializers.Serializer):
 
     def get_changeDeadline(self, instance):
         return self.get_expirationDate(instance)
+
+    def get_enrollmentUrl(self, instance):
+        return reverse('entitlements_api:v1:enrollments', args=[str(instance.uuid)])
 
 
 class RelatedProgramSerializer(serializers.Serializer):
