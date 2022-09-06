@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_noop
 
 
-from lms.djangoapps.discussion.toggles import ENABLE_VIEW_MFE_IN_IFRAME
+from lms.djangoapps.discussion.toggles import ENABLE_VIEW_MFE_IN_IFRAME, ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE
 from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from xmodule.tabs import TabFragmentViewMixin
 
@@ -44,7 +44,7 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
     @property
     def link_func(self):
         def _link_func(course, reverse_func):
-            if not ENABLE_VIEW_MFE_IN_IFRAME.is_enabled():
+            if not ENABLE_VIEW_MFE_IN_IFRAME.is_enabled() and ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course.id):
                 return get_discussions_mfe_url(course_key=course.id)
             return reverse('forum_form_discussion', args=[str(course.id)])
 

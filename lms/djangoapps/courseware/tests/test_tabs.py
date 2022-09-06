@@ -22,7 +22,7 @@ from lms.djangoapps.courseware.tabs import (
 )
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
-from lms.djangoapps.discussion.toggles import ENABLE_VIEW_MFE_IN_IFRAME
+from lms.djangoapps.discussion.toggles import ENABLE_VIEW_MFE_IN_IFRAME, ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE
 from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import get_course_by_id
@@ -841,12 +841,13 @@ class DiscussionLinkTestCase(TabTestCase):
             expected_link = get_discussions_mfe_url(course_key=self.course.id)
 
         with self.settings(FEATURES={'ENABLE_DISCUSSION_SERVICE': True}):
-            self.check_discussion(
-                tab_list=self.tabs_with_discussion,
-                expected_discussion_link=expected_link,
-                expected_can_display_value=True,
-                in_iframe_flag=toggle_enabled,
-            )
+            with override_waffle_flag(ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE, True):
+                self.check_discussion(
+                    tab_list=self.tabs_with_discussion,
+                    expected_discussion_link=expected_link,
+                    expected_can_display_value=True,
+                    in_iframe_flag=toggle_enabled,
+                )
 
 
 class DatesTabTestCase(TabListTestCase):
