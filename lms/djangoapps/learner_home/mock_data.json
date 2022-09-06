@@ -16,8 +16,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": true,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -103,8 +107,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": true,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -158,8 +166,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -205,8 +217,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -278,8 +294,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -340,8 +360,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -387,8 +411,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": true,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -464,8 +492,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": true,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -530,8 +562,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": true,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -582,8 +618,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": true,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -664,8 +704,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": true,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -716,8 +760,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": true,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -777,8 +825,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -850,8 +902,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -912,8 +968,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -945,8 +1005,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": true,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1018,8 +1082,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": true,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1081,8 +1149,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": true,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1128,8 +1200,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": true,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1202,8 +1278,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": true,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1265,8 +1345,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": true,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1348,8 +1432,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1456,8 +1544,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1553,8 +1645,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1635,8 +1731,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1717,8 +1817,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1788,8 +1892,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1845,8 +1953,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1927,8 +2039,12 @@
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1986,8 +2102,12 @@
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -2074,8 +2194,12 @@
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -2151,8 +2275,12 @@
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -2213,8 +2341,12 @@
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
-                "hasFinished": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -2275,21 +2407,9 @@
         "isNeeded": true,
         "sendEmailUrl": "sendConfirmation@edx.org"
     },
-    "enterpriseDashboards": {
-        "availableDashboards": [
-            {
-                "label": "edX, Inc.",
-                "url": "/edx-dashboard"
-            },
-            {
-                "label": "Harvard",
-                "url": "/harvard-dashboard"
-            }
-        ],
-        "mostRecentDashboard": {
-            "label": "edX, Inc.",
-            "url": "/edx-dashboard"
-        }
+    "enterpriseDashboard": {
+        "label": "edX, Inc.",
+        "url": "/edx-dashboard"
     },
     "platformSettings": {
         "supportEmail": "support@example.com",

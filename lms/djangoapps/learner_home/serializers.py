@@ -94,6 +94,41 @@ class CourseRunSerializer(serializers.Serializer):
         return self.context.get("resume_course_urls", {}).get(instance.course_id)
 
 
+class HasAccessSerializer(serializers.Serializer):
+    """
+    Info determining whether a user should be able to view course material.
+    Mirrors logic in "show_courseware_links_for" from old dashboard.py
+    """
+
+    hasUnmetPrerequisites = serializers.SerializerMethodField()
+    isTooEarly = serializers.SerializerMethodField()
+    isStaff = serializers.SerializerMethodField()
+
+    def _get_course_access_checks(self, enrollment):
+        """Internal helper to unpack access object for this particular enrollment"""
+        return self.context.get("course_access_checks", {}).get(
+            enrollment.course_id, {}
+        )
+
+    def get_hasUnmetPrerequisites(self, enrollment):
+        """Whether or not a course has unmet prerequisites"""
+        return self._get_course_access_checks(enrollment).get(
+            "has_unmet_prerequisites", False
+        )
+
+    def get_isTooEarly(self, enrollment):
+        """Determine if the course is open to a learner (course has started or user has early beta access)"""
+        return self._get_course_access_checks(enrollment).get(
+            "is_too_early_to_view", False
+        )
+
+    def get_isStaff(self, enrollment):
+        """Determine whether a user has staff access to this course"""
+        return self._get_course_access_checks(enrollment).get(
+            "user_has_staff_access", False
+        )
+
+
 class EnrollmentSerializer(serializers.Serializer):
     """
     Info about this particular enrollment.
@@ -112,7 +147,7 @@ class EnrollmentSerializer(serializers.Serializer):
     accessExpirationDate = serializers.SerializerMethodField()
     isAudit = serializers.SerializerMethodField()
     hasStarted = serializers.SerializerMethodField()
-    hasFinished = serializers.SerializerMethodField()
+    hasAccess = HasAccessSerializer(source="*")
     isVerified = serializers.SerializerMethodField()
     canUpgrade = serializers.SerializerMethodField()
     isAuditAccessExpired = serializers.SerializerMethodField()
@@ -137,10 +172,6 @@ class EnrollmentSerializer(serializers.Serializer):
             enrollment.course_id
         )
         return resume_button_url is not None
-
-    def get_hasFinished(self, enrollment):
-        # TODO - AU-796
-        return False
 
     def get_isVerified(self, enrollment):
         return enrollment.is_verified_enrollment()
@@ -329,22 +360,13 @@ class EnterpriseDashboardSerializer(serializers.Serializer):
     url = serializers.URLField()
 
 
-class EnterpriseDashboardsSerializer(serializers.Serializer):
-    """Listing of available enterprise dashboards"""
-
-    availableDashboards = serializers.ListField(
-        child=EnterpriseDashboardSerializer(), allow_empty=True
-    )
-    mostRecentDashboard = EnterpriseDashboardSerializer()
-
-
 class LearnerDashboardSerializer(serializers.Serializer):
     """Serializer for all info required to render the Learner Dashboard"""
 
     requires_context = True
 
     emailConfirmation = EmailConfirmationSerializer()
-    enterpriseDashboards = EnterpriseDashboardsSerializer()
+    enterpriseDashboard = EnterpriseDashboardSerializer(allow_null=True)
     platformSettings = PlatformSettingsSerializer()
     courses = serializers.SerializerMethodField()
     suggestedCourses = serializers.ListField(

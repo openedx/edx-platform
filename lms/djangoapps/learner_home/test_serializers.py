@@ -22,9 +22,10 @@ from lms.djangoapps.learner_home.serializers import (
     CourseSerializer,
     EmailConfirmationSerializer,
     EnrollmentSerializer,
-    EnterpriseDashboardsSerializer,
+    EnterpriseDashboardSerializer,
     EntitlementSerializer,
     GradeDataSerializer,
+    HasAccessSerializer,
     LearnerEnrollmentSerializer,
     PlatformSettingsSerializer,
     ProgramsSerializer,
@@ -67,18 +68,6 @@ class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
         test_enrollment.course_overview.certificate_available_date = random_date()
 
         return test_enrollment
-
-    @classmethod
-    def generate_base_test_context(cls):
-        """Base context object that can be used across tests"""
-        return {
-            "ecommerce_payment_page": random_url(),
-            "cert_statuses": {},
-            "course_mode_info": {},
-            "course_optouts": {},
-            "resume_course_urls": {},
-            "show_email_settings_for": {},
-        }
 
 
 class TestPlatformSettingsSerializer(TestCase):
@@ -163,6 +152,94 @@ class TestCourseRunSerializer(LearnerDashboardBaseTest):
         # Serializaiton set up so all fields will have values to make testing easy
         for key in output:
             assert output[key] is not None
+
+
+@ddt.ddt
+class TestHasAccessSerializer(LearnerDashboardBaseTest):
+    """Tests for the HasAccessSerializer"""
+
+    def create_test_context(self, course):
+        return {
+            "course_access_checks": {
+                course.id: {
+                    "has_unmet_prerequisites": False,
+                    "is_too_early_to_view": False,
+                    "user_has_staff_access": False,
+                }
+            }
+        }
+
+    @ddt.data(True, False)
+    def test_unmet_prerequisites(self, has_unmet_prerequisites):
+        # Given an enrollment
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
+
+        # ... without unmet prerequisites
+        if has_unmet_prerequisites:
+            # ... or with unmet prerequisites
+            prerequisite_course = CourseFactory()
+            input_context.update(
+                {
+                    "course_access_checks": {
+                        input_data.course.id: {
+                            "has_unmet_prerequisites": has_unmet_prerequisites,
+                        }
+                    }
+                }
+            )
+
+        # When I serialize
+        output_data = HasAccessSerializer(input_data, context=input_context).data
+
+        # Then "hasUnmetPrerequisites" is outputs correctly
+        self.assertEqual(output_data["hasUnmetPrerequisites"], has_unmet_prerequisites)
+
+    @ddt.data(True, False)
+    def test_is_staff(self, is_staff):
+        # Given an enrollment
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
+
+        # Where user has/hasn't staff access
+        input_context.update(
+            {
+                "course_access_checks": {
+                    input_data.course.id: {
+                        "user_has_staff_access": is_staff,
+                    }
+                }
+            }
+        )
+
+        # When I serialize
+        output_data = HasAccessSerializer(input_data, context=input_context).data
+
+        # Then "isStaff" serializes properly
+        self.assertEqual(output_data["isStaff"], is_staff)
+
+    @ddt.data(True, False)
+    def test_is_too_early(self, is_too_early):
+        # Given an enrollment
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
+
+        # Where the course is/n't yet open for a learner
+        input_context.update(
+            {
+                "course_access_checks": {
+                    input_data.course.id: {
+                        "is_too_early_to_view": is_too_early,
+                    }
+                }
+            }
+        )
+
+        # When I serialize
+        output_data = HasAccessSerializer(input_data, context=input_context).data
+
+        # Then "isTooEarly" serializes properly
+        self.assertEqual(output_data["isTooEarly"], is_too_early)
 
 
 @ddt.ddt
@@ -364,9 +441,7 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
         output_data = CertificateSerializer(input_data, context=input_context).data
 
         # Then the available date is the course end date
-        expected_available_date = datetime_to_django_format(
-            input_data.course.end
-        )
+        expected_available_date = datetime_to_django_format(input_data.course.end)
         self.assertEqual(output_data["availableDate"], expected_available_date)
 
     @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=True)
@@ -759,36 +834,25 @@ class TestEmailConfirmationSerializer(TestCase):
         )
 
 
-class TestEnterpriseDashboardsSerializer(TestCase):
-    """High-level tests for EnterpriseDashboardsSerializer"""
-
-    @classmethod
-    def generate_test_dashboard(cls):
-        return {
-            "label": f"{uuid4()}",
-            "url": random_url(),
-        }
+class TestEnterpriseDashboardSerializer(TestCase):
+    """High-level tests for EnterpriseDashboardSerializer"""
 
     @classmethod
     def generate_test_data(cls):
         return {
-            "availableDashboards": [
-                cls.generate_test_dashboard() for _ in range(randint(0, 3))
-            ],
-            "mostRecentDashboard": cls.generate_test_dashboard()
-            if random_bool()
-            else None,
+            "label": f"{uuid4()}",
+            "url": random_url(),
         }
 
     def test_structure(self):
         """Test that nothing breaks and the output fields look correct"""
         input_data = self.generate_test_data()
 
-        output_data = EnterpriseDashboardsSerializer(input_data).data
+        output_data = EnterpriseDashboardSerializer(input_data).data
 
         expected_keys = [
-            "availableDashboards",
-            "mostRecentDashboard",
+            "label",
+            "url",
         ]
         assert output_data.keys() == set(expected_keys)
 
@@ -797,13 +861,13 @@ class TestEnterpriseDashboardsSerializer(TestCase):
 
         input_data = self.generate_test_data()
 
-        output_data = EnterpriseDashboardsSerializer(input_data).data
+        output_data = EnterpriseDashboardSerializer(input_data).data
 
         self.assertDictEqual(
             output_data,
             {
-                "availableDashboards": input_data["availableDashboards"],
-                "mostRecentDashboard": input_data["mostRecentDashboard"],
+                "label": input_data["label"],
+                "url": input_data["url"],
             },
         )
 
@@ -819,7 +883,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
         input_data = {
             "emailConfirmation": None,
-            "enterpriseDashboards": None,
+            "enterpriseDashboard": None,
             "platformSettings": None,
             "enrollments": [],
             "unfulfilledEntitlements": [],
@@ -831,7 +895,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             output_data,
             {
                 "emailConfirmation": None,
-                "enterpriseDashboards": None,
+                "enterpriseDashboard": None,
                 "platformSettings": None,
                 "courses": [],
                 "suggestedCourses": [],
@@ -857,7 +921,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
         input_data = {
             "emailConfirmation": None,
-            "enterpriseDashboards": None,
+            "enterpriseDashboard": None,
             "platformSettings": None,
             "enrollments": enrollments,
             "unfulfilledEntitlements": [],
@@ -889,7 +953,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         "lms.djangoapps.learner_home.serializers.PlatformSettingsSerializer.to_representation"
     )
     @mock.patch(
-        "lms.djangoapps.learner_home.serializers.EnterpriseDashboardsSerializer.to_representation"
+        "lms.djangoapps.learner_home.serializers.EnterpriseDashboardSerializer.to_representation"
     )
     @mock.patch(
         "lms.djangoapps.learner_home.serializers.EmailConfirmationSerializer.to_representation"
@@ -897,7 +961,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
     def test_linkage(
         self,
         mock_email_confirmation_serializer,
-        mock_enterprise_dashboards_serializer,
+        mock_enterprise_dashboard_serializer,
         mock_platform_settings_serializer,
         mock_learner_enrollment_serializer,
         mock_entitlements_serializer,
@@ -906,8 +970,8 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         mock_email_confirmation_serializer.return_value = (
             mock_email_confirmation_serializer
         )
-        mock_enterprise_dashboards_serializer.return_value = (
-            mock_enterprise_dashboards_serializer
+        mock_enterprise_dashboard_serializer.return_value = (
+            mock_enterprise_dashboard_serializer
         )
         mock_platform_settings_serializer.return_value = (
             mock_platform_settings_serializer
@@ -920,7 +984,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
         input_data = {
             "emailConfirmation": {},
-            "enterpriseDashboards": [{}],
+            "enterpriseDashboard": {},
             "platformSettings": {},
             "enrollments": [{}],
             "unfulfilledEntitlements": [{}],
@@ -932,7 +996,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             output_data,
             {
                 "emailConfirmation": mock_email_confirmation_serializer,
-                "enterpriseDashboards": mock_enterprise_dashboards_serializer,
+                "enterpriseDashboard": mock_enterprise_dashboard_serializer,
                 "platformSettings": mock_platform_settings_serializer,
                 "courses": [
                     mock_learner_enrollment_serializer,
