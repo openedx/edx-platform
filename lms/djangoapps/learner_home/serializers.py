@@ -389,7 +389,8 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
 
     requires_context = True
 
-    ENROLLMENT_DATA = {
+    # This is the static constant data returned as the 'enrollment' key for all unfulfilled enrollments.
+    STATIC_ENTITLEMENT_ENROLLMENT_DATA = {
         'accessExpirationDate': None,
         'isAudit': False,
         'hasStarted': False,
@@ -423,7 +424,7 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
     courseRun = LiteralField(None)
     gradeData = LiteralField(None)
     certificate = LiteralField(None)
-    enrollment = LiteralField(ENROLLMENT_DATA)
+    enrollment = LiteralField(STATIC_ENTITLEMENT_ENROLLMENT_DATA)
 
     def get_course(self, instance):
         pseudo_session = self.context['unfulfilled_entitlement_pseudo_sessions'].get(str(instance.uuid))

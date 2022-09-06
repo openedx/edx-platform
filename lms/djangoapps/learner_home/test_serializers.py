@@ -72,6 +72,11 @@ class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
 
         return test_enrollment
 
+    def _assert_all_keys_equal(self, dicts):
+        element_0 = dicts[0]
+        for element in dicts[1:]:
+            assert element_0.keys() == element.keys()
+
 
 class TestPlatformSettingsSerializer(TestCase):
     """Tests for the PlatformSettingsSerializer"""
@@ -601,8 +606,7 @@ class TestEntitlementSerializer(TestCase):
 
         output_data = EntitlementSerializer(entitlement, context={
             'course_entitlement_available_sessions': course_entitlement_available_sessions
-        })
-        output_data = output_data.data
+        }).data
 
         output_sessions = output_data.pop('availableSessions')
         self._assert_availale_sessions(available_sessions, output_sessions)
@@ -619,7 +623,7 @@ class TestEntitlementSerializer(TestCase):
             "isExpired": bool(entitlement.expired_at),
             "expirationDate": expected_expiration_date,
             "uuid": str(entitlement.uuid),
-            "enrollmentUrl": f'/api/entitlements/v1/entitlements/{entitlement.uuid}/enrollments'
+            "enrollmentUrl": f"/api/entitlements/v1/entitlements/{entitlement.uuid}/enrollments"
         }
 
 
@@ -756,7 +760,7 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         assert output_data['courseRun'] is None
         assert output_data['gradeData'] is None
         assert output_data['certificate'] is None
-        assert output_data['enrollment'] == UnfulfilledEntitlementSerializer.ENROLLMENT_DATA
+        assert output_data['enrollment'] == UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA
 
     def test_static_enrollment_data(self):
         """
@@ -764,7 +768,7 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         This test is to ensure that that dict has the same keys as returned by the LearnerEnrollmentSerializer
         """
         output_data = TestEnrollmentSerializer().serialize_test_enrollment()
-        expected_keys = UnfulfilledEntitlementSerializer.ENROLLMENT_DATA.keys()
+        expected_keys = UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA.keys()
         actual_keys = output_data.keys()
         assert expected_keys == actual_keys
 
@@ -968,11 +972,6 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             },
         )
 
-    def _assert_all_keys_equal(self, dicts):
-        element_0 = dicts[0]
-        for element in dicts[1:]:
-            assert element_0.keys() == element.keys()
-
     def test_enrollments(self):
         """Test that enrollments-related info is linked and serialized correctly"""
 
@@ -1023,16 +1022,17 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         output_data = LearnerDashboardSerializer(input_data, context=input_context).data
 
         courses = output_data.pop("courses")
-        #We should have three dicts with the same base structure
+        # We should have three dicts with identical keys for the course card elements
         assert len(courses) == 3
         self._assert_all_keys_equal(courses)
+        # Non-entitlement enrollment should have no entitlement info
         assert not courses[0]['entitlements']
+        # Fulfuilled and Unfulfilled entitlement should have identical keys
         fulfilled_entitlement = courses[1]['entitlements']
         unfulfilled_entitlement = courses[2]['entitlements']
         assert fulfilled_entitlement
         assert unfulfilled_entitlement
         assert fulfilled_entitlement.keys() == unfulfilled_entitlement.keys()
-        self._assert_all_keys_equal([course_card['course'] for course_card in courses])
 
     @mock.patch(
         "lms.djangoapps.learner_home.serializers.SuggestedCourseSerializer.to_representation"
