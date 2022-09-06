@@ -44,7 +44,7 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
     @property
     def link_func(self):
         def _link_func(course, reverse_func):
-            if not ENABLE_VIEW_MFE_IN_IFRAME.is_enabled() and ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.enabled(course.id):
+            if not ENABLE_VIEW_MFE_IN_IFRAME.is_enabled() and ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course.id):
                 return get_discussions_mfe_url(course_key=course.id)
             return reverse('forum_form_discussion', args=[str(course.id)])
 
