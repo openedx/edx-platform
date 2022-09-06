@@ -247,7 +247,6 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "course_access_checks": course_access_checks,
             "resume_course_urls": resume_button_urls,
             "show_email_settings_for": show_email_settings_for,
-            'enterprise_learner_portal_base_url': settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL,
         }
 
         response_data = LearnerDashboardSerializer(
