@@ -394,7 +394,7 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         'accessExpirationDate': None,
         'isAudit': False,
         'hasStarted': False,
-        'hasFinished': False,
+        'hasAccess': True,
         'isVerified': False,
         'canUpgrade': False,
         'isAuditAccessExpired': False,
