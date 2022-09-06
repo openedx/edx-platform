@@ -305,8 +305,8 @@ class EntitlementSerializer(serializers.Serializer):
     expirationDate = serializers.SerializerMethodField()
     enrollmentUrl = serializers.SerializerMethodField()
 
-    # For some reason BooleanField won't cast None values to False so I'm hacking this
-    # fix until I can figure out why
+    # DRF doesn't convert None to False so we must do this rather than a booleanfield:
+    # https://github.com/encode/django-rest-framework/issues/2299
     def get_isFulfilled(self, instance):
         return bool(instance.enrollment_course_run)
 
