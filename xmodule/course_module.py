@@ -267,6 +267,7 @@ def get_available_providers():  # lint-amnesty, pylint: disable=missing-function
     )
 
     available_providers = [provider for provider in proctoring_backend_settings if provider != 'DEFAULT']
+    available_providers.append('lti_external')
     available_providers.sort()
     return available_providers
 

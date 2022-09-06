@@ -7,6 +7,7 @@ from mock import patch
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -14,6 +15,7 @@ from rest_framework.test import APITestCase
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -117,6 +119,46 @@ class ProctoringExamSettingsGetTests(ProctoringExamSettingsTestMixin, ModuleStor
         response = self.make_request()
         assert response.status_code == status.HTTP_200_OK
         assert response.data == self.get_expected_response_data(self.course, self.course_instructor)
+
+    @override_waffle_flag(EXAMS_IDA, active=False)
+    def test_providers_with_disabled_lti(self):
+        self.client.login(username=self.course_instructor.username, password=self.password)
+        response = self.make_request()
+        assert response.status_code == status.HTTP_200_OK
+
+        # expected data should not include lti_external value
+        expected_data = {
+            'proctored_exam_settings': {
+                'enable_proctored_exams': self.course.enable_proctored_exams,
+                'allow_proctoring_opt_out': self.course.allow_proctoring_opt_out,
+                'proctoring_provider': self.course.proctoring_provider,
+                'proctoring_escalation_email': self.course.proctoring_escalation_email,
+                'create_zendesk_tickets': self.course.create_zendesk_tickets,
+            },
+            'course_start_date': '2030-01-01T00:00:00Z',
+            'available_proctoring_providers': ['null'],
+        }
+        assert response.data == expected_data
+
+    @override_waffle_flag(EXAMS_IDA, active=True)
+    def test_providers_with_enabled_lti(self):
+        self.client.login(username=self.course_instructor.username, password=self.password)
+        response = self.make_request()
+        assert response.status_code == status.HTTP_200_OK
+
+        # expected data should include lti_external value
+        expected_data = {
+            'proctored_exam_settings': {
+                'enable_proctored_exams': self.course.enable_proctored_exams,
+                'allow_proctoring_opt_out': self.course.allow_proctoring_opt_out,
+                'proctoring_provider': self.course.proctoring_provider,
+                'proctoring_escalation_email': self.course.proctoring_escalation_email,
+                'create_zendesk_tickets': self.course.create_zendesk_tickets,
+            },
+            'course_start_date': '2030-01-01T00:00:00Z',
+            'available_proctoring_providers': ['lti_external', 'null'],
+        }
+        assert response.data == expected_data
 
 
 @ddt.ddt
@@ -339,3 +381,59 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
 
         updated = modulestore().get_item(self.course.location)
         assert updated.create_zendesk_tickets is create_zendesk_tickets
+
+    @override_waffle_flag(EXAMS_IDA, active=True)
+    def test_200_for_lti_provider(self):
+        self.client.login(username=self.global_staff.username, password=self.password)
+        PROCTORED_EXAMS_ENABLED_FEATURES = settings.FEATURES
+        PROCTORED_EXAMS_ENABLED_FEATURES['ENABLE_PROCTORED_EXAMS'] = True
+        with override_settings(FEATURES=PROCTORED_EXAMS_ENABLED_FEATURES):
+            data = self.get_request_data(
+                enable_proctored_exams=True,
+                proctoring_provider='lti_external',
+            )
+            response = self.make_request(data=data)
+
+        # response is correct
+        assert response.status_code == status.HTTP_200_OK
+
+        self.assertDictEqual(response.data, {
+            'proctored_exam_settings': {
+                'enable_proctored_exams': True,
+                'allow_proctoring_opt_out': True,
+                'proctoring_provider': 'lti_external',
+                'proctoring_escalation_email': None,
+                'create_zendesk_tickets': True,
+            }
+        })
+
+        # course settings have been updated
+        updated = modulestore().get_item(self.course.location)
+        assert updated.enable_proctored_exams is True
+        assert updated.proctoring_provider == 'lti_external'
+
+    @override_waffle_flag(EXAMS_IDA, active=False)
+    def test_400_for_disabled_lti(self):
+        self.client.login(username=self.global_staff.username, password=self.password)
+        PROCTORED_EXAMS_ENABLED_FEATURES = settings.FEATURES
+        PROCTORED_EXAMS_ENABLED_FEATURES['ENABLE_PROCTORED_EXAMS'] = True
+        with override_settings(FEATURES=PROCTORED_EXAMS_ENABLED_FEATURES):
+            data = self.get_request_data(
+                enable_proctored_exams=True,
+                proctoring_provider='lti_external',
+            )
+            response = self.make_request(data=data)
+
+        # response is correct
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        self.assertDictEqual(response.data, {
+            'detail': [{
+                'proctoring_provider': "The selected proctoring provider, lti_external, is not a valid provider. "
+                                       "Please select from one of ['null']."
+            }]
+        })
+
+        # course settings have been updated
+        updated = modulestore().get_item(self.course.location)
+        assert updated.enable_proctored_exams is False
+        assert updated.proctoring_provider == 'null'
