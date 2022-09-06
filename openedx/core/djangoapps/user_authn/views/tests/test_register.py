@@ -32,6 +32,7 @@ from openedx.core.djangoapps.user_api.accounts import (
     EMAIL_MIN_LENGTH,
     NAME_MAX_LENGTH,
     REQUIRED_FIELD_CONFIRM_EMAIL_MSG,
+    REQUIRED_FIELD_COUNTRY_MSG,
     USERNAME_BAD_LENGTH_MSG,
     USERNAME_INVALID_CHARS_ASCII,
     USERNAME_INVALID_CHARS_UNICODE,
@@ -89,7 +90,7 @@ class RegistrationViewValidationErrorTest(
     YEAR_OF_BIRTH = "1998"
     ADDRESS = "123 Fake Street"
     CITY = "Springfield"
-    COUNTRY = "us"
+    COUNTRY = "US"
     GOALS = "Learn all the things!"
 
     @classmethod
@@ -396,6 +397,66 @@ class RegistrationViewValidationErrorTest(
                     "user_message": AUTHN_EMAIL_CONFLICT_MSG,
                 }],
                 "error_code": "duplicate-email-username"
+            }
+        )
+
+    def test_duplicate_email_username_error(self):
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Try to create a second user with the same username and email
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": "Someone Else",
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "country": self.COUNTRY,
+            "honor_code": "true",
+        })
+
+        response_json = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == 409
+        username_suggestions = response_json.pop('username_suggestions')
+        assert len(username_suggestions) == 3
+        self.assertDictEqual(
+            response_json,
+            {
+                "username": [{
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
+                }],
+                "email": [{
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG,
+                }],
+                "error_code": "duplicate-email-username"
+            }
+        )
+
+    def test_invalid_country_code_error(self):
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "country": "Invalid country code",
+            "honor_code": "true",
+        })
+
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertHttpBadRequest(response)
+        self.assertDictEqual(
+            response_json,
+            {
+                "country": [{
+                    "user_message": REQUIRED_FIELD_COUNTRY_MSG,
+                }],
+                "error_code": "invalid-country"
             }
         )
 
@@ -1528,7 +1589,6 @@ class RegistrationViewTestV1(
         response = self.client.post(self.url, data)
         self.assertHttpBadRequest(response)
 
-    @override_settings(REGISTRATION_EXTRA_FIELDS={"country": "required"})
     @ddt.data("email", "name", "username", "password", "country")
     def test_register_missing_required_field(self, missing_field):
         data = {
@@ -1544,6 +1604,55 @@ class RegistrationViewTestV1(
         # Send a request missing a field
         response = self.client.post(self.url, data)
         self.assertHttpBadRequest(response)
+
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"country": "required"})
+    def test_register_missing_country_required_field(self):
+        data = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "country": self.COUNTRY,
+        }
+        del data['country']
+
+        response = self.client.post(self.url, data)
+        response_json = json.loads(response.content.decode('utf-8'))
+
+        self.assertHttpBadRequest(response)
+        self.assertDictEqual(
+            response_json,
+            {
+                "country": [{
+                    "user_message": REQUIRED_FIELD_COUNTRY_MSG,
+                }],
+                "error_code": "invalid-country"
+            }
+        )
+
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"country": "required"})
+    def test_register_invalid_country_required_field(self):
+        data = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "country": "Invalid country code",
+        }
+
+        response = self.client.post(self.url, data)
+        response_json = json.loads(response.content.decode('utf-8'))
+
+        self.assertHttpBadRequest(response)
+        self.assertDictEqual(
+            response_json,
+            {
+                "country": [{
+                    "user_message": REQUIRED_FIELD_COUNTRY_MSG,
+                }],
+                "error_code": "invalid-country"
+            }
+        )
 
     def test_register_duplicate_email(self):
         # Register the first user

@@ -21,6 +21,7 @@ from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
+from django_countries import countries
 from edx_django_utils.monitoring import set_custom_attribute
 from edx_toggles.toggles import WaffleFlag
 from openedx_events.learning.data import UserData, UserPersonalData
@@ -588,6 +589,10 @@ class RegistrationView(APIView):
         if response:
             return response
 
+        response = self._handle_country_code_validation(request, data)
+        if response:
+            return response
+
         response, user = self._create_account(request, data)
         if response:
             return response
@@ -606,6 +611,27 @@ class RegistrationView(APIView):
             )  # setting the cookie to show account activation dialogue in platform and learning MFE
         mark_user_change_as_expected(user.id)
         return response
+
+    def _handle_country_code_validation(self, request, data):
+        # pylint: disable=no-member
+        country = data.get('country')
+        is_valid_country_code = country in dict(countries).keys()
+
+        errors = {}
+        error_code = 'invalid-country'
+        error_message = accounts_settings.REQUIRED_FIELD_COUNTRY_MSG
+        extra_fields = configuration_helpers.get_value(
+            'REGISTRATION_EXTRA_FIELDS',
+            getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
+        )
+
+        if extra_fields.get('country', 'hidden') == 'required' and not is_valid_country_code:
+            errors['country'] = [{'user_message': error_message}]
+        elif country and not is_valid_country_code:
+            errors['country'] = [{'user_message': error_message}]
+
+        if errors:
+            return self._create_response(request, errors, status_code=400, error_code=error_code)
 
     def _handle_duplicate_email_username(self, request, data):
         # pylint: disable=no-member
