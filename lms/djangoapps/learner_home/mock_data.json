@@ -17,6 +17,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": true,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -103,6 +108,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": true,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -157,6 +167,11 @@
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -203,6 +218,11 @@
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -275,6 +295,11 @@
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -336,6 +361,11 @@
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -382,6 +412,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": true,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -458,6 +493,11 @@
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": true,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -523,6 +563,11 @@
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": true,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -574,6 +619,11 @@
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": true,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -655,6 +705,11 @@
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": true,
+                    "isStaff": false
+                },
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
@@ -706,6 +761,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": true,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -766,6 +826,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -838,6 +903,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -899,6 +969,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -931,6 +1006,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1003,6 +1083,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1065,6 +1150,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1111,6 +1201,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1184,6 +1279,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1246,6 +1346,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1328,6 +1433,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1435,6 +1545,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1531,6 +1646,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1612,6 +1732,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1693,6 +1818,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1763,6 +1893,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1819,6 +1954,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1900,6 +2040,11 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
@@ -1958,6 +2103,11 @@
                 "accessExpirationDate": null,
                 "canUpgrade": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -2045,6 +2195,11 @@
                 "accessExpirationDate": null,
                 "canUpgrade": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -2121,6 +2276,11 @@
                 "accessExpirationDate": null,
                 "canUpgrade": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -2182,6 +2342,11 @@
                 "accessExpirationDate": null,
                 "canUpgrade": false,
                 "hasStarted": false,
+                "hasAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": false
+                },
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
