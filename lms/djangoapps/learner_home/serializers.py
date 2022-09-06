@@ -1,6 +1,7 @@
 """
 Serializers for the Learner Dashboard
 """
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.urls import reverse
@@ -356,8 +357,11 @@ class EmailConfirmationSerializer(serializers.Serializer):
 class EnterpriseDashboardSerializer(serializers.Serializer):
     """Serializer for individual enterprise dashboard data"""
 
-    label = serializers.CharField()
-    url = serializers.URLField()
+    label = serializers.CharField(source='name')
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, instance):
+        return urljoin(settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL, instance['uuid'])
 
 
 class LearnerDashboardSerializer(serializers.Serializer):

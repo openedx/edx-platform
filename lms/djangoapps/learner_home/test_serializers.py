@@ -840,8 +840,8 @@ class TestEnterpriseDashboardSerializer(TestCase):
     @classmethod
     def generate_test_data(cls):
         return {
-            "label": f"{uuid4()}",
-            "url": random_url(),
+            "uuid": str(uuid4()),
+            "name": str(uuid4()),
         }
 
     def test_structure(self):
@@ -866,8 +866,8 @@ class TestEnterpriseDashboardSerializer(TestCase):
         self.assertDictEqual(
             output_data,
             {
-                "label": input_data["label"],
-                "url": input_data["url"],
+                "label": input_data["name"],
+                "url": settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL + '/' + input_data["uuid"],
             },
         )
 
