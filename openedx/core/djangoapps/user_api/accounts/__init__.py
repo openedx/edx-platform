@@ -52,7 +52,6 @@ USERNAME_INVALID_CHARS_UNICODE = _(
 
 # Translators: This message is shown to users who attempt to create a new account using
 # an invalid email format.
-EMAIL_INVALID_MSG = _('"{email}" is not a valid email address.')
 AUTHN_EMAIL_INVALID_MSG = _('Enter a valid email address')
 
 # Translators: This message is shown to users who attempt to create a new
