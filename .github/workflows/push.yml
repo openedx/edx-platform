@@ -35,5 +35,5 @@ jobs:
             This is meant for making sure all of our Hawthorn changes gets merge into Juniper otherwise Juniper would stall.
             If tests passes merge this pull request.
             If there are merge conflicts, it needs to be resolved manually in a seperate pull request.
-          PULL_REQUEST_REVIEWERS: "melvinsoft estherjsuh OmarIthawi thraxil"
+          PULL_REQUEST_REVIEWERS: "melvinsoft shadinaif OmarIthawi thraxil"
 
