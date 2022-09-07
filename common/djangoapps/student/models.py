@@ -1605,23 +1605,30 @@ class CourseEnrollment(models.Model):
                 extra_segment_properties = {
                     'studio_request': studio_request
                 }
+                exception_raised = False
                 if not studio_request and should_send_redesign_email():
                     if not request:
                         request = crum.get_current_request()
 
                     marketing_root_url = settings.MKTG_URLS.get('ROOT')
-                    course_dates_list = get_course_dates_for_email(self.user, self.course.id, request)
                     course_run_fields = [
                         'key', 'title', 'short_description', 'marketing_url', 'pacing_type', 'min_effort',
                         'max_effort', 'weeks_to_complete', 'enrollment_count', 'image', 'staff',
                     ]
-                    owners, course_run = None, None
+                    owners, course_run, course_dates_list = None, None, []
                     try:
+                        course_dates_list = get_course_dates_for_email(self.user, self.course.id, request)
                         course_uuid = get_course_uuid_for_course(str(self.course_id))
                         owners = get_owners_for_course(course_uuid=course_uuid)
                         course_run = get_course_run_details(str(self.course_id), course_run_fields)
                     except Exception:   # pylint: disable=broad-except
-                        pass
+                        exception_raised = True
+                        log.exception(
+                            'Unable to send extra properties for %s event, user %s and course %s',
+                            event_name,
+                            self.user.id,
+                            self.course_id,
+                        )
 
                     if course_run:
                         instructors = get_instructors(course_run, marketing_root_url)
@@ -1638,18 +1645,20 @@ class CourseEnrollment(models.Model):
                             'marketing_url': course_run.get('marketing_url'),
                             'banner_image_url': course_run.get('image').get('src') if course_run.get('image') else ''
                         })
+                    price = CourseMode.min_course_price_for_currency(course_id=str(self.course_id), currency='USD')
                     extra_segment_properties.update({
                         'goals_enabled': ENABLE_COURSE_GOALS.is_enabled(self.course_id),
                         'course_date_blocks': course_dates_list,
                         'partner_image_url': owners[0].get('logo_image_url') if owners else '',
                         'learner_name': self.user.profile.name,
                         'course_run_key': str(self.course_id),
-                        'price': self.course_price,
+                        'price': price,
                         'lms_base_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
                         'learning_base_url': configuration_helpers.get_value('LEARNING_MICROFRONTEND_URL',
                                                                              settings.LEARNING_MICROFRONTEND_URL)
                     })
                 segment_properties.update(extra_segment_properties)
+                segment_properties['exception_raised'] = exception_raised
                 segment_properties['email'] = self.user.email
                 # This next property is for an experiment, see method's comments for more information
                 segment_properties['external_course_updates'] = set_up_external_updates_for_enrollment(self.user,
@@ -1665,7 +1674,7 @@ class CourseEnrollment(models.Model):
                 # TODO: VAN-1052 - This is Optimizely's A/B experimentation block to test welcome email redesign.
                 #  Remove this temporary block after pausing the experiment.
                 optimizely_experiment_variation = None
-                if optimizely_client:
+                if optimizely_client and not studio_request:
                     optimizely_experiment_variation = optimizely_client.activate(
                         'welcome_email_redesign_experiment',
                         str(self.user.id),
@@ -1675,6 +1684,8 @@ class CourseEnrollment(models.Model):
                         }
                     )
                     optimizely_client.track('welcome_email_sent', str(self.user.id))
+                    if exception_raised and optimizely_experiment_variation == 'redesign_email_enabled':
+                        optimizely_client.track('welcome_email_not_sent', str(self.user.id))
 
                 # Set this property to True only if the welcome email redesign Optimizely experiment is running
                 # and user_id falls in required variation.
