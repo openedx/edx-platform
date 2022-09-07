@@ -4887,14 +4887,21 @@ LEARNING_MICROFRONTEND_URL = None
 #     waffle flag.
 ORA_GRADING_MICROFRONTEND_URL = None
 # .. setting_name: DISCUSSIONS_MICROFRONTEND_URL
-# .. setting_description: Base URL of the micro-frontend-based discussions page.
 # .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend-based discussions page.
 # .. setting_warning: Also set site's courseware.discussions_mfe waffle flag.
 DISCUSSIONS_MICROFRONTEND_URL = None
-# .. setting_name: DISCUSSIONS_MFE_FEEDBACK_URL = None
+# .. setting_name: DISCUSSIONS_MFE_FEEDBACK_URL
 # .. setting_default: None
 # .. setting_description: Base URL of the discussions micro-frontend google form based feedback.
 DISCUSSIONS_MFE_FEEDBACK_URL = None
+# .. setting_name: LEARNER_RECORD_MFE_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the micro-frontend responsible for displaying Learner Record and Program record
+#     pages. This MFE replaces the legacy frontend originally offered in the Credentials IDA.
+# .. setting_warning: In order to route requests to the MFE correctly you must also create and enable the credentials
+#     app's `USE_LEARNER_RECORD_MFE` waffle flag. See openedx/core/djangoapps/credentials/config.py.
+LEARNER_RECORD_MICROFRONTEND_URL = None
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
