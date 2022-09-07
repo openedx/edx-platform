@@ -18,6 +18,7 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 import xmodule.course_block
+from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.exceptions import InvalidProctoringProvider
@@ -32,10 +33,13 @@ _LAST_WEEK = _TODAY - timedelta(days=7)
 _NEXT_WEEK = _TODAY + timedelta(days=7)
 
 
-class CourseFieldsTestCase(unittest.TestCase):
+class CourseFieldsTestCase(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_default_start_date(self):
-        assert xmodule.course_block.CourseFields.start.default == datetime(2030, 1, 1, tzinfo=utc)
+        assert xmodule.course_block.CourseFields.start.default == DEFAULT_START_DATE
+
+    def test_default_enrollment_start_date(self):
+        assert xmodule.course_block.CourseFields.enrollment_start.default == DEFAULT_START_DATE
 
 
 class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring

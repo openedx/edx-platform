@@ -29,7 +29,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         super().setUp()
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(default_enrollment_start=True)
 
     def test_virgin_fetch(self):
         details = CourseDetails.fetch(self.course.id)
@@ -39,8 +39,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         assert details.course_image_name == self.course.course_image
         assert details.start_date.tzinfo is not None
         assert details.end_date is None, ('end date somehow initialized ' + str(details.end_date))
-        assert details.enrollment_start is None,\
-            ('enrollment_start date somehow initialized ' + str(details.enrollment_start))
+        assert details.enrollment_start == self.course.enrollment_start, 'enrollment_start not copied into'
         assert details.enrollment_end is None,\
             ('enrollment_end date somehow initialized ' + str(details.enrollment_end))
         assert details.certificate_available_date is None,\

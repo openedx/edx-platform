@@ -315,7 +315,11 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     )
 
     wiki_slug = String(help=_("Slug that points to the wiki for this course"), scope=Scope.content)
-    enrollment_start = Date(help=_("Date that enrollment for this class is opened"), scope=Scope.settings)
+    enrollment_start = Date(
+        help=_("Date that enrollment for this class is opened"),
+        default=DEFAULT_START_DATE,
+        scope=Scope.settings
+    )
     enrollment_end = Date(help=_("Date that enrollment for this class is closed"), scope=Scope.settings)
     start = Date(
         help=_("Start time when this block is visible"),
