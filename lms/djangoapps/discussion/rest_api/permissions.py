@@ -99,8 +99,8 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
     elif context.get("thread"):
         is_thread_closed = context["thread"]["closed"]
     else:
-        # No editable fields when outside thread context
-        return set()
+        # Flagging/un-flagging is always available.
+        return {"abuse_flagged"}
 
     # Map each field to the condition in which it's editable.
     editable_fields = {
