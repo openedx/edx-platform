@@ -37,9 +37,9 @@ class PlatformSettingsSerializer(serializers.Serializer):
 
 
 class CourseProviderSerializer(serializers.Serializer):
-    """Info about a course provider (institution/business)"""
+    """Info about a course provider (institution/business) from a CourseOverview"""
 
-    name = serializers.CharField()
+    name = serializers.CharField(source="display_org_with_default")
 
 
 class CourseSerializer(serializers.Serializer):
@@ -359,13 +359,13 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     requires_context = True
 
     course = CourseSerializer()
+    courseProvider = CourseProviderSerializer(source="course_overview")
     courseRun = CourseRunSerializer(source="*")
     enrollment = EnrollmentSerializer(source="*")
     certificate = CertificateSerializer(source="*")
     entitlement = serializers.SerializerMethodField()
 
     # TODO - remove "allow_null" as each of these are implemented, temp for testing.
-    courseProvider = CourseProviderSerializer(allow_null=True)
     gradeData = GradeDataSerializer(allow_null=True)
     programs = ProgramsSerializer(allow_null=True)
 

@@ -102,7 +102,7 @@ class TestPlatformSettingsSerializer(TestCase):
         }
 
 
-class TestCourseProviderSerializer(TestCase):
+class TestCourseProviderSerializer(LearnerDashboardBaseTest):
     """Tests for the CourseProviderSerializer"""
 
     @classmethod
@@ -113,12 +113,12 @@ class TestCourseProviderSerializer(TestCase):
         }
 
     def test_happy_path(self):
-        input_data = self.generate_test_provider_info()
+        test_enrollment = self.create_test_enrollment()
+
+        input_data = test_enrollment.course_overview
         output_data = CourseProviderSerializer(input_data).data
 
-        assert output_data == {
-            "name": input_data["name"],
-        }
+        self.assertEqual(output_data["name"], test_enrollment.course_overview.org)
 
 
 class TestCourseSerializer(LearnerDashboardBaseTest):
