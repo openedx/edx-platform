@@ -120,7 +120,7 @@ class ProgramEnrollment(TimeStampedModel):
         unique_together = ('student', 'program',)
 
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="program_enrollments")
-    gen_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="program_enrollments")
+    gen_class = models.ForeignKey(Class, on_delete=models.SET_NULL, null=True, related_name="program_enrollments")
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name="program_enrollments")
     status = models.CharField(max_length=9, choices=STATUS_CHOICES)
     history = HistoricalRecords()

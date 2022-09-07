@@ -9,6 +9,7 @@ class ProgramEnrollmentStatuses:
     ENDED = 'ended'
     __ACTIVE__ = (ENROLLED, PENDING)
     __ALL__ = (ENROLLED, PENDING, SUSPENDED, CANCELED, ENDED)
+    __VISIBLE__ = (ENDED, ENROLLED, PENDING)
     __MODEL_CHOICES__ = (
         (status, status) for status in __ALL__
     )

@@ -63,7 +63,7 @@ class ProgramAdmin(admin.ModelAdmin):
         'end_date',
         'status',
     )
-    readonly_fields = ('uuid',)
+    readonly_fields = ('slug', 'uuid',)
 
 
 @admin.register(ClassUnit)

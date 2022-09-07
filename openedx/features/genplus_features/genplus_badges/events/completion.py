@@ -5,11 +5,12 @@ from django.conf import settings
 from lms.djangoapps.badges.models import BadgeClass, CourseEventBadgesConfiguration
 from lms.djangoapps.badges.utils import requires_badges_enabled
 from xmodule.modulestore.django import modulestore
+from openedx.features.genplus_features.genplus_learning.models import Unit
 
 LOGGER = logging.getLogger(__name__)
 
 
-def get_completion_badge(user, course_key):
+def _get_unit_completion_badge(user, course_key):
     from common.djangoapps.student.models import CourseEnrollment
     enrollment = CourseEnrollment.objects.filter(
         user=user, course_id=course_key
@@ -37,7 +38,7 @@ def unit_badge_check(user, course_key):
     if not course.issue_badges:
         LOGGER.info("Course is not configured to issue badges.")
         return
-    badge_class = get_completion_badge(user, course_key)
+    badge_class = _get_unit_completion_badge(user, course_key)
     if not badge_class:
         LOGGER.info("BadgeClass not found.")
         return
@@ -52,25 +53,22 @@ def unit_badge_check(user, course_key):
 
 @requires_badges_enabled
 def program_badge_check(user, course_key):
-    config = CourseEventBadgesConfiguration.current().course_group_settings
-    awards = []
-    for slug, keys in config.items():
-        if course_key in keys:
-            completions = user.unitcompletion_set.filter(
-                is_complete=True,
-                course_key__in=keys,
-            )
-            if len(completions) == len(keys):
-                awards.append(slug)
+    unit = Unit.objects.filter(course__id=course_key).first()
+    if not unit:
+        return
 
-    for slug in awards:
-        badge_class = BadgeClass.objects.filter(
-            slug=slug,
+    program = unit.program
+    course_keys = program.units.all().values_list('course', flat=True)
+    completions = user.unitcompletion_set.filter(
+        is_complete=True,
+        course_key__in=course_keys,
+    )
+    if course_keys.count() == completions.count():
+        badge_class_qs = BadgeClass.objects.filter(
+            slug=program.slug,
             issuing_component='genplus__program'
         )
-        if badge_class.count() == 1:
-            badge_class = badge_class.first()
-            if badge_class.get_for_user(user):
-                continue
+        badge_class = badge_class_qs.first()
+        if badge_class_qs.count() == 1 and not badge_class.get_for_user(user):
             evidence_url = settings.GENPLUS_FRONTEND_URL
             badge_class.award(user, evidence_url)
