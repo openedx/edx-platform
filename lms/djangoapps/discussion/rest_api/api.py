@@ -16,6 +16,7 @@ from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework import status
@@ -1680,6 +1681,17 @@ def get_course_discussion_user_stats(
         params['usernames'] = comma_separated_usernames
 
     course_stats_response = get_course_user_stats(course_key, params)
+
+    tracker.emit(
+        'edx.forum.searched',
+        {
+            'query': username_search_string,
+            'search_type': 'Learner',
+            'page': params.get('page'),
+            'sort_key': params.get('sort_key'),
+            'total_results': course_stats_response.get('total_results'),
+        }
+    )
 
     if comma_separated_usernames:
         updated_course_stats = add_stats_for_users_with_no_discussion_content(
