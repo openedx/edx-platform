@@ -108,10 +108,10 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
         config_data = update_discussions_settings_from_course(self.course.id)
         assert config_data.course_key == self.course.id
         assert config_data.enable_graded_units is False
-        assert config_data.unit_level_visibility is False
+        assert config_data.unit_level_visibility is True
         assert config_data.provider_type is not None
         assert config_data.plugin_configuration == {}
-        assert len(config_data.contexts) == 4
+        assert {context.title for context in config_data.contexts} == {"General", "Unit", "Discussable Unit"}
 
     def test_general_topics(self):
         """
@@ -122,7 +122,7 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
             "Test Topic": {"id": "test-topic"},
         })
         config_data = update_discussions_settings_from_course(self.course.id)
-        assert len(config_data.contexts) == 5
+        assert len(config_data.contexts) == 4
         assert DiscussionTopicContext(
             title="General",
             external_id="general-topic",
@@ -135,15 +135,17 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
         ) in config_data.contexts
 
     @ddt.data(
+        ({}, 3, {"Unit", "Discussable Unit"},
+         {"Graded Unit", "Non-Discussable Unit", "Discussable Graded Unit", "Non-Discussable Graded Unit"}),
         ({"enable_in_context": False}, 1, set(), {"Unit", "Graded Unit"}),
-        ({"enable_graded_units": False}, 4, {"Unit", "Discussable Unit", "Non-Discussable Unit"},
+        ({"unit_level_visibility": False, "enable_graded_units": False}, 4,
+         {"Unit", "Discussable Unit", "Non-Discussable Unit"},
          {"Graded Unit"}),
-        ({"enable_graded_units": True}, 7, {"Unit", "Graded Unit", "Discussable Graded Unit"}, set()),
-        ({"unit_level_visibility": True}, 2, {"Discussable Unit"},
-         {"Unit", "Graded Unit", "Non-Discussable Unit", "Discussable Graded Unit", "Non-Discussable Graded Unit"}),
-        ({"unit_level_visibility": True, "enable_graded_units": True}, 3,
-         {"Discussable Unit", "Discussable Graded Unit"},
-         {"Graded Unit", "Non-Discussable Unit", "Non-Discussable Graded Unit"}),
+        ({"unit_level_visibility": False, "enable_graded_units": True}, 7,
+         {"Unit", "Graded Unit", "Discussable Graded Unit"}, set()),
+        ({"enable_graded_units": True}, 5,
+         {"Discussable Unit", "Discussable Graded Unit", "Graded Unit"},
+         {"Non-Discussable Unit", "Non-Discussable Graded Unit"}),
     )
     @ddt.unpack
     def test_custom_discussion_settings(self, settings, context_count, present_units, missing_units):

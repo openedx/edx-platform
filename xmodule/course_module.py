@@ -418,7 +418,7 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         default={
             "enable_in_context": True,
             "enable_graded_units": False,
-            "unit_level_visibility": False,
+            "unit_level_visibility": True,
         }
     )
     announcement = Date(
