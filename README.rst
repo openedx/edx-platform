@@ -12,7 +12,7 @@ edX Platform
 .. |Status| image:: https://img.shields.io/badge/status-maintained-31c653
 
 Purpose
-=======
+-------
 The `Open edX Platform <https://openedx.org>`_ is a service-oriented platform for authoring and
 delivering online learning at any scale.  The platform is written in
 Python and JavaScript and makes extensive use of the Django
