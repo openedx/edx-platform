@@ -6,6 +6,9 @@ on:
       - main
       - prod
   pull_request:
+    branches:
+      - main
+      - prod
 
 jobs:
   build:
