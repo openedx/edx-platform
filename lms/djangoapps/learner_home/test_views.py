@@ -36,7 +36,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-ENTERPRISE_ENABLED = 'ENABLE_ENTERPRISE_INTEGRATION'
+ENTERPRISE_ENABLED = "ENABLE_ENTERPRISE_INTEGRATION"
 
 
 class TestGetPlatformSettings(TestCase):

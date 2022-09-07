@@ -888,7 +888,9 @@ class TestEnterpriseDashboardSerializer(TestCase):
             output_data,
             {
                 "label": input_data["name"],
-                "url": settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL + '/' + input_data["uuid"],
+                "url": settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL
+                + "/"
+                + input_data["uuid"],
             },
         )
 

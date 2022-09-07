@@ -450,11 +450,11 @@ class EmailConfirmationSerializer(serializers.Serializer):
 class EnterpriseDashboardSerializer(serializers.Serializer):
     """Serializer for individual enterprise dashboard data"""
 
-    label = serializers.CharField(source='name')
+    label = serializers.CharField(source="name")
     url = serializers.SerializerMethodField()
 
     def get_url(self, instance):
-        return urljoin(settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL, instance['uuid'])
+        return urljoin(settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL, instance["uuid"])
 
 
 class LearnerDashboardSerializer(serializers.Serializer):
