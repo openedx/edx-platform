@@ -106,7 +106,7 @@ class ClassStudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Student
-        fields = ('username', 'profile_pic', 'skills_assessment', 'unit_lesson_completion')
+        fields = ('id', 'username', 'profile_pic', 'skills_assessment', 'unit_lesson_completion')
 
     def get_profile_pic(self, obj):
         profile = obj.character.profile_pic if obj.character else None
