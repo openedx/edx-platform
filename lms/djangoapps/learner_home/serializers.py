@@ -1,6 +1,7 @@
 """
 Serializers for the Learner Dashboard
 """
+from datetime import date, timedelta
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -10,6 +11,21 @@ from rest_framework import serializers
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import course_home_url
 from xmodule.data import CertificatesDisplayBehaviors
+
+
+class LiteralField(serializers.Field):
+    """
+    Custom Field for use with fields that will always intentionally serialize to the same static value.
+    """
+    def __init__(self, literal_value):
+        super().__init__()
+        self.literal_value = literal_value
+
+    def to_representation(self, _):
+        return self.literal_value
+
+    def get_attribute(self, _):
+        return self.literal_value
 
 
 class PlatformSettingsSerializer(serializers.Serializer):
@@ -271,23 +287,47 @@ class CertificateSerializer(serializers.Serializer):
 class AvailableEntitlementSessionSerializer(serializers.Serializer):
     """An available entitlement session"""
 
-    startDate = serializers.DateTimeField()
-    endDate = serializers.DateTimeField()
-    courseId = serializers.CharField()
+    startDate = serializers.DateTimeField(source='start')
+    endDate = serializers.DateTimeField(source='end')
+    courseId = serializers.CharField(source='key')
 
 
 class EntitlementSerializer(serializers.Serializer):
     """Entitlements info"""
+    requires_context = True
 
-    availableSessions = serializers.ListField(
-        child=AvailableEntitlementSessionSerializer(), allow_empty=True
-    )
-    isRefundable = serializers.BooleanField()
-    isFulfilled = serializers.BooleanField()
-    canViewCourse = serializers.BooleanField()
-    changeDeadline = serializers.DateTimeField()
-    isExpired = serializers.BooleanField()
-    expirationDate = serializers.DateTimeField()
+    availableSessions = serializers.SerializerMethodField()
+    uuid = serializers.UUIDField()
+    isRefundable = serializers.BooleanField(source='is_entitlement_refundable')
+    isFulfilled = serializers.SerializerMethodField()
+    changeDeadline = serializers.SerializerMethodField()
+    isExpired = serializers.SerializerMethodField()
+    expirationDate = serializers.SerializerMethodField()
+    enrollmentUrl = serializers.SerializerMethodField()
+
+    # DRF doesn't convert None to False so we must do this rather than a booleanfield:
+    # https://github.com/encode/django-rest-framework/issues/2299
+    def get_isFulfilled(self, instance):
+        return bool(instance.enrollment_course_run)
+
+    def get_isExpired(self, instance):
+        return bool(instance.expired_at)
+
+    def get_availableSessions(self, instance):
+        avaialableSessions = self.context['course_entitlement_available_sessions'].get(str(instance.uuid))
+        return AvailableEntitlementSessionSerializer(avaialableSessions, many=True).data
+
+    def get_expirationDate(self, instance):
+        if instance.expired_at is not None:
+            return instance.expired_at
+        else:
+            return date.today() + timedelta(days=instance.get_days_until_expiration())
+
+    def get_changeDeadline(self, instance):
+        return self.get_expirationDate(instance)
+
+    def get_enrollmentUrl(self, instance):
+        return reverse('entitlements_api:v1:enrollments', args=[str(instance.uuid)])
 
 
 class RelatedProgramSerializer(serializers.Serializer):
@@ -316,26 +356,79 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     Info for displaying an enrollment on the learner dashboard.
     Derived from a CourseEnrollment with added context.
     """
+    requires_context = True
 
     course = CourseSerializer()
     courseRun = CourseRunSerializer(source="*")
     enrollment = EnrollmentSerializer(source="*")
     certificate = CertificateSerializer(source="*")
+    entitlements = serializers.SerializerMethodField()
 
     # TODO - remove "allow_null" as each of these are implemented, temp for testing.
     courseProvider = CourseProviderSerializer(allow_null=True)
     gradeData = GradeDataSerializer(allow_null=True)
-    entitlements = EntitlementSerializer(allow_null=True)
     programs = ProgramsSerializer(allow_null=True)
+
+    def get_entitlements(self, instance):
+        """
+        If this enrollment is the fulfillment of an entitlement, include information about the entitlement
+        """
+        entitlement = self.context['fulfilled_entitlements'].get(str(instance.course_id))
+        if entitlement:
+            return EntitlementSerializer(entitlement, context=self.context).data
+        else:
+            return {}
 
 
 class UnfulfilledEntitlementSerializer(serializers.Serializer):
-    """Serializer for an unfulfilled entitlement"""
+    """
+    Serializer for an unfulfilled entitlement.
+    This should have the same keys as the LearnerEnrollmentSerializer.
+    We are flattening the two lists into one "course card" list and so should be the same shape.
+    """
 
+    requires_context = True
+
+    # This is the static constant data returned as the 'enrollment' key for all unfulfilled enrollments.
+    STATIC_ENTITLEMENT_ENROLLMENT_DATA = {
+        'accessExpirationDate': None,
+        'isAudit': False,
+        'hasStarted': False,
+        'hasAccess': True,
+        'isVerified': False,
+        'canUpgrade': False,
+        'isAuditAccessExpired': False,
+        'isEmailEnabled': False,
+        'hasOptedOutOfEmail': False,
+        'lastEnrolled': None,
+        'isEnrolled': False,
+    }
+
+    class _PseudoSessionCourseSerializer(serializers.Serializer):
+        """
+        'Private' Serilizer for the 'course' key data. This data comes from the pseudo session
+        """
+        bannerImgSrc = serializers.URLField(source="image.src")
+        courseName = serializers.CharField(source="title")
+        courseNumber = serializers.CharField(source="key")
+
+    # These fields contain all real data and will be serialized
+    entitlements = EntitlementSerializer(source="*")
+    course = serializers.SerializerMethodField()
+
+    # Change after data is implemented. This data is required
     courseProvider = CourseProviderSerializer(allow_null=True)
-    course = CourseSerializer()
-    entitlements = EntitlementSerializer()
-    programs = ProgramsSerializer()
+    programs = ProgramsSerializer(allow_null=True)
+
+    # These fields are literal values that do not change
+    courseRun = LiteralField(None)
+    gradeData = LiteralField(None)
+    certificate = LiteralField(None)
+    enrollment = LiteralField(STATIC_ENTITLEMENT_ENROLLMENT_DATA)
+
+    def get_course(self, instance):
+        pseudo_session = self.context['unfulfilled_entitlement_pseudo_sessions'].get(str(instance.uuid))
+        return UnfulfilledEntitlementSerializer._PseudoSessionCourseSerializer(pseudo_session).data
 
 
 class SuggestedCourseSerializer(serializers.Serializer):
