@@ -72,11 +72,11 @@ class ArticleViewSet(viewsets.ModelViewSet, GenzMixin):
         if data['action'] == 'add':
             FavoriteArticle.objects.create(teacher=teacher, article=article)
             return Response(SuccessMessages.ARTICLE_ADDED_TO_FAVORITES.format(title=article.title),
-                            status=status.HTTP_204_NO_CONTENT)
+                            status=status.HTTP_200_OK)
         else:
             FavoriteArticle.objects.filter(teacher=teacher, article=article).delete()
             return Response(SuccessMessages.ARTICLE_REMOVED_FROM_FAVORITES.format(title=article.title),
-                            status=status.HTTP_204_NO_CONTENT)
+                            status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'])
     def rate_article(self, request, pk=None):  # pylint: disable=unused-argument
