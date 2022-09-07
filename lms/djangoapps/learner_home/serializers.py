@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.urls import reverse
+from common.djangoapps.student.helpers import user_has_passing_grade_in_course
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -223,7 +224,10 @@ class EnrollmentSerializer(serializers.Serializer):
 class GradeDataSerializer(serializers.Serializer):
     """Info about grades for this enrollment"""
 
-    isPassing = serializers.BooleanField()
+    isPassing = serializers.SerializerMethodField()
+
+    def get_isPassing(self, enrollment):
+        return user_has_passing_grade_in_course(enrollment)
 
 
 class CertificateSerializer(serializers.Serializer):
@@ -364,9 +368,9 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     enrollment = EnrollmentSerializer(source="*")
     certificate = CertificateSerializer(source="*")
     entitlement = serializers.SerializerMethodField()
+    gradeData = GradeDataSerializer(source="*")
 
     # TODO - remove "allow_null" as each of these are implemented, temp for testing.
-    gradeData = GradeDataSerializer(allow_null=True)
     programs = ProgramsSerializer(allow_null=True)
 
     def get_entitlement(self, instance):

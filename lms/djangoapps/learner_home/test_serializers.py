@@ -344,23 +344,29 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
             self.assertFalse(output["hasStarted"])
 
 
-class TestGradeDataSerializer(TestCase):
+@ddt.ddt
+class TestGradeDataSerializer(LearnerDashboardBaseTest):
     """Tests for the GradeDataSerializer"""
 
-    @classmethod
-    def generate_test_grade_data(cls):
-        """Util to generate test grade data"""
-        return {
-            "isPassing": random_bool(),
-        }
+    @mock.patch(
+        "lms.djangoapps.learner_home.serializers.user_has_passing_grade_in_course"
+    )
+    @ddt.data(True, False, None)
+    def test_happy_path(self, is_passing, mock_get_grade_data):
+        # Given a course where I am/not passing
+        input_data = self.create_test_enrollment()
+        mock_get_grade_data.return_value = is_passing
 
-    def test_happy_path(self):
-        input_data = self.generate_test_grade_data()
+        # When I serialize grade data
         output_data = GradeDataSerializer(input_data).data
 
-        assert output_data == {
-            "isPassing": input_data["isPassing"],
-        }
+        # Then I get the correct data shape out
+        self.assertDictEqual(
+            output_data,
+            {
+                "isPassing": is_passing,
+            },
+        )
 
 
 @ddt.ddt
