@@ -77,9 +77,9 @@ six==1.16.0
     #   chem
     #   codejail-includes
     #   python-dateutil
-sympy==1.11
+sympy==1.11.1
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   openedx-calc
-tqdm==4.64.0
+tqdm==4.64.1
     # via nltk
