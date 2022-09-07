@@ -15,4 +15,4 @@ jobs:
           BRANCH_PREFIX: "main"
           PULL_REQUEST_BRANCH: "prod"
           PULL_REQUEST_TITLE: "Update from `main` (production)"
-          PULL_REQUEST_REVIEWERS: "melvinsoft OmarIthawi thraxil estherjsuh"
+          PULL_REQUEST_REVIEWERS: "melvinsoft OmarIthawi thraxil shadinaif"
