@@ -959,7 +959,7 @@ oscrypto==1.3.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-outcome-surveys==1.1.0
+outcome-surveys==1.1.1
     # via -r requirements/edx/base.txt
 packaging==21.3
     # via
