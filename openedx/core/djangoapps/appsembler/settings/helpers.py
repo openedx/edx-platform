@@ -4,6 +4,8 @@ Helpers for the settings.
 
 from os import path
 
+from tahoe_sites.api import get_tahoe_sites_auth_backends
+
 
 def get_tahoe_theme_static_dirs(settings):
     """
@@ -74,9 +76,10 @@ def get_tahoe_multitenant_auth_backends(settings):
         upstream_backend_index = authentication_backends.index(upstream_user_model_backend)
 
         # Use multi-tenant Tahoe backends instead of the upstream EdxRateLimitedAllowAllUsersModelBackend backend.
-        authentication_backends = settings.AUTHENTICATION_BACKENDS[:upstream_backend_index] + [
-            'organizations.backends.DefaultSiteBackend',
-            'organizations.backends.OrganizationMemberBackend',
-        ] + settings.AUTHENTICATION_BACKENDS[upstream_backend_index + 1:]
+        authentication_backends = (
+            settings.AUTHENTICATION_BACKENDS[:upstream_backend_index] +
+            get_tahoe_sites_auth_backends() +
+            settings.AUTHENTICATION_BACKENDS[upstream_backend_index + 1:]
+        )
 
     return authentication_backends

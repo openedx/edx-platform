@@ -1,7 +1,7 @@
 """
 A module for deprecated AMC tier utilities.
 
-TODO: Remove this module once AMC is shut down.
+TODO: Remove this module once AMC is shut down. Related to RED-2845 too
 """
 
 import logging

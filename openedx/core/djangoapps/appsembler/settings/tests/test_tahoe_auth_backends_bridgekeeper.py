@@ -36,8 +36,8 @@ class TestInstructorAccessWithTahoeAuthBackends(ModuleStoreTestCase):
         """
         Ensure get_tahoe_multitenant_auth_backends adds Tahoe backends to AUTHENTICATION_BACKENDS.
         """
-        assert 'organizations.backends.DefaultSiteBackend' in settings.AUTHENTICATION_BACKENDS
-        assert 'organizations.backends.OrganizationMemberBackend' in settings.AUTHENTICATION_BACKENDS
+        assert 'tahoe_sites.backends.DefaultSiteBackend' in settings.AUTHENTICATION_BACKENDS
+        assert 'tahoe_sites.backends.OrganizationMemberBackend' in settings.AUTHENTICATION_BACKENDS
 
     def test_instructors_has_access(self):
         """
