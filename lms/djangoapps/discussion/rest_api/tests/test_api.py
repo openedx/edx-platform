@@ -2898,7 +2898,8 @@ class UpdateThreadTest(
     @mock.patch("lms.djangoapps.discussion.rest_api.serializers.CLOSE_REASON_CODES", {
         "test-close-reason": "Test Close Reason",
     })
-    def test_update_thread_with_close_reason_code(self, role_name):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_update_thread_with_close_reason_code(self, role_name, mock_emit):
         """
         Test editing comments, specifying and retrieving edit reason codes.
         """
@@ -2914,6 +2915,21 @@ class UpdateThreadTest(
             request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
             assert request_body["close_reason_code"] == ["test-close-reason"]
             assert request_body["closing_user_id"] == [str(self.user.id)]
+
+            expected_event_name = "edx.forum.thread.locked"
+            expected_event_data = {
+                'id': 'test_thread',
+                'team_id': None,
+                'url': f'/courses/{self.course.id}/discussion/forum/original_topic/threads/test_thread',
+                'user_course_roles': [],
+                'user_forums_roles': ['Student', role_name],
+                'target_username': self.user.username,
+                'lock_reason': 'test-close-reason'
+            }
+
+            actual_event_name, actual_event_data = mock_emit.call_args[0]
+            self.assertEqual(actual_event_name, expected_event_name)
+            self.assertEqual(actual_event_data, expected_event_data)
         except ValidationError as error:
             assert role_name == FORUM_ROLE_STUDENT
             assert error.message_dict == {

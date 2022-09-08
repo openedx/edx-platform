@@ -11,9 +11,11 @@ from django.db.models import TextChoices
 from django.urls import reverse
 from django.utils.html import strip_tags
 from django.utils.text import Truncator
+from eventtracking import tracker
 from rest_framework import serializers
 
 from common.djangoapps.student.models import get_user_by_username_or_email
+from lms.djangoapps.discussion.django_comment_client.permissions import get_team
 from lms.djangoapps.discussion.django_comment_client.utils import (
     course_discussion_division_enabled,
     get_group_id_for_user,
@@ -425,11 +427,36 @@ class ThreadSerializer(_ContentSerializer):
             requesting_user_id = self.context["cc_requester"]["id"]
             if key == "closed" and val:
                 instance["closing_user_id"] = requesting_user_id
+                self.trigger_thread_closed_event(instance, validated_data)
             if key == "body" and val:
                 instance["editing_user_id"] = requesting_user_id
         instance.save()
         return instance
 
+    def trigger_thread_closed_event(self, instance, validated_data):
+        """
+        Triggers edx.forum.thread.locked tracking event
+        """
+        url_kwargs = {
+            'course_id': instance.course_id,
+            'discussion_id': instance.commentable_id,
+            'thread_id': instance.id
+        }
+        user = self.context['request'].user
+        user_course_roles = [role.role for role in user.courseaccessrole_set.filter(course_id=instance.course_id)]
+        user_forums_roles = [role.name for role in user.roles.filter(course_id=instance.course_id)]
+        tracker.emit(
+            'edx.forum.thread.locked',
+            {
+                'id': instance.id,
+                'team_id': get_team(instance.commentable_id),
+                'url': reverse('single_thread', kwargs=url_kwargs),
+                'user_course_roles': user_course_roles,
+                'user_forums_roles': user_forums_roles,
+                'target_username': instance.get('username'),
+                'lock_reason': validated_data.get('close_reason_code')
+            }
+        )
 
 class CommentSerializer(_ContentSerializer):
     """
