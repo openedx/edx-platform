@@ -25,6 +25,7 @@ from django.db import models
 from django.db.models.signals import post_save
 
 from django.utils.translation import gettext_lazy as _
+from edx_django_utils.cache.utils import RequestCache
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, LearningContextKeyField, UsageKeyField
 from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
@@ -233,6 +234,39 @@ class BaseStudentModuleHistory(models.Model):
 
         return history_entries
 
+    def save_history(sender, instance, history_model_cls, request_cache_key, **kwargs):
+        if instance.module_type in history_model_cls.HISTORY_SAVING_TYPES:
+            request_cache = RequestCache('studentmodulehistory')
+            history_entry = None
+            # To avoid duplicate history records within one request context, check if the student module instance
+            # has already been updated and generated a history record. If so, then update that history record rather
+            # than creating a new one
+            request_smh_cache = request_cache.get_cached_response(request_cache_key).get_value_or_default({})
+            if instance.id in request_smh_cache:
+                smh_id = request_smh_cache[instance.id]
+                try:
+                    history_entry = history_model_cls.objects.get(id=smh_id)
+                except history_model_cls.DoesNotExist:
+                    log.error(f"Cached {history_model_cls.__name__} instance does not exist: {history_model_cls.__name__}({smh_id}) for StudentModuel({instance.id})")
+
+            # If not StudentModuleHistory has been created during this request yet, then create a new one
+            if not history_entry:
+                history_entry = history_model_cls(student_module=instance, version=None)
+
+            # Regardless of whether this is a new or existing StudentModuleHistory, set its values to match the current
+            # state of the StudentModule record
+            history_entry.created=instance.modified
+            history_entry.state=instance.state
+            history_entry.grade=instance.grade
+            history_entry.max_grade=instance.max_grade
+            history_entry.save()
+
+            # Update the RequestCache to map this StudentModule to the StudentModuleHistory for this request cycle
+            # Only cache the id rather than the full object in order to be conscientious of space as the number of
+            # records modified in one request can get large
+            request_cache.setdefault(request_cache_key, {})
+            request_cache.data[request_cache_key][instance.id] = history_entry.id
+
 
 class StudentModuleHistory(BaseStudentModuleHistory):
     """Keeps a complete history of state changes for a given XModule for a given
@@ -251,17 +285,10 @@ class StudentModuleHistory(BaseStudentModuleHistory):
     def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
         """
         Checks the instance's module_type, and creates & saves a
-        StudentModuleHistoryExtended entry if the module_type is one that
+        StudentModuleHistory entry if the module_type is one that
         we save.
         """
-        if instance.module_type in StudentModuleHistory.HISTORY_SAVING_TYPES:
-            history_entry = StudentModuleHistory(student_module=instance,
-                                                 version=None,
-                                                 created=instance.modified,
-                                                 state=instance.state,
-                                                 grade=instance.grade,
-                                                 max_grade=instance.max_grade)
-            history_entry.save()
+        BaseStudentModuleHistory.save_history(sender, instance, StudentModuleHistory, "lms.djangoapps.courseware.models.student_module_history_map")
 
     # When the extended studentmodulehistory table exists, don't save
     # duplicate history into courseware_studentmodulehistory, just retain
