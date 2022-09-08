@@ -458,6 +458,7 @@ class ThreadSerializer(_ContentSerializer):
             }
         )
 
+
 class CommentSerializer(_ContentSerializer):
     """
     A serializer for comment data.
