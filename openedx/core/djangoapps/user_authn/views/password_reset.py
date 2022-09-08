@@ -170,7 +170,8 @@ class PasswordResetFormNoActive(PasswordResetForm):
             current_org = get_current_organization()
             try:
                 # The following will raise an exception if many records found in the organization for this email
-                one_user = get_organization_user_by_email(email=email, organization=current_org, fail_if_inactive=True)
+                one_user = get_organization_user_by_email(email=email, organization=current_org,
+                                                          fail_if_inactive=False)
             except User.DoesNotExist:
                 self.users_cache = []
             else:

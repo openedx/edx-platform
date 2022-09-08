@@ -6,28 +6,35 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.urls import reverse
 from django.test import TestCase
-from django.test.utils import override_settings
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 
 import ddt
 from mock import patch
 
+import tahoe_sites.api
+from openedx.core.djangoapps.appsembler.multi_tenant_emails.tests.test_utils import with_organization_context
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
 APPSEMBLER_API_VIEWS_MODULE_V2 = 'openedx.core.djangoapps.appsembler.api.v2.views'
+DUMMY_SITE_DOMAIN = 'blue-org.localhost'
 
 
 @ddt.ddt
 @patch(APPSEMBLER_API_VIEWS_MODULE_V2 + '.RegistrationViewSet.authentication_classes', [])
 @patch(APPSEMBLER_API_VIEWS_MODULE_V2 + '.RegistrationViewSet.permission_classes', [AllowAny])
 @patch(APPSEMBLER_API_VIEWS_MODULE_V2 + '.RegistrationViewSet.throttle_classes', [])
-@override_settings(APPSEMBLER_FEATURES={
-    'SKIP_LOGIN_AFTER_REGISTRATION': False,
-})
+@patch.dict('django.conf.settings.FEATURES', {'APPSEMBLER_MULTI_TENANT_EMAILS': True})
 class RegistrationApiViewTestsV2(TestCase):
     def setUp(self):
-        self.site = SiteFactory()
+        super().setUp()
+        # Emulate Multi-Tenant Emails in production.
+        org_data = tahoe_sites.api.create_tahoe_site(short_name='blue-org', domain=DUMMY_SITE_DOMAIN)
+        self.org_patcher = patch('openedx.core.djangoapps.appsembler.sites.utils._get_current_organization',
+                                 return_value=org_data['organization'])
+        self.org_patcher.start()
+
         # The DRF Router appends '-list' to the base 'registrations' name when
         # registering the endpoint
         self.url = reverse('tahoe-api:v2:registrations-list')
@@ -37,6 +44,10 @@ class RegistrationApiViewTestsV2(TestCase):
             'email': 'mr.robot@example.com',
             'name': 'Mr Robot'
         }
+
+    def tearDown(self):
+        super().tearDown()
+        self.org_patcher.stop()
 
     def test_registration_response(self):
         res = self.client.post(self.url, self.sample_user_data)
@@ -130,10 +141,12 @@ class RegistrationApiViewTestsV2(TestCase):
             'email': 'mr_potato_head@example.com',
             'name': 'Mr Potato Head',
         }
-        with patch('openedx.core.djangoapps.user_authn.views.password_reset.get_current_site',
-                   return_value=self.site):
-            res = self.client.post(self.url, params)
+        res = self.client.post(self.url, params)
         self.assertContains(res, 'user_id', status_code=status.HTTP_200_OK)
+        assert res.json()['password_reset_email_was_sent'], res.json()
+        new_user = User.objects.get(username=params['username'])
+        assert not new_user.is_active
+        assert len(mail.outbox) == 1, res.json()
 
     @ddt.data(
         {'send_activation_email': True},
@@ -157,14 +170,12 @@ class RegistrationApiViewTestsV2(TestCase):
         }
         params.update(activation_email_params)
 
-        with patch('openedx.core.djangoapps.user_authn.views.password_reset.get_current_site',
-                   return_value=self.site):
-            res = self.client.post(self.url, params)
+        res = self.client.post(self.url, params)
 
         self.assertContains(res, 'user_id', status_code=200)
         new_user = User.objects.get(username=params['username'])
         assert not new_user.is_active
-        assert mail.outbox, 'Should send the password reset email'
+        assert mail.outbox, 'Should send the password reset email: {}'.format(res.json())
 
         assert len(mail.outbox) == 1, ('Send NOT password reset email but NOT activation.\n'
                                        'Subjects={subjects}.\n'
@@ -175,6 +186,7 @@ class RegistrationApiViewTestsV2(TestCase):
 
         email = mail.outbox[0]
         assert 'Password reset on' in email.subject
+        assert res.json()['password_reset_email_was_sent'], res.json()
 
     @ddt.unpack
     @ddt.data(
