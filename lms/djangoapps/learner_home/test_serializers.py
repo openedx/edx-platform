@@ -9,6 +9,8 @@ from uuid import uuid4
 from django.conf import settings
 from django.test import TestCase
 import ddt
+from opaque_keys.edx.keys import CourseKey
+
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -19,6 +21,9 @@ from common.djangoapps.student.tests.factories import (
 )
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseRunFactory as CatalogCourseRunFactory,
+)
+from openedx.core.djangoapps.content.course_overviews.tests.factories import (
+    CourseOverviewFactory,
 )
 from lms.djangoapps.learner_home.serializers import (
     CertificateSerializer,
@@ -757,6 +762,12 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         available_sessions = {
             str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create_batch(3)
         }
+
+        # create course overview for course provider info
+        course_key_str = pseudo_sessions[str(unfulfilled_entitlement.uuid)]["key"]
+        course_key = CourseKey.from_string(course_key_str)
+        course_overview = CourseOverviewFactory.create(id=course_key)
+
         context = {
             "unfulfilled_entitlement_pseudo_sessions": pseudo_sessions,
             "course_entitlement_available_sessions": available_sessions,
@@ -778,6 +789,7 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         ]
 
         assert output_data.keys() == set(expected_keys)
+        assert output_data["courseProvider"] is not None
         assert output_data["courseRun"] is None
         assert output_data["gradeData"] is None
         assert output_data["certificate"] is None

@@ -11,6 +11,7 @@ from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import course_home_url
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.data import CertificatesDisplayBehaviors
 
 
@@ -426,9 +427,9 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
     # These fields contain all real data and will be serialized
     entitlement = EntitlementSerializer(source="*")
     course = serializers.SerializerMethodField()
+    courseProvider = serializers.SerializerMethodField()
 
     # Change after data is implemented. This data is required
-    courseProvider = CourseProviderSerializer(allow_null=True)
     programs = ProgramsSerializer(allow_null=True)
 
     # These fields are literal values that do not change
@@ -444,6 +445,14 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         return UnfulfilledEntitlementSerializer._PseudoSessionCourseSerializer(
             pseudo_session
         ).data
+
+    def get_courseProvider(self, entitlement):
+        """Look up course provider from CourseOverview matching the pseudo session"""
+        pseudo_session = self.context["unfulfilled_entitlement_pseudo_sessions"].get(
+            str(entitlement.uuid)
+        )
+        course_overview = CourseOverview.get_from_id(pseudo_session["key"]) or None
+        return CourseProviderSerializer(course_overview, allow_null=True).data
 
 
 class SuggestedCourseSerializer(serializers.Serializer):
