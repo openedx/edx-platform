@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from django.core.cache import cache
 from django.urls import reverse_lazy
+from enterprise.models import EnterpriseCourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
@@ -209,3 +210,23 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
             'in_progress': 0,
             'not_started': 1
         }
+
+    @with_site_configuration(configuration={'COURSE_CATALOG_API_URL': 'foo'})
+    def test_program_empty_list_if_no_enterprise_enrollments(self):
+        """
+        Verify API returns empty response if no enterprise enrollments exists for a learner.
+        """
+        # delete all enterprise course enrollments for the user
+        EnterpriseCourseEnrollment.objects.filter(
+            enterprise_customer_user__user_id=self.user.id
+        ).delete()
+
+        cache.set(
+            SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site.domain),
+            [self.program_uuid],
+            None
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])

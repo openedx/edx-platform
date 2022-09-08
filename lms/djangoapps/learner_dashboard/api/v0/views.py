@@ -96,6 +96,10 @@ class Programs(APIView):
         user = request.user
 
         enrollments = self._get_enterprise_course_enrollments(enterprise_uuid, user)
+        # return empty reponse if no enterprise enrollments exists for a user
+        if not enrollments:
+            return Response([])
+
         meter = ProgramProgressMeter(
             request.site,
             user,
