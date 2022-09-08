@@ -194,6 +194,66 @@ ${HTML(fragment.foot_html())}
 
       window.addEventListener('load', dispatchResizeMessage);
       window.addEventListener('resize', dispatchResizeMessage);
+
+      // Fix for the scorm xblock (https://github.com/overhangio/openedx-scorm-xblock)
+      // To correct fullscreen mode if it appears in the microfrontend app
+      function toggleScormFullScreen() {
+        // Detect if already full screen then exit from it
+        // Otherwise go fullscreen
+        if (
+            document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement
+        ) {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+        } else {
+          // Find scorm-xblock content
+          const element = $('.scorm-xblock').get(0);
+          if (element.requestFullscreen) {
+            element.requestFullscreen();
+          } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+          } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+          } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen();
+          }
+        }
+      }
+
+      // Locate scorm-xblock iframe content
+      const scormFrame = document.getElementsByClassName('scorm-embedded').contentWindow;
+      window.addEventListener('message', function(message) {
+        if (message.source !== scormFrame) {
+          // Catch event from the button inside scorm-xblock iframe and trigger fullscreen mode
+          $('.fullscreen-controls button').click(function() {
+            toggleScormFullScreen();
+          });
+
+          // Add handler to enable exit fullscreen mode by ESC key
+          if (document.addEventListener) {
+            document.addEventListener('fullscreenchange', exitScormFullScreenHandler, false);
+            document.addEventListener('mozfullscreenchange', exitScormFullScreenHandler, false);
+            document.addEventListener('MSFullscreenChange', exitScormFullScreenHandler, false);
+            document.addEventListener('webkitfullscreenchange', exitScormFullScreenHandler, false);
+          }
+
+          // If user exit fullscreen by the keyboard button
+          // Remove 'fullscreen-enabled' class from the scorm-xblock content
+          // For the correct block rendering in the iframe learning microfrontend app
+          function exitScormFullScreenHandler() {
+            if (!document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
+              $('.scorm-xblock').removeClass('fullscreen-enabled');
+            }
+          }
+        }
+      });
     }
   }());
 </script>
