@@ -4,12 +4,16 @@ from django_extensions.db.models import TimeStampedModel
 from openedx.features.genplus_features.genplus.models import Skill
 from openedx.features.genplus_features.genplus_badges.utils import validate_lowercase, validate_badge_image
 
+
 class BoosterBadge(models.Model):
     slug = models.SlugField(max_length=255, unique=True, validators=[validate_lowercase])
     skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True, blank=True)
     display_name = models.CharField(max_length=255)
     description = models.TextField()
     image = models.ImageField(upload_to='booster_badge_classes', validators=[validate_badge_image])
+
+    def __str__(self):
+        return f'{self.skill} - {self.display_name}'
 
     def get_for_user(self, user):
         return self.boosterbadgeaward_set.filter(user=user).first()
