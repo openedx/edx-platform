@@ -100,25 +100,25 @@ def get_enrollments(user, org_allow_list, org_block_list, course_limit=None):
 
 
 def get_entitlements(user, org_allow_list, org_block_list):
-    """Get entitlments for the user"""
+    """Get entitlements for the user"""
     (
         filtered_entitlements,
         course_entitlement_available_sessions,
         unfulfilled_entitlement_pseudo_sessions,
     ) = get_filtered_course_entitlements(user, org_allow_list, org_block_list)
     fulfilled_entitlements_by_course_key = {}
-    unfulfulled_entitlements = []
+    unfulfilled_entitlements = []
 
     for course_entitlement in filtered_entitlements:
         if course_entitlement.enrollment_course_run:
             course_id = str(course_entitlement.enrollment_course_run.course.id)
             fulfilled_entitlements_by_course_key[course_id] = course_entitlement
         else:
-            unfulfulled_entitlements.append(course_entitlement)
+            unfulfilled_entitlements.append(course_entitlement)
 
     return (
         fulfilled_entitlements_by_course_key,
-        unfulfulled_entitlements,
+        unfulfilled_entitlements,
         course_entitlement_available_sessions,
         unfulfilled_entitlement_pseudo_sessions,
     )
@@ -234,7 +234,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         # Get entitlements
         (
             fulfilled_entitlements_by_course_key,
-            unfulfulled_entitlements,
+            unfulfilled_entitlements,
             course_entitlement_available_sessions,
             unfulfilled_entitlement_pseudo_sessions,
         ) = get_entitlements(user, site_org_whitelist, site_org_blacklist)
@@ -268,7 +268,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "enterpriseDashboard": enterprise_customer,
             "platformSettings": get_platform_settings(),
             "enrollments": course_enrollments,
-            "unfulfilledEntitlements": unfulfulled_entitlements,
+            "unfulfilledEntitlements": unfulfilled_entitlements,
             "suggestedCourses": [],
         }
 
