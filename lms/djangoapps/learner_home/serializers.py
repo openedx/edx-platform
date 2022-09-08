@@ -318,8 +318,8 @@ class EntitlementSerializer(serializers.Serializer):
         return bool(instance.expired_at)
 
     def get_availableSessions(self, instance):
-        avaialableSessions = self.context['course_entitlement_available_sessions'].get(str(instance.uuid))
-        return AvailableEntitlementSessionSerializer(avaialableSessions, many=True).data
+        availableSessions = self.context['course_entitlement_available_sessions'].get(str(instance.uuid))
+        return AvailableEntitlementSessionSerializer(availableSessions, many=True).data
 
     def get_expirationDate(self, instance):
         if instance.expired_at is not None:
@@ -410,7 +410,7 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
 
     class _PseudoSessionCourseSerializer(serializers.Serializer):
         """
-        'Private' Serilizer for the 'course' key data. This data comes from the pseudo session
+        'Private' Serializer for the 'course' key data. This data comes from the pseudo session
         """
         bannerImgSrc = serializers.URLField(source="image.src")
         courseName = serializers.CharField(source="title")
