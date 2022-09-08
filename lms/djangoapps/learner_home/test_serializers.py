@@ -592,7 +592,7 @@ class TestEntitlementSerializer(TestCase):
 
     @ddt.unpack
     @ddt.idata(product([True, False], repeat=2))
-    def test_serialize_entitlements(self, isExpired, isEnrolled):
+    def test_serialize_entitlement(self, isExpired, isEnrolled):
         entitlement_kwargs = {}
         if isExpired:
             entitlement_kwargs['expired_at'] = datetime.now()
@@ -713,7 +713,7 @@ class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
             "enrollment",
             "gradeData",
             "certificate",
-            "entitlements",
+            "entitlement",
             "programs",
         ]
         assert output_data.keys() == set(expected_keys)
@@ -723,13 +723,13 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
     """High-level tests for UnfulfilledEntitlementSerializer"""
 
     @classmethod
-    def generate_test_entitlements_data(cls):
+    def generate_test_entitlement_data(cls):
         mock_enrollment = cls.create_test_enrollment(cls)
 
         return {
             "courseProvider": TestCourseProviderSerializer.generate_test_provider_info(),
             "course": mock_enrollment.course,
-            "entitlements": TestEntitlementSerializer.generate_test_entitlement_info(),
+            "entitlement": TestEntitlementSerializer.generate_test_entitlement_info(),
             "programs": TestProgramsSerializer.generate_test_programs_info(),
         }
 
@@ -748,7 +748,7 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         expected_keys = [
             "courseProvider",
             "course",
-            "entitlements",
+            "entitlement",
             "programs",
             "courseRun",
             "gradeData",
@@ -1026,10 +1026,10 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         assert len(courses) == 3
         self._assert_all_keys_equal(courses)
         # Non-entitlement enrollment should have no entitlement info
-        assert not courses[0]['entitlements']
+        assert not courses[0]['entitlement']
         # Fulfuilled and Unfulfilled entitlement should have identical keys
-        fulfilled_entitlement = courses[1]['entitlements']
-        unfulfilled_entitlement = courses[2]['entitlements']
+        fulfilled_entitlement = courses[1]['entitlement']
+        unfulfilled_entitlement = courses[2]['entitlement']
         assert fulfilled_entitlement
         assert unfulfilled_entitlement
         assert fulfilled_entitlement.keys() == unfulfilled_entitlement.keys()
@@ -1058,7 +1058,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         mock_enterprise_dashboard_serializer,
         mock_platform_settings_serializer,
         mock_learner_enrollment_serializer,
-        mock_entitlements_serializer,
+        mock_entitlement_serializer,
         mock_suggestions_serializer,
     ):
         mock_email_confirmation_serializer.return_value = (
@@ -1073,7 +1073,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         mock_learner_enrollment_serializer.return_value = (
             mock_learner_enrollment_serializer
         )
-        mock_entitlements_serializer.return_value = mock_entitlements_serializer
+        mock_entitlement_serializer.return_value = mock_entitlement_serializer
         mock_suggestions_serializer.return_value = mock_suggestions_serializer
 
         input_data = {
@@ -1094,7 +1094,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
                 "platformSettings": mock_platform_settings_serializer,
                 "courses": [
                     mock_learner_enrollment_serializer,
-                    mock_entitlements_serializer,
+                    mock_entitlement_serializer,
                 ],
                 "suggestedCourses": [mock_suggestions_serializer],
             },
