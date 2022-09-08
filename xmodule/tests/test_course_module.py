@@ -494,7 +494,7 @@ class ProctoringProviderTestCase(unittest.TestCase):
         throws a ValueError with the correct error message.
         """
         provider = 'invalid-provider'
-        allowed_proctoring_providers = ['mock', 'mock_proctoring_without_rules']
+        allowed_proctoring_providers = xmodule.course_module.get_available_providers()
 
         FEATURES_WITH_PROCTORED_EXAMS = settings.FEATURES.copy()
         FEATURES_WITH_PROCTORED_EXAMS['ENABLE_PROCTORED_EXAMS'] = proctored_exams_setting_enabled
