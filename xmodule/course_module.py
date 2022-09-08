@@ -403,14 +403,6 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         ),
         scope=Scope.settings
     )
-    discussion_sort_alpha = Boolean(
-        display_name=_("Discussion Sorting Alphabetical"),
-        scope=Scope.settings, default=False,
-        help=_(
-            "Enter true or false. If true, discussion categories and subcategories are sorted alphabetically. "
-            "If false, they are sorted chronologically by creation date and time."
-        )
-    )
     discussions_settings = Dict(
         display_name=_("Discussions Plugin Settings"),
         scope=Scope.settings,
