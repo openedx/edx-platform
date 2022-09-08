@@ -1652,7 +1652,7 @@ class CourseEnrollment(models.Model):
                         'partner_image_url': owners[0].get('logo_image_url') if owners else '',
                         'learner_name': self.user.profile.name,
                         'course_run_key': str(self.course_id),
-                        'price': price,
+                        'course_price': price,
                         'lms_base_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
                         'learning_base_url': configuration_helpers.get_value('LEARNING_MICROFRONTEND_URL',
                                                                              settings.LEARNING_MICROFRONTEND_URL)

@@ -726,7 +726,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
             })
             if not studio_request:
                 properties.update({
-                    'price': 0,
+                    'course_price': 0,
                     'goals_enabled': False,
                     'learner_name': user.profile.name,
                     'course_run_key': str(course_key),
