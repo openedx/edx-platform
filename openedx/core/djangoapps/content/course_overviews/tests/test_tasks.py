@@ -12,8 +12,8 @@ from ..tasks import enqueue_async_course_overview_update_tasks
 class BatchedAsyncCourseOverviewUpdateTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
         super().setUp()
-        self.course_1 = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
-        self.course_2 = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        self.course_1 = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
+        self.course_2 = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         self.course_3 = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
 
     @mock.patch('openedx.core.djangoapps.content.course_overviews.models.CourseOverview.update_select_courses')
@@ -25,7 +25,7 @@ class BatchedAsyncCourseOverviewUpdateTests(ModuleStoreTestCase):  # lint-amnest
         )
 
         called_args, called_kwargs = mock_update_courses.call_args_list[0]
-        assert sorted([self.course_1.id, self.course_2.id]) == sorted(called_args[0])  # Only split courses updated
+        assert sorted([self.course_1.id, self.course_2.id, self.course_3.id]) == sorted(called_args[0])
         assert {'force_update': True} == called_kwargs
         assert 1 == mock_update_courses.call_count
 

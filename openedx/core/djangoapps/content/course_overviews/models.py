@@ -660,9 +660,6 @@ class CourseOverview(TimeStampedModel):
         # make sure the "publish" signal was emitted when the course was
         # created. For tests using CourseFactory, use emit_signals=True.
         course_overviews = CourseOverview.objects.all()
-        # Exclude old mongo courses
-        deprecated_course_ids = [id for id in course_overviews.values_list('id', flat=True) if id.deprecated]
-        course_overviews = course_overviews.exclude(id__in=deprecated_course_ids)
 
         if orgs:
             # In rare cases, courses belonging to the same org may be accidentally assigned

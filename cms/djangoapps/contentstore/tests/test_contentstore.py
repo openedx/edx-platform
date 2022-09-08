@@ -1489,16 +1489,17 @@ class ContentStoreTest(ContentStoreTestCase):
         # course_handler raise 404 for old mongo course
         if course.id.deprecated:
             self.assertEqual(resp.status_code, 404)
-        else:
-            self.assertContains(
-                resp,
-                '<article class="outline outline-complex outline-course" data-locator="{locator}" data-course-key="{course_key}">'.format(  # lint-amnesty, pylint: disable=line-too-long
-                    locator=str(course.location),
-                    course_key=str(course.id),
-                ),
-                status_code=200,
-                html=True
-            )
+            return
+
+        self.assertContains(
+            resp,
+            '<article class="outline outline-complex outline-course" data-locator="{locator}" data-course-key="{course_key}">'.format(  # lint-amnesty, pylint: disable=line-too-long
+                locator=str(course.location),
+                course_key=str(course.id),
+            ),
+            status_code=200,
+            html=True
+        )
 
     def test_create_item(self):
         """Test creating a new xblock instance."""
@@ -1890,6 +1891,9 @@ class RerunCourseTest(ContentStoreTestCase):
         rerun_course_data.update(destination_course_data)
         destination_course_key = _get_course_id(self.store, destination_course_data)
 
+        if destination_course_key.deprecated:
+            raise SkipTest('OldMongo Deprecation')
+
         # post the request
         course_url = get_url('course_handler', destination_course_key, 'course_key_string')
         response = self.client.ajax_post(course_url, rerun_course_data)
@@ -2209,6 +2213,9 @@ def _create_course(test, course_key, course_data):
     """
     Creates a course via an AJAX request and verifies the URL returned in the response.
     """
+    if course_key.deprecated:
+        raise SkipTest('OldMongo Deprecation')
+
     course_url = get_url('course_handler', course_key, 'course_key_string')
     response = test.client.ajax_post(course_url, course_data)
     test.assertEqual(response.status_code, 200)

@@ -100,7 +100,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Test that people with is_staff see the courses and can navigate into them
         """
-        self.check_courses_on_index(self.client, 0)
+        self.check_courses_on_index(self.client, 1)
 
     def test_negative_conditions(self):
         """
@@ -110,7 +110,10 @@ class TestCourseIndex(CourseTestCase):
         # register a non-staff member and try to delete the course branch
         non_staff_client, _ = self.create_non_staff_authed_user_client()
         response = non_staff_client.delete(outline_url, {}, HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 403)
+        if self.course.id.deprecated:
+            self.assertEqual(response.status_code, 404)
+        else:
+            self.assertEqual(response.status_code, 403)
 
     def test_course_staff_access(self):
         """
@@ -128,7 +131,7 @@ class TestCourseIndex(CourseTestCase):
             )
 
         # test access
-        self.check_courses_on_index(course_staff_client, 0)
+        self.check_courses_on_index(course_staff_client, 1)
 
     def test_json_responses(self):
 
