@@ -242,11 +242,6 @@ class TestLoginWithAccessTokenView(TestCase):
         self.user.save()
 
         response = self._get_response(jwt_token, token_type="JWT")
-        error_msg = {
-            'error_code': 'account_disabled',
-            'developer_message': 'User account is disabled.'
-        }
-        self.assertDictEqual(error_msg, json.loads(response.content))
         assert '_auth_user_id' not in self.client.session
         assert response.status_code == 401
 
