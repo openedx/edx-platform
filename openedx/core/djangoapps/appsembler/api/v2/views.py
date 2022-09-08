@@ -9,6 +9,7 @@ import logging
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.db import transaction
 from django.utils.decorators import method_decorator
+from django.conf import settings
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -17,10 +18,12 @@ from openedx.core.djangoapps.appsembler.api.helpers import normalize_bool_param
 from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
 from student.helpers import AccountValidationError
 
+from openedx.core.djangoapps.user_authn.views.password_reset import PasswordResetFormNoActive
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 from openedx.core.djangoapps.appsembler.api.v1.views import (
     RegistrationViewSet as RegistrationViewSetV1,
     create_password,
-    send_password_reset_email
 )
 from openedx.core.djangoapps.appsembler.api.v2.api import (
     email_exists,
@@ -36,6 +39,26 @@ from openedx.core.djangoapps.appsembler.api.permissions import (
 
 
 log = logging.getLogger(__name__)
+
+
+@beeline.traced(name="apis.v2.views.send_password_reset_email")
+def send_password_reset_email(request):
+    """Copied/modified from appsembler_api.utils in enterprise Ginkgo
+    Copied the template files from enterprise Ginkgo LMS templates
+    """
+    form = PasswordResetFormNoActive(request.data)
+    if form.is_valid():
+        form.save(
+            use_https=request.is_secure(),
+            from_email=configuration_helpers.get_value(
+                'email_from_address', settings.DEFAULT_FROM_EMAIL),
+            request=request,
+            domain_override=request.get_host(),
+            subject_template_name='appsembler/emails/set_password_subject.txt',
+            email_template_name='appsembler/emails/set_password_email.html')
+        return True, None
+    else:
+        return False, form.errors
 
 
 class RegistrationViewSet(RegistrationViewSetV1):
@@ -96,6 +119,9 @@ class RegistrationViewSet(RegistrationViewSetV1):
         data['honor_code'] = 'True'
         data['terms_of_service'] = 'True'
 
+        password_reset_validation_errors = None
+        password_reset_email_was_sent = False
+
         if password_provided:
             try:
                 # Default behavior is True - send the email
@@ -153,11 +179,13 @@ class RegistrationViewSet(RegistrationViewSetV1):
             user.save()
             user_id = user.id
             if not password_provided:
-                success = send_password_reset_email(request)
-                if not success:
-                    log.error('Tahoe Reg API: Error sending password reset '
-                              'email to user {}'.format(user.username))
-
+                password_reset_email_was_sent, password_reset_validation_errors = send_password_reset_email(request)
+                if not password_reset_email_was_sent:
+                    log.error(
+                        'Tahoe Reg API: Error sending password reset email to user {}. Errors: {}.'.format(
+                            user.username, password_reset_validation_errors,
+                        )
+                    )
         except ValidationError as err:
             log.error('ValidationError. err={}'.format(err))
             # Should only get non-field errors from this function
@@ -177,4 +205,9 @@ class RegistrationViewSet(RegistrationViewSetV1):
             msg = 'Invalid parameters on user creation: {field}'.format(
                 field=err.field)
             return Response(dict(user_message=msg), status=status.HTTP_400_BAD_REQUEST)
-        return Response({'user_id': user_id}, status=status.HTTP_200_OK)
+        return Response({
+            'user_id': user_id,
+            'password_provided': password_provided,
+            'password_reset_email_was_sent': password_reset_email_was_sent,
+            'password_reset_validation_errors': password_reset_validation_errors,
+        }, status=status.HTTP_200_OK)
