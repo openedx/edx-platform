@@ -104,10 +104,8 @@ def get_entitlements(user, org_allow_list, org_block_list):
     (
         filtered_entitlements,
         course_entitlement_available_sessions,
-        unfulfilled_entitlement_pseudo_sessions
-    ) = get_filtered_course_entitlements(
-        user, org_allow_list, org_block_list
-    )
+        unfulfilled_entitlement_pseudo_sessions,
+    ) = get_filtered_course_entitlements(user, org_allow_list, org_block_list)
     fulfilled_entitlements_by_course_key = {}
     unfulfulled_entitlements = []
 
@@ -238,7 +236,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             fulfilled_entitlements_by_course_key,
             unfulfulled_entitlements,
             course_entitlement_available_sessions,
-            unfulfilled_entitlement_pseudo_sessions
+            unfulfilled_entitlement_pseudo_sessions,
         ) = get_entitlements(user, site_org_whitelist, site_org_blacklist)
 
         # Get enrollments

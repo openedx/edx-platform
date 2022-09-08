@@ -17,7 +17,9 @@ from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
 )
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory as CatalogCourseRunFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseRunFactory as CatalogCourseRunFactory,
+)
 from lms.djangoapps.learner_home.serializers import (
     CertificateSerializer,
     CourseProviderSerializer,
@@ -591,9 +593,9 @@ class TestEntitlementSerializer(TestCase):
         assert len(output_sessions) == len(input_sessions)
         for input_session, output_session in zip(input_sessions, output_sessions):
             assert output_session == {
-                'startDate': input_session['start'],
-                'endDate': input_session['end'],
-                'courseId': input_session['key']
+                "startDate": input_session["start"],
+                "endDate": input_session["end"],
+                "courseId": input_session["key"],
             }
 
     @ddt.unpack
@@ -601,26 +603,33 @@ class TestEntitlementSerializer(TestCase):
     def test_serialize_entitlement(self, isExpired, isEnrolled):
         entitlement_kwargs = {}
         if isExpired:
-            entitlement_kwargs['expired_at'] = datetime.now()
+            entitlement_kwargs["expired_at"] = datetime.now()
         if isEnrolled:
-            entitlement_kwargs['enrollment_course_run'] = CourseEnrollmentFactory.create()
+            entitlement_kwargs[
+                "enrollment_course_run"
+            ] = CourseEnrollmentFactory.create()
         entitlement = CourseEntitlementFactory.create(**entitlement_kwargs)
         available_sessions = CatalogCourseRunFactory.create_batch(4)
         course_entitlement_available_sessions = {
             str(entitlement.uuid): available_sessions
         }
 
-        output_data = EntitlementSerializer(entitlement, context={
-            'course_entitlement_available_sessions': course_entitlement_available_sessions
-        }).data
+        output_data = EntitlementSerializer(
+            entitlement,
+            context={
+                "course_entitlement_available_sessions": course_entitlement_available_sessions
+            },
+        ).data
 
-        output_sessions = output_data.pop('availableSessions')
+        output_sessions = output_data.pop("availableSessions")
         self._assert_availale_sessions(available_sessions, output_sessions)
 
         if isExpired:
             expected_expiration_date = entitlement.expired_at
         else:
-            expected_expiration_date = date.today() + timedelta(days=entitlement.get_days_until_expiration())
+            expected_expiration_date = date.today() + timedelta(
+                days=entitlement.get_days_until_expiration()
+            )
 
         assert output_data == {
             "isRefundable": entitlement.is_entitlement_refundable(),
@@ -629,7 +638,7 @@ class TestEntitlementSerializer(TestCase):
             "isExpired": bool(entitlement.expired_at),
             "expirationDate": expected_expiration_date,
             "uuid": str(entitlement.uuid),
-            "enrollmentUrl": f"/api/entitlements/v1/entitlements/{entitlement.uuid}/enrollments"
+            "enrollmentUrl": f"/api/entitlements/v1/entitlements/{entitlement.uuid}/enrollments",
         }
 
 
@@ -742,14 +751,20 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
     def test_happy_path(self):
         """Test that nothing breaks and the output fields look correct"""
         unfulfilled_entitlement = CourseEntitlementFactory.create()
-        pseudo_sessions = {str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create()}
-        available_sessions = {str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create_batch(3)}
+        pseudo_sessions = {
+            str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create()
+        }
+        available_sessions = {
+            str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create_batch(3)
+        }
         context = {
-            'unfulfilled_entitlement_pseudo_sessions': pseudo_sessions,
-            'course_entitlement_available_sessions': available_sessions,
+            "unfulfilled_entitlement_pseudo_sessions": pseudo_sessions,
+            "course_entitlement_available_sessions": available_sessions,
         }
 
-        output_data = UnfulfilledEntitlementSerializer(unfulfilled_entitlement, context=context).data
+        output_data = UnfulfilledEntitlementSerializer(
+            unfulfilled_entitlement, context=context
+        ).data
 
         expected_keys = [
             "courseProvider",
@@ -759,14 +774,17 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
             "courseRun",
             "gradeData",
             "certificate",
-            "enrollment"
+            "enrollment",
         ]
 
         assert output_data.keys() == set(expected_keys)
-        assert output_data['courseRun'] is None
-        assert output_data['gradeData'] is None
-        assert output_data['certificate'] is None
-        assert output_data['enrollment'] == UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA
+        assert output_data["courseRun"] is None
+        assert output_data["gradeData"] is None
+        assert output_data["certificate"] is None
+        assert (
+            output_data["enrollment"]
+            == UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA
+        )
 
     def test_static_enrollment_data(self):
         """
@@ -774,7 +792,9 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         This test is to ensure that that dict has the same keys as returned by the LearnerEnrollmentSerializer
         """
         output_data = TestEnrollmentSerializer().serialize_test_enrollment()
-        expected_keys = UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA.keys()
+        expected_keys = (
+            UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA.keys()
+        )
         actual_keys = output_data.keys()
         assert expected_keys == actual_keys
 
@@ -907,7 +927,12 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
     # Show full diff for serialization issues
     maxDiff = None
 
-    def make_test_context(self, enrollments=None, enrollments_with_entitlements=None, unfulfilled_entitlements=None):
+    def make_test_context(
+        self,
+        enrollments=None,
+        enrollments_with_entitlements=None,
+        unfulfilled_entitlements=None,
+    ):
         """
         Given enrollments and entitlements, generate a mathing serializer context
         """
@@ -1006,10 +1031,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
     def test_entitlements(self):
         # One standard enrollment, one fulfilled entitlement, one unfulfilled enrollment
-        enrollments = [
-            self.create_test_enrollment(),
-            self.create_test_enrollment()
-        ]
+        enrollments = [self.create_test_enrollment(), self.create_test_enrollment()]
         unfulfilled_entitlements = [CourseEntitlementFactory.create()]
 
         input_context = self.make_test_context(

@@ -28,7 +28,9 @@ from lms.djangoapps.learner_home.views import (
     get_entitlements,
 )
 from lms.djangoapps.learner_home.test_serializers import random_url
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory as CatalogCourseRunFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseRunFactory as CatalogCourseRunFactory,
+)
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
@@ -173,7 +175,7 @@ class TestGetEntitlements(SharedModuleStoreTestCase):
         self,
         filtered_entitlements,
         course_entitlement_available_sessions,
-        unfulfilled_entitlement_pseudo_sessions
+        unfulfilled_entitlement_pseudo_sessions,
     ):
         """
         Context manager utility for mocking get_filtered_course_entitlements.
@@ -184,7 +186,10 @@ class TestGetEntitlements(SharedModuleStoreTestCase):
             course_entitlement_available_sessions,
             unfulfilled_entitlement_pseudo_sessions,
         )
-        with patch('lms.djangoapps.learner_home.views.get_filtered_course_entitlements', return_value=return_value):
+        with patch(
+            "lms.djangoapps.learner_home.views.get_filtered_course_entitlements",
+            return_value=return_value,
+        ):
             yield
 
     def create_test_fulfilled_entitlement(self):
@@ -213,7 +218,9 @@ class TestGetEntitlements(SharedModuleStoreTestCase):
 
         available_sessions = {}
         for entitlement in fulfilled_test_entitlements + unfulfilled_test_entitlements:
-            available_sessions[str(entitlement.uuid)] = CatalogCourseRunFactory.create_batch(3)
+            available_sessions[
+                str(entitlement.uuid)
+            ] = CatalogCourseRunFactory.create_batch(3)
 
         pseudo_sessions = {}
         for entitlement in unfulfilled_test_entitlements:
@@ -222,7 +229,7 @@ class TestGetEntitlements(SharedModuleStoreTestCase):
         with self.mock_get_filtered_course_entitlements(
             fulfilled_test_entitlements + unfulfilled_test_entitlements,
             available_sessions,
-            pseudo_sessions
+            pseudo_sessions,
         ):
             (
                 fulfilled_entitlements_by_course_key,
@@ -231,7 +238,9 @@ class TestGetEntitlements(SharedModuleStoreTestCase):
                 unfulfilled_entitlement_pseudo_sessions,
             ) = get_entitlements(self.user, None, None)
 
-        assert len(fulfilled_entitlements_by_course_key) == len(fulfilled_test_entitlements)
+        assert len(fulfilled_entitlements_by_course_key) == len(
+            fulfilled_test_entitlements
+        )
         assert len(unfulfilled_entitlements) == len(unfulfilled_test_entitlements)
         assert set(unfulfilled_entitlements) == set(unfulfilled_test_entitlements)
         assert course_entitlement_available_sessions is available_sessions

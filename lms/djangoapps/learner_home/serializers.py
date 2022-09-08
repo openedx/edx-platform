@@ -18,6 +18,7 @@ class LiteralField(serializers.Field):
     """
     Custom Field for use with fields that will always intentionally serialize to the same static value.
     """
+
     def __init__(self, literal_value):
         super().__init__()
         self.literal_value = literal_value
@@ -291,9 +292,9 @@ class CertificateSerializer(serializers.Serializer):
 class AvailableEntitlementSessionSerializer(serializers.Serializer):
     """An available entitlement session"""
 
-    startDate = serializers.DateTimeField(source='start')
-    endDate = serializers.DateTimeField(source='end')
-    courseId = serializers.CharField(source='key')
+    startDate = serializers.DateTimeField(source="start")
+    endDate = serializers.DateTimeField(source="end")
+    courseId = serializers.CharField(source="key")
 
 
 class EntitlementSerializer(serializers.Serializer):
@@ -302,7 +303,7 @@ class EntitlementSerializer(serializers.Serializer):
 
     availableSessions = serializers.SerializerMethodField()
     uuid = serializers.UUIDField()
-    isRefundable = serializers.BooleanField(source='is_entitlement_refundable')
+    isRefundable = serializers.BooleanField(source="is_entitlement_refundable")
     isFulfilled = serializers.SerializerMethodField()
     changeDeadline = serializers.SerializerMethodField()
     isExpired = serializers.SerializerMethodField()
@@ -318,7 +319,9 @@ class EntitlementSerializer(serializers.Serializer):
         return bool(instance.expired_at)
 
     def get_availableSessions(self, instance):
-        availableSessions = self.context['course_entitlement_available_sessions'].get(str(instance.uuid))
+        availableSessions = self.context["course_entitlement_available_sessions"].get(
+            str(instance.uuid)
+        )
         return AvailableEntitlementSessionSerializer(availableSessions, many=True).data
 
     def get_expirationDate(self, instance):
@@ -331,7 +334,7 @@ class EntitlementSerializer(serializers.Serializer):
         return self.get_expirationDate(instance)
 
     def get_enrollmentUrl(self, instance):
-        return reverse('entitlements_api:v1:enrollments', args=[str(instance.uuid)])
+        return reverse("entitlements_api:v1:enrollments", args=[str(instance.uuid)])
 
 
 class RelatedProgramSerializer(serializers.Serializer):
@@ -360,6 +363,7 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     Info for displaying an enrollment on the learner dashboard.
     Derived from a CourseEnrollment with added context.
     """
+
     requires_context = True
 
     course = CourseSerializer()
@@ -377,7 +381,9 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
         """
         If this enrollment is the fulfillment of an entitlement, include information about the entitlement
         """
-        entitlement = self.context['fulfilled_entitlements'].get(str(instance.course_id))
+        entitlement = self.context["fulfilled_entitlements"].get(
+            str(instance.course_id)
+        )
         if entitlement:
             return EntitlementSerializer(entitlement, context=self.context).data
         else:
@@ -395,23 +401,24 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
 
     # This is the static constant data returned as the 'enrollment' key for all unfulfilled enrollments.
     STATIC_ENTITLEMENT_ENROLLMENT_DATA = {
-        'accessExpirationDate': None,
-        'isAudit': False,
-        'hasStarted': False,
-        'hasAccess': True,
-        'isVerified': False,
-        'canUpgrade': False,
-        'isAuditAccessExpired': False,
-        'isEmailEnabled': False,
-        'hasOptedOutOfEmail': False,
-        'lastEnrolled': None,
-        'isEnrolled': False,
+        "accessExpirationDate": None,
+        "isAudit": False,
+        "hasStarted": False,
+        "hasAccess": True,
+        "isVerified": False,
+        "canUpgrade": False,
+        "isAuditAccessExpired": False,
+        "isEmailEnabled": False,
+        "hasOptedOutOfEmail": False,
+        "lastEnrolled": None,
+        "isEnrolled": False,
     }
 
     class _PseudoSessionCourseSerializer(serializers.Serializer):
         """
         'Private' Serializer for the 'course' key data. This data comes from the pseudo session
         """
+
         bannerImgSrc = serializers.URLField(source="image.src")
         courseName = serializers.CharField(source="title")
         courseNumber = serializers.CharField(source="key")
@@ -431,8 +438,12 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
     enrollment = LiteralField(STATIC_ENTITLEMENT_ENROLLMENT_DATA)
 
     def get_course(self, instance):
-        pseudo_session = self.context['unfulfilled_entitlement_pseudo_sessions'].get(str(instance.uuid))
-        return UnfulfilledEntitlementSerializer._PseudoSessionCourseSerializer(pseudo_session).data
+        pseudo_session = self.context["unfulfilled_entitlement_pseudo_sessions"].get(
+            str(instance.uuid)
+        )
+        return UnfulfilledEntitlementSerializer._PseudoSessionCourseSerializer(
+            pseudo_session
+        ).data
 
 
 class SuggestedCourseSerializer(serializers.Serializer):
