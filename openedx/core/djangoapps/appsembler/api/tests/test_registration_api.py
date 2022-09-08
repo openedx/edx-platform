@@ -24,9 +24,6 @@ APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'
 @patch(APPSEMBLER_API_VIEWS_MODULE + '.RegistrationViewSet.authentication_classes', [])
 @patch(APPSEMBLER_API_VIEWS_MODULE + '.RegistrationViewSet.permission_classes', [AllowAny])
 @patch(APPSEMBLER_API_VIEWS_MODULE + '.RegistrationViewSet.throttle_classes', [])
-@override_settings(APPSEMBLER_FEATURES={
-    'SKIP_LOGIN_AFTER_REGISTRATION': False,
-})
 class RegistrationApiViewTests(TestCase):
     def setUp(self):
 

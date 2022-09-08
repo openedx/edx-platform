@@ -33,9 +33,6 @@ def make_post_data(val):
 @ddt.ddt
 @patch(APPSEMBLER_API_VIEWS_MODULE + '.RegistrationViewSet.authentication_classes', [])
 @patch(APPSEMBLER_API_VIEWS_MODULE + '.RegistrationViewSet.permission_classes', [AllowAny])
-@override_settings(APPSEMBLER_FEATURES={
-    'SKIP_LOGIN_AFTER_REGISTRATION': False,
-})
 @override_settings(CACHES={
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
