@@ -6,6 +6,7 @@ Tests for OAuth token exchange views
 
 import json
 import unittest
+from unittest import mock
 from datetime import timedelta
 from datetime import datetime
 
@@ -20,6 +21,8 @@ from oauth2_provider.models import Application
 from rest_framework.test import APIClient
 from social_django.models import Partial
 
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.permissions import NotJwtRestrictedApplication
 from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
@@ -236,12 +239,21 @@ class TestLoginWithAccessTokenView(TestCase):
         assert '_auth_user_id' not in self.client.session
         assert response.status_code == 401
 
-    def test_failure_with_valid_asymmetric_jwt_and_disabled_user(self):
+    @mock.patch.object(NotJwtRestrictedApplication, 'has_permission')
+    @mock.patch.object(JwtAuthentication, 'authenticate')
+    def test_failure_with_valid_asymmetric_jwt_and_disabled_user(self, jwt_authenticate, jwt_has_permissions):
+        jwt_authenticate.return_value = (self.user, 'mock-auth')
+        jwt_has_permissions.return_value = True
         jwt_token = self._create_jwt_token()
         self.user.set_unusable_password()
         self.user.save()
 
         response = self._get_response(jwt_token, token_type="JWT")
+        error_msg = {
+            'error_code': 'account_disabled',
+            'developer_message': 'User account is disabled.'
+        }
+        self.assertDictEqual(error_msg, json.loads(response.content))
         assert '_auth_user_id' not in self.client.session
         assert response.status_code == 401
 

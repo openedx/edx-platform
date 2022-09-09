@@ -18,6 +18,8 @@ from django.core import mail
 from django.core.cache import cache
 from django.test import TestCase
 from django.urls import reverse
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.permissions import NotJwtRestrictedApplication
 from enterprise.models import (
     EnterpriseCourseEnrollment,
     EnterpriseCustomer,
@@ -241,31 +243,37 @@ class TestDeactivateLogout(RetirementTestCase):
         # Assert that there is no longer a secondary/recovery email for test user
         assert len(AccountRecovery.objects.filter(user_id=self.test_user.id)) == 0
 
-    def test_password_mismatch(self):
+    @mock.patch.object(NotJwtRestrictedApplication, 'has_permission')
+    @mock.patch.object(JwtAuthentication, 'authenticate')
+    def test_password_mismatch(self, jwt_authenticate, jwt_has_permissions):
         """
         Verify that the user submitting a mismatched password results in
         a rejection.
         """
+        jwt_authenticate.return_value = (self.test_user, 'mock-auth')
+        jwt_has_permissions.return_value = True
         self.client.login(username=self.test_user.username, password=self.test_password)
         headers = build_jwt_headers(self.test_user)
-        with mock.patch.object(DeactivateLogoutView, 'authentication_classes', new=[]):
-            response = self.client.post(self.url, self.build_post(self.test_password + "xxxx"), **headers)
-            assert response.status_code == status.HTTP_403_FORBIDDEN
+        response = self.client.post(self.url, self.build_post(self.test_password + "xxxx"), **headers)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_called_twice(self):
+    @mock.patch.object(NotJwtRestrictedApplication, 'has_permission')
+    @mock.patch.object(JwtAuthentication, 'authenticate')
+    def test_called_twice(self, jwt_authenticate, jwt_has_permissions):
         """
         Verify a user calling the deactivation endpoint a second time results in a "forbidden"
         error, as the user will be logged out.
         """
+        jwt_authenticate.return_value = (self.test_user, 'mock-auth')
+        jwt_has_permissions.return_value = True
         self.client.login(username=self.test_user.username, password=self.test_password)
         headers = build_jwt_headers(self.test_user)
         response = self.client.post(self.url, self.build_post(self.test_password), **headers)
         assert response.status_code == status.HTTP_204_NO_CONTENT
         self.client.login(username=self.test_user.username, password=self.test_password)
         headers = build_jwt_headers(self.test_user)
-        with mock.patch.object(DeactivateLogoutView, 'authentication_classes', new=[]):
-            response = self.client.post(self.url, self.build_post(self.test_password), **headers)
-            assert response.status_code == status.HTTP_403_FORBIDDEN
+        response = self.client.post(self.url, self.build_post(self.test_password), **headers)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
