@@ -47,7 +47,7 @@ from openedx.core.djangoapps.credit.models import (
 from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.user_api.accounts.views import AccountRetirementPartnerReportView, DeactivateLogoutView
+from openedx.core.djangoapps.user_api.accounts.views import AccountRetirementPartnerReportView
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserOrgTag,
