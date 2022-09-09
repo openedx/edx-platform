@@ -594,7 +594,7 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
 class TestEntitlementSerializer(TestCase):
     """Tests for the EntitlementSerializer"""
 
-    def _assert_availale_sessions(self, input_sessions, output_sessions):
+    def _assert_available_sessions(self, input_sessions, output_sessions):
         assert len(output_sessions) == len(input_sessions)
         for input_session, output_session in zip(input_sessions, output_sessions):
             assert output_session == {
@@ -627,7 +627,7 @@ class TestEntitlementSerializer(TestCase):
         ).data
 
         output_sessions = output_data.pop("availableSessions")
-        self._assert_availale_sessions(available_sessions, output_sessions)
+        self._assert_available_sessions(available_sessions, output_sessions)
 
         if isExpired:
             expected_expiration_date = entitlement.expired_at
@@ -946,7 +946,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         unfulfilled_entitlements=None,
     ):
         """
-        Given enrollments and entitlements, generate a mathing serializer context
+        Given enrollments and entitlements, generate a matching serializer context
         """
         enrollments = enrollments or []
         enrollments_with_entitlements = enrollments_with_entitlements or []
@@ -1069,7 +1069,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         self._assert_all_keys_equal(courses)
         # Non-entitlement enrollment should have no entitlement info
         assert not courses[0]['entitlement']
-        # Fulfuilled and Unfulfilled entitlement should have identical keys
+        # Fulfilled and Unfulfilled entitlement should have identical keys
         fulfilled_entitlement = courses[1]['entitlement']
         unfulfilled_entitlement = courses[2]['entitlement']
         assert fulfilled_entitlement
