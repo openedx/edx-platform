@@ -71,13 +71,13 @@ local-requirements:
 	pip install -e .
 
 dev-requirements: local-requirements
-	pip install -q requirements/edx/development.txt
+	pip install -qr requirements/edx/development.txt
 
 base-requirements: local-requirements
-	pip install -q requirements/edx/base.txt
+	pip install -qr requirements/edx/base.txt
 
 test-requirements: local-requirements
-	pip install -q requirements/edx/testing.txt
+	pip install -qr requirements/edx/testing.txt
 
 requirements: pre-requirements ## install development environment requirements
 	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
