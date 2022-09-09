@@ -12,7 +12,7 @@ class SuccessMessages:
     ARTICLE_ADDED_TO_FAVORITES = '{title} has been added to your favorite articles.'
     ARTICLE_REMOVED_FROM_FAVORITES = '{title} has been removed from your favorite articles.'
     ARTICLE_RATED = "Thanks for the rating."
-    BADGE_AWARDED = 'Badges have been awarded successfully.'
+    BADGE_AWARDED = 'Feedback/badges have been awarded successfully.'
 
 
 class ErrorMessages:
