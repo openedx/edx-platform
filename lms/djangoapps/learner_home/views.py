@@ -29,9 +29,8 @@ from lms.djangoapps.courseware.access_utils import (
 from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.features.enterprise_support.api import (
-    enterprise_customer_from_session_or_learner_data,
-)
+from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
+from openedx.features.enterprise_support.api import enterprise_customer_from_session_or_learner_data
 
 
 def get_platform_settings():
@@ -237,12 +236,27 @@ def check_course_access(user, course_enrollments):
     return course_access_dict
 
 
+def get_course_programs(user, course_enrollments, site):
+    """
+    Get programs related to the courses the user is enrolled in.
+
+    Returns: {
+        <course_id>: {
+            "programs": [list of programs]
+        }
+    }
+    """
+    meter = ProgramProgressMeter(site, user, enrollments=course_enrollments)
+    return meter.invert_programs()
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
     def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         # Get user, determine if user needs to confirm email account
         user = request.user
+        site = request.site
         email_confirmation = get_user_account_confirmation_info(user)
 
         # Gather info for enterprise dashboard
@@ -278,7 +292,8 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         # Determine view access for course, (for showing courseware link) involves:
         course_access_checks = check_course_access(user, course_enrollments)
 
-        # TODO - Get related programs
+        # Get programs related to the courses the user is enrolled in
+        programs = get_course_programs(user, course_enrollments, site)
 
         # e-commerce info
         ecommerce_payment_page = get_ecommerce_payment_page(user)
@@ -307,6 +322,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "course_entitlement_available_sessions": course_entitlement_available_sessions,
             "unfulfilled_entitlement_pseudo_sessions": unfulfilled_entitlement_pseudo_sessions,
             "pseudo_session_course_overviews": pseudo_session_course_overviews,
+            "programs": programs,
         }
 
         response_data = LearnerDashboardSerializer(
