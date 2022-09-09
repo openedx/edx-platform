@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from organizations.models import Organization
-from tahoe_sites.api import get_organization_user_by_email
+from tahoe_sites.api import get_organization_user_by_email, get_organization_for_user, get_site_by_organization
 from branding.api import get_base_url
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from rest_framework.views import APIView
@@ -49,7 +49,8 @@ class SiteViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = Site.objects.exclude(id=settings.SITE_ID)
         user = self.request.user
         if not user.is_superuser:
-            queryset = queryset.filter(organizations__in=user.organizations.all())
+            organization = get_organization_for_user(user=user)
+            queryset = queryset.filter(id=get_site_by_organization(organization=organization).id)
         return queryset
 
 
