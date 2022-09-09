@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from lms.djangoapps.badges.models import BadgeClass, BadgeAssertion
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadge, BoosterBadgeAward
 from openedx.features.genplus_features.genplus_learning.models import Program
+from openedx.features.genplus_features.genplus.models import Student, Teacher, JournalPost
+from openedx.features.genplus_features.genplus.constants import JournalTypes
 from openedx.features.genplus_features.genplus_badges.utils import get_absolute_url
 
 
@@ -76,13 +78,12 @@ class ProgramBadgeSerializer(serializers.ModelSerializer):
         return assertion.created if assertion else None
 
 
-class AwardBoosterBadgesSerializer(serializers.ModelSerializer):
+class AwardBoosterBadgesSerializer(serializers.Serializer):
     user = serializers.ListField(child=serializers.CharField())
     badge = serializers.ListField(child=serializers.CharField())
-    feedback = serializers.CharField()
+    feedback = serializers.CharField(allow_blank=True)
 
     class Meta:
-        model = BoosterBadgeAward
         fields = ('user', 'badge', 'feedback')
 
     def create(self, validated_data):
@@ -105,18 +106,30 @@ class AwardBoosterBadgesSerializer(serializers.ModelSerializer):
                                               request, badge.image))
                 awards.append(award)
 
+        if feedback and users:
+            students = Student.objects.filter(gen_user__user__username__in=users)
+            teacher = Teacher.objects.get(gen_user__user=request.user)
+            journal_posts = [JournalPost(student=student, teacher=teacher,
+                                         type=JournalTypes.TEACHER_FEEDBACK,
+                                         description=feedback)
+                             for student in students]
+            JournalPost.objects.bulk_create(journal_posts)
+
         return BoosterBadgeAward.objects.bulk_create(awards,
                                                      ignore_conflicts=True)
 
-    def validate_user(self, value):
-        if not value or len(value) < 1:
-            raise serializers.ValidationError('This field may not be blank.')
-        return value
+    def validate(self, data):
+        feedback = data['feedback']
+        users = data['user']
+        badges = data['badge']
 
-    def validate_badge(self, value):
-        if not value or len(value) < 1:
-            raise serializers.ValidationError('This field may not be blank.')
-        return value
+        if not users:
+            raise serializers.ValidationError('Provide students to give feedback or award badges to.')
+
+        if users and not (feedback or badges):
+            raise serializers.ValidationError('Give feedback or award badges to provided students.')
+
+        return data
 
 
 class BoosterBadgeSerializer(serializers.ModelSerializer):
@@ -133,7 +146,6 @@ class BoosterBadgeSerializer(serializers.ModelSerializer):
 
 
 class ClassBoosterBadgesSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = BoosterBadgeAward
         fields = ('user', 'badge', 'awarded_by', 'feedback', 'image_url')

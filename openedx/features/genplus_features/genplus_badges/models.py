@@ -30,7 +30,7 @@ class BoosterBadgeAward(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='booster_badges')
     badge = models.ForeignKey(BoosterBadge, on_delete=models.CASCADE)
     awarded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='teacher_awards')
-    feedback = models.TextField()
+    feedback = models.TextField(blank=True, default="")
     image_url = models.URLField()
 
     @classmethod
