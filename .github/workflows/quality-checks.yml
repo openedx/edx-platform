@@ -16,7 +16,7 @@ jobs:
         os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
         node-version: [ 16 ]
-        
+
     steps:
 
     - uses: actions/checkout@v2
@@ -60,7 +60,8 @@ jobs:
         PIP_SRC_DIR: ${{ runner.temp }}
       run: |
         pip install -r requirements/pip.txt
-        pip install -r requirements/edx/testing.txt -r requirements/edx/django.txt --src $PIP_SRC_DIR
+        make test-requirements
+        pip install -r requirements/edx/django.txt
 
     - name: Run Quality Tests
       env:

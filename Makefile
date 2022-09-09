@@ -66,6 +66,19 @@ pull: ## update the Docker image used by "make shell"
 pre-requirements: ## install Python requirements for running pip-tools
 	pip install -qr requirements/edx/pip-tools.txt
 
+local-requirements:
+# 	edx-platform installs some Python projects from within the edx-platform repo itself.
+	pip install -e .
+
+dev-requirements: local-requirements
+	pip install -q requirements/edx/development.txt
+
+base-requirements: local-requirements
+	pip install -q requirements/edx/base.txt
+
+test-requirements: local-requirements
+	pip install -q requirements/edx/testing.txt
+
 requirements: pre-requirements ## install development environment requirements
 	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
 	@# of it if it does not.  Shell wildcarding can't do that with default options.

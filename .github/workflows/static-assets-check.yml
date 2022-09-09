@@ -50,9 +50,7 @@ jobs:
     - name: Install Required Python Dependencies
       run: |
         pip install -r requirements/pip.txt
-        pip install -r requirements/edx/base.txt
-#        edx-platform installs some Python projects from within the edx-platform repo itself.
-        pip install -e .
+        make base-requirements
 
     - name: Initiate Mongo DB Service
       run: sudo systemctl start mongod

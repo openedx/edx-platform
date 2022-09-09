@@ -64,9 +64,7 @@ jobs:
     - name: Install Required Python Dependencies
       run: |
         pip install -r requirements/pip.txt
-        pip install -r requirements/edx/base.txt
-#        edx-platform installs some Python projects from within the edx-platform repo itself.
-        pip install -e .
+        make base-requirements
 
     - uses: c-hive/gha-npm-cache@v1
     - name: Run JS Tests
