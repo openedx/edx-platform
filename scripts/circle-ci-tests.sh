@@ -82,7 +82,7 @@ else
             paver test_system -s cms --cov-args="-p"
             ;;
 
-        3)  # run the commonlib unit tests
+        3)  # run the pavelib unit tests
             paver test_lib --cov-args="-p"
             ;;
 

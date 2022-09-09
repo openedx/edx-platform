@@ -15,7 +15,7 @@ set -e
 #
 #       - "lms-unit": Run the LMS Python unit tests
 #       - "cms-unit": Run the CMS Python unit tests
-#       - "pavelib-unit": Run Python unit tests from the common/lib directory
+#       - "pavelib-unit": Run Python unit tests from the pavelib/paver_tests directory
 #
 #   `SHARD` is a number indicating which subset of the tests to build.
 #
