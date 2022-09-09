@@ -341,14 +341,41 @@ class EntitlementSerializer(serializers.Serializer):
 class RelatedProgramSerializer(serializers.Serializer):
     """Related programs information"""
 
-    bannerUrl = serializers.URLField()
-    estimatedNumberOfWeeks = serializers.IntegerField()
-    logoUrl = serializers.URLField()
-    numberOfCourses = serializers.IntegerField()
-    programType = serializers.CharField()
-    programUrl = serializers.URLField()
-    provider = serializers.CharField()
+    bannerUrl = serializers.URLField(source="banner_image.small.url")
+    logoUrl = serializers.SerializerMethodField()
+    numberOfCourses = serializers.SerializerMethodField()
+    programType = serializers.CharField(source="type")
+    programUrl = serializers.SerializerMethodField()
+    provider = serializers.SerializerMethodField()
     title = serializers.CharField()
+
+    def get_numberOfCourses(self, instance):
+        return len(instance["courses"])
+
+    def get_logoUrl(self, instance):
+        return (
+            instance["authoring_organizations"][0].get("logo_image_url")
+            if instance.get("authoring_organizations")
+            else None
+        )
+
+    def get_provider(self, instance):
+        return (
+            instance["authoring_organizations"][0].get("name")
+            if instance.get("authoring_organizations")
+            else None
+        )
+
+    def get_programUrl(self, instance):
+        return urljoin(
+            settings.LMS_ROOT_URL,
+            instance.get(
+                "detail_url",
+                reverse(
+                    "program_details_view", kwargs={"program_uuid": instance["uuid"]}
+                ),
+            ),
+        )
 
 
 class ProgramsSerializer(serializers.Serializer):
@@ -374,9 +401,10 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     certificate = CertificateSerializer(source="*")
     entitlement = serializers.SerializerMethodField()
     gradeData = GradeDataSerializer(source="*")
+    programs = serializers.SerializerMethodField()
 
     # TODO - remove "allow_null" as each of these are implemented, temp for testing.
-    programs = ProgramsSerializer(allow_null=True)
+    courseProvider = CourseProviderSerializer(allow_null=True)
 
     def get_entitlement(self, instance):
         """
@@ -389,6 +417,13 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
             return EntitlementSerializer(entitlement, context=self.context).data
         else:
             return {}
+
+    def get_programs(self, instance):
+        """
+        If this enrollment is part of a program, include information about the program and related programs
+        """
+        programs = self.context['programs'].get(str(instance.course_id), [])
+        return ProgramsSerializer({"relatedPrograms": programs}, context=self.context).data
 
 
 class UnfulfilledEntitlementSerializer(serializers.Serializer):
