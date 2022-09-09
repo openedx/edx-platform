@@ -293,7 +293,7 @@ class AvailableEntitlementSessionSerializer(serializers.Serializer):
 
 
 class EntitlementSerializer(serializers.Serializer):
-    """Entitlements info"""
+    """Entitlement info"""
     requires_context = True
 
     availableSessions = serializers.SerializerMethodField()
@@ -362,14 +362,14 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     courseRun = CourseRunSerializer(source="*")
     enrollment = EnrollmentSerializer(source="*")
     certificate = CertificateSerializer(source="*")
-    entitlements = serializers.SerializerMethodField()
+    entitlement = serializers.SerializerMethodField()
 
     # TODO - remove "allow_null" as each of these are implemented, temp for testing.
     courseProvider = CourseProviderSerializer(allow_null=True)
     gradeData = GradeDataSerializer(allow_null=True)
     programs = ProgramsSerializer(allow_null=True)
 
-    def get_entitlements(self, instance):
+    def get_entitlement(self, instance):
         """
         If this enrollment is the fulfillment of an entitlement, include information about the entitlement
         """
@@ -413,7 +413,7 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         courseNumber = serializers.CharField(source="key")
 
     # These fields contain all real data and will be serialized
-    entitlements = EntitlementSerializer(source="*")
+    entitlement = EntitlementSerializer(source="*")
     course = serializers.SerializerMethodField()
 
     # Change after data is implemented. This data is required
