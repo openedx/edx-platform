@@ -12,8 +12,6 @@
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
     # via -r requirements/edx/testing.txt
--e .
-    # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx/RateXBlock.git@2.0.1#egg=rate-xblock
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
@@ -135,7 +133,7 @@ celery==5.2.7
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-certifi==2022.6.15
+certifi==2022.6.15.1
     # via
     #   -r requirements/edx/testing.txt
     #   elasticsearch
@@ -584,7 +582,7 @@ edx-django-utils==5.0.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions==8.2.0
+edx-drf-extensions==8.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-completion
@@ -609,7 +607,7 @@ edx-i18n-tools==0.9.1
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-edx-lint==5.2.4
+edx-lint==5.2.5
     # via -r requirements/edx/testing.txt
 edx-milestones==0.4.0
     # via -r requirements/edx/testing.txt
@@ -653,7 +651,7 @@ edx-rest-api-client==5.5.0
     #   edx-proctoring
 edx-search==3.4.0
     # via -r requirements/edx/testing.txt
-edx-sga==0.19.0
+edx-sga==0.20.0
     # via -r requirements/edx/testing.txt
 edx-sphinx-theme==3.0.0
     # via -r requirements/edx/development.in
@@ -843,7 +841,7 @@ jsonfield==3.1.0
     #   lti-consumer-xblock
     #   ora2
     #   outcome-surveys
-jsonschema==4.15.0
+jsonschema==4.16.0
     # via
     #   -r requirements/edx/testing.txt
     #   optimizely-sdk
@@ -1534,10 +1532,7 @@ tinycss2==1.1.1
     #   -r requirements/edx/testing.txt
     #   bleach
 toml==0.10.2
-    # via
-    #   -r requirements/edx/testing.txt
-    #   tox
-    #   vulture
+    # via vulture
 tomli==2.0.1
     # via
     #   -r requirements/edx/pip-tools.txt
@@ -1548,7 +1543,8 @@ tomli==2.0.1
     #   pep517
     #   pylint
     #   pytest
-tox==3.25.1
+    #   tox
+tox==3.26.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox-battery
@@ -1601,7 +1597,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.16.4
+virtualenv==20.16.5
     # via
     #   -r requirements/edx/testing.txt
     #   tox
