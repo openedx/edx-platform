@@ -117,7 +117,9 @@ COPY . .
 # Install Python requirements again in order to capture local projects, which
 # were skipped earlier. This should be much quicker than if were installing
 # all requirements from scratch.
-RUN pip install -r requirements/edx/base.txt
+RUN pip install -r requirements/edx/base.txt \
+# edx-platform installs some Python projects from within the edx-platform repo itself.
+RUn pip install -e .
 
 ##################################################
 # Define LMS docker-based non-dev target.
