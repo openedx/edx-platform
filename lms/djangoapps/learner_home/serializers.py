@@ -508,8 +508,10 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         """
         If this entitlement is part of a program, include information about the program and related programs
         """
-        programs = self.context['programs'].get(str(instance.course_uuid), [])
-        return ProgramsSerializer({"relatedPrograms": programs}, context=self.context).data
+        programs = self.context["programs"].get(str(instance.course_uuid), [])
+        return ProgramsSerializer(
+            {"relatedPrograms": programs}, context=self.context
+        ).data
 
 
 class SuggestedCourseSerializer(serializers.Serializer):
