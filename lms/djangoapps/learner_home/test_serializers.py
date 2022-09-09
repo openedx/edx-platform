@@ -801,7 +801,7 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
     """High-level tests for UnfulfilledEntitlementSerializer"""
 
     def make_unfulfilled_entitlement(self):
-        """ Create an unfulflled entitlement, along with a pseudo session and available sessions"""
+        """Create an unfulflled entitlement, along with a pseudo session and available sessions"""
         unfulfilled_entitlement = CourseEntitlementFactory.create()
         pseudo_sessions = {
             str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create()
@@ -811,8 +811,10 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         }
         return unfulfilled_entitlement, pseudo_sessions, available_sessions
 
-    def make_pseudo_session_course_overviews(self, unfulfilled_entitlement, pseudo_sessions):
-        """ Create course overview for course provider info """
+    def make_pseudo_session_course_overviews(
+        self, unfulfilled_entitlement, pseudo_sessions
+    ):
+        """Create course overview for course provider info"""
         course_key_str = pseudo_sessions[str(unfulfilled_entitlement.uuid)]["key"]
         course_key = CourseKey.from_string(course_key_str)
         course_overview = CourseOverviewFactory.create(id=course_key)
@@ -820,16 +822,19 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
 
     def test_happy_path(self):
         """Test that nothing breaks and the output fields look correct"""
-        unfulfilled_entitlement, pseudo_sessions, available_sessions = self.make_unfulfilled_entitlement()
-        pseudo_session_course_overviews = self.make_pseudo_session_course_overviews(
+        (
             unfulfilled_entitlement,
-            pseudo_sessions
+            pseudo_sessions,
+            available_sessions,
+        ) = self.make_unfulfilled_entitlement()
+        pseudo_session_course_overviews = self.make_pseudo_session_course_overviews(
+            unfulfilled_entitlement, pseudo_sessions
         )
         context = {
             "unfulfilled_entitlement_pseudo_sessions": pseudo_sessions,
             "course_entitlement_available_sessions": available_sessions,
             "pseudo_session_course_overviews": pseudo_session_course_overviews,
-            "programs": {}
+            "programs": {},
         }
 
         output_data = UnfulfilledEntitlementSerializer(
@@ -861,30 +866,32 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         assert output_data["programs"] == {"relatedPrograms": []}
 
     def test_programs(self):
-        unfulfilled_entitlement, pseudo_sessions, available_sessions = self.make_unfulfilled_entitlement()
-        pseudo_session_course_overviews = self.make_pseudo_session_course_overviews(
+        (
             unfulfilled_entitlement,
-            pseudo_sessions
+            pseudo_sessions,
+            available_sessions,
+        ) = self.make_unfulfilled_entitlement()
+        pseudo_session_course_overviews = self.make_pseudo_session_course_overviews(
+            unfulfilled_entitlement, pseudo_sessions
         )
         related_programs = ProgramFactory.create_batch(3)
-        programs = {
-            str(unfulfilled_entitlement.course_uuid): related_programs
-        }
+        programs = {str(unfulfilled_entitlement.course_uuid): related_programs}
 
         context = {
             "unfulfilled_entitlement_pseudo_sessions": pseudo_sessions,
             "course_entitlement_available_sessions": available_sessions,
             "pseudo_session_course_overviews": pseudo_session_course_overviews,
-            "programs": programs
+            "programs": programs,
         }
 
         output_data = UnfulfilledEntitlementSerializer(
             unfulfilled_entitlement, context=context
         ).data
 
-        assert output_data["programs"] == ProgramsSerializer(
-            {"relatedPrograms": related_programs}
-        ).data
+        assert (
+            output_data["programs"]
+            == ProgramsSerializer({"relatedPrograms": related_programs}).data
+        )
 
     def test_static_enrollment_data(self):
         """
