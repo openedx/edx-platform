@@ -66,7 +66,7 @@ from .video_xfields import VideoFields
 # edxval is a proper XBlock Runtime Service.
 #
 # Here's the deal: the VideoBlock should be able to take advantage of edx-val
-# (https://github.com/edx/edx-val) to figure out what URL to give for video
+# (https://github.com/openedx/edx-val) to figure out what URL to give for video
 # resources that have an edx_video_id specified. edx-val is a Django app, and
 # including it causes tests to fail because we run common/lib tests standalone
 # without Django dependencies. The alternatives seem to be:

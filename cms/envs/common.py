@@ -225,7 +225,7 @@ FEATURES = {
     #   Open edX Studio. Set to False if you want to disable the editing of the course short description.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-02-13
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2334
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2334
     'EDITABLE_SHORT_DESCRIPTION': True,
 
     # Hide any Personally Identifiable Information from application logs
@@ -272,7 +272,7 @@ FEATURES = {
     #    Studio can be used as an LTI 1.3 tool by external LTI platforms.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-08-17
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/27411
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/27411
     'ENABLE_CONTENT_LIBRARIES_LTI_TOOL': False,
 
     # Milestones application flag
@@ -304,7 +304,7 @@ FEATURES = {
     #   the studio home page.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-02-13
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6965
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6965
     'ALLOW_COURSE_RERUNS': True,
 
     # Certificates Web/HTML Views
@@ -380,7 +380,7 @@ FEATURES = {
     #   page else Mobile Course Available UI Flag will be available on Studio side.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-14
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/23073
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/23073
     'DISABLE_MOBILE_COURSE_AVAILABLE': False,
 
     # .. toggle_name: FEATURES['ENABLE_CHANGE_USER_PASSWORD_ADMIN']
@@ -390,7 +390,7 @@ FEATURES = {
     #   default because enabling allows a method to bypass password policy.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
-    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
+    # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/21616'
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 
     ### ORA Feature Flags ###
@@ -466,7 +466,7 @@ FEATURES = {
     # .. toggle_description: When True, a help link is displayed on the main navbar. Set False to hide it.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-03-05
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/26106
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26106
     'ENABLE_HELP_LINK': True,
 
     # .. toggle_name: FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS']
@@ -485,7 +485,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Whether to replace ID verification course/certificate requirement
     # with an in-course Honor Code agreement
-    # (https://github.com/edx/edx-name-affirmation)
+    # (https://github.com/openedx/edx-name-affirmation)
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-02-15
     # .. toggle_target_removal_date: None
@@ -500,7 +500,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-03-22
     # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/28268
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/28268
     # .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
     #   in the LMS and CMS.
     'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': False,
@@ -1075,7 +1075,7 @@ DEFAULT_HASHING_ALGORITHM = 'sha1'
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
-    # from https://github.com/edx/codejail/blob/master/codejail/django_integration.py#L24, '' should be same as None
+    # from https://github.com/openedx/codejail/blob/master/codejail/django_integration.py#L24, '' should be same as None
     'python_bin': '/edx/app/edxapp/venvs/edxapp-sandbox/bin/python',
     # User to run as in the sandbox.
     'user': 'sandbox',
@@ -1758,7 +1758,7 @@ INSTALLED_APPS = [
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
-    # Database-backed Organizations App (http://github.com/edx/edx-organizations)
+    # Database-backed Organizations App (http://github.com/openedx/edx-organizations)
     'organizations',
 
     # User and group management via edx-django-utils
@@ -1905,7 +1905,7 @@ OPTIONAL_APPS = (
     # edxval
     ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
-    # Enterprise App (http://github.com/edx/edx-enterprise)
+    # Enterprise App (http://github.com/openedx/edx-enterprise)
     ('enterprise', None),
     ('consent', None),
     ('integrated_channels.integrated_channel', None),
@@ -2650,7 +2650,7 @@ VERIFY_STUDENT = {
 #   the orgs referenced in Studio content, then leave it enabled.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-11-02
-# .. toggle_tickets: https://github.com/edx/edx-organizations/blob/master/docs/decisions/0001-phase-in-db-backed-organizations-to-all.rst
+# .. toggle_tickets: https://github.com/openedx/edx-organizations/blob/master/docs/decisions/0001-phase-in-db-backed-organizations-to-all.rst
 ORGANIZATIONS_AUTOCREATE = True
 
 ################# Settings for brand logos. #################

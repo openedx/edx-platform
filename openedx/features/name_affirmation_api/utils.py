@@ -1,6 +1,6 @@
 """
 Utility functions for integration with Name Affirmation plugin
-(https://github.com/edx/edx-name-affirmation)
+(https://github.com/openedx/edx-name-affirmation)
 """
 
 from edx_django_utils.plugins import PluginError, PluginManager

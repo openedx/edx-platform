@@ -7,10 +7,10 @@
 #
 # This file is an experimental re-implementation of demo course provisioning
 # process defined in this Ansible role:
-# https://github.com/edx/configuration/tree/master/playbooks/roles/demo
+# https://github.com/openedx/configuration/tree/master/playbooks/roles/demo
 #
 # It was written as part of the effort to move our dev tools off of Ansible and
-# Paver, described here: https://github.com/edx/devstack/pull/866
+# Paver, described here: https://github.com/openedx/devstack/pull/866
 # TODO: If the effort described above is abandoned, then this script should
 # probably be deleted.
 
@@ -23,7 +23,7 @@ mkdir -p /edx/app/demo
 (
 	cd /edx/app/demo &&
 	rm -rf edx-demo-course &&
-	git clone https://github.com/edx/edx-demo-course.git --depth 1
+	git clone https://github.com/openedx/edx-demo-course.git --depth 1
 )
 
 # Import the course.

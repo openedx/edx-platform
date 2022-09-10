@@ -16,7 +16,7 @@ locations.
   edX ReadTheDocs`_.  The source for these guides can be found in the
   `edx-documentation`_ repository.
 
-.. _edx-platform docs directory: https://github.com/edx/edx-platform/tree/master/docs
+.. _edx-platform docs directory: https://github.com/openedx/edx-platform/tree/master/docs
 .. _Developer Documentation Index: https://openedx.atlassian.net/wiki/display/OpenDev/Developer+Documentation
 .. _Open edX Development space: https://openedx.atlassian.net/wiki/spaces/OpenDev/overview
 .. _Open edX ReadTheDocs: http://docs.edx.org/
@@ -44,4 +44,4 @@ Change History
 * November 3, 2014: The documentation for several sub-projects were moved into
   `edx-documentation`_.
 
-.. _edx-documentation: https://github.com/edx/edx-documentation
+.. _edx-documentation: https://github.com/openedx/edx-documentation

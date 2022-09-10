@@ -99,7 +99,7 @@ django_notify.Settings:
 django_notify.Subscription:
   ".. no_pii:": "No PII"
 
-# Via django-openid-auth https://github.com/edx/django-openid-auth
+# Via django-openid-auth https://github.com/openedx/django-openid-auth
 django_openid_auth.Association:
   ".. no_pii:": "No PII"
 django_openid_auth.Nonce:
@@ -127,7 +127,7 @@ djcelery.TaskState:
 djcelery.WorkerState:
   ".. no_pii:": "No PII"
 
-# Via edx-oauth2-provider https://github.com/edx/edx-oauth2-provider
+# Via edx-oauth2-provider https://github.com/openedx/edx-oauth2-provider
 edx_oauth2_provider.TrustedClient:
   ".. no_pii:": "No PII"
 
@@ -161,7 +161,7 @@ milestones.MilestoneRelationshipType:
 milestones.UserMilestone:
   ".. no_pii:": "No PII"
 
-# Via Django OAuth2 Provider https://github.com/edx/django-oauth2-provider
+# Via Django OAuth2 Provider https://github.com/openedx/django-oauth2-provider
 oauth2.Client:
   ".. no_pii:": "No PII"
 oauth2.AccessToken:
@@ -235,7 +235,7 @@ social_django.UserSocialAuth:
   ".. pii_types:": external_service
   ".. pii_retirement:": local_api
 
-# Via Splash https://github.com/edx/django-splash
+# Via Splash https://github.com/openedx/django-splash
 splash.SplashConfig:
   ".. no_pii:": "No PII"
 
@@ -269,7 +269,7 @@ waffle.Sample:
 waffle.Switch:
   ".. no_pii:": "No PII"
 
-# Via django-wiki https://github.com/edx/django-wiki
+# Via django-wiki https://github.com/openedx/django-wiki
 wiki.Article:
   ".. no_pii:": "No PII"
 wiki.ArticleForObject:

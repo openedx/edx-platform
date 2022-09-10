@@ -40,7 +40,7 @@ a Docker-based development environment.
 If you want to run your own Open edX server and have the technical skills to do
 so, `Open edX Installation Options`_ explains your options.
 
-.. _Open edX Developer Stack: https://github.com/edx/devstack
+.. _Open edX Developer Stack: https://github.com/openedx/devstack
 .. _Open edX Installation Options:  https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/60227779/Open+edX+Installation+Options
 
 License
@@ -49,7 +49,7 @@ License
 The code in this repository is licensed under version 3 of the AGPL
 unless otherwise noted. Please see the `LICENSE`_ file for details.
 
-.. _LICENSE: https://github.com/edx/edx-platform/blob/master/LICENSE
+.. _LICENSE: https://github.com/openedx/edx-platform/blob/master/LICENSE
 
 
 More about Open edX
@@ -111,4 +111,4 @@ Please do not report security issues in public. Please email
 security@edx.org.
 
 .. _individual contributor agreement: https://openedx.org/cla
-.. _CONTRIBUTING: https://github.com/edx/edx-platform/blob/master/CONTRIBUTING.rst
+.. _CONTRIBUTING: https://github.com/openedx/edx-platform/blob/master/CONTRIBUTING.rst

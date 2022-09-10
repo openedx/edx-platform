@@ -10,7 +10,7 @@ from openedx.core.djangoapps.plugins.constants import ProjectType
 class OlxRestApiAppConfig(AppConfig):
     """
     Configuration for the olx_rest_api Django plugin application.
-    See: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
+    See: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
 
     name = 'openedx.core.djangoapps.olx_rest_api'

@@ -144,7 +144,7 @@ urlpatterns = [
     path('api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
 
     # Video Abstraction Layer used to allow video teams to manage video assets
-    # independently of courseware. https://github.com/edx/edx-val
+    # independently of courseware. https://github.com/openedx/edx-val
     path('api/val/v0/', include('edxval.urls')),
 
     path(

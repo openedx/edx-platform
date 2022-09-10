@@ -703,7 +703,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         """
         # "last_update not only tells us when this course was last updated but also helps prevent collisions"
         # This code is just copying the behavior of the existing MongoPersistenceBackend
-        # See https://github.com/edx/edx-platform/pull/5200 for context
+        # See https://github.com/openedx/edx-platform/pull/5200 for context
         RequestCache(namespace="course_index_cache").clear()
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
         # Find the SplitModulestoreCourseIndex entry that we'll be updating:

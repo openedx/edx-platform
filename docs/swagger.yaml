@@ -5517,7 +5517,7 @@ paths:
         that a user has for course-runs within a given program.
         Fields included are the title, upcoming due dates, etc.
         This API endpoint is intended for use with the
-        [Program Learner Portal MFE](https://github.com/edx/frontend-app-learner-portal-programs).
+        [Program Learner Portal MFE](https://github.com/openedx/frontend-app-learner-portal-programs).
 
         It is important to note that the set of enrollments that this endpoint returns
         is different than a user's set of *program-course-run enrollments*.

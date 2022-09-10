@@ -140,39 +140,39 @@ well as the trigger location in this same repository.
 
    * - `STUDENT_REGISTRATION_COMPLETED <https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/signals.py#L24>`_
      - org.openedx.learning.student.registration.completed.v1
-     - `2022-06-14 <https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/user_authn/views/register.py#L262>`_
+     - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/user_authn/views/register.py#L262>`_
 
    * - `SESSION_LOGIN_COMPLETED <https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/signals.py#L36>`_
      - org.openedx.learning.auth.session.login.completed.v1
-     - `2022-06-14 <https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/user_authn/views/login.py#L320>`_
+     - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/user_authn/views/login.py#L320>`_
 
    * - `COURSE_ENROLLMENT_CREATED <https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/signals.py#L48>`_
      - org.openedx.learning.course.enrollment.created.v1
-     - `2022-06-14 <https://github.com/edx/edx-platform/blob/master/common/djangoapps/student/models.py#L1671>`_
+     - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/common/djangoapps/student/models.py#L1671>`_
 
    * - `COURSE_ENROLLMENT_CHANGED <https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/signals.py#L60>`_
      - org.openedx.learning.course.enrollment.changed.v1
-     - `2022-06-14 <https://github.com/edx/edx-platform/blob/master/common/djangoapps/student/models.py#L1430>`_
+     - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/common/djangoapps/student/models.py#L1430>`_
 
    * - `COURSE_UNENROLLMENT_COMPLETED <https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/signals.py#L72>`_
      - org.openedx.learning.course.unenrollment.completed.v1
-     - `2022-06-14 <https://github.com/edx/edx-platform/blob/master/common/djangoapps/student/models.py#L1457>`_
+     - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/common/djangoapps/student/models.py#L1457>`_
 
    * - `CERTIFICATE_CREATED <https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/signals.py#L84>`_
      - org.openedx.learning.certificate.created.v1
-     - `2022-06-14 <https://github.com/edx/edx-platform/blob/master/lms/djangoapps/certificates/models.py#L514>`_
+     - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/certificates/models.py#L514>`_
 
    * - `CERTIFICATE_CHANGED <https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/signals.py#L94>`_
      - org.openedx.learning.certificate.changed.v1
-     - `2022-06-14 <https://github.com/edx/edx-platform/blob/master/lms/djangoapps/certificates/models.py#L482>`_
+     - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/certificates/models.py#L482>`_
 
    * - `CERTIFICATE_REVOKED <https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/signals.py#L108>`_
      - org.openedx.learning.certificate.revoked.v1
-     - `2022-06-14 <https://github.com/edx/edx-platform/blob/master/lms/djangoapps/certificates/models.py#L402>`_
+     - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/certificates/models.py#L402>`_
 
    * - `COHORT_MEMBERSHIP_CHANGED <https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/signals.py#L120>`_
      - org.openedx.learning.cohort_membership.changed.v1
-     - `2022-06-14 <https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/course_groups/models.py#L166>`_
+     - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/course_groups/models.py#L166>`_
 
    * - `COURSE_DISCUSSIONS_CHANGED <https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/signals.py#L132>`_
      - org.openedx.learning.discussions.configuration.changed.v1

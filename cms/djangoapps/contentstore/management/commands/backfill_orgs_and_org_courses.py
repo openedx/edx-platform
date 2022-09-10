@@ -3,7 +3,7 @@ A backfill command to migrate Open edX instances to the new world of
 "organizations are enabled everywhere".
 
 For full context, see:
-https://github.com/edx/edx-organizations/blob/master/docs/decisions/0001-phase-in-db-backed-organizations-to-all.rst
+https://github.com/openedx/edx-organizations/blob/master/docs/decisions/0001-phase-in-db-backed-organizations-to-all.rst
 """
 from typing import Dict, List, Set, Tuple
 

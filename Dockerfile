@@ -46,7 +46,7 @@ RUN apt-get update && \
         libxml2-dev \
         libxmlsec1-dev \
         libxslt1-dev \
-        # lynx: Required by https://github.com/edx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
+        # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
         lynx \
         ntp \
         pkg-config \

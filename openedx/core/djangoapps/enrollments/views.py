@@ -91,7 +91,7 @@ class ApiKeyPermissionMixIn:
 class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
     """Limit the number of requests users can make to the enrollment API."""
 
-    # To see how the staff rate limit was selected, see https://github.com/edx/edx-platform/pull/18360
+    # To see how the staff rate limit was selected, see https://github.com/openedx/edx-platform/pull/18360
     THROTTLE_RATES = {
         'user': '40/minute',
         'staff': '120/minute',
