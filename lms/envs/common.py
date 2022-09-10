@@ -233,7 +233,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Enable an API endpoint, named "xblock_view", to serve rendered XBlock views. This might be
     #   used by external applications. See for instance jquery-xblock (now unmaintained):
-    #   https://github.com/openedx-solutions/jquery-xblock
+    #   https://github.com/openedx/jquery-xblock
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-14
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2968

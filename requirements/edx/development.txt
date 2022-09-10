@@ -16,7 +16,7 @@
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/openedx/RateXBlock.git@2.0.1#egg=rate-xblock
     # via -r requirements/edx/testing.txt
--e git+https://github.com/openedx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
+-e git+https://github.com/openedx/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
     # via -r requirements/edx/testing.txt
 acid-xblock==0.2.1
     # via -r requirements/edx/testing.txt
@@ -1659,7 +1659,7 @@ xblock==1.6.1
     #   xblock-google-drive
     #   xblock-poll
     #   xblock-utils
-xblock-drag-and-drop-v2 @ git+https://github.com/openedx-solutions/xblock-drag-and-drop-v2@v2.3.5
+xblock-drag-and-drop-v2 @ git+https://github.com/openedx/xblock-drag-and-drop-v2@v2.3.5
     # via -r requirements/edx/testing.txt
 xblock-poll @ git+https://github.com/open-craft/xblock-poll@v1.12.0
     # via -r requirements/edx/testing.txt
