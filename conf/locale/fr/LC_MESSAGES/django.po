@@ -314,7 +314,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-08-07 20:43+0000\n"
+"POT-Creation-Date: 2022-09-04 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Alexandre DS <alexandre@cleverm8.com>, 2020\n"
 "Language-Team: French (https://www.transifex.com/open-edx/teams/6205/fr/)\n"
@@ -3304,6 +3304,14 @@ msgstr "Vous n'avez pas accès à ce cours sur un appareil mobile"
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be enrolled in the course"
 msgstr "Vous devez être inscrits à ce cours"
+
+#: lms/djangoapps/courseware/access_response.py
+#, python-brace-format
+msgid ""
+"You are enrolled in this course with '{enrollment_enterprise_name}'. "
+"However, you are currently logged in as a '{active_enterprise_name}' user. "
+"Please log in with '{enrollment_enterprise_name}' to access this course."
+msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must give Data Sharing Consent for the course"
@@ -8372,11 +8380,6 @@ msgstr ""
 #. Translators: This message is shown to users who attempt to create a new
 #. account using
 #. an invalid email format.
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "\"{email}\" is not a valid email address."
-msgstr "« {email} » n’est pas une adresse e-mail valable."
-
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter a valid email address"
 msgstr "Entrez une adresse de courriel valide"
@@ -18254,6 +18257,12 @@ msgstr ""
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "ID de discussion : {discussion_id}"
+
+#: lms/templates/discussion/_discussion_inline_studio.html
+msgid ""
+"The discussion block is disabled for this course as it is not using a "
+"compatible discussion provider."
+msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Discussion topics list"

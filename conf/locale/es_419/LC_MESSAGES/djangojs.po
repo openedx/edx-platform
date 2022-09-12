@@ -177,7 +177,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-08-07 20:42+0000\n"
+"POT-Creation-Date: 2022-09-04 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Carolina De Mares <carolina.demares@edunext.co>, 2021\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -8479,7 +8479,7 @@ msgstr "Generar excepciones de certificados"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "Certificate exceptions group selection"
-msgstr ""
+msgstr "Selección de grupo de excepciones de certificado"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore
 msgid "All users on the Exception list who do not yet have a certificate"

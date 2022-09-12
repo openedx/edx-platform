@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-08-07 20:43+0000\n"
+"POT-Creation-Date: 2022-09-04 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>, 2019\n"
 "Language-Team: Basque (Spain) (https://www.transifex.com/open-edx/teams/6205/eu_ES/)\n"
@@ -2701,6 +2701,14 @@ msgstr "Ez duzu ikastaro honetarako sarbiderik gailu mugikor bidez"
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be enrolled in the course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+#, python-brace-format
+msgid ""
+"You are enrolled in this course with '{enrollment_enterprise_name}'. "
+"However, you are currently logged in as a '{active_enterprise_name}' user. "
+"Please log in with '{enrollment_enterprise_name}' to access this course."
 msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
@@ -7227,11 +7235,6 @@ msgstr ""
 #. Translators: This message is shown to users who attempt to create a new
 #. account using
 #. an invalid email format.
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "\"{email}\" is not a valid email address."
-msgstr ""
-
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter a valid email address"
 msgstr ""
@@ -15814,6 +15817,12 @@ msgstr ""
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "Eztabaidaren IDa: {discussion_id}"
+
+#: lms/templates/discussion/_discussion_inline_studio.html
+msgid ""
+"The discussion block is disabled for this course as it is not using a "
+"compatible discussion provider."
+msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Discussion topics list"
