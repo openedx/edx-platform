@@ -11,11 +11,10 @@ from django.db.models import TextChoices
 from django.urls import reverse
 from django.utils.html import strip_tags
 from django.utils.text import Truncator
-from eventtracking import tracker
 from rest_framework import serializers
 
 from common.djangoapps.student.models import get_user_by_username_or_email
-from lms.djangoapps.discussion.django_comment_client.permissions import get_team
+from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_lock_unlock_event
 from lms.djangoapps.discussion.django_comment_client.utils import (
     course_discussion_division_enabled,
     get_group_id_for_user,
@@ -349,8 +348,8 @@ class ThreadSerializer(_ContentSerializer):
         the endorsed query parameter.
         """
         if (
-                (obj["thread_type"] == "question" and endorsed is None) or
-                (obj["thread_type"] == "discussion" and endorsed is not None)
+            (obj["thread_type"] == "question" and endorsed is None) or
+            (obj["thread_type"] == "discussion" and endorsed is not None)
         ):
             return None
         path = reverse("comment-list")
@@ -427,36 +426,28 @@ class ThreadSerializer(_ContentSerializer):
             requesting_user_id = self.context["cc_requester"]["id"]
             if key == "closed" and val:
                 instance["closing_user_id"] = requesting_user_id
-                self.trigger_thread_closed_event(instance, validated_data)
+                event_data = {
+                    'request': self.context['request'],
+                    'course': self.context['course'],
+                    'thread': instance,
+                    'close_reason_code': validated_data.get('close_reason_code')
+                }
+                track_thread_lock_unlock_event(**event_data)
+
+            if key == "closed" and not val:
+                instance["closing_user_id"] = requesting_user_id
+                event_data = {
+                    'request': self.context['request'],
+                    'course': self.context['course'],
+                    'thread': instance,
+                    'close_reason_code': validated_data.get('close_reason_code')
+                }
+                track_thread_lock_unlock_event(**event_data, locked=False)
+
             if key == "body" and val:
                 instance["editing_user_id"] = requesting_user_id
         instance.save()
         return instance
-
-    def trigger_thread_closed_event(self, instance, validated_data):
-        """
-        Triggers edx.forum.thread.locked tracking event
-        """
-        url_kwargs = {
-            'course_id': instance.course_id,
-            'discussion_id': instance.commentable_id,
-            'thread_id': instance.id
-        }
-        user = self.context['request'].user
-        user_course_roles = [role.role for role in user.courseaccessrole_set.filter(course_id=instance.course_id)]
-        user_forums_roles = [role.name for role in user.roles.filter(course_id=instance.course_id)]
-        tracker.emit(
-            'edx.forum.thread.locked',
-            {
-                'id': instance.id,
-                'team_id': get_team(instance.commentable_id),
-                'url': reverse('single_thread', kwargs=url_kwargs),
-                'user_course_roles': user_course_roles,
-                'user_forums_roles': user_forums_roles,
-                'target_username': instance.get('username'),
-                'lock_reason': validated_data.get('close_reason_code')
-            }
-        )
 
 
 class CommentSerializer(_ContentSerializer):
@@ -502,8 +493,8 @@ class CommentSerializer(_ContentSerializer):
             # Avoid revealing the identity of an anonymous non-staff question
             # author who has endorsed a comment in the thread
             if not (
-                    self._is_anonymous(self.context["thread"]) and
-                    not self._is_user_privileged(endorser_id)
+                self._is_anonymous(self.context["thread"]) and
+                not self._is_user_privileged(endorser_id)
             ):
                 return User.objects.get(id=endorser_id).username
         return None

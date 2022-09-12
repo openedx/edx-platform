@@ -177,6 +177,20 @@ def track_thread_viewed_event(request, course, thread):
     track_forum_event(request, event_name, course, thread, event_data)
 
 
+def track_thread_lock_unlock_event(request, course, thread, close_reason_code, locked=True):
+    """
+    Triggers edx.forum.thread.locked  and edx.forum.thread.unlocked tracking event
+    """
+    event_name = f'edx.forum.thread.{"locked" if locked else "unlocked"}'
+    event_data = {
+        'target_username': thread.get('username'),
+        'lock_reason': close_reason_code,
+        'commentable_id': thread.get('commentable_id', ''),
+        'team_id': get_team(thread.commentable_id),
+    }
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
 def permitted(func):
     """
     View decorator to verify the user is authorized to access this endpoint.
