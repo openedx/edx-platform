@@ -30,7 +30,7 @@ client_secret`_ (privately shared with the OAuth Provider). Although this somewh
 above since each OAuth Client can no longer create tokens verifiable by other Clients, it does not
 allow a Client to forward a verifiable token to other Clients.
 
-.. _ID Tokens are HMACed with their own client_secret: https://github.com/openedx/edx-oauth2-provider/blob/7e59e30ae0bfd9eac4d05469768d79c50a90aeb7/edx_oauth2_provider/views.py#L155-L163
+.. _ID Tokens are HMACed with their own client_secret: https://github.com/edx/edx-oauth2-provider/blob/7e59e30ae0bfd9eac4d05469768d79c50a90aeb7/edx_oauth2_provider/views.py#L155-L163
 
 Looking forward, we want to support Single Page Apps (a.k.a., Microfronteds), where users can seamlessly
 traverse from one microfronted to another and access APIs on various backends. This *Single Sign On*

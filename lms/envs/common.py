@@ -965,7 +965,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Whether to display honor code agreement for learners before their first grade assignment
-    # (https://github.com/openedx/edx-name-affirmation)
+    # (https://github.com/edx/edx-name-affirmation)
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-02-15
     # .. toggle_target_removal_date: None

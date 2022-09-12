@@ -485,7 +485,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Whether to replace ID verification course/certificate requirement
     # with an in-course Honor Code agreement
-    # (https://github.com/openedx/edx-name-affirmation)
+    # (https://github.com/edx/edx-name-affirmation)
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-02-15
     # .. toggle_target_removal_date: None
