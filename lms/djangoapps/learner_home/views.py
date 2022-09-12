@@ -4,7 +4,6 @@ Views for the learner dashboard.
 from django.conf import settings
 from edx_django_utils import monitoring as monitoring_utils
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
 
@@ -28,6 +27,7 @@ from lms.djangoapps.courseware.access_utils import (
     check_course_open_for_learner,
 )
 from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support.api import (
     enterprise_customer_from_session_or_learner_data,

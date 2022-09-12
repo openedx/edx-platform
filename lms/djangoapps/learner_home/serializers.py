@@ -12,7 +12,6 @@ from rest_framework import serializers
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.helpers import user_has_passing_grade_in_course
 from openedx.features.course_experience import course_home_url
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.data import CertificatesDisplayBehaviors
 
 
