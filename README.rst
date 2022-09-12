@@ -22,6 +22,7 @@ micro-frontends (MFEs) based on the ReactJS.
 
 This repository hosts the monolith at the center of the Open edX
 platform.  Functionally, the edx-platform repository provides two services:
+
 * CMS, which powers Open edX Studio, the platform's learning content authoring environment; and
 * LMS, which delivers learning content.
 
