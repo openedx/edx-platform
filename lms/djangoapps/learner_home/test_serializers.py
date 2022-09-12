@@ -35,7 +35,7 @@ from lms.djangoapps.learner_home.serializers import (
     EnterpriseDashboardSerializer,
     EntitlementSerializer,
     GradeDataSerializer,
-    HasAccessSerializer,
+    CoursewareAccessSerializer,
     LearnerEnrollmentSerializer,
     PlatformSettingsSerializer,
     ProgramsSerializer,
@@ -195,8 +195,8 @@ class TestCourseRunSerializer(LearnerDashboardBaseTest):
 
 
 @ddt.ddt
-class TestHasAccessSerializer(LearnerDashboardBaseTest):
-    """Tests for the HasAccessSerializer"""
+class TestCoursewareAccessSerializer(LearnerDashboardBaseTest):
+    """Tests for the CoursewareAccessSerializer"""
 
     def create_test_context(self, course):
         return {
@@ -230,7 +230,7 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
             )
 
         # When I serialize
-        output_data = HasAccessSerializer(input_data, context=input_context).data
+        output_data = CoursewareAccessSerializer(input_data, context=input_context).data
 
         # Then "hasUnmetPrerequisites" is outputs correctly
         self.assertEqual(output_data["hasUnmetPrerequisites"], has_unmet_prerequisites)
@@ -253,7 +253,7 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
         )
 
         # When I serialize
-        output_data = HasAccessSerializer(input_data, context=input_context).data
+        output_data = CoursewareAccessSerializer(input_data, context=input_context).data
 
         # Then "isStaff" serializes properly
         self.assertEqual(output_data["isStaff"], is_staff)
@@ -276,7 +276,7 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
         )
 
         # When I serialize
-        output_data = HasAccessSerializer(input_data, context=input_context).data
+        output_data = CoursewareAccessSerializer(input_data, context=input_context).data
 
         # Then "isTooEarly" serializes properly
         self.assertEqual(output_data["isTooEarly"], is_too_early)

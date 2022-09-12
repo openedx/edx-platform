@@ -114,7 +114,7 @@ class CourseRunSerializer(serializers.Serializer):
         return self.context.get("resume_course_urls", {}).get(instance.course_id)
 
 
-class HasAccessSerializer(serializers.Serializer):
+class CoursewareAccessSerializer(serializers.Serializer):
     """
     Info determining whether a user should be able to view course material.
     Mirrors logic in "show_courseware_links_for" from old dashboard.py
@@ -167,7 +167,7 @@ class EnrollmentSerializer(serializers.Serializer):
     accessExpirationDate = serializers.SerializerMethodField()
     isAudit = serializers.SerializerMethodField()
     hasStarted = serializers.SerializerMethodField()
-    hasAccess = HasAccessSerializer(source="*")
+    coursewareAccess = CoursewareAccessSerializer(source="*")
     isVerified = serializers.SerializerMethodField()
     canUpgrade = serializers.SerializerMethodField()
     isAuditAccessExpired = serializers.SerializerMethodField()
@@ -402,17 +402,21 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
 
     # This is the static constant data returned as the 'enrollment' key for all unfulfilled enrollments.
     STATIC_ENTITLEMENT_ENROLLMENT_DATA = {
-        "accessExpirationDate": None,
-        "isAudit": False,
-        "hasStarted": False,
-        "hasAccess": True,
-        "isVerified": False,
-        "canUpgrade": False,
-        "isAuditAccessExpired": False,
-        "isEmailEnabled": False,
-        "hasOptedOutOfEmail": False,
-        "lastEnrolled": None,
-        "isEnrolled": False,
+        'accessExpirationDate': None,
+        'isAudit': False,
+        'hasStarted': False,
+        'coursewareAccess': {
+            "hasUnmetPrerequisites": False,
+            "isTooEarly": False,
+            "isStaff": False,
+        },
+        'isVerified': False,
+        'canUpgrade': False,
+        'isAuditAccessExpired': False,
+        'isEmailEnabled': False,
+        'hasOptedOutOfEmail': False,
+        'lastEnrolled': None,
+        'isEnrolled': False,
     }
 
     class _PseudoSessionCourseSerializer(serializers.Serializer):
