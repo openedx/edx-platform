@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-04 20:34+0000\n"
-"PO-Revision-Date: 2022-09-04 20:34:49.138307\n"
+"POT-Creation-Date: 2022-09-12 19:25+0000\n"
+"PO-Revision-Date: 2022-09-12 19:25:40.142540\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2920,6 +2920,17 @@ msgstr "Ɏøn dø nøʇ ɥɐʌǝ ɐɔɔǝss ʇø ʇɥᴉs ɔønɹsǝ øn ɐ ɯø
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be enrolled in the course"
 msgstr "Ɏøn ɯnsʇ bǝ ǝnɹøllǝd ᴉn ʇɥǝ ɔønɹsǝ"
+
+#: lms/djangoapps/courseware/access_response.py
+#, python-brace-format
+msgid ""
+"You are enrolled in this course with '{enrollment_enterprise_name}'. "
+"However, you are currently logged in as a '{active_enterprise_name}' user. "
+"Please log in with '{enrollment_enterprise_name}' to access this course."
+msgstr ""
+"Ɏøn ɐɹǝ ǝnɹøllǝd ᴉn ʇɥᴉs ɔønɹsǝ ʍᴉʇɥ '{enrollment_enterprise_name}'. "
+"Ħøʍǝʌǝɹ, ʎøn ɐɹǝ ɔnɹɹǝnʇlʎ løƃƃǝd ᴉn ɐs ɐ '{active_enterprise_name}' nsǝɹ. "
+"Ᵽlǝɐsǝ løƃ ᴉn ʍᴉʇɥ '{enrollment_enterprise_name}' ʇø ɐɔɔǝss ʇɥᴉs ɔønɹsǝ."
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must give Data Sharing Consent for the course"
@@ -7850,11 +7861,6 @@ msgstr ""
 #. Translators: This message is shown to users who attempt to create a new
 #. account using
 #. an invalid email format.
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "\"{email}\" is not a valid email address."
-msgstr "\"{email}\" ᴉs nøʇ ɐ ʌɐlᴉd ǝɯɐᴉl ɐddɹǝss."
-
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter a valid email address"
 msgstr "Ɇnʇǝɹ ɐ ʌɐlᴉd ǝɯɐᴉl ɐddɹǝss"
