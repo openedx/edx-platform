@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.urls import reverse
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -451,7 +452,14 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         pseudo_session = self.context["unfulfilled_entitlement_pseudo_sessions"].get(
             str(entitlement.uuid)
         )
-        course_overview = CourseOverview.get_from_id(pseudo_session["key"]) or None
+        course_overview = None
+
+        if pseudo_session:
+            course_key = CourseKey.from_string(pseudo_session["key"])
+            course_overview = self.context.get("pseudo_session_course_overviews").get(
+                course_key
+            )
+
         return CourseProviderSerializer(course_overview, allow_null=True).data
 
 

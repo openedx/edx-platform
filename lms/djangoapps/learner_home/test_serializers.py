@@ -79,6 +79,31 @@ class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
 
         return test_enrollment
 
+    def create_test_entitlement_and_sessions(self):
+        """
+        Create a test entitlement
+
+        Returns: (unfulfilled_entitlement, pseudo_sessions, available_sessions)
+        """
+        unfulfilled_entitlement = CourseEntitlementFactory.create()
+
+        # Create pseudo-sessions
+        pseudo_sessions = {
+            str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create()
+        }
+
+        # Create available sessions
+        available_sessions = {
+            str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create_batch(3)
+        }
+
+        # Create related course overviews
+        course_key_str = pseudo_sessions[str(unfulfilled_entitlement.uuid)]["key"]
+        course_key = CourseKey.from_string(course_key_str)
+        course_overview = CourseOverviewFactory.create(id=course_key)
+
+        return unfulfilled_entitlement, pseudo_sessions, available_sessions
+
     def _assert_all_keys_equal(self, dicts):
         element_0 = dicts[0]
         for element in dicts[1:]:
@@ -768,9 +793,12 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         course_key = CourseKey.from_string(course_key_str)
         course_overview = CourseOverviewFactory.create(id=course_key)
 
+        pseudo_session_course_overviews = {course_key: course_overview}
+
         context = {
             "unfulfilled_entitlement_pseudo_sessions": pseudo_sessions,
             "course_entitlement_available_sessions": available_sessions,
+            "pseudo_session_course_overviews": pseudo_session_course_overviews,
         }
 
         output_data = UnfulfilledEntitlementSerializer(
@@ -983,6 +1011,17 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             for entitlement in all_entitlements
         }
 
+        # Create related course overviews for entitlement pseudo sessions
+        pseudo_session_course_overviews = {}
+        for unfulfilled_entitlement in unfulfilled_entitlement_pseudo_sessions:
+            course_key_str = unfulfilled_entitlement_pseudo_sessions[
+                unfulfilled_entitlement
+            ]["key"]
+            course_key = CourseKey.from_string(course_key_str)
+            course_overview = CourseOverviewFactory.create(id=course_key)
+
+            pseudo_session_course_overviews[course_key] = course_overview
+
         input_context = {
             "resume_course_urls": resume_course_urls,
             "ecommerce_payment_page": random_url(),
@@ -990,6 +1029,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             "fulfilled_entitlements": fulfilled_entitlements,
             "unfulfilled_entitlement_pseudo_sessions": unfulfilled_entitlement_pseudo_sessions,
             "course_entitlement_available_sessions": course_entitlement_available_sessions,
+            "pseudo_session_course_overviews": pseudo_session_course_overviews,
         }
         return input_context
 
