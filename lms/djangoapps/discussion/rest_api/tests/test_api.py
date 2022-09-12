@@ -802,7 +802,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 "comment_count": 6,
                 "unread_comment_count": 3,
                 "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_0",
-                "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+                "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
                 "has_endorsed": True,
                 "read": True,
                 "created_at": "2015-04-28T00:00:00Z",
@@ -832,7 +832,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 "non_endorsed_comment_list_url": (
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
                 ),
-                "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+                "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
                 "abuse_flagged_count": None,
                 "can_delete": False,
             }),
@@ -1893,6 +1893,7 @@ class CreateThreadTest(
                 "anonymous",
                 "close_reason_code",
                 "closed",
+                "copy_link",
                 "edit_reason_code",
                 "following",
                 "pinned",
@@ -3718,7 +3719,7 @@ class RetrieveThreadTest(
         self.request.user = non_author_user
         assert get_thread(self.request, self.thread_id) == self.expected_thread_data({
             'can_delete': False,
-            'editable_fields': ['abuse_flagged', 'following', 'read', 'voted'],
+            'editable_fields': ['abuse_flagged', 'copy_link', 'following', 'read', 'voted'],
             'unread_comment_count': 1
         })
         assert httpretty.last_request().method == 'GET'

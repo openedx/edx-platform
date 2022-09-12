@@ -186,7 +186,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "comment_count": 6,
             "unread_comment_count": 3,
             "pinned": True,
-            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
             "abuse_flagged_count": None,
         })
         assert self.serialize(thread) == expected
