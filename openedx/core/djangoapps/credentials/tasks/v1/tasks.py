@@ -48,12 +48,19 @@ MAX_RETRIES = 11
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def send_grade_to_credentials(self, username, course_run_key, verified, letter_grade, percent_grade):
+def send_grade_to_credentials(
+        self,
+        username,
+        course_run_key,
+        verified,
+        letter_grade,
+        percent_grade,
+        grade_last_modified=None
+    ):
     """
     Celery task to notify the Credentials IDA of a grade change via POST.
     """
     logger.info(f"Running task send_grade_to_credentials for username {username} and course {course_run_key}")
-
     countdown = 2 ** self.request.retries
     course_key = CourseKey.from_string(course_run_key)
 
@@ -61,21 +68,20 @@ def send_grade_to_credentials(self, username, course_run_key, verified, letter_g
         credentials_client = get_credentials_api_client(
             User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)
         )
-        api_url = urljoin(f"{get_credentials_api_base_url(org=course_key.org)}/", "grades/")
+        api_url = f"{get_credentials_api_base_url(org=course_key.org)}grades/"
         response = credentials_client.post(
             api_url,
             data={
                 'username': username,
-                'course_run': str(course_key),
+                'course_run': course_run_key,
                 'letter_grade': letter_grade,
                 'percent_grade': percent_grade,
                 'verified': verified,
+                'lms_last_updated_at': grade_last_modified
             }
         )
         response.raise_for_status()
-
         logger.info(f"Sent grade for course {course_run_key} to user {username}")
-
     except Exception:  # lint-amnesty, pylint: disable=W0703
         grade_str = f'(percent: {percent_grade} letter: {letter_grade})'
         error_msg = f'Failed to send grade{grade_str} for course {course_run_key} to user {username}.'
@@ -197,6 +203,7 @@ def send_notifications(
             status,
             grade.letter_grade,
             grade.percent_grade,
+            grade.modified,
             verbose=verbose
         )
 
@@ -263,28 +270,25 @@ def gradestr(grade):
 
 # This has Credentials business logic that has bled into the LMS. But we want to filter here in order to
 # not flood our task queue with a bunch of signals. So we put up with it.
-def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, percent_grade, verbose=False):
+def send_grade_if_interesting(
+    user,
+    course_run_key,
+    mode,
+    status,
+    letter_grade,
+    percent_grade,
+    grade_last_modified,
+    verbose=False
+):
     """ Checks if grade is interesting to Credentials and schedules a Celery task if so. """
-
     if verbose:
-        msg = "Starting send_grade_if_interesting with params: "\
-            "user [{username}], "\
-            "course_run_key [{key}], "\
-            "mode [{mode}], "\
-            "status [{status}], "\
-            "letter_grade [{letter_grade}], "\
-            "percent_grade [{percent_grade}], "\
-            "verbose [{verbose}]"\
-            .format(
-                username=getattr(user, 'username', None),
-                key=str(course_run_key),
-                mode=mode,
-                status=status,
-                letter_grade=letter_grade,
-                percent_grade=percent_grade,
-                verbose=verbose
-            )
+        msg = (
+            f"Starting send_grade_if_interesting with_params: user [{getattr(user, 'username', None)}], "
+            f"course_run_key [{course_run_key}], mode [{mode}], status [{status}], letter_grade [{letter_grade}], "
+            f"percent_grade [{percent_grade}], grade_last_modified [{grade_last_modified}], verbose [{verbose}]"
+        )
         logger.info(msg)
+
     # Avoid scheduling new tasks if certification is disabled. (Grades are a part of the records/cert story)
     if not CredentialsApiConfig.current().is_learner_issuance_enabled:
         if verbose:
@@ -294,14 +298,10 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
     # Avoid scheduling new tasks if learner records are disabled for this site.
     if not is_learner_records_enabled_for_org(course_run_key.org):
         if verbose:
-            logger.info(
-                "Skipping send grade: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
-                    org=course_run_key.org
-                )
-            )
+            logger.info(f"Skipping send grade: ENABLE_LEARNER_RECORDS False for org [{course_run_key.org}]")
         return
 
-    # Grab mode/status if we don't have them in hand
+    # Grab the course-run's mode and the certificate status from the certificate record if we don't have them now
     if mode is None or status is None:
         try:
             cert = GeneratedCertificate.objects.get(user=user, course_id=course_run_key)  # pylint: disable=no-member
@@ -311,10 +311,8 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
             # We only care about grades for which there is a certificate.
             if verbose:
                 logger.info(
-                    "Skipping send grade: no cert for user [{username}] & course_id [{course_id}]".format(
-                        username=getattr(user, 'username', None),
-                        course_id=str(course_run_key)
-                    )
+                    f"Skipping send grade: no cert for user [{getattr(user, 'username', None)}] & course_id "
+                    f"[{course_run_key}]"
                 )
             return
 
@@ -323,12 +321,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
     # those too.
     if mode not in INTERESTING_MODES or status not in INTERESTING_STATUSES:
         if verbose:
-            logger.info(
-                "Skipping send grade: mode/status uninteresting for mode [{mode}] & status [{status}]".format(
-                    mode=mode,
-                    status=status
-                )
-            )
+            logger.info(f"Skipping send grade: mode/status uninteresting for mode [{mode}] & status [{status}]")
         return
 
     # If the course isn't in any program, don't bother telling Credentials about it. When Credentials grows support
@@ -336,7 +329,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
     if not is_course_run_in_a_program(course_run_key):
         if verbose:
             logger.info(
-                f"Skipping send grade: course run not in a program. [{str(course_run_key)}]"
+                f"Skipping send grade: course run not in a program. [{course_run_key}]"
             )
         return
 
@@ -346,16 +339,23 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
         if grade is None:
             if verbose:
                 logger.info(
-                    "Skipping send grade: No grade found for user [{username}] & course_id [{course_id}]".format(
-                        username=getattr(user, 'username', None),
-                        course_id=str(course_run_key)
-                    )
+                    f"Skipping send grade: No grade found for user [{getattr(user, 'username', None)}] & course_id "
+                    f"[{course_run_key}]"
                 )
             return
         letter_grade = grade.letter_grade
         percent_grade = grade.percent
+        # attempt to grab the `modified` date for the grade, defaults to None if this is a `ZeroCourseGrade` instance
+        grade_last_modified = getattr(grade, 'modified', None)
 
-    send_grade_to_credentials.delay(user.username, str(course_run_key), True, letter_grade, percent_grade)
+    send_grade_to_credentials.delay(
+        user.username,
+        str(course_run_key),
+        True,
+        letter_grade,
+        percent_grade,
+        grade_last_modified
+    )
 
 
 def is_course_run_in_a_program(course_run_key):
