@@ -2,11 +2,12 @@
 Utilities for migrating to safer IP address determination.
 
 This module used to contain utilities for reading the IP addresses of
-a request, but those have since moved edx-django-utils.
+a request, but those have since moved ``edx_django_utils.ip``.
 
 What remains are the "legacy IP" utils, which should be used only
 temporarily when switching a piece of code from using the leftmost IP
-(legacy IP) to using the safest IP or full public IP chain.
+(legacy IP) to using the safest IP or full public IP chain (using
+edx-django-utils).
 """
 
 from edx_toggles.toggles import WaffleSwitch
@@ -27,8 +28,8 @@ from edx_toggles.toggles import WaffleSwitch
 #   opt into querying this switch, and can call ``get_legacy_ip`` if the switch is enabled.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2022-03-24
-# .. toggle_target_removal_date: 2022-07-01
-# .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-2056 (internal only)
+# .. toggle_target_removal_date: 2023-01-01
+# .. toggle_tickets: https://2u-internal.atlassian.net/browse/ARCHBOM-2056 (internal only)
 USE_LEGACY_IP = WaffleSwitch('ip.legacy', module_name=__name__)
 
 
