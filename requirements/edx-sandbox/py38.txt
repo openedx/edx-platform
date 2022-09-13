@@ -14,7 +14,7 @@ click==8.1.3
     #   nltk
 codejail-includes==1.0.0
     # via -r requirements/edx-sandbox/py38.in
-cryptography==37.0.4
+cryptography==38.0.1
     # via -r requirements/edx-sandbox/py38.in
 cycler==0.11.0
     # via matplotlib
@@ -64,7 +64,7 @@ python-dateutil==2.8.2
     # via matplotlib
 random2==1.0.1
     # via -r requirements/edx-sandbox/py38.in
-regex==2022.8.17
+regex==2022.9.13
     # via nltk
 scipy==1.7.3
     # via
