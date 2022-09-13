@@ -3,6 +3,7 @@ Views for the learner dashboard.
 """
 from django.conf import settings
 from edx_django_utils import monitoring as monitoring_utils
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
 
@@ -26,8 +27,11 @@ from lms.djangoapps.courseware.access_utils import (
     check_course_open_for_learner,
 )
 from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.features.enterprise_support.api import enterprise_customer_from_session_or_learner_data
+from openedx.features.enterprise_support.api import (
+    enterprise_customer_from_session_or_learner_data,
+)
 
 
 def get_platform_settings():
@@ -98,30 +102,46 @@ def get_enrollments(user, org_allow_list, org_block_list, course_limit=None):
 
 
 def get_entitlements(user, org_allow_list, org_block_list):
-    """Get entitlments for the user"""
+    """Get entitlements for the user"""
     (
         filtered_entitlements,
         course_entitlement_available_sessions,
-        unfulfilled_entitlement_pseudo_sessions
-    ) = get_filtered_course_entitlements(
-        user, org_allow_list, org_block_list
-    )
+        unfulfilled_entitlement_pseudo_sessions,
+    ) = get_filtered_course_entitlements(user, org_allow_list, org_block_list)
     fulfilled_entitlements_by_course_key = {}
-    unfulfulled_entitlements = []
+    unfulfilled_entitlements = []
 
     for course_entitlement in filtered_entitlements:
         if course_entitlement.enrollment_course_run:
             course_id = str(course_entitlement.enrollment_course_run.course.id)
             fulfilled_entitlements_by_course_key[course_id] = course_entitlement
         else:
-            unfulfulled_entitlements.append(course_entitlement)
+            unfulfilled_entitlements.append(course_entitlement)
 
     return (
         fulfilled_entitlements_by_course_key,
-        unfulfulled_entitlements,
+        unfulfilled_entitlements,
         course_entitlement_available_sessions,
         unfulfilled_entitlement_pseudo_sessions,
     )
+
+
+def get_course_overviews_for_pseudo_sessions(unfulfilled_entitlement_pseudo_sessions):
+    """
+    Get course overviews for entitlement pseudo sessions. This is required for
+    serializing course providers for entitlements.
+
+    Returns: dict of course overviews, keyed by CourseKey
+    """
+    course_ids = []
+
+    # Get course IDs from unfulfilled entitlement pseudo sessions
+    for pseudo_session in unfulfilled_entitlement_pseudo_sessions.values():
+        course_id = pseudo_session.get("key")
+        if course_id:
+            course_ids.append(CourseKey.from_string(course_id))
+
+    return CourseOverview.get_from_ids(course_ids)
 
 
 def get_email_settings_info(user, course_enrollments):
@@ -231,13 +251,16 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         # Get the org whitelist or the org blacklist for the current site
         site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
 
-        # Get entitlements
+        # Get entitlements and course overviews for serializing
         (
             fulfilled_entitlements_by_course_key,
-            unfulfulled_entitlements,
+            unfulfilled_entitlements,
             course_entitlement_available_sessions,
-            unfulfilled_entitlement_pseudo_sessions
+            unfulfilled_entitlement_pseudo_sessions,
         ) = get_entitlements(user, site_org_whitelist, site_org_blacklist)
+        pseudo_session_course_overviews = get_course_overviews_for_pseudo_sessions(
+            unfulfilled_entitlement_pseudo_sessions
+        )
 
         # Get enrollments
         course_enrollments, course_mode_info = get_enrollments(
@@ -268,7 +291,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "enterpriseDashboard": enterprise_customer,
             "platformSettings": get_platform_settings(),
             "enrollments": course_enrollments,
-            "unfulfilledEntitlements": unfulfulled_entitlements,
+            "unfulfilledEntitlements": unfulfilled_entitlements,
             "suggestedCourses": [],
         }
 
@@ -283,6 +306,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             "fulfilled_entitlements": fulfilled_entitlements_by_course_key,
             "course_entitlement_available_sessions": course_entitlement_available_sessions,
             "unfulfilled_entitlement_pseudo_sessions": unfulfilled_entitlement_pseudo_sessions,
+            "pseudo_session_course_overviews": pseudo_session_course_overviews,
         }
 
         response_data = LearnerDashboardSerializer(

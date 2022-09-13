@@ -9,6 +9,8 @@ from uuid import uuid4
 from django.conf import settings
 from django.test import TestCase
 import ddt
+from opaque_keys.edx.keys import CourseKey
+
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -17,7 +19,12 @@ from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
 )
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory as CatalogCourseRunFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseRunFactory as CatalogCourseRunFactory,
+)
+from openedx.core.djangoapps.content.course_overviews.tests.factories import (
+    CourseOverviewFactory,
+)
 from lms.djangoapps.learner_home.serializers import (
     CertificateSerializer,
     CourseProviderSerializer,
@@ -72,6 +79,31 @@ class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
 
         return test_enrollment
 
+    def create_test_entitlement_and_sessions(self):
+        """
+        Create a test entitlement
+
+        Returns: (unfulfilled_entitlement, pseudo_sessions, available_sessions)
+        """
+        unfulfilled_entitlement = CourseEntitlementFactory.create()
+
+        # Create pseudo-sessions
+        pseudo_sessions = {
+            str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create()
+        }
+
+        # Create available sessions
+        available_sessions = {
+            str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create_batch(3)
+        }
+
+        # Create related course overviews
+        course_key_str = pseudo_sessions[str(unfulfilled_entitlement.uuid)]["key"]
+        course_key = CourseKey.from_string(course_key_str)
+        course_overview = CourseOverviewFactory.create(id=course_key)
+
+        return unfulfilled_entitlement, pseudo_sessions, available_sessions
+
     def _assert_all_keys_equal(self, dicts):
         element_0 = dicts[0]
         for element in dicts[1:]:
@@ -102,7 +134,7 @@ class TestPlatformSettingsSerializer(TestCase):
         }
 
 
-class TestCourseProviderSerializer(TestCase):
+class TestCourseProviderSerializer(LearnerDashboardBaseTest):
     """Tests for the CourseProviderSerializer"""
 
     @classmethod
@@ -113,12 +145,12 @@ class TestCourseProviderSerializer(TestCase):
         }
 
     def test_happy_path(self):
-        input_data = self.generate_test_provider_info()
+        test_enrollment = self.create_test_enrollment()
+
+        input_data = test_enrollment.course_overview
         output_data = CourseProviderSerializer(input_data).data
 
-        assert output_data == {
-            "name": input_data["name"],
-        }
+        self.assertEqual(output_data["name"], test_enrollment.course_overview.org)
 
 
 class TestCourseSerializer(LearnerDashboardBaseTest):
@@ -344,23 +376,29 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
             self.assertFalse(output["hasStarted"])
 
 
-class TestGradeDataSerializer(TestCase):
+@ddt.ddt
+class TestGradeDataSerializer(LearnerDashboardBaseTest):
     """Tests for the GradeDataSerializer"""
 
-    @classmethod
-    def generate_test_grade_data(cls):
-        """Util to generate test grade data"""
-        return {
-            "isPassing": random_bool(),
-        }
+    @mock.patch(
+        "lms.djangoapps.learner_home.serializers.user_has_passing_grade_in_course"
+    )
+    @ddt.data(True, False, None)
+    def test_happy_path(self, is_passing, mock_get_grade_data):
+        # Given a course where I am/not passing
+        input_data = self.create_test_enrollment()
+        mock_get_grade_data.return_value = is_passing
 
-    def test_happy_path(self):
-        input_data = self.generate_test_grade_data()
+        # When I serialize grade data
         output_data = GradeDataSerializer(input_data).data
 
-        assert output_data == {
-            "isPassing": input_data["isPassing"],
-        }
+        # Then I get the correct data shape out
+        self.assertDictEqual(
+            output_data,
+            {
+                "isPassing": is_passing,
+            },
+        )
 
 
 @ddt.ddt
@@ -581,13 +619,13 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
 class TestEntitlementSerializer(TestCase):
     """Tests for the EntitlementSerializer"""
 
-    def _assert_availale_sessions(self, input_sessions, output_sessions):
+    def _assert_available_sessions(self, input_sessions, output_sessions):
         assert len(output_sessions) == len(input_sessions)
         for input_session, output_session in zip(input_sessions, output_sessions):
             assert output_session == {
-                'startDate': input_session['start'],
-                'endDate': input_session['end'],
-                'courseId': input_session['key']
+                "startDate": input_session["start"],
+                "endDate": input_session["end"],
+                "courseId": input_session["key"],
             }
 
     @ddt.unpack
@@ -595,26 +633,33 @@ class TestEntitlementSerializer(TestCase):
     def test_serialize_entitlement(self, isExpired, isEnrolled):
         entitlement_kwargs = {}
         if isExpired:
-            entitlement_kwargs['expired_at'] = datetime.now()
+            entitlement_kwargs["expired_at"] = datetime.now()
         if isEnrolled:
-            entitlement_kwargs['enrollment_course_run'] = CourseEnrollmentFactory.create()
+            entitlement_kwargs[
+                "enrollment_course_run"
+            ] = CourseEnrollmentFactory.create()
         entitlement = CourseEntitlementFactory.create(**entitlement_kwargs)
         available_sessions = CatalogCourseRunFactory.create_batch(4)
         course_entitlement_available_sessions = {
             str(entitlement.uuid): available_sessions
         }
 
-        output_data = EntitlementSerializer(entitlement, context={
-            'course_entitlement_available_sessions': course_entitlement_available_sessions
-        }).data
+        output_data = EntitlementSerializer(
+            entitlement,
+            context={
+                "course_entitlement_available_sessions": course_entitlement_available_sessions
+            },
+        ).data
 
-        output_sessions = output_data.pop('availableSessions')
-        self._assert_availale_sessions(available_sessions, output_sessions)
+        output_sessions = output_data.pop("availableSessions")
+        self._assert_available_sessions(available_sessions, output_sessions)
 
         if isExpired:
             expected_expiration_date = entitlement.expired_at
         else:
-            expected_expiration_date = date.today() + timedelta(days=entitlement.get_days_until_expiration())
+            expected_expiration_date = date.today() + timedelta(
+                days=entitlement.get_days_until_expiration()
+            )
 
         assert output_data == {
             "isRefundable": entitlement.is_entitlement_refundable(),
@@ -623,7 +668,7 @@ class TestEntitlementSerializer(TestCase):
             "isExpired": bool(entitlement.expired_at),
             "expirationDate": expected_expiration_date,
             "uuid": str(entitlement.uuid),
-            "enrollmentUrl": f"/api/entitlements/v1/entitlements/{entitlement.uuid}/enrollments"
+            "enrollmentUrl": f"/api/entitlements/v1/entitlements/{entitlement.uuid}/enrollments",
         }
 
 
@@ -736,14 +781,29 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
     def test_happy_path(self):
         """Test that nothing breaks and the output fields look correct"""
         unfulfilled_entitlement = CourseEntitlementFactory.create()
-        pseudo_sessions = {str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create()}
-        available_sessions = {str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create_batch(3)}
-        context = {
-            'unfulfilled_entitlement_pseudo_sessions': pseudo_sessions,
-            'course_entitlement_available_sessions': available_sessions,
+        pseudo_sessions = {
+            str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create()
+        }
+        available_sessions = {
+            str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create_batch(3)
         }
 
-        output_data = UnfulfilledEntitlementSerializer(unfulfilled_entitlement, context=context).data
+        # create course overview for course provider info
+        course_key_str = pseudo_sessions[str(unfulfilled_entitlement.uuid)]["key"]
+        course_key = CourseKey.from_string(course_key_str)
+        course_overview = CourseOverviewFactory.create(id=course_key)
+
+        pseudo_session_course_overviews = {course_key: course_overview}
+
+        context = {
+            "unfulfilled_entitlement_pseudo_sessions": pseudo_sessions,
+            "course_entitlement_available_sessions": available_sessions,
+            "pseudo_session_course_overviews": pseudo_session_course_overviews,
+        }
+
+        output_data = UnfulfilledEntitlementSerializer(
+            unfulfilled_entitlement, context=context
+        ).data
 
         expected_keys = [
             "courseProvider",
@@ -753,14 +813,18 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
             "courseRun",
             "gradeData",
             "certificate",
-            "enrollment"
+            "enrollment",
         ]
 
         assert output_data.keys() == set(expected_keys)
-        assert output_data['courseRun'] is None
-        assert output_data['gradeData'] is None
-        assert output_data['certificate'] is None
-        assert output_data['enrollment'] == UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA
+        assert output_data["courseProvider"] is not None
+        assert output_data["courseRun"] is None
+        assert output_data["gradeData"] is None
+        assert output_data["certificate"] is None
+        assert (
+            output_data["enrollment"]
+            == UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA
+        )
 
     def test_static_enrollment_data(self):
         """
@@ -768,7 +832,9 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         This test is to ensure that that dict has the same keys as returned by the LearnerEnrollmentSerializer
         """
         output_data = TestEnrollmentSerializer().serialize_test_enrollment()
-        expected_keys = UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA.keys()
+        expected_keys = (
+            UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA.keys()
+        )
         actual_keys = output_data.keys()
         assert expected_keys == actual_keys
 
@@ -888,7 +954,9 @@ class TestEnterpriseDashboardSerializer(TestCase):
             output_data,
             {
                 "label": input_data["name"],
-                "url": settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL + '/' + input_data["uuid"],
+                "url": settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL
+                + "/"
+                + input_data["uuid"],
             },
         )
 
@@ -899,9 +967,14 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
     # Show full diff for serialization issues
     maxDiff = None
 
-    def make_test_context(self, enrollments=None, enrollments_with_entitlements=None, unfulfilled_entitlements=None):
+    def make_test_context(
+        self,
+        enrollments=None,
+        enrollments_with_entitlements=None,
+        unfulfilled_entitlements=None,
+    ):
         """
-        Given enrollments and entitlements, generate a mathing serializer context
+        Given enrollments and entitlements, generate a matching serializer context
         """
         enrollments = enrollments or []
         enrollments_with_entitlements = enrollments_with_entitlements or []
@@ -938,6 +1011,17 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             for entitlement in all_entitlements
         }
 
+        # Create related course overviews for entitlement pseudo sessions
+        pseudo_session_course_overviews = {}
+        for unfulfilled_entitlement in unfulfilled_entitlement_pseudo_sessions:
+            course_key_str = unfulfilled_entitlement_pseudo_sessions[
+                unfulfilled_entitlement
+            ]["key"]
+            course_key = CourseKey.from_string(course_key_str)
+            course_overview = CourseOverviewFactory.create(id=course_key)
+
+            pseudo_session_course_overviews[course_key] = course_overview
+
         input_context = {
             "resume_course_urls": resume_course_urls,
             "ecommerce_payment_page": random_url(),
@@ -945,6 +1029,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             "fulfilled_entitlements": fulfilled_entitlements,
             "unfulfilled_entitlement_pseudo_sessions": unfulfilled_entitlement_pseudo_sessions,
             "course_entitlement_available_sessions": course_entitlement_available_sessions,
+            "pseudo_session_course_overviews": pseudo_session_course_overviews,
         }
         return input_context
 
@@ -998,10 +1083,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
     def test_entitlements(self):
         # One standard enrollment, one fulfilled entitlement, one unfulfilled enrollment
-        enrollments = [
-            self.create_test_enrollment(),
-            self.create_test_enrollment()
-        ]
+        enrollments = [self.create_test_enrollment(), self.create_test_enrollment()]
         unfulfilled_entitlements = [CourseEntitlementFactory.create()]
 
         input_context = self.make_test_context(
@@ -1027,7 +1109,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         self._assert_all_keys_equal(courses)
         # Non-entitlement enrollment should have no entitlement info
         assert not courses[0]['entitlement']
-        # Fulfuilled and Unfulfilled entitlement should have identical keys
+        # Fulfilled and Unfulfilled entitlement should have identical keys
         fulfilled_entitlement = courses[1]['entitlement']
         unfulfilled_entitlement = courses[2]['entitlement']
         assert fulfilled_entitlement
