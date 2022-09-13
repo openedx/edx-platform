@@ -55,21 +55,26 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
     with transaction.atomic():
         log.info(f"Updating existing discussion topic links for {course_key}")
         for topic_link in DiscussionTopicLink.objects.filter(
-            context_key=course_key, provider_id=provider_id,
+            context_key=course_key,
+            provider_id=provider_id,
         ):
             lookup_key = topic_link.usage_key or topic_link.external_id
             topic_context = new_topic_map.pop(lookup_key, None)
-            # TODO: handle deleting topics that are no longer in use
-            # currently this will simply not work for course-wide topics since deleting the link will
-            # remove access to all posts in the topic.
             if topic_context is None:
                 topic_link.enabled_in_context = False
+                try:
+                    # If the section/subsection/unit a topic is in is deleted, add that context to title.
+                    topic_link.title = "{section}|{subsection}|{unit}".format(**topic_link.context)
+                except KeyError:
+                    # It's possible the context is if the topic link was created before the context field was added.
+                    pass
             else:
                 topic_link.enabled_in_context = True
                 topic_link.ordering = topic_context.ordering
                 topic_link.title = topic_context.title
                 if topic_context.external_id:
                     topic_link.external_id = topic_context.external_id
+                topic_link.context = topic_context.context
             topic_link.save()
         log.info(f"Creating new discussion topic links for {course_key}")
 
@@ -82,6 +87,7 @@ def update_course_discussion_config(configuration: CourseDiscussionConfiguration
                 external_id=topic_context.external_id or uuid4(),
                 ordering=topic_context.ordering,
                 enabled_in_context=True,
+                context=topic_context.context,
             )
             for topic_context in new_topic_map.values()
         ])

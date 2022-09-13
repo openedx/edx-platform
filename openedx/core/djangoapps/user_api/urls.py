@@ -17,7 +17,7 @@ from .accounts.views import (
     DeactivateLogoutView,
     LMSAccountRetirementView,
     NameChangeView,
-    UsernameReplacementView
+    UsernameReplacementView, CancelAccountRetirementStatusView
 )
 from . import views as user_api_views
 from .models import UserPreference
@@ -60,6 +60,10 @@ PARTNER_REPORT = AccountRetirementPartnerReportView.as_view({
 
 PARTNER_REPORT_CLEANUP = AccountRetirementPartnerReportView.as_view({
     'post': 'retirement_partner_cleanup'
+})
+
+CANCEL_RETIREMENT = CancelAccountRetirementStatusView.as_view({
+    'post': 'cancel_retirement'
 })
 
 RETIREMENT_QUEUE = AccountRetirementStatusView.as_view({
@@ -157,6 +161,9 @@ urlpatterns = [
          ),
     path('v1/accounts/retirement_partner_report_cleanup/', PARTNER_REPORT_CLEANUP,
          name='accounts_retirement_partner_report_cleanup'
+         ),
+    path('v1/accounts/cancel_retirement/', CANCEL_RETIREMENT,
+         name='cancel_account_retirement'
          ),
     path('v1/accounts/retirement_queue/', RETIREMENT_QUEUE,
          name='accounts_retirement_queue'
