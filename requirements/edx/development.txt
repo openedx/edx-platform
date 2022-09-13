@@ -135,7 +135,7 @@ celery==5.2.7
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-certifi==2022.6.15
+certifi==2022.6.15.1
     # via
     #   -r requirements/edx/testing.txt
     #   elasticsearch
@@ -567,7 +567,7 @@ edx-django-release-util==1.2.0
     #   blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/testing.txt
-edx-django-utils==5.0.0
+edx-django-utils==5.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
@@ -584,7 +584,7 @@ edx-django-utils==5.0.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions==8.2.0
+edx-drf-extensions==8.3.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-completion
@@ -609,7 +609,7 @@ edx-i18n-tools==0.9.1
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-edx-lint==5.2.4
+edx-lint==5.2.5
     # via -r requirements/edx/testing.txt
 edx-milestones==0.4.0
     # via -r requirements/edx/testing.txt
@@ -653,7 +653,7 @@ edx-rest-api-client==5.5.0
     #   edx-proctoring
 edx-search==3.4.0
     # via -r requirements/edx/testing.txt
-edx-sga==0.19.0
+edx-sga==0.20.0
     # via -r requirements/edx/testing.txt
 edx-sphinx-theme==3.0.0
     # via -r requirements/edx/development.in
@@ -710,11 +710,11 @@ faker==14.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.82.0
+fastapi==0.83.0
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
-fastavro==1.6.0
+fastavro==1.6.1
     # via
     #   -r requirements/edx/testing.txt
     #   openedx-events
@@ -843,7 +843,7 @@ jsonfield==3.1.0
     #   lti-consumer-xblock
     #   ora2
     #   outcome-surveys
-jsonschema==4.15.0
+jsonschema==4.16.0
     # via
     #   -r requirements/edx/testing.txt
     #   optimizely-sdk
@@ -965,7 +965,7 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   blockstore
-newrelic==8.0.0.179
+newrelic==8.1.0.180
     # via
     #   -r requirements/edx/testing.txt
     #   edx-django-utils
@@ -1020,7 +1020,7 @@ packaging==21.3
     #   redis
     #   sphinx
     #   tox
-pact-python==1.5.2
+pact-python==1.6.0
     # via -r requirements/edx/testing.txt
 pansi==2020.7.3
     # via
@@ -1170,7 +1170,7 @@ pylint-plugin-utils==0.7
     #   pylint-django
 pylint-pytest==0.3.0
     # via -r requirements/edx/testing.txt
-pylti1p3==1.11.0
+pylti1p3==1.12.0
     # via -r requirements/edx/testing.txt
 pymongo==3.12.3
     # via
@@ -1317,7 +1317,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/testing.txt
 redis==4.3.4
     # via -r requirements/edx/testing.txt
-regex==2022.8.17
+regex==2022.9.13
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
@@ -1534,10 +1534,7 @@ tinycss2==1.1.1
     #   -r requirements/edx/testing.txt
     #   bleach
 toml==0.10.2
-    # via
-    #   -r requirements/edx/testing.txt
-    #   tox
-    #   vulture
+    # via vulture
 tomli==2.0.1
     # via
     #   -r requirements/edx/pip-tools.txt
@@ -1548,7 +1545,8 @@ tomli==2.0.1
     #   pep517
     #   pylint
     #   pytest
-tox==3.25.1
+    #   tox
+tox==3.26.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox-battery
@@ -1601,7 +1599,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.16.4
+virtualenv==20.16.5
     # via
     #   -r requirements/edx/testing.txt
     #   tox
