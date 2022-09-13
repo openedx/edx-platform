@@ -73,7 +73,9 @@ from ..config.waffle import ENABLE_LEARNERS_STATS
 
 from ..django_comment_client.base.views import (
     track_comment_created_event,
+    track_comment_deleted_event,
     track_thread_created_event,
+    track_thread_deleted_event,
     track_thread_viewed_event,
     track_voted_event,
 )
@@ -1604,6 +1606,7 @@ def delete_thread(request, thread_id):
     if can_delete(cc_thread, context):
         cc_thread.delete()
         thread_deleted.send(sender=None, user=request.user, post=cc_thread)
+        track_thread_deleted_event(request, context["course"], cc_thread)
     else:
         raise PermissionDenied
 
@@ -1628,6 +1631,7 @@ def delete_comment(request, comment_id):
     if can_delete(cc_comment, context):
         cc_comment.delete()
         comment_deleted.send(sender=None, user=request.user, post=cc_comment)
+        track_comment_deleted_event(request, context["course"], cc_comment)
     else:
         raise PermissionDenied
 

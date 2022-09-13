@@ -191,6 +191,42 @@ def track_thread_lock_unlock_event(request, course, thread, close_reason_code, l
     track_forum_event(request, event_name, course, thread, event_data)
 
 
+def track_thread_deleted_event(request, course, thread):
+    """
+    Send analytics event for a deleted thread.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='deleted')
+    own_content = str(request.user.id) == thread['user_id']
+    event_data = {
+        'body': thread.body[:TRACKING_MAX_FORUM_BODY],
+        'content_type': 'Post',
+        'own_content': own_content,
+        'commentable_id': thread.get('commentable_id', ''),
+    }
+    if hasattr(thread, 'username'):
+        event_data['target_username'] = thread.get('username', '')
+    add_truncated_title_to_event_data(event_data, thread.get('title', ''))
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
+def track_comment_deleted_event(request, course, comment):
+    """
+    Send analytics event for a deleted response or comment.
+    """
+    obj_type = 'comment' if comment.get('parent_id') else 'response'
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='deleted')
+    own_content = str(request.user.id) == comment["user_id"]
+    event_data = {
+        'body': comment.body[:TRACKING_MAX_FORUM_BODY],
+        'commentable_id': comment.get('commentable_id', ''),
+        'content_type': obj_type.capitalize(),
+        'own_content': own_content,
+    }
+    if hasattr(comment, 'username'):
+        event_data['target_username'] = comment.get('username', '')
+    track_forum_event(request, event_name, course, comment, event_data)
+
+
 def permitted(func):
     """
     View decorator to verify the user is authorized to access this endpoint.
