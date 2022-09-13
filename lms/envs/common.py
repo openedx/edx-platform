@@ -5162,6 +5162,7 @@ DISCUSSION_MODERATION_EDIT_REASON_CODES = {
     "format-change": _("Formatting changes needed"),
     "post-type-change": _("Post type needs change"),
     "contains-pii": _("Contains personally identifiable information"),
+    "violates-guidelines": _("Violates community guidelines"),
 }
 # Provide a list of reason codes for moderators to close posts, as a mapping
 # from the internal reason code representation, to  an internationalizable label
