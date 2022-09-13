@@ -19,7 +19,7 @@ import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
 
-import openedx.core.djangoapps.util.ip as ip
+from openedx.core.djangoapps.util import legacy_ip
 from openedx.core.lib.x_forwarded_for.middleware import XForwardedForMiddleware
 
 
@@ -43,8 +43,8 @@ class TestClientIP(TestCase):
     )
     def test_get_legacy_ip(self, request_meta, expected):
         self.request.META = request_meta
-        assert ip.get_legacy_ip(self.request) == expected
+        assert legacy_ip.get_legacy_ip(self.request) == expected
 
         # Check that it still works after the XFF middleware has done its dirty work
         XForwardedForMiddleware().process_request(self.request)
-        assert ip.get_legacy_ip(self.request) == expected
+        assert legacy_ip.get_legacy_ip(self.request) == expected
