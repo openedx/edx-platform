@@ -2391,7 +2391,8 @@
     "platformSettings": {
         "supportEmail": "support@example.com",
         "billingEmail": "billing@email.com",
-        "courseSearchUrl": "edx.com/course-search"
+        "courseSearchUrl": "edx.com/course-search",
+        "emailSettingsUrl": "edx.com/api/change_email_settings"
     },
     "suggestedCourses": [
         {
