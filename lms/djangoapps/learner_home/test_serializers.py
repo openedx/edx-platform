@@ -85,10 +85,10 @@ class TestPlatformSettingsSerializer(TestCase):
     def generate_test_platform_settings(cls):
         """Util to generate test platform settings data"""
         return {
-            "feedbackEmail": f"{uuid4()}@example.com",
             "supportEmail": f"{uuid4()}@example.com",
             "billingEmail": f"{uuid4()}@example.com",
-            "courseSearchUrl": f"{uuid4()}.example.com/search",
+            "courseSearchUrl": random_url(),
+            "emailSettingsUrl": random_url(),
         }
 
     def test_happy_path(self):
@@ -99,6 +99,7 @@ class TestPlatformSettingsSerializer(TestCase):
             "supportEmail": input_data["supportEmail"],
             "billingEmail": input_data["billingEmail"],
             "courseSearchUrl": input_data["courseSearchUrl"],
+            "emailSettingsUrl": input_data["emailSettingsUrl"],
         }
 
 

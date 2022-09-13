@@ -2,6 +2,7 @@
 Views for the learner dashboard.
 """
 from django.conf import settings
+from django.urls import reverse
 from edx_django_utils import monitoring as monitoring_utils
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
@@ -37,6 +38,7 @@ def get_platform_settings():
         "supportEmail": settings.DEFAULT_FEEDBACK_EMAIL,
         "billingEmail": settings.PAYMENT_SUPPORT_EMAIL,
         "courseSearchUrl": marketing_link("COURSES"),
+        "emailSettingsUrl": reverse("change_email_settings"),
     }
 
 

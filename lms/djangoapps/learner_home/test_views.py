@@ -63,6 +63,7 @@ class TestGetPlatformSettings(TestCase):
                 "supportEmail": self.MOCK_SETTINGS["DEFAULT_FEEDBACK_EMAIL"],
                 "billingEmail": self.MOCK_SETTINGS["PAYMENT_SUPPORT_EMAIL"],
                 "courseSearchUrl": mock_search_url,
+                "emailSettingsUrl": reverse("change_email_settings")
             },
         )
 

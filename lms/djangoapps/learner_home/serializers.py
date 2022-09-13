@@ -34,6 +34,7 @@ class PlatformSettingsSerializer(serializers.Serializer):
     supportEmail = serializers.EmailField()
     billingEmail = serializers.EmailField()
     courseSearchUrl = serializers.URLField()
+    emailSettingsUrl = serializers.URLField()
 
 
 class CourseProviderSerializer(serializers.Serializer):
