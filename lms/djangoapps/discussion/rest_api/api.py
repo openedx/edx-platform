@@ -13,6 +13,7 @@ from urllib.parse import urlencode, urlunparse
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.http import Http404
 from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
@@ -542,16 +543,28 @@ def get_course_topics_v2(
     # Check access to the course
     store = modulestore()
     _get_course(course_key, user=user, check_tab=False)
+    user_is_privileged = user.is_staff or user.roles.filter(
+        course_id=course_key,
+        name__in=[
+            FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_COMMUNITY_TA,
+            FORUM_ROLE_ADMINISTRATOR,
+        ]
+    ).exists()
     course_blocks = get_course_blocks(user, store.make_course_usage_key(course_key))
     accessible_vertical_keys = [
         block for block in course_blocks.get_block_keys()
-        if block.category == 'vertical'
+        if block.block_type == 'vertical'
     ] + [None]
     topics_query = DiscussionTopicLink.objects.filter(
         context_key=course_key,
         provider_id=provider_type,
-        usage_key__in=accessible_vertical_keys,
     )
+
+    if user_is_privileged:
+        topics_query = topics_query.filter(Q(usage_key__in=accessible_vertical_keys) | Q(enabled_in_context=False))
+    else:
+        topics_query = topics_query.filter(usage_key__in=accessible_vertical_keys, enabled_in_context=True)
 
     if topic_ids:
         topics_query = topics_query.filter(external_id__in=topic_ids)
@@ -567,7 +580,12 @@ def get_course_topics_v2(
     else:
         topics_query = topics_query.order_by('ordering')
 
-    return DiscussionTopicSerializerV2(topics_query, many=True, context={"thread_counts": thread_counts}).data
+    topics_data = DiscussionTopicSerializerV2(topics_query, many=True, context={"thread_counts": thread_counts}).data
+    return [
+        topic_data
+        for topic_data in topics_data
+        if topic_data["enabled_in_context"] or sum(topic_data["thread_counts"].values())
+    ]
 
 
 def _get_user_profile_dict(request, usernames):

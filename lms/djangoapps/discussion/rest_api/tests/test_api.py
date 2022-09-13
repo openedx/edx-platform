@@ -3826,7 +3826,7 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
         topic_ids.remove(self.staff_only_id)
         topic_ids_by_name = list(topic_id_query.order_by('title'))
         topic_ids_by_name.remove(self.staff_only_id)
-        deleted_topic_ids = [f'disabled-topic-{idx}' for idx in range(10)]
+        self.deleted_topic_ids = deleted_topic_ids = [f'disabled-topic-{idx}' for idx in range(10)]
         for idx, topic_id in enumerate(deleted_topic_ids):
             usage_key = course_key.make_usage_key('vertical', topic_id)
             topic_links.append(
@@ -3837,7 +3837,7 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
                     external_id=topic_id,
                     provider_id=Provider.OPEN_EDX,
                     ordering=idx,
-                    enabled_in_context=False
+                    enabled_in_context=False,
                 )
             )
         DiscussionTopicLink.objects.bulk_create(topic_links)
@@ -3845,9 +3845,14 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
         self.topic_ids_by_name = topic_ids_by_name
         self.user = UserFactory.create()
         self.staff = AdminFactory.create()
+        self.all_topic_ids = set(topic_ids) | set(deleted_topic_ids) | {self.staff_only_id}
+        # Set up topic stats for all topics, but have one deleted topic
+        # and one active topic return zero stats for testing.
         self.topic_stats = {
-            topic_id: dict(discussion=random.randint(0, 10), question=random.randint(0, 10))
-            for topic_id in self.topic_ids
+            **{topic_id: dict(discussion=random.randint(0, 10), question=random.randint(0, 10))
+               for topic_id in self.all_topic_ids},
+            deleted_topic_ids[0]: dict(discussion=0, question=0),
+            self.topic_ids[0]: dict(discussion=0, question=0),
         }
         patcher = mock.patch(
             'lms.djangoapps.discussion.rest_api.api.get_course_commentable_counts',
@@ -3861,15 +3866,15 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
         Test that the standard response contains the correct number of items
         """
         topics_list = get_course_topics_v2(course_key=self.course_key, user=self.user)
-        assert len(topics_list) == len(self.topic_ids)
+        assert {t['id'] for t in topics_list} == set(self.topic_ids)
 
     def test_staff_response(self):
         """
         Test that the standard response contains the correct number of items
         """
         topics_list = get_course_topics_v2(course_key=self.course_key, user=self.staff)
-        assert len(topics_list) == len(self.topic_ids) + 1
-        assert any(topic_data.get('id') == self.staff_only_id for topic_data in topics_list)
+        # All topic ids should be returned except for the first deleted topic id which has zero stats
+        assert {t['id'] for t in topics_list} == self.all_topic_ids - {self.deleted_topic_ids[0]}
 
     def test_filtering(self):
         """
