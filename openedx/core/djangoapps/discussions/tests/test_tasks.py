@@ -25,40 +25,40 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
         self.course = course = CourseFactory.create()
         self.course_key = course_key = self.course.id
         with self.store.bulk_operations(course_key):
-            section = ItemFactory.create(
+            self.section = ItemFactory.create(
                 parent_location=course.location,
                 category="chapter",
                 display_name="Section"
             )
-            sequence = ItemFactory.create(
-                parent_location=section.location,
+            self.sequence = ItemFactory.create(
+                parent_location=self.section.location,
                 category="sequential",
                 display_name="Sequence"
             )
-            unit = ItemFactory.create(
-                parent_location=sequence.location,
+            self.unit = ItemFactory.create(
+                parent_location=self.sequence.location,
                 category="vertical",
                 display_name="Unit"
             )
             ItemFactory.create(
-                parent_location=sequence.location,
+                parent_location=self.sequence.location,
                 category="vertical",
                 display_name="Discussable Unit",
                 discussion_enabled=True,
             )
             ItemFactory.create(
-                parent_location=sequence.location,
+                parent_location=self.sequence.location,
                 category="vertical",
                 display_name="Non-Discussable Unit",
                 discussion_enabled=False,
             )
             ItemFactory.create(
-                parent_location=unit.location,
+                parent_location=self.unit.location,
                 category="html",
                 display_name="An HTML Module"
             )
             graded_sequence = ItemFactory.create(
-                parent_location=section.location,
+                parent_location=self.section.location,
                 category="sequential",
                 display_name="Graded Sequence",
                 graded=True,
@@ -113,9 +113,9 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
         assert config_data.plugin_configuration == {}
         assert {context.title for context in config_data.contexts} == {"General", "Unit", "Discussable Unit"}
 
-    def test_general_topics(self):
+    def test_topics_contexts(self):
         """
-        Test the handling of course general topics.
+        Test the handling of topics.
         """
         self.update_course_field(discussion_topics={
             "General": {"id": "general-topic"},
@@ -132,6 +132,14 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
             title="Test Topic",
             external_id="test-topic",
             ordering=1,
+        ) in config_data.contexts
+        assert DiscussionTopicContext(
+            title='Unit',
+            usage_key=self.unit.location,
+            group_id=None,
+            external_id=None,
+            ordering=100,
+            context={'section': 'Section', 'subsection': 'Sequence', 'unit': 'Unit'}
         ) in config_data.contexts
 
     @ddt.data(

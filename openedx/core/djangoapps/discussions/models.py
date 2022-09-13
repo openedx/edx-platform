@@ -582,6 +582,10 @@ class DiscussionTopicLink(models.Model):
         null=True,
         help_text=_("Ordering of this topic in its learning context"),
     )
+    context = models.JSONField(
+        default=dict,
+        help_text=_("Additional context for this topic, such as its section, and subsection"),
+    )
 
     def __str__(self):
         return (

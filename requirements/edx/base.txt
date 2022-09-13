@@ -96,7 +96,7 @@ celery==5.2.7
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-certifi==2022.6.15
+certifi==2022.6.15.1
     # via
     #   -r requirements/edx/paver.txt
     #   elasticsearch
@@ -453,7 +453,7 @@ edx-django-release-util==1.2.0
     #   blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.in
-edx-django-utils==5.0.0
+edx-django-utils==5.0.1
     # via
     #   -r requirements/edx/base.in
     #   blockstore
@@ -470,7 +470,7 @@ edx-django-utils==5.0.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions==8.2.0
+edx-drf-extensions==8.3.1
     # via
     #   -r requirements/edx/base.in
     #   edx-completion
@@ -534,7 +534,7 @@ edx-rest-api-client==5.5.0
     #   edx-proctoring
 edx-search==3.4.0
     # via -r requirements/edx/base.in
-edx-sga==0.19.0
+edx-sga==0.20.0
     # via -r requirements/edx/base.in
 edx-submissions==3.5.4
     # via
@@ -574,7 +574,7 @@ event-tracking==2.1.0
     #   -r requirements/edx/base.in
     #   edx-proctoring
     #   edx-search
-fastavro==1.6.0
+fastavro==1.6.1
     # via openedx-events
 filelock==3.8.0
     # via snowflake-connector-python
@@ -654,7 +654,7 @@ jsonfield==3.1.0
     #   lti-consumer-xblock
     #   ora2
     #   outcome-surveys
-jsonschema==4.15.0
+jsonschema==4.16.0
     # via optimizely-sdk
 jwcrypto==1.3.1
     # via pylti1p3
@@ -668,7 +668,7 @@ lazy==1.4
     #   acid-xblock
     #   lti-consumer-xblock
     #   ora2
-learner-pathway-progress==1.3.1
+learner-pathway-progress==1.3.2
     # via -r requirements/edx/base.in
 libsass==0.10.0
     # via
@@ -739,7 +739,7 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/edx/base.in
     #   blockstore
-newrelic==8.0.0.179
+newrelic==8.1.0.180
     # via
     #   -r requirements/edx/base.in
     #   edx-django-utils
@@ -860,7 +860,7 @@ pyjwt[crypto]==2.4.0
     #   social-auth-core
 pylatexenc==2.10
     # via olxcleaner
-pylti1p3==1.11.0
+pylti1p3==1.12.0
     # via -r requirements/edx/base.in
 pymongo==3.12.3
     # via
@@ -959,7 +959,7 @@ recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
 redis==4.3.4
     # via -r requirements/edx/base.in
-regex==2022.8.17
+regex==2022.9.13
     # via nltk
 requests==2.28.1
     # via
