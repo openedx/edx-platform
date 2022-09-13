@@ -459,5 +459,4 @@ class TestMongoDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
         """ Test that `get_course_summaries` method in modulestore work as expected. """
         with self.store.branch_setting(branch_setting=branch):
             course_summaries = self.store.get_course_summaries()
-            # get_course_summaries skip old mongo courses
-            assert len(course_summaries) == 0
+            assert len(course_summaries) == 1

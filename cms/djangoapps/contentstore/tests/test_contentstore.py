@@ -1891,6 +1891,7 @@ class RerunCourseTest(ContentStoreTestCase):
         rerun_course_data.update(destination_course_data)
         destination_course_key = _get_course_id(self.store, destination_course_data)
 
+        # course_handler raise 404 for old mongo course
         if destination_course_key.deprecated:
             raise SkipTest('OldMongo Deprecation')
 
@@ -2213,6 +2214,7 @@ def _create_course(test, course_key, course_data):
     """
     Creates a course via an AJAX request and verifies the URL returned in the response.
     """
+    # course_handler raise 404 for old mongo course
     if course_key.deprecated:
         raise SkipTest('OldMongo Deprecation')
 
