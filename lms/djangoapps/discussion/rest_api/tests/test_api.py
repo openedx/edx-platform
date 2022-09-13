@@ -3437,12 +3437,32 @@ class DeleteThreadTest(
         self.register_get_thread_response(cs_data)
         self.register_delete_thread_response(cs_data["id"])
 
-    def test_basic(self):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_basic(self, mock_emit):
         self.register_thread()
         with self.assert_signal_sent(api, 'thread_deleted', sender=None, user=self.user, exclude_args=('post',)):
             assert delete_thread(self.request, self.thread_id) is None
         assert urlparse(httpretty.last_request().path).path == f"/api/v1/threads/{self.thread_id}"  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
+
+        expected_event_name = 'edx.forum.thread.deleted'
+        expected_event_data = {
+            'body': 'dummy',
+            'content_type': 'Post',
+            'own_content': True,
+            'commentable_id': 'dummy',
+            'target_username': 'dummy',
+            'title_truncated': False,
+            'title': 'dummy',
+            'id': 'test_thread',
+            'url': '',
+            'user_forums_roles': ['Student'],
+            'user_course_roles': []
+        }
+
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
 
     def test_thread_id_not_found(self):
         self.register_get_thread_error_response("missing_thread", 404)
@@ -3579,12 +3599,30 @@ class DeleteCommentTest(
         self.register_get_comment_response(cs_comment_data)
         self.register_delete_comment_response(self.comment_id)
 
-    def test_basic(self):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_basic(self, mock_emit):
         self.register_comment_and_thread()
         with self.assert_signal_sent(api, 'comment_deleted', sender=None, user=self.user, exclude_args=('post',)):
             assert delete_comment(self.request, self.comment_id) is None
         assert urlparse(httpretty.last_request().path).path == f"/api/v1/comments/{self.comment_id}"  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
+
+        expected_event_name = 'edx.forum.response.deleted'
+        expected_event_data = {
+            'body': 'dummy',
+            'content_type': 'Response',
+            'own_content': True,
+            'commentable_id': 'dummy',
+            'target_username': self.user.username,
+            'id': 'test_comment',
+            'url': '',
+            'user_forums_roles': ['Student'],
+            'user_course_roles': []
+        }
+
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
 
     def test_comment_id_not_found(self):
         self.register_get_comment_error_response("missing_comment", 404)
