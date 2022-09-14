@@ -271,6 +271,11 @@ def course_handler(request, course_key_string=None):
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
     try:
+        if course_key_string:
+            course_key = CourseKey.from_string(course_key_string)
+            if course_key.deprecated:
+                logging.error(f"User {request.user.id} tried to access Studio for Old Mongo course {course_key}.")
+                return HttpResponseNotFound()
         response_format = request.GET.get('format') or request.POST.get('format') or 'html'
         if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
             if request.method == 'GET':
@@ -783,7 +788,7 @@ def _process_courses_list(courses_iter, in_process_course_actions, split_archive
         """
         Return a dict of the data which the view requires for each course
         """
-        return {
+        course_context = {
             'display_name': course.display_name,
             'course_key': str(course.location.course_key),
             'url': reverse_course_url('course_handler', course.id),
@@ -793,6 +798,13 @@ def _process_courses_list(courses_iter, in_process_course_actions, split_archive
             'number': course.display_number_with_default,
             'run': course.location.run
         }
+        if course.id.deprecated:
+            course_context.update({
+                'url': None,
+                'lms_link': None,
+                'rerun_link': None
+            })
+        return course_context
 
     in_process_action_course_keys = {uca.course_key for uca in in_process_course_actions}
     active_courses = []

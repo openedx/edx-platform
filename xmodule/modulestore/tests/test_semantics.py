@@ -446,9 +446,17 @@ class TestSplitDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
                                    self.ASIDE_DATA_FIELD.field_name, self.ASIDE_DATA_FIELD.updated)
 
 
+@ddt.ddt
 class TestMongoDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the MongoModulestore
     """
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
     __test__ = True
+
+    @ddt.data(ModuleStoreEnum.Branch.draft_preferred, ModuleStoreEnum.Branch.published_only)
+    def test_course_summaries(self, branch):
+        """ Test that `get_course_summaries` method in modulestore work as expected. """
+        with self.store.branch_setting(branch_setting=branch):
+            course_summaries = self.store.get_course_summaries()
+            assert len(course_summaries) == 1
