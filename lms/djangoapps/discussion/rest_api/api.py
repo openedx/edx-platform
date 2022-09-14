@@ -32,8 +32,7 @@ from xmodule.tabs import CourseTabList
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE, \
-    ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from lms.djangoapps.discussion.views import is_user_moderator
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
@@ -1202,7 +1201,7 @@ def _handle_abuse_flagged_field(form_value, user, cc_content):
     course_key = CourseKey.from_string(cc_content.course_id)
     if form_value:
         cc_content.flagAbuse(user, cc_content)
-        if ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key) and reported_content_email_notification_enabled(
+        if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key) and reported_content_email_notification_enabled(
                 course_key):
             if cc_content.type == 'thread':
                 thread_flagged.send(sender='flag_abuse_for_thread', user=user, post=cc_content)
