@@ -49,14 +49,14 @@ MAX_RETRIES = 11
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def send_grade_to_credentials(
-        self,
-        username,
-        course_run_key,
-        verified,
-        letter_grade,
-        percent_grade,
-        grade_last_modified=None
-    ):
+    self,
+    username,
+    course_run_key,
+    verified,
+    letter_grade,
+    percent_grade,
+    grade_last_modified=None
+):
     """
     Celery task to notify the Credentials IDA of a grade change via POST.
     """

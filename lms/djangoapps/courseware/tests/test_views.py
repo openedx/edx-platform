@@ -1508,7 +1508,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 60, 42),
+        (False, 60, 43),
         (True, 52, 36)
     )
     @ddt.unpack
