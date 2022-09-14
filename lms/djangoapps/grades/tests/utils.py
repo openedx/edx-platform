@@ -15,7 +15,7 @@ from xmodule.graders import ProblemScore  # lint-amnesty, pylint: disable=wrong-
 
 
 @contextmanager
-def mock_passing_grade(letter_grade='Pass', percent=0.75, modified=None):
+def mock_passing_grade(letter_grade='Pass', percent=0.75):
     """
     Mock the grading function to always return a passing grade.
     """
@@ -23,8 +23,7 @@ def mock_passing_grade(letter_grade='Pass', percent=0.75, modified=None):
         letter_grade=letter_grade,
         percent=percent,
         passed=letter_grade is not None,
-        attempted=True,
-        modified=modified,
+        attempted=True
     )
     with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade_read:
         mock_grade_read.return_value = MagicMock(**passing_grade_fields)

@@ -22,6 +22,7 @@ from lms.djangoapps.certificates.api import get_recently_modified_certificates
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.grades.api import CourseGradeFactory, get_recently_modified_grades
+from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled_for_org
@@ -55,7 +56,7 @@ def send_grade_to_credentials(
     verified,
     letter_grade,
     percent_grade,
-    grade_last_modified=None
+    grade_last_updated
 ):
     """
     Celery task to notify the Credentials IDA of a grade change via POST.
@@ -77,7 +78,7 @@ def send_grade_to_credentials(
                 'letter_grade': letter_grade,
                 'percent_grade': percent_grade,
                 'verified': verified,
-                'lms_last_updated_at': grade_last_modified
+                'lms_last_updated_at': grade_last_updated
             }
         )
         response.raise_for_status()
@@ -203,7 +204,7 @@ def send_notifications(
             status,
             grade.letter_grade,
             grade.percent_grade,
-            grade.modified,
+            grade_last_modified=grade.modified,
             verbose=verbose
         )
 
@@ -277,7 +278,7 @@ def send_grade_if_interesting(
     status,
     letter_grade,
     percent_grade,
-    grade_last_modified,
+    grade_last_updated=None,
     verbose=False
 ):
     """ Checks if grade is interesting to Credentials and schedules a Celery task if so. """
@@ -285,7 +286,7 @@ def send_grade_if_interesting(
         msg = (
             f"Starting send_grade_if_interesting with_params: user [{getattr(user, 'username', None)}], "
             f"course_run_key [{course_run_key}], mode [{mode}], status [{status}], letter_grade [{letter_grade}], "
-            f"percent_grade [{percent_grade}], grade_last_modified [{grade_last_modified}], verbose [{verbose}]"
+            f"percent_grade [{percent_grade}], grade_last_updated [{grade_last_updated}], verbose [{verbose}]"
         )
         logger.info(msg)
 
@@ -345,8 +346,18 @@ def send_grade_if_interesting(
             return
         letter_grade = grade.letter_grade
         percent_grade = grade.percent
-        # attempt to grab the `modified` date for the grade, defaults to None if this is a `ZeroCourseGrade` instance
-        grade_last_modified = getattr(grade, 'modified', None)
+
+    # We have a vested interest in Credentials knowing the last time a grade was updated so we can keep easily tell
+    # if the data in each system has drifted. Attempt to grab the `modified` date of the PersistentCourseGrade instance.
+    if not grade_last_updated:
+        try:
+            persistent_grade = PersistentCourseGrade.objects.get(user=user, course_id=course_run_key)
+        except PersistentCourseGrade.DoesNotExist:
+            logger.warning(
+                f"Could not find a persistent course grade record for user [{user.id}] in course [{course_run_key}]"
+            )
+        else:
+            grade_last_updated = persistent_grade.modified
 
     send_grade_to_credentials.delay(
         user.username,
@@ -354,7 +365,7 @@ def send_grade_if_interesting(
         True,
         letter_grade,
         percent_grade,
-        grade_last_modified
+        grade_last_updated
     )
 
 

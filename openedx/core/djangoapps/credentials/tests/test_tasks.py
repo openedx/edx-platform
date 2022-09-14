@@ -454,7 +454,7 @@ class TestSendGradeIfInteresting(TestCase):
         mock_is_course_run_in_a_program.return_value = True
 
         # Test direct send
-        tasks.send_grade_if_interesting(self.user, self.key, mode, status, 'A', 1.0, None)
+        tasks.send_grade_if_interesting(self.user, self.key, mode, status, 'A', 1.0)
         assert mock_send_grade_to_credentials.delay.called is called
         mock_send_grade_to_credentials.delay.reset_mock()
 
@@ -465,12 +465,12 @@ class TestSendGradeIfInteresting(TestCase):
             status=status,
             mode=mode
         )
-        tasks.send_grade_if_interesting(self.user, self.key, None, None, 'A', 1.0, None)
+        tasks.send_grade_if_interesting(self.user, self.key, None, None, 'A', 1.0)
         assert mock_send_grade_to_credentials.delay.called is called
         mock_send_grade_to_credentials.delay.reset_mock()
 
     def test_send_grade_missing_cert(self, _, mock_send_grade_to_credentials, _mock_is_learner_issuance_enabled):
-        tasks.send_grade_if_interesting(self.user, self.key, None, None, 'A', 1.0, None)
+        tasks.send_grade_if_interesting(self.user, self.key, None, None, 'A', 1.0)
         assert not mock_send_grade_to_credentials.delay.called
 
     @ddt.data([True], [False])
@@ -478,7 +478,7 @@ class TestSendGradeIfInteresting(TestCase):
     def test_send_grade_if_in_a_program(self, in_program, mock_is_course_run_in_a_program,
                                         mock_send_grade_to_credentials, _mock_is_learner_issuance_enabled):
         mock_is_course_run_in_a_program.return_value = in_program
-        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', 'A', 1.0, None)
+        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', 'A', 1.0)
         assert mock_send_grade_to_credentials.delay.called is in_program
 
     def test_send_grade_queries_grade(self, mock_is_course_run_in_a_program, mock_send_grade_to_credentials,
@@ -486,7 +486,7 @@ class TestSendGradeIfInteresting(TestCase):
         mock_is_course_run_in_a_program.return_value = True
 
         with mock_passing_grade('B', 0.81):
-            tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None, None)
+            tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None)
         assert mock_send_grade_to_credentials.delay.called
         assert mock_send_grade_to_credentials.delay.call_args[0] == (
             self.user.username, str(self.key), True, 'B', 0.81, None
@@ -502,6 +502,7 @@ class TestSendGradeIfInteresting(TestCase):
 
         modified_dt = datetime.now()
         modified_dt_utc = modified_dt.replace(tzinfo=pytz.UTC)
+
         with mock_passing_grade('B', 0.81, modified_dt_utc):
             tasks.send_grade_if_interesting(
                 self.user,
@@ -527,13 +528,13 @@ class TestSendGradeIfInteresting(TestCase):
     def test_send_grade_without_grade(self, mock_is_course_run_in_a_program, mock_send_grade_to_credentials,
                                       _mock_is_learner_issuance_enabled):
         mock_is_course_run_in_a_program.return_value = True
-        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None, None)
+        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
         assert not mock_send_grade_to_credentials.delay.called
 
     def test_send_grade_without_issuance_enabled(self, _mock_is_course_run_in_a_program,
                                                  mock_send_grade_to_credentials, mock_is_learner_issuance_enabled):
         mock_is_learner_issuance_enabled.return_value = False
-        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None, None)
+        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
         assert mock_is_learner_issuance_enabled.called
         assert not mock_send_grade_to_credentials.delay.called
 
@@ -544,14 +545,14 @@ class TestSendGradeIfInteresting(TestCase):
         )
 
         # Correctly sent
-        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None, None)
+        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
         assert mock_send_grade_to_credentials.delay.called
         mock_send_grade_to_credentials.delay.reset_mock()
 
         # Correctly not sent
         site_config.site_values['ENABLE_LEARNER_RECORDS'] = False
         site_config.save()
-        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None, None)
+        tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
         assert not mock_send_grade_to_credentials.delay.called
 
     def test_send_grade_records_disabled_globally(
@@ -561,7 +562,7 @@ class TestSendGradeIfInteresting(TestCase):
         assert is_learner_records_enabled()
         with override_settings(FEATURES={"ENABLE_LEARNER_RECORDS": False}):
             assert not is_learner_records_enabled()
-            tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None, None)
+            tasks.send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
         assert not mock_send_grade_to_credentials.delay.called
 
 
