@@ -6,7 +6,7 @@ Django admin dashboard configuration for LMS XBlock infrastructure.
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
-from .models import AppVersionConfig, IgnoreMobileAvailableFlagConfig, MobileApiConfig
+from .models import AppVersionConfig, IgnoreMobileAvailableFlagConfig, MobileApiConfig, MobileIapConfig
 
 admin.site.register(MobileApiConfig, ConfigurationModelAdmin)
 admin.site.register(IgnoreMobileAvailableFlagConfig, ConfigurationModelAdmin)
@@ -24,4 +24,14 @@ class AppVersionConfigAdmin(admin.ModelAdmin):
         """ defines fields to display in list view """
         return ['platform', 'version', 'expire_at', 'enabled', 'created_at', 'updated_at']
 
+
+class MobileIapConfigAdmin(admin.ModelAdmin):
+    """ Admin class for MobileIapConfig model """
+    fields = ('name', 'enabled')
+    readonly_fields = ['created_at', 'updated_at']
+
+    class Meta:
+        ordering = ['name']
+
 admin.site.register(AppVersionConfig, AppVersionConfigAdmin)
+admin.site.register(MobileIapConfig, MobileIapConfigAdmin)

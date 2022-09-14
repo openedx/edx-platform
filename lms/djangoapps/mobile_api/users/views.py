@@ -27,6 +27,7 @@ from lms.djangoapps.courseware.courses import get_current_child
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.views.index import save_positions_recursively_up
+from lms.djangoapps.mobile_api.models import MobileIapConfig
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V15
 from lms.djangoapps.mobile_api.waffle import VALUE_PROP_ENABLED
 from openedx.features.course_duration_limits.access import check_course_expired
@@ -366,15 +367,35 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         api_version = self.kwargs.get('api_version')
 
         if api_version == API_V15:
+            mobile_iap_config_flags = MobileIapConfig.objects.all().values('name', 'enabled')
             enrollment_data = {
                 'config': {
-                    'value_prop_enabled': VALUE_PROP_ENABLED.is_enabled()
+                    'value_prop_enabled': VALUE_PROP_ENABLED.is_enabled(),
+                    'iap_config': {},
                 },
                 'enrollments': response.data
             }
+            enrollment_data['config'] = self._populate_mobile_iap_config(
+                enrollment_data['config'], mobile_iap_config_flags)
             return Response(enrollment_data)
 
         return response
+
+    def _populate_mobile_iap_config(self, config, flags):
+        """
+        Add flag values to config in the following manner:
+            - If flag name starts with `iap_`, add value to config['iap_config']
+            - Else add values to config[]
+        """
+        for flag in flags:
+            name = flag.get('name')
+            enabled = flag.get('enabled')
+            if name.startswith('iap_'):
+                name = name.split('iap_')[1]
+                config['iap_config'][name] = enabled
+                continue
+            config[name] = enabled
+        return config
 
 
 @api_view(["GET"])
