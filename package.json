@@ -68,7 +68,7 @@
     "underscore.string": "3.3.6",
     "universal-cookie": "^4.0.4",
     "webpack": "2.7.0",
-    "webpack-bundle-tracker": "0.2.1",
+    "webpack-bundle-tracker": "0.4.3",
     "webpack-merge": "4.1.1",
     "whatwg-fetch": "2.0.3",
     "which-country": "1.0.0"
