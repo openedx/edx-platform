@@ -834,12 +834,12 @@ class DiscussionLinkTestCase(TabTestCase):
     @ddt.data(True, False)
     def test_tab_link(self, toggle_enabled):
         if toggle_enabled:
-            expected_link = reverse("forum_form_discussion", args=[str(self.course.id)])
-        else:
             expected_link = get_discussions_mfe_url(course_key=self.course.id)
+        else:
+            expected_link = reverse("forum_form_discussion", args=[str(self.course.id)])
 
         with self.settings(FEATURES={'ENABLE_DISCUSSION_SERVICE': True}):
-            with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
+            with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, toggle_enabled):
                 self.check_discussion(
                     tab_list=self.tabs_with_discussion,
                     expected_discussion_link=expected_link,

@@ -1,7 +1,6 @@
 """
 Tests the forum notification views.
 """
-import itertools
 import json
 import logging
 from datetime import datetime
@@ -2323,7 +2322,7 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
 
         with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, toggle_enabled):
             self.client.login(username=self.user.username, password='test')
-            url = reverse("user_profile", args=[self.course.id, user.id])
+            url = reverse("user_profile", args=[self.course.id, self.user.id])
             response = self.client.get(url)
             content = response.content.decode('utf8')
 
