@@ -10,9 +10,7 @@ from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 import ddt
-import pytest
 import pytz
-from django.conf import settings
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -25,7 +23,6 @@ from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, get_event_transaction_id
 from common.djangoapps.util.date_utils import to_timestamp
 from lms.djangoapps.grades import tasks
-from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
@@ -47,7 +44,7 @@ class HasCourseWithProblemsMixin:
     """
     Mixin to provide tests with a sample course with graded subsections
     """
-    def set_up_course(self, enable_persistent_grades=True, create_multiple_subsections=False, course_end=None):
+    def set_up_course(self, create_multiple_subsections=False, course_end=None):
         """
         Configures the course for this test.
         """
@@ -57,8 +54,6 @@ class HasCourseWithProblemsMixin:
             run='run',
             end=course_end
         )
-        if not enable_persistent_grades:
-            PersistentGradesEnabledFlag.objects.create(enabled=False)
 
         self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
         self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequential1")
@@ -103,7 +98,6 @@ class HasCourseWithProblemsMixin:
         # pylint: enable=attribute-defined-outside-init,no-member
 
 
-@patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
 @ddt.ddt
 class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTestCase):
     """
@@ -114,7 +108,6 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
-        PersistentGradesEnabledFlag.objects.create(enabled_for_all_courses=True, enabled=True)
 
     @contextmanager
     def mock_csm_get_score(self, score=MagicMock(grade=1.0, max_grade=2.0)):
@@ -152,7 +145,6 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
     def test_block_structure_created_only_once(self):
         self.set_up_course()
-        assert PersistentGradesEnabledFlag.feature_enabled(self.course.id)
         with patch(
             'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_store',
             side_effect=BlockStructureNotFound(self.course.location),
@@ -170,7 +162,6 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
         with self.store.default_store(default_store):
             self.set_up_course(create_multiple_subsections=create_multiple_subsections)
-            assert PersistentGradesEnabledFlag.feature_enabled(self.course.id)
             with check_mongo_calls(num_mongo_calls):
                 with self.assertNumQueries(num_sql_calls):
                     self._apply_recalculate_subsection_grade()
@@ -183,7 +174,6 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
         with self.store.default_store(default_store):
             self.set_up_course(create_multiple_subsections=True)
-            assert PersistentGradesEnabledFlag.feature_enabled(self.course.id)
 
             num_problems = 10
             for _ in range(num_problems):
@@ -223,28 +213,13 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 24),
-        (ModuleStoreEnum.Type.split, 2, 24),
+        (ModuleStoreEnum.Type.mongo, 1, 41),
+        (ModuleStoreEnum.Type.split, 2, 41),
     )
     @ddt.unpack
-    def test_persistent_grades_not_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
+    def test_persistent_grades_on_course(self, default_store, num_mongo_queries, num_sql_queries):
         with self.store.default_store(default_store):
-            self.set_up_course(enable_persistent_grades=False)
-            with check_mongo_calls(num_mongo_queries):
-                with self.assertNumQueries(num_sql_queries):
-                    self._apply_recalculate_subsection_grade()
-            with pytest.raises(PersistentCourseGrade.DoesNotExist):
-                PersistentCourseGrade.read(self.user.id, self.course.id)
-            assert len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)) == 0
-
-    @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 42),
-        (ModuleStoreEnum.Type.split, 2, 42),
-    )
-    @ddt.unpack
-    def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
-        with self.store.default_store(default_store):
-            self.set_up_course(enable_persistent_grades=True)
+            self.set_up_course()
             with check_mongo_calls(num_mongo_queries):
                 with self.assertNumQueries(num_sql_queries):
                     self._apply_recalculate_subsection_grade()
