@@ -95,6 +95,12 @@ class LtiSerializer(serializers.ModelSerializer):
             return provider.requires_email, provider.requires_username
         return False, False
 
+    def to_representation(self, instance):
+        payload = super().to_representation(instance)
+        # breakpoint()
+        payload['lti_1p1_client_secret'] = '*' * len(payload['lti_1p1_client_secret'])
+        return payload
+
 
 class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
     """

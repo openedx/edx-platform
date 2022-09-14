@@ -171,7 +171,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
             'free_tier': False,
             'lti_configuration': {
                 'lti_1p1_client_key': 'this_is_key',
-                'lti_1p1_client_secret': 'this_is_secret',
+                'lti_1p1_client_secret': '**************',
                 'lti_1p1_launch_url': 'example.com',
                 'version': 'lti_1p1',
                 'lti_config': {
@@ -223,7 +223,7 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
             'free_tier': False,
             'lti_configuration': {
                 'lti_1p1_client_key': 'new_key',
-                'lti_1p1_client_secret': 'new_secret',
+                'lti_1p1_client_secret': '**********',
                 'lti_1p1_launch_url': 'example01.com',
                 'version': 'lti_1p1',
                 'lti_config': {
