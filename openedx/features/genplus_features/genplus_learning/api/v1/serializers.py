@@ -100,13 +100,14 @@ class ClassSummarySerializer(serializers.ModelSerializer):
 
 class ClassStudentSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
+    user_id = serializers.CharField(source='user.id')
     profile_pic = serializers.SerializerMethodField()
     skills_assessment = serializers.SerializerMethodField()
     unit_lesson_completion = serializers.SerializerMethodField()
 
     class Meta:
         model = Student
-        fields = ('id', 'username', 'profile_pic', 'skills_assessment', 'unit_lesson_completion')
+        fields = ('id', 'user_id', 'username', 'profile_pic', 'skills_assessment', 'unit_lesson_completion')
 
     def get_profile_pic(self, obj):
         profile = obj.character.profile_pic if obj.character else None

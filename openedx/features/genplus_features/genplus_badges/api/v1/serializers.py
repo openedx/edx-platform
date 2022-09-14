@@ -58,11 +58,15 @@ class ProgramBadgeSerializer(serializers.ModelSerializer):
         program = Program.objects.filter(slug=obj.slug).first()
         unit_badges = BadgeClass.objects.none()
         if program:
-            unit_ids = program.units.all().order_by('order').values_list(
-                'course', flat=True)
+            units = program.units.all().order_by('order').values(
+                'course', 'order')
+            unit_ids = units.values_list('course', flat=True)
+            unit_order = {unit['course']: unit['order'] for unit in units}
             unit_badges = BadgeClass.objects.prefetch_related(
                 'badgeassertion_set').filter(course_id__in=unit_ids,
                                              issuing_component='genplus__unit')
+
+            unit_badges = sorted(unit_badges, key=lambda unit: unit_order[unit.course_id])
 
         return UnitBadgeSerializer(unit_badges,
                                    many=True,

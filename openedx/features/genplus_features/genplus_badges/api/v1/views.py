@@ -20,10 +20,15 @@ from .serializers import (ProgramBadgeSerializer, AwardBoosterBadgesSerializer,
 class StudentProgramBadgeView(generics.ListAPIView):
     serializer_class = ProgramBadgeSerializer
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
-    permission_classes = [IsAuthenticated, IsStudent]
+    permission_classes = [IsAuthenticated, IsStudentOrTeacher]
+
+    def get_user(self):
+        user_id = self.request.query_params.get('user_id', None)
+        return get_object_or_404(User, pk=user_id) if user_id else self.request.user
 
     def get_queryset(self):
-        gen_user = self.request.user.gen_user
+        user = self.get_user()
+        gen_user = user.gen_user
         enrolled_programs = ProgramEnrollment.objects \
             .filter(student=gen_user.student,
                     status__in=ProgramEnrollmentStatuses.__VISIBLE__).order_by('created')
@@ -46,7 +51,7 @@ class StudentProgramBadgeView(generics.ListAPIView):
 
     def get_serializer_context(self):
         context = super(StudentProgramBadgeView, self).get_serializer_context()
-        context.update({"user": self.request.user})
+        context.update({"user": self.get_user()})
         return context
 
 
