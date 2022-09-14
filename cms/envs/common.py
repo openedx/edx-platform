@@ -2042,7 +2042,7 @@ USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 
 FILES_AND_UPLOAD_TYPE_FILTERS = {
     "Images": ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff', 'image/tif', 'image/x-icon',
-               'image/svg+xml', 'image/bmp', 'image/x-ms-bmp', ],
+               'image/svg+xml', 'image/bmp', 'image/x-ms-bmp', 'image/vnd.microsoft.icon', ],
     "Documents": [
         'application/pdf',
         'text/plain',
