@@ -374,6 +374,22 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
 
         return response
 
+    def _populate_mobile_iap_config(self, config, flags):
+        """
+        Add flag values to config in the following manner:
+            - If flag name starts with `iap_`, add value to config['iap_config']
+            - Else add values to config[]
+        """
+        for flag in flags:
+            name = flag.get('name')
+            enabled = flag.get('enabled')
+            if name.startswith('iap_'):
+                name = name.split('iap_')[1]
+                config['iap_config'][name] = enabled
+                continue
+            config[name] = enabled
+        return config
+
 
 @api_view(["GET"])
 @mobile_view()
