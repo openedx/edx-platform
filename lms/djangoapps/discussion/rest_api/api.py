@@ -377,23 +377,12 @@ def get_courseware_topics(
     courseware_topics = []
     existing_topic_ids = set()
 
-    def get_xblock_sort_key(xblock):
-        """
-        Get the sort key for the xblock (falling back to the discussion_target
-        setting if absent)
-        """
-        return xblock.sort_key or xblock.discussion_target
-
-    def get_sorted_xblocks(category):
-        """Returns key sorted xblocks by category"""
-        return sorted(xblocks_by_category[category], key=get_xblock_sort_key)
-
     discussion_xblocks = get_accessible_discussion_xblocks(course, request.user)
     xblocks_by_category = defaultdict(list)
     for xblock in discussion_xblocks:
         xblocks_by_category[xblock.discussion_category].append(xblock)
 
-    for category in sorted(xblocks_by_category.keys()):
+    for category in xblocks_by_category.keys():
         children = []
         for xblock in xblocks_by_category[category]:
             if not topic_ids or xblock.discussion_id in topic_ids:
@@ -413,7 +402,11 @@ def get_courseware_topics(
             discussion_topic = DiscussionTopic(
                 None,
                 category,
-                get_thread_list_url(request, course_key, [item.discussion_id for item in get_sorted_xblocks(category)]),
+                get_thread_list_url(
+                    request,
+                    course_key,
+                    [item.discussion_id for item in xblocks_by_category[category]],
+                ),
                 children,
                 None,
             )
@@ -449,8 +442,8 @@ def get_non_courseware_topics(
     """
     non_courseware_topics = []
     existing_topic_ids = set()
-    sorted_topics = sorted(list(course.discussion_topics.items()), key=lambda item: item[1].get("sort_key", item[0]))
-    for name, entry in sorted_topics:
+    topics = list(course.discussion_topics.items())
+    for name, entry in topics:
         if not topic_ids or entry['id'] in topic_ids:
             discussion_topic = DiscussionTopic(
                 entry["id"], name, get_thread_list_url(request, course_key, [entry["id"]]),
