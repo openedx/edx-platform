@@ -22,7 +22,16 @@ class CourseGradeBase:
     """
     Base class for Course Grades.
     """
-    def __init__(self, user, course_data, percent=0.0, letter_grade=None, passed=False, force_update_subsections=False):
+    def __init__(
+        self,
+        user,
+        course_data,
+        percent=0.0,
+        letter_grade=None,
+        passed=False,
+        force_update_subsections=False,
+        last_updated=None
+    ):
         self.user = user
         self.course_data = course_data
 
@@ -32,6 +41,8 @@ class CourseGradeBase:
         # Convert empty strings to None when reading from the table
         self.letter_grade = letter_grade or None
         self.force_update_subsections = force_update_subsections
+
+        self.last_updated = last_updated
 
     def __str__(self):
         return 'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
