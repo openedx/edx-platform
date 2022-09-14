@@ -1468,11 +1468,6 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
     def test_html(self, mock_request):
         self.check_html(mock_request)
 
-    @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
-    @override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True)
-    def test_html_with_mfe_enabled(self, mock_request):
-        self.check_html(mock_request)
-
     def test_ajax(self, mock_request):
         self.check_ajax(mock_request)
 
@@ -2291,65 +2286,46 @@ class ForumMFETestCase(ForumsEnableMixin, SharedModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
     @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
-    @ddt.data(True, False)
-    def test_redirect_from_legacy_base_url_to_new_experience(self, toggle_enabled):
+    def test_redirect_from_legacy_base_url_to_new_experience(self):
         """
         Verify that the legacy url is redirected to MFE homepage when
         ENABLE_DISCUSSIONS_MFE flag is enabled.
         """
 
-        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, toggle_enabled):
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
             self.client.login(username=self.user.username, password='test')
             url = reverse("forum_form_discussion", args=[self.course.id])
             response = self.client.get(url)
-            content = response.content.decode('utf8')
-
-        if toggle_enabled:
             assert response.status_code == 302
             expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}"
             assert response.url == expected_url
-        else:
-            assert response.status_code == 200
-            assert "discussions-mfe-tab-embed" not in content
 
     @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
-    @ddt.data(True, False)
-    def test_redirect_from_legacy_profile_url_to_new_experience(self, toggle_enabled):
+    def test_redirect_from_legacy_profile_url_to_new_experience(self):
         """
         Verify that the requested user profile is redirected to MFE learners tab when
         ENABLE_DISCUSSIONS_MFE flag is enabled
         """
 
-        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, toggle_enabled):
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
             self.client.login(username=self.user.username, password='test')
             url = reverse("user_profile", args=[self.course.id, self.user.id])
             response = self.client.get(url)
-            content = response.content.decode('utf8')
-
-        if toggle_enabled:
             assert response.status_code == 302
             expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}/learners"
             assert response.url == expected_url
-        else:
-            assert response.status_code == 200
-            assert "discussions-mfe-tab-embed" not in content
 
     @override_settings(DISCUSSIONS_MICROFRONTEND_URL="http://test.url")
-    @ddt.data(True, False)
-    def test_correct_experience_for_single_thread_url(self, toggle_enabled):
+    def test_redirect_from_legacy_single_thread_to_new_experience(self):
         """
-        Verify that the correct experience is shown based on the ENABLE_DISCUSSIONS_MFE flag
+        Verify that a legacy single url is redirected to corresponding MFE thread url when the ENABLE_DISCUSSIONS_MFE
+        flag is enabled
         """
 
-        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, toggle_enabled):
+        with override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True):
             self.client.login(username=self.user.username, password='test')
             url = reverse("single_thread", args=[self.course.id, "test_discussion", "test_thread"])
             response = self.client.get(url)
-            content = response.content.decode('utf8')
-        if toggle_enabled:
             assert response.status_code == 302
             expected_url = f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}/posts/test_thread"
             assert response.url == expected_url
-        else:
-            assert response.status_code == 200
-            assert "discussions-mfe-tab-embed" not in content
