@@ -1,7 +1,7 @@
 {
     "courses": [
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -73,7 +73,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -135,7 +135,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -185,7 +185,7 @@
             "relatedPrograms": []
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -257,7 +257,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -319,7 +319,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -369,7 +369,7 @@
             "relatedPrograms": []
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -442,7 +442,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -508,7 +508,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -562,7 +562,7 @@
             "relatedPrograms": []
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -642,7 +642,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -713,7 +713,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -763,7 +763,7 @@
             "relatedPrograms": []
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -835,7 +835,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -897,7 +897,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": false
             },
             "entitlement": null,
@@ -947,7 +947,7 @@
             "relatedPrograms": []
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": false
             },
             "entitlement": null,
@@ -1019,7 +1019,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -1082,7 +1082,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -1132,7 +1132,7 @@
             "relatedPrograms": []
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -1205,7 +1205,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -1268,7 +1268,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -1319,7 +1319,7 @@
             "relatedPrograms": []
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": {
@@ -1427,7 +1427,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": {
@@ -1525,7 +1525,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": false
             },
             "entitlement": {
@@ -1611,7 +1611,7 @@
             "relatedPrograms": []
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": {
@@ -1719,7 +1719,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": false
             },
             "entitlement": {
@@ -1791,7 +1791,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": {
@@ -1852,7 +1852,7 @@
             "relatedPrograms": []
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": false
             },
             "entitlement": {
@@ -1934,7 +1934,7 @@
             ]
         },
         {
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": {
@@ -2024,7 +2024,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
+            "gradeData": null,
             "certificates": null,
             "courseRun": null,
             "entitlement": {
@@ -2112,7 +2112,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
+            "gradeData": null,
             "certificates": null,
             "courseRun": null,
             "entitlement": {
@@ -2190,7 +2190,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
+            "gradeData": null,
             "certificates": null,
             "courseRun": null,
             "entitlement": {
@@ -2256,7 +2256,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
+            "gradeData": null,
             "certificates": null,
             "courseRun": null,
             "entitlement": {
@@ -2318,7 +2318,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
+            "gradeData": null,
             "certificates": null,
             "courseRun": null,
             "entitlement": {
@@ -2380,7 +2380,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
+            "gradeData": null,
             "certificates": null,
             "courseRun": {
                 "isStarted": false,
@@ -2455,7 +2455,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
+            "gradeData": null,
             "certificates": null,
             "courseRun": null,
             "entitlement": {
@@ -2517,7 +2517,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
+            "gradeData": null,
             "certificates": null,
             "courseRun": {
                 "isStarted": false,
