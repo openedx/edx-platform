@@ -5,7 +5,7 @@
                 "isPassing": true
             },
             "entitlement": null,
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -90,7 +90,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number1-course-id1"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -169,7 +169,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -219,7 +219,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -291,7 +291,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -353,7 +353,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -403,7 +403,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -475,7 +475,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -537,7 +537,7 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -590,7 +590,7 @@
             "grade": {
                 "isPassing": false
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -665,7 +665,7 @@
             "grade": {
                 "isPassing": false
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -714,7 +714,7 @@
                 "isVerified": true,
                 "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -777,7 +777,7 @@
                 "isVerified": true,
                 "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -849,7 +849,7 @@
                 "isVerified": true,
                 "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -911,7 +911,7 @@
                 "isVerified": true,
                 "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -961,7 +961,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number15-course-id15"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -1033,7 +1033,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number16-course-id16"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/3030",
                 "isRestricted": false,
                 "isEarned": true,
@@ -1096,7 +1096,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number17-course-id17"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": true,
                 "isEarned": false,
@@ -1146,7 +1146,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number18-course-id18"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/2000",
                 "isRestricted": false,
                 "isEarned": true,
@@ -1219,7 +1219,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number19-course-id19"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/2000",
                 "isRestricted": false,
                 "isEarned": true,
@@ -1282,7 +1282,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number20-course-id20"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/2000",
                 "isRestricted": false,
                 "isEarned": true,
@@ -1369,7 +1369,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number21-course-id21"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -1477,7 +1477,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number22-course-id22"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -1575,7 +1575,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number23-course-id23"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -1661,7 +1661,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number24-course-id24"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -1743,7 +1743,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number25-course-id25"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -1815,7 +1815,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number26-course-id26"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/2000",
                 "isRestricted": false,
                 "isEarned": true,
@@ -1876,7 +1876,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number27-course-id27"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -1958,7 +1958,7 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number28-course-id28"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/2000",
                 "isRestricted": false,
                 "isEarned": true,
@@ -2005,7 +2005,7 @@
                 "lastEnrolled": null
             },
             "gradeData": null,
-            "certificates": null,
+            "certificate": null,
             "courseRun": null,
             "entitlement": {
                 "uuid": "entitlement-course-uuid-10",
@@ -2093,7 +2093,7 @@
                 "lastEnrolled": null
             },
             "gradeData": null,
-            "certificates": null,
+            "certificate": null,
             "courseRun": null,
             "entitlement": {
                 "uuid": "entitlement-course-uuid-11",
@@ -2171,7 +2171,7 @@
                 "lastEnrolled": null
             },
             "gradeData": null,
-            "certificates": null,
+            "certificate": null,
             "courseRun": null,
             "entitlement": {
                 "uuid": "entitlement-course-uuid-12",
@@ -2237,7 +2237,7 @@
                 "lastEnrolled": null
             },
             "gradeData": null,
-            "certificates": null,
+            "certificate": null,
             "courseRun": null,
             "entitlement": {
                 "uuid": "entitlement-course-uuid-13",
@@ -2299,7 +2299,7 @@
                 "lastEnrolled": null
             },
             "gradeData": null,
-            "certificates": null,
+            "certificate": null,
             "courseRun": null,
             "entitlement": {
                 "uuid": "entitlement-course-uuid-14",
@@ -2361,7 +2361,7 @@
                 "lastEnrolled": null
             },
             "gradeData": null,
-            "certificates": null,
+            "certificate": null,
             "courseRun": {
                 "isStarted": false,
                 "isArchived": false,
@@ -2435,7 +2435,7 @@
                 "lastEnrolled": null
             },
             "gradeData": null,
-            "certificates": null,
+            "certificate": null,
             "courseRun": null,
             "entitlement": {
                 "uuid": "entitlement-course-uuid-16",
@@ -2497,7 +2497,7 @@
                 "lastEnrolled": null
             },
             "gradeData": null,
-            "certificates": null,
+            "certificate": null,
             "courseRun": {
                 "isStarted": false,
                 "isArchived": false,
