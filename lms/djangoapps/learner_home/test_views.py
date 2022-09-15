@@ -354,23 +354,21 @@ class TestGetSuggestedCourses(SharedModuleStoreTestCase):
     """Tests for get_suggested_courses"""
 
     MOCK_SUGGESTED_COURSES = {
-        "GENERAL_RECOMMENDATION": {
-            "courses": [
-                {
-                    "course_key": "HogwartsX+6.00.1x",
-                    "logo_image_url": random_url(),
-                    "marketing_url": random_url(),
-                    "title": "Defense Against the Dark Arts",
-                },
-                {
-                    "course_key": "MonstersX+SC101EN",
-                    "logo_image_url": random_url(),
-                    "marketing_url": random_url(),
-                    "title": "Scaring 101",
-                },
-            ],
-            "is_personalized_recommendation": False,
-        }
+        "courses": [
+            {
+                "course_key": "HogwartsX+6.00.1x",
+                "logo_image_url": random_url(),
+                "marketing_url": random_url(),
+                "title": "Defense Against the Dark Arts",
+            },
+            {
+                "course_key": "MonstersX+SC101EN",
+                "logo_image_url": random_url(),
+                "marketing_url": random_url(),
+                "title": "Scaring 101",
+            },
+        ],
+        "is_personalized_recommendation": False,
     }
 
     EMPTY_SUGGESTED_COURSES = {
@@ -378,7 +376,7 @@ class TestGetSuggestedCourses(SharedModuleStoreTestCase):
         "is_personalized_recommendation": False,
     }
 
-    @patch.multiple("django.conf.settings", **MOCK_SUGGESTED_COURSES)
+    @patch("django.conf.settings.GENERAL_RECOMMENDATION", MOCK_SUGGESTED_COURSES)
     def test_suggested_courses(self):
         # Given suggested courses are configured
         # When I request suggested courses
@@ -387,7 +385,7 @@ class TestGetSuggestedCourses(SharedModuleStoreTestCase):
         # Then I return them in the appropriate response
         self.assertDictEqual(return_data, self.MOCK_SUGGESTED_COURSES)
 
-    def test_suggested_courses(self):
+    def test_no_suggested_courses(self):
         # Given suggested courses are not found/configured
         # When I request suggested courses
         return_data = get_suggested_courses()
