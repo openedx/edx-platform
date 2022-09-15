@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
 
-from common.djangoapps.student import models as student_models
+from common.djangoapps.student.models.student import models as student_models
 
 
 class Migration(migrations.Migration):

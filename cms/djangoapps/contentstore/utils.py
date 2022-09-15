@@ -15,7 +15,7 @@ from opaque_keys.edx.locator import LibraryLocator
 from pytz import UTC
 
 from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
-from common.djangoapps.student import auth
+from common.djangoapps.student.models.student import auth
 from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled

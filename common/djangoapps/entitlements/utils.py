@@ -8,7 +8,7 @@ import logging
 from django.utils import timezone
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger("common.entitlements.utils")

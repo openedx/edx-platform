@@ -20,8 +20,8 @@ from cms.djangoapps.contentstore.views.item import _duplicate_item
 from cms.djangoapps.contentstore.views.preview import _load_preview_module
 from cms.djangoapps.contentstore.views.tests.test_library import LIBRARY_REST_URL
 from cms.djangoapps.course_creators.views import add_user_with_status_granted
-from common.djangoapps.student import auth
-from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.models.student import auth
+from common.djangoapps.student.models.student.auth import has_studio_read_access, has_studio_write_access
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,

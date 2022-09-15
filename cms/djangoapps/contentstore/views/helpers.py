@@ -14,7 +14,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from common.djangoapps.student import auth
+from common.djangoapps.student.models.student import auth
 from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
 from openedx.core.toggles import ENTRANCE_EXAMS
 

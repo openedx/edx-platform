@@ -16,7 +16,7 @@ from simple_history.models import HistoricalRecords
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
-from common.djangoapps.student.models.student import CourseEnrollment, CourseEnrollmentException
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment, CourseEnrollmentException
 from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps.certificates import api as certificates_api
 from lms.djangoapps.certificates.data import CertificateStatuses

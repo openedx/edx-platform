@@ -4,7 +4,7 @@ Methods for interacting programmatically with the user creator table.
 
 
 from cms.djangoapps.course_creators.models import CourseCreator
-from common.djangoapps.student import auth
+from common.djangoapps.student.models.student import auth
 from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
 
 

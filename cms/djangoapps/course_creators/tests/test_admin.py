@@ -12,7 +12,7 @@ from django.test import TestCase
 
 from cms.djangoapps.course_creators.admin import CourseCreatorAdmin
 from cms.djangoapps.course_creators.models import CourseCreator
-from common.djangoapps.student import auth
+from common.djangoapps.student.models.student import auth
 from common.djangoapps.student.roles import CourseCreatorRole
 from common.djangoapps.student.tests.factories import UserFactory
 

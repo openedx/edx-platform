@@ -19,7 +19,7 @@ from django.urls import reverse
 
 from common.djangoapps.course_modes.models import CourseMode, Mode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from common.djangoapps.util.tests.mixins.discovery import CourseCatalogServiceMockMixin
