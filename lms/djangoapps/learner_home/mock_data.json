@@ -1,7 +1,6 @@
 {
     "courses": [
         {
-            "cardId": "card-id0",
             "grades": {
                 "isPassing": true
             },
@@ -76,7 +75,6 @@
             ]
         },
         {
-            "cardId": "card-id1",
             "grades": {
                 "isPassing": true
             },
@@ -141,7 +139,6 @@
             ]
         },
         {
-            "cardId": "card-id2",
             "grades": {
                 "isPassing": true
             },
@@ -192,7 +189,6 @@
             "relatedPrograms": []
         },
         {
-            "cardId": "card-id3",
             "grades": {
                 "isPassing": true
             },
@@ -267,7 +263,6 @@
             ]
         },
         {
-            "cardId": "card-id4",
             "grades": {
                 "isPassing": true
             },
@@ -332,7 +327,6 @@
             ]
         },
         {
-            "cardId": "card-id5",
             "grades": {
                 "isPassing": true
             },
@@ -383,7 +377,6 @@
             "relatedPrograms": []
         },
         {
-            "cardId": "card-id6",
             "grades": {
                 "isPassing": true
             },
@@ -459,7 +452,6 @@
             ]
         },
         {
-            "cardId": "card-id7",
             "grades": {
                 "isPassing": true
             },
@@ -528,7 +520,6 @@
             ]
         },
         {
-            "cardId": "card-id8",
             "grades": {
                 "isPassing": true
             },
@@ -583,7 +574,6 @@
             "relatedPrograms": []
         },
         {
-            "cardId": "card-id9",
             "grades": {
                 "isPassing": true
             },
@@ -666,7 +656,6 @@
             ]
         },
         {
-            "cardId": "card-id10",
             "grades": {
                 "isPassing": true
             },
@@ -740,7 +729,6 @@
             ]
         },
         {
-            "cardId": "card-id11",
             "grades": {
                 "isPassing": true
             },
@@ -791,7 +779,6 @@
             "relatedPrograms": []
         },
         {
-            "cardId": "card-id12",
             "grades": {
                 "isPassing": true
             },
@@ -866,7 +853,6 @@
             ]
         },
         {
-            "cardId": "card-id13",
             "grades": {
                 "isPassing": true
             },
@@ -931,7 +917,6 @@
             ]
         },
         {
-            "cardId": "card-id14",
             "grades": {
                 "isPassing": false
             },
@@ -982,7 +967,6 @@
             "relatedPrograms": []
         },
         {
-            "cardId": "card-id15",
             "grades": {
                 "isPassing": false
             },
@@ -1057,7 +1041,6 @@
             ]
         },
         {
-            "cardId": "card-id16",
             "grades": {
                 "isPassing": true
             },
@@ -1123,7 +1106,6 @@
             ]
         },
         {
-            "cardId": "card-id17",
             "grades": {
                 "isPassing": true
             },
@@ -1174,7 +1156,6 @@
             "relatedPrograms": []
         },
         {
-            "cardId": "card-id18",
             "grades": {
                 "isPassing": true
             },
@@ -1250,7 +1231,6 @@
             ]
         },
         {
-            "cardId": "card-id19",
             "grades": {
                 "isPassing": true
             },
@@ -1316,7 +1296,6 @@
             ]
         },
         {
-            "cardId": "card-id20",
             "grades": {
                 "isPassing": true
             },
@@ -1368,7 +1347,6 @@
             "relatedPrograms": []
         },
         {
-            "cardId": "card-id21",
             "grades": {
                 "isPassing": true
             },
@@ -1479,7 +1457,6 @@
             ]
         },
         {
-            "cardId": "card-id22",
             "grades": {
                 "isPassing": true
             },
@@ -1580,7 +1557,6 @@
             ]
         },
         {
-            "cardId": "card-id23",
             "grades": {
                 "isPassing": false
             },
@@ -1667,7 +1643,6 @@
             "relatedPrograms": []
         },
         {
-            "cardId": "card-id24",
             "grades": {
                 "isPassing": true
             },
@@ -1778,7 +1753,6 @@
             ]
         },
         {
-            "cardId": "card-id25",
             "grades": {
                 "isPassing": false
             },
@@ -1853,7 +1827,6 @@
             ]
         },
         {
-            "cardId": "card-id26",
             "grades": {
                 "isPassing": true
             },
@@ -1915,7 +1888,6 @@
             "relatedPrograms": []
         },
         {
-            "cardId": "card-id27",
             "grades": {
                 "isPassing": false
             },
@@ -2000,7 +1972,6 @@
             ]
         },
         {
-            "cardId": "card-id28",
             "grades": {
                 "isPassing": true
             },
@@ -2076,7 +2047,6 @@
             ]
         },
         {
-            "cardId": "card-id100",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
@@ -2167,7 +2137,6 @@
             ]
         },
         {
-            "cardId": "card-id101",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
@@ -2248,7 +2217,6 @@
             ]
         },
         {
-            "cardId": "card-id102",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
@@ -2315,7 +2283,6 @@
             "relatedPrograms": []
         },
         {
-            "cardId": "card-id103",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
@@ -2380,7 +2347,6 @@
             ]
         },
         {
-            "cardId": "card-id104",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
@@ -2445,7 +2411,6 @@
             ]
         },
         {
-            "cardId": "card-id105",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
@@ -2523,7 +2488,6 @@
             ]
         },
         {
-            "cardId": "card-id106",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
@@ -2588,7 +2552,6 @@
             ]
         },
         {
-            "cardId": "card-id107",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
