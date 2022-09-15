@@ -49,7 +49,7 @@
             },
             "course": {
                 "courseName": "Course Name 0",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number0"
             },
             "relatedPrograms": [
@@ -123,7 +123,7 @@
             },
             "course": {
                 "courseName": "Course Name 1",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number1"
             },
             "relatedPrograms": [
@@ -183,7 +183,7 @@
             "provider": null,
             "course": {
                 "courseName": "Course Name 2",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number2"
             },
             "relatedPrograms": []
@@ -237,7 +237,7 @@
             },
             "course": {
                 "courseName": "Course Name 3",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number3"
             },
             "relatedPrograms": [
@@ -311,7 +311,7 @@
             },
             "course": {
                 "courseName": "Course Name 4",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number4"
             },
             "relatedPrograms": [
@@ -371,7 +371,7 @@
             "provider": null,
             "course": {
                 "courseName": "Course Name 5",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number5"
             },
             "relatedPrograms": []
@@ -426,7 +426,7 @@
             },
             "course": {
                 "courseName": "Course Name 6",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number6"
             },
             "relatedPrograms": [
@@ -504,7 +504,7 @@
             },
             "course": {
                 "courseName": "Course Name 7",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number7"
             },
             "relatedPrograms": [
@@ -568,7 +568,7 @@
             "provider": null,
             "course": {
                 "courseName": "Course Name 8",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number8"
             },
             "relatedPrograms": []
@@ -630,7 +630,7 @@
             },
             "course": {
                 "courseName": "Course Name 9",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number9"
             },
             "relatedPrograms": [
@@ -713,7 +713,7 @@
             },
             "course": {
                 "courseName": "Course Name 10",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number10"
             },
             "relatedPrograms": [
@@ -773,7 +773,7 @@
             "provider": null,
             "course": {
                 "courseName": "Course Name 11",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number11"
             },
             "relatedPrograms": []
@@ -827,7 +827,7 @@
             },
             "course": {
                 "courseName": "Course Name 12",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number12"
             },
             "relatedPrograms": [
@@ -901,7 +901,7 @@
             },
             "course": {
                 "courseName": "Course Name 13",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number13"
             },
             "relatedPrograms": [
@@ -961,7 +961,7 @@
             "provider": null,
             "course": {
                 "courseName": "Course Name 14",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number14"
             },
             "relatedPrograms": []
@@ -1015,7 +1015,7 @@
             },
             "course": {
                 "courseName": "Course Name 15",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number15"
             },
             "relatedPrograms": [
@@ -1090,7 +1090,7 @@
             },
             "course": {
                 "courseName": "Course Name 16",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number16"
             },
             "relatedPrograms": [
@@ -1150,7 +1150,7 @@
             "provider": null,
             "course": {
                 "courseName": "Course Name 17",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number17"
             },
             "relatedPrograms": []
@@ -1205,7 +1205,7 @@
             },
             "course": {
                 "courseName": "Course Name 18",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number18"
             },
             "relatedPrograms": [
@@ -1280,7 +1280,7 @@
             },
             "course": {
                 "courseName": "Course Name 19",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number19"
             },
             "relatedPrograms": [
@@ -1341,7 +1341,7 @@
             "provider": null,
             "course": {
                 "courseName": "Course Name 20",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number20"
             },
             "relatedPrograms": []
@@ -1431,7 +1431,7 @@
             },
             "course": {
                 "courseName": "Course Name 21",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number21"
             },
             "relatedPrograms": [
@@ -1541,7 +1541,7 @@
             },
             "course": {
                 "courseName": "Course Name 22",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number22"
             },
             "relatedPrograms": [
@@ -1637,7 +1637,7 @@
             "provider": null,
             "course": {
                 "courseName": "Course Name 23",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number23"
             },
             "relatedPrograms": []
@@ -1727,7 +1727,7 @@
             },
             "course": {
                 "courseName": "Course Name 24",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number24"
             },
             "relatedPrograms": [
@@ -1811,7 +1811,7 @@
             },
             "course": {
                 "courseName": "Course Name 25",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number25"
             },
             "relatedPrograms": [
@@ -1882,7 +1882,7 @@
             "provider": null,
             "course": {
                 "courseName": "Course Name 26",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number26"
             },
             "relatedPrograms": []
@@ -1946,7 +1946,7 @@
             },
             "course": {
                 "courseName": "Course Name 27",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number27"
             },
             "relatedPrograms": [
@@ -2031,7 +2031,7 @@
             },
             "course": {
                 "courseName": "Course Name 28",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number28"
             },
             "relatedPrograms": [
@@ -2112,7 +2112,7 @@
             "course": {
                 "courseNumber": "course-number100",
                 "courseName": "Course Name 100",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "relatedPrograms": [
                 {
@@ -2202,7 +2202,7 @@
             "course": {
                 "courseNumber": "course-number101",
                 "courseName": "Course Name 101",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg"
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg"
             },
             "relatedPrograms": [
                 {
@@ -2278,7 +2278,7 @@
             "course": {
                 "courseNumber": "course-number102",
                 "courseName": "Course Name 102",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg"
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg"
             },
             "relatedPrograms": []
         },
@@ -2322,7 +2322,7 @@
             "course": {
                 "courseNumber": "course-number103",
                 "courseName": "Course Name 103",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "relatedPrograms": [
                 {
@@ -2386,7 +2386,7 @@
             "course": {
                 "courseNumber": "course-number104",
                 "courseName": "Course Name 104",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "relatedPrograms": [
                 {
@@ -2463,7 +2463,7 @@
             "course": {
                 "courseNumber": "course-number105",
                 "courseName": "Course Name 105",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "relatedPrograms": [
                 {
@@ -2527,7 +2527,7 @@
             "course": {
                 "courseNumber": "course-number106",
                 "courseName": "Course Name 106",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "relatedPrograms": [
                 {
@@ -2604,7 +2604,7 @@
             "course": {
                 "courseNumber": "course-number107",
                 "courseName": "Course Name 107",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "relatedPrograms": [
                 {
