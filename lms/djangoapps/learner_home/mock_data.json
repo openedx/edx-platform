@@ -1038,8 +1038,7 @@
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": false,
-                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview",
-                "isAvailable": false
+                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
                 "name": "MIT"
@@ -1151,8 +1150,7 @@
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "courseProvider": {
                 "name": "edX Course Provider"
@@ -1224,8 +1222,7 @@
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview",
-                "isAvailable": true
+                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
                 "name": "MIT"
@@ -1287,8 +1284,7 @@
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "courseProvider": null,
             "course": {
@@ -1820,8 +1816,7 @@
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "courseProvider": null,
             "course": {
@@ -1963,8 +1958,7 @@
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "courseProvider": {
                 "name": "MIT"
