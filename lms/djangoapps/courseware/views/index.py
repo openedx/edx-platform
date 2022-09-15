@@ -44,6 +44,7 @@ from openedx.features.course_experience import (
 )
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
+from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
@@ -460,10 +461,20 @@ class CoursewareIndex(View):
             self.section_url_name,
             self.field_data_cache,
         )
+
+        if not self.request.user.is_authenticated:
+            course_block_tree = table_of_contents
+        else:
+            course_block_tree = get_course_outline_block_tree(
+                request, str(self.course.id), request.user
+            )
+
         courseware_context['accordion'] = render_accordion(
             self.request,
             self.course,
-            table_of_contents['chapters'],
+            course_block_tree,
+            self.chapter_url_name,
+            self.section_url_name,
         )
 
         courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
@@ -569,7 +580,7 @@ class CoursewareIndex(View):
         return section_context
 
 
-def render_accordion(request, course, table_of_contents):
+def render_accordion(request, course, table_of_contents, active_section, active_subsection):
     """
     Returns the HTML that renders the navigation for the given course.
     Expects the table_of_contents to have data on each chapter and section,
@@ -577,9 +588,12 @@ def render_accordion(request, course, table_of_contents):
     """
     context = dict(
         [
-            ('toc', table_of_contents),
+            ('blocks', table_of_contents),
+            ('course_title', course.display_name),
             ('course_id', str(course.id)),
             ('csrf', csrf(request)['csrf_token']),
+            ('action_section', active_section),
+            ('active_subsection', active_subsection),
             ('due_date_display_format', course.due_date_display_format),
         ] + list(TEMPLATE_IMPORTS.items())
     )
