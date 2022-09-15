@@ -17,7 +17,7 @@ from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from path import Path as path
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.models.student import UserProfile
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from lms.djangoapps.certificates.models import (
     CertificateAllowlist,

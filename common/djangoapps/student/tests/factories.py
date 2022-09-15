@@ -12,7 +12,7 @@ from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     AccountRecovery,
     CourseAccessRole,
     CourseEnrollment,

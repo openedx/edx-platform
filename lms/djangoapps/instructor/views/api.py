@@ -48,7 +48,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student import auth
 from common.djangoapps.student.api import is_user_enrolled_in_course
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     ALLOWEDTOENROLL_TO_UNENROLLED,
     CourseEnrollment,

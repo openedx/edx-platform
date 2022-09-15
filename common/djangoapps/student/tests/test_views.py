@@ -25,7 +25,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES
-from common.djangoapps.student.models import CourseEnrollment, UserProfile
+from common.djangoapps.student.models.student import CourseEnrollment, UserProfile
 from common.djangoapps.student.signals import REFUND_ORDER
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.student.views.dashboard import check_for_unacknowledged_notices

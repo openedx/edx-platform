@@ -18,7 +18,7 @@ from django_countries.fields import CountryField
 from model_utils import FieldTracker
 from opaque_keys.edx.django.models import CourseKeyField
 
-from common.djangoapps.student.models import CourseEnrollment, LanguageField
+from common.djangoapps.student.models.student import CourseEnrollment, LanguageField
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 from lms.djangoapps.teams.utils import emit_team_event
 from openedx.core.djangoapps.django_comment_common.signals import (

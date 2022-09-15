@@ -12,7 +12,7 @@ from django.test.client import Client
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models.student import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments

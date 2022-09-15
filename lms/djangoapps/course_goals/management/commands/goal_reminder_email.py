@@ -11,7 +11,7 @@ from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.recipient import Recipient
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from lms.djangoapps.certificates.api import get_certificate_for_user_id
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.courseware.context_processor import get_user_timezone_or_last_seen_timezone_or_utc

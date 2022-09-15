@@ -20,7 +20,7 @@ from openedx.core.djangoapps.enrollments.errors import (
 )
 from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSerializer, CourseSerializer
 from openedx.core.lib.exceptions import CourseNotFoundError
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     AlreadyEnrolledError,
     CourseEnrollment,
     CourseEnrollmentAttribute,

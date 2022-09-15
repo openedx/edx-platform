@@ -20,7 +20,7 @@ from rest_framework.permissions import IsAuthenticated  # lint-amnesty, pylint: 
 from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.util.views import expose_header
 from lms.djangoapps.course_goals.api import (
     add_course_goal,

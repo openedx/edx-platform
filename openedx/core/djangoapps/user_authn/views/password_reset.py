@@ -45,7 +45,7 @@ from openedx.core.djangoapps.user_authn.message_types import PasswordReset, Pass
 from openedx.core.djangoapps.user_authn.utils import check_pwned_password
 from openedx.core.djangolib.markup import HTML
 from common.djangoapps.student.forms import send_account_recovery_email_for_user
-from common.djangoapps.student.models import AccountRecovery, LoginFailures
+from common.djangoapps.student.models.student import AccountRecovery, LoginFailures
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.password_policy_validators import normalize_password, validate_password
 

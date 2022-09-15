@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from openedx.core.djangoapps.catalog.cache import (
     CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
     COURSE_PROGRAMS_CACHE_KEY_TPL,

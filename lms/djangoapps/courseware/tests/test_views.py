@@ -41,7 +41,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 import lms.djangoapps.courseware.views.views as views
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import (
     TEST_PASSWORD,

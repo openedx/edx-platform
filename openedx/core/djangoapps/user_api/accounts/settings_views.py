@@ -16,7 +16,7 @@ from django_countries import countries
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.models.student import UserProfile
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps.commerce.models import CommerceConfiguration

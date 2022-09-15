@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode, format_course_price, get_cosmetic_verified_display_price
 from common.djangoapps.entitlements.models import CourseEntitlement
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link

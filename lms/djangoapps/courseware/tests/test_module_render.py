@@ -83,7 +83,7 @@ from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFa
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
-from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
+from common.djangoapps.student.models.student import CourseEnrollment, anonymous_id_for_user
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from common.djangoapps.xblock_django.models import XBlockConfiguration
 

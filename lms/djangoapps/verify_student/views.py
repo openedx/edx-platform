@@ -30,7 +30,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.track import segment
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse

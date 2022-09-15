@@ -15,7 +15,7 @@ from django.utils import timezone
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.user_api.management.commands.sync_hubspot_contacts import Command as sync_command
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.student.models import UserAttribute, UserProfile
+from common.djangoapps.student.models.student import UserAttribute, UserProfile
 from common.djangoapps.student.tests.factories import UserFactory
 
 

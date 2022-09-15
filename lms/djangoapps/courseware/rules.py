@@ -17,7 +17,7 @@ from xblock.core import XBlock
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import is_enrollment_valid_for_proctoring
-from common.djangoapps.student.models import CourseAccessRole
+from common.djangoapps.student.models.student import CourseAccessRole
 from common.djangoapps.student.roles import CourseRole, OrgRole
 from xmodule.course_module import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.error_module import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
