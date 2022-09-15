@@ -50,27 +50,29 @@
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number0"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -122,17 +124,19 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number1"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -182,7 +186,9 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number2"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
             "gradeData": {
@@ -234,27 +240,29 @@
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number3"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -306,17 +314,19 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number4"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -366,7 +376,9 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number5"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
             "gradeData": {
@@ -418,27 +430,29 @@
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number6"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -490,17 +504,19 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number7"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -550,7 +566,9 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number8"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
             "gradeData": {
@@ -605,27 +623,29 @@
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number9"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -680,17 +700,19 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number10"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -740,7 +762,9 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number11"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
             "gradeData": {
@@ -792,27 +816,29 @@
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number12"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -864,17 +890,19 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number13"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -924,7 +952,9 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number14"
             },
-            "relatedPrograms": []
+            "programs": {
+              "relatedPrograms": []
+            }
         },
         {
             "gradeData": {
@@ -976,27 +1006,29 @@
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number15"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -1048,17 +1080,19 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number16"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -1108,7 +1142,9 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number17"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
             "gradeData": {
@@ -1160,27 +1196,29 @@
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number18"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -1232,17 +1270,19 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number19"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -1292,7 +1332,9 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number20"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
             "gradeData": {
@@ -1379,27 +1421,29 @@
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number21"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -1486,17 +1530,19 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number22"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -1581,7 +1627,9 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number23"
             },
-            "relatedPrograms": []
+            "programs": {
+               "relatedPrograms": []
+            }
         },
         {
             "gradeData": {
@@ -1668,27 +1716,29 @@
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number24"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -1749,17 +1799,19 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number25"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -1818,7 +1870,9 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number26"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
             "gradeData": {
@@ -1879,27 +1933,29 @@
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number27"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "gradeData": {
@@ -1960,17 +2016,19 @@
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number28"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "enrollment": {
@@ -2037,27 +2095,29 @@
                 "courseName": "Course Name 100",
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "enrollment": {
@@ -2124,17 +2184,19 @@
                 "courseName": "Course Name 101",
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "enrollment": {
@@ -2199,7 +2261,9 @@
                 "courseName": "Course Name 102",
                 "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
             "enrollment": {
@@ -2240,27 +2304,29 @@
                 "courseName": "Course Name 103",
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "enrollment": {
@@ -2301,27 +2367,29 @@
                 "courseName": "Course Name 104",
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "enrollment": {
@@ -2374,27 +2442,29 @@
                 "courseName": "Course Name 105",
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "enrollment": {
@@ -2435,27 +2505,29 @@
                 "courseName": "Course Name 106",
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
             "enrollment": {
@@ -2508,27 +2580,29 @@
                 "courseName": "Course Name 107",
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         }
     ],
     "emailConfirmation": {
