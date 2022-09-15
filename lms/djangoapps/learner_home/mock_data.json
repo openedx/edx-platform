@@ -1330,7 +1330,6 @@
                 "canViewCourse": false,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1438,7 +1437,6 @@
                 "canViewCourse": true,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1536,7 +1534,6 @@
                 "canViewCourse": true,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1622,7 +1619,6 @@
                 "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1704,7 +1700,6 @@
                 "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": false
@@ -1776,7 +1771,6 @@
                 "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": false
@@ -1834,7 +1828,6 @@
                 "uuid": "entitlement-course-uuid-6",
                 "availableSessions": null,
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isFulfilled": true,
                 "isRefundable": false,
                 "canViewCourse": true,
@@ -1918,7 +1911,6 @@
                 "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isRefundable": false,
                 "isFulfilled": true
@@ -2033,7 +2025,6 @@
                 "canViewCourse": false,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2121,7 +2112,6 @@
                 "canViewCourse": false,
                 "changeDeadline": "Sat Nov 05 2022",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2199,7 +2189,6 @@
                 "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2239,7 +2228,6 @@
                 "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": true,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2301,7 +2289,6 @@
                 "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": true,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2375,7 +2362,6 @@
                 "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": true,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2437,7 +2423,6 @@
                 "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": true,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2511,7 +2496,6 @@
                 "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": true,
                 "isFulfilled": false,
                 "isRefundable": true
