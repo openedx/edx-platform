@@ -24,15 +24,14 @@ from opaque_keys.edx.keys import CourseKey
 
 from edx_toggles.toggles import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
-from common.djangoapps.student.models.student import (
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.models import (
     AccountRecovery,
     AccountRecoveryConfiguration,
     AllowedAuthUser,
     BulkChangeEnrollmentConfiguration,
     BulkUnenrollConfiguration,
     CourseAccessRole,
-    CourseEnrollment,
-    CourseEnrollmentAllowed,
     CourseEnrollmentCelebration,
     DashboardConfiguration,
     LinkedInAddToProfileConfiguration,

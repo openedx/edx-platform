@@ -13,7 +13,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.http import urlencode
 
-from common.djangoapps.student.models.student import Registration
+from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
@@ -77,7 +77,7 @@ class TestActivateAccount(TestCase):
         assert self.user.is_active
         assert not mock_segment_identify.called
 
-    @patch('common.djangoapps.student.models.student.USER_ACCOUNT_ACTIVATED')
+    @patch('common.djangoapps.student.models.USER_ACCOUNT_ACTIVATED')
     def test_activation_signal(self, mock_signal):
         """
         Verify that USER_ACCOUNT_ACTIVATED is emitted upon account email activation.

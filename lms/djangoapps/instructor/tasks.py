@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import UsageKey
 from xblock.completable import XBlockCompletionMode
 from edx_django_utils.monitoring import set_code_owner_attribute
 
-from common.djangoapps.student.models.student import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from openedx.core.lib.request_utils import get_request_or_stub

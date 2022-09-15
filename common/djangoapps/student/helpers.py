@@ -24,7 +24,7 @@ from pytz import UTC, timezone
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import (
+from common.djangoapps.student.models import (
     CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     Registration,

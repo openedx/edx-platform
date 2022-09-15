@@ -19,7 +19,7 @@ from django.views.decorators.http import require_GET, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student.models.student import CourseEnrollment, User
+from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.certificates.api import generate_certificate_task, get_certificates_for_user
 from lms.djangoapps.certificates.generation_handler import CertificateGenerationNotAllowed

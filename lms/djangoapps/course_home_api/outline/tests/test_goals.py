@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.course_goals.models import CourseGoal

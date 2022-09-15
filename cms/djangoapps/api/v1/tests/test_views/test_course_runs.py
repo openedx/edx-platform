@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from organizations.api import add_organization, get_course_organizations
 from rest_framework.test import APIClient
 
-from common.djangoapps.student.models.student import CourseAccessRole
+from common.djangoapps.student.models import CourseAccessRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, UserFactory
 from openedx.core.lib.courses import course_image_url
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order

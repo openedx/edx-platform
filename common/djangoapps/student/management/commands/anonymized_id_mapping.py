@@ -14,7 +14,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student.models.student import anonymous_id_for_user
+from common.djangoapps.student.models import anonymous_id_for_user
 
 
 class Command(BaseCommand):

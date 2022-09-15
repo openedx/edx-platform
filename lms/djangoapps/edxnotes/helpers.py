@@ -20,7 +20,7 @@ from oauth2_provider.models import Application
 from opaque_keys.edx.keys import UsageKey
 from requests.exceptions import RequestException
 
-from common.djangoapps.student.models.student import anonymous_id_for_user
+from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.util.date_utils import get_default_time_display
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_current_child

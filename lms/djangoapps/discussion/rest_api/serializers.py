@@ -13,7 +13,7 @@ from django.utils.html import strip_tags
 from django.utils.text import Truncator
 from rest_framework import serializers
 
-from common.djangoapps.student.models.student import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email
 from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_lock_unlock_event
 from lms.djangoapps.discussion.django_comment_client.utils import (
     course_discussion_division_enabled,

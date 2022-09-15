@@ -11,7 +11,7 @@ from edx_rbac.utils import create_role_auth_claim_for_user
 from jwkest import jwk
 from jwkest.jws import JWS
 
-from common.djangoapps.student.models.student import UserProfile, anonymous_id_for_user
+from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
 
 log = logging.getLogger(__name__)
 

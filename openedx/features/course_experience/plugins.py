@@ -8,7 +8,7 @@ This includes any locally defined CourseTools.
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.lib.courses import get_course_by_id
 
 from .course_tools import CourseTool

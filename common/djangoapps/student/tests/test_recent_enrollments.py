@@ -14,7 +14,8 @@ from opaque_keys.edx import locator
 from pytz import UTC
 
 from common.test.utils import XssTestMixin
-from common.djangoapps.student.models.student import CourseEnrollment, DashboardConfiguration
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import DashboardConfiguration
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments
 from common.djangoapps.student.views.dashboard import _get_recently_enrolled_courses

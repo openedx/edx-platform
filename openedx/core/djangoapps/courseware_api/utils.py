@@ -5,7 +5,7 @@ Courseware API Mixins.
 from babel.numbers import get_currency_symbol
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollmentCelebration, UserCelebration
+from common.djangoapps.student.models import CourseEnrollmentCelebration, UserCelebration
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.discounts.applicability import can_show_streak_discount_coupon

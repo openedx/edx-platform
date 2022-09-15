@@ -11,7 +11,7 @@ from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from pytz import UTC
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
 from lms.djangoapps.badges.tests.factories import CourseCompleteImageConfigurationFactory

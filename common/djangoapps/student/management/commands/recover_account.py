@@ -17,7 +17,7 @@ from django.utils.http import int_to_base36
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 
-from common.djangoapps.student.models.student import AccountRecoveryConfiguration
+from common.djangoapps.student.models import AccountRecoveryConfiguration
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY

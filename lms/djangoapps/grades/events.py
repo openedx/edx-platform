@@ -8,7 +8,7 @@ from django.conf import settings
 from eventtracking import tracker
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.track import contexts, segment
 from common.djangoapps.track.event_transaction_utils import (
     create_new_event_transaction_id,

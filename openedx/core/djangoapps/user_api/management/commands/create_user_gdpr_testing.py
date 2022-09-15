@@ -27,7 +27,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.profile_images.images import create_profile_images
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
-from common.djangoapps.student.models.student import (
+from common.djangoapps.student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
     PendingEmailChange,

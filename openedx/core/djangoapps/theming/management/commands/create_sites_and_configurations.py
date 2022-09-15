@@ -18,7 +18,7 @@ from lms.djangoapps.commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.models import SiteTheme
-from common.djangoapps.student.models.student import UserProfile
+from common.djangoapps.student.models import UserProfile
 
 LOG = logging.getLogger(__name__)
 

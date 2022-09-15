@@ -9,7 +9,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models.student import EVENT_NAME_ENROLLMENT_MODE_CHANGED, CourseEnrollment
+from common.djangoapps.student.models import EVENT_NAME_ENROLLMENT_MODE_CHANGED, CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -27,7 +27,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
         self.users = UserFactory.create_batch(5)
         CourseOverview.load_from_module_store(self.course.id)
 
-    @patch('common.djangoapps.student.models.student.tracker')
+    @patch('common.djangoapps.student.models.tracker')
     @ddt.data(('audit', 'honor'), ('honor', 'audit'))
     @ddt.unpack
     def test_bulk_convert(self, from_mode, to_mode, mock_tracker):
@@ -55,7 +55,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
             CourseEnrollment.objects.get(mode=to_mode, course_id=self.course.id, user=user)
             self._assert_mode_changed(mock_tracker, self.course, user, to_mode)
 
-    @patch('common.djangoapps.student.models.student.tracker')
+    @patch('common.djangoapps.student.models.tracker')
     @ddt.data(('audit', 'no-id-professional'), ('no-id-professional', 'audit'))
     @ddt.unpack
     def test_bulk_convert_with_org(self, from_mode, to_mode, mock_tracker):
@@ -108,7 +108,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
 
         assert 'Error: argument -o/--org: not allowed with argument -c/--course' == str(err.value)
 
-    @patch('common.djangoapps.student.models.student.tracker')
+    @patch('common.djangoapps.student.models.tracker')
     def test_with_org_and_invalid_to_mode(self, mock_tracker):
         """Verify that enrollments are changed correctly when org was given."""
         from_mode = 'audit'

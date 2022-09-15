@@ -13,7 +13,7 @@ from xblock.runtime import KvsFieldData
 from xblock.scorable import Score
 
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
-from common.djangoapps.student.models.student import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from common.djangoapps.track.views import task_track
 from common.djangoapps.util.db import outer_atomic

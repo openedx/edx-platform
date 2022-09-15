@@ -10,7 +10,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.dates.serializers import DatesTabSerializer
 from lms.djangoapps.courseware.access import has_access

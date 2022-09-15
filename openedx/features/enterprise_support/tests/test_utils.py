@@ -18,7 +18,7 @@ from django.urls import NoReverseMatch
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED

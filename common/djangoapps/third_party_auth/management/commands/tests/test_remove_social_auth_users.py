@@ -16,7 +16,7 @@ from django.test import TestCase, override_settings
 from six import StringIO
 from social_django.models import UserSocialAuth
 
-from common.djangoapps.student.models.student import User
+from common.djangoapps.student.models import User
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.management.commands import remove_social_auth_users
 from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory

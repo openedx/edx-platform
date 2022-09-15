@@ -13,7 +13,7 @@ from django.utils import timezone
 from xmodule.modulestore.tests.django_utils import \
     SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.grades.management.commands import send_segment_events_for_failed_learners
 from lms.djangoapps.grades.management.commands.send_segment_events_for_failed_learners import (

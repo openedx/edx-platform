@@ -6,10 +6,10 @@ import logging
 
 from pytz import UTC
 
-from common.djangoapps.student.models.student import CourseAccessRole as _CourseAccessRole
-from common.djangoapps.student.models.student import CourseEnrollment as _CourseEnrollment
-from common.djangoapps.student.models.student import ManualEnrollmentAudit as _ManualEnrollmentAudit
-from common.djangoapps.student.models.student import (
+from common.djangoapps.student.models import CourseAccessRole as _CourseAccessRole
+from common.djangoapps.student.models import CourseEnrollment as _CourseEnrollment
+from common.djangoapps.student.models import ManualEnrollmentAudit as _ManualEnrollmentAudit
+from common.djangoapps.student.models import (
     ENROLLED_TO_ENROLLED as _ENROLLED_TO_ENROLLED,
     ENROLLED_TO_UNENROLLED as _ENROLLED_TO_UNENROLLED,
     UNENROLLED_TO_ENROLLED as _UNENROLLED_TO_ENROLLED,
@@ -19,8 +19,8 @@ from common.djangoapps.student.models.student import (
     ALLOWEDTOENROLL_TO_UNENROLLED as _ALLOWEDTOENROLL_TO_UNENROLLED,
     DEFAULT_TRANSITION_STATE as _DEFAULT_TRANSITION_STATE,
 )
-from common.djangoapps.student.models.student import PendingNameChange as _PendingNameChange
-from common.djangoapps.student.models.student import UserProfile as _UserProfile
+from common.djangoapps.student.models import PendingNameChange as _PendingNameChange
+from common.djangoapps.student.models import UserProfile as _UserProfile
 
 # This is done so that if these strings change within the app, we can keep exported constants the same
 ENROLLED_TO_ENROLLED = _ENROLLED_TO_ENROLLED
