@@ -204,6 +204,16 @@ def set_due_date_extension(course, unit, student, due_date, actor=None, reason='
         else:
             api.set_date_for_block(course.id, block.location, 'due', None, user=student, reason=reason, actor=actor)
 
+    # edx-proctoring is checking cached course dates, so the overrides made above will not be enforced until the
+    # TieredCache is reloaded. This can lead to situations when a student's extension is revoked, but they can still
+    # complete an exam for some time. The instructors don't have a way of checking whether the cache has been
+    # regenerated because the Instructor Dashboard simply lists all extensions. Therefore, to avoid having a confusing
+    # user experience, we want trigger cache regeneration after changing the due date.
+    api.get_dates_for_course(course.id, user=student, published_version=version, use_cached=False)
+    if version:
+        # edx-proctoring is not using the course version while checking its dates.
+        api.get_dates_for_course(course.id, user=student, use_cached=False)
+
 
 def dump_module_extensions(course, unit):
     """
