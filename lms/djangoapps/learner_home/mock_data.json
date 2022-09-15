@@ -39,8 +39,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number0-course-id0",
-                "lastEnrolled": "2022-09-06T15:20:57.513Z"
+                "courseId": "course-number0-course-id0"
             },
             "courseProvider": {
                 "name": "edX Course Provider"
@@ -88,8 +87,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number1-course-id1",
-                "lastEnrolled": "2022-09-05T15:20:57.513Z"
+                "courseId": "course-number1-course-id1"
             },
             "certificates": {
                 "availableDate": null,
@@ -150,8 +148,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number2-course-id2",
-                "lastEnrolled": "2022-09-04T15:20:57.513Z"
+                "courseId": "course-number2-course-id2"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
@@ -200,8 +197,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number3-course-id3",
-                "lastEnrolled": "2022-09-03T15:20:57.513Z"
+                "courseId": "course-number3-course-id3"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
@@ -272,8 +268,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number4-course-id4",
-                "lastEnrolled": "2022-09-02T15:20:57.513Z"
+                "courseId": "course-number4-course-id4"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
@@ -334,8 +329,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number5-course-id5",
-                "lastEnrolled": "2022-09-01T15:20:57.513Z"
+                "courseId": "course-number5-course-id5"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
@@ -384,8 +378,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number6-course-id6",
-                "lastEnrolled": "2022-08-31T15:20:57.513Z"
+                "courseId": "course-number6-course-id6"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
@@ -460,8 +453,7 @@
                 "courseRun": {
                     "isStarted": true
                 },
-                "courseId": "course-number7-course-id7",
-                "lastEnrolled": "2022-08-30T15:20:57.513Z"
+                "courseId": "course-number7-course-id7"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
@@ -526,8 +518,7 @@
                 "courseRun": {
                     "isStarted": true
                 },
-                "courseId": "course-number8-course-id8",
-                "lastEnrolled": "2022-08-29T15:20:57.514Z"
+                "courseId": "course-number8-course-id8"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
@@ -581,8 +572,7 @@
                     "isStarted": true,
                     "endDate": "11/11/2000"
                 },
-                "courseId": "course-number9-course-id9",
-                "lastEnrolled": "2022-08-28T15:20:57.514Z"
+                "courseId": "course-number9-course-id9"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
@@ -662,8 +652,7 @@
                     "isArchived": true,
                     "endDate": "11/11/2000"
                 },
-                "courseId": "course-number10-course-id10",
-                "lastEnrolled": "2022-08-27T15:20:57.514Z"
+                "courseId": "course-number10-course-id10"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
@@ -751,8 +740,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number11-course-id11",
-                "lastEnrolled": "2022-08-26T15:20:57.514Z"
+                "courseId": "course-number11-course-id11"
             },
             "courseProvider": null,
             "course": {
@@ -778,8 +766,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number12-course-id12",
-                "lastEnrolled": "2022-08-25T15:20:57.514Z"
+                "courseId": "course-number12-course-id12"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
@@ -850,8 +837,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number13-course-id13",
-                "lastEnrolled": "2022-08-24T15:20:57.514Z"
+                "courseId": "course-number13-course-id13"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
@@ -912,8 +898,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number14-course-id14",
-                "lastEnrolled": "2022-08-23T15:20:57.514Z"
+                "courseId": "course-number14-course-id14"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
@@ -978,8 +963,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number15-course-id15",
-                "lastEnrolled": "2022-08-22T15:20:57.514Z"
+                "courseId": "course-number15-course-id15"
             },
             "certificates": {
                 "availableDate": null,
@@ -1050,8 +1034,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number16-course-id16",
-                "lastEnrolled": "2022-08-21T15:20:57.514Z"
+                "courseId": "course-number16-course-id16"
             },
             "certificates": {
                 "availableDate": "11/11/3030",
@@ -1113,8 +1096,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number17-course-id17",
-                "lastEnrolled": "2022-08-20T15:20:57.514Z"
+                "courseId": "course-number17-course-id17"
             },
             "certificates": {
                 "availableDate": null,
@@ -1163,8 +1145,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number18-course-id18",
-                "lastEnrolled": "2022-08-19T15:20:57.514Z"
+                "courseId": "course-number18-course-id18"
             },
             "certificates": {
                 "availableDate": "11/11/2000",
@@ -1236,8 +1217,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number19-course-id19",
-                "lastEnrolled": "2022-08-18T15:20:57.514Z"
+                "courseId": "course-number19-course-id19"
             },
             "certificates": {
                 "availableDate": "11/11/2000",
@@ -1299,8 +1279,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number20-course-id20",
-                "lastEnrolled": "2022-08-17T15:20:57.514Z"
+                "courseId": "course-number20-course-id20"
             },
             "certificates": {
                 "availableDate": "11/11/2000",
@@ -1386,8 +1365,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number21-course-id21",
-                "lastEnrolled": "2022-08-16T15:20:57.514Z"
+                "courseId": "course-number21-course-id21"
             },
             "certificates": {
                 "availableDate": null,
@@ -1494,8 +1472,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number22-course-id22",
-                "lastEnrolled": "2022-08-15T15:20:57.514Z"
+                "courseId": "course-number22-course-id22"
             },
             "certificates": {
                 "availableDate": null,
@@ -1592,8 +1569,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number23-course-id23",
-                "lastEnrolled": "2022-08-14T15:20:57.514Z"
+                "courseId": "course-number23-course-id23"
             },
             "certificates": {
                 "availableDate": null,
@@ -1678,8 +1654,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number24-course-id24",
-                "lastEnrolled": "2022-08-13T15:20:57.514Z"
+                "courseId": "course-number24-course-id24"
             },
             "certificates": {
                 "availableDate": null,
@@ -1760,8 +1735,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number25-course-id25",
-                "lastEnrolled": "2022-08-12T15:20:57.514Z"
+                "courseId": "course-number25-course-id25"
             },
             "certificates": {
                 "availableDate": null,
@@ -1832,8 +1806,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number26-course-id26",
-                "lastEnrolled": "2022-08-11T15:20:57.514Z"
+                "courseId": "course-number26-course-id26"
             },
             "certificates": {
                 "availableDate": "11/11/2000",
@@ -1893,8 +1866,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number27-course-id27",
-                "lastEnrolled": "2022-08-10T15:20:57.514Z"
+                "courseId": "course-number27-course-id27"
             },
             "certificates": {
                 "availableDate": null,
@@ -1975,8 +1947,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number28-course-id28",
-                "lastEnrolled": "2022-08-09T15:20:57.514Z"
+                "courseId": "course-number28-course-id28"
             },
             "certificates": {
                 "availableDate": "11/11/2000",
@@ -2393,8 +2364,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number15-course-id15",
-                "lastEnrolled": "2022-09-06T15:20:57.513Z"
+                "courseId": "course-number15-course-id15"
             },
             "entitlement": {
                 "uuid": "entitlement-course-uuid-15",
@@ -2530,8 +2500,7 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number15-course-id15",
-                "lastEnrolled": "2022-09-06T15:20:57.513Z"
+                "courseId": "course-number15-course-id15"
             },
             "entitlement": {
                 "uuid": "entitlement-course-uuid-17",
