@@ -357,16 +357,16 @@ class TestGetSuggestedCourses(SharedModuleStoreTestCase):
         "GENERAL_RECOMMENDATION": {
             "courses": [
                 {
-                    "course_key": "MITx+6.00.1x",
-                    "logo_image_url": "https://prod-discovery.edx-cdn.org/organization/logos/2a73d2ce-c34a-4e08-8223-83bca9d2f01d-2cc8854c6fee.png",
-                    "marketing_url": "https://www.edx.org/course/introduction-to-computer-science-and-programming-7",
-                    "title": "Introduction to Computer Science and Programming Using Python",
+                    "course_key": "HogwartsX+6.00.1x",
+                    "logo_image_url": random_url(),
+                    "marketing_url": random_url(),
+                    "title": "Defense Against the Dark Arts",
                 },
                 {
-                    "course_key": "IBM+PY0101EN",
-                    "logo_image_url": "https://prod-discovery.edx-cdn.org/organization/logos/87b07564-d569-4cfd-bee6-8b0a407acb73-dc33e4b5f353.png",
-                    "marketing_url": "https://www.edx.org/course/python-basics-for-data-science",
-                    "title": "Python Basics for Data Science",
+                    "course_key": "MonstersX+SC101EN",
+                    "logo_image_url": random_url(),
+                    "marketing_url": random_url(),
+                    "title": "Scaring 101",
                 },
             ],
             "is_personalized_recommendation": False,
