@@ -47,7 +47,7 @@ from cms.djangoapps.contentstore.views.component import ADVANCED_COMPONENT_TYPES
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.student import auth
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.roles import CourseCreatorRole, CourseInstructorRole
 from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
 from openedx.core.lib.tempdir import mkdtemp_clean

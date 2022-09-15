@@ -20,7 +20,7 @@ from rest_framework.response import Response
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
 
-from common.djangoapps.student.models.student import CourseEnrollment, User  # lint-amnesty, pylint: disable=reimported
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment, User  # lint-amnesty, pylint: disable=reimported
 from lms.djangoapps.courseware.access import is_mobile_available_for_user
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.courseware.courses import get_current_child

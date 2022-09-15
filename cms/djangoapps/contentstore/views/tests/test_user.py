@@ -10,7 +10,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from common.djangoapps.student import auth
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 

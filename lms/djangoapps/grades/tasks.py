@@ -18,7 +18,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.track.event_transaction_utils import set_event_transaction_id, set_event_transaction_type
 from common.djangoapps.util.date_utils import from_timestamp
 from lms.djangoapps.course_blocks.api import get_course_blocks

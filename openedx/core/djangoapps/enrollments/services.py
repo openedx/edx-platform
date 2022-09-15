@@ -9,7 +9,7 @@ from django.db.models import Q
 
 from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 

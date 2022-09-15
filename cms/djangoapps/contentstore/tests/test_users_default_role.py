@@ -7,7 +7,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODUL
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.utils import delete_course, reverse_url
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 
 

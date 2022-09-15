@@ -18,7 +18,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 import lms.djangoapps.branding.api as branding_api
 import lms.djangoapps.courseware.views.views as courseware_views
 from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response
-from common.djangoapps.student import views as student_views
+from common.djangoapps.student.models.student import views as student_views
 from common.djangoapps.util.cache import cache_if_anonymous
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.lang_pref.api import released_languages

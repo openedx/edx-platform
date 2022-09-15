@@ -27,7 +27,7 @@ from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
-from common.djangoapps.student.models.student import CourseEnrollment, Registration
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment, Registration
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.date_utils import strftime_localized_html
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order

@@ -72,7 +72,7 @@ from common.djangoapps.student.helpers import (
     create_or_set_user_attribute_created_on_site,
     do_create_account
 )
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     RegistrationCookieConfiguration,
     UserAttribute,
     create_comments_service_user,

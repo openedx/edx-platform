@@ -37,7 +37,7 @@ from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
 from common.djangoapps.entitlements.models import CourseEntitlement
-from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models.student import (  # lint-amnesty, pylint: disable=unused-import
     CourseEnrollmentAllowed,
     LoginFailures,
     ManualEnrollmentAudit,

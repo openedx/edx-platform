@@ -26,7 +26,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, Samp
 from xmodule.x_module import XModuleMixin
 from xmodule.capa.tests.response_xml_factory import StringResponseXMLFactory
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.models.student import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.ccx.models import CustomCourseForEdX

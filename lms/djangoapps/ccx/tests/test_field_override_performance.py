@@ -24,7 +24,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData

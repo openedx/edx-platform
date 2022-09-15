@@ -9,7 +9,8 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models.student import EVENT_NAME_ENROLLMENT_MODE_CHANGED, CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
+from common.djangoapps.student.models.student import EVENT_NAME_ENROLLMENT_MODE_CHANGED
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order

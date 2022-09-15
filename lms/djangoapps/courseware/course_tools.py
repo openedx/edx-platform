@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from lms.djangoapps.courseware.utils import _use_new_financial_assistance_flow
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_experience.course_tools import CourseTool

@@ -46,7 +46,7 @@ from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import check_course_expired
 from common.djangoapps.student import auth
-from common.djangoapps.student.models.student import CourseEnrollmentAllowed
+from common.djangoapps.student.models.course_enrollment import CourseEnrollmentAllowed
 from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseCcxCoachRole,

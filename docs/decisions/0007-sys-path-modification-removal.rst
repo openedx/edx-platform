@@ -56,7 +56,7 @@ This error class is intentionally *not* a subclass of ``ImportError``;
 to understand why, consider the following common pattern used in packages outside
 of the edx-platform repo itself::
   try:
-      from student.models.student import CourseEnrollment
+      from student.models.course_enrollment import CourseEnrollment
   except ImportError:
       CourseEnrollment = None
 This pattern is (unfortunately) widely used to so packages can import

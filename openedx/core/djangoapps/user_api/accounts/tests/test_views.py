@@ -18,7 +18,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from common.djangoapps.student.models import PendingEmailChange, UserProfile
+from common.djangoapps.student.models.student import PendingEmailChange, UserProfile
 from common.djangoapps.student.models_api import do_name_change_request, get_pending_name_change
 from common.djangoapps.student.tests.factories import (
     TEST_PASSWORD,

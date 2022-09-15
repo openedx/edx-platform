@@ -38,7 +38,7 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirementStatus
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import from_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order

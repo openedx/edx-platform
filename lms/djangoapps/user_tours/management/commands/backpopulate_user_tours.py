@@ -5,7 +5,7 @@ import time
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from lms.djangoapps.user_tours.models import UserTour
 
 User = get_user_model()

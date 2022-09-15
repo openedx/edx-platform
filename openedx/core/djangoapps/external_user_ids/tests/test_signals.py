@@ -18,7 +18,7 @@ from openedx.core.djangoapps.catalog.cache import (
     PROGRAM_CACHE_KEY_TPL,
 )
 from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.course_modes.models import CourseMode
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase

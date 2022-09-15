@@ -15,7 +15,7 @@ from slumber.exceptions import HttpClientError, HttpServerError
 from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models.student import CourseEnrollmentAttribute
+from common.djangoapps.student.models.course_enrollment import CourseEnrollmentAttribute
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.signals import listen_for_passing_grade
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT

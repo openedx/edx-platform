@@ -26,7 +26,7 @@ from pytz import UTC
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate

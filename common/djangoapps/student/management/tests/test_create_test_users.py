@@ -11,7 +11,8 @@ from django.core.management.base import CommandError
 from opaque_keys import InvalidKeyError
 
 from common.djangoapps.student.helpers import AccountValidationError
-from common.djangoapps.student.models.student import CourseAccessRole, CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
+from common.djangoapps.student.models.student import CourseAccessRole
 from common.djangoapps.student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order

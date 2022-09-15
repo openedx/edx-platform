@@ -30,7 +30,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models.student import get_retired_username_by_username, CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
+from common.djangoapps.student.models.student import get_retired_username_by_username
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin

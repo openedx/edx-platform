@@ -23,7 +23,7 @@ from rest_framework.test import APIClient, APITestCase
 from search.search_engine_base import SearchEngine
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, StaffFactory, UserFactory
 from common.djangoapps.util.testing import EventTestMixin
 from common.test.utils import skip_signal

@@ -44,7 +44,7 @@ from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITIO
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition
 from openedx.features.content_type_gating.services import ContentTypeGatingService
-from common.djangoapps.student.models.student import CourseEnrollment, FBEEnrollmentExclusion
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment, FBEEnrollmentExclusion
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 

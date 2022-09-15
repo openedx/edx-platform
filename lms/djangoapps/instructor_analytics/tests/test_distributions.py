@@ -5,7 +5,7 @@ import pytest
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.instructor_analytics.distributions import AVAILABLE_PROFILE_FEATURES, profile_distribution
 

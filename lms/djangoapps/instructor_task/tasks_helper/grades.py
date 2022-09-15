@@ -17,7 +17,7 @@ from pytz import UTC
 from six.moves import zip_longest
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.roles import BulkRoleCache
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import GeneratedCertificate

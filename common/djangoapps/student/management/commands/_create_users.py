@@ -7,7 +7,7 @@ from xmodule.modulestore.django import modulestore
 from lms.djangoapps.instructor.access import allow_access
 from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
 from common.djangoapps.student.helpers import do_create_account, AccountValidationError
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 
 
 User = get_user_model()

@@ -13,7 +13,8 @@ from django.db import migrations, models
 
 import openedx.core.djangolib.model_mixins
 from common.djangoapps.course_modes import models as course_modes_models
-from common.djangoapps.student.models.student import CourseEnrollment, FBEEnrollmentExclusion
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
+from common.djangoapps.student.models.student import FBEEnrollmentExclusion
 from lms.djangoapps.experiments.models import ExperimentData
 from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
 

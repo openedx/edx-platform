@@ -13,7 +13,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyC
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 
 

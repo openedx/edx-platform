@@ -9,7 +9,7 @@ from edx_django_utils.cache import RequestCache
 from web_fragments.fragment import Fragment
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.util.date_utils import strftime_localized, strftime_localized_html
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED

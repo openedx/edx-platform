@@ -14,7 +14,7 @@ from django.utils.translation import override as override_language
 from django.utils.translation import gettext as _
 from pytz import UTC
 from common.djangoapps.student import views as student_views
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     AccountRecovery,
     User,
     UserProfile,

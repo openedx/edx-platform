@@ -26,7 +26,7 @@ from lms.djangoapps.discussion.toggles import ENABLE_VIEW_MFE_IN_IFRAME, ENABLE_
 from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import get_course_by_id
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory

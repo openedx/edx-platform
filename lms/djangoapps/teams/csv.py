@@ -8,7 +8,7 @@ from collections import Counter
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Prefetch
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment
 from lms.djangoapps.teams.api import (
     ORGANIZATION_PROTECTED_MODES,

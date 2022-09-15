@@ -9,7 +9,8 @@ import ddt
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import AnonymousUserId, CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
+from common.djangoapps.student.models.student import AnonymousUserId
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.teams import api as teams_api

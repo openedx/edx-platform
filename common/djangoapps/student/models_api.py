@@ -7,7 +7,7 @@ import logging
 from pytz import UTC
 
 from common.djangoapps.student.models.student import CourseAccessRole as _CourseAccessRole
-from common.djangoapps.student.models.student import CourseEnrollment as _CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment as _CourseEnrollment
 from common.djangoapps.student.models.student import ManualEnrollmentAudit as _ManualEnrollmentAudit
 from common.djangoapps.student.models.student import (
     ENROLLED_TO_ENROLLED as _ENROLLED_TO_ENROLLED,

@@ -19,7 +19,7 @@ import ddt
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase, APIClient
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin

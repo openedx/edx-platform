@@ -12,7 +12,7 @@ from django.conf import settings
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser
 from pytz import UTC
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.roles import CourseBetaTesterRole
 from lms.djangoapps.courseware.access_response import (
     AccessResponse,

@@ -20,7 +20,7 @@ from submissions import api as sub_api
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from common.djangoapps.student.models.student import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from common.djangoapps.student.roles import CourseCcxCoachRole
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from lms.djangoapps.ccx.tests.factories import CcxFactory

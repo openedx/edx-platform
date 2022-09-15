@@ -13,7 +13,7 @@ from rest_framework.pagination import CursorPagination
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from lms.djangoapps.bulk_email.api import get_emails_enabled
 from lms.djangoapps.certificates.api import get_certificates_for_user_by_course_keys
 from lms.djangoapps.course_api.api import get_course_run_url, get_due_dates

@@ -13,7 +13,7 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_overview_with_access, get_course_with_access
 from openedx.core.lib.request_utils import course_id_from_url
 from openedx.features.enterprise_support.api import get_enterprise_consent_url
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 
 
 class WikiAccessMiddleware(MiddlewareMixin):

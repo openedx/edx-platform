@@ -11,7 +11,7 @@ from lms.djangoapps.courseware.utils import (
 )
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.discounts.utils import format_strikeout_price
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 
 
 class CourseSockFragmentView(EdxFragmentView):

@@ -7,7 +7,7 @@ from unittest.mock import patch
 from crum import set_current_request
 
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.instructor.enrollment import reset_student_attempts
