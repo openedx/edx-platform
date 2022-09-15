@@ -1833,12 +1833,13 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-6",
                 "availableSessions": null,
-                "enrollmentUrl": "/entitlement-enrollment",
-                "isFulfilled": true,
-                "isRefundable": false,
                 "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
+                "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
+                "isExpired": false,
+                "isFulfilled": true,
+                "isRefundable": false
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
@@ -1919,8 +1920,8 @@
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
                 "isExpired": false,
-                "isRefundable": false,
-                "isFulfilled": true
+                "isFulfilled": true,
+                "isRefundable": false
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
@@ -2118,7 +2119,7 @@
                     }
                 ],
                 "canViewCourse": false,
-                "changeDeadline": "Sat Nov 05 2022",
+                "changeDeadline": "11/05/2022",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
                 "isExpired": false,
