@@ -17,7 +17,7 @@ from cms.djangoapps.course_creators.views import (
     update_org_content_creator_role,
     user_requested_access
 )
-from common.djangoapps.student import auth
+from common.djangoapps.student.models.student import auth
 from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
 from common.djangoapps.student.tests.factories import UserFactory
 

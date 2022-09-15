@@ -11,7 +11,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student import auth
+from common.djangoapps.student.models.student import auth
 from common.djangoapps.student.roles import CourseStaffRole
 from openedx.core.djangoapps.agreements.api import (
     create_integrity_signature,

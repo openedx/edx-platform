@@ -5,7 +5,7 @@ import django_countries.fields
 from django.db import migrations, models
 
 import lms.djangoapps.teams.models
-from common.djangoapps.student import models as student_models
+from common.djangoapps.student.models.student import models as student_models
 
 
 class Migration(migrations.Migration):

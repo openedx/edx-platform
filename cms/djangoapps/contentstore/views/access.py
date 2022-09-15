@@ -1,7 +1,7 @@
 """ Helper methods for determining user access permissions in Studio """
 
 
-from common.djangoapps.student import auth
+from common.djangoapps.student.models.student import auth
 from common.djangoapps.student.roles import CourseInstructorRole
 
 

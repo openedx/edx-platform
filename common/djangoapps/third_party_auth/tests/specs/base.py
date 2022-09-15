@@ -29,7 +29,7 @@ from openedx.core.djangoapps.user_authn.views.register import RegistrationView
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
-from common.djangoapps.student import models as student_models
+from common.djangoapps.student.models.student import models as student_models
 from common.djangoapps.student.tests.factories import UserFactory
 
 from common.djangoapps.third_party_auth import middleware, pipeline
