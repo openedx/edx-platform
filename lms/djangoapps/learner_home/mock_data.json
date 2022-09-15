@@ -401,7 +401,6 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true,
                 "lastEnrolled": null
             },
             "certificates": {
@@ -477,7 +476,6 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true,
                 "lastEnrolled": null
             },
             "certificates": {
@@ -598,7 +596,6 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true,
                 "lastEnrolled": null
             },
             "grade": {
@@ -679,7 +676,6 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true,
                 "lastEnrolled": null
             },
             "grade": {
