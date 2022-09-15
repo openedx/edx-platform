@@ -176,26 +176,41 @@ class TestCourseSerializer(LearnerDashboardBaseTest):
 class TestCourseRunSerializer(LearnerDashboardBaseTest):
     """Tests for the CourseRunSerializer"""
 
-    def test_with_data(self):
-        input_data = self.create_test_enrollment()
-
-        input_context = {
-            "resume_course_urls": {input_data.course.id: random_url()},
+    def create_test_context(self, course_id):
+        return {
+            "resume_course_urls": {course_id: random_url()},
             "ecommerce_payment_page": random_url(),
             "course_mode_info": {
-                input_data.course.id: {
+                course_id: {
                     "verified_sku": str(uuid4()),
                     "days_for_upsell": randint(0, 14),
                 }
             },
         }
 
-        serializer = CourseRunSerializer(input_data, context=input_context)
-        output = serializer.data
+    def test_with_data(self):
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course.id)
 
-        # Serializaiton set up so all fields will have values to make testing easy
-        for key in output:
-            assert output[key] is not None
+        output_data = CourseRunSerializer(input_data, context=input_context).data
+
+        # Serialization set up so all fields will have values to make testing easy
+        for key in output_data:
+            assert output_data[key] is not None
+
+    def test_missing_resume_url(self):
+        # Given a course run
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course.id)
+
+        # ... where a user hasn't started
+        input_context["resume_course_urls"][input_data.course.id] = ""
+
+        # When I serialize
+        output_data = CourseRunSerializer(input_data, context=input_context).data
+
+        # Then the resumeUrl is None
+        self.assertIsNone(output_data["resumeUrl"])
 
 
 @ddt.ddt
