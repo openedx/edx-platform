@@ -7,7 +7,7 @@ from openedx.features.genplus_features.genplus_badges.utils import validate_lowe
 
 class BoosterBadge(models.Model):
     slug = models.SlugField(max_length=255, unique=True, validators=[validate_lowercase])
-    skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True, blank=True)
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
     display_name = models.CharField(max_length=255)
     description = models.TextField()
     image = models.ImageField(upload_to='booster_badge_classes', validators=[validate_badge_image])
