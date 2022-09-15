@@ -43,9 +43,7 @@
                 "lastEnrolled": "2022-09-06T15:20:57.513Z"
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 0",
@@ -117,9 +115,7 @@
                 "isVerified": false
             },
             "courseProvider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+                "name": "MIT"
             },
             "course": {
                 "courseName": "Course Name 1",
@@ -231,9 +227,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 3",
@@ -305,9 +299,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+                "name": "MIT"
             },
             "course": {
                 "courseName": "Course Name 4",
@@ -420,9 +412,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 6",
@@ -498,9 +488,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+                "name": "MIT"
             },
             "course": {
                 "courseName": "Course Name 7",
@@ -624,9 +612,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 9",
@@ -707,9 +693,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+                "name": "MIT"
             },
             "course": {
                 "courseName": "Course Name 10",
@@ -821,9 +805,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 12",
@@ -895,9 +877,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+                "name": "MIT"
             },
             "course": {
                 "courseName": "Course Name 13",
@@ -1009,9 +989,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 15",
@@ -1084,9 +1062,7 @@
                 "isAvailable": false
             },
             "courseProvider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+                "name": "MIT"
             },
             "course": {
                 "courseName": "Course Name 16",
@@ -1199,9 +1175,7 @@
                 "isAvailable": true
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 18",
@@ -1274,9 +1248,7 @@
                 "isAvailable": true
             },
             "courseProvider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+                "name": "MIT"
             },
             "course": {
                 "courseName": "Course Name 19",
@@ -1425,9 +1397,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 21",
@@ -1535,9 +1505,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+                "name": "MIT"
             },
             "course": {
                 "courseName": "Course Name 22",
@@ -1721,9 +1689,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 24",
@@ -1805,9 +1771,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+                "name": "MIT"
             },
             "course": {
                 "courseName": "Course Name 25",
@@ -1940,9 +1904,7 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 27",
@@ -2025,9 +1987,7 @@
                 "isAvailable": true
             },
             "courseProvider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+                "name": "MIT"
             },
             "course": {
                 "courseName": "Course Name 28",
@@ -2105,9 +2065,7 @@
                 "isRefundable": true
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseNumber": "course-number100",
@@ -2195,9 +2153,7 @@
                 "isRefundable": true
             },
             "courseProvider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+                "name": "MIT"
             },
             "course": {
                 "courseNumber": "course-number101",
@@ -2315,9 +2271,7 @@
                 "isRefundable": true
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseNumber": "course-number103",
@@ -2379,9 +2333,7 @@
                 "isRefundable": true
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseNumber": "course-number104",
@@ -2456,9 +2408,7 @@
                 "isRefundable": true
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseNumber": "course-number105",
@@ -2520,9 +2470,7 @@
                 "isRefundable": true
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseNumber": "course-number106",
@@ -2597,9 +2545,7 @@
                 "isRefundable": true
             },
             "courseProvider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseNumber": "course-number107",
