@@ -111,7 +111,10 @@ class CourseRunSerializer(serializers.Serializer):
             return f"{ecommerce_payment_page}?sku={verified_sku}"
 
     def get_resumeUrl(self, instance):
-        return self.context.get("resume_course_urls", {}).get(instance.course_id)
+        resumeUrl = self.context.get("resume_course_urls", {}).get(instance.course_id)
+
+        # Return None if missing or empty string
+        return resumeUrl if bool(resumeUrl) else None
 
 
 class CoursewareAccessSerializer(serializers.Serializer):
