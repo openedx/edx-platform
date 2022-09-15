@@ -12,7 +12,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentException
+from common.djangoapps.student.models.student import CourseEnrollment, CourseEnrollmentException
 from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
 from lms.djangoapps.ccx.tests.factories import CcxFactory

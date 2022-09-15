@@ -5,7 +5,7 @@ from datetime import datetime
 from opaque_keys.edx.keys import CourseKey
 from openedx.core import types
 
-from common.djangoapps.student.models import EntranceExamConfiguration
+from common.djangoapps.student.models.student import EntranceExamConfiguration
 from common.djangoapps.util import milestones_helpers
 
 from .base import OutlineProcessor

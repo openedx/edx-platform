@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
 
-from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.models.student import UserProfile
 from common.djangoapps.student.tests.factories import UserFactory
 
 

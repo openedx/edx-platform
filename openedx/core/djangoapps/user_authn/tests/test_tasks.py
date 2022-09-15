@@ -8,7 +8,7 @@ from django.test import TestCase
 from edx_ace.errors import ChannelError, RecoverableChannelDeliveryError
 from unittest import mock  # lint-amnesty, pylint: disable=wrong-import-order
 
-from common.djangoapps.student.models import Registration
+from common.djangoapps.student.models.student import Registration
 from common.djangoapps.student.views.management import compose_activation_email, compose_and_send_activation_email
 from lms.djangoapps.courseware.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory

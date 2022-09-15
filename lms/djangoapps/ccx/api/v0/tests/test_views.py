@@ -20,7 +20,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from lms.djangoapps.ccx.api.v0 import views

@@ -10,7 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from edx_toggles.toggles.testutils import override_waffle_switch
 from opaque_keys import InvalidKeyError
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor.access import allow_access

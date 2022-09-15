@@ -15,7 +15,7 @@ from django.urls import reverse
 from lxml import etree
 from onelogin.saml2.errors import OneLogin_Saml2_Error
 
-from common.djangoapps.student.models import Registration
+from common.djangoapps.student.models.student import Registration
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth import pipeline
 # Define some XML namespaces:

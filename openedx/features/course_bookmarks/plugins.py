@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _
 
 from lms.djangoapps.courseware.permissions import EDIT_BOOKMARK
 from openedx.features.course_experience.course_tools import CourseTool
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 
 
 class CourseBookmarksTool(CourseTool):

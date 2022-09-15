@@ -9,7 +9,7 @@ from jwkest.jwk import KEYS
 from jwkest.jws import JWS
 from jwt.exceptions import ExpiredSignatureError
 
-from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
+from common.djangoapps.student.models.student import UserProfile, anonymous_id_for_user
 
 
 class AccessTokenMixin:

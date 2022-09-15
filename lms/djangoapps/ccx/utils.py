@@ -17,7 +17,7 @@ from django.core.validators import validate_email
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentException
+from common.djangoapps.student.models.student import CourseEnrollment, CourseEnrollmentException
 from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX

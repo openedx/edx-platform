@@ -41,7 +41,7 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_duration_limits.access import get_user_course_duration, get_user_course_expiration_date
 from openedx.features.course_experience import course_home_url
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.util.db import outer_atomic
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 

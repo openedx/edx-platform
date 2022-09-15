@@ -27,7 +27,7 @@ from opaque_keys.edx.keys import CourseKey
 from six import StringIO
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.roles import CourseCcxCoachRole
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import (

@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.models_api import create_manual_enrollment_audit as _create_manual_enrollment_audit
 from common.djangoapps.student.models_api import get_course_access_role
 from common.djangoapps.student.models_api import get_course_enrollment as _get_course_enrollment

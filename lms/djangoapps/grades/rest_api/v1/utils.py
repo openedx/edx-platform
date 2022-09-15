@@ -12,7 +12,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.pagination import CursorPagination
 from rest_framework.response import Response
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.util.query import use_read_replica_if_available
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin

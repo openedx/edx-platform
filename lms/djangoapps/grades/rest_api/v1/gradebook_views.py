@@ -21,7 +21,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.auth import has_course_author_access
-from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment, CourseMode
+from common.djangoapps.student.models.student import CourseAccessRole, CourseEnrollment, CourseMode
 from common.djangoapps.student.roles import BulkRoleCache
 from common.djangoapps.track.event_transaction_utils import (
     create_new_event_transaction_id,

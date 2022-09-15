@@ -9,7 +9,11 @@ from xblock.reference.user_service import UserService, XBlockUser
 
 from openedx.core.djangoapps.external_user_ids.models import ExternalId
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
-from common.djangoapps.student.models import anonymous_id_for_user, get_user_by_username_or_email, user_by_anonymous_id
+from common.djangoapps.student.models.student import (
+    anonymous_id_for_user,
+    get_user_by_username_or_email,
+    user_by_anonymous_id
+)
 
 from .constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,

@@ -12,7 +12,7 @@ from openedx_filters.learning.filters import CertificateCreationRequested
 
 from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
     CertificateAllowlist,

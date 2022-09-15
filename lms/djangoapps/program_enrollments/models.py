@@ -12,7 +12,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 from user_util import user_util
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 
 from .constants import ProgramCourseEnrollmentRoles, ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
 
