@@ -300,6 +300,7 @@ class AvailableEntitlementSessionSerializer(serializers.Serializer):
 
 class EntitlementSerializer(serializers.Serializer):
     """Entitlement info"""
+
     requires_context = True
 
     availableSessions = serializers.SerializerMethodField()
@@ -422,8 +423,10 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
         """
         If this enrollment is part of a program, include information about the program and related programs
         """
-        programs = self.context['programs'].get(str(instance.course_id), [])
-        return ProgramsSerializer({"relatedPrograms": programs}, context=self.context).data
+        programs = self.context["programs"].get(str(instance.course_id), [])
+        return ProgramsSerializer(
+            {"relatedPrograms": programs}, context=self.context
+        ).data
 
 
 class UnfulfilledEntitlementSerializer(serializers.Serializer):
@@ -437,21 +440,21 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
 
     # This is the static constant data returned as the 'enrollment' key for all unfulfilled enrollments.
     STATIC_ENTITLEMENT_ENROLLMENT_DATA = {
-        'accessExpirationDate': None,
-        'isAudit': False,
-        'hasStarted': False,
-        'coursewareAccess': {
+        "accessExpirationDate": None,
+        "isAudit": False,
+        "hasStarted": False,
+        "coursewareAccess": {
             "hasUnmetPrerequisites": False,
             "isTooEarly": False,
             "isStaff": False,
         },
-        'isVerified': False,
-        'canUpgrade': False,
-        'isAuditAccessExpired': False,
-        'isEmailEnabled': False,
-        'hasOptedOutOfEmail': False,
-        'lastEnrolled': None,
-        'isEnrolled': False,
+        "isVerified": False,
+        "canUpgrade": False,
+        "isAuditAccessExpired": False,
+        "isEmailEnabled": False,
+        "hasOptedOutOfEmail": False,
+        "lastEnrolled": None,
+        "isEnrolled": False,
     }
 
     class _PseudoSessionCourseSerializer(serializers.Serializer):

@@ -32,7 +32,10 @@ from lms.djangoapps.learner_home.views import (
     get_entitlements,
 )
 from lms.djangoapps.learner_home.test_serializers import random_url
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory as CatalogCourseRunFactory, ProgramFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseRunFactory as CatalogCourseRunFactory,
+    ProgramFactory,
+)
 from openedx.core.djangoapps.content.course_overviews.tests.factories import (
     CourseOverviewFactory,
 )
@@ -42,7 +45,9 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory
-from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseFactory as CatalogCourseFactory,
+)
 
 
 ENTERPRISE_ENABLED = "ENABLE_ENTERPRISE_INTEGRATION"
@@ -430,23 +435,17 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         program = ProgramFactory(courses=[CatalogCourseFactory(uuid=str(course_uuid))])
 
         enrollment = CourseEnrollmentFactory(
-            user=self.user,
-            mode=CourseMode.VERIFIED,
-            is_active=False
+            user=self.user, mode=CourseMode.VERIFIED, is_active=False
         )
 
         entitlement = CourseEntitlementFactory.create(
             user=self.user,
             course_uuid=course_uuid,
             mode=CourseMode.VERIFIED,
-            enrollment_course_run=enrollment
+            enrollment_course_run=enrollment,
         )
 
-        return (
-            program,
-            enrollment,
-            entitlement
-        )
+        return (program, enrollment, entitlement)
 
     @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
     def test_response_structure(self):
@@ -578,7 +577,9 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         course_uuid = str(uuid4())
         course_uuid2 = str(uuid4())
         program, enrollment, _ = self._create_course_programs(course_uuid=course_uuid)
-        program2, enrollment2, _ = self._create_course_programs(course_uuid=course_uuid2)
+        program2, enrollment2, _ = self._create_course_programs(
+            course_uuid=course_uuid2
+        )
 
         data = [
             program,

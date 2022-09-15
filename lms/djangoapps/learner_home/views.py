@@ -30,7 +30,9 @@ from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
-from openedx.features.enterprise_support.api import enterprise_customer_from_session_or_learner_data
+from openedx.features.enterprise_support.api import (
+    enterprise_customer_from_session_or_learner_data,
+)
 
 
 def get_platform_settings():
