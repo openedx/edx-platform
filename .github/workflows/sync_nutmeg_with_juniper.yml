@@ -1,0 +1,26 @@
+name: Sync Nutmeg with `main` (Juniper)
+on:
+  push:
+    branches:
+      - main
+jobs:
+  juniper-to-nutmeg:
+    name: PullRequestAction
+    runs-on: ubuntu-latest
+    steps:
+      - name: pull-request-action
+        uses: vsoch/pull-request-action@1.0.19
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_PREFIX: "main"
+          PULL_REQUEST_BRANCH: "shadinaif/upgrade-to-nutmeg"
+          PULL_REQUEST_TITLE: "Update Tahoe Nutmeg upgrade branch with changes from `main`"
+          PULL_REQUEST_BODY: |
+            This is an automated pull request from branch Juniper `main` into  `shadinaif/upgrade-to-nutmeg` (Nutmeg upgrade).
+
+            This is meant for making sure all of our Juniper changes gets merge into Nutmeg otherwise Juniper would stall. If tests passes merge this pull request.
+
+            If there are merge conflicts, it needs to be resolved manually as descriped in the following Runbook:
+               - [Resolve git conflict for automatic GitHub pull requests](https://appsembler.atlassian.net/l/cp/iqnbQ59f)
+
+            Fixing the conflicts via GitHub UI is usually a bad idea due to over simplified UX that makes the process less predictable.
