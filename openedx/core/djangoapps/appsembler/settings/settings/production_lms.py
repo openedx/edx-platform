@@ -52,6 +52,7 @@ def plugin_settings(settings):
             '/courses/yt_video_metadata',
             '/accounts/manage_user_standing',
             '/accounts/disable_account_ajax',
+            '/completion-aggregator/',  # :(  no /api/ in that API path
         ]
 
     settings.LMS_BASE = settings.ENV_TOKENS.get('LMS_BASE')
