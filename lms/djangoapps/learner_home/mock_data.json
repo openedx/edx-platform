@@ -446,7 +446,7 @@
             },
             "entitlement": null,
             "courseRun": {
-                "isStarted": false,
+                "isStarted": true,
                 "isArchived": false,
                 "startDate": "11/11/3030",
                 "endDate": "11/11/4040",
@@ -456,9 +456,6 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseRun": {
-                    "isStarted": true
-                },
                 "courseId": "course-number7-course-id7"
             },
             "enrollment": {
@@ -511,7 +508,7 @@
             },
             "entitlement": null,
             "courseRun": {
-                "isStarted": false,
+                "isStarted": true,
                 "isArchived": false,
                 "startDate": "11/11/3030",
                 "endDate": "11/11/4040",
@@ -521,9 +518,6 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseRun": {
-                    "isStarted": true
-                },
                 "courseId": "course-number8-course-id8"
             },
             "enrollment": {
@@ -541,7 +535,6 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true,
                 "lastEnrolled": null
             },
             "certificates": {
@@ -565,7 +558,7 @@
             },
             "entitlement": null,
             "courseRun": {
-                "isStarted": false,
+                "isStarted": true,
                 "isArchived": false,
                 "startDate": "11/11/3030",
                 "endDate": "11/11/4040",
@@ -575,10 +568,6 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseRun": {
-                    "isStarted": true,
-                    "endDate": "11/11/2000"
-                },
                 "courseId": "course-number9-course-id9"
             },
             "enrollment": {
@@ -644,21 +633,16 @@
             },
             "entitlement": null,
             "courseRun": {
-                "isStarted": false,
-                "isArchived": false,
+                "isStarted": true,
+                "isArchived": true,
                 "startDate": "11/11/3030",
-                "endDate": "11/11/4040",
+                "endDate": "11/11/2000",
                 "minPassingGrade": 70,
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseRun": {
-                    "isStarted": true,
-                    "isArchived": true,
-                    "endDate": "11/11/2000"
-                },
                 "courseId": "course-number10-course-id10"
             },
             "enrollment": {
