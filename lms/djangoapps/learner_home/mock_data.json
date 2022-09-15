@@ -1327,7 +1327,6 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/12/3030",
@@ -1435,7 +1434,6 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": true,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
@@ -1533,7 +1531,6 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": true,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
@@ -1619,7 +1616,6 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
@@ -1701,7 +1697,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-4",
                 "availableSessions": null,
-                "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
@@ -1773,7 +1768,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-5",
                 "availableSessions": null,
-                "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
@@ -1833,7 +1827,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-6",
                 "availableSessions": null,
-                "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
@@ -1915,7 +1908,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-7",
                 "availableSessions": null,
-                "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
@@ -2030,7 +2022,6 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
@@ -2118,7 +2109,6 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": false,
                 "changeDeadline": "11/05/2022",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
@@ -2196,7 +2186,6 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/11/4030",
@@ -2236,7 +2225,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-13",
                 "availableSessions": [],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/12/2000",
@@ -2298,7 +2286,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-14",
                 "availableSessions": [],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/12/2000",
@@ -2372,7 +2359,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-15",
                 "availableSessions": [],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/12/2000",
@@ -2434,7 +2420,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-16",
                 "availableSessions": [],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/12/2000",
@@ -2508,7 +2493,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-17",
                 "availableSessions": [],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "expirationDate": "11/12/2000",
