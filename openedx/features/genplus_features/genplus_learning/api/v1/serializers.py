@@ -79,14 +79,9 @@ class ProgramSerializer(serializers.ModelSerializer):
 
 
 class ClassLessonSerializer(serializers.ModelSerializer):
-    class_lesson_progress = serializers.SerializerMethodField()
-
     class Meta:
         model = ClassLesson
-        fields = ('id', 'is_locked', 'class_lesson_progress', 'lms_url')
-
-    def get_class_lesson_progress(self, obj):
-        return calculate_class_lesson_progress(obj.course_key, obj.usage_key, obj.class_unit.gen_class)
+        fields = ('id', 'display_name', 'is_locked', 'lms_url')
 
 
 class ClassSummarySerializer(serializers.ModelSerializer):

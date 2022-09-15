@@ -46,6 +46,7 @@ from openedx.features.course_experience.views.course_sock import CourseSockFragm
 from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.features.genplus_features.genplus_learning.models import ClassLesson, ProgramEnrollment
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
@@ -468,6 +469,19 @@ class CoursewareIndex(View):
             course_block_tree = get_course_outline_block_tree(
                 request, str(self.course.id), request.user
             )
+            try:
+                program = self.course_overview.unit.program
+                gen_user = request.user.gen_user
+                if gen_user.is_student:
+                    enrollment = ProgramEnrollment.objects.get(student=gen_user.student, program=program)
+                    lessons = ClassLesson.objects.filter(class_unit__gen_class=enrollment.gen_class, course_key=self.course.id)
+                    sections = course_block_tree.get('children')
+                    for i, section in enumerate(sections):
+                        lesson = lessons.get(usage_key=UsageKey.from_string(section.get('id')))
+                        sections[i]['is_locked'] = lesson.is_locked if lesson else False
+                    course_block_tree['children'] = sections
+            except:
+                log.error('An error occurred')
 
         courseware_context['accordion'] = render_accordion(
             self.request,
@@ -592,7 +606,7 @@ def render_accordion(request, course, table_of_contents, active_section, active_
             ('course_title', course.display_name),
             ('course_id', str(course.id)),
             ('csrf', csrf(request)['csrf_token']),
-            ('action_section', active_section),
+            ('active_section', active_section),
             ('active_subsection', active_subsection),
             ('due_date_display_format', course.due_date_display_format),
         ] + list(TEMPLATE_IMPORTS.items())

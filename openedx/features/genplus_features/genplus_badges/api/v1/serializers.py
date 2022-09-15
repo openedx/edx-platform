@@ -58,7 +58,7 @@ class ProgramBadgeSerializer(serializers.ModelSerializer):
         program = Program.objects.filter(slug=obj.slug).first()
         unit_badges = BadgeClass.objects.none()
         if program:
-            units = program.units.all().order_by('order').values(
+            units = program.units.all().values(
                 'course', 'order')
             unit_ids = units.values_list('course', flat=True)
             unit_order = {unit['course']: unit['order'] for unit in units}

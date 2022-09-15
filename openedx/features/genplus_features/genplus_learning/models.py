@@ -141,6 +141,7 @@ class ProgramUnitEnrollment(TimeStampedModel):
 class ClassUnit(models.Model):
     class Meta:
         unique_together = ("gen_class", "unit",)
+        ordering = ["unit__order"]
 
     gen_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="class_units")
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="class_units")
@@ -157,12 +158,17 @@ class ClassUnit(models.Model):
 class ClassLesson(models.Model):
     class Meta:
         unique_together = ("class_unit", "usage_key",)
+        ordering = ["order"]
 
     class_unit = models.ForeignKey(ClassUnit, on_delete=models.CASCADE, related_name="class_lessons")
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
     course_key = CourseKeyField(max_length=255)
     usage_key = UsageKeyField(max_length=255)
     is_locked = models.BooleanField(default=True)
+
+    @property
+    def display_name(self):
+        return modulestore().get_item(self.usage_key).display_name
 
     @property
     def lms_url(self):

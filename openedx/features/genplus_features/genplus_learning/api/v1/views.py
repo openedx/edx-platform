@@ -61,7 +61,7 @@ class ClassStudentViewSet(mixins.ListModelMixin,
         if group_id:
             gen_class = get_object_or_404(Class, group_id=group_id)
             class_units = ClassUnit.objects.select_related('unit')
-            context['class_units'] = class_units.filter(gen_class=gen_class).order_by('unit__order')
+            context['class_units'] = class_units.filter(gen_class=gen_class)
             context['request'] = self.request
             return context
 
@@ -90,11 +90,6 @@ class ClassSummaryViewSet(mixins.RetrieveModelMixin,
         class_units = ClassUnit.objects.select_related('gen_class', 'unit').prefetch_related('class_lessons')
         class_units = class_units.filter(gen_class=gen_class)
         data = self.get_serializer(class_units, many=True).data
-
-        for i in range(len(data)):
-            lessons = data[i]['class_lessons']
-            data[i]['unit_progress'] = round(statistics.fmean([lesson['class_lesson_progress']
-                                                               for lesson in lessons])) if lessons else 0
 
         gen_class_data = {
             'school_name': gen_class.school.name,
