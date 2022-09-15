@@ -26,7 +26,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": false,
@@ -110,7 +111,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
             "courseProvider": {
                 "name": "MIT"
@@ -164,7 +166,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
             "certificates": {
                 "availableDate": null,
@@ -213,7 +216,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
             "certificates": {
                 "availableDate": null,
@@ -284,7 +288,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
             "certificates": {
                 "availableDate": null,
@@ -345,7 +350,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
             "certificates": {
                 "availableDate": null,
@@ -395,7 +401,8 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true
+                "isStarted": true,
+                "lastEnrolled": null
             },
             "certificates": {
                 "availableDate": null,
@@ -470,7 +477,8 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true
+                "isStarted": true,
+                "lastEnrolled": null
             },
             "certificates": {
                 "availableDate": null,
@@ -535,7 +543,8 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true
+                "isStarted": true,
+                "lastEnrolled": null
             },
             "certificates": {
                 "availableDate": null,
@@ -589,7 +598,8 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true
+                "isStarted": true,
+                "lastEnrolled": null
             },
             "grade": {
                 "isPassing": false
@@ -669,7 +679,8 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true
+                "isStarted": true,
+                "lastEnrolled": null
             },
             "grade": {
                 "isPassing": false
@@ -720,7 +731,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "certificates": {
                 "availableDate": null,
@@ -782,7 +794,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "certificates": {
                 "availableDate": null,
@@ -853,7 +866,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "certificates": {
                 "availableDate": null,
@@ -914,7 +928,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "certificates": {
                 "availableDate": null,
@@ -950,7 +965,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1021,7 +1037,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1083,7 +1100,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1132,7 +1150,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1204,7 +1223,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1266,7 +1286,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1352,7 +1373,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": false,
@@ -1459,7 +1481,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1556,7 +1579,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1641,7 +1665,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1722,7 +1747,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1793,7 +1819,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1853,7 +1880,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1934,7 +1962,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
