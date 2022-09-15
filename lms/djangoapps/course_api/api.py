@@ -14,7 +14,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 
-from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
+from common.djangoapps.student.models.student import CourseAccessRole, CourseEnrollment
 from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import (

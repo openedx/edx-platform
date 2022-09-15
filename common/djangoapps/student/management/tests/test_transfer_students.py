@@ -12,7 +12,7 @@ from django.core.management import call_command
 from opaque_keys.edx import locator
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     EVENT_NAME_ENROLLMENT_ACTIVATED,
     EVENT_NAME_ENROLLMENT_DEACTIVATED,
     EVENT_NAME_ENROLLMENT_MODE_CHANGED,
@@ -42,7 +42,7 @@ class TestTransferStudents(ModuleStoreTestCase):
         super().setUp()
 
         UNENROLL_DONE.connect(self.assert_unenroll_signal)
-        patcher = patch('common.djangoapps.student.models.tracker')
+        patcher = patch('common.djangoapps.student.models.student.tracker')
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
         self.addCleanup(UNENROLL_DONE.disconnect, self.assert_unenroll_signal)

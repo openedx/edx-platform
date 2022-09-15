@@ -17,7 +17,7 @@ from enterprise.models import EnterpriseCourseEnrollment
 from opaque_keys.edx.keys import CourseKey
 from requests.exceptions import RequestException
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.util.query import use_read_replica_if_available
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 

@@ -9,7 +9,7 @@ from time import time
 from pytz import UTC
 from lms.djangoapps.instructor_analytics.basic import enrolled_students_features, list_may_enroll
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
-from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models.student import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
 
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store  # lint-amnesty, pylint: disable=unused-import

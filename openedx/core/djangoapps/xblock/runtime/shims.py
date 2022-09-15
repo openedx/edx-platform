@@ -15,7 +15,7 @@ from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from common.djangoapps.student.models import anonymous_id_for_user
+from common.djangoapps.student.models.student import anonymous_id_for_user
 
 
 class RuntimeShim:

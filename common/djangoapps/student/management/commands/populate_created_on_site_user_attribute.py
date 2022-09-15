@@ -8,7 +8,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand, CommandError
 
-from common.djangoapps.student.models import Registration, UserAttribute
+from common.djangoapps.student.models.student import Registration, UserAttribute
 
 CREATED_ON_SITE = 'created_on_site'
 

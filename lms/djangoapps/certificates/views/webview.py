@@ -24,7 +24,7 @@ from edx_django_utils.plugins import pluggable_override
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.edxmako.template import Template
-from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
+from common.djangoapps.student.models.student import LinkedInAddToProfileConfiguration
 from common.djangoapps.util.date_utils import strftime_localized
 from common.djangoapps.util.views import handle_500
 from lms.djangoapps.badges.events.course_complete import get_completion_badge

@@ -14,7 +14,7 @@ from openedx.core.djangoapps.schedules.content_highlights import (
 )
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 
 

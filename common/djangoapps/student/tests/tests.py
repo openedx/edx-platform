@@ -26,7 +26,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.helpers import _cert_info, process_survey_link
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     AnonymousUserId,
     CourseEnrollment,
     LinkedInAddToProfileConfiguration,
@@ -637,8 +637,8 @@ class UserSettingsEventTestMixin(EventTestMixin):
 class EnrollmentEventTestMixin(EventTestMixin):
     """ Mixin with assertions for validating enrollment events. """
     def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
-        super().setUp('common.djangoapps.student.models.tracker')
-        segment_patcher = patch('common.djangoapps.student.models.segment')
+        super().setUp('common.djangoapps.student.models.student.tracker')
+        segment_patcher = patch('common.djangoapps.student.models.student.segment')
         self.mock_segment_tracker = segment_patcher.start()
         self.addCleanup(segment_patcher.stop)
 

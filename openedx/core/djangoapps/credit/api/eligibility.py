@@ -18,7 +18,7 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirement,
     CreditRequirementStatus
 )
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 
 # TODO: Cleanup this mess! ECOM-2908
 

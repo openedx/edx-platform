@@ -13,7 +13,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 
 from lms.djangoapps.save_for_later.helper import send_email
 from lms.djangoapps.save_for_later.models import SavedCourse
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.util.query import use_read_replica_if_available
 

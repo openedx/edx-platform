@@ -53,7 +53,7 @@ from xmodule.x_module import STUDENT_VIEW
 
 from common.djangoapps.course_modes.models import CourseMode, get_course_prices
 from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
-from common.djangoapps.student.models import CourseEnrollment, UserTestGroup
+from common.djangoapps.student.models.student import CourseEnrollment, UserTestGroup
 from common.djangoapps.util.cache import cache, cache_if_anonymous
 from common.djangoapps.util.course import course_location_from_key
 from common.djangoapps.util.db import outer_atomic

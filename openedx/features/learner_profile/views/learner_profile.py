@@ -21,7 +21,7 @@ from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFo
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.features.learner_profile.toggles import should_redirect_to_profile_microfrontend
 from openedx.features.learner_profile.views.learner_achievements import LearnerAchievementsFragmentView
-from common.djangoapps.student.models import User
+from common.djangoapps.student.models.student import User
 
 
 @login_required

@@ -9,7 +9,7 @@ from django.conf import settings
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 
-from common.djangoapps.student.models import EntranceExamConfiguration
+from common.djangoapps.student.models.student import EntranceExamConfiguration
 from common.djangoapps.util import milestones_helpers
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 

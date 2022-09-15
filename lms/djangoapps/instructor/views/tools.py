@@ -14,7 +14,7 @@ from edx_when import api
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 
-from common.djangoapps.student.models import CourseEnrollment, get_user_by_username_or_email
+from common.djangoapps.student.models.student import CourseEnrollment, get_user_by_username_or_email
 from openedx.core.djangoapps.schedules.models import Schedule
 
 

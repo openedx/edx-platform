@@ -20,7 +20,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory

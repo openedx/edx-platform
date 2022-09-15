@@ -24,7 +24,7 @@ from common.djangoapps.course_modes.api import get_paid_modes_for_course
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.api import get_active_entitlement_list_for_user
 from common.djangoapps.entitlements.models import CourseEntitlement
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.data import CertificateStatuses

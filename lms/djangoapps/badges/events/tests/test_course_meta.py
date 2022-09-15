@@ -9,7 +9,7 @@ from ddt import data, ddt, unpack
 from django.conf import settings
 from django.test.utils import override_settings
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.badges.tests.factories import CourseEventBadgesConfigurationFactory, RandomBadgeClassFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
