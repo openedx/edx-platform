@@ -12,7 +12,7 @@ from django.views.generic import View
 from rest_framework.generics import GenericAPIView
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.models import UserPasswordToggleHistory
+from common.djangoapps.student.models.student import UserPasswordToggleHistory
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.support.decorators import require_support_permission
 from openedx.core.djangoapps.user_api.accounts.serializers import AccountUserSerializer

@@ -16,7 +16,7 @@ from django.utils.deprecation import MiddlewareMixin
 from opaque_keys.edx.keys import CourseKey, UsageKey, i4xEncoder
 from pytz import UTC
 
-from common.djangoapps.student.models import get_user_by_username_or_email
+from common.djangoapps.student.models.student import get_user_by_username_or_email
 from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY

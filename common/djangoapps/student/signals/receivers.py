@@ -14,7 +14,7 @@ from django.dispatch import receiver
 from lms.djangoapps.courseware.toggles import courseware_mfe_progress_milestones_are_active
 from lms.djangoapps.utils import get_braze_client
 from common.djangoapps.student.helpers import EMAIL_EXISTS_MSG_FMT, USERNAME_EXISTS_MSG_FMT, AccountValidationError
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     CourseEnrollment,
     CourseEnrollmentCelebration,
     PendingNameChange,

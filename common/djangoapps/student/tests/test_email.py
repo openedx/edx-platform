@@ -20,7 +20,7 @@ from testfixtures import LogCapture
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from common.djangoapps.student.email_helpers import generate_proctoring_requirements_email_context
 from common.djangoapps.student.emails import send_proctoring_requirements_email
-from common.djangoapps.student.models import PendingEmailChange, Registration, UserProfile
+from common.djangoapps.student.models.student import PendingEmailChange, Registration, UserProfile
 from common.djangoapps.student.tests.factories import PendingEmailChangeFactory, UserFactory
 from common.djangoapps.student.views import (
     SETTING_CHANGE_INITIATED,

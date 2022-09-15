@@ -17,7 +17,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.management.base import BaseCommand, CommandError
 from requests.exceptions import HTTPError
 
-from common.djangoapps.student.models import UserAttribute
+from common.djangoapps.student.models.student import UserAttribute
 from common.djangoapps.util.query import use_read_replica_if_available
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 

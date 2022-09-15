@@ -14,7 +14,7 @@ from django.core.management.base import BaseCommand
 from mailsnake import MailSnake
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student.models import UserProfile, unique_id_for_user
+from common.djangoapps.student.models.student import UserProfile, unique_id_for_user
 
 BATCH_SIZE = 15000
 # If you try to subscribe with too many users at once

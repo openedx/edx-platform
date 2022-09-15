@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from common.djangoapps.course_modes import api as modes_api
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.generation_handler import (
     CertificateGenerationNotAllowed,

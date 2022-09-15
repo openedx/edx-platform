@@ -6,7 +6,7 @@ from unittest.mock import patch
 from django.conf import settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 
-from common.djangoapps.student.models import CourseEnrollmentCelebration, PendingNameChange, UserProfile
+from common.djangoapps.student.models.student import CourseEnrollmentCelebration, PendingNameChange, UserProfile
 from common.djangoapps.student.signals.signals import USER_EMAIL_CHANGED
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
 from lms.djangoapps.courseware.toggles import COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES

@@ -11,7 +11,7 @@ from django.test import TestCase
 from django.test.client import Client
 from opaque_keys.edx.locator import CourseLocator
 
-from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
+from common.djangoapps.student.models.student import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
 from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,

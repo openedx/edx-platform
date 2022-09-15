@@ -37,7 +37,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     ENROLLED_TO_ENROLLED,
     UNENROLLED_TO_ENROLLED,
     CourseEnrollment,

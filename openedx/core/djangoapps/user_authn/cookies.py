@@ -15,7 +15,7 @@ from django.utils.http import http_date, parse_http_date
 from edx_rest_framework_extensions.auth.jwt import cookies as jwt_cookies
 from edx_rest_framework_extensions.auth.jwt.constants import JWT_DELIMITER
 from oauth2_provider.models import Application
-from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.models.student import UserProfile
 
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token

@@ -22,7 +22,7 @@ from edx_django_utils.cache import TieredCache, get_cache_key
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, EnrollmentRefundConfiguration
+from common.djangoapps.student.models.student import CourseEnrollment, CourseEnrollmentAttribute, EnrollmentRefundConfiguration
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory

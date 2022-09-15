@@ -10,7 +10,7 @@ from django.conf import settings
 from lazy import lazy
 from submissions import api as submissions_api
 
-from common.djangoapps.student.models import anonymous_id_for_user
+from common.djangoapps.student.models.student import anonymous_id_for_user
 from lms.djangoapps.courseware.model_data import ScoresClient
 from lms.djangoapps.grades.models import PersistentSubsectionGrade
 from lms.djangoapps.grades.scores import possibly_scored

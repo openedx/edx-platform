@@ -25,7 +25,7 @@ from xmodule.modulestore.tests.factories import CourseFactory as ModulestoreCour
 from xmodule.modulestore.tests.factories import ItemFactory
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.student.tests.factories import GlobalStaffFactory

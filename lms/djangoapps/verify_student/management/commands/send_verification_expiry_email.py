@@ -16,7 +16,7 @@ from django.db.models import Q  # lint-amnesty, pylint: disable=wrong-import-ord
 from django.utils.timezone import now  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_ace import ace  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_ace.recipient import Recipient  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.util.query import use_read_replica_if_available
 from lms.djangoapps.verify_student.message_types import VerificationExpiry
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
