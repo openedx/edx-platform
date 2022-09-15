@@ -876,42 +876,41 @@ class TestSuggestedCourseSerializer(TestCase):
     """High-level tests for SuggestedCourseSerializer"""
 
     @classmethod
-    def generate_test_suggested_courses(cls):
-        return {
-            "bannerUrl": random_url(),
-            "logoUrl": random_url(),
-            "title": f"{uuid4()}",
-            "courseUrl": random_url(),
+    def mock_suggested_courses(cls, courses_count=5):
+        """
+        Sample return data from general recommendations
+        """
+        suggested_courses = {
+            "courses": [],
+            "is_personalized_recommendation": False,
         }
 
-    def test_structure(self):
-        """Test that nothing breaks and the output fields look correct"""
-        input_data = self.generate_test_suggested_courses()
+        for i in range(courses_count):
+            suggested_courses["courses"].append(
+                {
+                    "course_key": uuid4(),
+                    "logo_image_url": random_url(),
+                    "marketing_url": random_url(),
+                    "title": str(uuid4()),
+                },
+            )
 
-        output_data = SuggestedCourseSerializer(input_data).data
-
-        expected_keys = [
-            "bannerUrl",
-            "logoUrl",
-            "title",
-            "courseUrl",
-        ]
-        assert output_data.keys() == set(expected_keys)
+        return suggested_courses
 
     def test_happy_path(self):
         """Test that data serializes correctly"""
 
-        input_data = self.generate_test_suggested_courses()
+        input_data = self.mock_suggested_courses()["courses"]
 
         output_data = SuggestedCourseSerializer(input_data).data
 
         self.assertDictEqual(
             output_data,
             {
-                "bannerUrl": input_data["bannerUrl"],
-                "logoUrl": input_data["logoUrl"],
+                "bannerUrl": input_data["logo_image_url"],
+                "logoUrl": None,
                 "title": input_data["title"],
-                "courseUrl": input_data["courseUrl"],
+                "courseUrl": input_data["marketing_url"],
             },
         )
 
@@ -1160,6 +1159,26 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         # test programs
         assert courses[0]['programs']
         assert len(courses[0]['programs']['relatedPrograms']) == 3
+
+    def test_suggested_courses(self):
+
+        suggested_courses = TestSuggestedCourseSerializer.mock_suggested_courses()[
+            "courses"
+        ]
+
+        input_data = {
+            "emailConfirmation": None,
+            "enterpriseDashboard": None,
+            "platformSettings": None,
+            "enrollments": [],
+            "unfulfilledEntitlements": [],
+            "suggestedCourses": suggested_courses,
+        }
+        output_data = LearnerDashboardSerializer(input_data).data
+
+        output_suggested_courses = output_data.pop("suggestedCourses")
+
+        self.assertEqual(len(suggested_courses), len(output_suggested_courses))
 
     @mock.patch(
         "lms.djangoapps.learner_home.serializers.SuggestedCourseSerializer.to_representation"

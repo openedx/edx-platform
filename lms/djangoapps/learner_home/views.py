@@ -250,6 +250,19 @@ def get_course_programs(user, course_enrollments, site):
     return meter.invert_programs()
 
 
+def get_suggested_courses():
+    """
+    Currently just returns general recommendations from settings
+    """
+    empty_course_suggestions = {"courses": [], "is_personalized_recommendation": False}
+    return (
+        configuration_helpers.get_value(
+            "GENERAL_RECOMMENDATION", settings.GENERAL_RECOMMENDATION
+        )
+        or empty_course_suggestions
+    )
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
@@ -301,13 +314,16 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         # Gather urls for course card resume buttons.
         resume_button_urls = get_resume_urls_for_enrollments(user, course_enrollments)
 
+        # Get suggested courses
+        suggested_courses = get_suggested_courses().get("courses", [])
+
         learner_dash_data = {
             "emailConfirmation": email_confirmation,
             "enterpriseDashboard": enterprise_customer,
             "platformSettings": get_platform_settings(),
             "enrollments": course_enrollments,
             "unfulfilledEntitlements": unfulfilled_entitlements,
-            "suggestedCourses": [],
+            "suggestedCourses": suggested_courses,
         }
 
         context = {

@@ -27,6 +27,7 @@ from lms.djangoapps.learner_home.views import (
     get_email_settings_info,
     get_enrollments,
     get_platform_settings,
+    get_suggested_courses,
     get_user_account_confirmation_info,
     get_entitlements,
 )
@@ -342,6 +343,52 @@ class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
             {optout.course_id for optout in optouts},
             set(course_optouts),
         )
+
+
+class TestGetSuggestedCourses(SharedModuleStoreTestCase):
+    """Tests for get_suggested_courses"""
+
+    MOCK_SUGGESTED_COURSES = {
+        "GENERAL_RECOMMENDATION": {
+            "courses": [
+                {
+                    "course_key": "MITx+6.00.1x",
+                    "logo_image_url": "https://prod-discovery.edx-cdn.org/organization/logos/2a73d2ce-c34a-4e08-8223-83bca9d2f01d-2cc8854c6fee.png",
+                    "marketing_url": "https://www.edx.org/course/introduction-to-computer-science-and-programming-7",
+                    "title": "Introduction to Computer Science and Programming Using Python",
+                },
+                {
+                    "course_key": "IBM+PY0101EN",
+                    "logo_image_url": "https://prod-discovery.edx-cdn.org/organization/logos/87b07564-d569-4cfd-bee6-8b0a407acb73-dc33e4b5f353.png",
+                    "marketing_url": "https://www.edx.org/course/python-basics-for-data-science",
+                    "title": "Python Basics for Data Science",
+                },
+            ],
+            "is_personalized_recommendation": False,
+        }
+    }
+
+    EMPTY_SUGGESTED_COURSES = {
+        "courses": [],
+        "is_personalized_recommendation": False,
+    }
+
+    @patch.multiple("django.conf.settings", **MOCK_SUGGESTED_COURSES)
+    def test_suggested_courses(self):
+        # Given suggested courses are configured
+        # When I request suggested courses
+        return_data = get_suggested_courses()
+
+        # Then I return them in the appropriate response
+        self.assertDictEqual(return_data, self.MOCK_SUGGESTED_COURSES)
+
+    def test_suggested_courses(self):
+        # Given suggested courses are not found/configured
+        # When I request suggested courses
+        return_data = get_suggested_courses()
+
+        # Then I return them in the appropriate response
+        self.assertDictEqual(return_data, self.EMPTY_SUGGESTED_COURSES)
 
 
 class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
