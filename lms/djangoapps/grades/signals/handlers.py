@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import LearningContextKey
 from submissions.models import score_reset, score_set
 from xblock.scorable import ScorableXBlockMixin, Score
 
-from common.djangoapps.student.models.student import user_by_anonymous_id
+from common.djangoapps.student.models import user_by_anonymous_id
 from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from common.djangoapps.util.date_utils import to_timestamp

@@ -9,7 +9,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values
-from common.djangoapps.student.models.student import CourseEnrollment, CourseEnrollmentAttribute, User
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, User
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

@@ -39,7 +39,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from common.djangoapps.student.tests.test_configuration_overrides import fake_get_value
 from common.djangoapps.student.tests.test_email import mock_render_to_string
-from common.djangoapps.student.models.student import AccountRecovery, LoginFailures
+from common.djangoapps.student.models import AccountRecovery, LoginFailures
 
 from common.djangoapps.util.password_policy_validators import create_validator_config
 from common.djangoapps.util.testing import EventTestMixin

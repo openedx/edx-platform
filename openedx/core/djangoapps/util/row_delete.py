@@ -8,7 +8,7 @@ Following lines show how to use delete_rows():
 import logging
 
 from openedx.core.djangoapps.util.row_delete import BaseDeletionCommand, delete_rows
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 

@@ -25,7 +25,7 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 from .context_processor import user_timezone_locale_prefs
 

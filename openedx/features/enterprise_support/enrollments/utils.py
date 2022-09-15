@@ -6,7 +6,7 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist  # lint-amnesty, pylint: disable=wrong-import-order
 from django.db import transaction
 
-from common.djangoapps.student.models.student import User
+from common.djangoapps.student.models import User
 from openedx.core.djangoapps.enrollments import api as enrollment_api
 from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError, CourseEnrollmentExistsError
 from openedx.core.lib.log_utils import audit_log

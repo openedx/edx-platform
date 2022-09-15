@@ -21,7 +21,7 @@ from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from cms.djangoapps.contentstore.utils import reverse_url
-from common.djangoapps.student.models.student import Registration
+from common.djangoapps.student.models import Registration
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 

@@ -1,7 +1,7 @@
 """utils for feature-based enrollments"""
 
 
-from common.djangoapps.student.models.student import FBEEnrollmentExclusion
+from common.djangoapps.student.models import FBEEnrollmentExclusion
 
 
 def is_in_holdback(enrollment):

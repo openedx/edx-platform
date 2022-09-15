@@ -16,7 +16,7 @@ from django.test import TestCase, RequestFactory, override_settings
 
 from testfixtures import LogCapture
 from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.student.models.student import AccountRecoveryConfiguration
+from common.djangoapps.student.models import AccountRecoveryConfiguration
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 

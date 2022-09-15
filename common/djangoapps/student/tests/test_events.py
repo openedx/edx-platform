@@ -10,7 +10,7 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
 
-from common.djangoapps.student.models.student import CourseEnrollmentAllowed, CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollmentAllowed, CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory, UserProfileFactory
 from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 

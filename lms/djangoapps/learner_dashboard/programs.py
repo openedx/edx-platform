@@ -15,7 +15,7 @@ from django.utils.translation import to_locale
 from lti_consumer.lti_1p1.contrib.django import lti_embed
 from web_fragments.fragment import Fragment
 
-from common.djangoapps.student.models.student import anonymous_id_for_user
+from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.learner_dashboard.utils import program_tab_view_is_enabled
 from openedx.core.djangoapps.catalog.utils import get_programs

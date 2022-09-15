@@ -10,7 +10,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.management.base import BaseCommand
 from pytz import UTC
 
-from common.djangoapps.student.models.student import UserTestGroup
+from common.djangoapps.student.models import UserTestGroup
 
 # Examples:
 # python manage.py assigngroups summary_test:0.3,skip_summary_test:0.7 log.txt "Do previews of future materials help?"

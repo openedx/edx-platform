@@ -19,7 +19,7 @@ from rest_framework.generics import GenericAPIView
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.entitlements.models import CourseEntitlement
-from common.djangoapps.student.models.student import (
+from common.djangoapps.student.models import (
     ENROLLED_TO_ENROLLED,
     UNENROLLED_TO_ENROLLED,
     CourseEnrollment,

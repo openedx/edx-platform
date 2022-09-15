@@ -12,7 +12,7 @@ from textwrap import dedent
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment
 
 log = logging.getLogger(__name__)

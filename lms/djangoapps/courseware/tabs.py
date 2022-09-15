@@ -15,7 +15,7 @@ from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.features.course_experience import default_course_url
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 
 class EnrolledTab(CourseTab):

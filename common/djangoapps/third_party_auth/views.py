@@ -15,7 +15,7 @@ from social_django.views import complete
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.student.helpers import get_next_url_for_login_page, is_safe_login_or_logout_redirect
-from common.djangoapps.student.models.student import UserProfile
+from common.djangoapps.student.models import UserProfile
 from common.djangoapps.student.views import compose_and_send_activation_email
 from common.djangoapps.third_party_auth import pipeline, provider
 

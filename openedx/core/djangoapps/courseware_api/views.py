@@ -57,7 +57,7 @@ from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import get_access_expiration_data
 from openedx.features.discounts.utils import generate_offer_data
-from common.djangoapps.student.models.student import (
+from common.djangoapps.student.models import (
     CourseEnrollment,
     CourseEnrollmentCelebration,
     LinkedInAddToProfileConfiguration

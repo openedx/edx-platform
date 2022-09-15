@@ -4,7 +4,7 @@ Signals for user_authn
 
 from typing import Any, Dict, Optional, Tuple
 
-from common.djangoapps.student.models.student import UserProfile
+from common.djangoapps.student.models import UserProfile
 from common.djangoapps.track import segment
 
 

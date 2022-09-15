@@ -10,7 +10,7 @@ from time import time
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.api import (
     generate_certificate_task,
     get_enrolled_allowlisted_users,

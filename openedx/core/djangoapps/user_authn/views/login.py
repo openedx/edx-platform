@@ -33,7 +33,7 @@ from openedx_filters.learning.filters import StudentLoginRequested
 from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.helpers import get_next_url_for_login_page, get_redirect_url_with_host
-from common.djangoapps.student.models.student import AllowedAuthUser, LoginFailures, UserProfile
+from common.djangoapps.student.models import AllowedAuthUser, LoginFailures, UserProfile
 from common.djangoapps.student.views import compose_and_send_activation_email
 from common.djangoapps.third_party_auth import pipeline, provider
 from common.djangoapps.track import segment

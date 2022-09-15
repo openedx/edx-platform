@@ -15,7 +15,7 @@ from requests.structures import CaseInsensitiveDict
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.api import get_access_role_by_role_name
-from common.djangoapps.student.models.student import CourseEnrollmentException
+from common.djangoapps.student.models import CourseEnrollmentException
 
 from .reading import fetch_program_enrollments
 from .writing import enroll_in_masters_track

@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 from django.views.generic import View
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support import api as enterprise_api
 

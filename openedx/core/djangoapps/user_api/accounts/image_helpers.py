@@ -11,7 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import get_storage_class
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from common.djangoapps.student.models.student import UserProfile
+from common.djangoapps.student.models import UserProfile
 
 from ..errors import UserNotFound
 

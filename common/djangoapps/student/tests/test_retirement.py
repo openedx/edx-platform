@@ -16,7 +16,10 @@ from django.urls import reverse
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models.student import (
     _get_all_retired_emails_by_email,
-    _get_all_retired_usernames_by_username,
+    _get_all_retired_usernames_by_username
+)
+
+from common.djangoapps.student.models import (
     get_potentially_retired_user_by_username,
     get_potentially_retired_user_by_username_and_hash,
     get_retired_email_by_email,
