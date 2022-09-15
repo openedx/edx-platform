@@ -10,7 +10,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.test import TestCase
 from django.urls import reverse
 
-from common.djangoapps.student.models import UserSignupSource
+from common.djangoapps.student.models.student import UserSignupSource
 
 FAKE_SITE = {
     "SITE_NAME": "openedx.localhost",

@@ -13,7 +13,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.http import urlencode
 
-from common.djangoapps.student.models import Registration
+from common.djangoapps.student.models.student import Registration
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory

@@ -12,7 +12,7 @@ from django.core.management import call_command
 from opaque_keys.edx import locator
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     EVENT_NAME_ENROLLMENT_ACTIVATED,
     EVENT_NAME_ENROLLMENT_DEACTIVATED,
     EVENT_NAME_ENROLLMENT_MODE_CHANGED,

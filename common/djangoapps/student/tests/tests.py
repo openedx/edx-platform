@@ -26,7 +26,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.helpers import _cert_info, process_survey_link
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     AnonymousUserId,
     CourseEnrollment,
     LinkedInAddToProfileConfiguration,

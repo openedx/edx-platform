@@ -28,7 +28,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.roles import CourseCcxCoachRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import (
     AdminFactory,

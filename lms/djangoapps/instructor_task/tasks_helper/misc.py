@@ -19,7 +19,7 @@ from django.core.files.storage import DefaultStorage
 from openassessment.data import OraAggregateData, OraDownloadData
 from pytz import UTC
 
-from common.djangoapps.student.models import unique_id_for_user, anonymous_id_for_user
+from common.djangoapps.student.models.student import unique_id_for_user, anonymous_id_for_user
 from lms.djangoapps.instructor_analytics.basic import get_proctored_exam_results
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.survey.models import SurveyAnswer

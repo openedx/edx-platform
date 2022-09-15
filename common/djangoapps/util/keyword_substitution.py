@@ -21,7 +21,7 @@ Usage:
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 
-from common.djangoapps.student.models import anonymous_id_for_user
+from common.djangoapps.student.models.student import anonymous_id_for_user
 
 
 def anonymous_id_from_user_id(user_id):

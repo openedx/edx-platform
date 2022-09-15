@@ -25,7 +25,7 @@ from openedx.core.djangolib.markup import HTML
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
 from openedx.features.content_type_gating.helpers import FULL_ACCESS
 from openedx.features.content_type_gating.helpers import LIMITED_ACCESS
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.role_helpers import has_staff_roles
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order

@@ -27,7 +27,7 @@ from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory, InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 

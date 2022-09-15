@@ -11,7 +11,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
+from common.djangoapps.student.models.student import CourseEnrollment, anonymous_id_for_user
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges

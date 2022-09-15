@@ -28,7 +28,7 @@ from xmodule.modulestore.django import modulestore
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from lms.djangoapps.courseware.access import has_access

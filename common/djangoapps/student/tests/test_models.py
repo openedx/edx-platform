@@ -18,7 +18,7 @@ from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     IS_MARKETABLE,
     AccountRecovery,

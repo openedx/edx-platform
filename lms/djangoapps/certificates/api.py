@@ -22,7 +22,7 @@ from organizations.api import get_course_organization_id
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.api import is_user_enrolled_in_course
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.generation_handler import (
     generate_certificate_task as _generate_certificate_task,

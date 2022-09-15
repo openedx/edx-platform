@@ -12,7 +12,7 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 from six import StringIO
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.program_enrollments.management.commands import reset_enrollment_data
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment

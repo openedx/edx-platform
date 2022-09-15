@@ -37,7 +37,7 @@ from lms.djangoapps.courseware.toggles import (
 )
 from lms.djangoapps.courseware.toggles import COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT
 from lms.djangoapps.verify_student.services import IDVerificationService
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     CourseEnrollment, CourseEnrollmentCelebration
 )
 from common.djangoapps.student.roles import CourseInstructorRole

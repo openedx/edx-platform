@@ -14,7 +14,7 @@ from edx_ace.message import Message
 from edx_ace.policy import PolicyResult
 from edx_ace.recipient import Recipient
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.bulk_email.api import get_unsubscribed_link
 from lms.djangoapps.bulk_email.models import BulkEmailFlag
