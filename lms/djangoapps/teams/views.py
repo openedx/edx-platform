@@ -27,7 +27,8 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
-from common.djangoapps.student.models.student import CourseAccessRole, CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseAccessRole
 from common.djangoapps.util.model_utils import truncate_fields
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges

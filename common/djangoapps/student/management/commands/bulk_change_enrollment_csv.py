@@ -14,9 +14,9 @@ from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student.models.student import CourseEnrollment, CourseEnrollmentAttribute, User
-
-from common.djangoapps.student.models.student import BulkChangeEnrollmentConfiguration
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute
+from common.djangoapps.student.models import User
+from common.djangoapps.student.models import BulkChangeEnrollmentConfiguration
 
 logger = logging.getLogger('common.djangoapps.student.management.commands.bulk_change_enrollment_csv')
 

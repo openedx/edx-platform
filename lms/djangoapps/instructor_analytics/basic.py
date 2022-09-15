@@ -19,7 +19,7 @@ from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 import xmodule.graders as xmgraders
-from common.djangoapps.student.models.student import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.courseware.models import StudentModule

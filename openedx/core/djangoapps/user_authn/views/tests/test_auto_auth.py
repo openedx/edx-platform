@@ -11,7 +11,7 @@ from django.test import TestCase
 from django.test.client import Client
 from opaque_keys.edx.locator import CourseLocator
 
-from common.djangoapps.student.models.student import (
+from common.djangoapps.student.models import (
     CourseAccessRole,
     CourseEnrollment,
     UserProfile,

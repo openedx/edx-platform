@@ -11,7 +11,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
-from common.djangoapps.student.models.student import Registration, UserAttribute
+from common.djangoapps.student.models import Registration, UserAttribute
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 

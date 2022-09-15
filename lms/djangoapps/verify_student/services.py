@@ -13,7 +13,7 @@ from django.utils.timezone import now
 from django.utils.translation import gettext as _
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import User
+from common.djangoapps.student.models import User
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 

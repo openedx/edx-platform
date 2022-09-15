@@ -16,7 +16,7 @@ from testfixtures import LogCapture
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollmentException
+from common.djangoapps.student.models import CourseEnrollmentException
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory

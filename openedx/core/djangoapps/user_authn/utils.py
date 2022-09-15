@@ -14,7 +14,7 @@ from django.utils import http
 from oauth2_provider.models import Application
 from rest_framework.status import HTTP_408_REQUEST_TIMEOUT
 
-from common.djangoapps.student.models.student import username_exists_or_retired
+from common.djangoapps.student.models import username_exists_or_retired
 from openedx.core.djangoapps.password_policy.hibp import PwnedPasswordsAPI
 from openedx.core.djangoapps.user_api.accounts import USERNAME_MAX_LENGTH
 

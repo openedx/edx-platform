@@ -26,7 +26,8 @@ from common.djangoapps.entitlements.rest_api.v1.filters import CourseEntitlement
 from common.djangoapps.entitlements.rest_api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
 from common.djangoapps.entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
 from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
-from common.djangoapps.student.models.student import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollmentException
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, get_owners_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf

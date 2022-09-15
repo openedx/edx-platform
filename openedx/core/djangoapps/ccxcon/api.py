@@ -15,7 +15,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.courses import get_course_by_id
-from common.djangoapps.student.models.student import anonymous_id_for_user
+from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.student.roles import CourseInstructorRole
 
 from .models import CCXCon

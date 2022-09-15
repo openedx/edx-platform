@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests

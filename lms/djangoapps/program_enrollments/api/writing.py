@@ -12,7 +12,7 @@ from requests.structures import CaseInsensitiveDict
 from simple_history.utils import bulk_create_with_history
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollment, NonExistentCourseError
+from common.djangoapps.student.models import CourseEnrollment, NonExistentCourseError
 from common.djangoapps.student.roles import CourseStaffRole
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 

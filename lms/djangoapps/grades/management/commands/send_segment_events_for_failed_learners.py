@@ -10,7 +10,7 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.track import segment
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

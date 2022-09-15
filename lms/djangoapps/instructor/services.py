@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 import lms.djangoapps.instructor.enrollment as enrollment
 from common.djangoapps.student import auth
-from common.djangoapps.student.models.student import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.student.roles import CourseStaffRole
 from lms.djangoapps.commerce.utils import create_zendesk_ticket
 from lms.djangoapps.courseware.models import StudentModule

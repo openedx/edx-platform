@@ -23,7 +23,8 @@ from common.djangoapps.student.admin import (  # lint-amnesty, pylint: disable=l
     CourseEnrollmentForm,
     UserAdmin
 )
-from common.djangoapps.student.models.student import AllowedAuthUser, CourseEnrollment, LoginFailures
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import AllowedAuthUser, LoginFailures
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin

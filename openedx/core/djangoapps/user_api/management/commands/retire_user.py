@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from social_django.models import UserSocialAuth
 
-from common.djangoapps.student.models.student import AccountRecovery, Registration, get_retired_email_by_email
+from common.djangoapps.student.models import AccountRecovery, Registration, get_retired_email_by_email
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 
 from ...models import UserRetirementStatus

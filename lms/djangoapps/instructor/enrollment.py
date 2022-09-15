@@ -22,9 +22,9 @@ from submissions import api as sub_api  # installed from the edx-submissions rep
 from submissions.models import score_set
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models.student import (  # lint-amnesty, pylint: disable=line-too-long
+from common.djangoapps.student.models import CourseEnrollmentAllowed
+from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=line-too-long
     CourseEnrollment,
-    CourseEnrollmentAllowed,
     anonymous_id_for_user,
     is_email_retired
 )

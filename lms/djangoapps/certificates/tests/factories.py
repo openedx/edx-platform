@@ -8,7 +8,7 @@ from uuid import uuid4
 
 from factory.django import DjangoModelFactory
 
-from common.djangoapps.student.models.student import LinkedInAddToProfileConfiguration
+from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 from lms.djangoapps.certificates.models import (
     CertificateAllowlist,
     CertificateDateOverride,

@@ -4,7 +4,7 @@ Encapsulates permissions checks for Course Blocks API
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student.models.student import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import AccessResponse

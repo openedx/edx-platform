@@ -12,7 +12,7 @@ from django.test import TestCase
 from oauth2_provider.models import Application
 from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
 from openedx.core.djangoapps.theming.models import SiteTheme
-from common.djangoapps.student.models.student import UserProfile
+from common.djangoapps.student.models import UserProfile
 
 SITES = ["site_a", "site_b"]
 MANAGEMENT_COMMAND_PATH = "openedx.core.djangoapps.theming.management.commands.create_sites_and_configurations."

@@ -10,7 +10,9 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credit.models import CreditEligibility
-from common.djangoapps.student.models.student import CourseEnrollment, User
+
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import User
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

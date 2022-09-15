@@ -6,7 +6,7 @@ Serializer for user API
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from common.djangoapps.student.models.student import CourseEnrollment, User
+from common.djangoapps.student.models import CourseEnrollment, User
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.access import has_access

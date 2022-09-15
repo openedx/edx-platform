@@ -14,7 +14,7 @@ from django_countries import countries
 from pytz import common_timezones, common_timezones_set, country_timezones
 
 from openedx.core.lib.time_zone_utils import get_display_time_zone
-from common.djangoapps.student.models.student import User, UserProfile
+from common.djangoapps.student.models import User, UserProfile
 from common.djangoapps.track import segment
 
 from ..errors import (  # lint-amnesty, pylint: disable=unused-import

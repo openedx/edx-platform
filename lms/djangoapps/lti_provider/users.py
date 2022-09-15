@@ -14,7 +14,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, transaction
 
-from common.djangoapps.student.models.student import UserProfile
+from common.djangoapps.student.models import UserProfile
 from lms.djangoapps.lti_provider.models import LtiUser
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 
