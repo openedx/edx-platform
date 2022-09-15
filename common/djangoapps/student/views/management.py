@@ -61,7 +61,7 @@ from openedx.features.enterprise_support.utils import is_enterprise_learner
 from common.djangoapps.student.email_helpers import generate_activation_email_context
 from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info
 from common.djangoapps.student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate  # lint-amnesty, pylint: disable=line-too-long
-from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models.student import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
     CourseEnrollment,
     PendingEmailChange,  # unimport:skip

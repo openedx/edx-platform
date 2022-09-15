@@ -5,7 +5,7 @@ import json
 
 from rest_framework import serializers
 
-from common.djangoapps.student.models import CourseEnrollment, ManualEnrollmentAudit
+from common.djangoapps.student.models.student import CourseEnrollment, ManualEnrollmentAudit
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from openedx.core.djangoapps.catalog.utils import get_programs_by_uuids
 from openedx.features.course_experience import default_course_url

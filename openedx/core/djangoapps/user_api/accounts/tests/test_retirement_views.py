@@ -52,7 +52,7 @@ from openedx.core.djangoapps.user_api.models import (
     UserRetirementPartnerReportingStatus,
     UserRetirementStatus
 )
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,

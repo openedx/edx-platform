@@ -14,7 +14,7 @@ from django.urls import reverse
 from rest_framework import serializers
 
 
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     LanguageProficiency,
     PendingNameChange,
     SocialLink,

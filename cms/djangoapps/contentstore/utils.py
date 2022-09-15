@@ -16,7 +16,7 @@ from pytz import UTC
 
 from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
 from common.djangoapps.student import auth
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND

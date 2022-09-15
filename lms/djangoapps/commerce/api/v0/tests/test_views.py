@@ -16,7 +16,7 @@ from django.urls import reverse, reverse_lazy
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.tests.tests import EnrollmentEventTestMixin  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.enrollments.api import get_enrollment

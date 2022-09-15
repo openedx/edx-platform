@@ -13,7 +13,7 @@ from lxml import etree
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
-from common.djangoapps.student.models import User
+from common.djangoapps.student.models.student import User
 from lms.djangoapps.survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 from openedx.core.djangolib.markup import HTML
 

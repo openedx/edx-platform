@@ -7,7 +7,7 @@ from django.core import mail
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY

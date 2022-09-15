@@ -12,7 +12,7 @@ from django.utils.timezone import now
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.data import CertificateStatuses

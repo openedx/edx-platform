@@ -8,7 +8,7 @@ import ddt
 from django.urls import reverse
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 

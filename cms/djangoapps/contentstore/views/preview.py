@@ -30,7 +30,7 @@ from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id
 from cms.lib.xblock.field_data import CmsFieldData
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
-from common.djangoapps.student.models import anonymous_id_for_user
+from common.djangoapps.student.models.student import anonymous_id_for_user
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService

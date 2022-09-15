@@ -24,7 +24,7 @@ from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint:
 )
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.models.student import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order

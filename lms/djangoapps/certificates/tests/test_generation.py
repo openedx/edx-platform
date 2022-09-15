@@ -6,7 +6,7 @@ import logging  # lint-amnesty, pylint: disable=wrong-import-order
 from unittest import mock, skipUnless  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.models.student import UserProfile
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.certificates.data import CertificateStatuses

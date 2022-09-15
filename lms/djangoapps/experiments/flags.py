@@ -114,7 +114,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
     def _is_enrollment_inside_date_bounds(self, experiment_values, user, course_key):
         """ Returns True if the user's enrollment (if any) is valid for the configured experiment date range """
-        from common.djangoapps.student.models import CourseEnrollment
+        from common.djangoapps.student.models.student import CourseEnrollment
 
         enrollment_start = experiment_values.get('enrollment_start')
         enrollment_end = experiment_values.get('enrollment_end')

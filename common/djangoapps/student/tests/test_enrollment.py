@@ -16,7 +16,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models.student import (
     SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,
     CourseEnrollment,
     CourseFullError,

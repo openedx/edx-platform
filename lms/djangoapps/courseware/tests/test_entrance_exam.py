@@ -20,7 +20,7 @@ from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback, toc_for_course
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangolib.testing.utils import get_mock_request
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models.student import CourseEnrollment
 from common.djangoapps.student.tests.factories import AnonymousUserFactory
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf

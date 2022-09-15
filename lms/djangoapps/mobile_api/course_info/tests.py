@@ -11,7 +11,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from rest_framework.test import APIClient  # pylint: disable=unused-import
 
-from common.djangoapps.student.models import CourseEnrollment  # pylint: disable=unused-import
+from common.djangoapps.student.models.student import CourseEnrollment  # pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05

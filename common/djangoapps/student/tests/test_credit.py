@@ -13,7 +13,7 @@ from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from common.djangoapps.student.models import CourseEnrollmentAttribute
+from common.djangoapps.student.models.student import CourseEnrollmentAttribute
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.credit import api as credit_api
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility, CreditProvider
