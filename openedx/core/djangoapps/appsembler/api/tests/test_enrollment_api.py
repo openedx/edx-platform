@@ -36,7 +36,6 @@ from tahoe_sites.api import get_users_of_organization
 from openedx.core.djangoapps.appsembler.api.sites import (
     get_enrollments_for_site,
 )
-from openedx.core.djangoapps.appsembler.api.v1.waffle import FIX_ENROLLMENT_RESULTS_BUG
 from openedx.core.djangoapps.appsembler.api.tests.factories import (
     CourseOverviewFactory,
     OrganizationFactory,
@@ -289,12 +288,10 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
                 assert not CourseEnrollmentAllowed.objects.filter(
                     email=rec['identifier']).exists()
 
-    @override_waffle_flag(FIX_ENROLLMENT_RESULTS_BUG, True)
     def test_enroll_learner_in_two_courses(self):
         """
         Enroll a learner in two courses in a single call.
         """
-        assert FIX_ENROLLMENT_RESULTS_BUG.is_enabled(), 'Fix can be enabled'
         new_users_email = 'alpha@example.com'
         payload = {
             'action': 'enroll',
@@ -312,31 +309,6 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         assert len(results) == len(self.my_course_overviews), 'Ensure result from all courses are returned'
         assert results[0]['course'] == str(self.my_course_overviews[0].id), 'Flag on: Course ID should be in results'
         assert results[1]['course'] == str(self.my_course_overviews[1].id), 'Flag on: Course ID should be in results'
-
-    def test_enroll_learner_in_two_courses_with_bug(self):
-        """
-        Enroll a learner in two courses in a single call, but preserve the resutls bug.
-
-        Really? Yup, until the fix is rolled out to all customers. See RED-1386.
-        TODO: RED-1387: This temporary and should be removed.
-        """
-        assert not FIX_ENROLLMENT_RESULTS_BUG.is_enabled(), 'Ensure fix is disabled by default'
-        new_users_email = 'alpha@example.com'
-        payload = {
-            'action': 'enroll',
-            'auto_enroll': True,
-            # Enroll both of the registered users and new ones
-            'identifiers': [new_users_email],
-            'email_learners': True,
-            'courses': [str(co.id) for co in self.my_course_overviews],
-        }
-        response = self.call_enrollment_api('post', self.my_site, self.caller, {
-            'data': payload,
-        })
-        results = response.data['results']
-        assert CourseEnrollmentAllowed.objects.count() == len(self.my_course_overviews)
-        assert len(results) == 1, 'Ensure the flag preserves the original bug in results'
-        assert 'course' not in results[0], 'Flag is off: Course ID should NOT be returned in results'
 
     def test_enroll_with_other_site_course(self):
 
