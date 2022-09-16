@@ -43,7 +43,7 @@ def plugin_settings(settings):
         )
         # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
         # from the redirect mechanics.
-        settings.MAIN_SITE_REDIRECT_WHITELIST = [
+        settings.MAIN_SITE_REDIRECT_ALLOWLIST = [
             'api',
             'admin',
             'oauth',
