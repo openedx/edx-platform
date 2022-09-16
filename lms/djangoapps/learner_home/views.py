@@ -246,7 +246,7 @@ def get_course_programs(user, course_enrollments, site):
         }
     }
     """
-    meter = ProgramProgressMeter(site, user, enrollments=course_enrollments)
+    meter = ProgramProgressMeter(site, user, enrollments=course_enrollments, include_course_entitlements=True)
     return meter.invert_programs()
 
 
