@@ -27,6 +27,9 @@ class LtiSerializer(serializers.ModelSerializer):
         read_only = [
             'version'
         ]
+        extra_kwargs = {
+            'lti_1p1_client_secret': {'write_only': True}
+        }
 
     def validate_lti_config(self, value):
         """
@@ -76,6 +79,9 @@ class LtiSerializer(serializers.ModelSerializer):
         if lti_config.get('additional_parameters', None):
             instance.lti_config['additional_parameters'] = lti_config.get('additional_parameters')
 
+        if validated_data.get('lti_1p1_client_secret') == '':
+            validated_data['lti_1p1_client_secret'] = instance.lti_1p1_client_secret
+
         if validated_data:
             for key, value in validated_data.items():
                 if key in self.Meta.fields:
@@ -94,11 +100,6 @@ class LtiSerializer(serializers.ModelSerializer):
         if pii_sharing_allowed and provider:
             return provider.requires_email, provider.requires_username
         return False, False
-
-    def to_representation(self, instance):
-        payload = super().to_representation(instance)
-        payload['lti_1p1_client_secret'] = '*' * len(payload['lti_1p1_client_secret'])
-        return payload
 
 
 class CourseLiveConfigurationSerializer(serializers.ModelSerializer):
