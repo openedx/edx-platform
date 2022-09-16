@@ -467,9 +467,7 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
     entitlement = EntitlementSerializer(source="*")
     course = serializers.SerializerMethodField()
     courseProvider = serializers.SerializerMethodField()
-
-    # Change after data is implemented. This data is required
-    programs = ProgramsSerializer(allow_null=True)
+    programs = serializers.SerializerMethodField()
 
     # These fields are literal values that do not change
     courseRun = LiteralField(None)
@@ -499,6 +497,13 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
             )
 
         return CourseProviderSerializer(course_overview, allow_null=True).data
+
+    def get_programs(self, instance):
+        """
+        If this entitlement is part of a program, include information about the program and related programs
+        """
+        programs = self.context['programs'].get(str(instance.course_uuid), [])
+        return ProgramsSerializer({"relatedPrograms": programs}, context=self.context).data
 
 
 class SuggestedCourseSerializer(serializers.Serializer):
