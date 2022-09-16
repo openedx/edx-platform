@@ -2620,27 +2620,27 @@
     },
     "suggestedCourses": [
         {
-            "bannerUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "logoUrl": null,
-            "title": "Suggested course 1",
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+            "logoImgSrc": null,
+            "courseName": "Suggested course 1",
             "courseUrl": "www.edx/suggested-course"
         },
         {
-            "bannerUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "logoUrl": null,
-            "title": "Suggested course 2",
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+            "logoImgSrc": null,
+            "courseName": "Suggested course 2",
             "courseUrl": "www.edx/suggested-course"
         },
         {
-            "bannerUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "logoUrl": null,
-            "title": "Suggested course 3",
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+            "logoImgSrc": null,
+            "courseName": "Suggested course 3",
             "courseUrl": "www.edx/suggested-course"
         },
         {
-            "bannerUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "logoUrl": null,
-            "title": "Suggested course 4",
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+            "logoImgSrc": null,
+            "courseName": "Suggested course 4",
             "courseUrl": "www.edx/suggested-course"
         }
     ]

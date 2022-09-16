@@ -515,9 +515,9 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
 class SuggestedCourseSerializer(serializers.Serializer):
     """Serializer for a suggested course from recommendation engine"""
 
-    bannerUrl = serializers.URLField(source="logo_image_url")
-    logoUrl = serializers.URLField(allow_null=True)
-    title = serializers.CharField()
+    bannerImgSrc = serializers.URLField(source="logo_image_url")
+    logoImgSrc = serializers.URLField(allow_null=True)
+    courseName = serializers.CharField(source="title")
     courseUrl = serializers.URLField(source="marketing_url")
 
 

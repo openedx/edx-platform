@@ -932,9 +932,9 @@ class TestSuggestedCourseSerializer(TestCase):
         self.assertDictEqual(
             output_data,
             {
-                "bannerUrl": input_data["logo_image_url"],
-                "logoUrl": None,
-                "title": input_data["title"],
+                "bannerImgSrc": input_data["logo_image_url"],
+                "logoImgSrc": None,
+                "courseName": input_data["title"],
                 "courseUrl": input_data["marketing_url"],
             },
         )
