@@ -76,7 +76,7 @@ class CharacterSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ClassSerializer(serializers.ModelSerializer):
+class ClassListSerializer(serializers.ModelSerializer):
     current_unit = serializers.SerializerMethodField('get_current_unit')
     lesson = serializers.SerializerMethodField('get_lesson')
 
@@ -89,6 +89,15 @@ class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
         fields = ('group_id', 'name', 'current_unit', 'lesson')
+
+
+class ClassSummarySerializer(serializers.ModelSerializer):
+    school_name = serializers.CharField(source="school.name")
+    program_name = serializers.CharField(source="program.year_group.name", default=None)
+
+    class Meta:
+        model = Class
+        fields = ('group_id', 'name', 'school_name', 'program_name',)
 
 
 class FavoriteClassSerializer(serializers.Serializer):

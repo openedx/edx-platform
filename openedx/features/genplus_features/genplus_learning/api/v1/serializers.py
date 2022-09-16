@@ -84,7 +84,7 @@ class ClassLessonSerializer(serializers.ModelSerializer):
         fields = ('id', 'display_name', 'is_locked', 'lms_url')
 
 
-class ClassSummarySerializer(serializers.ModelSerializer):
+class ClassUnitSerializer(serializers.ModelSerializer):
     class_lessons = ClassLessonSerializer(many=True, read_only=True)
     display_name = serializers.CharField(source="unit.display_name")
 

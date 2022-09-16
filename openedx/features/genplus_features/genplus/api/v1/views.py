@@ -20,7 +20,8 @@ from openedx.features.genplus_features.genplus.constants import JournalTypes
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from .serializers import (
     CharacterSerializer,
-    ClassSerializer,
+    ClassListSerializer,
+    ClassSummarySerializer,
     FavoriteClassSerializer,
     UserInfoSerializer,
     JournalListSerializer,
@@ -126,7 +127,6 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
     """
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, IsTeacher]
-    serializer_class = ClassSerializer
     lookup_field = 'group_id'
 
     def get_queryset(self):
@@ -169,6 +169,11 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
             return Response(SuccessMessages.CLASS_REMOVED_FROM_FAVORITES.format(class_name=gen_class.name),
                             status=status.HTTP_204_NO_CONTENT)
 
+    def get_serializer_class(self):
+        if self.action in ['list']:
+            return ClassListSerializer
+
+        return ClassSummarySerializer
 
 class JournalViewSet(GenzMixin, viewsets.ModelViewSet):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
