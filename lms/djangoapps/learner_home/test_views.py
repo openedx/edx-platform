@@ -27,11 +27,15 @@ from lms.djangoapps.learner_home.views import (
     get_email_settings_info,
     get_enrollments,
     get_platform_settings,
+    get_suggested_courses,
     get_user_account_confirmation_info,
     get_entitlements,
 )
 from lms.djangoapps.learner_home.test_serializers import random_url
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory as CatalogCourseRunFactory, ProgramFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseRunFactory as CatalogCourseRunFactory,
+    ProgramFactory,
+)
 from openedx.core.djangoapps.content.course_overviews.tests.factories import (
     CourseOverviewFactory,
 )
@@ -41,7 +45,9 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory
-from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseFactory as CatalogCourseFactory,
+)
 
 
 ENTERPRISE_ENABLED = "ENABLE_ENTERPRISE_INTEGRATION"
@@ -344,6 +350,50 @@ class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
         )
 
 
+class TestGetSuggestedCourses(SharedModuleStoreTestCase):
+    """Tests for get_suggested_courses"""
+
+    MOCK_SUGGESTED_COURSES = {
+        "courses": [
+            {
+                "course_key": "HogwartsX+6.00.1x",
+                "logo_image_url": random_url(),
+                "marketing_url": random_url(),
+                "title": "Defense Against the Dark Arts",
+            },
+            {
+                "course_key": "MonstersX+SC101EN",
+                "logo_image_url": random_url(),
+                "marketing_url": random_url(),
+                "title": "Scaring 101",
+            },
+        ],
+        "is_personalized_recommendation": False,
+    }
+
+    EMPTY_SUGGESTED_COURSES = {
+        "courses": [],
+        "is_personalized_recommendation": False,
+    }
+
+    @patch("django.conf.settings.GENERAL_RECOMMENDATION", MOCK_SUGGESTED_COURSES)
+    def test_suggested_courses(self):
+        # Given suggested courses are configured
+        # When I request suggested courses
+        return_data = get_suggested_courses()
+
+        # Then I return them in the appropriate response
+        self.assertDictEqual(return_data, self.MOCK_SUGGESTED_COURSES)
+
+    def test_no_suggested_courses(self):
+        # Given suggested courses are not found/configured
+        # When I request suggested courses
+        return_data = get_suggested_courses()
+
+        # Then I return them in the appropriate response
+        self.assertDictEqual(return_data, self.EMPTY_SUGGESTED_COURSES)
+
+
 class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
     """Tests for the dashboard view"""
 
@@ -383,23 +433,17 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         program = ProgramFactory(courses=[CatalogCourseFactory(uuid=str(course_uuid))])
 
         enrollment = CourseEnrollmentFactory(
-            user=self.user,
-            mode=CourseMode.VERIFIED,
-            is_active=False
+            user=self.user, mode=CourseMode.VERIFIED, is_active=False
         )
 
         entitlement = CourseEntitlementFactory.create(
             user=self.user,
             course_uuid=course_uuid,
             mode=CourseMode.VERIFIED,
-            enrollment_course_run=enrollment
+            enrollment_course_run=enrollment,
         )
 
-        return (
-            program,
-            enrollment,
-            entitlement
-        )
+        return (program, enrollment, entitlement)
 
     @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
     def test_response_structure(self):
@@ -531,7 +575,9 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         course_uuid = str(uuid4())
         course_uuid2 = str(uuid4())
         program, enrollment, _ = self._create_course_programs(course_uuid=course_uuid)
-        program2, enrollment2, _ = self._create_course_programs(course_uuid=course_uuid2)
+        program2, enrollment2, _ = self._create_course_programs(
+            course_uuid=course_uuid2
+        )
 
         data = [
             program,

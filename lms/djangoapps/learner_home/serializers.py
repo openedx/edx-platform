@@ -111,7 +111,10 @@ class CourseRunSerializer(serializers.Serializer):
             return f"{ecommerce_payment_page}?sku={verified_sku}"
 
     def get_resumeUrl(self, instance):
-        return self.context.get("resume_course_urls", {}).get(instance.course_id)
+        resumeUrl = self.context.get("resume_course_urls", {}).get(instance.course_id)
+
+        # Return None if missing or empty string
+        return resumeUrl if bool(resumeUrl) else None
 
 
 class CoursewareAccessSerializer(serializers.Serializer):
@@ -300,6 +303,7 @@ class AvailableEntitlementSessionSerializer(serializers.Serializer):
 
 class EntitlementSerializer(serializers.Serializer):
     """Entitlement info"""
+
     requires_context = True
 
     availableSessions = serializers.SerializerMethodField()
@@ -341,8 +345,8 @@ class EntitlementSerializer(serializers.Serializer):
 class RelatedProgramSerializer(serializers.Serializer):
     """Related programs information"""
 
-    bannerUrl = serializers.URLField(source="banner_image.small.url")
-    logoUrl = serializers.SerializerMethodField()
+    bannerImgSrc = serializers.URLField(source="banner_image.small.url")
+    logoImgSrc = serializers.SerializerMethodField()
     numberOfCourses = serializers.SerializerMethodField()
     programType = serializers.CharField(source="type")
     programUrl = serializers.SerializerMethodField()
@@ -352,7 +356,7 @@ class RelatedProgramSerializer(serializers.Serializer):
     def get_numberOfCourses(self, instance):
         return len(instance["courses"])
 
-    def get_logoUrl(self, instance):
+    def get_logoImgSrc(self, instance):
         return (
             instance["authoring_organizations"][0].get("logo_image_url")
             if instance.get("authoring_organizations")
@@ -422,8 +426,10 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
         """
         If this enrollment is part of a program, include information about the program and related programs
         """
-        programs = self.context['programs'].get(str(instance.course_id), [])
-        return ProgramsSerializer({"relatedPrograms": programs}, context=self.context).data
+        programs = self.context["programs"].get(str(instance.course_id), [])
+        return ProgramsSerializer(
+            {"relatedPrograms": programs}, context=self.context
+        ).data
 
 
 class UnfulfilledEntitlementSerializer(serializers.Serializer):
@@ -437,21 +443,21 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
 
     # This is the static constant data returned as the 'enrollment' key for all unfulfilled enrollments.
     STATIC_ENTITLEMENT_ENROLLMENT_DATA = {
-        'accessExpirationDate': None,
-        'isAudit': False,
-        'hasStarted': False,
-        'coursewareAccess': {
+        "accessExpirationDate": None,
+        "isAudit": False,
+        "hasStarted": False,
+        "coursewareAccess": {
             "hasUnmetPrerequisites": False,
             "isTooEarly": False,
             "isStaff": False,
         },
-        'isVerified': False,
-        'canUpgrade': False,
-        'isAuditAccessExpired': False,
-        'isEmailEnabled': False,
-        'hasOptedOutOfEmail': False,
-        'lastEnrolled': None,
-        'isEnrolled': False,
+        "isVerified": False,
+        "canUpgrade": False,
+        "isAuditAccessExpired": False,
+        "isEmailEnabled": False,
+        "hasOptedOutOfEmail": False,
+        "lastEnrolled": None,
+        "isEnrolled": False,
     }
 
     class _PseudoSessionCourseSerializer(serializers.Serializer):
@@ -507,12 +513,12 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
 
 
 class SuggestedCourseSerializer(serializers.Serializer):
-    """Serializer for a suggested course"""
+    """Serializer for a suggested course from recommendation engine"""
 
-    bannerUrl = serializers.URLField()
-    logoUrl = serializers.URLField()
-    title = serializers.CharField()
-    courseUrl = serializers.URLField()
+    bannerImgSrc = serializers.URLField(source="logo_image_url")
+    logoImgSrc = serializers.URLField(allow_null=True)
+    courseName = serializers.CharField(source="title")
+    courseUrl = serializers.URLField(source="marketing_url")
 
 
 class EmailConfirmationSerializer(serializers.Serializer):
