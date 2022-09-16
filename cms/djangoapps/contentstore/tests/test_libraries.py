@@ -774,8 +774,8 @@ class TestLibraryAccess(LibraryTestCase):
         """
         Test that user could attach to the problem only libraries that he has access (or which were created by him).
         This test was created on the basis of bug described in the pull requests on github:
-        https://github.com/edx/edx-platform/pull/11331
-        https://github.com/edx/edx-platform/pull/11611
+        https://github.com/openedx/edx-platform/pull/11331
+        https://github.com/openedx/edx-platform/pull/11611
         """
         self._create_library(org='admin_org_1', library='lib_adm_1', display_name='admin_lib_1')
         self._create_library(org='admin_org_2', library='lib_adm_2', display_name='admin_lib_2')

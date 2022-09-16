@@ -1,7 +1,7 @@
 from django.db import migrations, models
 
 # We used to have a uniqueness constraint on auth_user.email:
-# https://github.com/edx/edx-platform/commit/c52727b0e0fb241d8211900975d3b69fe5a1bd57
+# https://github.com/openedx/edx-platform/commit/c52727b0e0fb241d8211900975d3b69fe5a1bd57
 #
 # That constraint was lost in the upgrade from Django 1.4->1.8.  This migration
 # adds it back.  But because it might already exist in databases created

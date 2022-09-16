@@ -15,7 +15,7 @@
 #    a devstack.py at all.
 #
 # This is part of the effort to move our dev tools off of Ansible and
-# Paver, described here: https://github.com/edx/devstack/pull/866
+# Paver, described here: https://github.com/openedx/devstack/pull/866
 # TODO: If the effort described above is abandoned, then this file should
 # probably be deleted.
 ACTIVATION_EMAIL_SUPPORT_LINK: ''

@@ -98,7 +98,7 @@ FEATURES = {
     #   by course staff.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-09-04
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2425
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2425
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
 
     # .. toggle_name: FEATURES['DISPLAY_HISTOGRAMS_TO_STAFF']
@@ -109,7 +109,7 @@ FEATURES = {
     # .. toggle_creation_date: 2014-02-13
     # .. toggle_warning: Generating histograms requires scanning the courseware_studentmodule table on each view. This
     #   can make staff access to courseware very slow on large courses.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2425
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2425
     'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
 
     'REROUTE_ACTIVATION_EMAIL': False,  # nonempty string = address for all activation emails
@@ -122,7 +122,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2012-07-24
     # .. toggle_warning: This will cause ALL courses to be immediately visible.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/17913
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/17913
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,
@@ -148,7 +148,7 @@ FEATURES = {
     # .. toggle_creation_date: 2014-03-27
     # .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
     #   in the CMS.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/3064
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/3064
     'ENABLE_TEXTBOOK': True,
 
     # .. toggle_name: FEATURES['ENABLE_DISCUSSION_HOME_PANEL']
@@ -159,7 +159,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-07-30
     # .. toggle_warning: This should remain off in production until digest notifications are online.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/520
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/520
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
     # .. toggle_name: FEATURES['ENABLE_DISCUSSION_EMAIL_DIGEST']
@@ -174,7 +174,7 @@ FEATURES = {
     # .. toggle_warning: It is not recommended to enable this feature if ENABLE_DISCUSSION_HOME_PANEL is not enabled,
     #   since subscribers who receive digests in that case will only be able to unsubscribe via links embedded in
     #   their emails, and they will have no way to resubscribe.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/4891
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/4891
     'ENABLE_DISCUSSION_EMAIL_DIGEST': False,
 
     # .. toggle_name: FEATURES['ENABLE_UNICODE_USERNAME']
@@ -185,7 +185,7 @@ FEATURES = {
     #   regular expression defined by USERNAME_REGEX_PARTIAL.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-06-27
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14729
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14729
     'ENABLE_UNICODE_USERNAME': False,
 
     # .. toggle_name: FEATURES['ENABLE_DJANGO_ADMIN_SITE']
@@ -196,7 +196,7 @@ FEATURES = {
     # .. toggle_creation_date: 2013-09-26
     # .. toggle_warning: It is not recommended to disable this feature as there are many settings available on
     #  Django's admin site and will be inaccessible to the superuser.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/829
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/829
     'ENABLE_DJANGO_ADMIN_SITE': True,
     'ENABLE_LMS_MIGRATION': False,
 
@@ -233,10 +233,10 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Enable an API endpoint, named "xblock_view", to serve rendered XBlock views. This might be
     #   used by external applications. See for instance jquery-xblock (now unmaintained):
-    #   https://github.com/edx-solutions/jquery-xblock
+    #   https://github.com/openedx/jquery-xblock
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-14
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2968
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2968
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
 
     # Allows to configure the LMS to provide CORS headers to serve requests from other
@@ -252,7 +252,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-09-28
     # .. toggle_warning: This Effects views and templates.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1073
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/1073
     'COURSES_ARE_BROWSABLE': True,
 
     # Can be turned off to disable the help link in the navbar
@@ -262,7 +262,7 @@ FEATURES = {
     # .. toggle_description: When True, a help link is displayed on the main navbar. Set False to hide it.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2021-03-05
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/26106
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26106
     'ENABLE_HELP_LINK': True,
 
     # .. toggle_name: FEATURES['HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED']
@@ -282,7 +282,7 @@ FEATURES = {
     #   tool. Set to False if you want to hide Submission History from the courseware page.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-02-15
-    # .. toggle_tickets: https://github.com/edx/edx-platform/commit/8f17e6ae9ed76fa75b3caf867b65ccb632cb6870
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/commit/8f17e6ae9ed76fa75b3caf867b65ccb632cb6870
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
     # Turn on a page that lets staff enter Python code to be run in the
@@ -319,7 +319,7 @@ FEATURES = {
     #    be added to MODULESTORE_FIELD_OVERRIDE_PROVIDERS
     # .. toggle_use_cases: opt_in, circuit_breaker
     # .. toggle_creation_date: 2015-04-10
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6636
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6636
     'CUSTOM_COURSES_EDX': False,
 
     # Toggle to enable certificates of courses on dashboard
@@ -349,7 +349,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-07-25
     # .. toggle_warning: If this has been set to True then the account activation email will be skipped.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/417
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/417
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
     # .. toggle_name: FEATURES['RESTRICT_AUTOMATIC_AUTH']
@@ -390,7 +390,7 @@ FEATURES = {
     #   cosmetic price is used when there is no registration price associated to the course.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-10-10
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6876
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6876
     # .. toggle_warning: The use case of this feature toggle is uncertain.
     'ENABLE_COSMETIC_DISPLAY_PRICE': False,
 
@@ -405,7 +405,7 @@ FEATURES = {
     #   identity verification attempts.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-10-03
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/1184
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/1184
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
 
     # Maximum number of rows to include in the csv file for downloading problem responses.
@@ -430,7 +430,7 @@ FEATURES = {
     #   set to False then account locking will be disabled for failed login attempts.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-01-30
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2331
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2331
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True,
 
     # Hide any Personally Identifiable Information from application logs
@@ -447,7 +447,7 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_warning: reverse proxy should be configured appropriately for example Client IP address headers
     #   (e.g HTTP_X_FORWARDED_FOR) should be configured.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2749
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/2749
     'EMBARGO': False,
 
     # Whether the Wiki subsystem should be accessible via the direct /wiki/ paths. Setting this to True means
@@ -487,7 +487,7 @@ FEATURES = {
     #   the user.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-09-16
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/5220
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/5220
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
     # .. toggle_name: FEATURES['ENABLE_COURSE_SORTING_BY_START_DATE']
@@ -498,7 +498,7 @@ FEATURES = {
     #   by their start dates, latest first.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-03-27
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7548
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7548
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
 
     # .. toggle_name: FEATURES['ENABLE_COURSE_HOME_REDIRECT']
@@ -508,7 +508,7 @@ FEATURES = {
     #   course "about" page will be redirected to the course home url.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2019-01-15
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19604
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/19604
     'ENABLE_COURSE_HOME_REDIRECT': True,
 
     # Expose Mobile REST API. Note that if you use this, you must also set
@@ -538,7 +538,7 @@ FEATURES = {
     # .. toggle_warning: If you set this to True then you should also set your mobile application's app store and play
     #   store URLs in the MOBILE_STORE_URLS settings dictionary. These links are not part of the default theme. If you
     #   want these links on your footer then you should use the edx.org theme.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6588
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6588
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
     # Let students save and manage their annotations
@@ -552,7 +552,7 @@ FEATURES = {
     #   EDXNOTES_INTERNAL_API and EDXNOTES_PUBLIC_API. If you update this setting, also update it in Studio.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-01-04
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6321
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6321
     'ENABLE_EDXNOTES': False,
 
     # Toggle to enable coordination with the Publisher tool (keep in sync with cms/envs/common.py)
@@ -581,7 +581,7 @@ FEATURES = {
     # .. toggle_creation_date: 2015-01-29
     # .. toggle_warning: In order to get this working, your courses data should be indexed in Elasticsearch. You will
     #   see the search widget on the courseware page only if the DISABLE_COURSE_OUTLINE_PAGE_FLAG is set.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6506
     'ENABLE_COURSEWARE_SEARCH': False,
 
     # .. toggle_name: FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF']
@@ -606,7 +606,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-01-29
     # .. toggle_warning: In order to get this working, your courses data should be indexed in Elasticsearch.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6506
     'ENABLE_DASHBOARD_SEARCH': False,
 
     # log all information from cybersource callbacks
@@ -619,7 +619,7 @@ FEATURES = {
     #   license information to the courseware.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-05-14
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7315
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7315
     'LICENSING': False,
 
     # .. toggle_name: FEATURES['CERTIFICATES_HTML_VIEW']
@@ -632,7 +632,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-03-13
     # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7113
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7113
     'CERTIFICATES_HTML_VIEW': False,
 
     # .. toggle_name: FEATURES['CUSTOM_CERTIFICATE_TEMPLATES_ENABLED']
@@ -656,7 +656,7 @@ FEATURES = {
     # .. toggle_creation_date: 2015-04-23
     # .. toggle_target_removal_date: None
     # .. toggle_warning: The COURSE_DISCOVERY_MEANINGS setting should be properly defined.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7845
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7845
     'ENABLE_COURSE_DISCOVERY': False,
 
     # .. toggle_name: FEATURES['ENABLE_COURSE_FILENAME_CCX_SUFFIX']
@@ -691,7 +691,7 @@ FEATURES = {
     # .. toggle_description: Enable to use special exams, aka timed and proctored exams.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-09-04
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/9744
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/9744
     'ENABLE_SPECIAL_EXAMS': False,
 
     # .. toggle_name: FEATURES['ENABLE_OPENBADGES']
@@ -717,7 +717,7 @@ FEATURES = {
     #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/lti/index.html
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-04-24
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7689
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7689
     'ENABLE_LTI_PROVIDER': False,
 
     # .. toggle_name: FEATURES['SHOW_HEADER_LANGUAGE_SELECTOR']
@@ -728,7 +728,7 @@ FEATURES = {
     # .. toggle_creation_date: 2017-05-25
     # .. toggle_warning: You should set the languages in the DarkLangConfig table to get this working. If you have
     #   not set any languages in the DarkLangConfig table then the language selector will not be visible in the header.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15133
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/15133
     'SHOW_HEADER_LANGUAGE_SELECTOR': False,
 
     # At edX it's safe to assume that English transcripts are always available
@@ -743,7 +743,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-05-25
     # .. toggle_warning: LANGUAGE_COOKIE_NAME is required to use footer-language-selector, set it if it has not been set.
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15133
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/15133
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
 
     # .. toggle_name: FEATURES['ENABLE_CSMH_EXTENDED']
@@ -811,7 +811,7 @@ FEATURES = {
     #   users in a course using bulk enrollment API endpoint (/api/bulk_enroll/v1/bulk_enroll).
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-07-15
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15006
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/15006
     'ENABLE_BULK_ENROLLMENT_VIEW': False,
 
     # Set to enable Enterprise integration
@@ -851,7 +851,7 @@ FEATURES = {
     #   hide this section.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2018-06-01
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/18298
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/18298
     'ENABLE_ACCOUNT_DELETION': True,
 
     # Enable feature to remove enrollments and users. Used to reset state of master's integration environments
@@ -865,7 +865,7 @@ FEATURES = {
     #   default because enabling allows a method to bypass password policy.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
-    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
+    # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/21616'
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 
     # .. toggle_name: FEATURES['ENABLE_AUTHN_MICROFRONTEND']
@@ -875,7 +875,7 @@ FEATURES = {
     # .. toggle_use_cases: temporary, open_edx
     # .. toggle_creation_date: 2020-09-08
     # .. toggle_target_removal_date: None
-    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/24908'
+    # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/24908'
     # .. toggle_warning: Also set settings.AUTHN_MICROFRONTEND_URL for rollout. This temporary feature
     #   toggle does not have a target removal date.
     'ENABLE_AUTHN_MICROFRONTEND': os.environ.get("EDXAPP_ENABLE_AUTHN_MFE", False),
@@ -992,7 +992,7 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-03-22
     # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/28268
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/28268
     # .. toggle_warning: For consistency in user-experience, keep the value in sync with the setting of the same name
     #   in the LMS and CMS.
     'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': False,
@@ -1667,7 +1667,7 @@ DEFAULT_HASHING_ALGORITHM = 'sha1'
 #################### Python sandbox ############################################
 
 CODE_JAIL = {
-    # from https://github.com/edx/codejail/blob/master/codejail/django_integration.py#L24, '' should be same as None
+    # from https://github.com/openedx/codejail/blob/master/codejail/django_integration.py#L24, '' should be same as None
     'python_bin': '/edx/app/edxapp/venvs/edxapp-sandbox/bin/python',
     # User to run as in the sandbox.
     'user': 'sandbox',
@@ -1957,7 +1957,7 @@ from lms.djangoapps.course_wiki import settings as course_wiki_settings  # pylin
 # .. toggle_default: False
 # .. toggle_description: We recommend you leave this as 'False' for an Open edX installation
 #   to get the proper behavior for register, login and logout. For the original docs see:
-#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+#   https://github.com/openedx/django-wiki/blob/edx_release/wiki/conf/settings.py
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2012-08-13
 WIKI_ACCOUNT_HANDLING = False
@@ -1968,7 +1968,7 @@ WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children o
 # .. toggle_default: False
 # .. toggle_description: Enabling this allows access to anonymous users.
 #   For the original docs, see:
-#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+#   https://github.com/openedx/django-wiki/blob/edx_release/wiki/conf/settings.py
 # .. toggle_warning: Setting allow anonymous access to `True` may have styling issues.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2012-08-21
@@ -1983,7 +1983,7 @@ WIKI_CAN_ASSIGN = course_wiki_settings.CAN_ASSIGN
 # .. toggle_default: False
 # .. toggle_description: Enabling this will use the bootstrap select widget.
 #   For the original docs, see:
-#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+#   https://github.com/openedx/django-wiki/blob/edx_release/wiki/conf/settings.py
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2012-08-22
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
@@ -1991,7 +1991,7 @@ WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
 # .. toggle_description: This setting is defined in the original docs:
-#   https://github.com/edx/django-wiki/blob/edx_release/wiki/conf/settings.py
+#   https://github.com/openedx/django-wiki/blob/edx_release/wiki/conf/settings.py
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2012-08-23
 WIKI_LINK_LIVE_LOOKUPS = False
@@ -2811,22 +2811,22 @@ HEARTBEAT_CELERY_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 # .. setting_default: dict of settings
 # .. setting_description: Stores all the settings used by block structures and block structure
 #   related tasks. See BLOCK_STRUCTURES_SETTINGS[XXX] documentation for details of each setting.
-#   For more information, check https://github.com/edx/edx-platform/pull/13388.
+#   For more information, check https://github.com/openedx/edx-platform/pull/13388.
 BLOCK_STRUCTURES_SETTINGS = dict(
     # .. setting_name: BLOCK_STRUCTURES_SETTINGS['COURSE_PUBLISH_TASK_DELAY']
     # .. setting_default: 30
     # .. setting_description: Delay, in seconds, after a new edit of a course is published before
     #   updating the block structures cache. This is needed for a better chance at getting
     #   the latest changes when there are secondary reads in sharded mongoDB clusters.
-    #   For more information, check https://github.com/edx/edx-platform/pull/13388 and
-    #   https://github.com/edx/edx-platform/pull/14571.
+    #   For more information, check https://github.com/openedx/edx-platform/pull/13388 and
+    #   https://github.com/openedx/edx-platform/pull/14571.
     COURSE_PUBLISH_TASK_DELAY=30,
 
     # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_DEFAULT_RETRY_DELAY']
     # .. setting_default: 30
     # .. setting_description: Delay, in seconds, between retry attempts if a block structure task
-    #   fails. For more information, check https://github.com/edx/edx-platform/pull/13388 and
-    #   https://github.com/edx/edx-platform/pull/14571.
+    #   fails. For more information, check https://github.com/openedx/edx-platform/pull/13388 and
+    #   https://github.com/openedx/edx-platform/pull/14571.
     TASK_DEFAULT_RETRY_DELAY=30,
 
     # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_MAX_RETRIES']
@@ -2834,8 +2834,8 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     # .. setting_description: Maximum number of retries per block structure task.
     #   If the maximum number of retries is exceeded, then you can attempt to either manually run
     #   the celery task, or wait for it to be triggered again.
-    #   For more information, check https://github.com/edx/edx-platform/pull/13388 and
-    #   https://github.com/edx/edx-platform/pull/14571.
+    #   For more information, check https://github.com/openedx/edx-platform/pull/13388 and
+    #   https://github.com/openedx/edx-platform/pull/14571.
     TASK_MAX_RETRIES=5,
 
     # .. toggle_name: BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE']
@@ -2849,8 +2849,8 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2018-03-22
     # .. toggle_target_removal_date: 2018-06-22
-    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14571,
-    #   https://github.com/edx/edx-platform/pull/17760,
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14571,
+    #   https://github.com/openedx/edx-platform/pull/17760,
     #   https://openedx.atlassian.net/browse/DEPR-146
     PRUNING_ACTIVE=False,
 )
@@ -2938,7 +2938,7 @@ YOUTUBE_API_KEY = 'PUT_YOUR_API_KEY_HERE'
 # - Add it to OPTIONAL_APPS below (registered if importable)
 # - Add it to the ADDL_INSTALLED_APPS configuration variable (acts like EXTRA_APPS in other IDAs)
 # - Make it a plugin (which are auto-registered) and add it to the EDXAPP_PRIVATE_REQUIREMENTS configuration variable
-#   (See https://github.com/edx/edx-django-utils/tree/master/edx_django_utils/plugins)
+#   (See https://github.com/openedx/edx-django-utils/tree/master/edx_django_utils/plugins)
 INSTALLED_APPS = [
     # Standard ones that are always installed...
     'django.contrib.auth',
@@ -3230,7 +3230,7 @@ INSTALLED_APPS = [
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
-    # Database-backed Organizations App (http://github.com/edx/edx-organizations)
+    # Database-backed Organizations App (http://github.com/openedx/edx-organizations)
     'organizations',
 
     # Bulk User Retirement
@@ -3292,7 +3292,7 @@ REST_FRAMEWORK = {
 #    is validated via RegistrationValidationView.
 #    It's POST endpoint is rate-limited up to 30 requests per IP Address in a week by default.
 #    It was introduced because an attacker can guess or brute force a series of names to enumerate valid users.
-# .. setting_tickets: https://github.com/edx/edx-platform/pull/24664
+# .. setting_tickets: https://github.com/openedx/edx-platform/pull/24664
 REGISTRATION_VALIDATION_RATELIMIT = '30/7d'
 
 # .. setting_name: REGISTRATION_RATELIMIT
@@ -3300,7 +3300,7 @@ REGISTRATION_VALIDATION_RATELIMIT = '30/7d'
 # .. setting_description: New users are registered on edx via RegistrationView.
 #    It's POST end-point is rate-limited up to 60 requests per IP Address in a week by default.
 #    Purpose of this setting is to restrict an attacker from registering numerous fake accounts.
-# .. setting_tickets: https://github.com/edx/edx-platform/pull/27060
+# .. setting_tickets: https://github.com/openedx/edx-platform/pull/27060
 REGISTRATION_RATELIMIT = '60/7d'
 
 SWAGGER_SETTINGS = {
@@ -3508,7 +3508,7 @@ ENABLE_CREDIT_ELIGIBILITY = True
 #   Eligibility" section then appears for those courses in the LMS.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2015-06-17
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/8550
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/8550
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
 
 ############# Cross-domain requests #################
@@ -3986,7 +3986,7 @@ OPTIONAL_APPS = [
     # edxval
     ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
-    # Enterprise Apps (http://github.com/edx/edx-enterprise)
+    # Enterprise Apps (http://github.com/openedx/edx-enterprise)
     ('enterprise', None),
     ('consent', None),
     ('integrated_channels.integrated_channel', None),
@@ -4430,7 +4430,7 @@ PROGRAM_CERTIFICATES_ROUTING_KEY = 'edx.lms.core.default'
 
 # Settings for Comprehensive Theming app
 
-# See https://github.com/edx/edx-django-sites-extensions for more info
+# See https://github.com/openedx/edx-django-sites-extensions for more info
 # Default site to use if site matching request headers does not exist
 SITE_ID = 1
 
@@ -4715,7 +4715,7 @@ COMPLETION_BY_VIEWING_DELAY_MS = 5000
 #    When disabled, RATELIMIT_RATE is not applied.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-01-08
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/16951
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/16951
 RATELIMIT_ENABLE = True
 
 # .. setting_name: RATELIMIT_RATE
@@ -4726,7 +4726,7 @@ RATELIMIT_ENABLE = True
 # .. setting_warning: RATELIMIT_ENABLE flag must also be enabled/set to True to use this RATELIMIT_RATE setting.
 # .. setting_use_cases: open_edx
 # .. setting_creation_date: 2018-01-08
-# .. setting_tickets: https://github.com/edx/edx-platform/pull/16951
+# .. setting_tickets: https://github.com/openedx/edx-platform/pull/16951
 RATELIMIT_RATE = '120/m'
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
@@ -5128,7 +5128,7 @@ SHOW_ACTIVATE_CTA_POPUP_COOKIE_NAME = 'show-account-activation-popup'
 # .. toggle_default: False
 # .. toggle_description: Flag would be used to show account activation popup after the registration
 # .. toggle_use_cases: open_edx
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/27661
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/27661
 # .. toggle_creation_date: 2021-06-10
 SHOW_ACCOUNT_ACTIVATION_CTA = False
 

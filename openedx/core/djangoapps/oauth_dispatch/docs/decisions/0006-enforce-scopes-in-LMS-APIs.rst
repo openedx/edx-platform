@@ -91,10 +91,10 @@ unprotected microservices.
     * a `feature toggle (switch)`_ named "oauth2.enforce_jwt_scopes" is enabled.
       * **Note:** the toggle has since been retired with the equivalent of ``enforce_jwt_scopes`` value of True.
 
-.. _edx-platform settings: https://github.com/edx/edx-platform/blob/master/lms/envs/docs/README.rst
-.. _JwtBuilder: https://github.com/edx/edx-platform/blob/d3d64970c36f36a96d684571ec5b48ed645618d8/openedx/core/lib/token_utils.py#L15
-.. _oauth_dispatch.views.AccessTokenView.dispatch: https://github.com/edx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/djangoapps/oauth_dispatch/views.py#L100
-.. _oauth_dispatch.validators: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/dot_overrides/validators.py
+.. _edx-platform settings: https://github.com/openedx/edx-platform/blob/master/lms/envs/docs/README.rst
+.. _JwtBuilder: https://github.com/openedx/edx-platform/blob/d3d64970c36f36a96d684571ec5b48ed645618d8/openedx/core/lib/token_utils.py#L15
+.. _oauth_dispatch.views.AccessTokenView.dispatch: https://github.com/openedx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/djangoapps/oauth_dispatch/views.py#L100
+.. _oauth_dispatch.validators: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/dot_overrides/validators.py
 
 4. Associate Available Scopes with Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -189,7 +189,7 @@ See 0007-include-organizations-in-tokens_ for decisions on this.
 .. _function-based Django views: https://docs.djangoproject.com/en/2.0/topics/http/views/
 .. _Django Rest Framework (DRF): http://www.django-rest-framework.org/
 .. _Python decorator: http://www.django-rest-framework.org/tutorial/2-requests-and-responses/#wrapping-api-views
-.. _JwtAuthentication: https://github.com/edx/edx-drf-extensions/blob/4569b9bf7e54a917d4acdd545b10c058c960dd1a/edx_rest_framework_extensions/auth/jwt/authentication.py#L17
+.. _JwtAuthentication: https://github.com/openedx/edx-drf-extensions/blob/4569b9bf7e54a917d4acdd545b10c058c960dd1a/edx_rest_framework_extensions/auth/jwt/authentication.py#L17
 
 
 Consequences

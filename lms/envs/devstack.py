@@ -378,7 +378,7 @@ FEATURES.update({
     'SHOW_HEADER_LANGUAGE_SELECTOR': True,
 
     # Enable enterprise integration by default.
-    # See https://github.com/edx/edx-enterprise/blob/master/docs/development.rst for
+    # See https://github.com/openedx/edx-enterprise/blob/master/docs/development.rst for
     # more background on edx-enterprise.
     # Toggle this off if you don't want anything to do with enterprise in devstack.
     'ENABLE_ENTERPRISE_INTEGRATION': True,

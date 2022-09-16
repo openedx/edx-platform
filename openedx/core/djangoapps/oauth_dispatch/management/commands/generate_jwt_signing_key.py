@@ -35,7 +35,7 @@ class Command(BaseCommand):
     length 'key-id-size' (unless you explicitly provide a "kid" of your own via
     the 'key-id' option).
 
-    See https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0008-use-asymmetric-jwts.rst
+    See https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0008-use-asymmetric-jwts.rst
     '''
 
     def create_parser(self, *args, **kwargs):  # pylint: disable=arguments-differ
@@ -144,7 +144,7 @@ class Command(BaseCommand):
         print("  # The following is the string representation of a JSON Web Key Set (JWK set)")
         print("  # containing all active public keys for verifying JWT signatures.")
         print(
-            "  # See https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/"
+            "  # See https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/"
             "docs/decisions/0008-use-asymmetric-jwts.rst"
         )
         print("  ")
@@ -172,7 +172,7 @@ class Command(BaseCommand):
         print("  # The following is the string representation of a JSON Web Key (JWK)")
         print("  # containing the single active private key for signing JSON Web Tokens (JWTs).")
         print(
-            "  # See https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/"
+            "  # See https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/"
             "docs/decisions/0008-use-asymmetric-jwts.rst"
         )
         print("  ")

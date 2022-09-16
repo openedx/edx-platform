@@ -3,7 +3,7 @@
 """
 Deletes the ENFORCE_JWT_SCOPES waffle switch that has already been deprecated and removed.
 
-See https://github.com/edx/edx-platform/pull/23188 for the removal
+See https://github.com/openedx/edx-platform/pull/23188 for the removal
 """
 
 from django.db import migrations

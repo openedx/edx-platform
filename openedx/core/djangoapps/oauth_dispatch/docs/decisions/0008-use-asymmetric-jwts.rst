@@ -23,7 +23,7 @@ But to verify that the JWT was created by the OAuth Provider, the client should 
 sent along with the JWT. Since the secret is "symmetric" any OAuth Client that is privy to the secret
 could also have just as easily created the JWT (thus spoofing the OAuth Provider).
 
-.. _`Use JWT as OAuth2 Tokens; Remove OpenID Connect`: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0003-use-jwt-as-oauth-tokens-remove-openid-connect.rst
+.. _`Use JWT as OAuth2 Tokens; Remove OpenID Connect`: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0003-use-jwt-as-oauth-tokens-remove-openid-connect.rst
 
 Additionally, for clients that still use Open ID Connect, their `ID Tokens are HMACed with their own
 client_secret`_ (privately shared with the OAuth Provider). Although this somewhat mitigates the issue
@@ -75,11 +75,11 @@ Additionally, **JWT_ISSUERS** is not intended to be used for key rotation. Rathe
 keys should be specified as a `JSON Web Key Set (JWK Set)`_ instead. Thus, there would only be a single
 issuer, but with (the potential of) multiple signing keys stored in a JWT Set.
 
-.. _edx_rest_framework_extensions.settings: https://github.com/edx/edx-drf-extensions/blob/1db9f5e3e5130a1e0f43af2035489b3ed916d245/edx_rest_framework_extensions/settings.py#L73
+.. _edx_rest_framework_extensions.settings: https://github.com/openedx/edx-drf-extensions/blob/1db9f5e3e5130a1e0f43af2035489b3ed916d245/edx_rest_framework_extensions/settings.py#L73
 .. _JWT standard: https://tools.ietf.org/html/rfc7519
 .. _issuer: https://tools.ietf.org/html/rfc7519#section-4.1.1
 .. _JSON Web Key Set (JWK Set): https://tools.ietf.org/html/draft-ietf-jose-json-web-key-36#section-5
-.. _site configuration: https://github.com/edx/edx-platform/blob/af841336c7e39d634c238cd8a11c5a3a661aa9e2/openedx/core/djangoapps/site_configuration/__init__.py
+.. _site configuration: https://github.com/openedx/edx-platform/blob/af841336c7e39d634c238cd8a11c5a3a661aa9e2/openedx/core/djangoapps/site_configuration/__init__.py
 
 Example Code
 ------------

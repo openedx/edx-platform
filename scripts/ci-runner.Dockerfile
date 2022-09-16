@@ -8,7 +8,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install --yes \
     build-essential git language-pack-en libmysqlclient-dev libssl-dev libxml2-dev \
     libxmlsec1-dev libxslt1-dev \
-    # lynx: Required by https://github.com/edx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
+    # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
     lynx xvfb pkg-config \
     python3-dev python3-venv \
     && rm -rf /var/lib/apt/lists/*

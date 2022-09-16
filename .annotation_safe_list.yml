@@ -235,7 +235,7 @@ social_django.UserSocialAuth:
   ".. pii_types:": external_service
   ".. pii_retirement:": local_api
 
-# Via Splash https://github.com/edx/django-splash
+# Via Splash https://github.com/openedx/django-splash
 splash.SplashConfig:
   ".. no_pii:": "No PII"
 
@@ -269,7 +269,7 @@ waffle.Sample:
 waffle.Switch:
   ".. no_pii:": "No PII"
 
-# Via django-wiki https://github.com/edx/django-wiki
+# Via django-wiki https://github.com/openedx/django-wiki
 wiki.Article:
   ".. no_pii:": "No PII"
 wiki.ArticleForObject:

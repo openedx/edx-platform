@@ -7,7 +7,7 @@ the behavior should be modified, so it has been decided to consider any
 necessary fixes in a new ticket.
 
 Please see the PR and discussion linked below for further context
-https://github.com/edx/edx-platform/pull/24545#discussion_r501738511
+https://github.com/openedx/edx-platform/pull/24545#discussion_r501738511
 """
 
 import logging
