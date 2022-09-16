@@ -156,14 +156,14 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         """
         lti_config, data, response = self.create_course_live_config(provider)
         updated_lti_config = {
-                'lti_1p1_client_key': 'new_key',
-                'lti_1p1_client_secret': '',
-                'lti_1p1_launch_url': 'example01.com',
-                'lti_config': {
-                    'additional_parameters': {
-                        'custom_instructor_email': 'new_email@example.com'
-                    },
+            'lti_1p1_client_key': 'new_key',
+            'lti_1p1_client_secret': '',
+            'lti_1p1_launch_url': 'example01.com',
+            'lti_config': {
+                'additional_parameters': {
+                    'custom_instructor_email': 'new_email@example.com'
                 },
+            },
         }
         updated_data = {
             'enabled': False,
@@ -195,7 +195,6 @@ class TestCourseLiveConfigurationView(ModuleStoreTestCase, APITestCase):
         }, lti_configuration.lti_config)
 
         self.assertEqual(response.status_code, 200)
-
 
     @ddt.data(('zoom', False, False), ('big_blue_button', False, True))
     @ddt.unpack
