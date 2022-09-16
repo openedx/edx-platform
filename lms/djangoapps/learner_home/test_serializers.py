@@ -716,8 +716,10 @@ class TestProgramsSerializer(TestCase):
         self.assertEqual(
             output_data,
             {
-                "bannerUrl": input_data["banner_image"]["small"]["url"],
-                "logoUrl": input_data["authoring_organizations"][0]["logo_image_url"],
+                "bannerImgSrc": input_data["banner_image"]["small"]["url"],
+                "logoImgSrc": input_data["authoring_organizations"][0][
+                    "logo_image_url"
+                ],
                 "numberOfCourses": len(input_data["courses"]),
                 "programType": input_data["type"],
                 "programUrl": settings.LMS_ROOT_URL

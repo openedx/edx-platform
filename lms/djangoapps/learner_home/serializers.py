@@ -345,8 +345,8 @@ class EntitlementSerializer(serializers.Serializer):
 class RelatedProgramSerializer(serializers.Serializer):
     """Related programs information"""
 
-    bannerUrl = serializers.URLField(source="banner_image.small.url")
-    logoUrl = serializers.SerializerMethodField()
+    bannerImgSrc = serializers.URLField(source="banner_image.small.url")
+    logoImgSrc = serializers.SerializerMethodField()
     numberOfCourses = serializers.SerializerMethodField()
     programType = serializers.CharField(source="type")
     programUrl = serializers.SerializerMethodField()
@@ -356,7 +356,7 @@ class RelatedProgramSerializer(serializers.Serializer):
     def get_numberOfCourses(self, instance):
         return len(instance["courses"])
 
-    def get_logoUrl(self, instance):
+    def get_logoImgSrc(self, instance):
         return (
             instance["authoring_organizations"][0].get("logo_image_url")
             if instance.get("authoring_organizations")
