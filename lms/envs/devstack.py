@@ -238,6 +238,9 @@ COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
+############## Exams CONFIGURATION SETTINGS ####################
+EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
+
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 

@@ -2414,6 +2414,9 @@ ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'
 
+EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
+EXAMS_SERVICE_USERNAME = 'exams_service_user'
+
 FINANCIAL_REPORTS = {
     'STORAGE_TYPE': 'localfs',
     'BUCKET': None,
