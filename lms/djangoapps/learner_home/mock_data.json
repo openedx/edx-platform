@@ -1371,7 +1371,6 @@
                 ],
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/12/3030",
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1480,7 +1479,6 @@
                 ],
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/11/4030",
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1579,7 +1577,6 @@
                 ],
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/11/4030",
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1666,7 +1663,6 @@
                 ],
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/11/4030",
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1749,7 +1745,6 @@
                 "availableSessions": null,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/11/4030",
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": false
@@ -1822,7 +1817,6 @@
                 "availableSessions": null,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/11/4030",
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": false
@@ -1883,7 +1877,6 @@
                 "availableSessions": null,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/11/4030",
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": false
@@ -1966,7 +1959,6 @@
                 "availableSessions": null,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/11/4030",
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": false
@@ -2082,7 +2074,6 @@
                 ],
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/11/4030",
                 "isExpired": false,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2171,7 +2162,6 @@
                 ],
                 "changeDeadline": "11/05/2022",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/11/4030",
                 "isExpired": false,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2250,7 +2240,6 @@
                 ],
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/11/4030",
                 "isExpired": false,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2291,7 +2280,6 @@
                 "availableSessions": [],
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/12/2000",
                 "isExpired": true,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2354,7 +2342,6 @@
                 "availableSessions": [],
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/12/2000",
                 "isExpired": true,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2429,7 +2416,6 @@
                 "availableSessions": [],
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/12/2000",
                 "isExpired": true,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2492,7 +2478,6 @@
                 "availableSessions": [],
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/12/2000",
                 "isExpired": true,
                 "isFulfilled": false,
                 "isRefundable": true
@@ -2567,7 +2552,6 @@
                 "availableSessions": [],
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "expirationDate": "11/12/2000",
                 "isExpired": true,
                 "isFulfilled": false,
                 "isRefundable": true
