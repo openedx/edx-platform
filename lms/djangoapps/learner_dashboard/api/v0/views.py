@@ -373,8 +373,17 @@ class CourseRecommendationApiView(APIView):
             return Response(status=400)
 
         recommended_courses = []
+        user_enrolled_course_keys = set()
         fields = ['title', 'owners', 'marketing_url']
-        for course_id in course_keys:
+
+        course_enrollments = CourseEnrollment.enrollments_for_user(request.user)
+        for course_enrollment in course_enrollments:
+            course_key = f'{course_enrollment.course_id.org}+{course_enrollment.course_id.course}'
+            user_enrolled_course_keys.add(course_key)
+
+        # Pick 5 course keys, excluding the user's already enrolled course(s).
+        enrollable_course_keys = list(set(course_keys).difference(user_enrolled_course_keys))[:5]
+        for course_id in enrollable_course_keys:
             course_data = get_course_data(course_id, fields)
             if course_data:
                 recommended_courses.append({
@@ -384,4 +393,5 @@ class CourseRecommendationApiView(APIView):
                     'marketing_url': course_data.get('marketing_url')
                 })
 
+        segment.track(user_id, 'edx.bi.user.recommendations.count', {'count': len(recommended_courses)})
         return Response({'courses': recommended_courses, 'is_personalized_recommendation': not is_control}, status=200)
