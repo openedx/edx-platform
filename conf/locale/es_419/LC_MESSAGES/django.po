@@ -159,7 +159,7 @@
 # 1673e3cf8bd85685e54576636ae7f409, 2014
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2021
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2022
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
@@ -274,7 +274,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-04 20:42+0000\n"
+"POT-Creation-Date: 2022-09-12 12:15+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -3259,6 +3259,10 @@ msgid ""
 "However, you are currently logged in as a '{active_enterprise_name}' user. "
 "Please log in with '{enrollment_enterprise_name}' to access this course."
 msgstr ""
+"Usted se enroló en este curso con '{enrollment_enterprise_name}'.  Sin "
+"embargo, actualmente está conectado como usuario de "
+"'{active_enterprise_name}'. Inicie sesión con '{enrollment_enterprise_name}'"
+" para acceder a este curso."
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must give Data Sharing Consent for the course"
@@ -5106,7 +5110,7 @@ msgstr "Estado:  {action} {succeeded} de {attempted}"
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid " (skipping {skipped})"
-msgstr " (ignorando {skipped})"
+msgstr " (Se han ignorado {skipped} registros)"
 
 #. Translators: {total} is a count.  This message is appended to task progress
 #. status messages.
@@ -20354,8 +20358,8 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Adjust all enrolled learners' grades for a specific problem"
 msgstr ""
-"Ajustar la calificación de cada estudiante inscrito para una pregunta "
-"específica"
+"Ajustar la calificación de todos los estudiantes inscritos para una pregunta"
+" específica"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Allows all learners to work on the problem again."
@@ -20371,7 +20375,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Learners' Submissions"
-msgstr "Recalificar los envíos de cada estudiante"
+msgstr "Recalificar los envíos de todos los estudiantes"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Only If Scores Improve"
