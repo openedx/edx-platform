@@ -162,7 +162,7 @@
 # Poxtic <erandelle@outlook.com>, 2017
 # Javier Galnares Arias <javigalnares@yahoo.es>, 2015
 # Jose Antonio Sanchez Romero <isc.antonio.sr@gmail.com>, 2017
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017,2022
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # karlman72 <karlman72@gmail.com>, 2014
@@ -177,9 +177,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-04 20:42+0000\n"
+"POT-Creation-Date: 2022-09-12 12:15+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Carolina De Mares <carolina.demares@edunext.co>, 2021\n"
+"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017,2022\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -11740,7 +11740,7 @@ msgid ""
 " transcript on YouTube. You can import the YouTube transcript or upload your"
 " own .srt transcript file."
 msgstr ""
-"EdX no tiene una transcripción de este video en Studio, pero hemos "
+"No se encontró una transcripción de este video en Studio, pero hemos "
 "encontrado una en Youtube. Puede importar la transcripción de Youtube o "
 "subir su propio archivo .srt."
 
@@ -11757,8 +11757,8 @@ msgid ""
 "EdX doesn\\'t have a timed transcript for this video. Please upload an .srt "
 "file."
 msgstr ""
-"EdX no cuenta con una transcripción para este video. Por favor suba un "
-"archivo de transcripción .srt"
+"No se encontró una transcripción para este video. Por favor suba un archivo "
+"de transcripción .srt"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid ""
