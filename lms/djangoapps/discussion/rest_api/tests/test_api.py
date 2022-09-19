@@ -445,7 +445,10 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
         }
         assert actual == expected
 
-    def test_sort_key(self):
+    def test_sort_key_doesnot_work(self):
+        """
+        Test to check that providing sort_key doesn't change the sort order
+        """
         with self.store.bulk_operations(self.course.id, emit_signals=False):
             self.course.discussion_topics = {
                 "W": {"id": "non-courseware-1", "sort_key": "Z"},
@@ -486,10 +489,10 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 ),
             ],
             "non_courseware_topics": [
-                self.make_expected_tree("non-courseware-4", "Z"),
+                self.make_expected_tree("non-courseware-1", "W"),
                 self.make_expected_tree("non-courseware-2", "X"),
                 self.make_expected_tree("non-courseware-3", "Y"),
-                self.make_expected_tree("non-courseware-1", "W"),
+                self.make_expected_tree("non-courseware-4", "Z"),
             ],
         }
         assert actual == expected
