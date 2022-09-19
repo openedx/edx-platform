@@ -6,17 +6,7 @@
 #
 -e git+https://github.com/openedx/blockstore.git@1.2.1#egg=blockstore==1.2.1
     # via -r requirements/edx/base.txt
--e git+https://github.com/openedx/codejail.git@3.1.3#egg=codejail==3.1.3
-    # via -r requirements/edx/base.txt
--e git+https://github.com/openedx/django-wiki.git@1.1.1#egg=django-wiki
-    # via -r requirements/edx/base.txt
--e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
-    # via -r requirements/edx/base.txt
--e .
-    # via -r requirements/edx/base.txt
--e git+https://github.com/openedx/RateXBlock.git@2.0.1#egg=rate-xblock
-    # via -r requirements/edx/base.txt
--e git+https://github.com/openedx/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
+-e file:///home/runner/work/edx-platform/edx-platform
     # via -r requirements/edx/base.txt
 acid-xblock==0.2.1
     # via -r requirements/edx/base.txt
@@ -127,7 +117,7 @@ celery==5.2.7
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-certifi==2022.6.15.1
+certifi==2022.9.14
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -192,6 +182,8 @@ code-annotations==1.3.0
     #   edx-enterprise
     #   edx-lint
     #   edx-toggles
+codejail @ git+https://github.com/openedx/codejail.git@3.1.3
+    # via -r requirements/edx/base.txt
 codejail-includes==1.0.0
     # via -r requirements/edx/base.txt
 contextlib2==21.6.0
@@ -427,7 +419,7 @@ django-pyfs==3.2.0
     # via -r requirements/edx/base.txt
 django-ratelimit==3.0.1
     # via -r requirements/edx/base.txt
-django-require @ git+https://github.com/openedx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
+django-require @ git+https://github.com/openedx/django-require.git@f4f01e4e959adc6210873ae99e7f2c3741afbf35
     # via -r requirements/edx/base.txt
 django-sekizai==4.0.0
     # via
@@ -470,6 +462,8 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-proctoring
+django-wiki @ git+https://github.com/openedx/django-wiki.git@1.1.1
+    # via -r requirements/edx/base.txt
 djangorestframework==3.12.4
     # via
     #   -r requirements/edx/base.txt
@@ -590,7 +584,7 @@ edx-i18n-tools==0.9.1
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
     #   ora2
-edx-lint==5.2.5
+edx-lint==5.3.0
     # via -r requirements/edx/testing.in
 edx-milestones==0.4.0
     # via -r requirements/edx/base.txt
@@ -684,7 +678,7 @@ factory-boy==3.2.1
     # via -r requirements/edx/testing.in
 faker==14.2.0
     # via factory-boy
-fastapi==0.83.0
+fastapi==0.85.0
     # via pact-python
 fastavro==1.6.1
     # via
@@ -736,7 +730,7 @@ httpretty==1.1.4
     # via -r requirements/edx/testing.in
 icalendar==4.1.0
     # via -r requirements/edx/base.txt
-idna==3.3
+idna==3.4
     # via
     #   -r requirements/edx/base.txt
     #   anyio
@@ -789,7 +783,7 @@ jmespath==0.10.0
     #   -r requirements/edx/base.txt
     #   boto3
     #   botocore
-joblib==1.1.0
+joblib==1.2.0
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -812,7 +806,7 @@ jsonschema==4.16.0
     # via
     #   -r requirements/edx/base.txt
     #   optimizely-sdk
-jwcrypto==1.3.1
+jwcrypto==1.4.2
     # via
     #   -r requirements/edx/base.txt
     #   pylti1p3
@@ -822,7 +816,7 @@ kombu==5.2.4
     #   celery
 laboratory==1.0.2
     # via -r requirements/edx/base.txt
-lazy==1.4
+lazy==1.5
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
@@ -940,6 +934,8 @@ oauthlib==3.0.1
     #   lti-consumer-xblock
     #   requests-oauthlib
     #   social-auth-core
+olxcleaner @ git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297
+    # via -r requirements/edx/base.txt
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
 openedx-events==0.12.0
@@ -1070,7 +1066,7 @@ pyjwkest==1.4.2
     #   -r requirements/edx/base.txt
     #   edx-drf-extensions
     #   lti-consumer-xblock
-pyjwt[crypto]==2.4.0
+pyjwt[crypto]==2.5.0
     # via
     #   -r requirements/edx/base.txt
     #   drf-jwt
@@ -1103,7 +1099,7 @@ pylint-plugin-utils==0.7
     #   pylint-django
 pylint-pytest==0.3.0
     # via -r requirements/edx/testing.in
-pylti1p3==1.12.0
+pylti1p3==1.12.1
     # via -r requirements/edx/base.txt
 pymongo==3.12.3
     # via
@@ -1239,6 +1235,8 @@ pyyaml==6.0
     #   edx-i18n-tools
     #   xblock
 random2==1.0.1
+    # via -r requirements/edx/base.txt
+rate-xblock @ git+https://github.com/openedx/RateXBlock.git@2.0.1
     # via -r requirements/edx/base.txt
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
@@ -1395,7 +1393,7 @@ sqlparse==0.4.2
     #   django
 staff-graded-xblock==2.0.1
     # via -r requirements/edx/base.txt
-starlette==0.19.1
+starlette==0.20.4
     # via fastapi
 stevedore==4.0.0
     # via
@@ -1446,6 +1444,10 @@ tqdm==4.64.1
     # via
     #   -r requirements/edx/base.txt
     #   nltk
+types-cryptography==3.3.23
+    # via
+    #   -r requirements/edx/base.txt
+    #   pyjwt
 typing-extensions==4.3.0
     # via
     #   -r requirements/edx/base.txt
@@ -1540,6 +1542,8 @@ xblock==1.6.1
     #   xblock-poll
     #   xblock-utils
 xblock-drag-and-drop-v2 @ git+https://github.com/openedx/xblock-drag-and-drop-v2@v2.3.5
+    # via -r requirements/edx/base.txt
+xblock-google-drive @ git+https://github.com/openedx/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6
     # via -r requirements/edx/base.txt
 xblock-poll @ git+https://github.com/open-craft/xblock-poll@v1.12.0
     # via -r requirements/edx/base.txt

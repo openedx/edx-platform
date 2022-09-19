@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-certifi==2022.6.15.1
+certifi==2022.9.14
     # via requests
 charset-normalizer==2.0.12
     # via
@@ -12,9 +12,9 @@ charset-normalizer==2.0.12
     #   requests
 edx-opaque-keys==2.3.0
     # via -r requirements/edx/paver.in
-idna==3.3
+idna==3.4
     # via requests
-lazy==1.4
+lazy==1.5
     # via -r requirements/edx/paver.in
 libsass==0.10.0
     # via -r requirements/edx/paver.in
