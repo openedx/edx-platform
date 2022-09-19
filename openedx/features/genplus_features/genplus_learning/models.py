@@ -40,6 +40,7 @@ class Program(TimeStampedModel):
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=ProgramStatuses.UNPUBLISHED)
+    banner_image = models.ImageField(upload_to="program_banner_images", default="")
     history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
