@@ -172,7 +172,7 @@ class RerunCourseTaskTestCase(CourseTestCase):  # lint-amnesty, pylint: disable=
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
-class RegisterExamsTaskTestCase(CourseTestCase):
+class RegisterExamsTaskTestCase(CourseTestCase):  # pylint: disable=missing-class-docstring
 
     @mock.patch('cms.djangoapps.contentstore.exams.register_exams')
     @mock.patch('cms.djangoapps.contentstore.proctoring.register_special_exams')
