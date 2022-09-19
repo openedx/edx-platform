@@ -1,15 +1,29 @@
-# DON'T JUST ADD NEW DEPENDENCIES!!!
+# This file holds all GitHub-hosted edx-platform Python dependencies.
+# Such dependencies should be added here, not to base.in.
+# That being said....
 #
-# If you open a pull request that adds a new dependency, you should:
+# ---->>> DON'T JUST ADD NEW DEPENDENCIES!!! <<<----
+#
+# We are working to move all dependencies here to proper PyPI-hosted
+# projects that can be specified in base.in (or development.in, etc).
+# Every new GitHub-hosted dependency slows down the edx-platform build and
+# subverts our continuous dependency upgrade process. This file should
+# only be added to in exceptional circumstances.
+#
+# "I don't have time to publish my package to PyPI" is **not** an
+# acceptable excuse. You can add a GitHub Action workflow to automatically
+# upload your package to PyPI with the push of a button:
+#
+# * Go to https://github.com/openedx/<YOUR_REPO>/actions/new
+# * Find "Publish Python Package"
+# * Merge the generated PR and push package.
+# * You're done! Add your dependency to base.in, and the requirements
+#   bot will automatically keep it fresh in edx-platform.
+#
+# If you must open a pull request that adds a new git dependency, you should:
 #   * verify that the dependency has a license compatible with AGPLv3
 #   * confirm that it has no system requirements beyond what we already install
 #   * run "make upgrade" to update the detailed requirements files
-#
-# Do *NOT* install Python packages from GitHub unless it's absolutely necessary!
-# "I don't have time to add automatic Travis upload to PyPI." is *not* an
-# acceptable excuse. Non-wheel module installations slow down the dev/building process.
-# Travis/PyPI instructions are here:
-# https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/41911049/Publishing+a+Package+to+PyPI+using+Travis
 #
 # A correct GitHub reference looks like this:
 #
