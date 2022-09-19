@@ -2510,7 +2510,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
 
     @ddt.data(
         [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.mongo],
-        [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split],
         [ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.split]
     )
     @ddt.unpack

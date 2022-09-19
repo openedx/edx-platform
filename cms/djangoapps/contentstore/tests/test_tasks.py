@@ -23,6 +23,7 @@ from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -117,6 +118,9 @@ class ExportLibraryTestCase(LibraryTestCase):
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class RerunCourseTaskTestCase(CourseTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     def _rerun_course(self, old_course_key, new_course_key):
         CourseRerunState.objects.initiated(old_course_key, new_course_key, self.user, 'Test Re-run')
         rerun_course(str(old_course_key), str(new_course_key), self.user.id)
