@@ -6,7 +6,7 @@
 #
 -e git+https://github.com/openedx/blockstore.git@1.2.1#egg=blockstore==1.2.1
     # via -r requirements/edx/testing.txt
--e file:///home/runner/work/edx-platform/edx-platform
+-e .
     # via -r requirements/edx/testing.txt
 acid-xblock==0.2.1
     # via -r requirements/edx/testing.txt
