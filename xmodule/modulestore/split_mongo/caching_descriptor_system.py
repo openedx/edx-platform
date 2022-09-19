@@ -60,7 +60,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         kwargs.setdefault('id_generator', id_manager)
 
         super().__init__(
-            field_data=None,
             load_item=self._load_item,
             resources_fs=OSFS(root),
             **kwargs

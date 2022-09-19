@@ -204,7 +204,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         kwargs.setdefault('id_reader', id_manager)
         kwargs.setdefault('id_generator', id_manager)
         super().__init__(
-            field_data=None,
             load_item=self.load_item,
             **kwargs
         )
