@@ -250,7 +250,7 @@ def update_special_exams_and_publish(course_key_str):
     course_key = CourseKey.from_string(course_key_str)
     LOGGER.info('Attempting to register exams for course %s', course_key_str)
 
-    # Call the appropriate handler for the exams IDA or the legacy edx-proctoring plugin
+    # Call the appropriate handler for either the exams IDA or the edx-proctoring plugin
     register_exams_handler = register_exams if exams_ida_enabled(course_key) else register_exams_legacy
     try:
         register_exams_handler(course_key)

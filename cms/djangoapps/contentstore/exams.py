@@ -1,6 +1,5 @@
-
 """
-Utilities for working with the exam service
+Code related to working with the exam service
 """
 
 import json
@@ -26,8 +25,8 @@ def register_exams(course_key):
     """
     This is typically called on a course published signal. The course is examined for sequences
     that are marked as timed exams. Then these are registered with the exams service.
-    Likewise, if formerly registered exams are unmarked, then those
-    registered exams are marked as inactive
+    Likewise, if formerly registered exams are not included in the payload they will
+    be marked inactive by the exam service.
     """
     if not settings.FEATURES.get('ENABLE_SPECIAL_EXAMS') or not exams_ida_enabled(course_key):
         # if feature is not enabled then do a quick exit
@@ -36,12 +35,6 @@ def register_exams(course_key):
     course = modulestore().get_course(course_key)
     if course is None:
         raise ItemNotFoundError("Course {} does not exist", str(course_key))  # lint-amnesty, pylint: disable=raising-format-tuple
-
-    if not course.enable_proctored_exams and not course.enable_timed_exams:
-        # TODO: I'M NOT SO SURE WE ACTUALLY WANT THIS
-        # likewise if course does not have these features turned on
-        # then quickly exit
-        return
 
     # get all sequences, since they can be marked as timed/proctored exams
     _timed_exams = modulestore().get_items(
@@ -92,7 +85,7 @@ def register_exams(course_key):
             'exam_type': exam_type,
             'is_active': True,
             'hide_after_due': timed_exam.hide_after_due,
-            # backend is only required for edx-proctoring support edx-exams will maintain LTI backends
+            # backend is only required for continued edx-proctoring support
             'backend': course.proctoring_provider,
         })
 
@@ -100,8 +93,9 @@ def register_exams(course_key):
         _patch_course_exams(exams_list, str(course_key))
         log.info(f'Successfully registered {locations} with exam service')
     # pylint: disable=broad-except
-    except Exception:
+    except Exception as ex:
         log.exception('Failed to register exams with exam API', exc_info=True)
+        raise ex
 
 
 def _get_exams_api_client():
