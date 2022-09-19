@@ -60,17 +60,17 @@ class MFEContextView(APIView):
 
         if settings.ENABLE_DYNAMIC_REGISTRATION_FIELDS:
             if is_register_page:
-                registration_fields = RegistrationFieldsContext()._get_fields()  # pylint: disable=protected-access
+                registration_fields = RegistrationFieldsContext().get_fields()
                 context['registration_fields'].update({
                     'fields': registration_fields,
                     'extended_profile': configuration_helpers.get_value('extended_profile_fields', []),
                 })
-            optional_fields = RegistrationFieldsContext('optional')._get_fields()  # pylint: disable=protected-access
-            if optional_fields:
-                context['optional_fields'].update({
-                    'fields': optional_fields,
-                    'extended_profile': configuration_helpers.get_value('extended_profile_fields', []),
-                })
+                optional_fields = RegistrationFieldsContext('optional').get_fields()
+                if optional_fields:
+                    context['optional_fields'].update({
+                        'fields': optional_fields,
+                        'extended_profile': configuration_helpers.get_value('extended_profile_fields', []),
+                    })
 
         return Response(
             status=status.HTTP_200_OK,

@@ -110,5 +110,5 @@ how and when we should be using different libraries.
 .. _django-ratelimit: https://django-ratelimit.readthedocs.io/en/stable/usage.html#usage-chapter
 .. _django-ratelimit-backend: https://django-ratelimit-backend.readthedocs.io/en/latest/
 .. _djangorestframework rate limiting: https://www.django-rest-framework.org/api-guide/throttling/
-.. _MAX_FAILED_LOGIN_ATTEMPTS: https://github.com/edx/edx-platform/blob/cd6064692681ab99912e3da3721cd857a0b313e9/common/djangoapps/student/models.py#L980
+.. _MAX_FAILED_LOGIN_ATTEMPTS: https://github.com/openedx/edx-platform/blob/cd6064692681ab99912e3da3721cd857a0b313e9/common/djangoapps/student/models.py#L980
 .. _cloudflare rate limiting: https://www.cloudflare.com/rate-limiting/

@@ -10,7 +10,7 @@ Notes needs to insert a new tab into the LMS courseware, as well as wrap/decorat
 
 This app is also currently proxying some requests through the LMS instead of hitting its service endpoint directly. It should instead always let the user's browser hit the edx-notes-api service directly.
 
-The edxnotes app also has an endpoint to get JWT tokens that the edx-notes-api will accept. This should be removed, and the edx-notes-api service converted to use the OAuth2 + JWT Cookie approach detailed in the `Transport JWT in HTTP Cookies <https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0009-jwt-in-session-cookie.rst>`_ decision record for ``oauth_dispatch``.
+The edxnotes app also has an endpoint to get JWT tokens that the edx-notes-api will accept. This should be removed, and the edx-notes-api service converted to use the OAuth2 + JWT Cookie approach detailed in the `Transport JWT in HTTP Cookies <https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0009-jwt-in-session-cookie.rst>`_ decision record for ``oauth_dispatch``.
 
 Glossary
 ========

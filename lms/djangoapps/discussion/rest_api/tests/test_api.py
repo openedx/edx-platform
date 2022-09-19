@@ -2891,30 +2891,55 @@ class UpdateThreadTest(
             assert error.message_dict == {"edit_reason_code": ["This field is not editable."]}
 
     @ddt.data(
-        FORUM_ROLE_ADMINISTRATOR,
-        FORUM_ROLE_MODERATOR,
-        FORUM_ROLE_COMMUNITY_TA,
-        FORUM_ROLE_STUDENT,
+        *itertools.product(
+            [
+                FORUM_ROLE_ADMINISTRATOR,
+                FORUM_ROLE_MODERATOR,
+                FORUM_ROLE_COMMUNITY_TA,
+                FORUM_ROLE_STUDENT,
+            ],
+            [True, False]
+        )
     )
+    @ddt.unpack
     @mock.patch("lms.djangoapps.discussion.rest_api.serializers.CLOSE_REASON_CODES", {
         "test-close-reason": "Test Close Reason",
     })
-    def test_update_thread_with_close_reason_code(self, role_name):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_update_thread_with_close_reason_code(self, role_name, closed, mock_emit):
         """
         Test editing comments, specifying and retrieving edit reason codes.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_thread()
         try:
+            self.request.META['HTTP_REFERER'] = 'https://example.cop'
             result = update_thread(self.request, "test_thread", {
-                "closed": True,
+                "closed": closed,
                 "close_reason_code": "test-close-reason",
             })
+
             assert role_name != FORUM_ROLE_STUDENT
-            assert result["closed"]
+            assert result["closed"] == closed
             request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
             assert request_body["close_reason_code"] == ["test-close-reason"]
             assert request_body["closing_user_id"] == [str(self.user.id)]
+
+            expected_event_name = f'edx.forum.thread.{"locked" if closed else "unlocked"}'
+            expected_event_data = {
+                'id': 'test_thread',
+                'team_id': None,
+                'url': self.request.META['HTTP_REFERER'],
+                'user_course_roles': [],
+                'user_forums_roles': ['Student', role_name],
+                'target_username': self.user.username,
+                'lock_reason': 'test-close-reason',
+                'commentable_id': 'original_topic'
+            }
+
+            actual_event_name, actual_event_data = mock_emit.call_args[0]
+            self.assertEqual(actual_event_name, expected_event_name)
+            self.assertEqual(actual_event_data, expected_event_data)
         except ValidationError as error:
             assert role_name == FORUM_ROLE_STUDENT
             assert error.message_dict == {

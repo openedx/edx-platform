@@ -17,7 +17,7 @@ Additionally, the fully qualified waffle name, including the namespace, is requi
 
 Lastly, the namespace classes contain a lot of logic, but in effect, they only are used to ensure the flag name has a prefix like '<NAMESPACE_NAME>.<FLAG_NAME>'.
 
-.. _example switch in ecommerce: https://github.com/edx/ecommerce/blob/e899c78325ac492d0a2b1ea0aab4d5e230262b8f/ecommerce/extensions/dashboard/users/views.py#L21
+.. _example switch in ecommerce: https://github.com/openedx/ecommerce/blob/e899c78325ac492d0a2b1ea0aab4d5e230262b8f/ecommerce/extensions/dashboard/users/views.py#L21
 
 Decision
 ========

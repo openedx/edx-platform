@@ -223,7 +223,7 @@ run one of these commands::
     paver test_system -s cms -t common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
     pytest common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
-.. _YouTube stub server: https://github.com/edx/edx-platform/blob/master/common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
+.. _YouTube stub server: https://github.com/openedx/edx-platform/blob/master/common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
 
 Debugging Unittest Flakiness

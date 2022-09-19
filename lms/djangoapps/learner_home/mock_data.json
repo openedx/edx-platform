@@ -1,12 +1,11 @@
 {
     "courses": [
         {
-            "cardId": "card-id0",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -17,7 +16,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": true,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -27,7 +26,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": false,
@@ -40,44 +40,42 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number0-course-id0",
-                "lastEnrolled": "2022-09-06T15:20:57.513Z"
+                "courseId": "course-number0-course-id0"
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
-                "title": "Course Name 0",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "courseName": "Course Name 0",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number0"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id1",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -92,10 +90,9 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number1-course-id1",
-                "lastEnrolled": "2022-09-05T15:20:57.513Z"
+                "courseId": "course-number1-course-id1"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -106,7 +103,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": true,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -116,33 +113,33 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
-            "provider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+            "courseProvider": {
+                "name": "MIT"
             },
             "course": {
-                "title": "Course Name 1",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 1",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number1"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id2",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -157,14 +154,13 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number2-course-id2",
-                "lastEnrolled": "2022-09-04T15:20:57.513Z"
+                "courseId": "course-number2-course-id2"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -174,26 +170,28 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": null,
+            "courseProvider": null,
             "course": {
-                "title": "Course Name 2",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 2",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number2"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
-            "cardId": "card-id3",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -208,14 +206,13 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number3-course-id3",
-                "lastEnrolled": "2022-09-03T15:20:57.513Z"
+                "courseId": "course-number3-course-id3"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -225,50 +222,50 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
-                "title": "Course Name 3",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "courseName": "Course Name 3",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number3"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id4",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -283,14 +280,13 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number4-course-id4",
-                "lastEnrolled": "2022-09-02T15:20:57.513Z"
+                "courseId": "course-number4-course-id4"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -300,40 +296,40 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+            "courseProvider": {
+                "name": "MIT"
             },
             "course": {
-                "title": "Course Name 4",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 4",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number4"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id5",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -348,14 +344,13 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number5-course-id5",
-                "lastEnrolled": "2022-09-01T15:20:57.513Z"
+                "courseId": "course-number5-course-id5"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -365,26 +360,28 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": false
+                "isVerified": false,
+                "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": null,
+            "courseProvider": null,
             "course": {
-                "title": "Course Name 5",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 5",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number5"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
-            "cardId": "card-id6",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -399,14 +396,13 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number6-course-id6",
-                "lastEnrolled": "2022-08-31T15:20:57.513Z"
+                "courseId": "course-number6-course-id6"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": true,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -417,55 +413,54 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true
+                "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
-                "title": "Course Name 6",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "courseName": "Course Name 6",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number6"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id7",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
             "courseRun": {
-                "isStarted": false,
+                "isStarted": true,
                 "isArchived": false,
                 "startDate": "11/11/3030",
                 "endDate": "11/11/4040",
@@ -475,17 +470,13 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseRun": {
-                    "isStarted": true
-                },
-                "courseId": "course-number7-course-id7",
-                "lastEnrolled": "2022-08-30T15:20:57.513Z"
+                "courseId": "course-number7-course-id7"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": true,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": true,
                     "isStaff": false
@@ -496,45 +487,44 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true
+                "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+            "courseProvider": {
+                "name": "MIT"
             },
             "course": {
-                "title": "Course Name 7",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 7",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number7"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id8",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
             "courseRun": {
-                "isStarted": false,
+                "isStarted": true,
                 "isArchived": false,
                 "startDate": "11/11/3030",
                 "endDate": "11/11/4040",
@@ -544,17 +534,13 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseRun": {
-                    "isStarted": true
-                },
-                "courseId": "course-number8-course-id8",
-                "lastEnrolled": "2022-08-29T15:20:57.514Z"
+                "courseId": "course-number8-course-id8"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": true,
                     "isStaff": false
@@ -565,31 +551,32 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true
+                "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": null,
+            "courseProvider": null,
             "course": {
-                "title": "Course Name 8",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 8",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number8"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
-            "cardId": "card-id9",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
             "courseRun": {
-                "isStarted": false,
+                "isStarted": true,
                 "isArchived": false,
                 "startDate": "11/11/3030",
                 "endDate": "11/11/4040",
@@ -599,18 +586,13 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseRun": {
-                    "isStarted": true,
-                    "endDate": "11/11/2000"
-                },
-                "courseId": "course-number9-course-id9",
-                "lastEnrolled": "2022-08-28T15:20:57.514Z"
+                "courseId": "course-number9-course-id9"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": true,
                     "isStaff": false
@@ -621,80 +603,73 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true
+                "lastEnrolled": null
             },
             "grade": {
                 "isPassing": false
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
-                "title": "Course Name 9",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "courseName": "Course Name 9",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number9"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id10",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
             "courseRun": {
-                "isStarted": false,
-                "isArchived": false,
+                "isStarted": true,
+                "isArchived": true,
                 "startDate": "11/11/3030",
-                "endDate": "11/11/4040",
+                "endDate": "11/11/2000",
                 "minPassingGrade": 70,
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseRun": {
-                    "isStarted": true,
-                    "isArchived": true,
-                    "endDate": "11/11/2000"
-                },
-                "courseId": "course-number10-course-id10",
-                "lastEnrolled": "2022-08-27T15:20:57.514Z"
+                "courseId": "course-number10-course-id10"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/2000",
                 "canUpgrade": false,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": true,
                     "isStaff": false
@@ -705,43 +680,42 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "isStarted": true
+                "lastEnrolled": null
             },
             "grade": {
                 "isPassing": false
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+            "courseProvider": {
+                "name": "MIT"
             },
             "course": {
-                "title": "Course Name 10",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 10",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number10"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id11",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -749,7 +723,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": true,
                     "isStaff": false
@@ -759,9 +733,10 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
@@ -779,20 +754,20 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number11-course-id11",
-                "lastEnrolled": "2022-08-26T15:20:57.514Z"
+                "courseId": "course-number11-course-id11"
             },
-            "provider": null,
+            "courseProvider": null,
             "course": {
-                "title": "Course Name 11",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 11",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number11"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
-            "cardId": "card-id12",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -807,14 +782,13 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number12-course-id12",
-                "lastEnrolled": "2022-08-25T15:20:57.514Z"
+                "courseId": "course-number12-course-id12"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -824,50 +798,50 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
-                "title": "Course Name 12",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "courseName": "Course Name 12",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number12"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id13",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -882,14 +856,13 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number13-course-id13",
-                "lastEnrolled": "2022-08-24T15:20:57.514Z"
+                "courseId": "course-number13-course-id13"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -899,40 +872,40 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+            "courseProvider": {
+                "name": "MIT"
             },
             "course": {
-                "title": "Course Name 13",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 13",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number13"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id14",
-            "grades": {
+            "gradeData": {
                 "isPassing": false
             },
             "entitlement": null,
@@ -947,14 +920,13 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number14-course-id14",
-                "lastEnrolled": "2022-08-23T15:20:57.514Z"
+                "courseId": "course-number14-course-id14"
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -964,26 +936,28 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": null,
+            "courseProvider": null,
             "course": {
-                "title": "Course Name 14",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 14",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number14"
             },
-            "relatedPrograms": []
+            "programs": {
+              "relatedPrograms": []
+            }
         },
         {
-            "cardId": "card-id15",
-            "grades": {
+            "gradeData": {
                 "isPassing": false
             },
             "entitlement": null,
@@ -991,7 +965,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1001,7 +975,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1014,51 +989,49 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number15-course-id15",
-                "lastEnrolled": "2022-08-22T15:20:57.514Z"
+                "courseId": "course-number15-course-id15"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
-                "title": "Course Name 15",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "courseName": "Course Name 15",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number15"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id16",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -1066,7 +1039,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1076,7 +1049,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1089,42 +1063,39 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number16-course-id16",
-                "lastEnrolled": "2022-08-21T15:20:57.514Z"
+                "courseId": "course-number16-course-id16"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/3030",
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": false,
-                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview",
-                "isAvailable": false
+                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+            "courseProvider": {
+                "name": "MIT"
             },
             "course": {
-                "title": "Course Name 16",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 16",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number16"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id17",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -1132,7 +1103,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1142,7 +1113,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1155,27 +1127,27 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number17-course-id17",
-                "lastEnrolled": "2022-08-20T15:20:57.514Z"
+                "courseId": "course-number17-course-id17"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": true,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": null,
+            "courseProvider": null,
             "course": {
-                "title": "Course Name 17",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 17",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number17"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
-            "cardId": "card-id18",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -1183,7 +1155,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1193,7 +1165,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1206,52 +1179,49 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number18-course-id18",
-                "lastEnrolled": "2022-08-19T15:20:57.514Z"
+                "courseId": "course-number18-course-id18"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/2000",
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
-                "title": "Course Name 18",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "courseName": "Course Name 18",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number18"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id19",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -1259,7 +1229,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1269,7 +1239,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1282,42 +1253,39 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number19-course-id19",
-                "lastEnrolled": "2022-08-18T15:20:57.514Z"
+                "courseId": "course-number19-course-id19"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/2000",
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview",
-                "isAvailable": true
+                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+            "courseProvider": {
+                "name": "MIT"
             },
             "course": {
-                "title": "Course Name 19",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 19",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number19"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id20",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": null,
@@ -1325,7 +1293,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1335,7 +1303,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1348,28 +1317,27 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number20-course-id20",
-                "lastEnrolled": "2022-08-17T15:20:57.514Z"
+                "courseId": "course-number20-course-id20"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/2000",
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "provider": null,
+            "courseProvider": null,
             "course": {
-                "title": "Course Name 20",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 20",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number20"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
-            "cardId": "card-id21",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": {
@@ -1401,10 +1369,8 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1413,7 +1379,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1423,7 +1389,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": false,
@@ -1436,51 +1403,49 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number21-course-id21",
-                "lastEnrolled": "2022-08-16T15:20:57.514Z"
+                "courseId": "course-number21-course-id21"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
-                "title": "Course Name 21",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "courseName": "Course Name 21",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number21"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id22",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": {
@@ -1512,10 +1477,8 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": true,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1524,7 +1487,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1534,7 +1497,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1547,41 +1511,39 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number22-course-id22",
-                "lastEnrolled": "2022-08-15T15:20:57.514Z"
+                "courseId": "course-number22-course-id22"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+            "courseProvider": {
+                "name": "MIT"
             },
             "course": {
-                "title": "Course Name 22",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 22",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number22"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id23",
-            "grades": {
+            "gradeData": {
                 "isPassing": false
             },
             "entitlement": {
@@ -1613,10 +1575,8 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": true,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1625,7 +1585,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1635,7 +1595,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1648,27 +1609,27 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number23-course-id23",
-                "lastEnrolled": "2022-08-14T15:20:57.514Z"
+                "courseId": "course-number23-course-id23"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": null,
+            "courseProvider": null,
             "course": {
-                "title": "Course Name 23",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 23",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number23"
             },
-            "relatedPrograms": []
+            "programs": {
+               "relatedPrograms": []
+            }
         },
         {
-            "cardId": "card-id24",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": {
@@ -1700,10 +1661,8 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
@@ -1712,7 +1671,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": true,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1722,7 +1681,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1735,60 +1695,56 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number24-course-id24",
-                "lastEnrolled": "2022-08-13T15:20:57.514Z"
+                "courseId": "course-number24-course-id24"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
-                "title": "Course Name 24",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "courseName": "Course Name 24",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number24"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id25",
-            "grades": {
+            "gradeData": {
                 "isPassing": false
             },
             "entitlement": {
                 "uuid": "entitlement-course-uuid-4",
                 "availableSessions": null,
-                "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": false
@@ -1797,7 +1753,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1807,7 +1763,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1820,50 +1777,46 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number25-course-id25",
-                "lastEnrolled": "2022-08-12T15:20:57.514Z"
+                "courseId": "course-number25-course-id25"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+            "courseProvider": {
+                "name": "MIT"
             },
             "course": {
-                "title": "Course Name 25",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 25",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number25"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id26",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": {
                 "uuid": "entitlement-course-uuid-5",
                 "availableSessions": null,
-                "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": false
@@ -1872,7 +1825,7 @@
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1882,7 +1835,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1895,46 +1849,43 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number26-course-id26",
-                "lastEnrolled": "2022-08-11T15:20:57.514Z"
+                "courseId": "course-number26-course-id26"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/2000",
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "provider": null,
+            "courseProvider": null,
             "course": {
-                "title": "Course Name 26",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 26",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number26"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
-            "cardId": "card-id27",
-            "grades": {
+            "gradeData": {
                 "isPassing": false
             },
             "entitlement": {
                 "uuid": "entitlement-course-uuid-6",
                 "availableSessions": null,
-                "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
-                "isFulfilled": true,
-                "isRefundable": false,
-                "canViewCourse": true,
                 "changeDeadline": "11/11/2000",
-                "isExpired": false
+                "enrollmentUrl": "/entitlement-enrollment",
+                "isExpired": false,
+                "isFulfilled": true,
+                "isRefundable": false
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -1944,7 +1895,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -1957,69 +1909,65 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number27-course-id27",
-                "lastEnrolled": "2022-08-10T15:20:57.514Z"
+                "courseId": "course-number27-course-id27"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
-                "title": "Course Name 27",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg",
+                "courseName": "Course Name 27",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
                 "courseNumber": "course-number27"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id28",
-            "grades": {
+            "gradeData": {
                 "isPassing": true
             },
             "entitlement": {
                 "uuid": "entitlement-course-uuid-7",
                 "availableSessions": null,
-                "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
-                "isRefundable": false,
-                "isFulfilled": true
+                "isFulfilled": true,
+                "isRefundable": false
             },
             "enrollment": {
                 "accessExpirationDate": "11/11/3030",
                 "canUpgrade": null,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -2029,7 +1977,8 @@
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true
+                "isVerified": true,
+                "lastEnrolled": null
             },
             "courseRun": {
                 "isStarted": true,
@@ -2042,46 +1991,43 @@
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number28-course-id28",
-                "lastEnrolled": "2022-08-09T15:20:57.514Z"
+                "courseId": "course-number28-course-id28"
             },
-            "certificates": {
+            "certificate": {
                 "availableDate": "11/11/2000",
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg",
-                "isAvailable": true
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "provider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+            "courseProvider": {
+                "name": "MIT"
             },
             "course": {
-                "title": "Course Name 28",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "courseName": "Course Name 28",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
                 "courseNumber": "course-number28"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id100",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -2094,8 +2040,8 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
-            "certificates": null,
+            "gradeData": null,
+            "certificate": null,
             "courseRun": null,
             "entitlement": {
                 "uuid": "entitlement-course-uuid-10",
@@ -2126,53 +2072,50 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/3030",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": false,
                 "isRefundable": true
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseNumber": "course-number100",
-                "title": "Course Name 100",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "courseName": "Course Name 100",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id101",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -2185,8 +2128,8 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
-            "certificates": null,
+            "gradeData": null,
+            "certificate": null,
             "courseRun": null,
             "entitlement": {
                 "uuid": "entitlement-course-uuid-11",
@@ -2217,43 +2160,40 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": false,
-                "changeDeadline": "Sat Nov 05 2022",
+                "changeDeadline": "11/05/2022",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": false,
                 "isRefundable": true
             },
-            "provider": {
-                "name": "MIT",
-                "website": "www.mit.edu",
-                "email": "support@mit.edu"
+            "courseProvider": {
+                "name": "MIT"
             },
             "course": {
                 "courseNumber": "course-number101",
-                "title": "Course Name 101",
-                "bannerUrl": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg"
+                "courseName": "Course Name 101",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
-                }
-            ]
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         },
         {
-            "cardId": "card-id102",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -2266,8 +2206,8 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
-            "certificates": null,
+            "gradeData": null,
+            "certificate": null,
             "courseRun": null,
             "entitlement": {
                 "uuid": "entitlement-course-uuid-12",
@@ -2298,29 +2238,28 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": false,
                 "isFulfilled": false,
                 "isRefundable": true
             },
-            "provider": null,
+            "courseProvider": null,
             "course": {
                 "courseNumber": "course-number102",
-                "title": "Course Name 102",
-                "bannerUrl": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg"
+                "courseName": "Course Name 102",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg"
             },
-            "relatedPrograms": []
+            "programs": {
+                "relatedPrograms": []
+            }
         },
         {
-            "cardId": "card-id103",
             "enrollment": {
                 "accessExpirationDate": null,
                 "canUpgrade": false,
                 "hasStarted": false,
-                "hasAccess": {
+                "coursewareAccess": {
                     "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
                     "isStaff": false
@@ -2333,51 +2272,321 @@
                 "isVerified": false,
                 "lastEnrolled": null
             },
-            "grades": null,
-            "certificates": null,
+            "gradeData": null,
+            "certificate": null,
             "courseRun": null,
             "entitlement": {
                 "uuid": "entitlement-course-uuid-13",
                 "availableSessions": [],
-                "canViewCourse": false,
                 "changeDeadline": "11/11/2000",
                 "enrollmentUrl": "/entitlement-enrollment",
-                "isEntitlement": true,
                 "isExpired": true,
                 "isFulfilled": false,
                 "isRefundable": true
             },
-            "provider": {
-                "name": "edX Course Provider",
-                "website": "www.edx.com",
-                "email": "support@edx.com"
+            "courseProvider": {
+                "name": "edX Course Provider"
             },
             "course": {
                 "courseNumber": "course-number103",
-                "title": "Course Name 103",
-                "bannerUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "courseName": "Course Name 103",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
-            "relatedPrograms": [
-                {
-                    "provider": "HarvardX",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                    "title": "Relativity in Modern Mechanics",
-                    "programUrl": "www.edx/my-program",
-                    "programType": "MicroBachelors Program",
-                    "numberOfCourses": 3
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
+        },
+        {
+            "enrollment": {
+                "accessExpirationDate": null,
+                "canUpgrade": false,
+                "hasStarted": false,
+                "coursewareAccess": {
+                    "hasUnmetPrerequisites": true,
+                    "isTooEarly": false,
+                    "isStaff": false
                 },
-                {
-                    "provider": "University  of Maryland",
-                    "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                    "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                    "title": "Pandering for Modern Professionals",
-                    "programUrl": "www.edx/my-program-2",
-                    "programType": "MicroBachelors Program",
-                    "programTypeUrl": "www.edx/my-program-type",
-                    "numberOfCourses": 3
-                }
-            ]
+                "isAudit": false,
+                "isAuditAccessExpired": false,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": false,
+                "isVerified": false,
+                "lastEnrolled": null
+            },
+            "gradeData": null,
+            "certificate": null,
+            "courseRun": null,
+            "entitlement": {
+                "uuid": "entitlement-course-uuid-14",
+                "availableSessions": [],
+                "changeDeadline": "11/11/2000",
+                "enrollmentUrl": "/entitlement-enrollment",
+                "isExpired": true,
+                "isFulfilled": false,
+                "isRefundable": true
+            },
+            "courseProvider": {
+                "name": "edX Course Provider"
+            },
+            "course": {
+                "courseNumber": "course-number104",
+                "courseName": "Course Name 104",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
+            },
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
+        },
+        {
+            "enrollment": {
+                "accessExpirationDate": null,
+                "canUpgrade": false,
+                "hasStarted": false,
+                "coursewareAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": true,
+                    "isStaff": false
+                },
+                "isAudit": false,
+                "isAuditAccessExpired": false,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": false,
+                "isVerified": false,
+                "lastEnrolled": null
+            },
+            "gradeData": null,
+            "certificate": null,
+            "courseRun": {
+                "isStarted": false,
+                "isArchived": false,
+                "startDate": "11/11/3030",
+                "endDate": "11/11/4040",
+                "minPassingGrade": 70,
+                "homeUrl": "edx.com/courses/my-course-url/home",
+                "marketingUrl": "edx.com/courses/my-course-url/marketing",
+                "progressUrl": "edx.com/courses/my-course-url/progress",
+                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
+                "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseId": "course-number15-course-id15"
+            },
+            "entitlement": {
+                "uuid": "entitlement-course-uuid-15",
+                "availableSessions": [],
+                "changeDeadline": "11/11/2000",
+                "enrollmentUrl": "/entitlement-enrollment",
+                "isExpired": true,
+                "isFulfilled": false,
+                "isRefundable": true
+            },
+            "courseProvider": {
+                "name": "edX Course Provider"
+            },
+            "course": {
+                "courseNumber": "course-number105",
+                "courseName": "Course Name 105",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
+            },
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
+        },
+        {
+            "enrollment": {
+                "accessExpirationDate": null,
+                "canUpgrade": false,
+                "hasStarted": false,
+                "coursewareAccess": {
+                    "hasUnmetPrerequisites": false,
+                    "isTooEarly": false,
+                    "isStaff": true
+                },
+                "isAudit": false,
+                "isAuditAccessExpired": false,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": false,
+                "isVerified": false,
+                "lastEnrolled": null
+            },
+            "gradeData": null,
+            "certificate": null,
+            "courseRun": null,
+            "entitlement": {
+                "uuid": "entitlement-course-uuid-16",
+                "availableSessions": [],
+                "changeDeadline": "11/11/2000",
+                "enrollmentUrl": "/entitlement-enrollment",
+                "isExpired": true,
+                "isFulfilled": false,
+                "isRefundable": true
+            },
+            "courseProvider": {
+                "name": "edX Course Provider"
+            },
+            "course": {
+                "courseNumber": "course-number106",
+                "courseName": "Course Name 106",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
+            },
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
+        },
+        {
+            "enrollment": {
+                "accessExpirationDate": null,
+                "canUpgrade": false,
+                "hasStarted": false,
+                "coursewareAccess": {
+                    "hasUnmetPrerequisites": true,
+                    "isTooEarly": true,
+                    "isStaff": true
+                },
+                "isAudit": false,
+                "isAuditAccessExpired": false,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": false,
+                "isVerified": false,
+                "lastEnrolled": null
+            },
+            "gradeData": null,
+            "certificate": null,
+            "courseRun": {
+                "isStarted": false,
+                "isArchived": false,
+                "startDate": "11/11/3030",
+                "endDate": "11/11/4040",
+                "minPassingGrade": 70,
+                "homeUrl": "edx.com/courses/my-course-url/home",
+                "marketingUrl": "edx.com/courses/my-course-url/marketing",
+                "progressUrl": "edx.com/courses/my-course-url/progress",
+                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
+                "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseId": "course-number15-course-id15"
+            },
+            "entitlement": {
+                "uuid": "entitlement-course-uuid-17",
+                "availableSessions": [],
+                "changeDeadline": "11/11/2000",
+                "enrollmentUrl": "/entitlement-enrollment",
+                "isExpired": true,
+                "isFulfilled": false,
+                "isRefundable": true
+            },
+            "courseProvider": {
+                "name": "edX Course Provider"
+            },
+            "course": {
+                "courseNumber": "course-number107",
+                "courseName": "Course Name 107",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
+            },
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
         }
     ],
     "emailConfirmation": {
@@ -2395,27 +2604,27 @@
     },
     "suggestedCourses": [
         {
-            "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-            "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "title": "Suggested course 1",
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+            "logoImgSrc": null,
+            "courseName": "Suggested course 1",
             "courseUrl": "www.edx/suggested-course"
         },
         {
-            "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-            "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "title": "Suggested course 2",
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+            "logoImgSrc": null,
+            "courseName": "Suggested course 2",
             "courseUrl": "www.edx/suggested-course"
         },
         {
-            "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-            "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "title": "Suggested course 3",
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+            "logoImgSrc": null,
+            "courseName": "Suggested course 3",
             "courseUrl": "www.edx/suggested-course"
         },
         {
-            "bannerUrl": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-            "logoUrl": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "title": "Suggested course 4",
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+            "logoImgSrc": null,
+            "courseName": "Suggested course 4",
             "courseUrl": "www.edx/suggested-course"
         }
     ]

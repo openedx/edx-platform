@@ -12,7 +12,7 @@ protection on that code.
 If you want to configure sandboxing, you're going to use the `README from
 CodeJail`__, with a few customized tweaks.
 
-__ https://github.com/edx/codejail/blob/master/README.rst
+__ https://github.com/openedx/codejail/blob/master/README.rst
 
 
 1. At the instruction to install packages into the sandboxed code, you'll

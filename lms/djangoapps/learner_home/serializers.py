@@ -111,10 +111,13 @@ class CourseRunSerializer(serializers.Serializer):
             return f"{ecommerce_payment_page}?sku={verified_sku}"
 
     def get_resumeUrl(self, instance):
-        return self.context.get("resume_course_urls", {}).get(instance.course_id)
+        resumeUrl = self.context.get("resume_course_urls", {}).get(instance.course_id)
+
+        # Return None if missing or empty string
+        return resumeUrl if bool(resumeUrl) else None
 
 
-class HasAccessSerializer(serializers.Serializer):
+class CoursewareAccessSerializer(serializers.Serializer):
     """
     Info determining whether a user should be able to view course material.
     Mirrors logic in "show_courseware_links_for" from old dashboard.py
@@ -167,7 +170,7 @@ class EnrollmentSerializer(serializers.Serializer):
     accessExpirationDate = serializers.SerializerMethodField()
     isAudit = serializers.SerializerMethodField()
     hasStarted = serializers.SerializerMethodField()
-    hasAccess = HasAccessSerializer(source="*")
+    coursewareAccess = CoursewareAccessSerializer(source="*")
     isVerified = serializers.SerializerMethodField()
     canUpgrade = serializers.SerializerMethodField()
     isAuditAccessExpired = serializers.SerializerMethodField()
@@ -300,6 +303,7 @@ class AvailableEntitlementSessionSerializer(serializers.Serializer):
 
 class EntitlementSerializer(serializers.Serializer):
     """Entitlement info"""
+
     requires_context = True
 
     availableSessions = serializers.SerializerMethodField()
@@ -341,14 +345,41 @@ class EntitlementSerializer(serializers.Serializer):
 class RelatedProgramSerializer(serializers.Serializer):
     """Related programs information"""
 
-    bannerUrl = serializers.URLField()
-    estimatedNumberOfWeeks = serializers.IntegerField()
-    logoUrl = serializers.URLField()
-    numberOfCourses = serializers.IntegerField()
-    programType = serializers.CharField()
-    programUrl = serializers.URLField()
-    provider = serializers.CharField()
+    bannerImgSrc = serializers.URLField(source="banner_image.small.url")
+    logoImgSrc = serializers.SerializerMethodField()
+    numberOfCourses = serializers.SerializerMethodField()
+    programType = serializers.CharField(source="type")
+    programUrl = serializers.SerializerMethodField()
+    provider = serializers.SerializerMethodField()
     title = serializers.CharField()
+
+    def get_numberOfCourses(self, instance):
+        return len(instance["courses"])
+
+    def get_logoImgSrc(self, instance):
+        return (
+            instance["authoring_organizations"][0].get("logo_image_url")
+            if instance.get("authoring_organizations")
+            else None
+        )
+
+    def get_provider(self, instance):
+        return (
+            instance["authoring_organizations"][0].get("name")
+            if instance.get("authoring_organizations")
+            else None
+        )
+
+    def get_programUrl(self, instance):
+        return urljoin(
+            settings.LMS_ROOT_URL,
+            instance.get(
+                "detail_url",
+                reverse(
+                    "program_details_view", kwargs={"program_uuid": instance["uuid"]}
+                ),
+            ),
+        )
 
 
 class ProgramsSerializer(serializers.Serializer):
@@ -374,9 +405,10 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     certificate = CertificateSerializer(source="*")
     entitlement = serializers.SerializerMethodField()
     gradeData = GradeDataSerializer(source="*")
+    programs = serializers.SerializerMethodField()
 
     # TODO - remove "allow_null" as each of these are implemented, temp for testing.
-    programs = ProgramsSerializer(allow_null=True)
+    courseProvider = CourseProviderSerializer(allow_null=True)
 
     def get_entitlement(self, instance):
         """
@@ -389,6 +421,15 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
             return EntitlementSerializer(entitlement, context=self.context).data
         else:
             return {}
+
+    def get_programs(self, instance):
+        """
+        If this enrollment is part of a program, include information about the program and related programs
+        """
+        programs = self.context["programs"].get(str(instance.course_id), [])
+        return ProgramsSerializer(
+            {"relatedPrograms": programs}, context=self.context
+        ).data
 
 
 class UnfulfilledEntitlementSerializer(serializers.Serializer):
@@ -405,7 +446,11 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         "accessExpirationDate": None,
         "isAudit": False,
         "hasStarted": False,
-        "hasAccess": True,
+        "coursewareAccess": {
+            "hasUnmetPrerequisites": False,
+            "isTooEarly": False,
+            "isStaff": False,
+        },
         "isVerified": False,
         "canUpgrade": False,
         "isAuditAccessExpired": False,
@@ -428,9 +473,7 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
     entitlement = EntitlementSerializer(source="*")
     course = serializers.SerializerMethodField()
     courseProvider = serializers.SerializerMethodField()
-
-    # Change after data is implemented. This data is required
-    programs = ProgramsSerializer(allow_null=True)
+    programs = serializers.SerializerMethodField()
 
     # These fields are literal values that do not change
     courseRun = LiteralField(None)
@@ -461,14 +504,21 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
 
         return CourseProviderSerializer(course_overview, allow_null=True).data
 
+    def get_programs(self, instance):
+        """
+        If this entitlement is part of a program, include information about the program and related programs
+        """
+        programs = self.context['programs'].get(str(instance.course_uuid), [])
+        return ProgramsSerializer({"relatedPrograms": programs}, context=self.context).data
+
 
 class SuggestedCourseSerializer(serializers.Serializer):
-    """Serializer for a suggested course"""
+    """Serializer for a suggested course from recommendation engine"""
 
-    bannerUrl = serializers.URLField()
-    logoUrl = serializers.URLField()
-    title = serializers.CharField()
-    courseUrl = serializers.URLField()
+    bannerImgSrc = serializers.URLField(source="logo_image_url")
+    logoImgSrc = serializers.URLField(allow_null=True)
+    courseName = serializers.CharField(source="title")
+    courseUrl = serializers.URLField(source="marketing_url")
 
 
 class EmailConfirmationSerializer(serializers.Serializer):

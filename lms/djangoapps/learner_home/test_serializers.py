@@ -7,6 +7,7 @@ from unittest import mock
 from uuid import uuid4
 
 from django.conf import settings
+from django.urls import reverse
 from django.test import TestCase
 import ddt
 from opaque_keys.edx.keys import CourseKey
@@ -21,6 +22,7 @@ from common.djangoapps.student.tests.factories import (
 )
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseRunFactory as CatalogCourseRunFactory,
+    ProgramFactory,
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import (
     CourseOverviewFactory,
@@ -35,14 +37,16 @@ from lms.djangoapps.learner_home.serializers import (
     EnterpriseDashboardSerializer,
     EntitlementSerializer,
     GradeDataSerializer,
-    HasAccessSerializer,
+    CoursewareAccessSerializer,
     LearnerEnrollmentSerializer,
     PlatformSettingsSerializer,
     ProgramsSerializer,
     LearnerDashboardSerializer,
+    RelatedProgramSerializer,
     SuggestedCourseSerializer,
     UnfulfilledEntitlementSerializer,
 )
+
 from lms.djangoapps.learner_home.test_utils import (
     datetime_to_django_format,
     random_bool,
@@ -172,31 +176,46 @@ class TestCourseSerializer(LearnerDashboardBaseTest):
 class TestCourseRunSerializer(LearnerDashboardBaseTest):
     """Tests for the CourseRunSerializer"""
 
-    def test_with_data(self):
-        input_data = self.create_test_enrollment()
-
-        input_context = {
-            "resume_course_urls": {input_data.course.id: random_url()},
+    def create_test_context(self, course_id):
+        return {
+            "resume_course_urls": {course_id: random_url()},
             "ecommerce_payment_page": random_url(),
             "course_mode_info": {
-                input_data.course.id: {
+                course_id: {
                     "verified_sku": str(uuid4()),
                     "days_for_upsell": randint(0, 14),
                 }
             },
         }
 
-        serializer = CourseRunSerializer(input_data, context=input_context)
-        output = serializer.data
+    def test_with_data(self):
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course.id)
 
-        # Serializaiton set up so all fields will have values to make testing easy
-        for key in output:
-            assert output[key] is not None
+        output_data = CourseRunSerializer(input_data, context=input_context).data
+
+        # Serialization set up so all fields will have values to make testing easy
+        for key in output_data:
+            assert output_data[key] is not None
+
+    def test_missing_resume_url(self):
+        # Given a course run
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course.id)
+
+        # ... where a user hasn't started
+        input_context["resume_course_urls"][input_data.course.id] = ""
+
+        # When I serialize
+        output_data = CourseRunSerializer(input_data, context=input_context).data
+
+        # Then the resumeUrl is None
+        self.assertIsNone(output_data["resumeUrl"])
 
 
 @ddt.ddt
-class TestHasAccessSerializer(LearnerDashboardBaseTest):
-    """Tests for the HasAccessSerializer"""
+class TestCoursewareAccessSerializer(LearnerDashboardBaseTest):
+    """Tests for the CoursewareAccessSerializer"""
 
     def create_test_context(self, course):
         return {
@@ -230,7 +249,7 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
             )
 
         # When I serialize
-        output_data = HasAccessSerializer(input_data, context=input_context).data
+        output_data = CoursewareAccessSerializer(input_data, context=input_context).data
 
         # Then "hasUnmetPrerequisites" is outputs correctly
         self.assertEqual(output_data["hasUnmetPrerequisites"], has_unmet_prerequisites)
@@ -253,7 +272,7 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
         )
 
         # When I serialize
-        output_data = HasAccessSerializer(input_data, context=input_context).data
+        output_data = CoursewareAccessSerializer(input_data, context=input_context).data
 
         # Then "isStaff" serializes properly
         self.assertEqual(output_data["isStaff"], is_staff)
@@ -276,7 +295,7 @@ class TestHasAccessSerializer(LearnerDashboardBaseTest):
         )
 
         # When I serialize
-        output_data = HasAccessSerializer(input_data, context=input_context).data
+        output_data = CoursewareAccessSerializer(input_data, context=input_context).data
 
         # Then "isTooEarly" serializes properly
         self.assertEqual(output_data["isTooEarly"], is_too_early)
@@ -678,46 +697,59 @@ class TestProgramsSerializer(TestCase):
     @classmethod
     def generate_test_related_program(cls):
         """Generate a program with random test data"""
-        return {
-            "bannerUrl": random_url(),
-            "estimatedNumberOfWeeks": randint(0, 45),
-            "logoUrl": random_url(),
-            "numberOfCourses": randint(0, 100),
-            "programType": f"{uuid4()}",
-            "programUrl": random_url(),
-            "provider": f"{uuid4()} Inc.",
-            "title": f"{uuid4()}",
-        }
+        return ProgramFactory()
 
     @classmethod
     def generate_test_programs_info(cls):
         """Util to generate test programs info"""
         return {
-            "relatedPrograms": [
-                cls.generate_test_related_program() for _ in range(randint(0, 3))
-            ],
+            "relatedPrograms": [cls.generate_test_related_program() for _ in range(3)],
         }
 
-    def test_happy_path(self):
+    def test_related_program_serializer(self):
+        """Test the RelatedProgramSerializer"""
+        # Given a program
+        input_data = self.generate_test_related_program()
+        # When I serialize it
+        output_data = RelatedProgramSerializer(input_data).data
+        # Then the output should map with the input
+        self.assertEqual(
+            output_data,
+            {
+                "bannerImgSrc": input_data["banner_image"]["small"]["url"],
+                "logoImgSrc": input_data["authoring_organizations"][0][
+                    "logo_image_url"
+                ],
+                "numberOfCourses": len(input_data["courses"]),
+                "programType": input_data["type"],
+                "programUrl": settings.LMS_ROOT_URL
+                + reverse(
+                    "program_details_view", kwargs={"program_uuid": input_data["uuid"]}
+                ),
+                "provider": input_data["authoring_organizations"][0]["name"],
+                "title": input_data["title"],
+            },
+        )
+
+    def test_programs_serializer(self):
+        """Test the ProgramsSerializer"""
+        # Given a program with random test data
         input_data = self.generate_test_programs_info()
+
+        # When I serialize the program
         output_data = ProgramsSerializer(input_data).data
 
-        related_programs = output_data.pop("relatedPrograms")
-
-        for i, related_program in enumerate(related_programs):
-            input_program = input_data["relatedPrograms"][i]
-            assert related_program == {
-                "bannerUrl": input_program["bannerUrl"],
-                "estimatedNumberOfWeeks": input_program["estimatedNumberOfWeeks"],
-                "logoUrl": input_program["logoUrl"],
-                "numberOfCourses": input_program["numberOfCourses"],
-                "programType": input_program["programType"],
-                "programUrl": input_program["programUrl"],
-                "provider": input_program["provider"],
-                "title": input_program["title"],
-            }
-
-        self.assertDictEqual(output_data, {})
+        # Test the output
+        assert output_data["relatedPrograms"]
+        assert len(output_data["relatedPrograms"]) == len(input_data["relatedPrograms"])
+        self.assertEqual(
+            output_data,
+            {
+                "relatedPrograms": RelatedProgramSerializer(
+                    input_data["relatedPrograms"], many=True
+                ).data
+            },
+        )
 
     def test_empty_sessions(self):
         input_data = {"relatedPrograms": []}
@@ -746,6 +778,7 @@ class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
             },
             "fulfilled_entitlements": {},
             "unfulfilled_entitlement_pseudo_sessions": {},
+            "programs": {},
         }
 
         output_data = LearnerEnrollmentSerializer(
@@ -767,19 +800,8 @@ class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
 class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
     """High-level tests for UnfulfilledEntitlementSerializer"""
 
-    @classmethod
-    def generate_test_entitlement_data(cls):
-        mock_enrollment = cls.create_test_enrollment(cls)
-
-        return {
-            "courseProvider": TestCourseProviderSerializer.generate_test_provider_info(),
-            "course": mock_enrollment.course,
-            "entitlement": TestEntitlementSerializer.generate_test_entitlement_info(),
-            "programs": TestProgramsSerializer.generate_test_programs_info(),
-        }
-
-    def test_happy_path(self):
-        """Test that nothing breaks and the output fields look correct"""
+    def make_unfulfilled_entitlement(self):
+        """ Create an unfulflled entitlement, along with a pseudo session and available sessions"""
         unfulfilled_entitlement = CourseEntitlementFactory.create()
         pseudo_sessions = {
             str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create()
@@ -787,18 +809,27 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         available_sessions = {
             str(unfulfilled_entitlement.uuid): CatalogCourseRunFactory.create_batch(3)
         }
+        return unfulfilled_entitlement, pseudo_sessions, available_sessions
 
-        # create course overview for course provider info
+    def make_pseudo_session_course_overviews(self, unfulfilled_entitlement, pseudo_sessions):
+        """ Create course overview for course provider info """
         course_key_str = pseudo_sessions[str(unfulfilled_entitlement.uuid)]["key"]
         course_key = CourseKey.from_string(course_key_str)
         course_overview = CourseOverviewFactory.create(id=course_key)
+        return {course_key: course_overview}
 
-        pseudo_session_course_overviews = {course_key: course_overview}
-
+    def test_happy_path(self):
+        """Test that nothing breaks and the output fields look correct"""
+        unfulfilled_entitlement, pseudo_sessions, available_sessions = self.make_unfulfilled_entitlement()
+        pseudo_session_course_overviews = self.make_pseudo_session_course_overviews(
+            unfulfilled_entitlement,
+            pseudo_sessions
+        )
         context = {
             "unfulfilled_entitlement_pseudo_sessions": pseudo_sessions,
             "course_entitlement_available_sessions": available_sessions,
             "pseudo_session_course_overviews": pseudo_session_course_overviews,
+            "programs": {}
         }
 
         output_data = UnfulfilledEntitlementSerializer(
@@ -825,6 +856,35 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
             output_data["enrollment"]
             == UnfulfilledEntitlementSerializer.STATIC_ENTITLEMENT_ENROLLMENT_DATA
         )
+        assert output_data["course"] is not None
+        assert output_data["courseProvider"] is not None
+        assert output_data["programs"] == {"relatedPrograms": []}
+
+    def test_programs(self):
+        unfulfilled_entitlement, pseudo_sessions, available_sessions = self.make_unfulfilled_entitlement()
+        pseudo_session_course_overviews = self.make_pseudo_session_course_overviews(
+            unfulfilled_entitlement,
+            pseudo_sessions
+        )
+        related_programs = ProgramFactory.create_batch(3)
+        programs = {
+            str(unfulfilled_entitlement.course_uuid): related_programs
+        }
+
+        context = {
+            "unfulfilled_entitlement_pseudo_sessions": pseudo_sessions,
+            "course_entitlement_available_sessions": available_sessions,
+            "pseudo_session_course_overviews": pseudo_session_course_overviews,
+            "programs": programs
+        }
+
+        output_data = UnfulfilledEntitlementSerializer(
+            unfulfilled_entitlement, context=context
+        ).data
+
+        assert output_data["programs"] == ProgramsSerializer(
+            {"relatedPrograms": related_programs}
+        ).data
 
     def test_static_enrollment_data(self):
         """
@@ -843,42 +903,41 @@ class TestSuggestedCourseSerializer(TestCase):
     """High-level tests for SuggestedCourseSerializer"""
 
     @classmethod
-    def generate_test_suggested_courses(cls):
-        return {
-            "bannerUrl": random_url(),
-            "logoUrl": random_url(),
-            "title": f"{uuid4()}",
-            "courseUrl": random_url(),
+    def mock_suggested_courses(cls, courses_count=5):
+        """
+        Sample return data from general recommendations
+        """
+        suggested_courses = {
+            "courses": [],
+            "is_personalized_recommendation": False,
         }
 
-    def test_structure(self):
-        """Test that nothing breaks and the output fields look correct"""
-        input_data = self.generate_test_suggested_courses()
+        for i in range(courses_count):
+            suggested_courses["courses"].append(
+                {
+                    "course_key": uuid4(),
+                    "logo_image_url": random_url(),
+                    "marketing_url": random_url(),
+                    "title": str(uuid4()),
+                },
+            )
 
-        output_data = SuggestedCourseSerializer(input_data).data
-
-        expected_keys = [
-            "bannerUrl",
-            "logoUrl",
-            "title",
-            "courseUrl",
-        ]
-        assert output_data.keys() == set(expected_keys)
+        return suggested_courses
 
     def test_happy_path(self):
         """Test that data serializes correctly"""
 
-        input_data = self.generate_test_suggested_courses()
+        input_data = self.mock_suggested_courses(courses_count=1)["courses"][0]
 
         output_data = SuggestedCourseSerializer(input_data).data
 
         self.assertDictEqual(
             output_data,
             {
-                "bannerUrl": input_data["bannerUrl"],
-                "logoUrl": input_data["logoUrl"],
-                "title": input_data["title"],
-                "courseUrl": input_data["courseUrl"],
+                "bannerImgSrc": input_data["logo_image_url"],
+                "logoImgSrc": None,
+                "courseName": input_data["title"],
+                "courseUrl": input_data["marketing_url"],
             },
         )
 
@@ -972,6 +1031,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         enrollments=None,
         enrollments_with_entitlements=None,
         unfulfilled_entitlements=None,
+        has_programs=False,
     ):
         """
         Given enrollments and entitlements, generate a matching serializer context
@@ -1021,6 +1081,14 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             course_overview = CourseOverviewFactory.create(id=course_key)
 
             pseudo_session_course_overviews[course_key] = course_overview
+        programs = (
+            {
+                str(enrollment.course.id): ProgramFactory.create_batch(3)
+                for enrollment in enrollments
+            }
+            if has_programs
+            else {}
+        )
 
         input_context = {
             "resume_course_urls": resume_course_urls,
@@ -1030,6 +1098,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             "unfulfilled_entitlement_pseudo_sessions": unfulfilled_entitlement_pseudo_sessions,
             "course_entitlement_available_sessions": course_entitlement_available_sessions,
             "pseudo_session_course_overviews": pseudo_session_course_overviews,
+            "programs": programs,
         }
         return input_context
 
@@ -1090,6 +1159,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             enrollments=enrollments,
             enrollments_with_entitlements=[enrollments[1]],
             unfulfilled_entitlements=unfulfilled_entitlements,
+            has_programs=True,
         )
 
         input_data = {
@@ -1108,13 +1178,37 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         assert len(courses) == 3
         self._assert_all_keys_equal(courses)
         # Non-entitlement enrollment should have no entitlement info
-        assert not courses[0]['entitlement']
+        assert not courses[0]["entitlement"]
         # Fulfilled and Unfulfilled entitlement should have identical keys
-        fulfilled_entitlement = courses[1]['entitlement']
-        unfulfilled_entitlement = courses[2]['entitlement']
+        fulfilled_entitlement = courses[1]["entitlement"]
+        unfulfilled_entitlement = courses[2]["entitlement"]
         assert fulfilled_entitlement
         assert unfulfilled_entitlement
         assert fulfilled_entitlement.keys() == unfulfilled_entitlement.keys()
+
+        # test programs
+        assert courses[0]["programs"]
+        assert len(courses[0]["programs"]["relatedPrograms"]) == 3
+
+    def test_suggested_courses(self):
+
+        suggested_courses = TestSuggestedCourseSerializer.mock_suggested_courses()[
+            "courses"
+        ]
+
+        input_data = {
+            "emailConfirmation": None,
+            "enterpriseDashboard": None,
+            "platformSettings": None,
+            "enrollments": [],
+            "unfulfilledEntitlements": [],
+            "suggestedCourses": suggested_courses,
+        }
+        output_data = LearnerDashboardSerializer(input_data).data
+
+        output_suggested_courses = output_data.pop("suggestedCourses")
+
+        self.assertEqual(len(suggested_courses), len(output_suggested_courses))
 
     @mock.patch(
         "lms.djangoapps.learner_home.serializers.SuggestedCourseSerializer.to_representation"

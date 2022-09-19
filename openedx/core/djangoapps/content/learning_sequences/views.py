@@ -156,7 +156,7 @@ class CourseOutlineView(APIView):
         The CourseOutline, customized for a given user.
 
         TODO: Swagger docs of API. For an exemplar to imitate, see:
-        https://github.com/edx/edx-platform/blob/master/lms/djangoapps/program_enrollments/rest_api/v1/views.py#L792-L820
+        https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/program_enrollments/rest_api/v1/views.py#L792-L820
         """
         # Translate input params and do course key validation (will cause HTTP
         # 400 error if an invalid CourseKey was entered, instead of 404).

@@ -29,6 +29,7 @@ disable+ =
     unused-argument,
     unsubscriptable-object,
     abstract-method,
+    no-self-use,
 
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$

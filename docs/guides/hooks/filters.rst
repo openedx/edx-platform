@@ -148,11 +148,11 @@ well as the trigger location in this same repository.
 
    * - `StudentLoginRequested <https://github.com/eduNEXT/openedx-filters/blob/main/openedx_filters/learning/filters.py#L40>`_
      - org.openedx.learning.student.login.requested.v1
-     - `2022-06-14 <https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/user_authn/views/login.py#L569>`_
+     - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/user_authn/views/login.py#L569>`_
 
    * - `CourseEnrollmentStarted <https://github.com/eduNEXT/openedx-filters/blob/main/openedx_filters/learning/filters.py#L70>`_
      - org.openedx.learning.course.enrollment.started.v1
-     - `2022-06-14 <https://github.com/edx/edx-platform/blob/master/common/djangoapps/student/models.py#L1675>`_
+     - `2022-06-14 <https://github.com/openedx/edx-platform/blob/master/common/djangoapps/student/models.py#L1675>`_
 
    * - `CourseUnenrollmentStarted <https://github.com/eduNEXT/openedx-filters/blob/main/openedx_filters/learning/filters.py#L98>`_
      - org.openedx.learning.course.unenrollment.started.v1

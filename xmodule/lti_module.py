@@ -1,5 +1,5 @@
 """
-THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/edx/xblock-lti-consumer
+THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/openedx/xblock-lti-consumer
 
 Learning Tools Interoperability (LTI) module.
 
@@ -289,7 +289,7 @@ class LTIBlock(
     XModuleMixin,
 ):  # pylint: disable=abstract-method
     """
-    THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/edx/xblock-lti-consumer
+    THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/openedx/xblock-lti-consumer
 
     Module provides LTI integration to course.
 

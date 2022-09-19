@@ -20,7 +20,7 @@ class DuplicateXBlockTest(Exception):
     either case, it'd be nice to resolve (likely by renaming tests as they
     come in, hopefully still being careful to catch collisions which might
     effect deployed XBlocks. See discussion at:
-      https://github.com/edx/edx-platform/pull/11032#discussion_r48097392).
+      https://github.com/openedx/edx-platform/pull/11032#discussion_r48097392).
     '''
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
@@ -47,7 +47,7 @@ for entrypoint in pkg_resources.iter_entry_points(group="xblock.test.v0"):
     # This should never happen, but while we're testing for class name
     # validity, we figured it was okay to be a little overly defensive.
     # See discussion at:
-    # https://github.com/edx/edx-platform/pull/11032#discussion_r48097392
+    # https://github.com/openedx/edx-platform/pull/11032#discussion_r48097392
     if not classname.replace("_", "").isalnum():
         raise InvalidTestName("Python variables should be letters, numbers, and underscores: " + classname)
     globals()[classname] = plugin

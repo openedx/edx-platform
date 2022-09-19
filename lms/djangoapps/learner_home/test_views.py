@@ -23,24 +23,31 @@ from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.learner_home.test_utils import create_test_enrollment
 from lms.djangoapps.learner_home.views import (
     get_course_overviews_for_pseudo_sessions,
+    get_course_programs,
     get_email_settings_info,
     get_enrollments,
     get_platform_settings,
+    get_suggested_courses,
     get_user_account_confirmation_info,
     get_entitlements,
 )
 from lms.djangoapps.learner_home.test_serializers import random_url
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseRunFactory as CatalogCourseRunFactory,
+    ProgramFactory,
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import (
     CourseOverviewFactory,
 )
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseFactory as CatalogCourseFactory,
+)
 
 
 ENTERPRISE_ENABLED = "ENABLE_ENTERPRISE_INTEGRATION"
@@ -343,6 +350,50 @@ class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
         )
 
 
+class TestGetSuggestedCourses(SharedModuleStoreTestCase):
+    """Tests for get_suggested_courses"""
+
+    MOCK_SUGGESTED_COURSES = {
+        "courses": [
+            {
+                "course_key": "HogwartsX+6.00.1x",
+                "logo_image_url": random_url(),
+                "marketing_url": random_url(),
+                "title": "Defense Against the Dark Arts",
+            },
+            {
+                "course_key": "MonstersX+SC101EN",
+                "logo_image_url": random_url(),
+                "marketing_url": random_url(),
+                "title": "Scaring 101",
+            },
+        ],
+        "is_personalized_recommendation": False,
+    }
+
+    EMPTY_SUGGESTED_COURSES = {
+        "courses": [],
+        "is_personalized_recommendation": False,
+    }
+
+    @patch("django.conf.settings.GENERAL_RECOMMENDATION", MOCK_SUGGESTED_COURSES)
+    def test_suggested_courses(self):
+        # Given suggested courses are configured
+        # When I request suggested courses
+        return_data = get_suggested_courses()
+
+        # Then I return them in the appropriate response
+        self.assertDictEqual(return_data, self.MOCK_SUGGESTED_COURSES)
+
+    def test_no_suggested_courses(self):
+        # Given suggested courses are not found/configured
+        # When I request suggested courses
+        return_data = get_suggested_courses()
+
+        # Then I return them in the appropriate response
+        self.assertDictEqual(return_data, self.EMPTY_SUGGESTED_COURSES)
+
+
 class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
     """Tests for the dashboard view"""
 
@@ -363,6 +414,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         cls.username = "alan"
         cls.password = "enigma"
         cls.user = UserFactory(username=cls.username, password=cls.password)
+        cls.site = SiteFactory()
 
     def log_in(self):
         """Log in as a test user"""
@@ -371,6 +423,27 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
     def setUp(self):
         super().setUp()
         self.log_in()
+
+    def _create_course_programs(self, course_uuid=None):
+        """
+        Create a program with entitlements
+        """
+        course_uuid = course_uuid or str(uuid4())
+
+        program = ProgramFactory(courses=[CatalogCourseFactory(uuid=str(course_uuid))])
+
+        enrollment = CourseEnrollmentFactory(
+            user=self.user, mode=CourseMode.VERIFIED, is_active=False
+        )
+
+        entitlement = CourseEntitlementFactory.create(
+            user=self.user,
+            course_uuid=course_uuid,
+            mode=CourseMode.VERIFIED,
+            enrollment_course_run=enrollment,
+        )
+
+        return (program, enrollment, entitlement)
 
     @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
     def test_response_structure(self):
@@ -467,3 +540,53 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
                 "certPreviewUrl": mock_cert_info["cert_web_view_url"],
             },
         )
+
+    @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
+    @patch("openedx.core.djangoapps.programs.utils.get_programs")
+    def test_get_for_one_of_course_programs(self, mock_get_programs):
+        """Test that course programs get loaded correctly"""
+
+        # Given I am logged in
+        self.log_in()
+
+        course_uuid = str(uuid4())
+        program, enrollment, _ = self._create_course_programs(course_uuid=course_uuid)
+
+        data = [
+            program,
+            ProgramFactory(),
+        ]
+        mock_get_programs.return_value = data
+
+        programs = get_course_programs(self.user, [enrollment], self.site)
+
+        assert len(programs) == 1
+        assert programs[course_uuid][0] == program
+        assert len(data) > len(programs)
+
+    @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
+    @patch("openedx.core.djangoapps.programs.utils.get_programs")
+    def test_get_multiple_course_programs(self, mock_get_programs):
+        """Test that course programs get loaded correctly"""
+
+        # Given I am logged in
+        self.log_in()
+
+        course_uuid = str(uuid4())
+        course_uuid2 = str(uuid4())
+        program, enrollment, _ = self._create_course_programs(course_uuid=course_uuid)
+        program2, enrollment2, _ = self._create_course_programs(
+            course_uuid=course_uuid2
+        )
+
+        data = [
+            program,
+            program2,
+        ]
+        mock_get_programs.return_value = data
+
+        programs = get_course_programs(self.user, [enrollment, enrollment2], self.site)
+
+        assert len(data) == len(programs)
+        assert programs[course_uuid][0] == program
+        assert programs[course_uuid2][0] == program2

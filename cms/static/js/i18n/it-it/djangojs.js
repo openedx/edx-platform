@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;
+    const v = (n != 1);
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -134,7 +134,6 @@
     " From this point in time, you must follow the <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online proctoring rules</a> to pass the proctoring review for your exam. ": " Da questo momento dovrai attenerti alle <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">regole di supervisione online</a> per superare la verifica della supervisione del tuo esame.",
     " Member": [
       " Membro",
-      " Membri",
       " Membri"
     ],
     " Your Proctoring Session Has Started ": " La tua sessione di supervisione \u00e8 stata avviata",
@@ -162,7 +161,6 @@
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)scommenti (%(unread_comments_count)s commenti non letti)%(span_close)s",
     "%(errorCount)s error found in form.": [
       "%(errorCount)s errore rilevato nel modulo.",
-      "%(errorCount)s errori rilevati nel modulo.",
       "%(errorCount)s errori rilevati nel modulo."
     ],
     "%(field)s can only contain up to %(count)d characters.": "%(field)s pu\u00f2 solo contenere fino a %(count)d caratteri.",
@@ -171,43 +169,35 @@
     "%(programName)s Home Page.": "Home page di %(programName)s . ",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s di %(cnt)s selezionato",
-      "%(sel)s di %(cnt)s selezionati",
-      ""
+      "%(sel)s di %(cnt)s selezionati"
     ],
     "%(type)s Component Template Menu": "Menu template componenti %(type)s ",
     "%(value)s hour": [
       "%(value)s ora",
-      "%(value)s ore",
       "%(value)s ore"
     ],
     "%(value)s minute": [
       "%(value)s minuto",
-      "%(value)s minuti",
       "%(value)s minuti"
     ],
     "%(value)s second": [
       "%(value)s secondo",
-      "%(value)s secondi",
       "%(value)s secondi"
     ],
     "%d day": [
       "%d giorno",
-      "%d giorni",
       "%d giorni"
     ],
     "%d minute": [
       "%d minuto",
-      "%d minuti",
       "%d minuti"
     ],
     "%d month": [
       "%d mese",
-      "%d mesi",
       "%d mesi"
     ],
     "%d year": [
       "%d anno",
-      "%d anni",
       "%d anni"
     ],
     "%s ago": "%s fa",
@@ -225,7 +215,6 @@
     "(Staff)": "(Staff)",
     "(contains %(student_count)s student)": [
       "(contiene %(student_count)s studente)",
-      "(contiene %(student_count)s studenti)",
       "(contiene %(student_count)s studenti)"
     ],
     "(optional)": "(facoltativo)",
@@ -588,7 +577,6 @@
     "Contains staff only content": "Contiene solo contenuti dello staff",
     "Contains {count} group": [
       "Contiene {count} gruppo",
-      "Contiene {count} gruppi",
       "Contiene {count} gruppi"
     ],
     "Content Group ID": "ID gruppo di contenuti",
@@ -623,7 +611,6 @@
     "Country or Region of Residence": "Paese o regione di residenza",
     "Course": [
       "Corso ",
-      "Corsi ",
       "Corsi "
     ],
     "Course Content": "Contenuto corso",
@@ -1185,7 +1172,6 @@
     "Load next {numResponses} responses": "Carica le successive {numResponses} risposte",
     "Load next {num_items} result": [
       "Carica {num_items} risultato successivo ",
-      "Carica {num_items} risultati successivi ",
       "Carica {num_items} risultati successivi "
     ],
     "Loading": "Caricamento",
@@ -1313,13 +1299,11 @@
     "Note: Learners can be in only one cohort. Adding learners to this group overrides any previous group assignment.": "Nota: gli studenti possono essere presenti in una sola coorte. L'aggiunta di studenti a questo gruppo sovrascrive qualsiasi precedente assegnazione a gruppi.",
     "Note: You are %s hour ahead of server time.": [
       "Nota: Sei %s ora in anticipo rispetto al server.",
-      "Nota: Sei %s ore in anticipo rispetto al server.",
-      ""
+      "Nota: Sei %s ore in anticipo rispetto al server."
     ],
     "Note: You are %s hour behind server time.": [
       "Nota: Sei %s ora in ritardo rispetto al server.",
-      "Nota: Sei %s ore in ritardo rispetto al server.",
-      ""
+      "Nota: Sei %s ore in ritardo rispetto al server."
     ],
     "Noted in:": "Annotato in:",
     "Notes": "Note",
@@ -1547,7 +1531,7 @@
     "Released:": "Rilasciato:",
     "Remaining": "Rimanenti",
     "Removal is in progress. To avoid errors, stay on this page until the process is complete.": "Rimozione in corso. Per evitare errori, rimani in questa pagina fino a completamento del processo.",
-    "Remove": "Rimuovi",
+    "Remove": "Elimina",
     "Remove Transcript": "Rimuovi trascrizione",
     "Remove all": "Elimina tutti",
     "Remove chapter %(chapterDisplayName)s": "Rimuovi capitolo %(chapterDisplayName)s",
@@ -1679,7 +1663,6 @@
     "Show Annotations": "Mostra le Annotazioni",
     "Show Comment (%(num_comments)s)": [
       "Mostra commento (%(num_comments)s)",
-      "Mostra commenti (%(num_comments)s)",
       "Mostra commenti (%(num_comments)s)"
     ],
     "Show Deprecated Settings": "Mostra impostazioni deprecate",
@@ -1699,7 +1682,6 @@
     "Showing all responses": "Mostrando tutte le risposte",
     "Showing first response": [
       "Visualizzazione della prima risposta",
-      "Visualizzazione delle prime {numResponses} risposte",
       "Visualizzazione delle prime {numResponses} risposte"
     ],
     "Showing results for \"{searchString}\"": "Visualizzazione risultati per \"{searchString}\"",
@@ -1946,7 +1928,6 @@
     "There was an error retrieving preview results for this catalog. Please check that your query is correct and try again.": "Si \u00e8 verificato un errore durante il recupero dei risultati dell'anteprima per questo catalogo. Verificare che la query sia corretta e riprovare. ",
     "There was an error when trying to add learners:": [
       "Si \u00e8 verificato un errore durante il tentativo di aggiungere studenti: ",
-      "Non \u00e8 stato possibile aggiungere {numErrors} studenti a questa coorte:",
       "Non \u00e8 stato possibile aggiungere {numErrors} studenti a questa coorte:"
     ],
     "There was an error while importing the new course to our database.": "Si \u00e8 verificato un errore nell'importazione del nuovo corso sul nostro database.",
@@ -2192,7 +2173,6 @@
     "Used": "Utilizzato ",
     "Used in {count} location": [
       "Utilizzato in {count} posizione",
-      "Utilizzato in {count} posizioni",
       "Utilizzato in {count} posizioni"
     ],
     "User Email": "Email utente ",
@@ -2245,8 +2225,7 @@
     "View {span_start} {team_name} {span_end}": "Visualizza {span_start} {team_name} {span_end}",
     "Viewing %s course": [
       "Vedi %s corsi",
-      "Vedi %s coursi",
-      "Vedi %s corsi"
+      "Vedi %s coursi"
     ],
     "Visibility": "Visibilit\u00e0",
     "Visible to": "Visibile a ",
@@ -2459,7 +2438,6 @@
     "abbrev. month September\u0004Sep": "Set",
     "about %d hour": [
       "circa %d ora",
-      "circa %d ore",
       "circa %d ore"
     ],
     "about a minute": "circa un minuto",
@@ -2552,7 +2530,6 @@
     "the more quickly and helpfully we can respond!": "il pi\u00f9 velocemente ed utilmente potremo rispondere!",
     "there is currently {numVotes} vote": [
       "attualmente \u00e8 presente {numVotes} voto",
-      "attualmente sono presenti {numVotes} voti",
       "attualmente sono presenti {numVotes} voti"
     ],
     "title_word_{uniqueId}": "title_word_{uniqueId}",
@@ -2579,12 +2556,10 @@
     "{download_link_start}Download this image (right-click or option-click, save as){link_end} and then {upload_link_start}upload{link_end} it to your backpack.": "{download_link_start}Scaricare questa immagine (clic con il tasto destro del mouse o clic su salva con nome){link_end} e {upload_link_start}caricarla{link_end} nel backpack.",
     "{earned}/{possible} point (graded)": [
       "{earned}/{possible} punto (valutato)",
-      "{earned}/{possible} punti (valutato)",
       "{earned}/{possible} punti (valutato)"
     ],
     "{earned}/{possible} point (ungraded)": [
       "{earned}/{possible} punto (non valutato)",
-      "{earned}/{possible} punti (non valutato)",
       "{earned}/{possible} punti (non valutato)"
     ],
     "{email}": "{email}",
@@ -2598,37 +2573,30 @@
     "{minutes} {unit}": "{minutes} {unit}",
     "{numMoved} learner was moved from {prevCohort}": [
       "{numMoved} studente spostato da {prevCohort}",
-      "{numMoved} studenti spostati da {prevCohort}",
       "{numMoved} studenti spostati da {prevCohort}"
     ],
     "{numPreassigned} learner was pre-assigned for this cohort. This learner will automatically be added to the cohort when they enroll in the course.": [
       "{numPreassigned} studente \u00e8 stato pre-assegnato a questa coorte. Questo studente verr\u00e0 automaticamente aggiunto alla coorte quando si iscriver\u00e0 al corso. ",
-      "{numPreassigned} studenti sono stati pre-assegnati a questa coorte. Questi studenti verranno automaticamente aggiunti alla coorte quando si iscriveranno al corso.",
       "{numPreassigned} studenti sono stati pre-assegnati a questa coorte. Questi studenti verranno automaticamente aggiunti alla coorte quando si iscriveranno al corso."
     ],
     "{numPresent} learner was already in the cohort": [
       "{numPresent} studente gi\u00e0 presente nella coorte",
-      "{numPresent} studenti gi\u00e0 presenti nella coorte",
       "{numPresent} studenti gi\u00e0 presenti nella coorte"
     ],
     "{numResponses} other response": [
       "{numResponses} altra risposta",
-      "{numResponses} altre risposte",
       "{numResponses} altre risposte"
     ],
     "{numResponses} response": [
       "{numResponses} risposta",
-      "{numResponses} risposte",
       "{numResponses} risposte"
     ],
     "{numUsersAdded} learner has been added to this cohort. ": [
       "{numUsersAdded} studente \u00e8 stato aggiunto a questa coorte.",
-      "{numUsersAdded} studenti sono stati aggiunti a questa coorte.",
       "{numUsersAdded} studenti sono stati aggiunti a questa coorte."
     ],
     "{numVotes} Vote": [
       "{numVotes} Voto",
-      "{numVotes} Voti",
       "{numVotes} Voti"
     ],
     "{num_of_hours} hour": "{num_of_hours} ora",
@@ -2637,22 +2605,18 @@
     "{num_of_minutes} minutes": "{num_of_minutes} minuti",
     "{num_points} point possible (graded)": [
       "{num_points} punto possibile (valutato)",
-      "{num_points} punti possibili (valutato)",
       "{num_points} punti possibili (valutato)"
     ],
     "{num_points} point possible (graded, results hidden)": [
       "{num_points} punto possibile (valutato, risultati nascosti)",
-      "{num_points} punti possibili (valutato, risultati nascosti)",
       "{num_points} punti possibili (valutato, risultati nascosti)"
     ],
     "{num_points} point possible (ungraded)": [
       "{num_points} punto possibile (non valutato)",
-      "{num_points} punti possibili (non valutato)",
       "{num_points} punti possibili (non valutato)"
     ],
     "{num_points} point possible (ungraded, results hidden)": [
       "{num_points} punto possibile (non valutato, risultati nascosti)",
-      "{num_points} punti possibili (non valutato, risultati nascosti)",
       "{num_points} punti possibili (non valutato, risultati nascosti)"
     ],
     "{organization}\\'s logo": "Logo {organization} ",
@@ -2670,13 +2634,11 @@
     "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on {platformName}.{strongEnd}": "{strongStart}Avvertenza: L'eliminazione dell'account \u00e8 definitiva.{strongEnd} Prima di procedere leggi attentamente quanto sopra. Questa \u00e8 un'azione irreversibile e {strongStart}non sarai pi\u00f9 in grado di utilizzare la stessa email su {platformName}.{strongEnd}",
     "{team_count} Team": [
       "{team_count} team",
-      "{team_count} team",
       "{team_count} team"
     ],
     "{totalItems} total": "{totalItems} totali",
     "{total_results} result found for \"{search_term}\"": [
       "{total_results} risultato trovato per \"{search_term}\"",
-      "{total_results} risultati trovati per \"{search_term}\"",
       "{total_results} risultati trovati per \"{search_term}\""
     ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",

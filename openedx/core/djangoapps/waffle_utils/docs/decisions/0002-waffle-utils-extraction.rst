@@ -16,7 +16,7 @@ Decision
 
 These utilities will be be moved to `edx/edx-toggles`_ so that they can be used by other IDAs. Additionally, the shared library will use the module name ``toggles``, rather than ``waffle_utils``, so it can more generally include non-waffle based toggle utilities as well.
 
-.. _edx/edx-toggles: https://github.com/edx/edx-toggles
+.. _edx/edx-toggles: https://github.com/openedx/edx-toggles
 
 Consequences
 ============
@@ -31,5 +31,5 @@ Consequences
 
 * The helper `get_instance_module_name`_ should probably move to `edx_django_utils/monitoring/code_owner`_. It could be considered hacky, but is quite useful. It needs to work whether the class definition is in a library or an IDA, and whether the instance declaration is in a library or an IDA.
 
-.. _get_instance_module_name: https://github.com/edx/edx-platform/blob/a8c3413a32510dc45301d0c462bf706a5f7ba487/openedx/core/djangoapps/waffle_utils/__init__.py#L521
-.. _edx_django_utils/monitoring/code_owner: https://github.com/edx/edx-django-utils/tree/master/edx_django_utils/monitoring/code_owner
+.. _get_instance_module_name: https://github.com/openedx/edx-platform/blob/a8c3413a32510dc45301d0c462bf706a5f7ba487/openedx/core/djangoapps/waffle_utils/__init__.py#L521
+.. _edx_django_utils/monitoring/code_owner: https://github.com/openedx/edx-django-utils/tree/master/edx_django_utils/monitoring/code_owner
