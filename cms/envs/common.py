@@ -1295,14 +1295,14 @@ PIPELINE['STYLESHEETS'] = {
     'style-vendor-tinymce-content': {
         'source_filenames': [
             'css/tinymce-studio-content-fonts.css',
-            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
+            'js/vendor/tinymce/js/tinymce/skins/ui/studio-tmce5/content.min.css',
             'css/tinymce-studio-content.css'
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-content.css',
     },
     'style-vendor-tinymce-skin': {
         'source_filenames': [
-            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
+            'js/vendor/tinymce/js/tinymce/skins/ui/studio-tmce5/skin.min.css'
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },

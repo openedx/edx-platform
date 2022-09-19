@@ -36,13 +36,15 @@ from openedx.core.djangolib.markup import HTML, Text
   <script type="text/javascript">
       tinymce.init({
           selector: "#id_content",
+          height: 450,
+          skin: "studio-tmce5",
           branding: false,
           plugins: [
               "advlist autolink lists link image charmap print anchor",
               "searchreplace visualblocks code",
               "insertdatetime media table contextmenu paste"
           ],
-          toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
+          toolbar: "undo redo styleselect bold italic alignleft aligncenter alignright alignjustify bullist numlist outdent indent link image"
       });
   </script>
 </%block>
