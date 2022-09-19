@@ -8,7 +8,7 @@ alabaster==0.7.12
     # via sphinx
 babel==2.10.3
     # via sphinx
-certifi==2022.6.15.1
+certifi==2022.9.14
     # via requests
 charset-normalizer==2.0.12
     # via
@@ -30,7 +30,7 @@ gitdb==4.0.9
     # via gitpython
 gitpython==3.1.27
     # via -r requirements/edx/doc.in
-idna==3.3
+idna==3.4
     # via requests
 imagesize==1.4.1
     # via sphinx
