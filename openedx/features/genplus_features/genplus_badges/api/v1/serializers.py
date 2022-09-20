@@ -1,7 +1,7 @@
 """
 Serializers for Badges
 """
-
+from django.conf import settings
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from lms.djangoapps.badges.models import BadgeClass, BadgeAssertion
@@ -42,6 +42,7 @@ class ProgramBadgeSerializer(serializers.ModelSerializer):
     unit_badges = serializers.SerializerMethodField()
     awarded = serializers.SerializerMethodField()
     awarded_on = serializers.SerializerMethodField()
+    banner_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = BadgeClass
@@ -52,6 +53,7 @@ class ProgramBadgeSerializer(serializers.ModelSerializer):
             'unit_badges',
             'awarded',
             'awarded_on',
+            'banner_image_url',
         )
 
     def get_unit_badges(self, obj):
@@ -80,6 +82,10 @@ class ProgramBadgeSerializer(serializers.ModelSerializer):
     def get_awarded_on(self, obj):
         assertion = obj.get_for_user(self.context.get('user')).first()
         return assertion.created if assertion else None
+
+    def get_banner_image_url(self, obj):
+        program = Program.objects.filter(slug=obj.slug).first()
+        return f"{settings.LMS_ROOT_URL}{program.banner_image.url}" if program.banner_image else ''
 
 
 class AwardBoosterBadgesSerializer(serializers.Serializer):
