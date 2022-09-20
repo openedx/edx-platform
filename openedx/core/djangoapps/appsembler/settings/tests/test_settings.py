@@ -30,7 +30,7 @@ def fake_production_settings(settings):
         'EMAIL_BACKEND': 'fake-email-backend',
         'FEATURES': {}
     }
-    settings.MAIN_SITE_REDIRECT_WHITELIST = []
+    settings.MAIN_SITE_REDIRECT_ALLOWLIST = []
     settings.CELERY_ROUTES = ()
     return settings
 

@@ -50,8 +50,8 @@ class RedirectMiddleware(MiddlewareMixin):
         site = request.site
         try:
             beeline.add_trace_field("site_id", site.id)
-            in_whitelist = any([p in request.path for p in settings.MAIN_SITE_REDIRECT_WHITELIST])
-            if (site.id == settings.SITE_ID) and not in_whitelist:
+            in_allowed_url = any([p in request.path for p in settings.MAIN_SITE_REDIRECT_ALLOWLIST])
+            if (site.id == settings.SITE_ID) and not in_allowed_url:
                 return redirect(settings.TAHOE_MAIN_SITE_REDIRECT_URL)
         except Exception:
             # I'm not entirely sure this middleware get's called only in LMS or in other apps as well.

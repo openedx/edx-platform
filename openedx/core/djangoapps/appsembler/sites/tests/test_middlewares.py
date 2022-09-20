@@ -31,7 +31,7 @@ class LmsCurrentOrganizationMiddlewareTests(TestCase):
 
 
 @override_settings(TAHOE_MAIN_SITE_REDIRECT_URL='https://foo.bar')
-@override_settings(MAIN_SITE_REDIRECT_WHITELIST=['/baz'])
+@override_settings(MAIN_SITE_REDIRECT_ALLOWLIST=['/baz'])
 class RedirectMiddlewareTests(TestCase):
     def setUp(self):
         super(RedirectMiddlewareTests, self).setUp()

@@ -43,11 +43,11 @@ def plugin_settings(settings):
         )
         # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
         # from the redirect mechanics.
-        settings.MAIN_SITE_REDIRECT_WHITELIST = [
-            'api',
-            'admin',
-            'oauth',
-            'status',
+        settings.MAIN_SITE_REDIRECT_ALLOWLIST = [
+            '/api/',
+            '/admin',
+            'oauth',  # TODO: Add slashes during Nutmeg upgrade since this requires a lot of QA
+            'status',  # TODO: Add slashes during Nutmeg upgrade since this requires a lot of QA
             '/heartbeat',
             '/courses/yt_video_metadata',
             '/accounts/manage_user_standing',
