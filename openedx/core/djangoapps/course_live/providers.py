@@ -104,6 +104,13 @@ class BigBlueButton(LiveProvider, HasGlobalCredentials):
     name = 'Big Blue Button'
     requires_username: bool = True
 
+    def __init__(self):
+        """
+        initialize BigBlueButton object
+        """
+        super().__init__()
+        self.has_valid_global_keys()
+
     @property
     def has_free_tier(self) -> bool:
         """
