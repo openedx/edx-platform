@@ -1121,7 +1121,7 @@ class MiscCourseTests(ContentStoreTestCase):
         # so we don't need to make an extra query to compute it.
         # set the branch to 'publish' in order to prevent extra lookups of draft versions
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, self.course.id):
-            with check_mongo_calls(3):
+            with check_mongo_calls(4):
                 course = self.store.get_course(self.course.id, depth=2)
 
             # make sure we pre-fetched a known sequential which should be at depth=2
@@ -1133,7 +1133,7 @@ class MiscCourseTests(ContentStoreTestCase):
         # Now, test with the branch set to draft. No extra round trips b/c it doesn't go deep enough to get
         # beyond direct only categories
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
-            with check_mongo_calls(3):
+            with check_mongo_calls(4):
                 self.store.get_course(self.course.id, depth=2)
 
     def _check_verticals(self, locations):
