@@ -12,7 +12,6 @@ edx-django-utils).
 
 from edx_toggles.toggles import WaffleSwitch
 
-
 # .. toggle_name: ip.legacy
 # .. toggle_implementation: WaffleSwitch
 # .. toggle_default: False
