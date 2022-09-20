@@ -28,7 +28,7 @@ class CourseOverviewSignalsTestCase(ModuleStoreTestCase):
     TODAY = datetime.datetime.utcnow()
     NEXT_WEEK = TODAY + datetime.timedelta(days=7)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    @ddt.data(ModuleStoreEnum.Type.split)
     def test_caching(self, modulestore_type):
         """
         Tests that CourseOverview structures are actually getting cached.

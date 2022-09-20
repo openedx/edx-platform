@@ -370,7 +370,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self._verify_cell_data_for_user(verified_user.username, course.id, 'Certificate Eligible', 'Y', num_rows=2)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 4, 47),
+        (ModuleStoreEnum.Type.mongo, 6, 47),
         (ModuleStoreEnum.Type.split, 2, 48),
     )
     @ddt.unpack
@@ -1779,8 +1779,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.define_option_problem('Unreleased', parent=self.unreleased_section)
 
     @patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
-    @ddt.data(True, False)
-    def test_grade_report(self, persistent_grades_enabled):
+    def test_grade_report(self):
         self.submit_student_answer(self.student.username, 'Problem1', ['Option 1'])
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
