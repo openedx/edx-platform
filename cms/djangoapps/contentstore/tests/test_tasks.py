@@ -11,16 +11,18 @@ from uuid import uuid4
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 from organizations.models import OrganizationCourse
 from organizations.tests.factories import OrganizationFactory
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from cms.djangoapps.contentstore.tasks import export_olx, rerun_course
+from cms.djangoapps.contentstore.tasks import export_olx, update_special_exams_and_publish, rerun_course
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
@@ -167,3 +169,33 @@ class RerunCourseTaskTestCase(CourseTestCase):  # lint-amnesty, pylint: disable=
             restricted_course=restricted_course,
             country=restricted_country
         )
+
+
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+class RegisterExamsTaskTestCase(CourseTestCase):  # pylint: disable=missing-class-docstring
+
+    @mock.patch('cms.djangoapps.contentstore.exams.register_exams')
+    @mock.patch('cms.djangoapps.contentstore.proctoring.register_special_exams')
+    def test_exam_service_not_enabled_success(self, _mock_register_exams_proctoring, _mock_register_exams_service):
+        """ edx-proctoring interface is called if exam service is not enabled """
+        update_special_exams_and_publish(str(self.course.id))
+        _mock_register_exams_proctoring.assert_called_once_with(self.course.id)
+        _mock_register_exams_service.assert_not_called()
+
+    @mock.patch('cms.djangoapps.contentstore.exams.register_exams')
+    @mock.patch('cms.djangoapps.contentstore.proctoring.register_special_exams')
+    @override_waffle_flag(EXAMS_IDA, active=True)
+    def test_exam_service_enabled_success(self, _mock_register_exams_proctoring, _mock_register_exams_service):
+        """ exams service interface is called if exam service is enabled """
+        update_special_exams_and_publish(str(self.course.id))
+        _mock_register_exams_proctoring.assert_not_called()
+        _mock_register_exams_service.assert_called_once_with(self.course.id)
+
+    @mock.patch('cms.djangoapps.contentstore.exams.register_exams')
+    @mock.patch('cms.djangoapps.contentstore.proctoring.register_special_exams')
+    def test_register_exams_failure(self, _mock_register_exams_proctoring, _mock_register_exams_service):
+        """ credit requirements update signal fires even if exam registration fails """
+        with mock.patch('openedx.core.djangoapps.credit.signals.on_course_publish') as course_publish:
+            _mock_register_exams_proctoring.side_effect = Exception('boom!')
+            update_special_exams_and_publish(str(self.course.id))
+            course_publish.assert_called()

@@ -611,6 +611,9 @@ PROCTORING_USER_OBFUSCATION_KEY = 'test_key'
 # (ref MST-637)
 PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
+############## Exams CONFIGURATION SETTINGS ####################
+EXAMS_SERVICE_URL = 'http://exams.example.com/api/v1'
+
 ############### Settings for Django Rate limit #####################
 
 RATELIMIT_RATE = '2/m'
