@@ -6,8 +6,18 @@
 #
 -e git+https://github.com/openedx/blockstore.git@1.2.1#egg=blockstore==1.2.1
     # via -r requirements/edx/github.in
+-e git+https://github.com/openedx/codejail.git@3.1.3#egg=codejail==3.1.3
+    # via -r requirements/edx/github.in
+-e git+https://github.com/openedx/django-wiki.git@1.1.1#egg=django-wiki
+    # via -r requirements/edx/github.in
+-e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
+    # via -r requirements/edx/github.in
 -e .
     # via -r requirements/edx/local.in
+-e git+https://github.com/openedx/RateXBlock.git@2.0.1#egg=rate-xblock
+    # via -r requirements/edx/github.in
+-e git+https://github.com/openedx/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
+    # via -r requirements/edx/github.in
 acid-xblock==0.2.1
     # via -r requirements/edx/base.in
 aiohttp==3.8.1
@@ -86,7 +96,7 @@ celery==5.2.7
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-certifi==2022.9.14
+certifi==2022.6.15.1
     # via
     #   -r requirements/edx/paver.txt
     #   elasticsearch
@@ -130,8 +140,6 @@ code-annotations==1.3.0
     # via
     #   edx-enterprise
     #   edx-toggles
-codejail @ git+https://github.com/openedx/codejail.git@3.1.3
-    # via -r requirements/edx/github.in
 codejail-includes==1.0.0
     # via -r requirements/edx/base.in
 contextlib2==21.6.0
@@ -334,7 +342,7 @@ django-pyfs==3.2.0
     # via -r requirements/edx/base.in
 django-ratelimit==3.0.1
     # via -r requirements/edx/base.in
-django-require @ git+https://github.com/openedx/django-require.git@f4f01e4e959adc6210873ae99e7f2c3741afbf35
+django-require @ git+https://github.com/openedx/django-require.git@0c54adb167142383b26ea6b3edecc3211822a776
     # via -r requirements/edx/github.in
 django-sekizai==4.0.0
     # via
@@ -377,8 +385,6 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-proctoring
-django-wiki @ git+https://github.com/openedx/django-wiki.git@1.1.1
-    # via -r requirements/edx/github.in
 djangorestframework==3.12.4
     # via
     #   -r requirements/edx/base.in
@@ -601,7 +607,7 @@ html5lib==1.1
     #   ora2
 icalendar==4.1.0
     # via -r requirements/edx/base.in
-idna==3.4
+idna==3.3
     # via
     #   -r requirements/edx/paver.txt
     #   optimizely-sdk
@@ -630,7 +636,7 @@ jmespath==0.10.0
     # via
     #   boto3
     #   botocore
-joblib==1.2.0
+joblib==1.1.0
     # via nltk
 jsondiff==2.0.0
     # via edx-enterprise
@@ -647,13 +653,13 @@ jsonfield==3.1.0
     #   outcome-surveys
 jsonschema==4.16.0
     # via optimizely-sdk
-jwcrypto==1.4.2
+jwcrypto==1.3.1
     # via pylti1p3
 kombu==5.2.4
     # via celery
 laboratory==1.0.2
     # via -r requirements/edx/base.in
-lazy==1.5
+lazy==1.4
     # via
     #   -r requirements/edx/paver.txt
     #   acid-xblock
@@ -753,8 +759,6 @@ oauthlib==3.0.1
     #   lti-consumer-xblock
     #   requests-oauthlib
     #   social-auth-core
-olxcleaner @ git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297
-    # via -r requirements/edx/github.in
 openedx-calc==3.0.1
     # via -r requirements/edx/base.in
 openedx-events==0.12.0
@@ -840,7 +844,7 @@ pyjwkest==1.4.2
     #   -r requirements/edx/base.in
     #   edx-drf-extensions
     #   lti-consumer-xblock
-pyjwt[crypto]==2.5.0
+pyjwt[crypto]==2.4.0
     # via
     #   -r requirements/edx/base.in
     #   drf-jwt
@@ -853,7 +857,7 @@ pyjwt[crypto]==2.5.0
     #   social-auth-core
 pylatexenc==2.10
     # via olxcleaner
-pylti1p3==1.12.1
+pylti1p3==1.12.0
     # via -r requirements/edx/base.in
 pymongo==3.12.3
     # via
@@ -948,8 +952,6 @@ pyyaml==6.0
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/base.in
-rate-xblock @ git+https://github.com/openedx/RateXBlock.git@2.0.1
-    # via -r requirements/edx/github.in
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
 redis==4.3.4
@@ -1099,8 +1101,6 @@ tinycss2==1.1.1
     # via bleach
 tqdm==4.64.1
     # via nltk
-types-cryptography==3.3.23
-    # via pyjwt
 typing-extensions==4.3.0
     # via
     #   django-countries
@@ -1174,8 +1174,6 @@ xblock==1.6.1
     #   xblock-poll
     #   xblock-utils
 xblock-drag-and-drop-v2 @ git+https://github.com/openedx/xblock-drag-and-drop-v2@v2.3.5
-    # via -r requirements/edx/github.in
-xblock-google-drive @ git+https://github.com/openedx/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6
     # via -r requirements/edx/github.in
 xblock-poll @ git+https://github.com/open-craft/xblock-poll@v1.12.0
     # via -r requirements/edx/github.in
