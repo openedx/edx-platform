@@ -3,12 +3,16 @@ Tests for discussions tasks.
 """
 import ddt
 import mock
-
-
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx_events.learning.data import DiscussionTopicContext
-from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, ModuleStoreTestCase
+from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
+from openedx.core.djangoapps.discussions.models import Provider
+from openedx.core.djangoapps.discussions.tasks import (
+    update_discussions_settings_from_course,
+    update_unit_discussion_state_from_discussion_blocks,
+)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
@@ -18,72 +22,55 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
     """
     Tests for the discussions settings update tasks
     """
-    MODULESTORE = TEST_DATA_MONGO_AMNESTY_MODULESTORE
 
     def setUp(self):
         super().setUp()
         self.course = course = CourseFactory.create()
         self.course_key = course_key = self.course.id
         with self.store.bulk_operations(course_key):
-            self.section = ItemFactory.create(
-                parent_location=course.location,
-                category="chapter",
-                display_name="Section"
-            )
-            self.sequence = ItemFactory.create(
-                parent_location=self.section.location,
-                category="sequential",
-                display_name="Sequence"
-            )
-            self.unit = ItemFactory.create(
-                parent_location=self.sequence.location,
-                category="vertical",
-                display_name="Unit"
-            )
+            self.section = ItemFactory.create(parent=course, category="chapter", display_name="Section")
+            self.sequence = ItemFactory.create(parent=self.section, category="sequential", display_name="Sequence")
+            self.unit = ItemFactory.create(parent=self.sequence, category="vertical", display_name="Unit")
             ItemFactory.create(
-                parent_location=self.sequence.location,
+                parent=self.sequence,
                 category="vertical",
                 display_name="Discussable Unit",
                 discussion_enabled=True,
             )
             ItemFactory.create(
-                parent_location=self.sequence.location,
+                parent=self.sequence,
                 category="vertical",
                 display_name="Non-Discussable Unit",
                 discussion_enabled=False,
             )
-            ItemFactory.create(
-                parent_location=self.unit.location,
-                category="html",
-                display_name="An HTML Module"
-            )
+            ItemFactory.create(parent=self.unit, category="html", display_name="An HTML Module")
             graded_sequence = ItemFactory.create(
-                parent_location=self.section.location,
+                parent=self.section,
                 category="sequential",
                 display_name="Graded Sequence",
                 graded=True,
             )
             graded_unit = ItemFactory.create(
-                parent_location=graded_sequence.location,
+                parent=graded_sequence,
                 category="vertical",
-                display_name="Graded Unit"
+                display_name="Graded Unit",
             )
             ItemFactory.create(
-                parent_location=graded_sequence.location,
+                parent=graded_sequence,
                 category="vertical",
                 display_name="Discussable Graded Unit",
                 discussion_enabled=True,
             )
             ItemFactory.create(
-                parent_location=graded_sequence.location,
+                parent=graded_sequence,
                 category="vertical",
                 display_name="Non-Discussable Graded Unit",
                 discussion_enabled=False,
             )
             ItemFactory.create(
-                parent_location=graded_unit.location,
+                parent=graded_unit,
                 category="html",
-                display_name="Graded HTML Module"
+                display_name="Graded HTML Module",
             )
 
     def update_course_field(self, **update):
@@ -92,14 +79,14 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
         """
         for key, value in update.items():
             setattr(self.course, key, value)
-        self.update_course(self.course, self.user.id)
+        self.store.update_item(self.course, self.user.id)
 
     def update_discussions_settings(self, settings):
         """
         Update course discussion settings based on the provided discussion settings.
         """
         self.course.discussions_settings.update(settings)
-        self.update_course(self.course, self.user.id)
+        self.store.update_item(self.course, self.user.id)
 
     def test_default(self):
         """
@@ -166,3 +153,155 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
         units_in_config = {context.title for context in config_data.contexts}
         assert present_units <= units_in_config
         assert not missing_units & units_in_config
+
+
+@ddt.ddt
+class MigrateUnitDiscussionStateFromXBlockTestCase(ModuleStoreTestCase):
+    """
+    Tests for the discussions settings update tasks
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course = course = CourseFactory.create()
+        self.course_key = course_key = self.course.id
+        with self.store.bulk_operations(course_key):
+            section = ItemFactory.create(
+                parent=course, category="chapter", display_name="Section"
+            )
+            sequence = ItemFactory.create(
+                parent=section, category="sequential", display_name="Sequence"
+            )
+            self.unit_discussible = unit_discussible = ItemFactory.create(
+                parent=sequence,
+                category="vertical",
+                display_name="Discussable Unit",
+            )
+            unit_non_discussible = ItemFactory.create(
+                parent=sequence,
+                category="vertical",
+                display_name="Non-Discussable Unit",
+                discussion_enabled=False,
+            )
+            graded_sequence = ItemFactory.create(
+                parent=section,
+                category="sequential",
+                display_name="Graded Sequence",
+                graded=True,
+            )
+            self.graded_unit_discussible = graded_unit_discussible = ItemFactory.create(
+                parent=graded_sequence,
+                category="vertical",
+                display_name="Discussable Graded Unit",
+            )
+            graded_unit_non_discussible = ItemFactory.create(
+                parent=graded_sequence,
+                category="vertical",
+                display_name="Non-Discussable Graded Unit",
+            )
+        self.discussible = {unit_discussible.display_name, graded_unit_discussible.display_name}
+        self.non_discussible = {
+            unit_non_discussible.display_name,
+            graded_unit_non_discussible.display_name,
+        }
+        self.graded = {
+            graded_unit_discussible.display_name,
+            graded_unit_non_discussible.display_name,
+        }
+
+    def add_discussion_block(self, units):
+        """
+        Add a discussion block to the specified units.
+        """
+        for unit in units:
+            ItemFactory.create(
+                parent=unit,
+                category='discussion',
+                discussion_id=f'id-{unit.location}',
+                discussion_target=f'Target {unit.display_name}',
+                discussion_category=f'Category {unit.display_name}',
+            )
+
+    def update_course_field(self, **update):
+        """
+        Update the test course using provided parameters.
+        """
+        for key, value in update.items():
+            setattr(self.course, key, value)
+        self.store.update_item(self.course, self.user.id)
+
+    def update_discussions_settings(self, settings):
+        """
+        Update course discussion settings based on the provided discussion settings.
+        """
+        self.course.discussions_settings.update(settings)
+        self.store.update_item(self.course, self.user.id)
+
+    @mock.patch('openedx.core.djangoapps.discussions.tasks.get_accessible_discussion_xblocks_by_course_id')
+    def test_course_not_using_legacy(self, mock_get_discussion_blocks):
+        self.update_discussions_settings({'provider': 'non-legacy'})
+        update_unit_discussion_state_from_discussion_blocks(self.course.id, self.user.id)
+        mock_get_discussion_blocks.assert_not_called()
+
+    @mock.patch('openedx.core.djangoapps.discussions.tasks.get_accessible_discussion_xblocks_by_course_id')
+    @ddt.data(None, 'legacy')
+    def test_course_using_legacy(self, provider, mock_get_discussion_blocks):
+        self.update_discussions_settings({'provider': provider})
+        update_unit_discussion_state_from_discussion_blocks(self.course.id, self.user.id)
+        mock_get_discussion_blocks.assert_called()
+
+    def get_discussible_and_non_discussible_blocks(self):
+        """
+        Get a set of display names of the discussible and non-discussible blocks in a course.
+        """
+        discussible = {
+            item.display_name
+            for item in self.store.get_items(
+                self.course.id,
+                qualifiers={'block_type': 'vertical'},
+                settings={'discussion_enabled': True},
+            )
+        }
+        non_discussible = {
+            item.display_name
+            for item in self.store.get_items(
+                self.course.id,
+                qualifiers={'block_type': 'vertical'},
+                settings={'discussion_enabled': False},
+            )
+        }
+        return discussible, non_discussible
+
+    def assert_discussion_settings(self, **settings):
+        """
+        Assert that the provided settings have the provided values in the course's discussion settings.
+        """
+        course = self.store.get_course(self.course.id)
+        for key, value in settings.items():
+            assert course.discussions_settings.get(key, None) == value
+
+    def test_without_graded(self):
+        self.add_discussion_block([self.unit_discussible])
+        update_unit_discussion_state_from_discussion_blocks(self.course.id, self.user.id)
+        discussible, non_discussible = self.get_discussible_and_non_discussible_blocks()
+        # A discussion block was not added to a graded unit, so it shouldn't be in the set of discussible blocks
+        assert discussible == (self.discussible - self.graded)
+        assert non_discussible == (self.non_discussible | self.graded)
+        self.assert_discussion_settings(enable_graded_units=False)
+
+    @ddt.data(True, False)
+    def test_with_graded(self, new_structure_enabled):
+        self.add_discussion_block([self.unit_discussible, self.graded_unit_discussible])
+        with override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, active=new_structure_enabled):
+            update_unit_discussion_state_from_discussion_blocks(self.course.id, self.user.id)
+            discussible, non_discussible = self.get_discussible_and_non_discussible_blocks()
+            # A discussion block was not added to a graded unit, so it shouldn't be in the set of discussible blocks
+            assert discussible == self.discussible
+            assert non_discussible == self.non_discussible
+            self.assert_discussion_settings(enable_graded_units=new_structure_enabled)
+
+    @override_waffle_flag(ENABLE_NEW_STRUCTURE_DISCUSSIONS, active=True)
+    def test_with_new_structure(self):
+        update_unit_discussion_state_from_discussion_blocks(self.course.id, self.user.id)
+        self.assert_discussion_settings(provider=Provider.OPEN_EDX)
+        self.assert_discussion_settings(unit_level_visibility=True)

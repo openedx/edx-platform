@@ -84,7 +84,8 @@ edx-django-sites-extensions
 edx-django-utils>=5.0.0            # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
 edx-enterprise
-edx-event-bus-kafka                 # Kafka implementation of event bus
+# 0.6.2 introduces topic prefixing
+edx-event-bus-kafka>=0.6.2          # Kafka implementation of event bus
 edx-milestones
 edx-name-affirmation
 edx-opaque-keys
@@ -127,7 +128,7 @@ openedx-calc                        # Library supporting mathematical calculatio
 openedx-events>=0.12.0              # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
 optimizely-sdk                      # Optimizely full stack SDK for Python
-ora2>=4.4.0
+ora2>=4.5.0
 outcome-surveys                     # edx-platform plugin to send and track segment events needed for surveys
 path
 piexif                              # Exif image metadata manipulation, used in the profile_images app

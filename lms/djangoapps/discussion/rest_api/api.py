@@ -198,12 +198,12 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
         course = _get_course(course_key, request.user)
         context = get_context(course, request, cc_thread)
 
-        if retrieve_kwargs.get("flagged_comments") and not context["is_requester_privileged"]:
+        if retrieve_kwargs.get("flagged_comments") and not context["has_moderation_privilege"]:
             raise ValidationError("Only privileged users can request flagged comments")
 
         course_discussion_settings = CourseDiscussionSettings.get(course_key)
         if (
-            not context["is_requester_privileged"] and
+            not context["has_moderation_privilege"] and
             cc_thread["group_id"] and
             is_commentable_divided(course.id, cc_thread["commentable_id"], course_discussion_settings)
         ):
@@ -241,7 +241,7 @@ def _is_user_author_or_privileged(cc_content, context):
         Boolean
     """
     return (
-        context["is_requester_privileged"] or
+        context["has_moderation_privilege"] or
         context["cc_requester"]["id"] == cc_content["user_id"]
     )
 
@@ -377,23 +377,12 @@ def get_courseware_topics(
     courseware_topics = []
     existing_topic_ids = set()
 
-    def get_xblock_sort_key(xblock):
-        """
-        Get the sort key for the xblock (falling back to the discussion_target
-        setting if absent)
-        """
-        return xblock.sort_key or xblock.discussion_target
-
-    def get_sorted_xblocks(category):
-        """Returns key sorted xblocks by category"""
-        return sorted(xblocks_by_category[category], key=get_xblock_sort_key)
-
     discussion_xblocks = get_accessible_discussion_xblocks(course, request.user)
     xblocks_by_category = defaultdict(list)
     for xblock in discussion_xblocks:
         xblocks_by_category[xblock.discussion_category].append(xblock)
 
-    for category in sorted(xblocks_by_category.keys()):
+    for category in xblocks_by_category.keys():
         children = []
         for xblock in xblocks_by_category[category]:
             if not topic_ids or xblock.discussion_id in topic_ids:
@@ -413,7 +402,11 @@ def get_courseware_topics(
             discussion_topic = DiscussionTopic(
                 None,
                 category,
-                get_thread_list_url(request, course_key, [item.discussion_id for item in get_sorted_xblocks(category)]),
+                get_thread_list_url(
+                    request,
+                    course_key,
+                    [item.discussion_id for item in xblocks_by_category[category]],
+                ),
                 children,
                 None,
             )
@@ -449,8 +442,8 @@ def get_non_courseware_topics(
     """
     non_courseware_topics = []
     existing_topic_ids = set()
-    sorted_topics = sorted(list(course.discussion_topics.items()), key=lambda item: item[1].get("sort_key", item[0]))
-    for name, entry in sorted_topics:
+    topics = list(course.discussion_topics.items())
+    for name, entry in topics:
         if not topic_ids or entry['id'] in topic_ids:
             discussion_topic = DiscussionTopic(
                 entry["id"], name, get_thread_list_url(request, course_key, [entry["id"]]),
@@ -819,7 +812,7 @@ def get_thread_list(
                 "text_search_rewrite": None,
             })
 
-    if count_flagged and not context["is_requester_privileged"]:
+    if count_flagged and not context["has_moderation_privilege"]:
         raise PermissionDenied("`count_flagged` can only be set by users with moderator access or higher.")
 
     group_id = None
@@ -836,7 +829,7 @@ def get_thread_list(
             except ValueError:
                 pass
 
-    if (group_id is None) and (not context["is_requester_privileged"]):
+    if (group_id is None) and not context["has_moderation_privilege"]:
         group_id = get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
 
     query_params = {
@@ -1559,7 +1552,7 @@ def get_user_comments(
     course = _get_course(course_key, request.user)
     context = get_context(course, request)
 
-    if flagged and not context["is_requester_privileged"]:
+    if flagged and not context["has_moderation_privilege"]:
         raise ValidationError("Only privileged users can filter comments by flagged status")
 
     try:
