@@ -6,7 +6,7 @@
 #
 -e git+https://github.com/openedx/blockstore.git@1.2.1#egg=blockstore==1.2.1
     # via -r requirements/edx/base.txt
--e .
+-e file:///home/runner/work/edx-platform/edx-platform
     # via -r requirements/edx/base.txt
 acid-xblock==0.2.1
     # via -r requirements/edx/base.txt
@@ -242,7 +242,7 @@ deprecated==1.2.13
     #   -r requirements/edx/base.txt
     #   jwcrypto
     #   redis
-diff-cover==6.5.1
+diff-cover==7.0.1
     # via -r requirements/edx/coverage.txt
 dill==0.3.5.1
     # via pylint
@@ -541,7 +541,7 @@ edx-django-release-util==1.2.0
     #   blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.txt
-edx-django-utils==5.0.1
+edx-django-utils==5.1.0
     # via
     #   -r requirements/edx/base.txt
     #   blockstore
