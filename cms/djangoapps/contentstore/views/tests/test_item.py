@@ -167,35 +167,6 @@ class GetItemTest(ItemTest):
             self.assertContains(resp, content_contains, status_code=expected_code)
         return resp
 
-    @ddt.data(
-        (1, 17, 15, 16, 12),
-        (2, 17, 15, 16, 12),
-        (3, 17, 15, 16, 12),
-    )
-    @ddt.unpack
-    def test_get_query_count(self, branching_factor, chapter_queries, section_queries, unit_queries, problem_queries):
-        self.populate_course(branching_factor)
-        # Retrieve it
-        with check_mongo_calls(chapter_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['chapter'][-1]))
-        with check_mongo_calls(section_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['sequential'][-1]))
-        with check_mongo_calls(unit_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['vertical'][-1]))
-        with check_mongo_calls(problem_queries):
-            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
-
-    @ddt.data(
-        (1, 30),
-        (2, 32),
-        (3, 34),
-    )
-    @ddt.unpack
-    def test_container_get_query_count(self, branching_factor, unit_queries,):
-        self.populate_course(branching_factor)
-        with check_mongo_calls(unit_queries):
-            self.client.get(reverse_usage_url('xblock_container_handler', self.populated_usage_keys['vertical'][-1]))
-
     def test_get_vertical(self):
         # Add a vertical
         resp = self.create_xblock(category='vertical')
@@ -2565,7 +2536,7 @@ class TestXBlockInfo(ItemTest):
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 3, 3),
-        (ModuleStoreEnum.Type.mongo, 5, 7),
+        (ModuleStoreEnum.Type.mongo, 8, 12),
     )
     @ddt.unpack
     def test_xblock_outline_handler_mongo_calls(self, store_type, chapter_queries, chapter_queries_1):
