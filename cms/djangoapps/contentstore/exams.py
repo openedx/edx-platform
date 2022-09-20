@@ -66,16 +66,11 @@ def register_exams(course_key):
         log.info(msg)
         locations.append(location)
 
-        if timed_exam.is_proctored_exam:
-            if timed_exam.is_onboarding_exam:
-                exam_type = 'onboarding'
-            elif timed_exam.is_practice_exam:
-                exam_type = 'practice_proctored'
-            else:
-                exam_type = 'proctored'
-        else:
-            exam_type = 'timed'
-
+        exam_type = get_exam_type(
+            timed_exam.is_proctored_exam,
+            timed_exam.is_practice_exam,
+            timed_exam.is_onboarding_exam
+        )
         exams_list.append({
             'course_id': str(course_key),
             'content_id': str(timed_exam.location),
@@ -96,6 +91,24 @@ def register_exams(course_key):
     except Exception as ex:
         log.exception('Failed to register exams with exam API', exc_info=True)
         raise ex
+
+
+def get_exam_type(is_proctored, is_practice, is_onboarding):
+    """
+    Get the exam type string based on the proctored, practice and onboarding
+    attributes.
+    """
+    if is_proctored:
+        if is_onboarding:
+            exam_type = 'onboarding'
+        elif is_practice:
+            exam_type = 'practice_proctored'
+        else:
+            exam_type = 'proctored'
+    else:
+        exam_type = 'timed'
+
+    return exam_type
 
 
 def _get_exams_api_client():
