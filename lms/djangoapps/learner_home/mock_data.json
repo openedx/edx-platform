@@ -13,28 +13,29 @@
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": true,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": true,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": true,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-09-21T16:12:00.605Z"
             },
             "courseRun": {
                 "isStarted": false,
                 "isArchived": false,
-                "startDate": "11/11/3030",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "3030-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -79,18 +80,23 @@
                 "isPassing": true
             },
             "entitlement": null,
-            "courseRun": {
-                "isStarted": true,
-                "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
-                "homeUrl": "edx.com/courses/my-course-url/home",
-                "marketingUrl": "edx.com/courses/my-course-url/marketing",
-                "progressUrl": "edx.com/courses/my-course-url/progress",
-                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
-                "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number1-course-id1"
+            "enrollment": {
+                "coursewareAccess": {
+                    "isTooEarly": true,
+                    "hasUnmetPrerequisites": false,
+                    "isStaff": false
+                },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": true,
+                "hasFinished": false,
+                "hasStarted": false,
+                "isAudit": true,
+                "isAuditAccessExpired": false,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": true,
+                "isVerified": false,
+                "lastEnrolled": "2022-09-20T16:12:00.605Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -99,22 +105,18 @@
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
-            "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": true,
-                "hasStarted": false,
-                "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
-                    "isTooEarly": false,
-                    "isStaff": false
-                },
-                "isAudit": true,
-                "isAuditAccessExpired": false,
-                "isEmailEnabled": false,
-                "hasOptedOutOfEmail": false,
-                "isEnrolled": true,
-                "isVerified": false,
-                "lastEnrolled": null
+            "courseRun": {
+                "isStarted": false,
+                "isArchived": false,
+                "startDate": "3030-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
+                "homeUrl": "edx.com/courses/my-course-url/home",
+                "marketingUrl": "edx.com/courses/my-course-url/marketing",
+                "progressUrl": "edx.com/courses/my-course-url/progress",
+                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
+                "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseId": "course-number1-course-id1"
             },
             "courseProvider": {
                 "name": "MIT"
@@ -143,35 +145,23 @@
                 "isPassing": true
             },
             "entitlement": null,
-            "courseRun": {
-                "isStarted": true,
-                "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
-                "homeUrl": "edx.com/courses/my-course-url/home",
-                "marketingUrl": "edx.com/courses/my-course-url/marketing",
-                "progressUrl": "edx.com/courses/my-course-url/progress",
-                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
-                "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number2-course-id2"
-            },
             "enrollment": {
-                "accessExpirationDate": "11/11/2000",
-                "canUpgrade": true,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
-                    "isTooEarly": false,
+                    "isTooEarly": true,
+                    "hasUnmetPrerequisites": true,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": true,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": true,
-                "isAuditAccessExpired": true,
+                "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-09-19T16:12:00.605Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -179,6 +169,19 @@
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
+            },
+            "courseRun": {
+                "isStarted": false,
+                "isArchived": false,
+                "startDate": "3030-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
+                "homeUrl": "edx.com/courses/my-course-url/home",
+                "marketingUrl": "edx.com/courses/my-course-url/marketing",
+                "progressUrl": "edx.com/courses/my-course-url/progress",
+                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
+                "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseId": "course-number2-course-id2"
             },
             "courseProvider": null,
             "course": {
@@ -198,9 +201,9 @@
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -208,29 +211,30 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number3-course-id3"
             },
-            "enrollment": {
-                "accessExpirationDate": "11/11/2000",
-                "canUpgrade": false,
-                "hasStarted": false,
-                "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
-                    "isTooEarly": false,
-                    "isStaff": false
-                },
-                "isAudit": true,
-                "isAuditAccessExpired": true,
-                "isEmailEnabled": false,
-                "hasOptedOutOfEmail": false,
-                "isEnrolled": true,
-                "isVerified": false,
-                "lastEnrolled": null
-            },
             "certificate": {
                 "availableDate": null,
                 "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
+            },
+            "enrollment": {
+                "coursewareAccess": {
+                    "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
+                    "isStaff": false
+                },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": true,
+                "hasFinished": false,
+                "hasStarted": false,
+                "isAudit": true,
+                "isAuditAccessExpired": false,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": true,
+                "isVerified": false,
+                "lastEnrolled": "2022-09-18T16:12:00.605Z"
             },
             "courseProvider": {
                 "name": "edX Course Provider"
@@ -269,35 +273,36 @@
                 "isPassing": true
             },
             "entitlement": null,
+            "enrollment": {
+                "coursewareAccess": {
+                    "isTooEarly": true,
+                    "hasUnmetPrerequisites": true,
+                    "isStaff": false
+                },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": true,
+                "hasFinished": false,
+                "hasStarted": false,
+                "isAudit": true,
+                "isAuditAccessExpired": false,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": true,
+                "isVerified": false,
+                "lastEnrolled": "2022-09-17T16:12:00.605Z"
+            },
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/2000",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number4-course-id4"
-            },
-            "enrollment": {
-                "accessExpirationDate": "11/11/2000",
-                "canUpgrade": true,
-                "hasStarted": false,
-                "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
-                    "isTooEarly": false,
-                    "isStaff": false
-                },
-                "isAudit": true,
-                "isAuditAccessExpired": true,
-                "isEmailEnabled": false,
-                "hasOptedOutOfEmail": false,
-                "isEnrolled": true,
-                "isVerified": false,
-                "lastEnrolled": null
             },
             "certificate": {
                 "availableDate": null,
@@ -335,10 +340,10 @@
             "entitlement": null,
             "courseRun": {
                 "isStarted": true,
-                "isArchived": true,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/2000",
-                "minPassingGrade": 70,
+                "isArchived": false,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -347,21 +352,22 @@
                 "courseId": "course-number5-course-id5"
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/2000",
-                "canUpgrade": true,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "2000-11-11T00:00:00Z",
+                "canUpgrade": true,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-09-16T16:12:00.605Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -388,9 +394,9 @@
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -399,21 +405,22 @@
                 "courseId": "course-number6-course-id6"
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": true,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "2000-11-11T00:00:00Z",
+                "canUpgrade": false,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": true,
-                "isAuditAccessExpired": false,
+                "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-09-15T16:12:00.605Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -462,9 +469,9 @@
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/3030",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "2000-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -473,21 +480,22 @@
                 "courseId": "course-number7-course-id7"
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/2000",
-                "canUpgrade": true,
-                "hasStarted": false,
                 "coursewareAccess": {
+                    "isTooEarly": false,
                     "hasUnmetPrerequisites": false,
-                    "isTooEarly": true,
                     "isStaff": false
                 },
+                "accessExpirationDate": "2000-11-11T00:00:00Z",
+                "canUpgrade": true,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-09-14T16:12:00.606Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -525,10 +533,10 @@
             "entitlement": null,
             "courseRun": {
                 "isStarted": true,
-                "isArchived": false,
-                "startDate": "11/11/3030",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "isArchived": true,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "2000-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -537,21 +545,22 @@
                 "courseId": "course-number8-course-id8"
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/2000",
-                "canUpgrade": false,
-                "hasStarted": false,
                 "coursewareAccess": {
+                    "isTooEarly": false,
                     "hasUnmetPrerequisites": false,
-                    "isTooEarly": true,
                     "isStaff": false
                 },
+                "accessExpirationDate": "2000-11-11T00:00:00Z",
+                "canUpgrade": true,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-09-13T16:12:00.606Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -578,9 +587,9 @@
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/3030",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -589,24 +598,22 @@
                 "courseId": "course-number9-course-id9"
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/2000",
-                "canUpgrade": false,
-                "hasStarted": false,
                 "coursewareAccess": {
+                    "isTooEarly": false,
                     "hasUnmetPrerequisites": false,
-                    "isTooEarly": true,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": true,
+                "hasFinished": false,
+                "hasStarted": true,
                 "isAudit": true,
-                "isAuditAccessExpired": true,
+                "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": null
-            },
-            "grade": {
-                "isPassing": false
+                "lastEnrolled": "2022-09-12T16:12:00.606Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -653,37 +660,38 @@
             },
             "entitlement": null,
             "courseRun": {
-                "isStarted": true,
-                "isArchived": true,
-                "startDate": "11/11/3030",
-                "endDate": "11/11/2000",
-                "minPassingGrade": 70,
+                "isStarted": false,
+                "isArchived": false,
+                "startDate": "3030-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseRun": {
+                    "isStarted": true
+                },
                 "courseId": "course-number10-course-id10"
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/2000",
-                "canUpgrade": false,
-                "hasStarted": false,
                 "coursewareAccess": {
+                    "isTooEarly": false,
                     "hasUnmetPrerequisites": false,
-                    "isTooEarly": true,
                     "isStaff": false
                 },
+                "accessExpirationDate": "2000-11-11T00:00:00Z",
+                "canUpgrade": true,
+                "hasFinished": false,
+                "hasStarted": true,
                 "isAudit": true,
                 "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": null
-            },
-            "grade": {
-                "isPassing": false
+                "lastEnrolled": "2022-09-11T16:12:00.606Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -719,22 +727,39 @@
                 "isPassing": true
             },
             "entitlement": null,
+            "courseRun": {
+                "isStarted": false,
+                "isArchived": false,
+                "startDate": "3030-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
+                "homeUrl": "edx.com/courses/my-course-url/home",
+                "marketingUrl": "edx.com/courses/my-course-url/marketing",
+                "progressUrl": "edx.com/courses/my-course-url/progress",
+                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
+                "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseRun": {
+                    "isStarted": true
+                },
+                "courseId": "course-number11-course-id11"
+            },
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": false,
                 "coursewareAccess": {
+                    "isTooEarly": false,
                     "hasUnmetPrerequisites": false,
-                    "isTooEarly": true,
                     "isStaff": false
                 },
-                "isAudit": false,
-                "isAuditAccessExpired": null,
+                "accessExpirationDate": "2000-11-11T00:00:00Z",
+                "canUpgrade": false,
+                "hasFinished": false,
+                "hasStarted": true,
+                "isAudit": true,
+                "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true,
-                "lastEnrolled": null
+                "isVerified": false,
+                "lastEnrolled": "2022-09-10T16:12:00.607Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -742,19 +767,6 @@
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
-            },
-            "courseRun": {
-                "isStarted": false,
-                "isArchived": false,
-                "startDate": "11/11/3030",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
-                "homeUrl": "edx.com/courses/my-course-url/home",
-                "marketingUrl": "edx.com/courses/my-course-url/marketing",
-                "progressUrl": "edx.com/courses/my-course-url/progress",
-                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
-                "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number11-course-id11"
             },
             "courseProvider": null,
             "course": {
@@ -772,34 +784,42 @@
             },
             "entitlement": null,
             "courseRun": {
-                "isStarted": true,
+                "isStarted": false,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "3030-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseRun": {
+                    "isStarted": true,
+                    "endDate": "2000-11-11T00:00:00Z"
+                },
                 "courseId": "course-number12-course-id12"
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
-                "isAudit": false,
-                "isAuditAccessExpired": null,
+                "accessExpirationDate": "2000-11-11T00:00:00Z",
+                "canUpgrade": false,
+                "hasFinished": false,
+                "hasStarted": true,
+                "isAudit": true,
+                "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true,
-                "lastEnrolled": null
+                "isVerified": false,
+                "lastEnrolled": "2022-09-09T16:12:00.607Z"
+            },
+            "grade": {
+                "isPassing": false
             },
             "certificate": {
                 "availableDate": null,
@@ -846,34 +866,43 @@
             },
             "entitlement": null,
             "courseRun": {
-                "isStarted": true,
+                "isStarted": false,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "3030-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseRun": {
+                    "isStarted": true,
+                    "isArchived": true,
+                    "endDate": "2000-11-11T00:00:00Z"
+                },
                 "courseId": "course-number13-course-id13"
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": true,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
-                "isAudit": false,
-                "isAuditAccessExpired": null,
+                "accessExpirationDate": "2000-11-11T00:00:00Z",
+                "canUpgrade": false,
+                "hasFinished": false,
+                "hasStarted": true,
+                "isAudit": true,
+                "isAuditAccessExpired": true,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
-                "isVerified": true,
-                "lastEnrolled": null
+                "isVerified": false,
+                "lastEnrolled": "2022-09-08T16:12:00.607Z"
+            },
+            "grade": {
+                "isPassing": false
             },
             "certificate": {
                 "availableDate": null,
@@ -906,38 +935,26 @@
         },
         {
             "gradeData": {
-                "isPassing": false
+                "isPassing": true
             },
             "entitlement": null,
-            "courseRun": {
-                "isStarted": true,
-                "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
-                "homeUrl": "edx.com/courses/my-course-url/home",
-                "marketingUrl": "edx.com/courses/my-course-url/marketing",
-                "progressUrl": "edx.com/courses/my-course-url/progress",
-                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
-                "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number14-course-id14"
-            },
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": true,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-09-07T16:12:00.607Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -946,6 +963,19 @@
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
+            "courseRun": {
+                "isStarted": false,
+                "isArchived": false,
+                "startDate": "3030-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
+                "homeUrl": "edx.com/courses/my-course-url/home",
+                "marketingUrl": "edx.com/courses/my-course-url/marketing",
+                "progressUrl": "edx.com/courses/my-course-url/progress",
+                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
+                "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseId": "course-number14-course-id14"
+            },
             "courseProvider": null,
             "course": {
                 "courseName": "Course Name 14",
@@ -953,43 +983,44 @@
                 "courseNumber": "course-number14"
             },
             "programs": {
-              "relatedPrograms": []
+                "relatedPrograms": []
             }
         },
         {
             "gradeData": {
-                "isPassing": false
+                "isPassing": true
             },
             "entitlement": null,
-            "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": true,
-                "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
-                    "isTooEarly": false,
-                    "isStaff": false
-                },
-                "isAudit": false,
-                "isAuditAccessExpired": null,
-                "isEmailEnabled": false,
-                "hasOptedOutOfEmail": false,
-                "isEnrolled": true,
-                "isVerified": true,
-                "lastEnrolled": null
-            },
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
                 "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number15-course-id15"
+            },
+            "enrollment": {
+                "coursewareAccess": {
+                    "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
+                    "isStaff": false
+                },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": false,
+                "hasStarted": false,
+                "isAudit": false,
+                "isAuditAccessExpired": null,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": true,
+                "isVerified": true,
+                "lastEnrolled": "2022-09-06T16:12:00.607Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -1035,29 +1066,12 @@
                 "isPassing": true
             },
             "entitlement": null,
-            "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": true,
-                "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
-                    "isTooEarly": false,
-                    "isStaff": false
-                },
-                "isAudit": false,
-                "isAuditAccessExpired": null,
-                "isEmailEnabled": false,
-                "hasOptedOutOfEmail": false,
-                "isEnrolled": true,
-                "isVerified": true,
-                "lastEnrolled": null
-            },
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1065,10 +1079,28 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number16-course-id16"
             },
+            "enrollment": {
+                "coursewareAccess": {
+                    "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
+                    "isStaff": false
+                },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": false,
+                "hasStarted": true,
+                "isAudit": false,
+                "isAuditAccessExpired": null,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": true,
+                "isVerified": true,
+                "lastEnrolled": "2022-09-05T16:12:00.607Z"
+            },
             "certificate": {
-                "availableDate": "11/11/3030",
+                "availableDate": null,
                 "isRestricted": false,
-                "isEarned": true,
+                "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
@@ -1096,32 +1128,15 @@
         },
         {
             "gradeData": {
-                "isPassing": true
+                "isPassing": false
             },
             "entitlement": null,
-            "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": true,
-                "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
-                    "isTooEarly": false,
-                    "isStaff": false
-                },
-                "isAudit": false,
-                "isAuditAccessExpired": null,
-                "isEmailEnabled": false,
-                "hasOptedOutOfEmail": false,
-                "isEnrolled": true,
-                "isVerified": true,
-                "lastEnrolled": null
-            },
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1129,9 +1144,27 @@
                 "resumeUrl": "edx.com/courses/my-course-url/resume",
                 "courseId": "course-number17-course-id17"
             },
+            "enrollment": {
+                "coursewareAccess": {
+                    "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
+                    "isStaff": false
+                },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": false,
+                "hasStarted": true,
+                "isAudit": false,
+                "isAuditAccessExpired": null,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": true,
+                "isVerified": true,
+                "lastEnrolled": "2022-09-04T16:12:00.607Z"
+            },
             "certificate": {
                 "availableDate": null,
-                "isRestricted": true,
+                "isRestricted": false,
                 "isEarned": false,
                 "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
@@ -1148,32 +1181,33 @@
         },
         {
             "gradeData": {
-                "isPassing": true
+                "isPassing": false
             },
             "entitlement": null,
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": true,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": true,
+                "hasStarted": true,
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-09-03T16:12:00.607Z"
             },
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1182,11 +1216,11 @@
                 "courseId": "course-number18-course-id18"
             },
             "certificate": {
-                "availableDate": "11/11/2000",
+                "availableDate": null,
                 "isRestricted": false,
-                "isEarned": true,
-                "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "isEarned": false,
+                "isDownloadable": false,
+                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
                 "name": "edX Course Provider"
@@ -1226,28 +1260,29 @@
             },
             "entitlement": null,
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": true,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": true,
+                "hasStarted": true,
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-09-02T16:12:00.607Z"
             },
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/2000",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1256,10 +1291,10 @@
                 "courseId": "course-number19-course-id19"
             },
             "certificate": {
-                "availableDate": "11/11/2000",
+                "availableDate": "3030-11-11T00:00:00Z",
                 "isRestricted": false,
                 "isEarned": true,
-                "isDownloadable": true,
+                "isDownloadable": false,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
@@ -1290,28 +1325,29 @@
             },
             "entitlement": null,
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": true,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": true,
+                "hasStarted": true,
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-09-01T16:12:00.607Z"
             },
             "courseRun": {
                 "isStarted": true,
-                "isArchived": true,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/2000",
-                "minPassingGrade": 70,
+                "isArchived": false,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1320,11 +1356,11 @@
                 "courseId": "course-number20-course-id20"
             },
             "certificate": {
-                "availableDate": "11/11/2000",
-                "isRestricted": false,
-                "isEarned": true,
-                "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "availableDate": null,
+                "isRestricted": true,
+                "isEarned": false,
+                "isDownloadable": false,
+                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": null,
             "course": {
@@ -1340,64 +1376,31 @@
             "gradeData": {
                 "isPassing": true
             },
-            "entitlement": {
-                "uuid": "entitlement-course-uuid-0",
-                "availableSessions": [
-                    {
-                        "startDate": "1/2/2000",
-                        "endDate": "1/2/2020",
-                        "courseId": "course-number1000-course-id1000"
-                    },
-                    {
-                        "startDate": "2/3/2000",
-                        "endDate": "2/3/2020",
-                        "courseId": "course-number1001-course-id1001"
-                    },
-                    {
-                        "startDate": "3/4/2000",
-                        "endDate": "3/4/2020",
-                        "courseId": "course-number1002-course-id1002"
-                    },
-                    {
-                        "startDate": "4/5/2000",
-                        "endDate": "4/6/2020",
-                        "courseId": "course-number1003-course-id1003"
-                    },
-                    {
-                        "startDate": "5/6/2000",
-                        "endDate": "5/7/2020",
-                        "courseId": "course-number1004-course-id1004"
-                    }
-                ],
-                "changeDeadline": "11/11/3030",
-                "enrollmentUrl": "/entitlement-enrollment",
-                "isExpired": false,
-                "isFulfilled": true,
-                "isRefundable": true
-            },
+            "entitlement": null,
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": true,
+                "hasStarted": true,
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-08-31T16:12:00.607Z"
             },
             "courseRun": {
-                "isStarted": false,
+                "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/3030",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1406,11 +1409,11 @@
                 "courseId": "course-number21-course-id21"
             },
             "certificate": {
-                "availableDate": null,
+                "availableDate": "2000-11-11T00:00:00Z",
                 "isRestricted": false,
-                "isEarned": false,
-                "isDownloadable": false,
-                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
+                "isEarned": true,
+                "isDownloadable": true,
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "courseProvider": {
                 "name": "edX Course Provider"
@@ -1448,64 +1451,31 @@
             "gradeData": {
                 "isPassing": true
             },
-            "entitlement": {
-                "uuid": "entitlement-course-uuid-1",
-                "availableSessions": [
-                    {
-                        "startDate": "1/2/2000",
-                        "endDate": "1/2/2020",
-                        "courseId": "course-number1000-course-id1000"
-                    },
-                    {
-                        "startDate": "2/3/2000",
-                        "endDate": "2/3/2020",
-                        "courseId": "course-number1001-course-id1001"
-                    },
-                    {
-                        "startDate": "3/4/2000",
-                        "endDate": "3/4/2020",
-                        "courseId": "course-number1002-course-id1002"
-                    },
-                    {
-                        "startDate": "4/5/2000",
-                        "endDate": "4/6/2020",
-                        "courseId": "course-number1003-course-id1003"
-                    },
-                    {
-                        "startDate": "5/6/2000",
-                        "endDate": "5/7/2020",
-                        "courseId": "course-number1004-course-id1004"
-                    }
-                ],
-                "changeDeadline": "11/11/3030",
-                "enrollmentUrl": "/entitlement-enrollment",
-                "isExpired": false,
-                "isFulfilled": true,
-                "isRefundable": true
-            },
+            "entitlement": null,
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": true,
+                "hasStarted": true,
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-08-30T16:12:00.607Z"
             },
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "2000-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1514,10 +1484,10 @@
                 "courseId": "course-number22-course-id22"
             },
             "certificate": {
-                "availableDate": null,
+                "availableDate": "2000-11-11T00:00:00Z",
                 "isRestricted": false,
-                "isEarned": false,
-                "isDownloadable": false,
+                "isEarned": true,
+                "isDownloadable": true,
                 "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
@@ -1544,66 +1514,33 @@
         },
         {
             "gradeData": {
-                "isPassing": false
+                "isPassing": true
             },
-            "entitlement": {
-                "uuid": "entitlement-course-uuid-2",
-                "availableSessions": [
-                    {
-                        "startDate": "1/2/2000",
-                        "endDate": "1/2/2020",
-                        "courseId": "course-number1000-course-id1000"
-                    },
-                    {
-                        "startDate": "2/3/2000",
-                        "endDate": "2/3/2020",
-                        "courseId": "course-number1001-course-id1001"
-                    },
-                    {
-                        "startDate": "3/4/2000",
-                        "endDate": "3/4/2020",
-                        "courseId": "course-number1002-course-id1002"
-                    },
-                    {
-                        "startDate": "4/5/2000",
-                        "endDate": "4/6/2020",
-                        "courseId": "course-number1003-course-id1003"
-                    },
-                    {
-                        "startDate": "5/6/2000",
-                        "endDate": "5/7/2020",
-                        "courseId": "course-number1004-course-id1004"
-                    }
-                ],
-                "changeDeadline": "11/11/3030",
-                "enrollmentUrl": "/entitlement-enrollment",
-                "isExpired": false,
-                "isFulfilled": true,
-                "isRefundable": true
-            },
+            "entitlement": null,
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": true,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": true,
+                "hasStarted": true,
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-08-29T16:12:00.607Z"
             },
             "courseRun": {
                 "isStarted": true,
-                "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "isArchived": true,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "2000-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1612,11 +1549,11 @@
                 "courseId": "course-number23-course-id23"
             },
             "certificate": {
-                "availableDate": null,
+                "availableDate": "2000-11-11T00:00:00Z",
                 "isRestricted": false,
-                "isEarned": false,
-                "isDownloadable": false,
-                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
+                "isEarned": true,
+                "isDownloadable": true,
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "courseProvider": null,
             "course": {
@@ -1625,7 +1562,7 @@
                 "courseNumber": "course-number23"
             },
             "programs": {
-               "relatedPrograms": []
+                "relatedPrograms": []
             }
         },
         {
@@ -1633,63 +1570,64 @@
                 "isPassing": true
             },
             "entitlement": {
-                "uuid": "entitlement-course-uuid-3",
+                "uuid": "entitlement-course-uuid-0",
                 "availableSessions": [
                     {
-                        "startDate": "1/2/2000",
-                        "endDate": "1/2/2020",
+                        "startDate": "2000-01-02T00:00:00Z",
+                        "endDate": "2020-01-02T00:00:00Z",
                         "courseId": "course-number1000-course-id1000"
                     },
                     {
-                        "startDate": "2/3/2000",
-                        "endDate": "2/3/2020",
+                        "startDate": "2000-02-03T00:00:00Z",
+                        "endDate": "2020-02-03T00:00:00Z",
                         "courseId": "course-number1001-course-id1001"
                     },
                     {
-                        "startDate": "3/4/2000",
-                        "endDate": "3/4/2020",
+                        "startDate": "2000-03-04T00:00:00Z",
+                        "endDate": "2020-03-04T00:00:00Z",
                         "courseId": "course-number1002-course-id1002"
                     },
                     {
-                        "startDate": "4/5/2000",
-                        "endDate": "4/6/2020",
+                        "startDate": "2000-04-05T00:00:00Z",
+                        "endDate": "2020-04-05T00:00:00Z",
                         "courseId": "course-number1003-course-id1003"
                     },
                     {
-                        "startDate": "5/6/2000",
-                        "endDate": "5/7/2020",
+                        "startDate": "2000-05-06T00:00:00Z",
+                        "endDate": "2020-05-06T00:00:00Z",
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "changeDeadline": "11/11/2000",
+                "changeDeadline": "3030-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": true
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": true,
                 "coursewareAccess": {
+                    "isTooEarly": true,
                     "hasUnmetPrerequisites": false,
-                    "isTooEarly": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-08-28T16:12:00.607Z"
             },
             "courseRun": {
-                "isStarted": true,
+                "isStarted": false,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "3030-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1738,40 +1676,63 @@
         },
         {
             "gradeData": {
-                "isPassing": false
+                "isPassing": true
             },
             "entitlement": {
-                "uuid": "entitlement-course-uuid-4",
-                "availableSessions": null,
-                "changeDeadline": "11/11/2000",
+                "uuid": "entitlement-course-uuid-1",
+                "availableSessions": [
+                    {
+                        "startDate": "2000-01-02T00:00:00Z",
+                        "endDate": "2020-01-02T00:00:00Z",
+                        "courseId": "course-number1000-course-id1000"
+                    },
+                    {
+                        "startDate": "2000-02-03T00:00:00Z",
+                        "endDate": "2020-02-03T00:00:00Z",
+                        "courseId": "course-number1001-course-id1001"
+                    },
+                    {
+                        "startDate": "2000-03-04T00:00:00Z",
+                        "endDate": "2020-03-04T00:00:00Z",
+                        "courseId": "course-number1002-course-id1002"
+                    },
+                    {
+                        "startDate": "2000-04-05T00:00:00Z",
+                        "endDate": "2020-04-05T00:00:00Z",
+                        "courseId": "course-number1003-course-id1003"
+                    },
+                    {
+                        "startDate": "2000-05-06T00:00:00Z",
+                        "endDate": "2020-05-06T00:00:00Z",
+                        "courseId": "course-number1004-course-id1004"
+                    }
+                ],
+                "changeDeadline": "3030-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
                 "isFulfilled": true,
-                "isRefundable": false
+                "isRefundable": true
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
+                "coursewareAccess": {},
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
                 "canUpgrade": null,
+                "hasFinished": false,
                 "hasStarted": false,
-                "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
-                    "isTooEarly": false,
-                    "isStaff": false
-                },
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-08-27T16:12:00.607Z"
             },
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1810,40 +1771,68 @@
         },
         {
             "gradeData": {
-                "isPassing": true
+                "isPassing": false
             },
             "entitlement": {
-                "uuid": "entitlement-course-uuid-5",
-                "availableSessions": null,
-                "changeDeadline": "11/11/2000",
+                "uuid": "entitlement-course-uuid-2",
+                "availableSessions": [
+                    {
+                        "startDate": "2000-01-02T00:00:00Z",
+                        "endDate": "2020-01-02T00:00:00Z",
+                        "courseId": "course-number1000-course-id1000"
+                    },
+                    {
+                        "startDate": "2000-02-03T00:00:00Z",
+                        "endDate": "2020-02-03T00:00:00Z",
+                        "courseId": "course-number1001-course-id1001"
+                    },
+                    {
+                        "startDate": "2000-03-04T00:00:00Z",
+                        "endDate": "2020-03-04T00:00:00Z",
+                        "courseId": "course-number1002-course-id1002"
+                    },
+                    {
+                        "startDate": "2000-04-05T00:00:00Z",
+                        "endDate": "2020-04-05T00:00:00Z",
+                        "courseId": "course-number1003-course-id1003"
+                    },
+                    {
+                        "startDate": "2000-05-06T00:00:00Z",
+                        "endDate": "2020-05-06T00:00:00Z",
+                        "courseId": "course-number1004-course-id1004"
+                    }
+                ],
+                "canViewCourse": true,
+                "changeDeadline": "3030-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
                 "isFulfilled": true,
-                "isRefundable": false
+                "isRefundable": true
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": false,
+                "hasStarted": true,
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-08-26T16:12:00.607Z"
             },
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1852,11 +1841,11 @@
                 "courseId": "course-number26-course-id26"
             },
             "certificate": {
-                "availableDate": "11/11/2000",
+                "availableDate": null,
                 "isRestricted": false,
-                "isEarned": true,
-                "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "isEarned": false,
+                "isDownloadable": false,
+                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": null,
             "course": {
@@ -1870,40 +1859,68 @@
         },
         {
             "gradeData": {
-                "isPassing": false
+                "isPassing": true
             },
             "entitlement": {
-                "uuid": "entitlement-course-uuid-6",
-                "availableSessions": null,
-                "changeDeadline": "11/11/2000",
+                "uuid": "entitlement-course-uuid-3",
+                "availableSessions": [
+                    {
+                        "startDate": "2000-01-02T00:00:00Z",
+                        "endDate": "2020-01-02T00:00:00Z",
+                        "courseId": "course-number1000-course-id1000"
+                    },
+                    {
+                        "startDate": "2000-02-03T00:00:00Z",
+                        "endDate": "2020-02-03T00:00:00Z",
+                        "courseId": "course-number1001-course-id1001"
+                    },
+                    {
+                        "startDate": "2000-03-04T00:00:00Z",
+                        "endDate": "2020-03-04T00:00:00Z",
+                        "courseId": "course-number1002-course-id1002"
+                    },
+                    {
+                        "startDate": "2000-04-05T00:00:00Z",
+                        "endDate": "2020-04-05T00:00:00Z",
+                        "courseId": "course-number1003-course-id1003"
+                    },
+                    {
+                        "startDate": "2000-05-06T00:00:00Z",
+                        "endDate": "2020-05-06T00:00:00Z",
+                        "courseId": "course-number1004-course-id1004"
+                    }
+                ],
+                "canViewCourse": true,
+                "changeDeadline": "2000-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
                 "isFulfilled": true,
-                "isRefundable": false
+                "isRefundable": true
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": false,
+                "hasStarted": true,
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-08-25T16:12:00.607Z"
             },
             "courseRun": {
                 "isStarted": true,
                 "isArchived": false,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/2000",
-                "minPassingGrade": 70,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1952,40 +1969,42 @@
         },
         {
             "gradeData": {
-                "isPassing": true
+                "isPassing": false
             },
             "entitlement": {
-                "uuid": "entitlement-course-uuid-7",
+                "uuid": "entitlement-course-uuid-4",
                 "availableSessions": null,
-                "changeDeadline": "11/11/2000",
+                "canViewCourse": true,
+                "changeDeadline": "2000-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
                 "isFulfilled": true,
                 "isRefundable": false
             },
             "enrollment": {
-                "accessExpirationDate": "11/11/3030",
-                "canUpgrade": null,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": false,
                 "isAuditAccessExpired": null,
                 "isEmailEnabled": false,
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": null
+                "lastEnrolled": "2022-08-24T16:12:00.607Z"
             },
             "courseRun": {
                 "isStarted": true,
-                "isArchived": true,
-                "startDate": "11/11/1900",
-                "endDate": "11/11/2000",
-                "minPassingGrade": 70,
+                "isArchived": false,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
                 "homeUrl": "edx.com/courses/my-course-url/home",
                 "marketingUrl": "edx.com/courses/my-course-url/marketing",
                 "progressUrl": "edx.com/courses/my-course-url/progress",
@@ -1994,11 +2013,11 @@
                 "courseId": "course-number28-course-id28"
             },
             "certificate": {
-                "availableDate": "11/11/2000",
+                "availableDate": null,
                 "isRestricted": false,
-                "isEarned": true,
-                "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "isEarned": false,
+                "isDownloadable": false,
+                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
             },
             "courseProvider": {
                 "name": "MIT"
@@ -2023,15 +2042,236 @@
             }
         },
         {
+            "gradeData": {
+                "isPassing": true
+            },
+            "entitlement": {
+                "uuid": "entitlement-course-uuid-5",
+                "availableSessions": null,
+                "canViewCourse": true,
+                "changeDeadline": "2000-11-11T00:00:00Z",
+                "enrollmentUrl": "/entitlement-enrollment",
+                "isExpired": false,
+                "isFulfilled": true,
+                "isRefundable": false
+            },
             "enrollment": {
-                "accessExpirationDate": null,
-                "canUpgrade": false,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": false,
+                "hasStarted": false,
+                "isAudit": false,
+                "isAuditAccessExpired": null,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": true,
+                "isVerified": true,
+                "lastEnrolled": "2022-08-23T16:12:00.607Z"
+            },
+            "courseRun": {
+                "isStarted": true,
+                "isArchived": false,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "4040-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
+                "homeUrl": "edx.com/courses/my-course-url/home",
+                "marketingUrl": "edx.com/courses/my-course-url/marketing",
+                "progressUrl": "edx.com/courses/my-course-url/progress",
+                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
+                "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseId": "course-number29-course-id29"
+            },
+            "certificate": {
+                "availableDate": "2000-11-11T00:00:00Z",
+                "isRestricted": false,
+                "isEarned": true,
+                "isDownloadable": true,
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+            },
+            "courseProvider": null,
+            "course": {
+                "courseName": "Course Name 29",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "courseNumber": "course-number29"
+            },
+            "programs": {
+                "relatedPrograms": []
+            }
+        },
+        {
+            "gradeData": {
+                "isPassing": false
+            },
+            "entitlement": {
+                "uuid": "entitlement-course-uuid-6",
+                "availableSessions": null,
+                "enrollmentUrl": "/entitlement-enrollment",
+                "isFulfilled": true,
+                "isRefundable": false,
+                "canViewCourse": true,
+                "changeDeadline": "2000-11-11T00:00:00Z",
+                "isExpired": false
+            },
+            "enrollment": {
+                "coursewareAccess": {
+                    "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
+                    "isStaff": false
+                },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": false,
+                "hasStarted": false,
+                "isAudit": false,
+                "isAuditAccessExpired": null,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": true,
+                "isVerified": true,
+                "lastEnrolled": "2022-08-22T16:12:00.608Z"
+            },
+            "courseRun": {
+                "isStarted": true,
+                "isArchived": false,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "2000-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
+                "homeUrl": "edx.com/courses/my-course-url/home",
+                "marketingUrl": "edx.com/courses/my-course-url/marketing",
+                "progressUrl": "edx.com/courses/my-course-url/progress",
+                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
+                "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseId": "course-number30-course-id30"
+            },
+            "certificate": {
+                "availableDate": null,
+                "isRestricted": false,
+                "isEarned": false,
+                "isDownloadable": false,
+                "certPreviewUrl": "edx.com/courses/my-course-url/cert-preview"
+            },
+            "courseProvider": {
+                "name": "edX Course Provider"
+            },
+            "course": {
+                "courseName": "Course Name 30",
+                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "courseNumber": "course-number30"
+            },
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    },
+                    {
+                        "provider": "University  of Maryland",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
+                        "title": "Pandering for Modern Professionals",
+                        "programUrl": "www.edx/my-program-2",
+                        "programType": "MicroBachelors Program",
+                        "programTypeUrl": "www.edx/my-program-type",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
+        },
+        {
+            "gradeData": {
+                "isPassing": true
+            },
+            "entitlement": {
+                "uuid": "entitlement-course-uuid-7",
+                "availableSessions": null,
+                "canViewCourse": false,
+                "changeDeadline": "2000-11-11T00:00:00Z",
+                "enrollmentUrl": "/entitlement-enrollment",
+                "isExpired": false,
+                "isRefundable": false,
+                "isFulfilled": true
+            },
+            "enrollment": {
+                "coursewareAccess": {
+                    "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
+                    "isStaff": false
+                },
+                "accessExpirationDate": "3030-11-11T00:00:00Z",
+                "canUpgrade": null,
+                "hasFinished": false,
+                "hasStarted": false,
+                "isAudit": false,
+                "isAuditAccessExpired": null,
+                "isEmailEnabled": false,
+                "hasOptedOutOfEmail": false,
+                "isEnrolled": true,
+                "isVerified": true,
+                "lastEnrolled": "2022-08-21T16:12:00.608Z"
+            },
+            "courseRun": {
+                "isStarted": true,
+                "isArchived": true,
+                "startDate": "1900-11-11T00:00:00Z",
+                "endDate": "2000-11-11T00:00:00Z",
+                "minPassingGrade": "0.70",
+                "homeUrl": "edx.com/courses/my-course-url/home",
+                "marketingUrl": "edx.com/courses/my-course-url/marketing",
+                "progressUrl": "edx.com/courses/my-course-url/progress",
+                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
+                "resumeUrl": "edx.com/courses/my-course-url/resume",
+                "courseId": "course-number31-course-id31"
+            },
+            "certificate": {
+                "availableDate": "2000-11-11T00:00:00Z",
+                "isRestricted": false,
+                "isEarned": true,
+                "isDownloadable": true,
+                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+            },
+            "courseProvider": {
+                "name": "MIT"
+            },
+            "course": {
+                "courseName": "Course Name 31",
+                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "courseNumber": "course-number31"
+            },
+            "programs": {
+                "relatedPrograms": [
+                    {
+                        "provider": "HarvardX",
+                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
+                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
+                        "title": "Relativity in Modern Mechanics",
+                        "programUrl": "www.edx/my-program",
+                        "programType": "MicroBachelors Program",
+                        "numberOfCourses": 3
+                    }
+                ]
+            }
+        },
+        {
+            "enrollment": {
+                "coursewareAccess": {
+                    "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
+                    "isStaff": false
+                },
+                "accessExpirationDate": null,
+                "canUpgrade": false,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -2047,32 +2287,33 @@
                 "uuid": "entitlement-course-uuid-10",
                 "availableSessions": [
                     {
-                        "startDate": "1/2/2000",
-                        "endDate": "1/2/2020",
+                        "startDate": "2000-01-02T00:00:00Z",
+                        "endDate": "2020-01-02T00:00:00Z",
                         "courseId": "course-number1000-course-id1000"
                     },
                     {
-                        "startDate": "2/3/2000",
-                        "endDate": "2/3/2020",
+                        "startDate": "2000-02-03T00:00:00Z",
+                        "endDate": "2020-02-03T00:00:00Z",
                         "courseId": "course-number1001-course-id1001"
                     },
                     {
-                        "startDate": "3/4/2000",
-                        "endDate": "3/4/2020",
+                        "startDate": "2000-03-04T00:00:00Z",
+                        "endDate": "2020-03-04T00:00:00Z",
                         "courseId": "course-number1002-course-id1002"
                     },
                     {
-                        "startDate": "4/5/2000",
-                        "endDate": "4/6/2020",
+                        "startDate": "2000-04-05T00:00:00Z",
+                        "endDate": "2020-04-05T00:00:00Z",
                         "courseId": "course-number1003-course-id1003"
                     },
                     {
-                        "startDate": "5/6/2000",
-                        "endDate": "5/7/2020",
+                        "startDate": "2000-05-06T00:00:00Z",
+                        "endDate": "2020-05-06T00:00:00Z",
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "changeDeadline": "11/11/3030",
+                "canViewCourse": false,
+                "changeDeadline": "3030-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
                 "isFulfilled": false,
@@ -2112,14 +2353,15 @@
         },
         {
             "enrollment": {
-                "accessExpirationDate": null,
-                "canUpgrade": false,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": null,
+                "canUpgrade": false,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -2135,32 +2377,33 @@
                 "uuid": "entitlement-course-uuid-11",
                 "availableSessions": [
                     {
-                        "startDate": "1/2/2000",
-                        "endDate": "1/2/2020",
+                        "startDate": "2000-01-02T00:00:00Z",
+                        "endDate": "2020-01-02T00:00:00Z",
                         "courseId": "course-number1000-course-id1000"
                     },
                     {
-                        "startDate": "2/3/2000",
-                        "endDate": "2/3/2020",
+                        "startDate": "2000-02-03T00:00:00Z",
+                        "endDate": "2020-02-03T00:00:00Z",
                         "courseId": "course-number1001-course-id1001"
                     },
                     {
-                        "startDate": "3/4/2000",
-                        "endDate": "3/4/2020",
+                        "startDate": "2000-03-04T00:00:00Z",
+                        "endDate": "2020-03-04T00:00:00Z",
                         "courseId": "course-number1002-course-id1002"
                     },
                     {
-                        "startDate": "4/5/2000",
-                        "endDate": "4/6/2020",
+                        "startDate": "2000-04-05T00:00:00Z",
+                        "endDate": "2020-04-05T00:00:00Z",
                         "courseId": "course-number1003-course-id1003"
                     },
                     {
-                        "startDate": "5/6/2000",
-                        "endDate": "5/7/2020",
+                        "startDate": "2000-05-06T00:00:00Z",
+                        "endDate": "2020-05-06T00:00:00Z",
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "changeDeadline": "11/05/2022",
+                "canViewCourse": false,
+                "changeDeadline": "Sun Nov 20 2022",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
                 "isFulfilled": false,
@@ -2190,14 +2433,15 @@
         },
         {
             "enrollment": {
-                "accessExpirationDate": null,
-                "canUpgrade": false,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": null,
+                "canUpgrade": false,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -2213,32 +2457,33 @@
                 "uuid": "entitlement-course-uuid-12",
                 "availableSessions": [
                     {
-                        "startDate": "1/2/2000",
-                        "endDate": "1/2/2020",
+                        "startDate": "2000-01-02T00:00:00Z",
+                        "endDate": "2020-01-02T00:00:00Z",
                         "courseId": "course-number1000-course-id1000"
                     },
                     {
-                        "startDate": "2/3/2000",
-                        "endDate": "2/3/2020",
+                        "startDate": "2000-02-03T00:00:00Z",
+                        "endDate": "2020-02-03T00:00:00Z",
                         "courseId": "course-number1001-course-id1001"
                     },
                     {
-                        "startDate": "3/4/2000",
-                        "endDate": "3/4/2020",
+                        "startDate": "2000-03-04T00:00:00Z",
+                        "endDate": "2020-03-04T00:00:00Z",
                         "courseId": "course-number1002-course-id1002"
                     },
                     {
-                        "startDate": "4/5/2000",
-                        "endDate": "4/6/2020",
+                        "startDate": "2000-04-05T00:00:00Z",
+                        "endDate": "2020-04-05T00:00:00Z",
                         "courseId": "course-number1003-course-id1003"
                     },
                     {
-                        "startDate": "5/6/2000",
-                        "endDate": "5/7/2020",
+                        "startDate": "2000-05-06T00:00:00Z",
+                        "endDate": "2020-05-06T00:00:00Z",
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "changeDeadline": "11/11/2000",
+                "canViewCourse": false,
+                "changeDeadline": "2000-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
                 "isFulfilled": false,
@@ -2256,14 +2501,15 @@
         },
         {
             "enrollment": {
-                "accessExpirationDate": null,
-                "canUpgrade": false,
-                "hasStarted": false,
                 "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
                     "isTooEarly": false,
+                    "hasUnmetPrerequisites": false,
                     "isStaff": false
                 },
+                "accessExpirationDate": null,
+                "canUpgrade": false,
+                "hasFinished": false,
+                "hasStarted": false,
                 "isAudit": false,
                 "isAuditAccessExpired": false,
                 "isEmailEnabled": false,
@@ -2278,7 +2524,8 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-13",
                 "availableSessions": [],
-                "changeDeadline": "11/11/2000",
+                "canViewCourse": false,
+                "changeDeadline": "2000-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": true,
                 "isFulfilled": false,
@@ -2290,278 +2537,6 @@
             "course": {
                 "courseNumber": "course-number103",
                 "courseName": "Course Name 103",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
-            },
-            "programs": {
-                "relatedPrograms": [
-                    {
-                        "provider": "HarvardX",
-                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                        "title": "Relativity in Modern Mechanics",
-                        "programUrl": "www.edx/my-program",
-                        "programType": "MicroBachelors Program",
-                        "numberOfCourses": 3
-                    },
-                    {
-                        "provider": "University  of Maryland",
-                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                        "title": "Pandering for Modern Professionals",
-                        "programUrl": "www.edx/my-program-2",
-                        "programType": "MicroBachelors Program",
-                        "programTypeUrl": "www.edx/my-program-type",
-                        "numberOfCourses": 3
-                    }
-                ]
-            }
-        },
-        {
-            "enrollment": {
-                "accessExpirationDate": null,
-                "canUpgrade": false,
-                "hasStarted": false,
-                "coursewareAccess": {
-                    "hasUnmetPrerequisites": true,
-                    "isTooEarly": false,
-                    "isStaff": false
-                },
-                "isAudit": false,
-                "isAuditAccessExpired": false,
-                "isEmailEnabled": false,
-                "hasOptedOutOfEmail": false,
-                "isEnrolled": false,
-                "isVerified": false,
-                "lastEnrolled": null
-            },
-            "gradeData": null,
-            "certificate": null,
-            "courseRun": null,
-            "entitlement": {
-                "uuid": "entitlement-course-uuid-14",
-                "availableSessions": [],
-                "changeDeadline": "11/11/2000",
-                "enrollmentUrl": "/entitlement-enrollment",
-                "isExpired": true,
-                "isFulfilled": false,
-                "isRefundable": true
-            },
-            "courseProvider": {
-                "name": "edX Course Provider"
-            },
-            "course": {
-                "courseNumber": "course-number104",
-                "courseName": "Course Name 104",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
-            },
-            "programs": {
-                "relatedPrograms": [
-                    {
-                        "provider": "HarvardX",
-                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                        "title": "Relativity in Modern Mechanics",
-                        "programUrl": "www.edx/my-program",
-                        "programType": "MicroBachelors Program",
-                        "numberOfCourses": 3
-                    },
-                    {
-                        "provider": "University  of Maryland",
-                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                        "title": "Pandering for Modern Professionals",
-                        "programUrl": "www.edx/my-program-2",
-                        "programType": "MicroBachelors Program",
-                        "programTypeUrl": "www.edx/my-program-type",
-                        "numberOfCourses": 3
-                    }
-                ]
-            }
-        },
-        {
-            "enrollment": {
-                "accessExpirationDate": null,
-                "canUpgrade": false,
-                "hasStarted": false,
-                "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
-                    "isTooEarly": true,
-                    "isStaff": false
-                },
-                "isAudit": false,
-                "isAuditAccessExpired": false,
-                "isEmailEnabled": false,
-                "hasOptedOutOfEmail": false,
-                "isEnrolled": false,
-                "isVerified": false,
-                "lastEnrolled": null
-            },
-            "gradeData": null,
-            "certificate": null,
-            "courseRun": {
-                "isStarted": false,
-                "isArchived": false,
-                "startDate": "11/11/3030",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
-                "homeUrl": "edx.com/courses/my-course-url/home",
-                "marketingUrl": "edx.com/courses/my-course-url/marketing",
-                "progressUrl": "edx.com/courses/my-course-url/progress",
-                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
-                "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number15-course-id15"
-            },
-            "entitlement": {
-                "uuid": "entitlement-course-uuid-15",
-                "availableSessions": [],
-                "changeDeadline": "11/11/2000",
-                "enrollmentUrl": "/entitlement-enrollment",
-                "isExpired": true,
-                "isFulfilled": false,
-                "isRefundable": true
-            },
-            "courseProvider": {
-                "name": "edX Course Provider"
-            },
-            "course": {
-                "courseNumber": "course-number105",
-                "courseName": "Course Name 105",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
-            },
-            "programs": {
-                "relatedPrograms": [
-                    {
-                        "provider": "HarvardX",
-                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                        "title": "Relativity in Modern Mechanics",
-                        "programUrl": "www.edx/my-program",
-                        "programType": "MicroBachelors Program",
-                        "numberOfCourses": 3
-                    },
-                    {
-                        "provider": "University  of Maryland",
-                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                        "title": "Pandering for Modern Professionals",
-                        "programUrl": "www.edx/my-program-2",
-                        "programType": "MicroBachelors Program",
-                        "programTypeUrl": "www.edx/my-program-type",
-                        "numberOfCourses": 3
-                    }
-                ]
-            }
-        },
-        {
-            "enrollment": {
-                "accessExpirationDate": null,
-                "canUpgrade": false,
-                "hasStarted": false,
-                "coursewareAccess": {
-                    "hasUnmetPrerequisites": false,
-                    "isTooEarly": false,
-                    "isStaff": true
-                },
-                "isAudit": false,
-                "isAuditAccessExpired": false,
-                "isEmailEnabled": false,
-                "hasOptedOutOfEmail": false,
-                "isEnrolled": false,
-                "isVerified": false,
-                "lastEnrolled": null
-            },
-            "gradeData": null,
-            "certificate": null,
-            "courseRun": null,
-            "entitlement": {
-                "uuid": "entitlement-course-uuid-16",
-                "availableSessions": [],
-                "changeDeadline": "11/11/2000",
-                "enrollmentUrl": "/entitlement-enrollment",
-                "isExpired": true,
-                "isFulfilled": false,
-                "isRefundable": true
-            },
-            "courseProvider": {
-                "name": "edX Course Provider"
-            },
-            "course": {
-                "courseNumber": "course-number106",
-                "courseName": "Course Name 106",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
-            },
-            "programs": {
-                "relatedPrograms": [
-                    {
-                        "provider": "HarvardX",
-                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/course/image/327c8e4f-315a-417b-9857-046dfc90c243-677b97464958.small.jpg",
-                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/44022f13-20df-4666-9111-cede3e5dc5b6-770e00385e7e.png",
-                        "title": "Relativity in Modern Mechanics",
-                        "programUrl": "www.edx/my-program",
-                        "programType": "MicroBachelors Program",
-                        "numberOfCourses": 3
-                    },
-                    {
-                        "provider": "University  of Maryland",
-                        "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
-                        "logoImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-                        "title": "Pandering for Modern Professionals",
-                        "programUrl": "www.edx/my-program-2",
-                        "programType": "MicroBachelors Program",
-                        "programTypeUrl": "www.edx/my-program-type",
-                        "numberOfCourses": 3
-                    }
-                ]
-            }
-        },
-        {
-            "enrollment": {
-                "accessExpirationDate": null,
-                "canUpgrade": false,
-                "hasStarted": false,
-                "coursewareAccess": {
-                    "hasUnmetPrerequisites": true,
-                    "isTooEarly": true,
-                    "isStaff": true
-                },
-                "isAudit": false,
-                "isAuditAccessExpired": false,
-                "isEmailEnabled": false,
-                "hasOptedOutOfEmail": false,
-                "isEnrolled": false,
-                "isVerified": false,
-                "lastEnrolled": null
-            },
-            "gradeData": null,
-            "certificate": null,
-            "courseRun": {
-                "isStarted": false,
-                "isArchived": false,
-                "startDate": "11/11/3030",
-                "endDate": "11/11/4040",
-                "minPassingGrade": 70,
-                "homeUrl": "edx.com/courses/my-course-url/home",
-                "marketingUrl": "edx.com/courses/my-course-url/marketing",
-                "progressUrl": "edx.com/courses/my-course-url/progress",
-                "unenrollUrl": "edx.com/courses/my-course-url/unenroll",
-                "resumeUrl": "edx.com/courses/my-course-url/resume",
-                "courseId": "course-number15-course-id15"
-            },
-            "entitlement": {
-                "uuid": "entitlement-course-uuid-17",
-                "availableSessions": [],
-                "changeDeadline": "11/11/2000",
-                "enrollmentUrl": "/entitlement-enrollment",
-                "isExpired": true,
-                "isFulfilled": false,
-                "isRefundable": true
-            },
-            "courseProvider": {
-                "name": "edX Course Provider"
-            },
-            "course": {
-                "courseNumber": "course-number107",
-                "courseName": "Course Name 107",
                 "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
             },
             "programs": {
@@ -2604,26 +2579,22 @@
     },
     "suggestedCourses": [
         {
-            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "logoImgSrc": null,
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
             "courseName": "Suggested course 1",
             "courseUrl": "www.edx/suggested-course"
         },
         {
-            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "logoImgSrc": null,
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
             "courseName": "Suggested course 2",
             "courseUrl": "www.edx/suggested-course"
         },
         {
-            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "logoImgSrc": null,
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
             "courseName": "Suggested course 3",
             "courseUrl": "www.edx/suggested-course"
         },
         {
-            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/organization/certificate_logos/b9dc96da-b3fc-45a6-b6b7-b8e12eb79335-ac60112330e3.png",
-            "logoImgSrc": null,
+            "bannerImgSrc": "https://prod-discovery.edx-cdn.org/media/programs/banner_images/9a310b98-8f27-439e-be85-12d6460245c9-f2efca129273.small.jpg",
             "courseName": "Suggested course 4",
             "courseUrl": "www.edx/suggested-course"
         }
