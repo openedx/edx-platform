@@ -28,7 +28,7 @@ from common.djangoapps.student.roles import (
     OrgStaffRole, OrgInstructorRole
 )
 from common.djangoapps.util.testing import UrlResetMixin
-from openedx.core.djangoapps.util.ip import USE_LEGACY_IP
+from openedx.core.djangoapps.util.legacy_ip import USE_LEGACY_IP
 
 from ..models import (
     RestrictedCourse, Country, CountryAccessRule,
