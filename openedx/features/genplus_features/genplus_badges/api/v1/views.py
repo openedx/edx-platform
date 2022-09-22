@@ -9,12 +9,16 @@ from rest_framework.permissions import IsAuthenticated
 from lms.djangoapps.badges.models import BadgeClass, BadgeAssertion
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus_learning.models import Program, ProgramEnrollment, YearGroup
+from openedx.features.genplus_features.genplus.models import Skill
 from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses, ProgramStatuses
 from openedx.features.genplus_features.genplus.api.v1.permissions import IsStudent, IsTeacher, IsStudentOrTeacher
 from openedx.features.genplus_features.common.display_messages import SuccessMessages
-from openedx.features.genplus_features.genplus_badges.models import BoosterBadge, BoosterBadgeAward
+from openedx.features.genplus_features.genplus_badges.models import (BoosterBadge,
+                                                                     BoosterBadgeAward,
+                                                                     BoosterBadgeType,
+                                                                     )
 from .serializers import (ProgramBadgeSerializer, AwardBoosterBadgesSerializer,
-                          BoosterBadgeSerializer, ClassBoosterBadgesSerializer)
+                          BoosterBadgeSerializer, BoosterBadgesTypeSerializer)
 
 
 class StudentProgramBadgeView(generics.ListAPIView):
@@ -80,7 +84,7 @@ class BoosterBadgeView(generics.ListAPIView):
     pagination_class = None
     filter_backends = [filters.SearchFilter]
     search_fields = ['display_name']
-    queryset = BoosterBadge.objects.select_related('skill').all()
+    queryset = BoosterBadge.objects.select_related('type').all()
 
     def get_serializer_context(self):
         context = super(BoosterBadgeView, self).get_serializer_context()
@@ -88,14 +92,18 @@ class BoosterBadgeView(generics.ListAPIView):
         return context
 
 
-class ClassBoosterBadgeView(generics.ListAPIView):
-    serializer_class = ClassBoosterBadgesSerializer
+class StudentBoosterBadgeView(generics.ListAPIView):
+    serializer_class = BoosterBadgesTypeSerializer
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, IsStudentOrTeacher]
     pagination_class = None
-    lookup_url_kwarg = 'username'
+    queryset = BoosterBadgeType.objects.prefetch_related('boosterbadge_set').all()
 
-    def get_queryset(self):
-        username = self.kwargs.get(self.lookup_url_kwarg, None)
-        user = get_object_or_404(User, username=username)
-        return BoosterBadgeAward.objects.filter(user=user)
+    def get_user(self):
+        user_id = self.request.query_params.get('user_id', None)
+        return get_object_or_404(User, pk=user_id) if user_id else self.request.user
+
+    def get_serializer_context(self):
+        context = super(StudentBoosterBadgeView, self).get_serializer_context()
+        context.update({'user': self.get_user()})
+        return context

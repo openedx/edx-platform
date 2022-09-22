@@ -1,21 +1,32 @@
 from django.contrib import admin
-from openedx.features.genplus_features.genplus_badges.models import BoosterBadge, BoosterBadgeAward
+from openedx.features.genplus_features.genplus_badges.models import (BoosterBadge,
+                                                                     BoosterBadgeAward,
+                                                                     BoosterBadgeType,
+                                                                     )
 
 
 @admin.register(BoosterBadge)
-class SkillAdmin(admin.ModelAdmin):
-    search_fields = ('display_name', )
+class BoosterBadgeAdmin(admin.ModelAdmin):
+    search_fields = ('display_name',)
     list_display = (
         'slug',
-        'skill',
+        'type',
         'display_name',
     )
 
 
 @admin.register(BoosterBadgeAward)
-class SkillAdmin(admin.ModelAdmin):
+class BoosterBadgeAwardAdmin(admin.ModelAdmin):
     list_display = (
         'user',
         'awarded_by',
         'badge',
+    )
+
+
+@admin.register(BoosterBadgeType)
+class BoosterBadgeType(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'name',
     )
