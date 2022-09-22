@@ -7,7 +7,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx_events.learning.data import DiscussionTopicContext
 
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
-from openedx.core.djangoapps.discussions.models import Provider
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.discussions.tasks import (
     update_discussions_settings_from_course,
     update_unit_discussion_state_from_discussion_blocks,
@@ -16,16 +16,57 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
+class DiscussionConfigUpdateMixin:
+    """
+    Mixin for common methods used to update course discussion configuration.
+    """
+
+    def update_course_field(self, **update):
+        """
+        Update the test course using provided parameters.
+        """
+        for key, value in update.items():
+            setattr(self.course, key, value)
+        self.store.update_item(self.course, self.user.id)
+
+    def update_discussions_settings(self, settings):
+        """
+        Update course discussion settings based on the provided discussion settings.
+        """
+        discussion_config = DiscussionsConfiguration.get(self.course.id)
+        for key, value in settings.items():
+            key = "provider_type" if key == "provider" else key
+            if value is not None:
+                setattr(discussion_config, key, value)
+        discussion_config.save()
+        self.course.discussions_settings.update(settings)
+        self.store.update_item(self.course, self.user.id)
+
+    def assert_discussion_settings(self, **settings):
+        """
+        Assert that the provided settings have the provided values in the course's discussion settings.
+        """
+        course = self.store.get_course(self.course.id)
+        discussion_config = DiscussionsConfiguration.get(self.course.id)
+        for key, value in settings.items():
+            assert course.discussions_settings.get(key, None) == value
+            key = "provider_type" if key == "provider" else key
+            assert getattr(discussion_config, key) == value
+
+
 @ddt.ddt
-@mock.patch('openedx.core.djangoapps.discussions.tasks.DiscussionsConfiguration', mock.Mock())
-class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
+class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase, DiscussionConfigUpdateMixin):
     """
     Tests for the discussions settings update tasks
     """
 
     def setUp(self):
         super().setUp()
-        self.course = course = CourseFactory.create()
+        self.course = course = CourseFactory.create(
+            discussions_settings={
+                "provider": Provider.OPEN_EDX
+            }
+        )
         self.course_key = course_key = self.course.id
         with self.store.bulk_operations(course_key):
             self.section = ItemFactory.create(parent=course, category="chapter", display_name="Section")
@@ -72,21 +113,9 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
                 category="html",
                 display_name="Graded HTML Module",
             )
-
-    def update_course_field(self, **update):
-        """
-        Update the test course using provided parameters.
-        """
-        for key, value in update.items():
-            setattr(self.course, key, value)
-        self.store.update_item(self.course, self.user.id)
-
-    def update_discussions_settings(self, settings):
-        """
-        Update course discussion settings based on the provided discussion settings.
-        """
-        self.course.discussions_settings.update(settings)
-        self.store.update_item(self.course, self.user.id)
+        discussion_config = DiscussionsConfiguration.get(course_key)
+        discussion_config.provider_type = Provider.OPEN_EDX
+        discussion_config.save()
 
     def test_default(self):
         """
@@ -156,7 +185,7 @@ class UpdateDiscussionsSettingsFromCourseTestCase(ModuleStoreTestCase):
 
 
 @ddt.ddt
-class MigrateUnitDiscussionStateFromXBlockTestCase(ModuleStoreTestCase):
+class MigrateUnitDiscussionStateFromXBlockTestCase(ModuleStoreTestCase, DiscussionConfigUpdateMixin):
     """
     Tests for the discussions settings update tasks
     """
@@ -222,21 +251,6 @@ class MigrateUnitDiscussionStateFromXBlockTestCase(ModuleStoreTestCase):
                 discussion_category=f'Category {unit.display_name}',
             )
 
-    def update_course_field(self, **update):
-        """
-        Update the test course using provided parameters.
-        """
-        for key, value in update.items():
-            setattr(self.course, key, value)
-        self.store.update_item(self.course, self.user.id)
-
-    def update_discussions_settings(self, settings):
-        """
-        Update course discussion settings based on the provided discussion settings.
-        """
-        self.course.discussions_settings.update(settings)
-        self.store.update_item(self.course, self.user.id)
-
     @mock.patch('openedx.core.djangoapps.discussions.tasks.get_accessible_discussion_xblocks_by_course_id')
     def test_course_not_using_legacy(self, mock_get_discussion_blocks):
         self.update_discussions_settings({'provider': 'non-legacy'})
@@ -271,14 +285,6 @@ class MigrateUnitDiscussionStateFromXBlockTestCase(ModuleStoreTestCase):
             )
         }
         return discussible, non_discussible
-
-    def assert_discussion_settings(self, **settings):
-        """
-        Assert that the provided settings have the provided values in the course's discussion settings.
-        """
-        course = self.store.get_course(self.course.id)
-        for key, value in settings.items():
-            assert course.discussions_settings.get(key, None) == value
 
     def test_without_graded(self):
         self.add_discussion_block([self.unit_discussible])
