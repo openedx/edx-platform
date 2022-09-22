@@ -28,7 +28,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-21T16:12:00.605Z"
+                "lastEnrolled": "2022-09-22T14:28:03.078Z"
             },
             "courseRun": {
                 "isStarted": false,
@@ -48,7 +48,7 @@
             },
             "course": {
                 "courseName": "Course Name 0",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number0"
             },
             "programs": {
@@ -96,7 +96,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-20T16:12:00.605Z"
+                "lastEnrolled": "2022-09-21T14:28:03.079Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -123,7 +123,7 @@
             },
             "course": {
                 "courseName": "Course Name 1",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number1"
             },
             "programs": {
@@ -161,7 +161,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-19T16:12:00.605Z"
+                "lastEnrolled": "2022-09-20T14:28:03.079Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -186,7 +186,7 @@
             "courseProvider": null,
             "course": {
                 "courseName": "Course Name 2",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number2"
             },
             "programs": {
@@ -234,14 +234,14 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-18T16:12:00.605Z"
+                "lastEnrolled": "2022-09-19T14:28:03.079Z"
             },
             "courseProvider": {
                 "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 3",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number3"
             },
             "programs": {
@@ -289,7 +289,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-17T16:12:00.605Z"
+                "lastEnrolled": "2022-09-18T14:28:03.079Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -316,7 +316,7 @@
             },
             "course": {
                 "courseName": "Course Name 4",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number4"
             },
             "programs": {
@@ -367,7 +367,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-16T16:12:00.605Z"
+                "lastEnrolled": "2022-09-17T14:28:03.079Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -379,7 +379,7 @@
             "courseProvider": null,
             "course": {
                 "courseName": "Course Name 5",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number5"
             },
             "programs": {
@@ -420,7 +420,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-15T16:12:00.605Z"
+                "lastEnrolled": "2022-09-16T14:28:03.079Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -434,7 +434,7 @@
             },
             "course": {
                 "courseName": "Course Name 6",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number6"
             },
             "programs": {
@@ -495,7 +495,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-14T16:12:00.606Z"
+                "lastEnrolled": "2022-09-15T14:28:03.079Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -509,7 +509,7 @@
             },
             "course": {
                 "courseName": "Course Name 7",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number7"
             },
             "programs": {
@@ -560,7 +560,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-13T16:12:00.606Z"
+                "lastEnrolled": "2022-09-14T14:28:03.079Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -572,7 +572,7 @@
             "courseProvider": null,
             "course": {
                 "courseName": "Course Name 8",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number8"
             },
             "programs": {
@@ -613,7 +613,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-12T16:12:00.606Z"
+                "lastEnrolled": "2022-09-13T14:28:03.080Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -627,7 +627,7 @@
             },
             "course": {
                 "courseName": "Course Name 9",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number9"
             },
             "programs": {
@@ -691,7 +691,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-11T16:12:00.606Z"
+                "lastEnrolled": "2022-09-12T14:28:03.080Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -705,7 +705,7 @@
             },
             "course": {
                 "courseName": "Course Name 10",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number10"
             },
             "programs": {
@@ -759,7 +759,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-10T16:12:00.607Z"
+                "lastEnrolled": "2022-09-11T14:28:03.080Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -771,7 +771,7 @@
             "courseProvider": null,
             "course": {
                 "courseName": "Course Name 11",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number11"
             },
             "programs": {
@@ -816,7 +816,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-09T16:12:00.607Z"
+                "lastEnrolled": "2022-09-10T14:28:03.080Z"
             },
             "grade": {
                 "isPassing": false
@@ -833,7 +833,7 @@
             },
             "course": {
                 "courseName": "Course Name 12",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number12"
             },
             "programs": {
@@ -899,7 +899,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": false,
-                "lastEnrolled": "2022-09-08T16:12:00.607Z"
+                "lastEnrolled": "2022-09-09T14:28:03.080Z"
             },
             "grade": {
                 "isPassing": false
@@ -916,7 +916,7 @@
             },
             "course": {
                 "courseName": "Course Name 13",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number13"
             },
             "programs": {
@@ -954,7 +954,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-09-07T16:12:00.607Z"
+                "lastEnrolled": "2022-09-08T14:28:03.080Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -979,7 +979,7 @@
             "courseProvider": null,
             "course": {
                 "courseName": "Course Name 14",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number14"
             },
             "programs": {
@@ -1020,7 +1020,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-09-06T16:12:00.607Z"
+                "lastEnrolled": "2022-09-07T14:28:03.080Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -1034,7 +1034,7 @@
             },
             "course": {
                 "courseName": "Course Name 15",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number15"
             },
             "programs": {
@@ -1095,7 +1095,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-09-05T16:12:00.607Z"
+                "lastEnrolled": "2022-09-06T14:28:03.080Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -1109,7 +1109,7 @@
             },
             "course": {
                 "courseName": "Course Name 16",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number16"
             },
             "programs": {
@@ -1160,7 +1160,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-09-04T16:12:00.607Z"
+                "lastEnrolled": "2022-09-05T14:28:03.080Z"
             },
             "certificate": {
                 "availableDate": null,
@@ -1172,7 +1172,7 @@
             "courseProvider": null,
             "course": {
                 "courseName": "Course Name 17",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number17"
             },
             "programs": {
@@ -1200,7 +1200,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-09-03T16:12:00.607Z"
+                "lastEnrolled": "2022-09-04T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -1227,7 +1227,7 @@
             },
             "course": {
                 "courseName": "Course Name 18",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number18"
             },
             "programs": {
@@ -1275,7 +1275,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-09-02T16:12:00.607Z"
+                "lastEnrolled": "2022-09-03T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -1302,7 +1302,7 @@
             },
             "course": {
                 "courseName": "Course Name 19",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number19"
             },
             "programs": {
@@ -1340,7 +1340,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-09-01T16:12:00.607Z"
+                "lastEnrolled": "2022-09-02T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -1365,7 +1365,7 @@
             "courseProvider": null,
             "course": {
                 "courseName": "Course Name 20",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number20"
             },
             "programs": {
@@ -1393,7 +1393,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-08-31T16:12:00.607Z"
+                "lastEnrolled": "2022-09-01T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -1413,14 +1413,14 @@
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "certPreviewUrl": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
             },
             "courseProvider": {
                 "name": "edX Course Provider"
             },
             "course": {
                 "courseName": "Course Name 21",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number21"
             },
             "programs": {
@@ -1468,7 +1468,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-08-30T16:12:00.607Z"
+                "lastEnrolled": "2022-08-31T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -1495,7 +1495,7 @@
             },
             "course": {
                 "courseName": "Course Name 22",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number22"
             },
             "programs": {
@@ -1533,7 +1533,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-08-29T16:12:00.607Z"
+                "lastEnrolled": "2022-08-30T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -1553,12 +1553,12 @@
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "certPreviewUrl": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
             },
             "courseProvider": null,
             "course": {
                 "courseName": "Course Name 23",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number23"
             },
             "programs": {
@@ -1620,7 +1620,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-08-28T16:12:00.607Z"
+                "lastEnrolled": "2022-08-29T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": false,
@@ -1647,7 +1647,7 @@
             },
             "course": {
                 "courseName": "Course Name 24",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number24"
             },
             "programs": {
@@ -1725,7 +1725,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-08-27T16:12:00.607Z"
+                "lastEnrolled": "2022-08-28T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -1752,7 +1752,7 @@
             },
             "course": {
                 "courseName": "Course Name 25",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number25"
             },
             "programs": {
@@ -1802,7 +1802,6 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": true,
                 "changeDeadline": "3030-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
@@ -1825,7 +1824,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-08-26T16:12:00.607Z"
+                "lastEnrolled": "2022-08-27T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -1850,7 +1849,7 @@
             "courseProvider": null,
             "course": {
                 "courseName": "Course Name 26",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number26"
             },
             "programs": {
@@ -1890,7 +1889,6 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": true,
                 "changeDeadline": "2000-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
@@ -1913,7 +1911,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-08-25T16:12:00.607Z"
+                "lastEnrolled": "2022-08-26T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -1940,7 +1938,7 @@
             },
             "course": {
                 "courseName": "Course Name 27",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number27"
             },
             "programs": {
@@ -1974,7 +1972,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-4",
                 "availableSessions": null,
-                "canViewCourse": true,
                 "changeDeadline": "2000-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
@@ -1997,7 +1994,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-08-24T16:12:00.607Z"
+                "lastEnrolled": "2022-08-25T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -2024,7 +2021,7 @@
             },
             "course": {
                 "courseName": "Course Name 28",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number28"
             },
             "programs": {
@@ -2048,7 +2045,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-5",
                 "availableSessions": null,
-                "canViewCourse": true,
                 "changeDeadline": "2000-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
@@ -2071,7 +2067,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-08-23T16:12:00.607Z"
+                "lastEnrolled": "2022-08-24T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -2091,12 +2087,12 @@
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "certPreviewUrl": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
             },
             "courseProvider": null,
             "course": {
                 "courseName": "Course Name 29",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number29"
             },
             "programs": {
@@ -2113,7 +2109,6 @@
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isFulfilled": true,
                 "isRefundable": false,
-                "canViewCourse": true,
                 "changeDeadline": "2000-11-11T00:00:00Z",
                 "isExpired": false
             },
@@ -2133,7 +2128,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-08-22T16:12:00.608Z"
+                "lastEnrolled": "2022-08-23T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -2160,7 +2155,7 @@
             },
             "course": {
                 "courseName": "Course Name 30",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number30"
             },
             "programs": {
@@ -2194,7 +2189,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-7",
                 "availableSessions": null,
-                "canViewCourse": false,
                 "changeDeadline": "2000-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
@@ -2217,7 +2211,7 @@
                 "hasOptedOutOfEmail": false,
                 "isEnrolled": true,
                 "isVerified": true,
-                "lastEnrolled": "2022-08-21T16:12:00.608Z"
+                "lastEnrolled": "2022-08-22T14:28:03.080Z"
             },
             "courseRun": {
                 "isStarted": true,
@@ -2237,14 +2231,14 @@
                 "isRestricted": false,
                 "isEarned": true,
                 "isDownloadable": true,
-                "certPreviewUrl": "https://edx-cdn.org/v3/prod/logo.svg"
+                "certPreviewUrl": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
             },
             "courseProvider": {
                 "name": "MIT"
             },
             "course": {
                 "courseName": "Course Name 31",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg",
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg",
                 "courseNumber": "course-number31"
             },
             "programs": {
@@ -2312,7 +2306,6 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": false,
                 "changeDeadline": "3030-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
@@ -2325,7 +2318,7 @@
             "course": {
                 "courseNumber": "course-number100",
                 "courseName": "Course Name 100",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
             },
             "programs": {
                 "relatedPrograms": [
@@ -2402,8 +2395,7 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": false,
-                "changeDeadline": "Sun Nov 20 2022",
+                "changeDeadline": "Mon Nov 21 2022",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
                 "isFulfilled": false,
@@ -2415,7 +2407,7 @@
             "course": {
                 "courseNumber": "course-number101",
                 "courseName": "Course Name 101",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:HarvardX+PH525.5x+3T2020+type@thumbnail+block@course_image-375x200.jpg"
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
             },
             "programs": {
                 "relatedPrograms": [
@@ -2482,7 +2474,6 @@
                         "courseId": "course-number1004-course-id1004"
                     }
                 ],
-                "canViewCourse": false,
                 "changeDeadline": "2000-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": false,
@@ -2493,7 +2484,7 @@
             "course": {
                 "courseNumber": "course-number102",
                 "courseName": "Course Name 102",
-                "bannerImgSrc": "https://courses.edx.org/asset-v1:USMx+LDT200x+2T2021+type@thumbnail+block@course_image-375x200.jpg"
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
             },
             "programs": {
                 "relatedPrograms": []
@@ -2524,7 +2515,6 @@
             "entitlement": {
                 "uuid": "entitlement-course-uuid-13",
                 "availableSessions": [],
-                "canViewCourse": false,
                 "changeDeadline": "2000-11-11T00:00:00Z",
                 "enrollmentUrl": "/entitlement-enrollment",
                 "isExpired": true,
@@ -2537,7 +2527,7 @@
             "course": {
                 "courseNumber": "course-number103",
                 "courseName": "Course Name 103",
-                "bannerImgSrc": "https://edx-cdn.org/v3/prod/logo.svg"
+                "bannerImgSrc": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@images_course_image.jpg"
             },
             "programs": {
                 "relatedPrograms": [
