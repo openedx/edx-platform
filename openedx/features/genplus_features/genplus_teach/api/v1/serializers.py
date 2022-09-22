@@ -62,6 +62,7 @@ class ArticleSerializer(DynamicFieldsModelSerializer):
     reflections = serializers.SerializerMethodField('get_reflections')
     is_completed = serializers.SerializerMethodField('get_is_completed')
     is_rated = serializers.SerializerMethodField('get_is_rated')
+    answer = serializers.SerializerMethodField('get_answer')
 
     def get_is_completed(self, instance):
         teacher = self.context.get('teacher')
@@ -74,10 +75,17 @@ class ArticleSerializer(DynamicFieldsModelSerializer):
     def get_reflections(self, instance):
         return ReflectionSerializer(instance.reflections.all(), many=True).data
 
+    def get_answer(self, instance):
+        teacher = self.context.get('teacher')
+        try:
+            return instance.reflections_answers.get(teacher=teacher).answer
+        except ReflectionAnswer.DoesNotExist:
+            return
+
     class Meta:
         model = Article
         fields = ('id', 'title', 'cover', 'skills', 'gtcs', 'media_types', 'time',
-                  'content', 'author', 'is_completed', 'is_rated', 'reflections')
+                  'content', 'author', 'is_completed', 'is_rated', 'reflections', 'answer', 'created')
 
 
 class FavoriteArticleSerializer(serializers.Serializer):

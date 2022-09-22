@@ -13,6 +13,7 @@ class SuccessMessages:
     ARTICLE_REMOVED_FROM_FAVORITES = '{title} has been removed from your favorite articles.'
     ARTICLE_RATED = "Thanks for the rating."
     BADGE_AWARDED = 'Feedback/badges have been awarded successfully.'
+    REFLECTION_ADDED = "Reflection Submitted."
 
 
 class ErrorMessages:
@@ -27,4 +28,5 @@ class ErrorMessages:
     # genplus_teach messages
     ARTICLE_ALREADY_ADDED = 'This article is already added to your favorite.'
     ARTICLE_ALREADY_RATED = 'You have already rated this article.'
+    MAX_FAVORITE = 'You can only favorite {max} articles at a time.'
     NOT_A_PART_OF_PROGRAMME = 'You are currently not a part of any programme.'

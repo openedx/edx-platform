@@ -112,6 +112,7 @@ class ReflectionAnswer(TimeStampedModel):
 
 
 class FavoriteArticle(models.Model):
+    MAX_FAVORITE = 10
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='favorite_articles')
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
 

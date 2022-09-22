@@ -47,15 +47,26 @@ class ArticleViewSet(viewsets.ModelViewSet, GenzMixin):
             queryset = queryset.exclude(id__in=teacher.favorite_articles.values('article_id'))
         return queryset.order_by('-created')
 
-    @action(detail=True, methods=['get'])
-    def favorite_articles(self, request, pk=None):  # pylint: disable=unused-argument
-        """
-        get favorite articles
-        """
+    def list(self, request, *args, **kwargs):
         teacher = Teacher.objects.get(gen_user=self.gen_user)
-        queryset = self.queryset.filter(id__in=teacher.favorite_articles.values('article_id'))
-        serializer = self.serializer_class(queryset, many=True, context={'request': request})
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+        queryset = self.filter_queryset(self.get_queryset())
+        favorite_queryset = self.queryset.filter(id__in=teacher.favorite_articles.values('article_id'))
+        favorite_serializer = self.serializer_class(self.filter_queryset(favorite_queryset), many=True, context={
+            'request': request,
+            'teacher': teacher
+        })
+        response = {
+            'favorites': favorite_serializer.data
+        }
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            articles_serializer = self.get_serializer(page, many=True)
+            response['articles'] = self.get_paginated_response(articles_serializer.data).data
+            return Response(response, status=status.HTTP_200_OK)
+
+        response['articles'] = self.get_serializer(queryset, many=True).data
+
+        return Response(response, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'])
     def add_favorite_article(self, request, pk=None):  # pylint: disable=unused-argument
@@ -70,7 +81,11 @@ class ArticleViewSet(viewsets.ModelViewSet, GenzMixin):
         article = self.get_object()
         teacher = Teacher.objects.get(gen_user=self.gen_user)
         if data['action'] == 'add':
-            FavoriteArticle.objects.create(teacher=teacher, article=article)
+            # in case the favorite max tier is achieved
+            if FavoriteArticle.objects.filter(teacher=teacher).count() >= FavoriteArticle.MAX_FAVORITE:
+                return Response(ErrorMessages.MAX_FAVORITE.format(max=FavoriteArticle.MAX_FAVORITE),
+                                status=status.HTTP_400_BAD_REQUEST)
+            FavoriteArticle.objects.update_or_create(teacher=teacher, article=article)
             return Response(SuccessMessages.ARTICLE_ADDED_TO_FAVORITES.format(title=article.title),
                             status=status.HTTP_200_OK)
         else:
@@ -97,7 +112,7 @@ class ArticleViewSet(viewsets.ModelViewSet, GenzMixin):
             teacher=teacher,
             **serializer.data
         )
-        return Response(SuccessMessages.ARTICLE_RATED, status=status.HTTP_204_NO_CONTENT)
+        return Response(SuccessMessages.ARTICLE_RATED, status=status.HTTP_200_OK)
 
 
 class ReflectionAnswerViewSet(viewsets.ViewSet, GenzMixin):
@@ -121,7 +136,7 @@ class ReflectionAnswerViewSet(viewsets.ViewSet, GenzMixin):
             article=article, teacher=teacher,
             defaults={"answer": serializer.data.get('answer')}
         )
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(SuccessMessages.REFLECTION_ADDED, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def portfolio(self, request):

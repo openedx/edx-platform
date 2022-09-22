@@ -16,7 +16,6 @@ router.register('articles', ArticleViewSet, basename='articles')
 urlpatterns = (
     url(r'^portfolio/', ReflectionAnswerViewSet.as_view({"get": "portfolio"})),
     url(r'^filters/', FiltersViewSet.as_view({"get": "list"})),
-    url(r'^articles/favorites/', ArticleViewSet.as_view({"get": "favorite_articles"})),
     url(r'^articles/(?P<pk>\d+)/add_favorite/', ArticleViewSet.as_view({"put": "add_favorite_article"})),
     url(r'^articles/(?P<pk>\d+)/rate/', ArticleViewSet.as_view({"put": "rate_article"})),
     url(r'^articles/(?P<pk>\d+)/log/', ArticleViewLogViewSet.as_view({"put": "log"})),
