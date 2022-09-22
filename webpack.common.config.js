@@ -98,6 +98,7 @@ module.exports = Merge.smart({
             AxiosJwtTokenService: './lms/static/js/jwt_auth/AxiosJwtTokenService.js',
             EnterpriseLearnerPortalModal: './lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx',
             RecommendationsPanel: './lms/static/js/learner_dashboard/RecommendationsPanel.jsx',
+            Static2UCallouts: './lms/static/js/learner_dashboard/Static2UCallouts.jsx',
 
             // Learner Dashboard
             EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',
