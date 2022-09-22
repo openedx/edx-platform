@@ -9,7 +9,8 @@ from .views import (
     ProgramViewSet,
     ClassStudentViewSet,
     ClassSummaryViewSet,
-    StudentDashboardAPIView
+    StudentDashboardAPIView,
+    ActivityAPIView
 )
 
 router = DefaultRouter()
@@ -22,6 +23,7 @@ app_name = 'genplus_learning_api_v1'
 urlpatterns = [
     url(r'^class-students/(?P<group_id>\w+)/$', ClassStudentViewSet.as_view({'get': 'list'})),
     url(r'^student-dashboard/$', StudentDashboardAPIView.as_view()),
+    url(r'^activities/$', ActivityAPIView.as_view()),
     url(r'^class-summary/lesson/unlock/(?P<lesson_id>\d+)/$', ClassSummaryViewSet.as_view({"put": "unlock_lesson"})),
     path('', include(router.urls)),
 ]

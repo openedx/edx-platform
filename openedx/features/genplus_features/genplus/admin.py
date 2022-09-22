@@ -74,3 +74,4 @@ class TeacherAdmin(admin.ModelAdmin):
 admin.site.register(Student)
 
 admin.site.register(JournalPost)
+admin.site.register(Activity)

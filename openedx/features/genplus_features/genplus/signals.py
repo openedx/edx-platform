@@ -1,8 +1,8 @@
 from django.dispatch import receiver
 from django.conf import settings
-from django.db.models.signals import post_save
-from .models import GenUser, Student, Teacher, TempUser, Class
-
+from django.db.models.signals import post_save, pre_save
+from .models import GenUser, Student, Teacher, TempUser, Class, JournalPost, Activity
+from .constants import JournalTypes, ActivityTypes
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 
@@ -33,3 +33,31 @@ def create_gen_class(sender, instance, created, **kwargs):
     if created:
         teachers = Teacher.objects.filter(gen_user__school=instance.school)
         instance.teachers.add(*teachers)
+
+
+# capturing activity of student during onboard character selection
+@receiver(post_save, sender=Student)
+def create_activity_on_onboarded(sender, instance, created, update_fields=None, **kwargs):
+    if update_fields and 'onboarded' in update_fields:
+        Activity.objects.create(
+            actor=instance.gen_user.student,
+            type=ActivityTypes.ON_BOARDED,
+            action_object=instance,
+            target=instance.gen_user.student
+        )
+
+
+# capturing activity of student/teacher during journal posting
+@receiver(post_save, sender=JournalPost)
+def create_activity_for_journal(sender, instance, created, **kwargs):
+    if created:
+        activity_type = ActivityTypes.JOURNAL_ENTRY_BY_TEACHER
+        if instance.type == JournalTypes.STUDENT_POST:
+            activity_type = ActivityTypes.JOURNAL_ENTRY_BY_STUDENT
+        Activity.objects.create(
+            actor=instance.teacher,
+            type=activity_type,
+            action_object=instance,
+            target=instance.student
+        )
+

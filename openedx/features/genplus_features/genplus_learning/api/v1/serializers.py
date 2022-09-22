@@ -11,12 +11,13 @@ from openedx.features.genplus_features.genplus_learning.models import (
     UnitCompletion,
     UnitBlockCompletion,
 )
-from openedx.features.genplus_features.genplus_learning.constants import ProgramEnrollmentStatuses
 from openedx.features.genplus_features.genplus_learning.utils import (
     calculate_class_lesson_progress,
     get_absolute_url,
 )
-from openedx.features.genplus_features.genplus.models import Student
+from openedx.features.genplus_features.genplus.models import Student, JournalPost,  Activity, Teacher
+from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
+from openedx.features.genplus_features.genplus.api.v1.serializers import TeacherSerializer
 
 
 class UnitSerializer(serializers.ModelSerializer):
@@ -128,3 +129,48 @@ class ClassStudentSerializer(serializers.ModelSerializer):
             progress['lesson_completions'] = chapters
             results.append(progress)
         return results
+
+
+def get_generic_serializer(model_arg):
+    class GenericSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = model_arg
+            fields = '__all__'
+            depth = 1
+
+    return GenericSerializer
+
+
+StudentSerializer = get_generic_serializer(Student)
+JournalPostSerializer  = get_generic_serializer(JournalPost)
+UnitBlockCompletionSerializer = get_generic_serializer(UnitBlockCompletion)
+BoosterBadgeAwardSerializer = get_generic_serializer(BoosterBadgeAward)
+
+
+class ContentObjectRelatedField(serializers.RelatedField):
+
+    def to_representation(self, value):
+        if isinstance(value, Student):
+            serializer = StudentSerializer(value)
+        elif isinstance(value, Teacher):
+            serializer = TeacherSerializer(value)
+        elif isinstance(value, UnitBlockCompletion):
+            serializer = UnitBlockCompletionSerializer(value)
+        elif isinstance(value, BoosterBadgeAwardSerializer):
+            serializer = BoosterBadgeAwardSerializer(value)
+        elif isinstance(value, JournalPost):
+            serializer = JournalPostSerializer(value)
+        else:
+            raise Exception('Unexpected type of tagged object')
+
+        return serializer.data
+
+
+class ActivitySerializer(serializers.ModelSerializer):
+    actor = ContentObjectRelatedField(read_only=True)
+    action_object = ContentObjectRelatedField(read_only=True)
+    target = ContentObjectRelatedField(read_only=True)
+
+    class Meta:
+        model = Activity
+        fields = ('id', 'type','actor', 'action_object', 'target', 'created')

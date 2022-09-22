@@ -5,19 +5,16 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.features.genplus_features.genplus.models import GenUser, Student, Class
+from openedx.features.genplus_features.genplus.models import GenUser, Student, Class, Activity
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from openedx.features.genplus_features.genplus.api.v1.permissions import IsStudentOrTeacher, IsTeacher, IsStudent
 from openedx.features.genplus_features.genplus_learning.models import (Program, ProgramEnrollment,
                                                                        ClassUnit, ClassLesson,)
 from openedx.features.genplus_features.genplus_learning.utils import get_absolute_url
+from .serializers import ProgramSerializer, ClassStudentSerializer, ActivitySerializer, ClassUnitSerializer
 from openedx.features.genplus_features.genplus.api.v1.serializers import ClassSummarySerializer
-from openedx.features.genplus_features.genplus_learning.api.v1.serializers import (
-    ProgramSerializer,
-    ClassStudentSerializer,
-    ClassUnitSerializer,
-)
 
 
 class ProgramViewSet(viewsets.ModelViewSet):
@@ -141,3 +138,14 @@ class StudentDashboardAPIView(APIView):
             'average_progress': average_progress,
             'units_progress': program_data
         }
+
+
+class ActivityAPIView(ListAPIView):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsStudent]
+    serializer_class = ActivitySerializer
+
+    def get_queryset(self):
+        student = self.request.user.gen_user.student
+        return Activity.objects.student_activities(student_id=student.id)
+

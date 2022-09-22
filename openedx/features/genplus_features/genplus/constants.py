@@ -46,3 +46,19 @@ class JournalTypes:
     __MODEL_CHOICES__ = (
         (journal_type, journal_type) for journal_type in __ALL__
     )
+
+class ActivityTypes:
+
+    """
+    Activity choices
+    """
+    JOURNAL_ENTRY_BY_STUDENT = 'JournalEntryByStudent'
+    JOURNAL_ENTRY_BY_TEACHER = 'JournalEntryByTeacher'
+    BADGE_AWARD = 'BadgeAward'
+    LESSON_COMPLETION = 'LessonCompletion'
+    ON_BOARDED = 'OnBoarded'
+
+    __ALL__ = (JOURNAL_ENTRY_BY_STUDENT, JOURNAL_ENTRY_BY_TEACHER, BADGE_AWARD, LESSON_COMPLETION, ON_BOARDED)
+    __MODEL_CHOICES__ = (
+        (activity_type, activity_type) for activity_type in __ALL__
+    )

@@ -5,10 +5,11 @@ from django.db.models.signals import post_save, m2m_changed, pre_save
 
 from completion.models import BlockCompletion
 from xmodule.modulestore.django import SignalHandler, modulestore
-from openedx.features.genplus_features.genplus.models import Class, Teacher
+from openedx.features.genplus_features.genplus.models import Class, Teacher, Activity
+from openedx.features.genplus_features.genplus.constants import ActivityTypes
 import openedx.features.genplus_features.genplus_learning.tasks as genplus_learning_tasks
 from openedx.features.genplus_features.genplus_learning.models import (
-    Program, Unit, ClassUnit, ClassLesson
+    Program, Unit, ClassUnit, ClassLesson , UnitBlockCompletion
 )
 from openedx.features.genplus_features.genplus_learning.access import allow_access
 from openedx.features.genplus_features.genplus_learning.roles import ProgramInstructorRole
@@ -77,4 +78,16 @@ def set_unit_and_block_completions(sender, instance, created, **kwargs):
     if created:
         genplus_learning_tasks.update_unit_and_lesson_completions.apply_async(
             args=[instance.pk]
+        )
+
+
+# capture activity on lesson completion
+@receiver(post_save, sender=UnitBlockCompletion)
+def create_activity_on_lesson_completion(sender, instance, created, **kwargs):
+    if instance.is_completed:
+        Activity.objects.create(
+            actor=instance.user.gen_user.student,
+            type=ActivityTypes.LESSON_COMPLETION,
+            action_object=instance,
+            target=instance.user.gen_user.student
         )

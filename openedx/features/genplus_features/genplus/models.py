@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
-from .constants import GenUserRoles, ClassColors, JournalTypes
+from .constants import GenUserRoles, ClassColors, JournalTypes, ActivityTypes
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -138,3 +140,51 @@ class JournalPost(TimeStampedModel):
     skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True)
     description = models.TextField()
     type = models.CharField(max_length=32, choices=JOURNAL_TYPE_CHOICES)
+
+
+class ActivityManager(models.Manager):
+    def student_activities(self, student_id=None):
+        return super().get_queryset().filter(target_content_type__model='student', target_object_id=student_id)
+
+
+class Activity(TimeStampedModel):
+    ACTIVITY_TYPE = ActivityTypes.__MODEL_CHOICES__
+
+    # Actor: The object that performed the activity.
+    actor_content_type = models.ForeignKey(
+        ContentType, related_name='actor', blank=True, null=True,
+        on_delete=models.CASCADE, db_index=True
+    )
+    actor_object_id = models.CharField(max_length=255, db_index=True)
+    actor = GenericForeignKey('actor_content_type', 'actor_object_id')
+
+    # Type: the type of activity perform
+    type = models.CharField(max_length=128, choices=ACTIVITY_TYPE)
+
+    # Target: The object to which the activity was performed
+    target_content_type = models.ForeignKey(
+        ContentType, blank=True, null=True,
+        related_name='target',
+        on_delete=models.CASCADE, db_index=True
+    )
+    target_object_id = models.CharField(
+        max_length=255, blank=True, null=True, db_index=True
+    )
+    target = GenericForeignKey(
+        'target_content_type',
+        'target_object_id'
+    )
+    # Action : The object linked to the action itself
+    action_object_content_type = models.ForeignKey(
+        ContentType, blank=True, null=True,
+        related_name='action_object',
+        on_delete=models.CASCADE, db_index=True
+    )
+    action_object_object_id = models.CharField(
+        max_length=255, blank=True, null=True, db_index=True
+    )
+    action_object = GenericForeignKey(
+        'action_object_content_type',
+        'action_object_object_id'
+    )
+    objects = ActivityManager()
