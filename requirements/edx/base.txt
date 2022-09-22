@@ -517,7 +517,7 @@ edx-rest-api-client==5.5.0
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edx-proctoring
-edx-search==3.2.0
+edx-search==3.4.0
     # via -r requirements/edx/base.in
 edx-sga==0.18.0
     # via -r requirements/edx/base.in
