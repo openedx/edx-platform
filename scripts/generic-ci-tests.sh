@@ -17,9 +17,9 @@ set -e
 #       - "lms-unit": Run the LMS Python unit tests
 #       - "cms-unit": Run the CMS Python unit tests
 #       - "js-unit": Run the JavaScript tests
-#       - "pavelib-unit": Run Python unit tests from the pavelib/lib directory
-#       - "pavelib-js-unit": Run the JavaScript tests and the Python unit
-#           tests from the pavelib/lib directory
+#       - "commonlib-unit": Run Python unit tests from the common/lib directory
+#       - "commonlib-js-unit": Run the JavaScript tests and the Python unit
+#           tests from the common/lib directory
 #       - "bok-choy": Run acceptance tests that use the bok-choy framework
 #
 #   `SHARD` is a number indicating which subset of the tests to build.
@@ -147,7 +147,7 @@ case "$TEST_SUITE" in
         exit $EXIT
         ;;
 
-    "lms-unit"|"cms-unit"|"pavelib-unit")
+    "lms-unit"|"cms-unit"|"commonlib-unit")
         $TOX bash scripts/unit-tests.sh
         ;;
 
@@ -156,7 +156,7 @@ case "$TEST_SUITE" in
         $TOX paver diff_coverage
         ;;
 
-    "pavelib-js-unit")
+    "commonlib-js-unit")
         $TOX paver test_js --coverage --skip-clean || { EXIT=1; }
         paver test_lib --skip-clean $PAVER_ARGS || { EXIT=1; }
 

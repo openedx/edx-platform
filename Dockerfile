@@ -91,9 +91,15 @@ RUN python3.8 -m venv "$VIRTUAL_ENV"
 
 # Install Python requirements.
 # Requires copying over requirements files, but not entire repository.
+# We filter out the local ('common/*' and 'openedx/*', and '.') Python projects,
+# because those require code in order to be installed. They will be installed
+# later. This step can be simplified when the local projects are dissolved
+# (see https://openedx.atlassian.net/browse/BOM-2579).
 COPY requirements requirements
+RUN  sed '/^-e \(common\/\|openedx\/\|.\)/d' requirements/edx/base.txt \
+  > requirements/edx/base-minus-local.txt
 RUN pip install -r requirements/pip.txt
-RUN pip install -r requirements/edx/base.txt
+RUN pip install -r requirements/edx/base-minus-local.txt
 
 # Set up a Node environment and install Node requirements.
 # Must be done after Python requirements, since nodeenv is installed
@@ -108,8 +114,10 @@ RUN npm set progress=false && npm install
 # Copy over remaining parts of repository (including all code).
 COPY . .
 
-# Install Python requirements again in order to capture local projects
-RUN pip install -e .
+# Install Python requirements again in order to capture local projects, which
+# were skipped earlier. This should be much quicker than if were installing
+# all requirements from scratch.
+RUN pip install -r requirements/edx/base.txt
 
 ##################################################
 # Define LMS docker-based non-dev target.

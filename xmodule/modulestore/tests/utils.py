@@ -87,8 +87,9 @@ def remove_temp_files_from_list(file_list, dir):  # lint-amnesty, pylint: disabl
 
 class MixedSplitTestCase(ModuleStoreTestCase):
     """
-    A minimal version of ModuleStoreTestCase for testing in xmodule/modulestore that sets up MixedModuleStore
-    and Split (only). It also enables "draft preferred" mode, like Studio uses.
+    A minimal version of ModuleStoreTestCase for testing in common/lib/ that sets up MixedModuleStore and Split (only).
+
+    It also enables "draft preferred" mode, like Studio uses.
 
     Draft/old mongo modulestore is not initialized.
     """

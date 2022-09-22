@@ -51,7 +51,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         pip install -r requirements/pip.txt
-        make dev-requirements
+        pip install -r requirements/edx/development.txt
         pip uninstall -y mysqlclient
         pip install --no-binary mysqlclient mysqlclient
         pip uninstall -y xmlsec

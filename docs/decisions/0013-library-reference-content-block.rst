@@ -61,7 +61,7 @@ out of the set selected by the author.
 Current Architecture/Implementation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Currently, courses are stored in Modulestore and libraries can either be stored in
-Modulestore or Blockstore. The [library_sourced_block](https://github.com/openedx/edx-platform/blob/master/xmodule/library_sourced_block.py)
+Modulestore or Blockstore. The [library_sourced_block](https://github.com/openedx/edx-platform/blob/master/common/lib/xmodule/xmodule/library_sourced_block.py)
 is used to make a copy of blockstore-based v2 content library block and store it in
 Modulestore itself as the child.
 

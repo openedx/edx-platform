@@ -37,7 +37,7 @@ class PythonTestSuite(TestSuite):
     def _default_subsuites(self):
         """
         The default subsuites to be run. They include lms, cms,
-        and all of the libraries in pavelib/paver_tests.
+        and all of the libraries in common/lib.
         """
         lib_suites = [
             LibTestSuite(d, **self.opts) for d in Env.LIB_TEST_DIRS

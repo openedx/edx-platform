@@ -11,6 +11,7 @@
 -c ../constraints.txt
 
 -r github.in              # Forks and other dependencies not yet on PyPI
+-r local.in               # Packages in edx-platform which have their own setup.py
 -r paver.txt              # Requirements for running paver commands
 
 # Please follow these guidelines whenever you change this file:

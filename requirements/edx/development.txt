@@ -12,6 +12,8 @@
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/openedx/olxcleaner.git@2f0d6c7f126cbd69c9724b7b57a0b2565330a297#egg=olxcleaner
     # via -r requirements/edx/testing.txt
+-e .
+    # via -r requirements/edx/testing.txt
 -e git+https://github.com/openedx/RateXBlock.git@2.0.1#egg=rate-xblock
     # via -r requirements/edx/testing.txt
 -e git+https://github.com/openedx/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
