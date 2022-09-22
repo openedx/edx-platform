@@ -1,6 +1,9 @@
+import os
 from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+from django.core.exceptions import ValidationError
+from .constants import GenUserRoles, ClassColors, JournalTypes
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
@@ -26,20 +29,28 @@ class Skill(models.Model):
         return self.name
 
 
+# validate the file extensions for character model
+def validate_file_extension(value):
+    ext = os.path.splitext(value.name)[1]  # [0] returns path+filename
+    valid_extensions = ['.mp4', '.gif', '.jpg', '.jpeg', '.png']
+    if not ext.lower() in valid_extensions:
+        raise ValidationError(f'Unsupported file extension. supported files are {str(valid_extensions)}')
+
+
 class Character(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField()
     skills = models.ManyToManyField(Skill, related_name='characters', blank=True)
     profile_pic = models.ImageField(upload_to='gen_plus_avatars',
                                     help_text='Upload the image which will be seen by student on their dashboard')
-    standing = models.ImageField(upload_to='gen_plus_avatars',
-                                 help_text='Provide standing image of character')
-    running = models.ImageField(upload_to='gen_plus_avatars',
-                                help_text='Provide running image of character')
-    crouching = models.ImageField(upload_to='gen_plus_avatars',
-                                  help_text='Provide crouching image of character')
-    jumping = models.ImageField(upload_to='gen_plus_avatars',
-                                help_text='Provide jumping image of character')
+    standing = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
+                                help_text='Provide standing position of character')
+    running = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
+                               help_text='Provide running position of character')
+    crouching = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
+                                 help_text='Provide crouching position of character')
+    jumping = models.FileField(upload_to='gen_plus_avatars', validators=[validate_file_extension, ],
+                               help_text='Provide jumping position of character')
 
     def __str__(self):
         return self.name
@@ -105,7 +116,8 @@ class Class(TimeStampedModel):
     name = models.CharField(max_length=128)
     is_visible = models.BooleanField(default=False, help_text='Manage Visibility to Genplus platform')
     students = models.ManyToManyField(Student, related_name='classes', blank=True)
-    program = models.ForeignKey('genplus_learning.Program', on_delete=models.CASCADE, null=True, blank=True, related_name="classes")
+    program = models.ForeignKey('genplus_learning.Program', on_delete=models.CASCADE, null=True, blank=True,
+                                related_name="classes")
     objects = models.Manager()
     visible_objects = ClassManager()
 
