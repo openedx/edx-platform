@@ -4,10 +4,11 @@ from rest_framework import generics, status, views, viewsets, mixins, filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import GenUser, Student, Class
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
-from openedx.features.genplus_features.genplus.api.v1.permissions import IsStudentOrTeacher, IsTeacher
+from openedx.features.genplus_features.genplus.api.v1.permissions import IsStudentOrTeacher, IsTeacher, IsStudent
 from openedx.features.genplus_features.genplus_learning.models import (Program, ProgramEnrollment,
                                                                        ClassUnit, ClassLesson,)
 from openedx.features.genplus_features.genplus_learning.utils import get_absolute_url
@@ -109,3 +110,34 @@ class ClassSummaryViewSet(viewsets.ModelViewSet):
         lesson.is_locked = False
         lesson.save()
         return Response(SuccessMessages.LESSON_UNLOCKED, status.HTTP_204_NO_CONTENT)
+
+
+class StudentDashboardAPIView(APIView):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsStudent]
+
+    def get(self, request):  # pylint: disable=unused-argument
+        """
+       student dashboard data
+        """
+        gen_class = request.user.gen_user.student.classes.first()
+        if gen_class:
+            data = {
+                'progress': self.get_progress(gen_class)
+            }
+            return Response(data, status.HTTP_200_OK)
+
+        return Response(ErrorMessages.NOT_A_PART_OF_PROGRAMME, status.HTTP_400_BAD_REQUEST)
+
+    def get_progress(self, gen_class):
+        gen_user = self.request.user.gen_user
+        units_count = gen_class.program.units.count()
+        average_progress = 0
+        program_data = ProgramSerializer(gen_class.program, context={'gen_user', gen_user}).data
+        if program_data and units_count > 0:
+            average_progress += sum(item['progress'] for item in program_data['units']) / units_count
+
+        return {
+            'average_progress': average_progress,
+            'units_progress': program_data
+        }

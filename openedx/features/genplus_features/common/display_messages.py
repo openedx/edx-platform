@@ -27,3 +27,4 @@ class ErrorMessages:
     # genplus_teach messages
     ARTICLE_ALREADY_ADDED = 'This article is already added to your favorite.'
     ARTICLE_ALREADY_RATED = 'You have already rated this article.'
+    NOT_A_PART_OF_PROGRAMME = 'You are currently not a part of any programme.'
