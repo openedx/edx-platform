@@ -149,7 +149,10 @@ def wrap_xblock(
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
-        template_context['js_init_parameters'] = frag.json_init_args
+        json_init_args = frag.json_init_args
+        if hasattr(block, "showanswer"):
+            json_init_args["showanswer"] = block.showanswer
+        template_context['js_init_parameters'] = json_init_args
     else:
         template_context['js_init_parameters'] = ""
 
