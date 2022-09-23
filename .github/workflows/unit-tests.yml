@@ -8,34 +8,33 @@ on:
 
 jobs:
   run-tests:
+    name: python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
     if: github.repository == 'openedx/edx-platform' || github.repository == 'edx/edx-platform-private'
     runs-on: [ edx-platform-runner ]
     strategy:
       matrix:
-        python-version: ['3.8']
+        python-version:
+          - "3.8"
         django-version:
           - "pinned"
           #- "4.0"
-        shard_name: [
-            "lms-1",
-            "lms-2",
-            "lms-3",
-            "lms-4",
-            "lms-5",
-            "lms-6",
-            "openedx-1",
-            "openedx-2",
-            "openedx-3",
-            "openedx-4",
-            "cms-1",
-            "cms-2",
-            "common-1",
-            "common-2",
-            "xmodule-1"
-        ]
+        shard_name:
+          - "lms-1"
+          - "lms-2"
+          - "lms-3"
+          - "lms-4"
+          - "lms-5"
+          - "lms-6"
+          - "openedx-1"
+          - "openedx-2"
+          - "openedx-3"
+          - "openedx-4"
+          - "cms-1"
+          - "cms-2"
+          - "common-1"
+          - "common-2"
+          - "xmodule-1"
 
-
-    name: python-${{ matrix.python-version }},django-${{ matrix.django-version }},${{ matrix.shard_name }}
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
