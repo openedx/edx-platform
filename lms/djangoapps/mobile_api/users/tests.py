@@ -354,19 +354,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         courses = self._get_enrollment_data(api_version, expired)
         self._assert_enrollment_results(api_version, courses, num_courses_returned, False)
 
-    @ddt.data(
-        (API_V05,),
-        (API_V1,),
-    )
-    @ddt.unpack
-    def test_enrollment_without_configs(self, api_version):
-        """
-        Test that expired courses are only returned in v1 of API
-        when waffle flag enabled, and un-expired courses always returned
-        """
-        courses = self._get_enrollment_data(api_version)
-        self._assert_enrollment_results(api_version, courses)
-
     def test_enrollment_with_configs(self):
         """
         Test that expired courses are only returned in v1 of API
@@ -381,7 +368,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             'iap_configs': {'iap_config': 'iap'},
             'simple config': 'simple',
             'iap config': 'false iap',
-            }
+        }
 
         response = self.api_response(api_version=API_V2)
         self.assertDictEqual(response.data['configs'], expected_result)
