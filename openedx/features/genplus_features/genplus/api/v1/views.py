@@ -208,6 +208,12 @@ class JournalViewSet(GenzMixin, FlatMultipleModelMixin, viewsets.ModelViewSet):
         queryset = queryset.filter(feedback__icontains=search)
         return queryset
 
+    def _rename_entry_type(self, results):
+        for i, entry in enumerate(results):
+            if entry['type'] == 'JournalPost':
+                results[i]['type'] = results[i]['journal_type']
+        return results
+
     def get_querylist(self):
         query_params = self.request.query_params
         journal_posts = JournalPost.objects.select_related('student', 'teacher', 'skill')
@@ -237,6 +243,7 @@ class JournalViewSet(GenzMixin, FlatMultipleModelMixin, viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         response = super(FlatMultipleModelMixin, self).list(request, args, kwargs)
+        response.data['results'] = self._rename_entry_type(response.data['results'])
         querylist = self.get_querylist()
         queryset = querylist[0]['queryset']
         skills_qs = Skill.objects.filter(pk__in=queryset.values_list('skill', flat=True))
