@@ -247,3 +247,14 @@ img {
     text-align: center;
   }
 }
+
+// fix discussion-alert when it's appear in mfe when forum is stopped
+body.view-in-mfe #discussion-alert {
+    margin: 0 !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) scale(.85);
+
+    @include media-breakpoint-down(xs) {
+        transform: translate(-50%, -50%) scale(.55);
+    }
+}
