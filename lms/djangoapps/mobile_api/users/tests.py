@@ -372,7 +372,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         Test that expired courses are only returned in v1 of API
         when waffle flag enabled, and un-expired courses always returned
         """
-        self.login_and_enroll=()
+        self.login_and_enroll()
 
         MobileConfigs(name='simple config', value='simple').save()
         MobileConfigs(name='iap_config', value='iap').save()
