@@ -9,7 +9,7 @@ import ddt
 from django.test import TestCase
 from pytz import UTC
 
-from lms.djangoapps.mobile_api.models import AppVersionConfig, MobileApiConfig
+from lms.djangoapps.mobile_api.models import AppVersionConfig, MobileApiConfig, MobileConfigs
 
 
 @ddt.ddt
@@ -109,3 +109,38 @@ class TestMobileApiConfig(TestCase):
         MobileApiConfig(video_profiles="").save()
         video_profile_list = MobileApiConfig.get_video_profiles()
         assert video_profile_list == []
+
+
+class TestMobileConfigs(TestCase):
+    """
+    Tests MobileAPIConfig
+    """
+
+    def test_structured_configs(self):
+        """Check that configs are structured properly"""
+        MobileConfigs(name="simple config", value="simple").save()
+        MobileConfigs(name="iap config", value="false iap").save()
+        MobileConfigs(name="iap_config", value="true").save()
+        MobileConfigs(name="", value="empty").save()
+        configs = MobileConfigs.get_structured_configs()
+        expected_result = {
+            'iap_configs': {'iap_config': 'true'},
+            'simple config': 'simple',
+            'iap config': 'false iap',
+            '': 'empty'}
+
+        self.assertDictEqual(configs, expected_result)
+
+    def test_structured_configs_without_iap_configs(self):
+        """Check that configs are structured properly without iap configs"""
+        MobileConfigs(name="simple config", value="simple").save()
+        MobileConfigs(name="iap config", value="false iap").save()
+        MobileConfigs(name="", value="empty").save()
+        configs = MobileConfigs.get_structured_configs()
+        expected_result = {
+            'iap_configs': {},
+            'simple config': 'simple',
+            'iap config': 'false iap',
+            '': 'empty'}
+
+        self.assertDictEqual(configs, expected_result)
