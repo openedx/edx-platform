@@ -6,7 +6,7 @@ Django admin dashboard configuration for LMS XBlock infrastructure.
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
-from .models import AppVersionConfig, IgnoreMobileAvailableFlagConfig, MobileApiConfig, MobileConfigs
+from .models import AppVersionConfig, IgnoreMobileAvailableFlagConfig, MobileApiConfig, MobileConfig
 
 admin.site.register(MobileApiConfig, ConfigurationModelAdmin)
 admin.site.register(IgnoreMobileAvailableFlagConfig, ConfigurationModelAdmin)
@@ -26,7 +26,7 @@ class AppVersionConfigAdmin(admin.ModelAdmin):
 
 
 class MobileConfigAdmin(admin.ModelAdmin):
-    """ Admin class for MobileConfigs model """
+    """ Admin class for MobileConfig model """
     fields = ('name', 'value')
     readonly_fields = ['created', 'modified']
 
@@ -35,4 +35,4 @@ class MobileConfigAdmin(admin.ModelAdmin):
 
 
 admin.site.register(AppVersionConfig, AppVersionConfigAdmin)
-admin.site.register(MobileConfigs, MobileConfigAdmin)
+admin.site.register(MobileConfig, MobileConfigAdmin)

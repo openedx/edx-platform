@@ -103,7 +103,7 @@ class IgnoreMobileAvailableFlagConfig(ConfigurationModel):
         app_label = "mobile_api"
 
 
-class MobileConfigs(TimeStampedModel):
+class MobileConfig(TimeStampedModel):
     """
     Mobile configs to add through admin panel. Config values can be added dynamically.
 
@@ -125,7 +125,7 @@ class MobileConfigs(TimeStampedModel):
             - If flag name starts with `iap_`, add value to configs['iap_configs']
             - Else add values to configs{}
         """
-        configs = MobileConfigs.objects.all().values('name', 'value')
+        configs = MobileConfig.objects.all().values('name', 'value')
         structured_configs = {"iap_configs": {}}
         for config in configs:
             name = config.get('name')

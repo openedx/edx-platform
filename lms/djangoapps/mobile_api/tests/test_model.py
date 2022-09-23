@@ -9,7 +9,7 @@ import ddt
 from django.test import TestCase
 from pytz import UTC
 
-from lms.djangoapps.mobile_api.models import AppVersionConfig, MobileApiConfig, MobileConfigs
+from lms.djangoapps.mobile_api.models import AppVersionConfig, MobileApiConfig, MobileConfig
 
 
 @ddt.ddt
@@ -111,18 +111,18 @@ class TestMobileApiConfig(TestCase):
         assert video_profile_list == []
 
 
-class TestMobileConfigs(TestCase):
+class TestMobileConfig(TestCase):
     """
-    Tests MobileAPIConfig
+    Tests MobileConfig
     """
 
     def test_structured_configs(self):
         """Check that configs are structured properly"""
-        MobileConfigs(name="simple config", value="simple").save()
-        MobileConfigs(name="iap config", value="false iap").save()
-        MobileConfigs(name="iap_config", value="true").save()
-        MobileConfigs(name="", value="empty").save()
-        configs = MobileConfigs.get_structured_configs()
+        MobileConfig(name="simple config", value="simple").save()
+        MobileConfig(name="iap config", value="false iap").save()
+        MobileConfig(name="iap_config", value="true").save()
+        MobileConfig(name="", value="empty").save()
+        configs = MobileConfig.get_structured_configs()
         expected_result = {
             'iap_configs': {'iap_config': 'true'},
             'simple config': 'simple',
@@ -133,10 +133,10 @@ class TestMobileConfigs(TestCase):
 
     def test_structured_configs_without_iap_configs(self):
         """Check that configs are structured properly without iap configs"""
-        MobileConfigs(name="simple config", value="simple").save()
-        MobileConfigs(name="iap config", value="false iap").save()
-        MobileConfigs(name="", value="empty").save()
-        configs = MobileConfigs.get_structured_configs()
+        MobileConfig(name="simple config", value="simple").save()
+        MobileConfig(name="iap config", value="false iap").save()
+        MobileConfig(name="", value="empty").save()
+        configs = MobileConfig.get_structured_configs()
         expected_result = {
             'iap_configs': {},
             'simple config': 'simple',

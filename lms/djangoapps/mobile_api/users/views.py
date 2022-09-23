@@ -27,7 +27,7 @@ from lms.djangoapps.courseware.courses import get_current_child
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.views.index import save_positions_recursively_up
-from lms.djangoapps.mobile_api.models import MobileConfigs
+from lms.djangoapps.mobile_api.models import MobileConfig
 from lms.djangoapps.mobile_api.utils import API_V1, API_V05, API_V2
 from openedx.features.course_duration_limits.access import check_course_expired
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -367,7 +367,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
 
         if api_version == API_V2:
             enrollment_data = {
-                'configs': MobileConfigs.get_structured_configs(),
+                'configs': MobileConfig.get_structured_configs(),
                 'enrollments': response.data
             }
             return Response(enrollment_data)

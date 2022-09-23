@@ -27,7 +27,7 @@ from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
-from lms.djangoapps.mobile_api.models import MobileConfigs
+from lms.djangoapps.mobile_api.models import MobileConfig
 from lms.djangoapps.mobile_api.testutils import (
     MobileAPITestCase,
     MobileAuthTestMixin,
@@ -300,6 +300,9 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         add_course_mode(course)
 
     def _get_enrollment_data(self, api_version, expired):
+        """
+        Login, Create enrollments and get data through enrollments api.
+        """
         self.login()
         self.create_enrollment(expired)
         response = self.api_response(api_version=api_version).data
@@ -356,14 +359,13 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
     def test_enrollment_with_configs(self):
         """
-        Test that expired courses are only returned in v1 of API
-        when waffle flag enabled, and un-expired courses always returned
+        Test that configs are returned in proper structure in enrollments api.
         """
         self.login_and_enroll()
 
-        MobileConfigs(name='simple config', value='simple').save()
-        MobileConfigs(name='iap_config', value='iap').save()
-        MobileConfigs(name='iap config', value='false iap').save()
+        MobileConfig(name='simple config', value='simple').save()
+        MobileConfig(name='iap_config', value='iap').save()
+        MobileConfig(name='iap config', value='false iap').save()
         expected_result = {
             'iap_configs': {'iap_config': 'iap'},
             'simple config': 'simple',
