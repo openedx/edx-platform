@@ -17,11 +17,25 @@ from cms.djangoapps.contentstore.tasks import (
     DEFAULT_FORCE_UPDATE,
     enqueue_async_migrate_transcripts_tasks
 )
+from openedx.core.djangoapps.appsembler.sites.utils import get_active_organizations
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.video_config.models import MigrationEnqueuedCourse, TranscriptMigrationSetting
 from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
+
+
+def get_active_courses_keys():
+    """
+    Get course keys for active organizations.
+    """
+    active_orgs = get_active_organizations()
+    active_courses = CourseOverview.get_all_courses_from_organizations(orgs=[
+        org.short_name for org in active_orgs
+    ])
+
+    ids = [course.id for course in active_courses]
+    return ids
 
 
 class Command(BaseCommand):
@@ -93,13 +107,13 @@ class Command(BaseCommand):
         commit = options['commit']
         courses_mode = get_mutually_exclusive_required_option(options, 'course_ids', 'all_courses', 'from_settings')
         if courses_mode == 'all_courses':
-            course_keys = [course.id for course in modulestore().get_course_summaries()]
+            course_keys = get_active_courses_keys()
         elif courses_mode == 'course_ids':
             course_keys = list(map(self._parse_course_key, options['course_ids']))
         else:
             migration_settings = self._latest_settings()
             if migration_settings.all_courses:
-                all_courses = [course.id for course in modulestore().get_course_summaries()]
+                all_courses = get_active_courses_keys()
                 # Following is to avoid re-rerunning migrations for the already enqueued courses.
                 # Although the migrations job is idempotent, but we need to track if the transcript migration
                 # job was initiated for specific course(s) in order to elevate load from the workers and for
