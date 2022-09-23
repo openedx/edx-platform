@@ -34,6 +34,8 @@ jobs:
           - "common-1"
           - "common-2"
           - "xmodule-1"
+    # We expect Django 4.0 to fail, so don't stop when it fails.
+    continue-on-error: ${{ matrix.django-version == '4.0' }}
 
     steps:
       - name: sync directory owner
@@ -73,6 +75,17 @@ jobs:
 
       - name: Setup and run tests
         uses: ./.github/actions/unit-tests
+
+  success:
+    name: Tests successful
+    # A collection step to give a simple name for required status checks.
+    # https://github.com/orgs/community/discussions/33579
+    needs: run-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Success"
+        run: |
+          echo Tests successful
 
   compile-warnings-report:
     runs-on: [ edx-platform-runner ]
