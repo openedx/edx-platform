@@ -2,6 +2,8 @@ from django.middleware import csrf
 from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.db import IntegrityError
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, status, views, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.pagination import PageNumberPagination
@@ -9,8 +11,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import filters
+from rest_framework import mixins
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from drf_multiple_model.mixins import FlatMultipleModelMixin
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import (
@@ -18,6 +22,8 @@ from openedx.features.genplus_features.genplus.models import (
 )
 from openedx.features.genplus_features.genplus.constants import JournalTypes
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
+from openedx.features.genplus_features.genplus_badges.api.v1.serializers import JournalBoosterBadgeSerializer
+from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
 from .serializers import (
     CharacterSerializer,
     ClassListSerializer,
@@ -31,6 +37,7 @@ from .serializers import (
 )
 from .permissions import IsStudent, IsTeacher, IsStudentOrTeacher, IsGenUser
 from .mixins import GenzMixin
+from .pagination import JournalListPagination
 
 
 class UserInfo(GenzMixin, views.APIView):
@@ -175,45 +182,67 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
 
         return ClassSummarySerializer
 
-class JournalViewSet(GenzMixin, viewsets.ModelViewSet):
+class JournalViewSet(GenzMixin, FlatMultipleModelMixin, viewsets.ModelViewSet):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, IsStudentOrTeacher]
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['title', 'description']
-    ordering = ['-created']
+    queryset = JournalPost.objects.none()
+    sorting_field = 'created'
+    pagination_class = JournalListPagination
+    sort_descending = True
 
-    def get_queryset(self):
+    def _journal_entry_filter(self, queryset, request, *args, **kwargs):
+        query_params = self.request.query_params
+        skill_id = query_params.get('skill_id')
+        search = query_params.get('search', '')
+        if skill_id:
+            queryset = queryset.filter(skill__id=skill_id)
+        queryset = queryset.filter(Q(title__icontains=search) | Q(description__icontains=search))
+        return queryset
+
+    def _booster_badge_filter(self, queryset, request, *args, **kwargs):
+        query_params = self.request.query_params
+        skill_id = query_params.get('skill_id')
+        if skill_id:
+            return BoosterBadgeAward.objects.none()
+        search = query_params.get('search', '')
+        queryset = queryset.filter(feedback__icontains=search)
+        return queryset
+
+    def get_querylist(self):
         query_params = self.request.query_params
         journal_posts = JournalPost.objects.select_related('student', 'teacher', 'skill')
+
         if self.gen_user.is_student:
+            student = self.gen_user.student
             journal_posts = journal_posts.filter(student=self.gen_user.student)
+            booster_badges = BoosterBadgeAward.objects.filter(user=self.gen_user.user)
         else:
             student_id = query_params.get('student_id')
-            if student_id:
-                journal_posts = journal_posts.filter(student__id=student_id)
-            else:
-                journal_posts = JournalPost.objects.none()
+            student = get_object_or_404(Student, pk=student_id)
+            journal_posts = journal_posts.filter(student=student)
+            booster_badges = BoosterBadgeAward.objects.filter(user__gen_user=student.gen_user)
 
-        skill = query_params.get('skill')
-        if skill:
-            journal_posts = journal_posts.filter(skill__name__iexact=skill)
-
-        return journal_posts.order_by(*self.ordering)
+        return [
+            {
+                'queryset': journal_posts,
+                'serializer_class': JournalListSerializer,
+                'filter_fn': self._journal_entry_filter
+            },
+            {
+                'queryset': booster_badges,
+                'serializer_class': JournalBoosterBadgeSerializer,
+                'filter_fn': self._booster_badge_filter
+            }
+        ]
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        skill_qs = Skill.objects.all()
-        skills = SkillSerializer(skill_qs, many=True).data
-        page = self.paginate_queryset(queryset)
+        response = super(FlatMultipleModelMixin, self).list(request, args, kwargs)
+        querylist = self.get_querylist()
+        queryset = querylist[0]['queryset']
+        skills_qs = Skill.objects.filter(pk__in=queryset.values_list('skill', flat=True))
+        response.data['skills'] = SkillSerializer(skills_qs, many=True).data
+        return response
 
-        if page is not None:
-            data = self.get_serializer(page, many=True).data
-            response = self.get_paginated_response(data)
-            response.data['skills'] = skills
-            return response
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         if self.gen_user.is_student:
@@ -233,16 +262,16 @@ class JournalViewSet(GenzMixin, viewsets.ModelViewSet):
 
         return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
 
-    def _create_journal_post_data(self, request_data, entry_type):
+    def _create_journal_post_data(self, request_data, journal_type):
         data = {
             'title': request_data.get('title'),
             'description': request_data.get('description'),
-            'type': entry_type,
+            'journal_type': journal_type,
         }
-        if entry_type == JournalTypes.STUDENT_POST:
+        if journal_type == JournalTypes.STUDENT_POST:
             data['student'] = self.gen_user.student.id
             data['skill'] = request_data.get('skill')
-        elif entry_type == JournalTypes.TEACHER_FEEDBACK:
+        elif journal_type == JournalTypes.TEACHER_FEEDBACK:
             data['student'] = self.request.query_params.get('student_id')
             data['teacher'] = self.gen_user.teacher.id
 

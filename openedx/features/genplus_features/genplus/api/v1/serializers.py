@@ -114,21 +114,19 @@ class FavoriteClassSerializer(serializers.Serializer):
 class JournalListSerializer(serializers.ModelSerializer):
     skill = SkillSerializer(read_only=True)
     teacher = TeacherSerializer(read_only=True)
-    created = serializers.DateTimeField(format="%d/%m/%Y")
     class Meta:
         model = JournalPost
-        fields = ('id', 'title', 'skill', 'description', 'teacher', 'type', 'created')
-
+        fields = ('id', 'title', 'skill', 'description', 'teacher', 'journal_type', 'created')
 
 class StudentPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = JournalPost
-        fields = ('student', 'title', 'skill', 'description', 'type')
+        fields = ('student', 'title', 'skill', 'description', 'journal_type')
         extra_kwargs = {'skill': {'required': True, 'allow_null': False}}
 
 
 class TeacherFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = JournalPost
-        fields = ('teacher', 'student', 'title', 'description', 'type')
+        fields = ('teacher', 'student', 'title', 'description', 'journal_type')
         extra_kwargs = {'teacher': {'required': True, 'allow_null': False}}
