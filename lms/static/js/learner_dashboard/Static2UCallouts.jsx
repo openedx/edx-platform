@@ -2,6 +2,17 @@
 import React from 'react';
 
 class Static2UCallouts extends React.Component {
+
+  componentDidMount() {
+    if (!this.props.isEnterpriseUser){
+      window['optimizely'] = window['optimizely'] || [];
+      window['optimizely'].push({
+        type: "page",
+        pageName: "merchandise_2u_lobs"
+      });
+    }
+  }
+
   render() {
     return (
       <div className="static-callouts-main">

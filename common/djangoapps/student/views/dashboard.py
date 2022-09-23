@@ -51,6 +51,7 @@ from openedx.features.enterprise_support.api import (
     get_dashboard_consent_notification,
     get_enterprise_learner_portal_context,
 )
+from openedx.features.enterprise_support.utils import is_enterprise_learner
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
@@ -838,6 +839,8 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         # TODO START: clean up as part of REVEM-199 (END)
         'disable_unenrollment': disable_unenrollment,
         'country_code': country_code,
+        # TODO: clean when experiment(Merchandise 2U LOBs - Dashboard) would be stop. [VAN-1097]
+        'is_enterprise_user': is_enterprise_learner(user),
     }
 
     # Include enterprise learner portal metadata and messaging
