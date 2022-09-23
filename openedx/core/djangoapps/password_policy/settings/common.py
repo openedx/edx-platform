@@ -35,3 +35,4 @@ def plugin_settings(settings):
         # Ex: 2018-04-19 00:00:00+00:00
         'GENERAL_USER_COMPLIANCE_DEADLINE': None,
     }
+    settings.PASSWORD_POLICY_COMPLIANCE_API_TIMEOUT = 5
