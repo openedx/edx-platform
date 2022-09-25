@@ -29,7 +29,7 @@
 # AzizAhmed <dr.zezo@gmail.com>, 2014
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016-2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
-# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021
+# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021-2022
 # Glib Glugovskiy <glugov1998@gmail.com>, 2021
 # Hamza Madni, 2022
 # HasnaG <hasnaa.elghandor@yahoo.com>, 2014
@@ -252,7 +252,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-12 12:15+0000\n"
+"POT-Creation-Date: 2022-09-18 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -2043,6 +2043,9 @@ msgid ""
 "                    Proctoring requirements for %(course_name)s\n"
 "                "
 msgstr ""
+"\n"
+" متطلبات المراقبة لـ %(course_name)s\n"
+"                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 #, python-format
@@ -2051,6 +2054,9 @@ msgid ""
 "                    Hello %(full_name)s,\n"
 "                "
 msgstr ""
+"\n"
+"                    مرحبًا %(full_name)s,\n"
+"                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 #, python-format
@@ -2067,6 +2073,9 @@ msgid ""
 "                    Proctored exams are timed exams that you take while proctoring software monitors your computer's desktop, webcam video, and audio. Your course uses %(proctoring_provider)s software for proctoring.\n"
 "                "
 msgstr ""
+"\n"
+"الامتحانات التي يتم مراقبتها هي اختبارات محددة بوقت يتم إجراؤها أثناء قيام برنامج المراقبة بمراقبة سطح المكتب لجهاز الكمبيوتر الخاص بك وفيديو كاميرا الويب والصوت. تستخدم مقررك الدراسي برنامج%(proctoring_provider)s للمراقبة\n"
+"                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 msgid ""
@@ -2074,6 +2083,9 @@ msgid ""
 "                    Carefully review the system requirements as well as the steps to take a proctored exam in order to ensure that you are prepared.\n"
 "                "
 msgstr ""
+"\n"
+"قم بمراجعة متطلبات النظام بعناية بالإضافة إلى خطوات إجراء اختبار مراقب للتأكد من استعدادك.\n"
+"                "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 msgid ""
@@ -2081,6 +2093,9 @@ msgid ""
 "                Proctoring Instructions and Requirements\n"
 "            "
 msgstr ""
+"\n"
+"تعليمات ومتطلبات المراقبة\n"
+"            "
 
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.html
 #: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
@@ -2969,6 +2984,9 @@ msgid ""
 "                            Adjust my goal\n"
 "                        "
 msgstr ""
+"\n"
+"                            اضبط هدفي\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -2976,6 +2994,9 @@ msgid ""
 "                            Unsubscribe from goal reminder emails for this course\n"
 "                        "
 msgstr ""
+"\n"
+"                            إلغاء الاشتراك من رسائل البريد الإلكتروني الخاصة بتذكيرالاهدف لهذه الدورة\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
 msgid "You're almost there!"
@@ -3690,6 +3711,9 @@ msgid ""
 "                        %(course_name)s: Reported content awaits review\n"
 "                    "
 msgstr ""
+"\n"
+"                        %(course_name)s: المحتوى المبلغ عنه في انتظار المراجعة\n"
+"                    "
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/reportedcontentnotification/email/body.txt
@@ -5358,6 +5382,9 @@ msgid ""
 "            To stop receiving email like this, update your course email settings\n"
 "          "
 msgstr ""
+"\n"
+"لإيقاف تلقي بريد إلكتروني مثل هذا ، قم بتحديث إعدادات البريد الإلكتروني للدورة التدريبية\n"
+"          "
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 msgid "here"
@@ -7384,6 +7411,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Ordering of this topic in its learning context"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/plugins.py

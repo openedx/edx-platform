@@ -7786,6 +7786,10 @@ msgstr "Si ce sujet doit être présenté en contexte dans le cours."
 msgid "Ordering of this topic in its learning context"
 msgstr "Classement de ce sujet dans son contexte d'apprentissage"
 
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
+msgstr ""
+
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
 "Encourage participation and engagement in your course with discussions."
