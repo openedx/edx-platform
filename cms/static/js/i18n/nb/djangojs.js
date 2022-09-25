@@ -177,7 +177,6 @@
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Du har ulagrede endringer i individuelle felter. Hvis du utf\u00f8rer en handling, vil dine ulagrede endringer g\u00e5 tapt.",
     "You must provide a learner name.": "Du m\u00e5 oppgi et navn p\u00e5 kursdeltager.",
     "You're about to submit your response for this assignment. After you submit this response, you can't change it or submit a new response.": "Du er i ferd med \u00e5 levere ditt svar p\u00e5 denne oppgaven. Etter at du leverer svaret kan du ikke endre det eller levere et nytt svar.",
-    "Your file ": "Din fil",
     "abbrev. month April\u0004Apr": "Apr",
     "abbrev. month August\u0004Aug": "Aug",
     "abbrev. month December\u0004Dec": "Des",

@@ -127,7 +127,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-12 12:15+0000\n"
+"POT-Creation-Date: 2022-09-18 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2021\n"
 "Language-Team: Italian (Italy) (https://www.transifex.com/open-edx/teams/6205/it_IT/)\n"
@@ -3133,6 +3133,9 @@ msgid ""
 "However, you are currently logged in as a '{active_enterprise_name}' user. "
 "Please log in with '{enrollment_enterprise_name}' to access this course."
 msgstr ""
+"Sei iscritto a questo corso con '{enrollment_enterprise_name}'. Tuttavia, "
+"sei attualmente connesso come utente '{active_enterprise_name}'.. Accedi con"
+" '{enrollment_enterprise_name}' per accedere a questo corso."
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must give Data Sharing Consent for the course"
@@ -7627,6 +7630,12 @@ msgstr "Se questo argomento deve essere mostrato nel contesto del corso."
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Ordering of this topic in its learning context"
 msgstr "Ordinamento di questo argomento nel suo contesto di apprendimento"
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
+msgstr ""
+"Contesto aggiuntivo per questo argomento, ad esempio la relativa sezione e "
+"sottosezione"
 
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""

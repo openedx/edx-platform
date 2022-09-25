@@ -7,7 +7,7 @@
 
   
   django.pluralidx = function(n) {
-    const v = (n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;
+    const v = (n > 1);
     if (typeof v === 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -27,15 +27,13 @@
     "%(new_item_message)s": "%(new_item_message)s",
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s de %(cnt)s selecionado",
-      "%(sel)s de %(cnt)s selecionados",
-      ""
+      "%(sel)s de %(cnt)s selecionados"
     ],
     "%(type)s Component Template Menu": "%(type)s Menu de Modelos de Componentes",
     "(Add signatories for a certificate)": "(Adicionar assinaturas para um certificado)",
     "(Required Field)": "(Campo Obrigat\u00f3rio)",
     "(contains %(student_count)s student)": [
       "(cont\u00e9m %(student_count)s aluno)",
-      "(cont\u00e9m %(student_count)s alunos)",
       "(cont\u00e9m %(student_count)s alunos)"
     ],
     "- Sortable": "- Classific\u00e1veis",
@@ -518,13 +516,11 @@
     "Note": "Anota\u00e7\u00e3o",
     "Note: You are %s hour ahead of server time.": [
       "Nota: Voc\u00ea est\u00e1 %s hora \u00e0 frente do hor\u00e1rio do servidor.",
-      "Nota: Voc\u00ea est\u00e1 %s horas \u00e0 frente do hor\u00e1rio do servidor.",
-      ""
+      "Nota: Voc\u00ea est\u00e1 %s horas \u00e0 frente do hor\u00e1rio do servidor."
     ],
     "Note: You are %s hour behind server time.": [
       "Nota: Voc\u00ea est\u00e1 %s hora atr\u00e1s do tempo do servidor.",
-      "Nota: Voc\u00ea est\u00e1 %s horas atr\u00e1s do hor\u00e1rio do servidor.",
-      ""
+      "Nota: Voc\u00ea est\u00e1 %s horas atr\u00e1s do hor\u00e1rio do servidor."
     ],
     "Noted in:": "Anota\u00e7\u00e3o feita em:",
     "Notes": "Anota\u00e7\u00f5es",
@@ -910,7 +906,6 @@
     "View all errors": "Visualizar todos os erros",
     "Viewing %s course": [
       "Visualizando %s curso",
-      "Visualizando %s cursos",
       "Visualizando %s cursos"
     ],
     "Visible to Staff Only": "Vis\u00edvel apenas para os funcion\u00e1rios",
