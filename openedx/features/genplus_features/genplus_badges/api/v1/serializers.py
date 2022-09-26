@@ -191,4 +191,4 @@ class BoosterBadgesTypeSerializer(serializers.ModelSerializer):
 class JournalBoosterBadgeSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoosterBadgeAward
-        fields = ('image_url', 'feedback', 'created')
+        fields = ('id', 'image_url', 'feedback', 'created')
