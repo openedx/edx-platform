@@ -2,25 +2,13 @@
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
 
-
-import xblock.reference.plugins
-from completion.services import CompletionService
 from django.conf import settings
 from django.urls import reverse
-from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 
-from lms.djangoapps.badges.service import BadgingService
-from lms.djangoapps.badges.utils import badges_enabled
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-from lms.djangoapps.teams.services import TeamsService
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
-from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resource_url
-from xmodule.library_tools import LibraryToolsService  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import ModuleI18nService, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.services import SettingsService, TeamsConfigurationService  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import ModuleSystem  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -51,7 +39,7 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         view_name = 'xblock_handler_noauth'
 
     url = reverse(view_name, kwargs={
-        'course_id': str(block.location.course_key),
+        'course_id': str(block.scope_ids.usage_id.context_key),
         'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
         'handler': handler_name,
         'suffix': suffix,
@@ -132,32 +120,8 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
     """
-    def __init__(self, user, **kwargs):
-        request_cache_dict = DEFAULT_REQUEST_CACHE.data
-        store = modulestore()
-        course_id = kwargs.get('course_id')
-
-        services = kwargs.setdefault('services', {})
-        if user and user.is_authenticated:
-            services['completion'] = CompletionService(user=user, context_key=course_id)
-        services['fs'] = xblock.reference.plugins.FSService()
-        services['i18n'] = ModuleI18nService
-        services['library_tools'] = LibraryToolsService(store, user_id=user.id if user else None)
-        services['partitions'] = PartitionService(
-            course_id=course_id,
-            cache=request_cache_dict
-        )
-        services['settings'] = SettingsService()
-        services['user_tags'] = UserTagsService(
-            user=user,
-            course_id=course_id,
-        )
-        if badges_enabled():
-            services['badging'] = BadgingService(course_id=course_id, modulestore=store)
+    def __init__(self, **kwargs):
         self.request_token = kwargs.pop('request_token', None)
-        services['teams'] = TeamsService()
-        services['teams_configuration'] = TeamsConfigurationService()
-        services['call_to_action'] = CallToActionService()
         super().__init__(**kwargs)
 
     def handler_url(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs

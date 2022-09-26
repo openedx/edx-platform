@@ -12,6 +12,7 @@ import pytest
 from django.conf import settings
 from django.test import TestCase, override_settings
 from lxml import etree
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from pytz import UTC
 from webob.request import Request
@@ -61,14 +62,15 @@ class LTIBlockTest(TestCase):
                   </imsx_POXBody>
                 </imsx_POXEnvelopeRequest>
             """)
-        self.system = get_test_system()
+        self.course_id = CourseKey.from_string('org/course/run')
+        self.system = get_test_system(self.course_id)
         self.system.publish = Mock()
         self.system._services['rebind_user'] = Mock()  # pylint: disable=protected-access
 
         self.xmodule = LTIBlock(
             self.system,
             DictFieldData({}),
-            ScopeIds(None, None, None, BlockUsageLocator(self.system.course_id, 'lti', 'name'))
+            ScopeIds(None, None, None, BlockUsageLocator(self.course_id, 'lti', 'name'))
         )
         current_user = self.system.service(self.xmodule, 'user').get_current_user()
         self.user_id = current_user.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
@@ -319,7 +321,7 @@ class LTIBlockTest(TestCase):
 
     def test_lis_result_sourcedid(self):
         expected_sourced_id = ':'.join(parse.quote(i) for i in (
-            str(self.system.course_id),
+            str(self.course_id),
             self.xmodule.get_resource_link_id(),
             self.user_id
         ))
@@ -539,4 +541,4 @@ class LTIBlockTest(TestCase):
         """
         Tests that LTI parameter context_id is equal to course_id.
         """
-        assert str(self.system.course_id) == self.xmodule.context_id
+        assert str(self.course_id) == self.xmodule.context_id

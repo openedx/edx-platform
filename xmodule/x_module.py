@@ -1073,25 +1073,11 @@ class MetricsMixin:
 
     def render(self, block, view_name, context=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         start_time = time.time()
-        status = "success"
         try:
             return super().render(block, view_name, context=context)
-        except:
-            status = "failure"
-            raise
-
         finally:
             end_time = time.time()
             duration = end_time - start_time
-            course_id = getattr(self, 'course_id', '')
-            tags = [  # lint-amnesty, pylint: disable=unused-variable
-                f'view_name:{view_name}',
-                'action:render',
-                f'action_status:{status}',
-                f'course_id:{course_id}',
-                f'block_type:{block.scope_ids.block_type}',
-                f'block_family:{block.entry_point}',
-            ]
             log.debug(
                 "%.3fs - render %s.%s (%s)",
                 duration,
@@ -1102,25 +1088,11 @@ class MetricsMixin:
 
     def handle(self, block, handler_name, request, suffix=''):  # lint-amnesty, pylint: disable=missing-function-docstring
         start_time = time.time()
-        status = "success"
         try:
             return super().handle(block, handler_name, request, suffix=suffix)
-        except:
-            status = "failure"
-            raise
-
         finally:
             end_time = time.time()
             duration = end_time - start_time
-            course_id = getattr(self, 'course_id', '')
-            tags = [  # lint-amnesty, pylint: disable=unused-variable
-                f'handler_name:{handler_name}',
-                'action:handle',
-                f'action_status:{status}',
-                f'course_id:{course_id}',
-                f'block_type:{block.scope_ids.block_type}',
-                f'block_family:{block.entry_point}',
-            ]
             log.debug(
                 "%.3fs - handle %s.%s (%s)",
                 duration,
@@ -1718,6 +1690,19 @@ class ModuleSystemShim:
         )
         return settings.STATIC_URL
 
+    @property
+    def course_id(self):
+        """
+        Old API to get the course ID.
+
+        Deprecated in favor of `runtime.scope_ids.usage_id.context_key`.
+        """
+        warnings.warn(
+            "`runtime.course_id` is deprecated. Use `context_key` instead: `runtime.scope_ids.usage_id.context_key`.",
+            DeprecationWarning, stacklevel=3,
+        )
+        return self.descriptor_runtime.course_id.for_branch(None)
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1738,7 +1723,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         get_module,
         descriptor_runtime,
         publish=None,
-        course_id=None,
         **kwargs,
     ):
         """
@@ -1755,8 +1739,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
 
-        course_id - the course_id containing this module
-
         publish(event) - A function that allows XModules to publish events (such as grade changes)
         """
 
@@ -1766,7 +1748,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
         self.track_function = track_function
         self.get_module = get_module
-        self.course_id = course_id
 
         if publish:
             self.publish = publish
