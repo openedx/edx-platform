@@ -534,7 +534,10 @@ class EnterpriseDashboardSerializer(serializers.Serializer):
     url = serializers.SerializerMethodField()
 
     def get_url(self, instance):
-        return urljoin(settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL, instance["uuid"])
+        return urljoin(
+            settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL,
+            instance["slug"],
+        )
 
 
 class LearnerDashboardSerializer(serializers.Serializer):
