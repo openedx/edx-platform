@@ -13,9 +13,11 @@ from urllib.parse import urlencode, urlunparse
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.http import Http404
 from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework import status
@@ -23,7 +25,6 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.request import Request
 
-from lms.djangoapps.discussion.views import is_privileged_user
 from xmodule.course_module import CourseBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTabList
@@ -31,9 +32,9 @@ from xmodule.tabs import CourseTabList
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE, \
-    ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
+from lms.djangoapps.discussion.views import is_user_moderator
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common import comment_client
@@ -71,7 +72,9 @@ from ..config.waffle import ENABLE_LEARNERS_STATS
 
 from ..django_comment_client.base.views import (
     track_comment_created_event,
+    track_comment_deleted_event,
     track_thread_created_event,
+    track_thread_deleted_event,
     track_thread_viewed_event,
     track_voted_event,
 )
@@ -196,12 +199,12 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
         course = _get_course(course_key, request.user)
         context = get_context(course, request, cc_thread)
 
-        if retrieve_kwargs.get("flagged_comments") and not context["is_requester_privileged"]:
+        if retrieve_kwargs.get("flagged_comments") and not context["has_moderation_privilege"]:
             raise ValidationError("Only privileged users can request flagged comments")
 
         course_discussion_settings = CourseDiscussionSettings.get(course_key)
         if (
-            not context["is_requester_privileged"] and
+            not context["has_moderation_privilege"] and
             cc_thread["group_id"] and
             is_commentable_divided(course.id, cc_thread["commentable_id"], course_discussion_settings)
         ):
@@ -239,7 +242,7 @@ def _is_user_author_or_privileged(cc_content, context):
         Boolean
     """
     return (
-        context["is_requester_privileged"] or
+        context["has_moderation_privilege"] or
         context["cc_requester"]["id"] == cc_content["user_id"]
     )
 
@@ -375,23 +378,12 @@ def get_courseware_topics(
     courseware_topics = []
     existing_topic_ids = set()
 
-    def get_xblock_sort_key(xblock):
-        """
-        Get the sort key for the xblock (falling back to the discussion_target
-        setting if absent)
-        """
-        return xblock.sort_key or xblock.discussion_target
-
-    def get_sorted_xblocks(category):
-        """Returns key sorted xblocks by category"""
-        return sorted(xblocks_by_category[category], key=get_xblock_sort_key)
-
     discussion_xblocks = get_accessible_discussion_xblocks(course, request.user)
     xblocks_by_category = defaultdict(list)
     for xblock in discussion_xblocks:
         xblocks_by_category[xblock.discussion_category].append(xblock)
 
-    for category in sorted(xblocks_by_category.keys()):
+    for category in xblocks_by_category.keys():
         children = []
         for xblock in xblocks_by_category[category]:
             if not topic_ids or xblock.discussion_id in topic_ids:
@@ -411,7 +403,11 @@ def get_courseware_topics(
             discussion_topic = DiscussionTopic(
                 None,
                 category,
-                get_thread_list_url(request, course_key, [item.discussion_id for item in get_sorted_xblocks(category)]),
+                get_thread_list_url(
+                    request,
+                    course_key,
+                    [item.discussion_id for item in xblocks_by_category[category]],
+                ),
                 children,
                 None,
             )
@@ -447,8 +443,8 @@ def get_non_courseware_topics(
     """
     non_courseware_topics = []
     existing_topic_ids = set()
-    sorted_topics = sorted(list(course.discussion_topics.items()), key=lambda item: item[1].get("sort_key", item[0]))
-    for name, entry in sorted_topics:
+    topics = list(course.discussion_topics.items())
+    for name, entry in topics:
         if not topic_ids or entry['id'] in topic_ids:
             discussion_topic = DiscussionTopic(
                 entry["id"], name, get_thread_list_url(request, course_key, [entry["id"]]),
@@ -541,16 +537,28 @@ def get_course_topics_v2(
     # Check access to the course
     store = modulestore()
     _get_course(course_key, user=user, check_tab=False)
+    user_is_privileged = user.is_staff or user.roles.filter(
+        course_id=course_key,
+        name__in=[
+            FORUM_ROLE_MODERATOR,
+            FORUM_ROLE_COMMUNITY_TA,
+            FORUM_ROLE_ADMINISTRATOR,
+        ]
+    ).exists()
     course_blocks = get_course_blocks(user, store.make_course_usage_key(course_key))
     accessible_vertical_keys = [
         block for block in course_blocks.get_block_keys()
-        if block.category == 'vertical'
+        if block.block_type == 'vertical'
     ] + [None]
     topics_query = DiscussionTopicLink.objects.filter(
         context_key=course_key,
         provider_id=provider_type,
-        usage_key__in=accessible_vertical_keys,
     )
+
+    if user_is_privileged:
+        topics_query = topics_query.filter(Q(usage_key__in=accessible_vertical_keys) | Q(enabled_in_context=False))
+    else:
+        topics_query = topics_query.filter(usage_key__in=accessible_vertical_keys, enabled_in_context=True)
 
     if topic_ids:
         topics_query = topics_query.filter(external_id__in=topic_ids)
@@ -566,7 +574,12 @@ def get_course_topics_v2(
     else:
         topics_query = topics_query.order_by('ordering')
 
-    return DiscussionTopicSerializerV2(topics_query, many=True, context={"thread_counts": thread_counts}).data
+    topics_data = DiscussionTopicSerializerV2(topics_query, many=True, context={"thread_counts": thread_counts}).data
+    return [
+        topic_data
+        for topic_data in topics_data
+        if topic_data["enabled_in_context"] or sum(topic_data["thread_counts"].values())
+    ]
 
 
 def _get_user_profile_dict(request, usernames):
@@ -800,7 +813,7 @@ def get_thread_list(
                 "text_search_rewrite": None,
             })
 
-    if count_flagged and not context["is_requester_privileged"]:
+    if count_flagged and not context["has_moderation_privilege"]:
         raise PermissionDenied("`count_flagged` can only be set by users with moderator access or higher.")
 
     group_id = None
@@ -817,7 +830,7 @@ def get_thread_list(
             except ValueError:
                 pass
 
-    if (group_id is None) and (not context["is_requester_privileged"]):
+    if (group_id is None) and not context["has_moderation_privilege"]:
         group_id = get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
 
     query_params = {
@@ -1183,15 +1196,14 @@ def _handle_abuse_flagged_field(form_value, user, cc_content):
     course_key = CourseKey.from_string(cc_content.course_id)
     if form_value:
         cc_content.flagAbuse(user, cc_content)
-        if ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(course_key) and reported_content_email_notification_enabled(
+        if ENABLE_DISCUSSIONS_MFE.is_enabled(course_key) and reported_content_email_notification_enabled(
                 course_key):
             if cc_content.type == 'thread':
                 thread_flagged.send(sender='flag_abuse_for_thread', user=user, post=cc_content)
             else:
                 comment_flagged.send(sender='flag_abuse_for_comment', user=user, post=cc_content)
     else:
-        remove_all = bool(user.id != cc_content["user_id"] and is_privileged_user(course_key,
-                                                                                  User.objects.get(id=user.id)))
+        remove_all = bool(is_user_moderator(course_key, User.objects.get(id=user.id)))
         cc_content.unFlagAbuse(user, cc_content, remove_all)
 
 
@@ -1541,7 +1553,7 @@ def get_user_comments(
     course = _get_course(course_key, request.user)
     context = get_context(course, request)
 
-    if flagged and not context["is_requester_privileged"]:
+    if flagged and not context["has_moderation_privilege"]:
         raise ValidationError("Only privileged users can filter comments by flagged status")
 
     try:
@@ -1593,6 +1605,7 @@ def delete_thread(request, thread_id):
     if can_delete(cc_thread, context):
         cc_thread.delete()
         thread_deleted.send(sender=None, user=request.user, post=cc_thread)
+        track_thread_deleted_event(request, context["course"], cc_thread)
     else:
         raise PermissionDenied
 
@@ -1617,6 +1630,7 @@ def delete_comment(request, comment_id):
     if can_delete(cc_comment, context):
         cc_comment.delete()
         comment_deleted.send(sender=None, user=request.user, post=cc_comment)
+        track_comment_deleted_event(request, context["course"], cc_comment)
     else:
         raise PermissionDenied
 
@@ -1681,6 +1695,17 @@ def get_course_discussion_user_stats(
         params['usernames'] = comma_separated_usernames
 
     course_stats_response = get_course_user_stats(course_key, params)
+
+    tracker.emit(
+        'edx.forum.searched',
+        {
+            'query': username_search_string,
+            'search_type': 'Learner',
+            'page': params.get('page'),
+            'sort_key': params.get('sort_key'),
+            'total_results': course_stats_response.get('total_results'),
+        }
+    )
 
     if comma_separated_usernames:
         updated_course_stats = add_stats_for_users_with_no_discussion_content(

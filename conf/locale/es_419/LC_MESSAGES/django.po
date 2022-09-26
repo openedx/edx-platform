@@ -34,7 +34,7 @@
 # Jesica Greco, 2022
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020-2021
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020-2022
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan <juan.marrero@utec.edu.uy>, 2015
@@ -99,7 +99,7 @@
 # Jesica Greco, 2022
 # Jose Antonio Sanchez Romero <isc.antonio.sr@gmail.com>, 2017
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014-2017,2021
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014-2017,2021-2022
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 # karlman72 <karlman72@gmail.com>, 2014
 # karlman72 <karlman72@gmail.com>, 2014
@@ -159,7 +159,7 @@
 # 1673e3cf8bd85685e54576636ae7f409, 2014
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2021
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2022
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
@@ -274,7 +274,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-08-07 20:43+0000\n"
+"POT-Creation-Date: 2022-09-18 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -3253,6 +3253,18 @@ msgid "You must be enrolled in the course"
 msgstr "Debe estar inscrito en el curso"
 
 #: lms/djangoapps/courseware/access_response.py
+#, python-brace-format
+msgid ""
+"You are enrolled in this course with '{enrollment_enterprise_name}'. "
+"However, you are currently logged in as a '{active_enterprise_name}' user. "
+"Please log in with '{enrollment_enterprise_name}' to access this course."
+msgstr ""
+"Usted se enroló en este curso con '{enrollment_enterprise_name}'.  Sin "
+"embargo, actualmente está conectado como usuario de "
+"'{active_enterprise_name}'. Inicie sesión con '{enrollment_enterprise_name}'"
+" para acceder a este curso."
+
+#: lms/djangoapps/courseware/access_response.py
 msgid "You must give Data Sharing Consent for the course"
 msgstr "Debe dar el consentimiento para compartir datos para el curso"
 
@@ -5098,7 +5110,7 @@ msgstr "Estado:  {action} {succeeded} de {attempted}"
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid " (skipping {skipped})"
-msgstr " (ignorando {skipped})"
+msgstr " (Se han ignorado {skipped} registros)"
 
 #. Translators: {total} is a count.  This message is appended to task progress
 #. status messages.
@@ -7731,6 +7743,10 @@ msgstr "Si esta temática debe ser mostrada en el contexto del curso."
 msgid "Ordering of this topic in its learning context"
 msgstr "Ordenación de este tema en su contexto de aprendizaje"
 
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
+msgstr "Contexto adicional para este tema, como su sección y subsección"
+
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
 "Encourage participation and engagement in your course with discussions."
@@ -8324,11 +8340,6 @@ msgstr ""
 #. account using
 #. an invalid email format.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "\"{email}\" is not a valid email address."
-msgstr "\"{email}\" no es un correo electrónico válido."
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter a valid email address"
 msgstr "Introduce una dirección de correo electrónico válida"
 
@@ -8391,19 +8402,19 @@ msgstr ""
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your full name"
-msgstr ""
+msgstr "Introduce tu nombre completo"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your first name"
-msgstr ""
+msgstr "Ingresa tu nombre"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your last name"
-msgstr ""
+msgstr "Ingresa tu apellido"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "The email addresses do not match"
-msgstr ""
+msgstr "Las direcciones de correo electrónico no coinciden"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your confirm email"
@@ -8411,39 +8422,39 @@ msgstr "Ingrese su correo electrónico de confirmación"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your country or region of residence"
-msgstr ""
+msgstr "Selecciona tu país o región de residencia"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your profession"
-msgstr ""
+msgstr "Selecciona tu profesión"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your specialty"
-msgstr ""
+msgstr "Selecciona tu especialidad"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your profession"
-msgstr ""
+msgstr "Introduce tu profesión"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your specialty"
-msgstr ""
+msgstr "Introduce tu especialidad"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your state"
-msgstr ""
+msgstr "Ingresa tu estado"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your city"
-msgstr ""
+msgstr "Ingresa tu ciudad"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Tell us your goals"
-msgstr ""
+msgstr "Cuéntanos tus objetivos"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select the highest level of education you have completed"
-msgstr ""
+msgstr "Selecciona el nivel de educación más alto que hayas completado"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your year of birth"
@@ -8455,7 +8466,7 @@ msgstr "Selecciona tu género"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your mailing address"
-msgstr ""
+msgstr "Ingresa tu dirección postal"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
@@ -10656,7 +10667,7 @@ msgid ""
 "\"id:client_key:client_secret\"."
 msgstr ""
 "Ingrese los pasaportes para el curso de herramientas LTI en el siguiente formato:\n"
-"\"id\":\"client_key:client_secret\"."
+"\"id:client_key:client_secret\"."
 
 #: xmodule/course_module.py
 msgid ""
@@ -13519,7 +13530,7 @@ msgstr "Respuesta Abierta"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Library Content"
-msgstr ""
+msgstr "Contenido de librerías"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -18162,6 +18173,14 @@ msgstr ""
 msgid "Discussion ID: {discussion_id}"
 msgstr "ID de discusión: {discussion_id}"
 
+#: lms/templates/discussion/_discussion_inline_studio.html
+msgid ""
+"The discussion block is disabled for this course as it is not using a "
+"compatible discussion provider."
+msgstr ""
+"El bloque de discusión está deshabilitado para este curso porque no utiliza "
+"un proveedor de discusión compatible."
+
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Discussion topics list"
 msgstr "Lista de temas de discusión"
@@ -20343,8 +20362,8 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Adjust all enrolled learners' grades for a specific problem"
 msgstr ""
-"Ajustar la calificación de cada estudiante inscrito para una pregunta "
-"específica"
+"Ajustar la calificación de todos los estudiantes inscritos para una pregunta"
+" específica"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Allows all learners to work on the problem again."
@@ -20360,7 +20379,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Learners' Submissions"
-msgstr "Recalificar los envíos de cada estudiante"
+msgstr "Recalificar los envíos de todos los estudiantes"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Only If Scores Improve"

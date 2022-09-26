@@ -10,4 +10,4 @@ Glossary
 More Documentation
 ==================
 `Architectural Decision Records
-<https://github.com/edx/edx-platform/tree/master/lms/djangoapps/courseware/docs/decisions>`_
+<https://github.com/openedx/edx-platform/tree/master/lms/djangoapps/courseware/docs/decisions>`_

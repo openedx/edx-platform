@@ -1705,6 +1705,19 @@ class ModuleSystemShim:
         if rebind_user_service:
             return partial(rebind_user_service.rebind_noauth_module_to_user)
 
+    # noinspection PyPep8Naming
+    @property
+    def STATIC_URL(self):  # pylint: disable=invalid-name
+        """
+        Returns the base URL for static assets.
+        Deprecated in favor of the settings.STATIC_URL configuration.
+        """
+        warnings.warn(
+            'runtime.STATIC_URL is deprecated. Please use settings.STATIC_URL instead.',
+            DeprecationWarning, stacklevel=3,
+        )
+        return settings.STATIC_URL
+
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, Runtime):
     """
@@ -1721,7 +1734,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
 
     def __init__(
         self,
-        static_url,
         track_function,
         get_module,
         descriptor_runtime,
@@ -1731,8 +1743,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
     ):
         """
         Create a closure around the system environment.
-
-        static_url - the base URL to static assets
 
         track_function - function of (event_type, event), intended for logging
                          or otherwise tracking the event.
@@ -1754,7 +1764,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemShim, 
         kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
         super().__init__(**kwargs)
 
-        self.STATIC_URL = static_url
         self.track_function = track_function
         self.get_module = get_module
         self.course_id = course_id

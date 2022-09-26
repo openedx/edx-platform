@@ -15,6 +15,7 @@ from xblock.fields import UNIQUE_ID, Scope, String
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.xblock_utils import get_css_dependencies, get_js_dependencies
 from xmodule.xml_module import XmlParserMixin
@@ -80,6 +81,14 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         continue to work with workbench-based testing.
         """
         return getattr(self.scope_ids.usage_id, 'course_key', None)
+
+    @property
+    def is_visible(self):
+        """
+        Discussion Xblock does not support new OPEN_EDX provider
+        """
+        provider = DiscussionsConfiguration.get(self.course_key)
+        return provider.provider_type == Provider.LEGACY
 
     @property
     def django_user(self):
@@ -162,8 +171,11 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         Renders student view for LMS.
         """
         fragment = Fragment()
-        self.add_resource_urls(fragment)
 
+        if not self.is_visible:
+            return fragment
+
+        self.add_resource_urls(fragment)
         login_msg = ''
 
         if not self.django_user.is_authenticated:
@@ -210,7 +222,10 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
         fragment = Fragment()
         fragment.add_content(self.runtime.service(self, 'mako').render_template(
             'discussion/_discussion_inline_studio.html',
-            {'discussion_id': self.discussion_id}
+            {
+                'discussion_id': self.discussion_id,
+                'is_visible': self.is_visible,
+            }
         ))
         return fragment
 

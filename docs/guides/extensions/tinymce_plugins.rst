@@ -62,4 +62,4 @@ Here's an example:
            - Normal
            - Secondary
 
-.. _guide on installing the plugins through the edX configuration: https://github.com/edx/configuration/blob/master/playbooks/roles/tinymce_plugins/README.rst
+.. _guide on installing the plugins through the edX configuration: https://github.com/openedx/configuration/blob/master/playbooks/roles/tinymce_plugins/README.rst

@@ -149,7 +149,6 @@ def get_test_system(
         return descriptor
 
     return TestModuleSystem(
-        static_url='/static',
         track_function=Mock(name='get_test_system.track_function'),
         get_module=get_module,
         services={
@@ -182,7 +181,6 @@ def get_test_descriptor_system(render_template=None):
         error_tracker=Mock(name='get_test_descriptor_system.error_tracker'),
         render_template=render_template or mock_render_template,
         mixins=(InheritanceMixin, XModuleMixin),
-        field_data=field_data,
         services={'field-data': field_data},
     )
     descriptor_system.get_asides = lambda block: []

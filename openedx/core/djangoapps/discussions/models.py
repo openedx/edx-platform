@@ -432,7 +432,7 @@ class DiscussionsConfiguration(TimeStampedModel):
         help_text=_("If enabled, discussion topics will be created for graded units as well.")
     )
     unit_level_visibility = models.BooleanField(
-        default=False,
+        default=True,
         help_text=_("If enabled, discussions will need to be manually enabled for each unit.")
     )
     plugin_configuration = JSONField(
@@ -581,6 +581,10 @@ class DiscussionTopicLink(models.Model):
     ordering = models.PositiveIntegerField(
         null=True,
         help_text=_("Ordering of this topic in its learning context"),
+    )
+    context = models.JSONField(
+        default=dict,
+        help_text=_("Additional context for this topic, such as its section, and subsection"),
     )
 
     def __str__(self):

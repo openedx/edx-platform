@@ -267,6 +267,7 @@ def get_available_providers():  # lint-amnesty, pylint: disable=missing-function
     )
 
     available_providers = [provider for provider in proctoring_backend_settings if provider != 'DEFAULT']
+    available_providers.append('lti_external')
     available_providers.sort()
     return available_providers
 
@@ -418,7 +419,7 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         default={
             "enable_in_context": True,
             "enable_graded_units": False,
-            "unit_level_visibility": False,
+            "unit_level_visibility": True,
         }
     )
     announcement = Date(

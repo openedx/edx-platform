@@ -48,8 +48,8 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     get_potentially_retired_user_by_username,
     get_retired_email_by_email,
     get_retired_username_by_username,
-    is_username_retired,
-    is_email_retired
+    is_email_retired,
+    is_username_retired
 )
 from common.djangoapps.student.models_api import confirm_name_change, do_name_change_request, get_pending_name_change
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
@@ -59,8 +59,9 @@ from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequireme
 from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
-from openedx.core.djangoapps.user_api.accounts import RETIRED_EMAIL_MSG
+from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
+from openedx.core.djangoapps.user_api.accounts.utils import handle_retirement_cancellation
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
@@ -72,15 +73,21 @@ from ..models import (
     RetirementStateError,
     UserOrgTag,
     UserRetirementPartnerReportingStatus,
-    UserRetirementStatus,
+    UserRetirementStatus
 )
 from .api import get_account_settings, update_account_settings
-from .permissions import CanDeactivateUser, CanGetAccountInfo, CanReplaceUsername, CanRetireUser
+from .permissions import (
+    CanCancelUserRetirement,
+    CanDeactivateUser,
+    CanGetAccountInfo,
+    CanReplaceUsername,
+    CanRetireUser
+)
 from .serializers import (
     PendingNameChangeSerializer,
     UserRetirementPartnerReportSerializer,
     UserRetirementStatusSerializer,
-    UserSearchEmailSerializer,
+    UserSearchEmailSerializer
 )
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
 from .utils import create_retirement_request_and_deactivate_account, username_suffix_generator
@@ -317,7 +324,28 @@ class AccountViewSet(ViewSet):
             search_usernames = usernames.strip(',').split(',')
         elif user_email:
             if is_email_retired(user_email):
-                return Response({'error_msg': RETIRED_EMAIL_MSG}, status=status.HTTP_404_NOT_FOUND)
+                can_cancel_retirement = True
+                retirement_id = None
+                earliest_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=settings.COOL_OFF_DAYS)
+                try:
+                    retirement_status = UserRetirementStatus.objects.get(
+                        created__gt=earliest_datetime,
+                        created__lt=datetime.datetime.now(pytz.UTC),
+                        original_email=user_email
+                    )
+                    retirement_id = retirement_status.id
+                except UserRetirementStatus.DoesNotExist:
+                    can_cancel_retirement = False
+
+                context = {
+                    'error_msg': accounts.RETIRED_EMAIL_MSG,
+                    'can_cancel_retirement': can_cancel_retirement,
+                    'retirement_id': retirement_id
+                }
+
+                return Response(
+                    context, status=status.HTTP_404_NOT_FOUND
+                )
             user_email = user_email.strip('')
             try:
                 user = User.objects.get(email=user_email)
@@ -833,6 +861,48 @@ class AccountRetirementPartnerReportView(ViewSet):
         retirement_statuses.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CancelAccountRetirementStatusView(ViewSet):
+    """
+    Provides API endpoints for canceling retirement process for a user's account.
+    """
+    authentication_classes = (JwtAuthentication, SessionAuthentication)
+    permission_classes = (permissions.IsAuthenticated, CanCancelUserRetirement,)
+
+    def cancel_retirement(self, request):
+        """
+        POST /api/user/v1/accounts/cancel_retirement/
+
+        Cancels the retirement for a user's account.
+        This also handles the top level error handling, and permissions.
+        """
+        try:
+            retirement_id = request.data['retirement_id']
+        except KeyError:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={'message': 'retirement_id must be specified.'}
+            )
+
+        try:
+            retirement = UserRetirementStatus.objects.get(id=retirement_id)
+        except UserRetirementStatus.DoesNotExist:
+            return Response(data={"message": 'Retirement does not exist!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if retirement.current_state.state_name != 'PENDING':
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": f"Retirement requests can only be cancelled for users in the PENDING state. Current "
+                               f"request state for '{retirement.original_username}': "
+                               f"{retirement.current_state.state_name}"
+                }
+            )
+
+        handle_retirement_cancellation(retirement)
+
+        return Response(data={"success": True}, status=status.HTTP_200_OK)
 
 
 class AccountRetirementStatusView(ViewSet):

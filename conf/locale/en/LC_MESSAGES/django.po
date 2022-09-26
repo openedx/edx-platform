@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-08-28 20:34+0000\n"
-"PO-Revision-Date: 2022-08-28 20:34:49.087264\n"
+"POT-Creation-Date: 2022-09-25 20:43+0000\n"
+"PO-Revision-Date: 2022-09-25 20:43:25.632671\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2627,6 +2627,14 @@ msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be enrolled in the course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+#, python-brace-format
+msgid ""
+"You are enrolled in this course with '{enrollment_enterprise_name}'. "
+"However, you are currently logged in as a '{active_enterprise_name}' user. "
+"Please log in with '{enrollment_enterprise_name}' to access this course."
 msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
@@ -6622,6 +6630,10 @@ msgstr ""
 msgid "Ordering of this topic in its learning context"
 msgstr ""
 
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
+msgstr ""
+
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
 "Encourage participation and engagement in your course with discussions."
@@ -7118,11 +7130,6 @@ msgstr ""
 #. Translators: This message is shown to users who attempt to create a new
 #. account using
 #. an invalid email format.
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "\"{email}\" is not a valid email address."
-msgstr ""
-
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter a valid email address"
 msgstr ""
@@ -15549,6 +15556,12 @@ msgstr ""
 
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
+msgstr ""
+
+#: lms/templates/discussion/_discussion_inline_studio.html
+msgid ""
+"The discussion block is disabled for this course as it is not using a "
+"compatible discussion provider."
 msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html

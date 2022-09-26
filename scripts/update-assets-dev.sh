@@ -7,12 +7,12 @@
 #
 # This file is an experimental re-implementation of the asset complation process
 # defined by the pavelib.assets:update_assets task in
-# https://github.com/edx/edx-platform/blob/master/pavelib/assets.py.
+# https://github.com/openedx/edx-platform/blob/master/pavelib/assets.py.
 # As the script name implies, it is only suited to compile assets for usage
 # in a development environment, NOT for production. 
 #
 # It was written as part of the effort to move our dev tools off of Ansible and
-# Paver, described here: https://github.com/edx/devstack/pull/866
+# Paver, described here: https://github.com/openedx/devstack/pull/866
 # TODO: If the effort described above is abandoned, then this script should
 # probably be deleted.
 

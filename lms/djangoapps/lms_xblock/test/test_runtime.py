@@ -60,7 +60,6 @@ class TestHandlerUrl(TestCase):
         self.block = BlockMock(name='block', scope_ids=ScopeIds(None, None, None, 'dummy'))
         self.course_key = CourseLocator("org", "course", "run")
         self.runtime = LmsModuleSystem(
-            static_url='/static',
             track_function=Mock(),
             get_module=Mock(),
             course_id=self.course_key,
@@ -125,7 +124,6 @@ class TestUserServiceAPI(TestCase):
         self.user = UserFactory.create()
 
         self.runtime = LmsModuleSystem(
-            static_url='/static',
             track_function=Mock(),
             get_module=Mock(),
             user=self.user,
@@ -175,7 +173,6 @@ class TestBadgingService(ModuleStoreTestCase):
         Create the testing runtime.
         """
         return LmsModuleSystem(
-            static_url='/static',
             track_function=Mock(),
             get_module=Mock(),
             course_id=self.course_id,
@@ -229,7 +226,6 @@ class TestI18nService(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.test_language = 'dummy language'
         self.runtime = LmsModuleSystem(
-            static_url='/static',
             track_function=Mock(),
             get_module=Mock(),
             course_id=self.course.id,

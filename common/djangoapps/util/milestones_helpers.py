@@ -27,7 +27,7 @@ REQUEST_CACHE_NAME = "milestones"
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
 # .. toggle_description: Enable the milestones application, which manages significant Course and/or Student events in
-#   the Open edX platform. (see https://github.com/edx/edx-milestones) Note that this feature is required to enable
+#   the Open edX platform. (see https://github.com/openedx/edx-milestones) Note that this feature is required to enable
 #   course pre-requisites.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2014-11-21

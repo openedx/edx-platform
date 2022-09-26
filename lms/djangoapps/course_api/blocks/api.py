@@ -93,7 +93,7 @@ def get_blocks(
     else:
         transformers += [course_blocks_api.visibility.VisibilityTransformer()]
 
-    # Note: A change to the BlockCompletionTransformer (https://github.com/edx/edx-platform/pull/27622/)
+    # Note: A change to the BlockCompletionTransformer (https://github.com/openedx/edx-platform/pull/27622/)
     # will be introducing a bug if hide_access_denials is True.  I'm accepting this risk because in
     # the AccessDeniedMessageFilterTransformer, there is note about deleting it and I believe it is
     # technically deprecated functionality. The only use case where hide_access_denials is True

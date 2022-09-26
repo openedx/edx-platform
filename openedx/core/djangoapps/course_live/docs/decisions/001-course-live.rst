@@ -20,7 +20,7 @@ The tool will be added as an LTI integration. We will currently support only
 added later.
 
 
-.. _Course Authoring MFE: https://github.com/edx/frontend-app-course-authoring/
+.. _Course Authoring MFE: https://github.com/openedx/frontend-app-course-authoring/
 
 
 Decision

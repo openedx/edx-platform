@@ -15,7 +15,7 @@ Certificates related functionality is scattered across a number of places and sh
 
 Ideally, we want to extract these into the `credentials service`_, which would be ultimately responsible for Course-Run and Program certificates (and possibly other credentials). Right now, the `credentials service`_ only manages Program certificates.
 
-.. _credentials service: https://github.com/edx/credentials
+.. _credentials service: https://github.com/openedx/credentials
 
 Glossary
 ========

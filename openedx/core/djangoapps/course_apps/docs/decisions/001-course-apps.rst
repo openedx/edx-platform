@@ -23,7 +23,7 @@ to automatically discover such apps and expose them via an API. This API will
 be used to list the installed apps that are available for a course and to
 enable/disable these apps using the API.
 
-.. _Course Authoring MFE: https://github.com/edx/frontend-app-course-authoring/
+.. _Course Authoring MFE: https://github.com/openedx/frontend-app-course-authoring/
 
 
 Decision
@@ -40,7 +40,7 @@ need a common interface for such apps so they can be enabled/disabled using
 a standard common interface.
 
 To do this we can follow the example of existing plugins, [such as Course
-Tabs](https://github.com/edx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/common/lib/xmodule/xmodule/tabs.py#L24-L243),
+Tabs](https://github.com/openedx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/common/lib/xmodule/xmodule/tabs.py#L24-L243),
 which provide a specific Python class that the plugin can inherit from, or
 implement. The required metadata and features, can be implemented as class
 attributes, and methods on this class.
@@ -48,7 +48,7 @@ attributes, and methods on this class.
 We can then discover the installed apps using the existing tooling for plugins
 using a subclass of PluginManager designed for this purpose. Here is an example
 for [Course
-Tabs](https://github.com/edx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/openedx/core/lib/course_tabs.py#L13-L47)
+Tabs](https://github.com/openedx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/openedx/core/lib/course_tabs.py#L13-L47)
 
 It might not always make sense for an app installed in this way to be
 automatically show up for use on all courses. So each app will expose a method
@@ -62,7 +62,7 @@ In the context of these apps, we need to distinguish between *installed*,
 
 Let's look at an existing feature to explain those terms. The `edxnotes` app
 has [code that is part of the
-platform](https://github.com/edx/edx-platform/tree/636b2ca4c5add531cfce755fdb8965599acd79e0/lms/djangoapps/edxnotes).
+platform](https://github.com/openedx/edx-platform/tree/636b2ca4c5add531cfce755fdb8965599acd79e0/lms/djangoapps/edxnotes).
 This code comes preinstalled since it's part of the platform. So it is already
 *installed*, however no one can use it just yet, since it it needs to first be
 enabled globally. In the case of an external plugin, you consider it installed
@@ -70,10 +70,10 @@ if it is `pip install`ed in the same environment in which edx-platform is
 running.
 
 To make the feature *available* for use, you need to now [enable a feature
-flag](https://github.com/edx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/lms/envs/common.py#L531-L543).
+flag](https://github.com/openedx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/lms/envs/common.py#L531-L543).
 Until this is set course authors/admins will [not even see the option of
 enabling this for their
-course](https://github.com/edx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/cms/djangoapps/models/settings/course_metadata.py#L91-L93).
+course](https://github.com/openedx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/cms/djangoapps/models/settings/course_metadata.py#L91-L93).
 For course apps this is where the availability check comes in.
 
 In the case of `edxnotes`, after setting the above feature flag, an option will

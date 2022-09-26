@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-08-28 20:34+0000\n"
-"PO-Revision-Date: 2022-08-28 20:34:49.087264\n"
+"POT-Creation-Date: 2022-09-25 20:43+0000\n"
+"PO-Revision-Date: 2022-09-25 20:43:25.632671\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2920,6 +2920,17 @@ msgstr "Ɏøn dø nøʇ ɥɐʌǝ ɐɔɔǝss ʇø ʇɥᴉs ɔønɹsǝ øn ɐ ɯø
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be enrolled in the course"
 msgstr "Ɏøn ɯnsʇ bǝ ǝnɹøllǝd ᴉn ʇɥǝ ɔønɹsǝ"
+
+#: lms/djangoapps/courseware/access_response.py
+#, python-brace-format
+msgid ""
+"You are enrolled in this course with '{enrollment_enterprise_name}'. "
+"However, you are currently logged in as a '{active_enterprise_name}' user. "
+"Please log in with '{enrollment_enterprise_name}' to access this course."
+msgstr ""
+"Ɏøn ɐɹǝ ǝnɹøllǝd ᴉn ʇɥᴉs ɔønɹsǝ ʍᴉʇɥ '{enrollment_enterprise_name}'. "
+"Ħøʍǝʌǝɹ, ʎøn ɐɹǝ ɔnɹɹǝnʇlʎ løƃƃǝd ᴉn ɐs ɐ '{active_enterprise_name}' nsǝɹ. "
+"Ᵽlǝɐsǝ løƃ ᴉn ʍᴉʇɥ '{enrollment_enterprise_name}' ʇø ɐɔɔǝss ʇɥᴉs ɔønɹsǝ."
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must give Data Sharing Consent for the course"
@@ -7275,6 +7286,11 @@ msgstr "Wɥǝʇɥǝɹ ʇɥᴉs ʇødᴉɔ sɥønld bǝ sɥøʍn ᴉn-ɔønʇǝx�
 msgid "Ordering of this topic in its learning context"
 msgstr "Øɹdǝɹᴉnƃ øɟ ʇɥᴉs ʇødᴉɔ ᴉn ᴉʇs lǝɐɹnᴉnƃ ɔønʇǝxʇ"
 
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
+msgstr ""
+"Ⱥddᴉʇᴉønɐl ɔønʇǝxʇ ɟøɹ ʇɥᴉs ʇødᴉɔ, snɔɥ ɐs ᴉʇs sǝɔʇᴉøn, ɐnd snbsǝɔʇᴉøn"
+
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""
 "Encourage participation and engagement in your course with discussions."
@@ -7850,11 +7866,6 @@ msgstr ""
 #. Translators: This message is shown to users who attempt to create a new
 #. account using
 #. an invalid email format.
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "\"{email}\" is not a valid email address."
-msgstr "\"{email}\" ᴉs nøʇ ɐ ʌɐlᴉd ǝɯɐᴉl ɐddɹǝss."
-
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter a valid email address"
 msgstr "Ɇnʇǝɹ ɐ ʌɐlᴉd ǝɯɐᴉl ɐddɹǝss"
@@ -17391,6 +17402,14 @@ msgstr ""
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "Đᴉsɔnssᴉøn ƗĐ: {discussion_id}"
+
+#: lms/templates/discussion/_discussion_inline_studio.html
+msgid ""
+"The discussion block is disabled for this course as it is not using a "
+"compatible discussion provider."
+msgstr ""
+"Ŧɥǝ dᴉsɔnssᴉøn bløɔʞ ᴉs dᴉsɐblǝd ɟøɹ ʇɥᴉs ɔønɹsǝ ɐs ᴉʇ ᴉs nøʇ nsᴉnƃ ɐ "
+"ɔøɯdɐʇᴉblǝ dᴉsɔnssᴉøn dɹøʌᴉdǝɹ."
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Discussion topics list"

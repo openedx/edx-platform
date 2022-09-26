@@ -11,7 +11,6 @@ from celery_utils.logged_task import LoggedTask
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
-from django.urls import reverse
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_ace.utils import date
@@ -19,6 +18,9 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from six.moves.urllib.parse import urljoin
+
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
@@ -206,10 +208,15 @@ def _build_message_context(context):  # lint-amnesty, pylint: disable=missing-fu
     message_context.update(context)
     thread_author = User.objects.get(id=context['thread_author_id'])
     comment_author = User.objects.get(id=context['comment_author_id'])
+    show_mfe_post_link = ENABLE_DISCUSSIONS_MFE.is_enabled(
+        context['course_id']
+    )
+    post_link = _get_mfe_thread_url(context) if show_mfe_post_link else _get_thread_url(context)
+
     message_context.update({
         'thread_username': thread_author.username,
         'comment_username': comment_author.username,
-        'post_link': _get_thread_url(context),
+        'post_link': post_link,
         'comment_created_at': date.deserialize(context['comment_created_at']),
         'thread_created_at': date.deserialize(context['thread_created_at'])
     })
@@ -231,12 +238,9 @@ def _get_mfe_thread_url(context):
     """
     Get thread url for new MFE
     """
-    scheme = 'https' if settings.HTTPS == 'on' else 'http'
-    forum_url = reverse('forum_form_discussion', args=[context['course_id']])
-    base_url = f"{scheme}://{context['site'].domain}{forum_url}"
-    mfe_post_link = f"?discussions_experience=new#posts/{context['thread_id']}"
-    post_link = urljoin(base_url, mfe_post_link)
-    return post_link
+    forum_url = get_discussions_mfe_url(course_key=context['course_id'])
+    mfe_post_link = f"posts/{context['thread_id']}"
+    return urljoin(forum_url, mfe_post_link)
 
 
 def _get_thread_url(context):  # lint-amnesty, pylint: disable=missing-function-docstring

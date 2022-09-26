@@ -17,9 +17,6 @@ openedx/features/course_experience/
 xmodule/
 
 # Core Extensions
-common/lib/xmodule/xmodule/capa_module.py
-common/lib/xmodule/xmodule/html_module.py
-common/lib/xmodule/xmodule/video_module
 lms/djangoapps/discussion/
 lms/djangoapps/edxnotes
 

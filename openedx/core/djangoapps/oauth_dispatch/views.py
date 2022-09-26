@@ -117,7 +117,9 @@ class AccessTokenView(_DispatchingView):
         Includes the JWT token and token type in the response.
         """
         opaque_token_dict = json.loads(response.content.decode('utf-8'))
-        jwt_token_dict = create_jwt_token_dict(opaque_token_dict, self.get_adapter(request))
+        use_asymmetric_key = request.POST.get('asymmetric_jwt', False)
+        jwt_token_dict = create_jwt_token_dict(opaque_token_dict, self.get_adapter(request),
+                                               use_asymmetric_key=use_asymmetric_key)
         return json.dumps(jwt_token_dict)
 
 
@@ -150,7 +152,9 @@ class AccessTokenExchangeView(_DispatchingView):
         Includes the JWT token and token type in the response.
         """
         opaque_token_dict = response.data
-        jwt_token_dict = create_jwt_token_dict(opaque_token_dict, self.get_adapter(request))
+        use_asymmetric_key = request.POST.get('asymmetric_jwt', False)
+        jwt_token_dict = create_jwt_token_dict(opaque_token_dict, self.get_adapter(request),
+                                               use_asymmetric_key=use_asymmetric_key)
         return jwt_token_dict
 
 

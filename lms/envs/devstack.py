@@ -238,6 +238,9 @@ COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
+############## Exams CONFIGURATION SETTINGS ####################
+EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
+
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
@@ -362,6 +365,7 @@ ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
+LEARNER_RECORD_MICROFRONTEND_URL = 'http://localhost:1990'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
@@ -377,7 +381,7 @@ FEATURES.update({
     'SHOW_HEADER_LANGUAGE_SELECTOR': True,
 
     # Enable enterprise integration by default.
-    # See https://github.com/edx/edx-enterprise/blob/master/docs/development.rst for
+    # See https://github.com/openedx/edx-enterprise/blob/master/docs/development.rst for
     # more background on edx-enterprise.
     # Toggle this off if you don't want anything to do with enterprise in devstack.
     'ENABLE_ENTERPRISE_INTEGRATION': True,

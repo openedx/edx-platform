@@ -120,7 +120,9 @@ class CourseLiveConfigurationView(APIView):
                 "pii_sharing_allowed": pii_sharing_allowed,
                 "message": "PII sharing is not allowed on this course"
             })
-
+        if provider and not provider.additional_parameters and request.data.get('lti_configuration', False):
+            # Add empty lti config if none is provided in case additional params are not required
+            request.data['lti_configuration']['lti_config'] = {'additional_parameters': {}}
         configuration = CourseLiveConfiguration.get(course_id)
         serializer = CourseLiveConfigurationSerializer(
             configuration,

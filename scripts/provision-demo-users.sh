@@ -7,7 +7,7 @@
 #
 # This file is an experimental re-implementation of demo user provisioning
 # process defined in this Ansible role:
-# https://github.com/edx/configuration/tree/master/playbooks/roles/demo
+# https://github.com/openedx/configuration/tree/master/playbooks/roles/demo
 #
 # It provisions five users:
 #  * edx (global superuser)
@@ -18,7 +18,7 @@
 # Each of which has {username}@example.com as their email and 'edx' as their password.
 #
 # It was written as part of the effort to move our dev tools off of Ansible and
-# Paver, described here: https://github.com/edx/devstack/pull/866
+# Paver, described here: https://github.com/openedx/devstack/pull/866
 # TODO: If the effort described above is abandoned, then this script should
 # probably be deleted.
 

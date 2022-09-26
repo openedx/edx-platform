@@ -35,10 +35,11 @@ from django.core.exceptions import MiddlewareNotUsed
 from django.urls import reverse
 from django.utils.deprecation import MiddlewareMixin
 from django.shortcuts import redirect
+from edx_django_utils import ip
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from openedx.core.djangoapps.util import ip
+from openedx.core.djangoapps.util import legacy_ip
 from openedx.core.lib.request_utils import course_id_from_url
 
 from . import api as embargo_api
@@ -86,8 +87,8 @@ class EmbargoMiddleware(MiddlewareMixin):
             if pattern.match(request.path) is not None:
                 return None
 
-        if ip.USE_LEGACY_IP.is_enabled():
-            safest_ip_address = ip.get_legacy_ip(request)
+        if legacy_ip.USE_LEGACY_IP.is_enabled():
+            safest_ip_address = legacy_ip.get_legacy_ip(request)
             all_ip_addresses = [safest_ip_address]
         else:
             safest_ip_address = ip.get_safest_client_ip(request)

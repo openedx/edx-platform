@@ -1,7 +1,7 @@
 """
 Course Header Menu Tests.
 """
-
+from unittest import SkipTest
 
 from django.conf import settings
 from django.test.utils import override_settings
@@ -37,6 +37,9 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
         Tests course header menu should not have `Certificates` menu item
         if course has not web/HTML certificates enabled.
         """
+        # course_handler raise 404 for old mongo course
+        if self.course.id.deprecated:
+            raise SkipTest("course_handler raise 404 for old mongo course")
         self.course.cert_html_view_enabled = False
         self.save_course()
         outline_url = reverse_course_url('course_handler', self.course.id)
@@ -49,6 +52,9 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
         Tests course header menu should have `Certificates` menu item
         if course has web/HTML certificates enabled.
         """
+        # course_handler raise 404 for old mongo course
+        if self.course.id.deprecated:
+            raise SkipTest("course_handler raise 404 for old mongo course")
         outline_url = reverse_course_url('course_handler', self.course.id)
         resp = self.client.get(outline_url, HTTP_ACCEPT='text/html')
         self.assertEqual(resp.status_code, 200)
@@ -60,6 +66,9 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
         Tests course header menu should not have `Exam Settings` menu item
         if course does not have the Exam Settings view enabled.
         """
+        # course_handler raise 404 for old mongo course
+        if self.course.id.deprecated:
+            raise SkipTest("course_handler raise 404 for old mongo course")
         outline_url = reverse_course_url('course_handler', self.course.id)
         resp = self.client.get(outline_url, HTTP_ACCEPT='text/html')
         self.assertEqual(resp.status_code, 200)
@@ -71,6 +80,9 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
         Tests course header menu should have `Exam Settings` menu item
         if course does have Exam Settings view enabled.
         """
+        # course_handler raise 404 for old mongo course
+        if self.course.id.deprecated:
+            raise SkipTest("course_handler raise 404 for old mongo course")
         outline_url = reverse_course_url('course_handler', self.course.id)
         resp = self.client.get(outline_url, HTTP_ACCEPT='text/html')
         self.assertEqual(resp.status_code, 200)

@@ -47,7 +47,7 @@ more explicit, we don't want to take on that work now as it may increase
 complexity.
 
 
-.. _OEP-45: https://github.com/edx/open-edx-proposals/pull/143/files
+.. _OEP-45: https://github.com/openedx/open-edx-proposals/pull/143/files
 
 Consequences
 ============

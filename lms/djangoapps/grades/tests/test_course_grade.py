@@ -3,8 +3,6 @@ from unittest.mock import patch
 
 import ddt
 from crum import set_current_request
-from django.conf import settings
-from edx_toggles.toggles.testutils import override_waffle_switch
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_AMNESTY_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -12,7 +10,6 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import get_mock_request
 
-from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from ..course_data import CourseData
 from ..course_grade import ZeroCourseGrade
 from ..course_grade_factory import CourseGradeFactory
@@ -20,7 +17,6 @@ from .base import GradeTestBase
 from .utils import answer_problem
 
 
-@patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
 @ddt.ddt
 class ZeroGradeTest(GradeTestBase):
     """
@@ -33,29 +29,27 @@ class ZeroGradeTest(GradeTestBase):
         """
         Creates a ZeroCourseGrade and ensures it's empty.
         """
-        with override_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
-            course_data = CourseData(self.request.user, structure=self.course_structure)
-            chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
-            for chapter in chapter_grades:
-                for section in chapter_grades[chapter]['sections']:
-                    for score in section.problem_scores.values():
-                        assert score.earned == 0
-                        assert score.first_attempted is None
-                    assert section.all_total.earned == 0
+        course_data = CourseData(self.request.user, structure=self.course_structure)
+        chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
+        for chapter in chapter_grades:
+            for section in chapter_grades[chapter]['sections']:
+                for score in section.problem_scores.values():
+                    assert score.earned == 0
+                    assert score.first_attempted is None
+                assert section.all_total.earned == 0
 
     @ddt.data(True, False)
     def test_zero_null_scores(self, assume_zero_enabled):
         """
         Creates a zero course grade and ensures that null scores aren't included in the section problem scores.
         """
-        with override_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
-            with patch('lms.djangoapps.grades.subsection_grade.get_score', return_value=None):
-                course_data = CourseData(self.request.user, structure=self.course_structure)
-                chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
-                for chapter in chapter_grades:
-                    assert {} != chapter_grades[chapter]['sections']
-                    for section in chapter_grades[chapter]['sections']:
-                        assert {} == section.problem_scores
+        with patch('lms.djangoapps.grades.subsection_grade.get_score', return_value=None):
+            course_data = CourseData(self.request.user, structure=self.course_structure)
+            chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
+            for chapter in chapter_grades:
+                assert {} != chapter_grades[chapter]['sections']
+                for section in chapter_grades[chapter]['sections']:
+                    assert {} == section.problem_scores
 
 
 class TestScoreForModule(SharedModuleStoreTestCase):

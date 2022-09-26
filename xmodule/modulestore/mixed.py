@@ -15,10 +15,9 @@ from opaque_keys.edx.locator import LibraryLocator
 
 from xmodule.assetstore import AssetMetadata
 
-from . import XMODULE_FIELDS_WITH_USAGE_KEYS, ModuleStoreEnum, ModuleStoreWriteBase
+from . import XMODULE_FIELDS_WITH_USAGE_KEYS, ModuleStoreWriteBase
 from .draft_and_published import ModuleStoreDraftAndPublished
 from .exceptions import DuplicateCourseError, ItemNotFoundError
-from .split_migrator import SplitMigrator
 
 log = logging.getLogger(__name__)
 
@@ -717,17 +716,9 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         if source_modulestore == dest_modulestore:
             return source_modulestore.clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
 
-        if dest_modulestore.get_modulestore_type() == ModuleStoreEnum.Type.split:
-            split_migrator = SplitMigrator(dest_modulestore, source_modulestore)
-            split_migrator.migrate_mongo_course(source_course_id, user_id, dest_course_id.org,
-                                                dest_course_id.course, dest_course_id.run, fields, **kwargs)
-
-            # the super handles assets and any other necessities
-            super().clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
-        else:
-            raise NotImplementedError("No code for cloning from {} to {}".format(
-                source_modulestore, dest_modulestore
-            ))
+        raise NotImplementedError("No code for cloning from {} to {}".format(
+            source_modulestore, dest_modulestore
+        ))
 
     @strip_key
     @prepare_asides

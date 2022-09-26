@@ -680,7 +680,6 @@ def get_module_system_for_user(
 
     system = LmsModuleSystem(
         track_function=track_function,
-        static_url=settings.STATIC_URL,
         get_module=inner_get_module,
         user=user,
         publish=publish,
@@ -911,7 +910,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
 
     # We are reusing DRF logic to provide support for JWT and Oauth2. We abandoned the idea of using DRF view here
     # to avoid introducing backwards-incompatible changes.
-    # You can see https://github.com/edx/XBlock/pull/383 for more details.
+    # You can see https://github.com/openedx/XBlock/pull/383 for more details.
     else:
         authentication_classes = (JwtAuthentication, BearerAuthenticationAllowInactiveUser)
         authenticators = [auth() for auth in authentication_classes]

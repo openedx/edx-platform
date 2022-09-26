@@ -630,7 +630,6 @@ class ProblemBlock(
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=None,
-            STATIC_URL=None,
             xqueue=None,
             matlab_api_key=None,
         )
@@ -691,7 +690,6 @@ class ProblemBlock(
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=1,
-            STATIC_URL=None,
             xqueue=None,
             matlab_api_key=None,
         )
@@ -839,7 +837,6 @@ class ProblemBlock(
             render_template=self.runtime.service(self, 'mako').render_template,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
-            STATIC_URL=self.runtime.STATIC_URL,
             xqueue=self.runtime.service(self, 'xqueue'),
             matlab_api_key=self.matlab_api_key
         )

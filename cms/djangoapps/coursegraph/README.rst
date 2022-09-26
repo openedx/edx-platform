@@ -19,7 +19,7 @@ In order for CourseGraph to have queryable, up-to-date data, learning content fr
 
 **Please note**: Access to a populated CourseGraph instance confers access to all the learning content in the associated Open edX CMS (Studio). The basic authentication provided by Neo4j may or may not be sufficient for your security needs. Consider taking additional security measures, such as restricting CourseGraph access to only users on a private VPN.
 
-.. _neo4j Ansible playbook: https://github.com/edx/configuration/blob/master/playbooks/neo4j.yml
+.. _neo4j Ansible playbook: https://github.com/openedx/configuration/blob/master/playbooks/neo4j.yml
 
 .. _CourseGraph plugin for Tutor: https://github.com/openedx/tutor-contrib-coursegraph/
 
@@ -58,7 +58,7 @@ Other Devstack CourseGraph commands include::
 
 The above commands should be run in your ``devstack`` folder, and they assume that LMS is already properly provisioned. See the `Devstack interface`_ for more details.
 
-.. _Open edX Devstack: https://github.com/edx/devstack/
+.. _Open edX Devstack: https://github.com/openedx/devstack/
 .. _Devstack interface: https://edx.readthedocs.io/projects/open-edx-devstack/en/latest/devstack_interface.html
 
 

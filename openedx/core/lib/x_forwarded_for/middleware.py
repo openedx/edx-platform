@@ -5,9 +5,10 @@ import ipaddress
 import warnings
 
 from django.utils.deprecation import MiddlewareMixin
+from edx_django_utils import ip
 from edx_django_utils.monitoring import set_custom_attribute
 
-import openedx.core.djangoapps.util.ip as ip
+from openedx.core.djangoapps.util import legacy_ip
 
 
 def _ip_type(ip_str):
@@ -60,7 +61,7 @@ class XForwardedForMiddleware(MiddlewareMixin):
             set_custom_attribute('ip_chain.count', len(ip_chain))
             set_custom_attribute('ip_chain.types', '-'.join(_ip_type(s) for s in ip_chain))
 
-            set_custom_attribute('ip_chain.use_legacy', ip.USE_LEGACY_IP.is_enabled())
+            set_custom_attribute('ip_chain.use_legacy', legacy_ip.USE_LEGACY_IP.is_enabled())
 
             external_chain = ip.get_all_client_ips(request)
             set_custom_attribute('ip_chain.external.count', len(external_chain))
@@ -103,7 +104,7 @@ class XForwardedForMiddleware(MiddlewareMixin):
         # without knowing about ORIGINAL_REMOTE_ADDR. (The less code that
         # is aware of that, the better, and the ip code should be lifted
         # out into a library anyhow.)
-        if ip.USE_LEGACY_IP.is_enabled():
-            request.META['REMOTE_ADDR'] = ip.get_legacy_ip(request)
+        if legacy_ip.USE_LEGACY_IP.is_enabled():
+            request.META['REMOTE_ADDR'] = legacy_ip.get_legacy_ip(request)
         else:
             request.META['REMOTE_ADDR'] = ip.get_safest_client_ip(request)

@@ -470,6 +470,7 @@ class CommentsServiceMockMixin:
             "editable_fields": [
                 "abuse_flagged",
                 "anonymous",
+                "copy_link",
                 "following",
                 "raw_body",
                 "read",
