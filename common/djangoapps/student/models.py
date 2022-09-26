@@ -1494,7 +1494,7 @@ class CourseEnrollment(models.Model):
                 self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED, enterprise_uuid=enterprise_uuid, request=request)
             else:
                 UNENROLL_DONE.send(sender=None, course_enrollment=self, skip_refund=skip_refund)
-                self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
+                self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED, enterprise_uuid=enterprise_uuid, request=request)
                 self.send_signal(EnrollStatusChange.unenroll)
 
                 # .. event_implemented_name: COURSE_UNENROLLMENT_COMPLETED
@@ -1568,10 +1568,23 @@ class CourseEnrollment(models.Model):
         from openedx.features.enterprise_support.utils import is_enterprise_learner
 
         optimizely_client = OptimizelyClient.get_optimizely_client()
+
+        segment_properties = {
+            'category': 'conversion',
+            'label': str(self.course_id),
+            'org': self.course_id.org,
+            'course': self.course_id.course,
+            'run': self.course_id.run,
+            'mode': self.mode,
+        }
+
         try:
             context = contexts.course_context_from_course_id(self.course_id)
             if enterprise_uuid:
                 context["enterprise_uuid"] = enterprise_uuid
+                context["enterprise_enrollment"] = True
+                segment_properties["enterprise_uuid"] = enterprise_uuid
+                segment_properties["enterprise_enrollment"] = True
             assert isinstance(self.course_id, CourseKey)
             data = {
                 'user_id': self.user.id,
@@ -1581,14 +1594,6 @@ class CourseEnrollment(models.Model):
             if enterprise_uuid and 'username' not in context:
                 data['username'] = self.user.username
 
-            segment_properties = {
-                'category': 'conversion',
-                'label': str(self.course_id),
-                'org': self.course_id.org,
-                'course': self.course_id.course,
-                'run': self.course_id.run,
-                'mode': self.mode,
-            }
             # DENG-803: For segment events forwarded along to Hubspot, duplicate the `properties`
             # section of the event payload into the `traits` section so that they can be received.
             # This is a temporary fix until we implement this behavior outside of the LMS.
