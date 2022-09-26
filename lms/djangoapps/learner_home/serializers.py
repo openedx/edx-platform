@@ -48,7 +48,7 @@ class CourseProviderSerializer(serializers.Serializer):
 class CourseSerializer(serializers.Serializer):
     """Course header information, derived from a CourseOverview"""
 
-    bannerImgSrc = serializers.URLField(source="banner_image_url")
+    bannerImgSrc = serializers.URLField(source="image_urls.small")
     courseName = serializers.CharField(source="display_name_with_default")
     courseNumber = serializers.CharField(source="display_number_with_default")
 
