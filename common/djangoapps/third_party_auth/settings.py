@@ -48,7 +48,6 @@ def apply_settings(django_settings):
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.
     django_settings.SOCIAL_AUTH_PIPELINE = [
-        'openedx.features.genplus_features.genplus.utils.override_next_url',
         'common.djangoapps.third_party_auth.pipeline.parse_query_params',
         'social_core.pipeline.social_auth.social_details',
         'social_core.pipeline.social_auth.social_uid',

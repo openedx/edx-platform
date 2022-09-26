@@ -1,68 +1,93 @@
 import logging
-
+from django.conf import settings
 from django.dispatch import receiver
+from django.db.models.signals import post_save, m2m_changed, pre_save
+
+from completion.models import BlockCompletion
 from xmodule.modulestore.django import SignalHandler, modulestore
-from django.db.models.signals import post_save, m2m_changed
-
-from openedx.features.genplus_features.genplus.models import Class
-from .models import Lesson, ClassEnrollment, Program
-from .constants import ProgramEnrollmentStatuses
+from openedx.features.genplus_features.genplus.models import Class, Teacher, Activity
+from openedx.features.genplus_features.genplus.constants import ActivityTypes
 import openedx.features.genplus_features.genplus_learning.tasks as genplus_learning_tasks
-
+from openedx.features.genplus_features.genplus_learning.models import (
+    Program, Unit, ClassUnit, ClassLesson , UnitBlockCompletion
+)
+from openedx.features.genplus_features.genplus_learning.access import allow_access
+from openedx.features.genplus_features.genplus_learning.roles import ProgramInstructorRole
+from openedx.features.genplus_features.genplus_learning.utils import update_class_lessons
 log = logging.getLogger(__name__)
 
-PROGRAM_ENROLLMENT_COUNTDOWN = 10
+
+def _create_class_unit_and_lessons(gen_class):
+    # create class_units and class_lessons for units in this program
+    units = gen_class.program.units.all()
+    class_lessons = []
+    for unit in units:
+        class_unit, created = ClassUnit.objects.get_or_create(gen_class=gen_class, unit=unit, course_key=unit.course.id)
+        course = modulestore().get_course(class_unit.course_key)
+        lessons = course.children
+        class_lessons += [
+            ClassLesson(order=order, class_unit=class_unit,
+                        course_key=class_unit.course_key, usage_key=usage_key)
+            for order, usage_key in enumerate(lessons, start=1)
+        ]
+
+    ClassLesson.objects.bulk_create(class_lessons, ignore_conflicts=True)
 
 
 @receiver(SignalHandler.course_published)
 def _listen_for_course_publish(sender, course_key, **kwargs):
-    course = modulestore().get_course(course_key)
-    section_usage_keys = set(course.children)
-    for usage_key in section_usage_keys:
-        Lesson.objects.get_or_create(course_key=course_key, usage_key=usage_key)
-
-    lessons = Lesson.objects.filter(course_key=course_key)
-    lesson_usage_keys = set(lessons.values_list('usage_key', flat=True))
-    for usage_key in (lesson_usage_keys - section_usage_keys):
-        Lesson.objects.get(course_key=course_key, usage_key=usage_key).delete()
+    update_class_lessons(course_key)
 
 
-@receiver(post_save, sender=ClassEnrollment)
-def add_program_enrollment(sender, instance, created, **kwargs):
-    if created:
+@receiver(pre_save, sender=Class)
+def gen_class_changed(sender, instance, *args, **kwargs):
+    gen_class_qs = Class.objects.filter(pk=instance.pk)
+    if gen_class_qs.exists() and gen_class_qs.first().program:
+        return
+
+    if instance.program:
+        # enroll students to the program
         genplus_learning_tasks.enroll_class_students_to_program.apply_async(
-            args=[instance.gen_class.pk, instance.program.pk],
-            countdown=PROGRAM_ENROLLMENT_COUNTDOWN,
+            args=[instance.pk, instance.program.pk],
+            countdown=settings.PROGRAM_ENROLLMENT_COUNTDOWN,
         )
 
+        # give staff access to teachers
+        for teacher in instance.teachers.all():
+            allow_access(instance.program, teacher.gen_user, ProgramInstructorRole.ROLE_NAME)
 
-@receiver(m2m_changed, sender=Program.units.through)
-def program_units_changed(sender, instance, action, **kwargs):
-    pk_set = kwargs.pop('pk_set', None)
-    if action == "post_add":
-        if isinstance(instance, Program) and instance.is_current:
-            program_class_ids = instance.class_enrollments.all().values_list('gen_class', flat=True)
-            program_unit_ids = [str(course_key) for course_key in pk_set]
-            for class_id in program_class_ids:
-                genplus_learning_tasks.enroll_class_students_to_program.apply_async(
-                    args=[class_id, instance.pk],
-                    kwargs={
-                        'program_unit_ids': program_unit_ids
-                    },
-                    countdown=PROGRAM_ENROLLMENT_COUNTDOWN
-                )
+        _create_class_unit_and_lessons(instance)
 
 
 @receiver(m2m_changed, sender=Class.students.through)
 def class_students_changed(sender, instance, action, **kwargs):
     pk_set = kwargs.pop('pk_set', None)
     if action == "post_add":
-        current_program = instance.current_program
-        if isinstance(instance, Class) and current_program:
+        if isinstance(instance, Class) and instance.program:
             genplus_learning_tasks.enroll_class_students_to_program.apply_async(
-                args=[instance.pk, current_program.pk],
+                args=[instance.pk, instance.program.pk],
                 kwargs={
                     'class_student_ids': list(pk_set),
                 },
-                countdown=PROGRAM_ENROLLMENT_COUNTDOWN
+                countdown=settings.PROGRAM_ENROLLMENT_COUNTDOWN
             )
+
+
+@receiver(post_save, sender=BlockCompletion)
+def set_unit_and_block_completions(sender, instance, created, **kwargs):
+    if created:
+        genplus_learning_tasks.update_unit_and_lesson_completions.apply_async(
+            args=[instance.pk]
+        )
+
+
+# capture activity on lesson completion
+@receiver(post_save, sender=UnitBlockCompletion)
+def create_activity_on_lesson_completion(sender, instance, created, **kwargs):
+    if instance.is_completed:
+        Activity.objects.create(
+            actor=instance.user.gen_user.student,
+            type=ActivityTypes.LESSON_COMPLETION,
+            action_object=instance,
+            target=instance.user.gen_user.student
+        )

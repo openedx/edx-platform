@@ -23,17 +23,33 @@
 % for description_id, description_text in response_data['descriptions'].items():
     <p class="question-description" id="${description_id}">${description_text}</p>
 % endfor
-<input type="text" name="input_${id}" id="input_${id}" ${describedby_html} value="${value}"
-    % if do_math:
-        class="math"
-    % endif
-    % if size:
-        size="${size}"
-    % endif
-    % if hidden:
-        style="display:none;"
-    % endif
-/>
+
+% if multiline:
+    <textarea type="text" name="input_${id}" id="input_${id}" placeholder="${placeholder}" ${describedby_html} value="${value}"
+        % if do_math:
+            class="math"
+        % endif
+        % if size:
+            size="${size}"
+        % endif
+        % if hidden:
+            style="display:none;"
+        % endif
+    >${value}</textarea>
+% else:
+    <input type="text" name="input_${id}" id="input_${id}" ${describedby_html} value="${value}"
+        % if do_math:
+            class="math"
+        % endif
+        % if size:
+            size="${size}"
+        % endif
+        % if hidden:
+            style="display:none;"
+        % endif
+    />
+% endif
+
 <span class="trailing_text" id="trailing_text_${id}">${trailing_text}</span>
 
 <%include file="status_span.html" args="status=status, status_id=id"/>

@@ -3129,6 +3129,7 @@ INSTALLED_APPS = [
     # in the LMS process at the moment, so anything that has Django admin access
     # permissions needs to be listed as an LMS app or the script will fail.
     'user_tasks',
+    'adminsortable2',
 ]
 
 ######################### GENPLUS APPS #################################
@@ -3142,9 +3143,29 @@ GENPLUS_INSTALLED_APPS = [
 
     # genplus teach app
     'openedx.features.genplus_features.genplus_teach',
+
+    # genplus badges app
+    'openedx.features.genplus_features.genplus_badges',
+
+    # installed third party apps
+    'tinymce'
 ]
 
 INSTALLED_APPS.extend(GENPLUS_INSTALLED_APPS)
+
+TINYMCE_DEFAULT_CONFIG = {
+    'plugins': "advlist,autolink,lists,link,image,charmap,print,preview,anchor,"
+    "searchreplace,visualblocks,code,fullscreen,insertdatetime,media,table,paste,"
+    "code,help,wordcount",
+    "toolbar": "undo redo | formatselect | "
+               "bold italic backcolor | alignleft aligncenter "
+               "alignright alignjustify | bullist numlist outdent indent | "
+               "removeformat | help",
+    'cleanup_on_startup': True,
+    'custom_undo_redo_levels': 10,
+    'width': '100%',
+    'height': 750
+}
 
 ######################### CSRF #########################################
 
@@ -3163,7 +3184,9 @@ RM_UNIFY_SECRET = 'rmunify-secret'
 
 ######################### GENPLUS SETTINGS #################################
 
-GENPLUS_FRONTEND_URL = '/'
+GENPLUS_FRONTEND_URL = ''
+PROGRAM_ENROLLMENT_COUNTDOWN = 10
+TP_LOGOUT_REDIRECT_URL = ''
 
 ######################### Django Rest Framework ########################
 
@@ -3473,6 +3496,28 @@ BADGR_BASE_URL = "http://localhost:8005"
 # .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_ISSUER_SLUG = "example-issuer"
 
+# .. setting_name: BADGR_USERNAME
+# .. setting_default: None
+# .. setting_description: The username for Badgr. You should set up an issuer application with Badgr
+#    (https://badgr.org/app-developers/). The username and password will then be used to create or renew
+#    OAuth2 tokens.
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
+BADGR_USERNAME = None
+
+# .. setting_name: BADGR_PASSWORD
+# .. setting_default: None
+# .. setting_description: The password for Badgr. You should set up an issuer application with Badgr
+#    (https://badgr.org/app-developers/). The username and password will then be used to create or renew
+#    OAuth2 tokens.
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
+BADGR_PASSWORD = None
+
+# .. setting_name: BADGR_TOKENS_CACHE_KEY
+# .. setting_default: None
+# .. setting_description: The cache key for Badgr API tokens. Once created, the tokens will be stored in cache.
+#    Define the key here for setting and retrieveing the tokens.
+# .. setting_warning: Review FEATURES['ENABLE_OPENBADGES'] for further context.
+BADGR_TOKENS_CACHE_KEY = None
 # .. setting_name: BADGR_TIMEOUT
 # .. setting_default: 10
 # .. setting_description: Number of seconds to wait on the badging server when contacting it before giving up.

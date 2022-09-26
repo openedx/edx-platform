@@ -1623,6 +1623,9 @@ GENPLUS_INSTALLED_APPS = [
 
     # genplus teach app
     'openedx.features.genplus_features.genplus_teach',
+
+    # genplus badges app
+    'openedx.features.genplus_features.genplus_badges',
 ]
 
 INSTALLED_APPS.extend(GENPLUS_INSTALLED_APPS)
@@ -1630,6 +1633,8 @@ INSTALLED_APPS.extend(GENPLUS_INSTALLED_APPS)
 ######################### GENPLUS SETTINGS #################################
 
 GENPLUS_FRONTEND_URL = ''
+PROGRAM_ENROLLMENT_COUNTDOWN = 10
+TP_LOGOUT_REDIRECT_URL = ''
 
 ################# EDX MARKETING SITE ##################################
 
@@ -1824,6 +1829,10 @@ ADVANCED_PROBLEM_TYPES = [
     },
     {
         'component': 'staffgradedxblock',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'scormxblock',
         'boilerplate_name': None
     }
 ]

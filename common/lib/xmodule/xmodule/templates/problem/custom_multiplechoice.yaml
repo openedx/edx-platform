@@ -1,0 +1,26 @@
+---
+metadata:
+    display_name: GenZ Multiple Choice
+    markdown: !!null
+data: |
+    <div class="choices-xblock theme-dark">
+      <problem>
+        <div class="choices-xblock-wapper">
+          <div class="choices-info">
+            <img src="https://dev.genplus.co.uk/asset-v1:genplus+GP741+2022_T1+type@asset+block@calendar.png" alt="Trophy" class="align-center" width="280" />
+          </div>
+          <div class="choices-form">
+            <choiceresponse>
+              <span class="question-text">Question 1</span>
+              <strong class="question-title">What does the term initiative means?</strong>
+              <description><em>Select the answer. </em></description>
+              <checkboxgroup>
+                <choice correct="true">The ability to make independent decisions quickly and effectively</choice>
+                <choice correct="false">The ability to recover quickly from difficult situiations</choice>
+                <choice correct="false">The ability to share your ideas and lead a discussion with a group</choice>
+              </checkboxgroup>
+            </choiceresponse>
+          </div>
+        </div>
+      </problem>
+    </div>

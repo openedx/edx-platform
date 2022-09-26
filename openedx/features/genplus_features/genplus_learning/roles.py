@@ -19,13 +19,13 @@ class ProgramAccessRole(AccessRole):
         units = self.program.units.all()
         for unit in units:
             for gen_user in gen_users:
-                allow_access(unit, gen_user.user, self._role_name, send_email)
+                allow_access(unit.course, gen_user.user, self._role_name, send_email)
 
     def remove_users(self, *gen_users, send_email):
         units = self.program.units.all()
         for unit in units:
             for gen_user in gen_users:
-                revoke_access(unit, gen_user.user, self._role_name, send_email)
+                revoke_access(unit.course, gen_user.user, self._role_name, send_email)
 
 
     def users_with_role(self):

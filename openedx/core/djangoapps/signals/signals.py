@@ -15,6 +15,7 @@ COURSE_CERT_CHANGED = Signal(providing_args=["user", "course_key", "mode", "stat
 COURSE_CERT_AWARDED = Signal(providing_args=["user", "course_key", "mode", "status"])
 COURSE_CERT_REVOKED = Signal(providing_args=["user", "course_key", "mode", "status"])
 COURSE_CERT_DATE_CHANGE = Signal(providing_args=["course_key", "available_date"])
+COURSE_COMPLETED = Signal(providing_args=["user", "course_key"])
 
 
 COURSE_ASSESSMENT_GRADE_CHANGED = Signal(

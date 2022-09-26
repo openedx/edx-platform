@@ -44,7 +44,9 @@ from openedx.features.course_experience import (
 )
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
+from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.features.genplus_features.genplus_learning.models import ClassLesson, ProgramEnrollment
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
@@ -444,7 +446,7 @@ class CoursewareIndex(View):
             # 'disable_accordion': not DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
             'disable_accordion': settings.DISABLE_ACCORDION,
             'show_search': show_search,
-            'genplus_social_auth_redirect_url': settings.GENPLUS_FRONTEND_URL + 'lessons/',
+            'genplus_social_auth_redirect_url': settings.GENPLUS_FRONTEND_URL + '/lessons/',
         }
         courseware_context.update(
             get_experiment_user_metadata_context(
@@ -460,10 +462,33 @@ class CoursewareIndex(View):
             self.section_url_name,
             self.field_data_cache,
         )
+
+        if not self.request.user.is_authenticated:
+            course_block_tree = table_of_contents
+        else:
+            course_block_tree = get_course_outline_block_tree(
+                request, str(self.course.id), request.user
+            )
+            try:
+                program = self.course_overview.unit.program
+                gen_user = request.user.gen_user
+                if gen_user.is_student:
+                    enrollment = ProgramEnrollment.objects.get(student=gen_user.student, program=program)
+                    lessons = ClassLesson.objects.filter(class_unit__gen_class=enrollment.gen_class, course_key=self.course.id)
+                    sections = course_block_tree.get('children')
+                    for i, section in enumerate(sections):
+                        lesson = lessons.get(usage_key=UsageKey.from_string(section.get('id')))
+                        sections[i]['is_locked'] = lesson.is_locked if lesson else False
+                    course_block_tree['children'] = sections
+            except:
+                log.error('An error occurred')
+
         courseware_context['accordion'] = render_accordion(
             self.request,
             self.course,
-            table_of_contents['chapters'],
+            course_block_tree,
+            self.chapter_url_name,
+            self.section_url_name,
         )
 
         courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
@@ -569,7 +594,7 @@ class CoursewareIndex(View):
         return section_context
 
 
-def render_accordion(request, course, table_of_contents):
+def render_accordion(request, course, table_of_contents, active_section, active_subsection):
     """
     Returns the HTML that renders the navigation for the given course.
     Expects the table_of_contents to have data on each chapter and section,
@@ -577,9 +602,12 @@ def render_accordion(request, course, table_of_contents):
     """
     context = dict(
         [
-            ('toc', table_of_contents),
+            ('blocks', table_of_contents),
+            ('course_title', course.display_name),
             ('course_id', str(course.id)),
             ('csrf', csrf(request)['csrf_token']),
+            ('active_section', active_section),
+            ('active_subsection', active_subsection),
             ('due_date_display_format', course.due_date_display_format),
         ] + list(TEMPLATE_IMPORTS.items())
     )

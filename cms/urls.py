@@ -181,6 +181,7 @@ urlpatterns = [
     url(r'^api/val/v0/', include('edxval.urls')),
     url(r'^api/tasks/v0/', include('user_tasks.urls')),
     url(r'^accessibility$', contentstore_views.accessibility, name='accessibility'),
+    url(r'^tinymce/', include('tinymce.urls')),
 ]
 
 urlpatterns += genplus_url_patterns

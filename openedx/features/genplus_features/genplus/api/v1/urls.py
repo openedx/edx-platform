@@ -8,7 +8,9 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     UserInfo,
     CharacterViewSet,
-    ClassViewSet
+    ClassViewSet,
+    JournalViewSet,
+    SkillViewSet,
 )
 
 app_name = 'genplus_api_v1'
@@ -16,6 +18,8 @@ app_name = 'genplus_api_v1'
 router = DefaultRouter()
 router.register('characters', CharacterViewSet, basename='characters')
 router.register('classes', ClassViewSet, basename='classes')
+router.register('journals', JournalViewSet, basename='journals')
+router.register('skills', SkillViewSet, basename='skills')
 
 urlpatterns = [
     url(r'^userinfo/$', UserInfo.as_view()),
