@@ -407,9 +407,6 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     gradeData = GradeDataSerializer(source="*")
     programs = serializers.SerializerMethodField()
 
-    # TODO - remove "allow_null" as each of these are implemented, temp for testing.
-    courseProvider = CourseProviderSerializer(allow_null=True)
-
     def get_entitlement(self, instance):
         """
         If this enrollment is the fulfillment of an entitlement, include information about the entitlement
