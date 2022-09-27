@@ -220,7 +220,7 @@ class JournalViewSet(GenzMixin, FlatMultipleModelMixin, viewsets.ModelViewSet):
 
         if self.gen_user.is_student:
             student = self.gen_user.student
-            journal_posts = journal_posts.filter(student=self.gen_user.student)
+            journal_posts = journal_posts.filter(student=student)
             booster_badges = BoosterBadgeAward.objects.filter(user=self.gen_user.user)
         else:
             student_id = query_params.get('student_id')
@@ -244,10 +244,6 @@ class JournalViewSet(GenzMixin, FlatMultipleModelMixin, viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         response = super(FlatMultipleModelMixin, self).list(request, args, kwargs)
         response.data['results'] = self._rename_entry_type(response.data['results'])
-        querylist = self.get_querylist()
-        queryset = querylist[0]['queryset']
-        skills_qs = Skill.objects.filter(pk__in=queryset.values_list('skill', flat=True))
-        response.data['skills'] = SkillSerializer(skills_qs, many=True).data
         return response
 
 
