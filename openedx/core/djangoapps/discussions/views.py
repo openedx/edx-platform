@@ -183,6 +183,11 @@ class DiscussionsProvidersView(APIView):
             else:
                 if configuration.provider_type != Provider.OPEN_EDX:
                     hidden_providers.append(Provider.OPEN_EDX)
+        else:
+            # if new discussions is not enabled, hide the new provider in case it is not already in use
+            if not ENABLE_NEW_STRUCTURE_DISCUSSIONS.is_enabled(course_key):
+                if configuration.provider_type != Provider.OPEN_EDX:
+                    hidden_providers.append(Provider.OPEN_EDX)
 
         serializer = DiscussionsProvidersSerializer(
             {

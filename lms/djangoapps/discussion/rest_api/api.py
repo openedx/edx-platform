@@ -23,7 +23,6 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.request import Request
 
-from lms.djangoapps.discussion.views import is_privileged_user
 from xmodule.course_module import CourseBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTabList
@@ -34,6 +33,7 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE, \
     ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
+from lms.djangoapps.discussion.views import is_user_moderator
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common import comment_client
@@ -1190,8 +1190,7 @@ def _handle_abuse_flagged_field(form_value, user, cc_content):
             else:
                 comment_flagged.send(sender='flag_abuse_for_comment', user=user, post=cc_content)
     else:
-        remove_all = bool(user.id != cc_content["user_id"] and is_privileged_user(course_key,
-                                                                                  User.objects.get(id=user.id)))
+        remove_all = bool(is_user_moderator(course_key, User.objects.get(id=user.id)))
         cc_content.unFlagAbuse(user, cc_content, remove_all)
 
 

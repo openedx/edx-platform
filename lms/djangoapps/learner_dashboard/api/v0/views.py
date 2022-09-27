@@ -369,8 +369,9 @@ class CourseRecommendationApiView(APIView):
             return Response(status=400)
 
         recommended_courses = []
+        fields = ['title', 'owners', 'marketing_url']
         for course_id in course_keys:
-            course_data = get_course_data(course_id)
+            course_data = get_course_data(course_id, fields)
             if course_data:
                 recommended_courses.append({
                     'course_key': course_id,

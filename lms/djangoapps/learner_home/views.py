@@ -8,17 +8,25 @@ from rest_framework.generics import RetrieveAPIView
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import marketing_link
-from common.djangoapps.student.helpers import get_resume_urls_for_enrollments
+from common.djangoapps.student.helpers import cert_info, get_resume_urls_for_enrollments
 from common.djangoapps.student.views.dashboard import (
     complete_course_mode_info,
     get_course_enrollments,
     get_org_black_and_whitelist_for_site,
 )
+from common.djangoapps.util.milestones_helpers import (
+    get_pre_requisite_courses_not_completed,
+)
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_feature_enabled
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.courseware.access import administrative_accesses_to_course_for_user
+from lms.djangoapps.courseware.access_utils import (
+    check_course_open_for_learner,
+)
 from lms.djangoapps.learner_home.serializers import LearnerDashboardSerializer
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.features.enterprise_support.api import enterprise_customer_from_session_or_learner_data
 
 
 def get_platform_settings():
@@ -117,6 +125,70 @@ def get_ecommerce_payment_page(user):
     )
 
 
+def get_cert_statuses(user, course_enrollments):
+    """Get cert status by course for user enrollments"""
+    return {
+        enrollment.course_id: cert_info(user, enrollment)
+        for enrollment in course_enrollments
+    }
+
+
+def _get_courses_with_unmet_prerequisites(user, course_enrollments):
+    """
+    Determine which courses have unmet prerequisites.
+    NOTE: that courses w/out prerequisites, or with met prerequisites are not returned
+    in the output dict. That way we can do a simple "course_id in dict" check.
+
+    Returns: {
+        <course_id>: { "courses": [listing of unmet prerequisites] }
+    }
+    """
+
+    courses_having_prerequisites = frozenset(
+        enrollment.course_id
+        for enrollment in course_enrollments
+        if enrollment.course_overview.pre_requisite_courses
+    )
+
+    return get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
+
+
+def check_course_access(user, course_enrollments):
+    """
+    Wrapper for checks surrounding user ability to view courseware
+
+    Returns: {
+        <course_enrollment.id>: {
+            "has_unmet_prerequisites": True/False,
+            "is_too_early_to_view": True/False,
+            "user_has_staff_access": True/False
+        }
+    }
+    """
+
+    course_access_dict = {}
+
+    courses_with_unmet_prerequisites = _get_courses_with_unmet_prerequisites(
+        user, course_enrollments
+    )
+
+    for course_enrollment in course_enrollments:
+        course_access_dict[course_enrollment.course_id] = {
+            "has_unmet_prerequisites": course_enrollment.course_id
+            in courses_with_unmet_prerequisites,
+            "is_too_early_to_view": not check_course_open_for_learner(
+                user, course_enrollment.course
+            ),
+            "user_has_staff_access": any(
+                administrative_accesses_to_course_for_user(
+                    user, course_enrollment.course_id
+                )
+            ),
+        }
+
+    return course_access_dict
+
+
 class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
     """List of courses a user is enrolled in or entitled to"""
 
@@ -124,6 +196,9 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
         # Get user, determine if user needs to confirm email account
         user = request.user
         email_confirmation = get_user_account_confirmation_info(user)
+
+        # Gather info for enterprise dashboard
+        enterprise_customer = enterprise_customer_from_session_or_learner_data(request)
 
         # Get the org whitelist or the org blacklist for the current site
         site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
@@ -141,13 +216,13 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
             user, course_enrollments
         )
 
-        # TODO - Get verification status by course (do we still need this?)
+        # Get cert status by course
+        cert_statuses = get_cert_statuses(user, course_enrollments)
 
-        # TODO - Determine view access for courses (for showing courseware link or not)
+        # Determine view access for course, (for showing courseware link) involves:
+        course_access_checks = check_course_access(user, course_enrollments)
 
         # TODO - Get related programs
-
-        # TODO - Get user verification status
 
         # e-commerce info
         ecommerce_payment_page = get_ecommerce_payment_page(user)
@@ -157,7 +232,7 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
 
         learner_dash_data = {
             "emailConfirmation": email_confirmation,
-            "enterpriseDashboards": None,
+            "enterpriseDashboard": enterprise_customer,
             "platformSettings": get_platform_settings(),
             "enrollments": course_enrollments,
             "unfulfilledEntitlements": [],
@@ -166,8 +241,10 @@ class InitializeView(RetrieveAPIView):  # pylint: disable=unused-argument
 
         context = {
             "ecommerce_payment_page": ecommerce_payment_page,
+            "cert_statuses": cert_statuses,
             "course_mode_info": course_mode_info,
             "course_optouts": course_optouts,
+            "course_access_checks": course_access_checks,
             "resume_course_urls": resume_button_urls,
             "show_email_settings_for": show_email_settings_for,
         }

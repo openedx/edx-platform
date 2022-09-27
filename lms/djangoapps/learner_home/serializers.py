@@ -1,12 +1,15 @@
 """
 Serializers for the Learner Dashboard
 """
+from urllib.parse import urljoin
 
+from django.conf import settings
 from django.urls import reverse
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import course_home_url
+from xmodule.data import CertificatesDisplayBehaviors
 
 
 class PlatformSettingsSerializer(serializers.Serializer):
@@ -92,6 +95,41 @@ class CourseRunSerializer(serializers.Serializer):
         return self.context.get("resume_course_urls", {}).get(instance.course_id)
 
 
+class HasAccessSerializer(serializers.Serializer):
+    """
+    Info determining whether a user should be able to view course material.
+    Mirrors logic in "show_courseware_links_for" from old dashboard.py
+    """
+
+    hasUnmetPrerequisites = serializers.SerializerMethodField()
+    isTooEarly = serializers.SerializerMethodField()
+    isStaff = serializers.SerializerMethodField()
+
+    def _get_course_access_checks(self, enrollment):
+        """Internal helper to unpack access object for this particular enrollment"""
+        return self.context.get("course_access_checks", {}).get(
+            enrollment.course_id, {}
+        )
+
+    def get_hasUnmetPrerequisites(self, enrollment):
+        """Whether or not a course has unmet prerequisites"""
+        return self._get_course_access_checks(enrollment).get(
+            "has_unmet_prerequisites", False
+        )
+
+    def get_isTooEarly(self, enrollment):
+        """Determine if the course is open to a learner (course has started or user has early beta access)"""
+        return self._get_course_access_checks(enrollment).get(
+            "is_too_early_to_view", False
+        )
+
+    def get_isStaff(self, enrollment):
+        """Determine whether a user has staff access to this course"""
+        return self._get_course_access_checks(enrollment).get(
+            "user_has_staff_access", False
+        )
+
+
 class EnrollmentSerializer(serializers.Serializer):
     """
     Info about this particular enrollment.
@@ -110,7 +148,7 @@ class EnrollmentSerializer(serializers.Serializer):
     accessExpirationDate = serializers.SerializerMethodField()
     isAudit = serializers.SerializerMethodField()
     hasStarted = serializers.SerializerMethodField()
-    hasFinished = serializers.SerializerMethodField()
+    hasAccess = HasAccessSerializer(source="*")
     isVerified = serializers.SerializerMethodField()
     canUpgrade = serializers.SerializerMethodField()
     isAuditAccessExpired = serializers.SerializerMethodField()
@@ -135,10 +173,6 @@ class EnrollmentSerializer(serializers.Serializer):
             enrollment.course_id
         )
         return resume_button_url is not None
-
-    def get_hasFinished(self, enrollment):
-        # TODO - AU-796
-        return False
 
     def get_isVerified(self, enrollment):
         return enrollment.is_verified_enrollment()
@@ -179,11 +213,59 @@ class GradeDataSerializer(serializers.Serializer):
 class CertificateSerializer(serializers.Serializer):
     """Certificate availability info"""
 
-    availableDate = serializers.DateTimeField(allow_null=True)
-    isRestricted = serializers.BooleanField()
-    isEarned = serializers.BooleanField()
-    isDownloadable = serializers.BooleanField()
-    certPreviewUrl = serializers.URLField(allow_null=True)
+    availableDate = serializers.SerializerMethodField()
+    isRestricted = serializers.SerializerMethodField()
+    isEarned = serializers.SerializerMethodField()
+    isDownloadable = serializers.SerializerMethodField()
+    certPreviewUrl = serializers.SerializerMethodField()
+
+    def get_cert_info(self, enrollment):
+        """Utility to grab certificate info for this enrollment or empty object"""
+        return self.context.get("cert_statuses", {}).get(enrollment.course.id, {})
+
+    def get_availableDate(self, enrollment):
+        """Available date changes based off of Certificate display behavior"""
+        course_overview = enrollment.course_overview
+        available_date = course_overview.certificate_available_date
+
+        if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False):
+            if (
+                course_overview.certificates_display_behavior
+                == CertificatesDisplayBehaviors.END_WITH_DATE
+                and course_overview.certificate_available_date
+            ):
+                available_date = course_overview.certificate_available_date
+            elif (
+                course_overview.certificates_display_behavior
+                == CertificatesDisplayBehaviors.END
+                and course_overview.end
+            ):
+                available_date = course_overview.end
+        else:
+            available_date = course_overview.certificate_available_date
+
+        return serializers.DateTimeField().to_representation(available_date)
+
+    def get_isRestricted(self, enrollment):
+        """Cert is considered restricted based on certificate status"""
+        return self.get_cert_info(enrollment).get("status") == "restricted"
+
+    def get_isEarned(self, enrollment):
+        """Cert is considered earned based on certificate status"""
+        is_earned_states = ("downloadable", "certificate_earned_but_not_available")
+        return self.get_cert_info(enrollment).get("status") in is_earned_states
+
+    def get_isDownloadable(self, enrollment):
+        """Cert is considered downloadable based on certificate status"""
+        return self.get_cert_info(enrollment).get("status") == "downloadable"
+
+    def get_certPreviewUrl(self, enrollment):
+        """Cert preview URL comes from certificate info"""
+        cert_info = self.get_cert_info(enrollment)
+        if not cert_info.get("show_cert_web_view", False):
+            return None
+        else:
+            return cert_info.get("cert_web_view_url")
 
 
 class AvailableEntitlementSessionSerializer(serializers.Serializer):
@@ -238,11 +320,11 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     course = CourseSerializer()
     courseRun = CourseRunSerializer(source="*")
     enrollment = EnrollmentSerializer(source="*")
+    certificate = CertificateSerializer(source="*")
 
     # TODO - remove "allow_null" as each of these are implemented, temp for testing.
     courseProvider = CourseProviderSerializer(allow_null=True)
     gradeData = GradeDataSerializer(allow_null=True)
-    certificate = CertificateSerializer(allow_null=True)
     entitlements = EntitlementSerializer(allow_null=True)
     programs = ProgramsSerializer(allow_null=True)
 
@@ -275,17 +357,11 @@ class EmailConfirmationSerializer(serializers.Serializer):
 class EnterpriseDashboardSerializer(serializers.Serializer):
     """Serializer for individual enterprise dashboard data"""
 
-    label = serializers.CharField()
-    url = serializers.URLField()
+    label = serializers.CharField(source='name')
+    url = serializers.SerializerMethodField()
 
-
-class EnterpriseDashboardsSerializer(serializers.Serializer):
-    """Listing of available enterprise dashboards"""
-
-    availableDashboards = serializers.ListField(
-        child=EnterpriseDashboardSerializer(), allow_empty=True
-    )
-    mostRecentDashboard = EnterpriseDashboardSerializer()
+    def get_url(self, instance):
+        return urljoin(settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL, instance['uuid'])
 
 
 class LearnerDashboardSerializer(serializers.Serializer):
@@ -294,7 +370,7 @@ class LearnerDashboardSerializer(serializers.Serializer):
     requires_context = True
 
     emailConfirmation = EmailConfirmationSerializer()
-    enterpriseDashboards = EnterpriseDashboardsSerializer()
+    enterpriseDashboard = EnterpriseDashboardSerializer(allow_null=True)
     platformSettings = PlatformSettingsSerializer()
     courses = serializers.SerializerMethodField()
     suggestedCourses = serializers.ListField(

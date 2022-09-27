@@ -1,0 +1,35 @@
+# This workflow detects PRs that make changes to lms/templates/dashboard.html
+# and only lms/templates/dashboard.html. This is the file that users are
+# guided through changing in the Open edX tutorial:
+# https://docs.openedx.org/en/latest/developers/quickstarts/first_openedx_pr.html#exercise-update-the-learner-dashboard
+
+# If this is the only file changed in the PR, we comment on the PR congratulating
+# the user and letting others know that this is not a community PR in need of
+# review. CODEOWNERS will tag a triaging team to provide reviews & ultimately
+# close the PR.
+
+name: Check for Tutorial PR
+description: Welcome contributors making their first PR from the tutorial
+on:
+  pull_request:
+    types: [opened]
+    paths:
+      - 'lms/templates/dashboard.html'
+
+jobs:
+  # Provide helpful bot comment
+  comment:
+    runs-on: ubuntu-latest
+    name: provide helpful bot comment
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: |
+            Thank you for your pull request! Congratulations on completing the Open edX tutorial! A team member will be by to take a look shortly.
+            To those watching community pull requests: No need to worry about this one, a tCRIL team member will be taking care of it.
+            For this PR's author: If this is a PR that is NOT coming from the Open edX tutorial, please comment and let us know to disregard this message.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

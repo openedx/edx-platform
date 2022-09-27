@@ -6,11 +6,12 @@ from unittest.mock import patch
 from uuid import uuid4
 
 import ddt
+from django.conf import settings
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
+from lms.djangoapps.learner_home.test_utils import create_test_enrollment
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
@@ -28,6 +29,9 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+
+
+ENTERPRISE_ENABLED = 'ENABLE_ENTERPRISE_INTEGRATION'
 
 
 class TestGetPlatformSettings(TestCase):
@@ -126,22 +130,9 @@ class TestGetEnrollments(SharedModuleStoreTestCase):
         super().setUp()
         self.user = UserFactory()
 
-    def create_test_enrollment(self, course_mode=CourseMode.AUDIT):
-        """Create a course and enrollment for the test user. Returns a CourseEnrollment"""
-        course = CourseFactory(self_paced=True)
-
-        CourseModeFactory(
-            course_id=course.id,
-            mode_slug=course_mode,
-        )
-
-        return CourseEnrollmentFactory(
-            course_id=course.id, mode=course_mode, user_id=self.user.id
-        )
-
     def test_basic(self):
         # Given a set of enrollments
-        test_enrollments = [self.create_test_enrollment() for i in range(3)]
+        test_enrollments = [create_test_enrollment(self.user) for i in range(3)]
 
         # When I request my enrollments
         returned_enrollments, course_mode_info = get_enrollments(self.user, None, None)
@@ -229,6 +220,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         super().setUp()
         self.log_in()
 
+    @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
     def test_response_structure(self):
         """Basic test for correct response structure"""
 
@@ -245,7 +237,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         expected_keys = set(
             [
                 "emailConfirmation",
-                "enterpriseDashboards",
+                "enterpriseDashboard",
                 "platformSettings",
                 "courses",
                 "suggestedCourses",
@@ -254,6 +246,7 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
 
         assert expected_keys == response_data.keys()
 
+    @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
     @patch("lms.djangoapps.learner_home.views.get_user_account_confirmation_info")
     def test_email_confirmation(self, mock_user_conf_info):
         """Test that email confirmation info passes through correctly"""
@@ -279,5 +272,46 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
             {
                 "isNeeded": mock_user_conf_info_response["isNeeded"],
                 "sendEmailUrl": mock_user_conf_info_response["sendEmailUrl"],
+            },
+        )
+
+    @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
+    @patch("lms.djangoapps.learner_home.views.cert_info")
+    def test_get_cert_statuses(self, mock_get_cert_info):
+        """Test that cert information gets loaded correctly"""
+
+        # Given I am logged in
+        self.log_in()
+
+        # (and we have tons of mocks to avoid integration tests)
+        mock_enrollment = create_test_enrollment(
+            self.user, course_mode=CourseMode.VERIFIED
+        )
+        mock_cert_info = {
+            "status": "downloadable",
+            "mode": "verified",
+            "linked_in_url": None,
+            "show_survey_button": False,
+            "can_unenroll": True,
+            "show_cert_web_view": True,
+            "cert_web_view_url": random_url(),
+        }
+        mock_get_cert_info.return_value = mock_cert_info
+
+        # When I request the dashboard
+        response = self.client.get(self.view_url)
+
+        # Then I get the expected success response
+        assert response.status_code == 200
+        response_data = json.loads(response.content)
+
+        self.assertDictEqual(
+            response_data["courses"][0]["certificate"],
+            {
+                "availableDate": mock_enrollment.course.certificate_available_date,
+                "isRestricted": False,
+                "isEarned": True,
+                "isDownloadable": True,
+                "certPreviewUrl": mock_cert_info["cert_web_view_url"],
             },
         )

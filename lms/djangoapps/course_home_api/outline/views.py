@@ -395,7 +395,7 @@ def save_course_goal(request):  # pylint: disable=missing-function-docstring
         #  Remove it after the experiment has been paused.
         optimizely_client = OptimizelyClient.get_optimizely_client()
         if optimizely_client and request.user:
-            optimizely_client.track('user_goal_setting_click', str(request.user.id))
+            optimizely_client.track('goal_set', str(request.user.id))
         return Response({
             'header': _('Your course goal has been successfully set.'),
             'message': _('Course goal updated successfully.'),

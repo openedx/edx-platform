@@ -5,6 +5,7 @@
 <%!
   from django.conf import settings
   from django.utils.translation import gettext as _
+  from urllib.parse import quote_plus
   from openedx.core.djangolib.markup import HTML, Text
 %>
 
@@ -162,7 +163,7 @@
 
     <ul class="list-actions">
       <li class="action-item">
-        <a href="${settings.FRONTEND_REGISTER_URL}?next=${current_url}" class="action action-primary">${_("Sign Up & Start Making Your {platform_name} Course").format(platform_name=settings.PLATFORM_NAME)}</a>
+        <a href="${settings.FRONTEND_REGISTER_URL}?next=${quote_plus(request.build_absolute_uri(settings.LOGIN_URL))}" class="action action-primary">${_("Sign Up & Start Making Your {platform_name} Course").format(platform_name=settings.PLATFORM_NAME)}</a>
       </li>
       <li class="action-item">
         <a href="${settings.LOGIN_URL}?next=${current_url}" class="action action-secondary">${_("Already have a {studio_name} Account? Sign In").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>

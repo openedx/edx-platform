@@ -108,14 +108,15 @@ class _DispatchingViewTestCase(TestCase):
         )
         models.RestrictedApplication.objects.create(application=self.restricted_dot_app)
 
-    def _post_request(self, user, client, token_type=None, scope=None, headers=None):
+    def _post_request(self, user, client, token_type=None, scope=None, headers=None, asymmetric_jwt=False):
         """
         Call the view with a POST request object with the appropriate format,
         returning the response object.
         """
-        return self.client.post(self.url, self._post_body(user, client, token_type, scope), **(headers or {}))  # pylint: disable=no-member
+        post_body = self._post_body(user, client, token_type, scope, asymmetric_jwt=asymmetric_jwt)
+        return self.client.post(self.url, post_body, **(headers or {}))  # pylint: disable=no-member
 
-    def _post_body(self, user, client, token_type=None, scope=None):
+    def _post_body(self, user, client, token_type=None, scope=None, asymmetric_jwt=False):
         """
         Return a dictionary to be used as the body of the POST request
         """
@@ -133,7 +134,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         self.url = reverse('access_token')
         self.view_class = views.AccessTokenView
 
-    def _post_body(self, user, client, token_type=None, scope=None):
+    def _post_body(self, user, client, token_type=None, scope=None, asymmetric_jwt=None):
         """
         Return a dictionary to be used as the body of the POST request
         """
@@ -155,6 +156,9 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         if scope:
             body['scope'] = scope
 
+        if asymmetric_jwt:
+            body['asymmetric_jwt'] = asymmetric_jwt
+
         return body
 
     def _generate_key_pair(self):
@@ -171,12 +175,13 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
 
         return serialized_public_keys_json, serialized_keypair_json
 
-    def _test_jwt_access_token(self, client_attr, token_type=None, headers=None, grant_type=None):
+    def _test_jwt_access_token(self, client_attr, token_type=None, headers=None, grant_type=None, asymmetric_jwt=False):
         """
         Test response for JWT token.
         """
         client = getattr(self, client_attr)
-        response = self._post_request(self.user, client, token_type=token_type, headers=headers or {})
+        response = self._post_request(self.user, client, token_type=token_type,
+                                      headers=headers or {}, asymmetric_jwt=asymmetric_jwt)
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
         expected_default_expires_in = 60 * 60
@@ -189,6 +194,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             grant_type=grant_type,
             should_be_restricted=False,
             expires_in=expected_default_expires_in,
+            should_be_asymmetric_key=asymmetric_jwt
         )
 
     @ddt.data('dot_app')
@@ -337,10 +343,17 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             grant_type=grant_type,
         )
 
+    def test_asymmetric_jwt_access_token(self):
+        """
+        Verify the JWT is asymmetric when requested.
+        """
+        self._test_jwt_access_token('dot_app', token_type='jwt', grant_type='password', asymmetric_jwt=True)
+
 
 @ddt.ddt
 @httpretty.activate
-class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAuthTestMixin, _DispatchingViewTestCase):
+class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAuthTestMixin,
+                                  _DispatchingViewTestCase, mixins.AccessTokenMixin):
     """
     Test class for AccessTokenExchangeView
     """
@@ -350,13 +363,16 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         self.view_class = views.AccessTokenExchangeView
         super().setUp()
 
-    def _post_body(self, user, client, token_type=None, scope=None):
+    def _post_body(self, user, client, token_type=None, scope=None, asymmetric_jwt=None):
         body = {
             'client_id': client.client_id,
             'access_token': self.access_token,
         }
         if token_type:
             body['token_type'] = token_type
+
+        if asymmetric_jwt:
+            body['asymmetric_jwt'] = asymmetric_jwt
 
         return body
 
@@ -375,8 +391,34 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         self._setup_provider_response(success=True)
         response = self._post_request(self.user, client, token_type='jwt')
         assert response.status_code == 200
-
         data = json.loads(response.content.decode('utf-8'))
+        self.assert_valid_jwt_access_token(
+            data['access_token'],
+            self.user,
+            data['scope'].split(' '),
+            grant_type='password'
+        )
+
+        assert 'expires_in' in data
+        assert data['expires_in'] > 0
+        assert data['token_type'] == 'JWT'
+
+    @ddt.data('dot_app')
+    def test_asymmetric_jwt_access_token_exchange_calls_dispatched_view(self, client_attr):
+        client = getattr(self, client_attr)
+        self.oauth_client = client
+        self._setup_provider_response(success=True)
+        response = self._post_request(self.user, client, token_type='jwt', asymmetric_jwt=True)
+        assert response.status_code == 200
+        data = json.loads(response.content.decode('utf-8'))
+        self.assert_valid_jwt_access_token(
+            data['access_token'],
+            self.user,
+            data['scope'].split(' '),
+            grant_type='password',
+            should_be_asymmetric_key=True
+        )
+
         assert 'expires_in' in data
         assert data['expires_in'] > 0
         assert data['token_type'] == 'JWT'

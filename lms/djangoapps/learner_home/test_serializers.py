@@ -5,6 +5,8 @@ from unittest import TestCase
 from unittest import mock
 from uuid import uuid4
 
+from django.conf import settings
+
 import ddt
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -20,9 +22,10 @@ from lms.djangoapps.learner_home.serializers import (
     CourseSerializer,
     EmailConfirmationSerializer,
     EnrollmentSerializer,
-    EnterpriseDashboardsSerializer,
+    EnterpriseDashboardSerializer,
     EntitlementSerializer,
     GradeDataSerializer,
+    HasAccessSerializer,
     LearnerEnrollmentSerializer,
     PlatformSettingsSerializer,
     ProgramsSerializer,
@@ -36,6 +39,7 @@ from lms.djangoapps.learner_home.test_utils import (
     random_date,
     random_url,
 )
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -48,21 +52,20 @@ class LearnerDashboardBaseTest(SharedModuleStoreTestCase):
         super().setUpClass()
         cls.user = UserFactory()
 
-    def create_test_enrollment(self):
+    def create_test_enrollment(self, course_mode=CourseMode.AUDIT):
         """Create a test user, course, and enrollment. Return the enrollment."""
         course = CourseFactory(self_paced=True)
         CourseModeFactory(
             course_id=course.id,
-            mode_slug=CourseMode.AUDIT,
+            mode_slug=course_mode,
         )
 
-        test_enrollment = CourseEnrollmentFactory(
-            course_id=course.id, mode=CourseMode.AUDIT
-        )
+        test_enrollment = CourseEnrollmentFactory(course_id=course.id, mode=course_mode)
 
         # Add extra info to exercise serialization
         test_enrollment.course_overview.marketing_url = random_url()
         test_enrollment.course_overview.end = random_date()
+        test_enrollment.course_overview.certificate_available_date = random_date()
 
         return test_enrollment
 
@@ -149,6 +152,94 @@ class TestCourseRunSerializer(LearnerDashboardBaseTest):
         # Serializaiton set up so all fields will have values to make testing easy
         for key in output:
             assert output[key] is not None
+
+
+@ddt.ddt
+class TestHasAccessSerializer(LearnerDashboardBaseTest):
+    """Tests for the HasAccessSerializer"""
+
+    def create_test_context(self, course):
+        return {
+            "course_access_checks": {
+                course.id: {
+                    "has_unmet_prerequisites": False,
+                    "is_too_early_to_view": False,
+                    "user_has_staff_access": False,
+                }
+            }
+        }
+
+    @ddt.data(True, False)
+    def test_unmet_prerequisites(self, has_unmet_prerequisites):
+        # Given an enrollment
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
+
+        # ... without unmet prerequisites
+        if has_unmet_prerequisites:
+            # ... or with unmet prerequisites
+            prerequisite_course = CourseFactory()
+            input_context.update(
+                {
+                    "course_access_checks": {
+                        input_data.course.id: {
+                            "has_unmet_prerequisites": has_unmet_prerequisites,
+                        }
+                    }
+                }
+            )
+
+        # When I serialize
+        output_data = HasAccessSerializer(input_data, context=input_context).data
+
+        # Then "hasUnmetPrerequisites" is outputs correctly
+        self.assertEqual(output_data["hasUnmetPrerequisites"], has_unmet_prerequisites)
+
+    @ddt.data(True, False)
+    def test_is_staff(self, is_staff):
+        # Given an enrollment
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
+
+        # Where user has/hasn't staff access
+        input_context.update(
+            {
+                "course_access_checks": {
+                    input_data.course.id: {
+                        "user_has_staff_access": is_staff,
+                    }
+                }
+            }
+        )
+
+        # When I serialize
+        output_data = HasAccessSerializer(input_data, context=input_context).data
+
+        # Then "isStaff" serializes properly
+        self.assertEqual(output_data["isStaff"], is_staff)
+
+    @ddt.data(True, False)
+    def test_is_too_early(self, is_too_early):
+        # Given an enrollment
+        input_data = self.create_test_enrollment()
+        input_context = self.create_test_context(input_data.course)
+
+        # Where the course is/n't yet open for a learner
+        input_context.update(
+            {
+                "course_access_checks": {
+                    input_data.course.id: {
+                        "is_too_early_to_view": is_too_early,
+                    }
+                }
+            }
+        )
+
+        # When I serialize
+        output_data = HasAccessSerializer(input_data, context=input_context).data
+
+        # Then "isTooEarly" serializes properly
+        self.assertEqual(output_data["isTooEarly"], is_too_early)
 
 
 @ddt.ddt
@@ -259,7 +350,8 @@ class TestGradeDataSerializer(TestCase):
         }
 
 
-class TestCertificateSerializer(TestCase):
+@ddt.ddt
+class TestCertificateSerializer(LearnerDashboardBaseTest):
     """Tests for the CertificateSerializer"""
 
     @classmethod
@@ -276,17 +368,200 @@ class TestCertificateSerializer(TestCase):
             "honorCertDownloadUrl": random_url(allow_null=True),
         }
 
-    def test_happy_path(self):
-        input_data = self.generate_test_certificate_info()
-        output_data = CertificateSerializer(input_data).data
-
-        assert output_data == {
-            "availableDate": datetime_to_django_format(input_data["availableDate"]),
-            "isRestricted": input_data["isRestricted"],
-            "isEarned": input_data["isEarned"],
-            "isDownloadable": input_data["isDownloadable"],
-            "certPreviewUrl": input_data["certPreviewUrl"],
+    def create_test_context(self, course):
+        """Get a test context object with an available certificate"""
+        return {
+            "cert_statuses": {
+                course.id: {
+                    "cert_web_view_url": random_url(),
+                    "status": "downloadable",
+                    "show_cert_web_view": True,
+                }
+            }
         }
+
+    def test_with_data(self):
+        """Simple mappings test for a course with an available certificate"""
+        # Given a verified enrollment
+        input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
+
+        # ... with a certificate
+        input_context = self.create_test_context(input_data.course)
+
+        # ... and some data preemptively gathered
+        available_date = random_date()
+        input_data.course.certificate_available_date = available_date
+        cert_url = input_context["cert_statuses"][input_data.course.id][
+            "cert_web_view_url"
+        ]
+
+        # When I get certificate info
+        output_data = CertificateSerializer(input_data, context=input_context).data
+
+        # Then all the info is provided correctly
+        self.assertDictEqual(
+            output_data,
+            {
+                "availableDate": datetime_to_django_format(available_date),
+                "isRestricted": False,
+                "isEarned": True,
+                "isDownloadable": True,
+                "certPreviewUrl": cert_url,
+            },
+        )
+
+    @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=False)
+    def test_available_date_old_format(self):
+        # Given new cert display settings are not enabled
+        input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
+        input_data.course.certificate_available_date = random_date()
+        input_context = self.create_test_context(input_data.course)
+
+        # When I get certificate info
+        output_data = CertificateSerializer(input_data, context=input_context).data
+
+        # Then the available date is defaulted to the certificate available date
+        expected_available_date = datetime_to_django_format(
+            input_data.course.certificate_available_date
+        )
+        self.assertEqual(output_data["availableDate"], expected_available_date)
+
+    @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=True)
+    def test_available_date_course_end(self):
+        # Given new cert display settings are enabled
+        input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
+        input_context = self.create_test_context(input_data.course)
+
+        # ... and certificate display behavior is set to the course end date
+        input_data.course.certificates_display_behavior = (
+            CertificatesDisplayBehaviors.END
+        )
+
+        # When I try to get cert available date
+        output_data = CertificateSerializer(input_data, context=input_context).data
+
+        # Then the available date is the course end date
+        expected_available_date = datetime_to_django_format(input_data.course.end)
+        self.assertEqual(output_data["availableDate"], expected_available_date)
+
+    @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=True)
+    def test_available_date_specific_end(self):
+        # Given new cert display settings are enabled
+        input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
+        input_context = self.create_test_context(input_data.course)
+
+        # ... and certificate display behavior is set to a specified date
+        input_data.course.certificate_available_date = random_date()
+        input_data.course.certificates_display_behavior = (
+            CertificatesDisplayBehaviors.END_WITH_DATE
+        )
+
+        # When I try to get cert available date
+        output_data = CertificateSerializer(input_data, context=input_context).data
+
+        # Then the available date is the course end date
+        expected_available_date = datetime_to_django_format(
+            input_data.course.certificate_available_date
+        )
+        self.assertEqual(output_data["availableDate"], expected_available_date)
+
+    @ddt.data(
+        ("downloadable", False),
+        ("notpassing", False),
+        ("restricted", True),
+        ("auditing", False),
+    )
+    @ddt.unpack
+    def test_is_restricted(self, cert_status, is_restricted_expected):
+        """Test for isRestricted field"""
+        # Given a verified enrollment with a certificate
+        input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
+        input_context = self.create_test_context(input_data.course)
+
+        # ... and a cert status {cert_status}
+        input_context["cert_statuses"][input_data.course.id]["status"] = cert_status
+
+        # When I get certificate info
+        output_data = CertificateSerializer(input_data, context=input_context).data
+
+        # Then isRestricted should be calculated correctly
+        self.assertEqual(output_data["isRestricted"], is_restricted_expected)
+
+    @ddt.data(
+        ("downloadable", True),
+        ("notpassing", False),
+        ("restricted", False),
+        ("auditing", False),
+        ("certificate_earned_but_not_available", True),
+    )
+    @ddt.unpack
+    def test_is_earned(self, cert_status, is_earned_expected):
+        """Test for isEarned field"""
+        # Given a verified enrollment with a certificate
+        input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
+        input_context = self.create_test_context(input_data.course)
+
+        # ... and a cert status {cert_status}
+        input_context["cert_statuses"][input_data.course.id]["status"] = cert_status
+
+        # When I get certificate info
+        output_data = CertificateSerializer(input_data, context=input_context).data
+
+        # Then isEarned should be calculated correctly
+        self.assertEqual(output_data["isEarned"], is_earned_expected)
+
+    @ddt.data(
+        ("downloadable", True),
+        ("notpassing", False),
+        ("restricted", False),
+        ("auditing", False),
+        ("certificate_earned_but_not_available", False),
+    )
+    @ddt.unpack
+    def test_is_downloadable(self, cert_status, is_downloadable_expected):
+        """Test for isDownloadable field"""
+        # Given a verified enrollment with a certificate
+        input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
+        input_context = self.create_test_context(input_data.course)
+
+        # ... and a cert status {cert_status}
+        input_context["cert_statuses"][input_data.course.id]["status"] = cert_status
+
+        # When I get certificate info
+        output_data = CertificateSerializer(input_data, context=input_context).data
+
+        # Then isDownloadable should be calculated correctly
+        self.assertEqual(output_data["isDownloadable"], is_downloadable_expected)
+
+    @ddt.data(
+        (True, random_url()),
+        (False, random_url()),
+        (True, None),
+        (False, None),
+    )
+    @ddt.unpack
+    def test_cert_preview_url(self, show_cert_web_view, cert_web_view_url):
+        """Test for certPreviewUrl field"""
+        # Given a verified enrollment with a certificate
+        input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
+        input_context = self.create_test_context(input_data.course)
+
+        # ... and settings show_cert_web_view and cert_web_view_url
+        input_context["cert_statuses"][input_data.course.id][
+            "show_cert_web_view"
+        ] = show_cert_web_view
+        input_context["cert_statuses"][input_data.course.id][
+            "cert_web_view_url"
+        ] = cert_web_view_url
+
+        # When I get certificate info
+        output_data = CertificateSerializer(input_data, context=input_context).data
+
+        # Then certPreviewUrl should be calculated correctly
+        self.assertEqual(
+            output_data["certPreviewUrl"],
+            cert_web_view_url if show_cert_web_view else None,
+        )
 
 
 class TestEntitlementSerializer(TestCase):
@@ -559,36 +834,25 @@ class TestEmailConfirmationSerializer(TestCase):
         )
 
 
-class TestEnterpriseDashboardsSerializer(TestCase):
-    """High-level tests for EnterpriseDashboardsSerializer"""
-
-    @classmethod
-    def generate_test_dashboard(cls):
-        return {
-            "label": f"{uuid4()}",
-            "url": random_url(),
-        }
+class TestEnterpriseDashboardSerializer(TestCase):
+    """High-level tests for EnterpriseDashboardSerializer"""
 
     @classmethod
     def generate_test_data(cls):
         return {
-            "availableDashboards": [
-                cls.generate_test_dashboard() for _ in range(randint(0, 3))
-            ],
-            "mostRecentDashboard": cls.generate_test_dashboard()
-            if random_bool()
-            else None,
+            "uuid": str(uuid4()),
+            "name": str(uuid4()),
         }
 
     def test_structure(self):
         """Test that nothing breaks and the output fields look correct"""
         input_data = self.generate_test_data()
 
-        output_data = EnterpriseDashboardsSerializer(input_data).data
+        output_data = EnterpriseDashboardSerializer(input_data).data
 
         expected_keys = [
-            "availableDashboards",
-            "mostRecentDashboard",
+            "label",
+            "url",
         ]
         assert output_data.keys() == set(expected_keys)
 
@@ -597,13 +861,13 @@ class TestEnterpriseDashboardsSerializer(TestCase):
 
         input_data = self.generate_test_data()
 
-        output_data = EnterpriseDashboardsSerializer(input_data).data
+        output_data = EnterpriseDashboardSerializer(input_data).data
 
         self.assertDictEqual(
             output_data,
             {
-                "availableDashboards": input_data["availableDashboards"],
-                "mostRecentDashboard": input_data["mostRecentDashboard"],
+                "label": input_data["name"],
+                "url": settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL + '/' + input_data["uuid"],
             },
         )
 
@@ -619,7 +883,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
         input_data = {
             "emailConfirmation": None,
-            "enterpriseDashboards": None,
+            "enterpriseDashboard": None,
             "platformSettings": None,
             "enrollments": [],
             "unfulfilledEntitlements": [],
@@ -631,7 +895,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             output_data,
             {
                 "emailConfirmation": None,
-                "enterpriseDashboards": None,
+                "enterpriseDashboard": None,
                 "platformSettings": None,
                 "courses": [],
                 "suggestedCourses": [],
@@ -657,7 +921,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
         input_data = {
             "emailConfirmation": None,
-            "enterpriseDashboards": None,
+            "enterpriseDashboard": None,
             "platformSettings": None,
             "enrollments": enrollments,
             "unfulfilledEntitlements": [],
@@ -689,7 +953,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         "lms.djangoapps.learner_home.serializers.PlatformSettingsSerializer.to_representation"
     )
     @mock.patch(
-        "lms.djangoapps.learner_home.serializers.EnterpriseDashboardsSerializer.to_representation"
+        "lms.djangoapps.learner_home.serializers.EnterpriseDashboardSerializer.to_representation"
     )
     @mock.patch(
         "lms.djangoapps.learner_home.serializers.EmailConfirmationSerializer.to_representation"
@@ -697,7 +961,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
     def test_linkage(
         self,
         mock_email_confirmation_serializer,
-        mock_enterprise_dashboards_serializer,
+        mock_enterprise_dashboard_serializer,
         mock_platform_settings_serializer,
         mock_learner_enrollment_serializer,
         mock_entitlements_serializer,
@@ -706,8 +970,8 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
         mock_email_confirmation_serializer.return_value = (
             mock_email_confirmation_serializer
         )
-        mock_enterprise_dashboards_serializer.return_value = (
-            mock_enterprise_dashboards_serializer
+        mock_enterprise_dashboard_serializer.return_value = (
+            mock_enterprise_dashboard_serializer
         )
         mock_platform_settings_serializer.return_value = (
             mock_platform_settings_serializer
@@ -720,7 +984,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
 
         input_data = {
             "emailConfirmation": {},
-            "enterpriseDashboards": [{}],
+            "enterpriseDashboard": {},
             "platformSettings": {},
             "enrollments": [{}],
             "unfulfilledEntitlements": [{}],
@@ -732,7 +996,7 @@ class TestLearnerDashboardSerializer(LearnerDashboardBaseTest):
             output_data,
             {
                 "emailConfirmation": mock_email_confirmation_serializer,
-                "enterpriseDashboards": mock_enterprise_dashboards_serializer,
+                "enterpriseDashboard": mock_enterprise_dashboard_serializer,
                 "platformSettings": mock_platform_settings_serializer,
                 "courses": [
                     mock_learner_enrollment_serializer,
