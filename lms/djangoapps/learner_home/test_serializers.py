@@ -51,6 +51,7 @@ from lms.djangoapps.learner_home.test_utils import (
     datetime_to_django_format,
     random_bool,
     random_date,
+    random_string,
     random_url,
 )
 from xmodule.data import CertificatesDisplayBehaviors
@@ -991,15 +992,17 @@ class TestEnterpriseDashboardSerializer(TestCase):
     """High-level tests for EnterpriseDashboardSerializer"""
 
     @classmethod
-    def generate_test_data(cls):
+    def generate_test_enterprise_customer(cls):
         return {
+            "name": random_string(),
+            "slug": str(uuid4()),
+            "enable_learner_portal": True,
             "uuid": str(uuid4()),
-            "name": str(uuid4()),
         }
 
     def test_structure(self):
         """Test that nothing breaks and the output fields look correct"""
-        input_data = self.generate_test_data()
+        input_data = self.generate_test_enterprise_customer()
 
         output_data = EnterpriseDashboardSerializer(input_data).data
 
@@ -1007,12 +1010,12 @@ class TestEnterpriseDashboardSerializer(TestCase):
             "label",
             "url",
         ]
-        assert output_data.keys() == set(expected_keys)
+        self.assertEqual(output_data.keys(), set(expected_keys))
 
     def test_happy_path(self):
         """Test that data serializes correctly"""
 
-        input_data = self.generate_test_data()
+        input_data = self.generate_test_enterprise_customer()
 
         output_data = EnterpriseDashboardSerializer(input_data).data
 
@@ -1022,7 +1025,7 @@ class TestEnterpriseDashboardSerializer(TestCase):
                 "label": input_data["name"],
                 "url": settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL
                 + "/"
-                + input_data["uuid"],
+                + input_data["slug"],
             },
         )
 

@@ -48,7 +48,7 @@ class CourseProviderSerializer(serializers.Serializer):
 class CourseSerializer(serializers.Serializer):
     """Course header information, derived from a CourseOverview"""
 
-    bannerImgSrc = serializers.URLField(source="banner_image_url")
+    bannerImgSrc = serializers.URLField(source="image_urls.small")
     courseName = serializers.CharField(source="display_name_with_default")
     courseNumber = serializers.CharField(source="display_number_with_default")
 
@@ -407,9 +407,6 @@ class LearnerEnrollmentSerializer(serializers.Serializer):
     gradeData = GradeDataSerializer(source="*")
     programs = serializers.SerializerMethodField()
 
-    # TODO - remove "allow_null" as each of these are implemented, temp for testing.
-    courseProvider = CourseProviderSerializer(allow_null=True)
-
     def get_entitlement(self, instance):
         """
         If this enrollment is the fulfillment of an entitlement, include information about the entitlement
@@ -537,7 +534,10 @@ class EnterpriseDashboardSerializer(serializers.Serializer):
     url = serializers.SerializerMethodField()
 
     def get_url(self, instance):
-        return urljoin(settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL, instance["uuid"])
+        return urljoin(
+            settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL,
+            instance["slug"],
+        )
 
 
 class LearnerDashboardSerializer(serializers.Serializer):
