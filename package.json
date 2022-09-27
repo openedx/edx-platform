@@ -10,7 +10,6 @@
     "@babel/preset-react": "7.18.6",
     "@edx/brand-edx.org": "^2.0.7",
     "@edx/edx-bootstrap": "2.2.3",
-    "@edx/edx-proctoring": "^4.12.0",
     "@edx/frontend-component-cookie-policy-banner": "2.2.0",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "^2.1.0",
