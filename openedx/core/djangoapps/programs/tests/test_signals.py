@@ -235,6 +235,7 @@ class CertRevokedReceiverTest(TestCase):
 
 @skip_unless_lms
 @mock.patch('openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update.delay')
+@mock.patch('openedx.core.djangoapps.programs.tasks.update_certificate_available_date_on_course_update.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
     new_callable=mock.PropertyMock,
@@ -256,35 +257,39 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
             'available_date': datetime.datetime.now()
         }
 
-    def test_signal_received(self, mock_is_learner_issuance_enabled, mock_task):  # pylint: disable=unused-argument
+    def test_signal_received(
+        self,
+        mock_is_learner_issuance_enabled,
+        mock_visible_date_task,
+        mock_cad_task
+    ):  # pylint: disable=unused-argument
         """
-        Ensures the receiver function is invoked when COURSE_CERT_DATE_CHANGE is
-        sent.
+        Ensures the receiver function is invoked when COURSE_CERT_DATE_CHANGE is sent.
 
-        Suboptimal: because we cannot mock the receiver function itself (due
-        to the way django signals work), we mock a configuration call that is
-        known to take place inside the function.
+        Suboptimal: because we cannot mock the receiver function itself (due to the way django signals work), we mock a
+        configuration call that is known to take place inside the function.
         """
         COURSE_CERT_DATE_CHANGE.send(**self.signal_kwargs)
         assert mock_is_learner_issuance_enabled.call_count == 1
 
-    def test_programs_disabled(self, mock_is_learner_issuance_enabled, mock_task):
+    def test_programs_disabled(self, mock_is_learner_issuance_enabled, mock_visible_date_task, mock_cad_task):
         """
-        Ensures that the receiver function does nothing when the credentials API
-        configuration is not enabled.
+        Ensures that the receiver function does nothing when the credentials API configuration is not enabled.
         """
         handle_course_cert_date_change(**self.signal_kwargs)
         assert mock_is_learner_issuance_enabled.call_count == 1
-        assert mock_task.call_count == 0
+        assert mock_visible_date_task.call_count == 0
+        assert mock_cad_task.call_count == 0
 
-    def test_programs_enabled(self, mock_is_learner_issuance_enabled, mock_task):
+    def test_programs_enabled(self, mock_is_learner_issuance_enabled, mock_visible_date_task, mock_cad_task):
         """
-        Ensures that the receiver function invokes the expected celery task
-        when the credentials API configuration is enabled.
+        Ensures that the receiver function invokes the expected celery task when the credentials API configuration is
+        enabled.
         """
         mock_is_learner_issuance_enabled.return_value = True
 
         handle_course_cert_date_change(**self.signal_kwargs)
 
         assert mock_is_learner_issuance_enabled.call_count == 1
-        assert mock_task.call_count == 1
+        assert mock_visible_date_task.call_count == 1
+        assert mock_cad_task.call_count == 1
