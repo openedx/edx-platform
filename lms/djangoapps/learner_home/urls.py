@@ -8,8 +8,8 @@ app_name = "learner_home"
 
 # Learner Dashboard Routing
 urlpatterns = [
-    re_path(r"init/?", views.InitializeView.as_view(), name="initialize"),
+    re_path(r"^init/?", views.InitializeView.as_view(), name="initialize"),
     re_path(
-        r"mock/init/?", mock_views.InitializeView.as_view(), name="mock_initialize"
+        r"^mock/init/?", mock_views.InitializeView.as_view(), name="mock_initialize"
     ),
 ]
