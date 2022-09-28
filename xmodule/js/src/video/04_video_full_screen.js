@@ -192,6 +192,18 @@
                 this.resizer.delta.reset().setMode('width');
             }
             this.el.trigger('fullscreen', [this.isFullScreen]);
+
+            if (window !== window.parent) {
+                // This is used by the Learning MFE to know about closing fullscreen mode.
+                // The MFE is then able to respond appropriately and scroll window to the previous position.
+                window.parent.postMessage({
+                        type: 'plugin.videoFullScreen',
+                        payload: {
+                            open: false
+                        }
+                    }, document.referrer
+                );
+            }
         }
 
         function handleEnter() {
@@ -200,6 +212,18 @@
 
             if (this.isFullScreen === true) {
                 return;
+            }
+
+            if (window !== window.parent) {
+                // This is used by the Learning MFE to know about opening fullscreen mode.
+                // The MFE is then able to respond appropriately and save the window scroll position.
+                window.parent.postMessage({
+                      type: 'plugin.videoFullScreen',
+                      payload: {
+                        open: true
+                      }
+                    }, document.referrer
+                );
             }
 
             this.videoFullScreen.fullScreenState = this.isFullScreen = true;
