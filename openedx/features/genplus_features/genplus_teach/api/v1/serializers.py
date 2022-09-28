@@ -55,6 +55,12 @@ class PortfolioSerializer(serializers.ModelSerializer):
         depth = 2
 
 
+class ArticleRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ArticleRating
+        fields = ('rating', 'comment')
+
+
 class ArticleSerializer(DynamicFieldsModelSerializer):
     skills = SkillSerializer(read_only=True, many=True)
     gtcs = GtcsSerializer(read_only=True, many=True)
@@ -62,6 +68,7 @@ class ArticleSerializer(DynamicFieldsModelSerializer):
     reflections = serializers.SerializerMethodField('get_reflections')
     is_completed = serializers.SerializerMethodField('get_is_completed')
     is_rated = serializers.SerializerMethodField('get_is_rated')
+    rating = serializers.SerializerMethodField('get_rating')
     answer = serializers.SerializerMethodField('get_answer')
 
     def get_is_completed(self, instance):
@@ -71,6 +78,13 @@ class ArticleSerializer(DynamicFieldsModelSerializer):
     def get_is_rated(self, instance):
         teacher = self.context.get('teacher')
         return instance.is_rated(teacher)
+    
+    def get_rating(self, instance):
+        teacher = self.context.get('teacher')
+        try:
+            return ArticleRatingSerializer(instance.ratings.get(teacher=teacher)).data
+        except ArticleRating.DoesNotExist:
+            return
 
     def get_reflections(self, instance):
         return ReflectionSerializer(instance.reflections.all(), many=True).data
@@ -85,7 +99,7 @@ class ArticleSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Article
         fields = ('id', 'title', 'cover', 'skills', 'gtcs', 'media_types', 'time',
-                  'content', 'author', 'is_completed', 'is_rated', 'reflections', 'answer', 'created')
+                  'content', 'author', 'is_completed', 'is_rated', 'rating', 'reflections', 'answer', 'created')
 
 
 class FavoriteArticleSerializer(serializers.Serializer):
@@ -97,12 +111,6 @@ class FavoriteArticleSerializer(serializers.Serializer):
                 ErrorMessages.ACTION_VALIDATION_ERROR
             )
         return data
-
-
-class ArticleRatingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ArticleRating
-        fields = ('rating', 'comment')
 
 
 class ArticleViewLogSerializer(serializers.ModelSerializer):

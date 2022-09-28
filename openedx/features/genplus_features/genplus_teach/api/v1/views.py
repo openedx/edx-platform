@@ -104,13 +104,10 @@ class ArticleViewSet(viewsets.ModelViewSet, GenzMixin):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        if ArticleRating.objects.filter(article=article, teacher=teacher).exists():
-            return Response(ErrorMessages.ARTICLE_ALREADY_RATED, status=status.HTTP_400_BAD_REQUEST)
-
-        ArticleRating.objects.create(
+        ArticleRating.objects.update_or_create(
             article=article,
             teacher=teacher,
-            **serializer.data
+            defaults=serializer.data
         )
         return Response(SuccessMessages.ARTICLE_RATED, status=status.HTTP_200_OK)
 
