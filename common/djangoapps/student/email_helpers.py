@@ -6,7 +6,7 @@ Helpers for Student app emails.
 from string import capwords
 
 from django.conf import settings
-
+# BIS TODO -- restored
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.enrollments.api import is_enrollment_valid_for_proctoring

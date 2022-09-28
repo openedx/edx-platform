@@ -17,7 +17,7 @@ from pytz import UTC
 import uuid  # lint-amnesty, pylint: disable=wrong-import-order
 
 from collections import defaultdict, namedtuple  # lint-amnesty, pylint: disable=wrong-import-order
-from datetime import datetime  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
@@ -25,7 +25,7 @@ from simple_history.models import HistoricalRecords
 from urllib.parse import urljoin
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import models
@@ -45,12 +45,7 @@ from openedx_filters.learning.filters import CourseEnrollmentStarted, CourseUnen
 from requests.exceptions import HTTPError, RequestException
 
 from common.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
-#from common.djangoapps.student.email_helpers import (
-#    generate_proctoring_requirements_email_context,
-#    should_send_proctoring_requirements_email,
-#)
 
-from common.djangoapps.student.emails import send_proctoring_requirements_email
 from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from common.djangoapps.track import contexts, segment
 from common.djangoapps.util.query import use_read_replica_if_available
@@ -73,6 +68,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 log = logging.getLogger(__name__)
+User = get_user_model()
 
 # Named tuple for fields pertaining to the state of
 # CourseEnrollment for a user in a course.  This type
@@ -592,10 +588,16 @@ class CourseEnrollment(models.Model):
                 )
 
         if mode_changed:
+            from common.djangoapps.student.email_helpers import (
+                generate_proctoring_requirements_email_context,
+                should_send_proctoring_requirements_email,
+            )
+            from common.djangoapps.student.emails import send_proctoring_requirements_email
+
             # If mode changed to one that requires proctoring, send proctoring requirements email
             if should_send_proctoring_requirements_email(self.user.username, self.course_id):
-                email_context = generate_proctoring_requirements_email_context(self.user, self.course_id)
-                send_proctoring_requirements_email(context=email_context)
+               email_context = generate_proctoring_requirements_email_context(self.user, self.course_id)
+               send_proctoring_requirements_email(context=email_context)
 
             # Only emit mode change events when the user's enrollment
             # mode has changed from its previous setting
@@ -742,9 +744,9 @@ class CourseEnrollment(models.Model):
                 segment_properties['course_pacing'] = self.course.pacing
 
                 course_key = f'{self.course_id.org}+{self.course_id.course}'
-                is_personalized_recommendation = is_personalized_recommendation_for_user(course_key)
-                if is_personalized_recommendation is not None:
-                    segment_properties['is_personalized_recommendation'] = is_personalized_recommendation
+# BIS TOD                is_personalized_recommendation = is_personalized_recommendation_for_user(course_key)
+#                if is_personalized_recommendation is not None:
+#                    segment_properties['is_personalized_recommendation'] = is_personalized_recommendation
 
                 # TODO: VAN-1052 - This is Optimizely's A/B experimentation block to test welcome email redesign.
                 #  Remove this temporary block after pausing the experiment.
@@ -1564,16 +1566,16 @@ class CourseEnrollment(models.Model):
         )
 
 
-    class FBEEnrollmentExclusion(models.Model):
-        """
-        Disable FBE for enrollments in this table.
+class FBEEnrollmentExclusion(models.Model):
+    """
+    Disable FBE for enrollments in this table.
 
-        .. no_pii:
-        """
-        enrollment = models.OneToOneField(
-            CourseEnrollment,
-            on_delete=models.DO_NOTHING,
-        )
+    .. no_pii:
+    """
+    enrollment = models.OneToOneField(
+        CourseEnrollment,
+        on_delete=models.DO_NOTHING,
+    )
 
-        def __str__(self):
-            return f"[FBEEnrollmentExclusion] {self.enrollment}"
+    def __str__(self):
+        return f"[FBEEnrollmentExclusion] {self.enrollment}"
