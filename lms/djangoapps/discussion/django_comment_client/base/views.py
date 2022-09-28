@@ -5,8 +5,6 @@ import logging
 import random
 import time
 
-import eventtracking
-
 import six
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -16,11 +14,13 @@ from django.utils.translation import gettext as _
 from django.views.decorators import csrf
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_GET, require_POST
+from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
 import lms.djangoapps.discussion.django_comment_client.settings as cc_settings
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from common.djangoapps.util.file import store_uploaded_file
+from common.djangoapps.track import contexts
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_overview_with_access, get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -92,7 +92,9 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
         role.role for role in user.courseaccessrole_set.filter(course_id=course.id)
     ]
 
-    eventtracking.tracker.emit(event_name, data)
+    context = contexts.course_context_from_course_id(course.id)
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(event_name, data)
 
 
 def track_created_event(request, event_name, course, obj, data):
