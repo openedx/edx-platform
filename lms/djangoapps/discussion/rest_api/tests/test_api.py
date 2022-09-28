@@ -2867,7 +2867,8 @@ class UpdateThreadTest(
     @mock.patch("lms.djangoapps.discussion.rest_api.serializers.EDIT_REASON_CODES", {
         "test-edit-reason": "Test Edit Reason",
     })
-    def test_update_thread_with_edit_reason_code(self, role_name):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_update_thread_with_edit_reason_code(self, role_name, mock_emit):
         """
         Test editing comments, specifying and retrieving edit reason codes.
         """
@@ -2887,6 +2888,24 @@ class UpdateThreadTest(
             }
             request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
             assert request_body["edit_reason_code"] == ["test-edit-reason"]
+
+            expected_event_name = 'edx.forum.thread.edited'
+            expected_event_data = {
+                'id': 'test_thread',
+                'content_type': 'Post',
+                'own_content': False,
+                'url': '',
+                'user_course_roles': [],
+                'user_forums_roles': ['Student', role_name],
+                'target_username': self.user.username,
+                'edit_reason': 'test-edit-reason',
+                'commentable_id': 'original_topic'
+            }
+
+            actual_event_name, actual_event_data = mock_emit.call_args[0]
+            self.assertEqual(actual_event_name, expected_event_name)
+            self.assertEqual(actual_event_data, expected_event_data)
+
         except ValidationError as error:
             assert role_name == FORUM_ROLE_STUDENT
             assert error.message_dict == {"edit_reason_code": ["This field is not editable."],
@@ -2915,7 +2934,7 @@ class UpdateThreadTest(
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_thread()
         try:
-            self.request.META['HTTP_REFERER'] = 'https://example.cop'
+            self.request.META['HTTP_REFERER'] = 'https://example.com'
             result = update_thread(self.request, "test_thread", {
                 "closed": closed,
                 "close_reason_code": "test-close-reason",
@@ -3368,7 +3387,8 @@ class UpdateCommentTest(
     @mock.patch("lms.djangoapps.discussion.rest_api.serializers.EDIT_REASON_CODES", {
         "test-edit-reason": "Test Edit Reason",
     })
-    def test_update_comment_with_edit_reason_code(self, role_name):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_update_comment_with_edit_reason_code(self, role_name, mock_emit):
         """
         Test editing comments, specifying and retrieving edit reason codes.
         """
@@ -3388,6 +3408,24 @@ class UpdateCommentTest(
             }
             request_body = httpretty.last_request().parsed_body  # pylint: disable=no-member
             assert request_body["edit_reason_code"] == ["test-edit-reason"]
+
+            expected_event_name = 'edx.forum.response.edited'
+            expected_event_data = {
+                'id': 'test_comment',
+                'content_type': 'Response',
+                'own_content': False,
+                'url': '',
+                'user_course_roles': [],
+                'user_forums_roles': ['Student', role_name],
+                'target_username': self.user.username,
+                'edit_reason': 'test-edit-reason',
+                'commentable_id': 'dummy'
+            }
+
+            actual_event_name, actual_event_data = mock_emit.call_args[0]
+            self.assertEqual(actual_event_name, expected_event_name)
+            self.assertEqual(actual_event_data, expected_event_data)
+
         except ValidationError:
             assert role_name == FORUM_ROLE_STUDENT
 

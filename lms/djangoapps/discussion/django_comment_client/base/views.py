@@ -6,6 +6,7 @@ import random
 import time
 
 import eventtracking
+
 import six
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -189,6 +190,39 @@ def track_thread_lock_unlock_event(request, course, thread, close_reason_code, l
         'team_id': get_team(thread.commentable_id),
     }
     track_forum_event(request, event_name, course, thread, event_data)
+
+
+def track_thread_edited_event(request, course, thread, edit_reason_code):
+    """
+    Send analytics event for an edited thread.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='edited')
+    own_content = str(request.user.id) == thread['user_id']
+    event_data = {
+        'target_username': thread.get('username'),
+        'content_type': 'Post',
+        'own_content': own_content,
+        'edit_reason': edit_reason_code,
+        'commentable_id': thread.get('commentable_id', ''),
+    }
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
+def track_comment_edited_event(request, course, comment, edit_reason_code):
+    """
+    Send analytics event for an edited response or comment.
+    """
+    obj_type = 'comment' if comment.get('parent_id') else 'response'
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='edited')
+    own_content = str(request.user.id) == comment['user_id']
+    event_data = {
+        'target_username': comment.get('username'),
+        'own_content': own_content,
+        'content_type': obj_type.capitalize(),
+        'edit_reason': edit_reason_code,
+        'commentable_id': comment.get('commentable_id', ''),
+    }
+    track_forum_event(request, event_name, course, comment, event_data)
 
 
 def track_thread_deleted_event(request, course, thread):
