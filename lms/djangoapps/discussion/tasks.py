@@ -19,7 +19,7 @@ from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from six.moves.urllib.parse import urljoin
 
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE, ENABLE_VIEW_MFE_IN_IFRAME
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from xmodule.modulestore.django import modulestore
 
@@ -208,9 +208,9 @@ def _build_message_context(context):  # lint-amnesty, pylint: disable=missing-fu
     message_context.update(context)
     thread_author = User.objects.get(id=context['thread_author_id'])
     comment_author = User.objects.get(id=context['comment_author_id'])
-    show_mfe_post_link = ENABLE_DISCUSSIONS_MFE_FOR_EVERYONE.is_enabled(
+    show_mfe_post_link = ENABLE_DISCUSSIONS_MFE.is_enabled(
         context['course_id']
-    ) and not ENABLE_VIEW_MFE_IN_IFRAME.is_enabled()
+    )
     post_link = _get_mfe_thread_url(context) if show_mfe_post_link else _get_thread_url(context)
 
     message_context.update({

@@ -91,7 +91,7 @@ Most python plugins are enabled using one of two methods:
 2. A Django setting: Some plugins require modification of Django settings, which is typically done by editing ``/edx/etc/lms.yml`` (in Production) or ``edx-platform/lms/envs/private.py`` (on Devstack).
 
 .. |edx_django_utils.plugins| replace:: ``edx_django_utils.plugins``
-.. _edx_django_utils.plugins: https://github.com/edx/edx-django-utils/blob/master/edx_django_utils/plugins
+.. _edx_django_utils.plugins: https://github.com/openedx/edx-django-utils/blob/master/edx_django_utils/plugins
 .. _stevedore: https://pypi.org/project/stevedore/
 
 Here are the different integration points that python plugins can use:
@@ -145,21 +145,21 @@ Here are the different integration points that python plugins can use:
      - Filters are also part of Hooks Extension Framework for open extension of edx-platform. Filters are a flexible way for plugin developers to modify learner or author application flows. They are defined by a `separate filters library`_ that developers can include in their requirements to develop and test the code without creating a dependency on this large repo. For more information see the `hooks guide`_.
 
 .. _Application: https://docs.djangoproject.com/en/3.0/ref/applications/
-.. _Django app plugin documentation: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
-.. _Plugin Contexts: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/docs/decisions/0003-plugin-contexts.rst
+.. _Django app plugin documentation: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
+.. _Plugin Contexts: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/plugins/docs/decisions/0003-plugin-contexts.rst
 .. _course tabs documentation: https://openedx.atlassian.net/wiki/spaces/AC/pages/30965919/Adding+a+new+course+tab
 .. |course_tools.py| replace:: ``course_tools.py``
-.. _course_tools.py: https://github.com/edx/edx-platform/blob/master/openedx/features/course_experience/course_tools.py
+.. _course_tools.py: https://github.com/openedx/edx-platform/blob/master/openedx/features/course_experience/course_tools.py
 .. _Adding Custom Fields to the Registration Page: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/customize_registration_page.html
 .. |learning_context.py| replace:: ``learning_context.py``
-.. _learning_context.py: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/xblock/learning_context/learning_context.py
+.. _learning_context.py: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/xblock/learning_context/learning_context.py
 .. |UserPartition docstring| replace:: ``UserPartition`` docstring
-.. _UserPartition docstring: https://github.com/edx/edx-platform/blob/f8cc58618a39c9f7b8e9e1001eb2d7a10395797e/common/lib/xmodule/xmodule/partitions/partitions.py#L105-L120
+.. _UserPartition docstring: https://github.com/openedx/edx-platform/blob/f8cc58618a39c9f7b8e9e1001eb2d7a10395797e/common/lib/xmodule/xmodule/partitions/partitions.py#L105-L120
 .. |pluggable_override docstring| replace:: ``pluggable_override`` docstring
-.. _pluggable_override docstring: https://github.com/edx/edx-django-utils/blob/master/edx_django_utils/plugins/pluggable_override.py
+.. _pluggable_override docstring: https://github.com/openedx/edx-django-utils/blob/master/edx_django_utils/plugins/pluggable_override.py
 .. _separate events library: https://github.com/eduNEXT/openedx-events/
 .. _separate filters library: https://github.com/eduNEXT/openedx-filters/
-.. _hooks guide: https://github.com/edx/edx-platform/blob/master/docs/guides/hooks/index.rst
+.. _hooks guide: https://github.com/openedx/edx-platform/blob/master/docs/guides/hooks/index.rst
 
 Platform Look & Feel
 ====================
@@ -186,7 +186,7 @@ Methods for theming MFEs are still being developed. It is likely to involve:
 In addition, Open edX operators will be able to replace entire MFEs with completely custom MFE implementations that use the same backend APIs.
 
 .. |example edx theme| replace:: example ``edx`` theme
-.. _example edx theme: https://github.com/edx/paragon/tree/master/scss/edx
+.. _example edx theme: https://github.com/openedx/paragon/tree/master/scss/edx
 .. _Changing Themes for an Open edX Site: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/
 .. _Overriding Brand Specific Elements: https://edx.readthedocs.io/projects/edx-developer-docs/en/latest/developers_guide/micro_frontends_in_open_edx.html#overriding-brand-specific-elements
 
@@ -195,4 +195,4 @@ Custom frontends
 
 *Status: Trial, Limited*
 
-If you need a *very* custom look and feel for your users, and you have the time and resources required for a huge project, you can consider creating a custom frontend for Open edX, which is a completely separate application that runs on its own domain and integrates with Open edX using REST APIs. The edX Mobile App can be thought of as an example of a separate frontend that connects to Open edX using only REST APIs. Another example is `LabXchange <https://www.labxchange.org/>`_. If you develop your custom frontend using Django, you may wish to use the `auth-backends <https://github.com/edx/auth-backends>`_ django plugin for user authentication.
+If you need a *very* custom look and feel for your users, and you have the time and resources required for a huge project, you can consider creating a custom frontend for Open edX, which is a completely separate application that runs on its own domain and integrates with Open edX using REST APIs. The edX Mobile App can be thought of as an example of a separate frontend that connects to Open edX using only REST APIs. Another example is `LabXchange <https://www.labxchange.org/>`_. If you develop your custom frontend using Django, you may wish to use the `auth-backends <https://github.com/openedx/auth-backends>`_ django plugin for user authentication.

@@ -36,7 +36,7 @@ from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_module import RawMixin
-from xmodule.util.sandboxing import get_python_lib_zip
+from xmodule.util.sandboxing import SandboxService
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
@@ -630,7 +630,6 @@ class ProblemBlock(
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=None,
-            STATIC_URL=None,
             xqueue=None,
             matlab_api_key=None,
         )
@@ -685,13 +684,14 @@ class ProblemBlock(
             anonymous_student_id=None,
             cache=None,
             can_execute_unsafe_code=lambda: None,
-            get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, self.runtime.course_id)),
+            get_python_lib_zip=(
+                lambda: SandboxService(contentstore, self.scope_ids.usage_id.context_key).get_python_lib_zip()
+            ),
             DEBUG=None,
             i18n=self.runtime.service(self, "i18n"),
             render_template=None,
             resources_fs=self.runtime.resources_fs,
             seed=1,
-            STATIC_URL=None,
             xqueue=None,
             matlab_api_key=None,
         )
@@ -839,7 +839,6 @@ class ProblemBlock(
             render_template=self.runtime.service(self, 'mako').render_template,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
-            STATIC_URL=self.runtime.STATIC_URL,
             xqueue=self.runtime.service(self, 'xqueue'),
             matlab_api_key=self.matlab_api_key
         )

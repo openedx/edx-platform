@@ -118,22 +118,15 @@ def add_stats_for_users_with_no_discussion_content(course_stats, users_in_course
 def get_course_staff_users_list(course_id):
     """
     Gets user ids for Staff roles for course discussions.
-    Roles include Discussion Administrator, Discussion Moderator, Course Instructor and Course Staff.
+    Roles Course Instructor and Course Staff.
     """
-    # TODO: cache staff_user_ids if we need to improve perf
-    staff_user_ids = [
-        user.id
-        for role in Role.objects.filter(
-            name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR],
-            course_id=course_id
-        )
-        for user in role.users.all()
-    ]
+    # TODO: cache course_staff_user_ids if we need to improve perf
+    course_staff_user_ids = []
     staff = list(CourseStaffRole(course_id).users_with_role().values_list('id', flat=True))
     admins = list(CourseInstructorRole(course_id).users_with_role().values_list('id', flat=True))
-    staff_user_ids.extend(staff)
-    staff_user_ids.extend(admins)
-    return set(staff_user_ids)
+    course_staff_user_ids.extend(staff)
+    course_staff_user_ids.extend(admins)
+    return list(set(course_staff_user_ids))
 
 
 def get_course_ta_users_list(course_id):
@@ -141,11 +134,28 @@ def get_course_ta_users_list(course_id):
     Gets user ids for TA roles for course discussions.
     Roles include Community TA and Group Community TA.
     """
-    # TODO: cache ta_user_ids if we need to improve perf
-    ta_user_ids = {
+    # TODO: cache ta_users_ids if we need to improve perf
+    ta_users_ids = [
         user.id
-        for role in Role.objects.filter(name__in=[FORUM_ROLE_COMMUNITY_TA,
-                                                  FORUM_ROLE_GROUP_MODERATOR], course_id=course_id)
+        for role in Role.objects.filter(name__in=[FORUM_ROLE_GROUP_MODERATOR,
+                                                  FORUM_ROLE_COMMUNITY_TA], course_id=course_id)
         for user in role.users.all()
-    }
-    return ta_user_ids
+    ]
+    return ta_users_ids
+
+
+def get_moderator_users_list(course_id):
+    """
+    Gets user ids for Moderator roles for course discussions.
+    Roles include Discussion Administrator and Discussion Moderator.
+    """
+    # TODO: cache moderator_user_ids if we need to improve perf
+    moderator_user_ids = [
+        user.id
+        for role in Role.objects.filter(
+            name__in=[FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR],
+            course_id=course_id
+        )
+        for user in role.users.all()
+    ]
+    return moderator_user_ids

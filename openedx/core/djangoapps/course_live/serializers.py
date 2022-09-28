@@ -27,6 +27,9 @@ class LtiSerializer(serializers.ModelSerializer):
         read_only = [
             'version'
         ]
+        extra_kwargs = {
+            'lti_1p1_client_secret': {'write_only': True}
+        }
 
     def validate_lti_config(self, value):
         """
@@ -75,6 +78,9 @@ class LtiSerializer(serializers.ModelSerializer):
         lti_config = validated_data.pop('lti_config', None)
         if lti_config.get('additional_parameters', None):
             instance.lti_config['additional_parameters'] = lti_config.get('additional_parameters')
+
+        if validated_data.get('lti_1p1_client_secret') == '':
+            validated_data['lti_1p1_client_secret'] = instance.lti_1p1_client_secret
 
         if validated_data:
             for key, value in validated_data.items():

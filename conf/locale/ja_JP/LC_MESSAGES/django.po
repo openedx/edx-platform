@@ -99,6 +99,7 @@
 # わたカフェの店長, 2014
 # h_yoshida <h_yoshida@matsumo-sys.com>, 2014
 # Kyoto University <edxkyotoux@gmail.com>, 2017-2018
+# Teoyama <drdobbsbigbear@gmail.com>, 2022
 # Toshiboumi Ohta <ohta@securesky-tech.com>, 2017-2018
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)
@@ -113,7 +114,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-04 20:42+0000\n"
+"POT-Creation-Date: 2022-09-12 12:15+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -6670,6 +6671,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Ordering of this topic in its learning context"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/plugins.py

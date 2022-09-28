@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-12 19:25+0000\n"
-"PO-Revision-Date: 2022-09-12 19:25:40.129372\n"
+"POT-Creation-Date: 2022-09-25 20:42+0000\n"
+"PO-Revision-Date: 2022-09-25 20:43:25.692578\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2944,8 +2944,32 @@ msgid "loading"
 msgstr "løɐdᴉnƃ"
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid ""
+"Browse recently launched courses and see what's new in your favorite "
+"subjects."
+msgstr ""
+"Ƀɹøʍsǝ ɹǝɔǝnʇlʎ lɐnnɔɥǝd ɔønɹsǝs ɐnd sǝǝ ʍɥɐʇ's nǝʍ ᴉn ʎønɹ ɟɐʌøɹᴉʇǝ "
+"snbɾǝɔʇs."
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Explore courses"
 msgstr "Ɇxdløɹǝ ɔønɹsǝs"
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid "More opportunities for you"
+msgstr "Møɹǝ øddøɹʇnnᴉʇᴉǝs ɟøɹ ʎøn"
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid " to learn"
+msgstr " ʇø lǝɐɹn"
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid ""
+"We've added 500+ learning opportunities to create one of the world's most "
+"comprehensive free-to-degree online learning platforms."
+msgstr ""
+"Wǝ'ʌǝ ɐddǝd 500+ lǝɐɹnᴉnƃ øddøɹʇnnᴉʇᴉǝs ʇø ɔɹǝɐʇǝ ønǝ øɟ ʇɥǝ ʍøɹld's ɯøsʇ "
+"ɔøɯdɹǝɥǝnsᴉʌǝ ɟɹǝǝ-ʇø-dǝƃɹǝǝ ønlᴉnǝ lǝɐɹnᴉnƃ dlɐʇɟøɹɯs."
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"

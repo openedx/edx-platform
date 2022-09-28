@@ -3,7 +3,8 @@
 from contextlib import contextmanager
 import json
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import Mock, patch
+from urllib.parse import urlencode
 from uuid import uuid4
 
 import ddt
@@ -26,12 +27,17 @@ from lms.djangoapps.learner_home.views import (
     get_course_programs,
     get_email_settings_info,
     get_enrollments,
+    get_enterprise_customer,
     get_platform_settings,
+    get_suggested_courses,
     get_user_account_confirmation_info,
     get_entitlements,
 )
 from lms.djangoapps.learner_home.test_serializers import random_url
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory as CatalogCourseRunFactory, ProgramFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseRunFactory as CatalogCourseRunFactory,
+    ProgramFactory,
+)
 from openedx.core.djangoapps.content.course_overviews.tests.factories import (
     CourseOverviewFactory,
 )
@@ -41,7 +47,9 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory
-from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseFactory as CatalogCourseFactory,
+)
 
 
 ENTERPRISE_ENABLED = "ENABLE_ENTERPRISE_INTEGRATION"
@@ -261,13 +269,13 @@ class TestGetEntitlements(SharedModuleStoreTestCase):
         with self.mock_get_filtered_course_entitlements([], {}, {}):
             (
                 fulfilled_entitlements_by_course_key,
-                unfulfulled_entitlements,
+                unfulfilled_entitlements,
                 course_entitlement_available_sessions,
                 unfulfilled_entitlement_pseudo_sessions,
             ) = get_entitlements(self.user, None, None)
 
         assert not fulfilled_entitlements_by_course_key
-        assert not unfulfulled_entitlements
+        assert not unfulfilled_entitlements
         assert not course_entitlement_available_sessions
         assert not unfulfilled_entitlement_pseudo_sessions
 
@@ -344,8 +352,74 @@ class TestGetEmailSettingsInfo(SharedModuleStoreTestCase):
         )
 
 
-class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
-    """Tests for the dashboard view"""
+class TestGetSuggestedCourses(SharedModuleStoreTestCase):
+    """Tests for get_suggested_courses"""
+
+    MOCK_SUGGESTED_COURSES = {
+        "courses": [
+            {
+                "course_key": "HogwartsX+6.00.1x",
+                "logo_image_url": random_url(),
+                "marketing_url": random_url(),
+                "title": "Defense Against the Dark Arts",
+            },
+            {
+                "course_key": "MonstersX+SC101EN",
+                "logo_image_url": random_url(),
+                "marketing_url": random_url(),
+                "title": "Scaring 101",
+            },
+        ],
+        "is_personalized_recommendation": False,
+    }
+
+    EMPTY_SUGGESTED_COURSES = {
+        "courses": [],
+        "is_personalized_recommendation": False,
+    }
+
+    @patch("django.conf.settings.GENERAL_RECOMMENDATION", MOCK_SUGGESTED_COURSES)
+    def test_suggested_courses(self):
+        # Given suggested courses are configured
+        # When I request suggested courses
+        return_data = get_suggested_courses()
+
+        # Then I return them in the appropriate response
+        self.assertDictEqual(return_data, self.MOCK_SUGGESTED_COURSES)
+
+    def test_no_suggested_courses(self):
+        # Given suggested courses are not found/configured
+        # When I request suggested courses
+        return_data = get_suggested_courses()
+
+        # Then I return them in the appropriate response
+        self.assertDictEqual(return_data, self.EMPTY_SUGGESTED_COURSES)
+
+
+@ddt.ddt
+class TestGetEnterpriseCustomer(TestCase):
+    """Test for get_enterprise_customer"""
+
+    @ddt.data(True, False)
+    @patch("lms.djangoapps.learner_home.views.get_enterprise_learner_data_from_db")
+    @patch(
+        "lms.djangoapps.learner_home.views.enterprise_customer_from_session_or_learner_data"
+    )
+    def test_get_enterprise_customer(
+        self, is_masquerading, mock_get_from_session, mock_get_from_db
+    ):
+        """Don't load the user from session if we're masquerading, load directly from db"""
+        user, request = Mock(), Mock()
+        result = get_enterprise_customer(user, request, is_masquerading)
+        if is_masquerading:
+            assert not mock_get_from_session.called
+            assert result is mock_get_from_db.return_value[0]["enterprise_customer"]
+        else:
+            assert result is mock_get_from_session.return_value
+
+
+class BaseTestDashboardView(SharedModuleStoreTestCase, APITestCase):
+    """Base class for test setup"""
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
@@ -363,8 +437,15 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         # Set up a user
         cls.username = "alan"
         cls.password = "enigma"
-        cls.user = UserFactory(username=cls.username, password=cls.password)
+
+        cls.user = UserFactory(
+            username=cls.username, password=cls.password, is_staff=False
+        )
         cls.site = SiteFactory()
+
+
+class TestDashboardView(BaseTestDashboardView):
+    """Tests for the dashboard view"""
 
     def log_in(self):
         """Log in as a test user"""
@@ -383,23 +464,17 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         program = ProgramFactory(courses=[CatalogCourseFactory(uuid=str(course_uuid))])
 
         enrollment = CourseEnrollmentFactory(
-            user=self.user,
-            mode=CourseMode.VERIFIED,
-            is_active=False
+            user=self.user, mode=CourseMode.VERIFIED, is_active=False
         )
 
         entitlement = CourseEntitlementFactory.create(
             user=self.user,
             course_uuid=course_uuid,
             mode=CourseMode.VERIFIED,
-            enrollment_course_run=enrollment
+            enrollment_course_run=enrollment,
         )
 
-        return (
-            program,
-            enrollment,
-            entitlement
-        )
+        return (program, enrollment, entitlement)
 
     @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
     def test_response_structure(self):
@@ -531,7 +606,9 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         course_uuid = str(uuid4())
         course_uuid2 = str(uuid4())
         program, enrollment, _ = self._create_course_programs(course_uuid=course_uuid)
-        program2, enrollment2, _ = self._create_course_programs(course_uuid=course_uuid2)
+        program2, enrollment2, _ = self._create_course_programs(
+            course_uuid=course_uuid2
+        )
 
         data = [
             program,
@@ -544,3 +621,132 @@ class TestDashboardView(SharedModuleStoreTestCase, APITestCase):
         assert len(data) == len(programs)
         assert programs[course_uuid][0] == program
         assert programs[course_uuid2][0] == program2
+
+
+class TestDashboardMasquerade(BaseTestDashboardView):
+    """Tests for the masquerade function for the learner home"""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.staff_username = "sudo_alan"
+        cls.user_2_username = "Alan II"
+        cls.staff_user = UserFactory(
+            username=cls.staff_username, password=cls.password, is_staff=True
+        )
+        cls.user_2 = UserFactory.create(
+            username=cls.user_2_username, password=cls.password, is_staff=False
+        )
+        cls.user_1_enrollment = create_test_enrollment(cls.user)
+        cls.user_2_enrollment = create_test_enrollment(cls.user_2)
+        cls.staff_user_enrollment = create_test_enrollment(cls.staff_user)
+
+    def log_in(self, user):
+        """Log in as the given user"""
+        self.client.login(username=user.username, password=self.password)
+
+    def get_first_course_id(self, response):
+        """Get the first course id from a dashboard init response"""
+        return response.json()["courses"][0]["courseRun"]["courseId"]
+
+    def get(self, user=None):
+        """Make a get request to the dashboard init view"""
+        if user:
+            params = {"user": user}
+            url_params = "/?" + urlencode(params)
+        else:
+            url_params = ""
+        url = self.view_url + url_params
+        return self.client.get(url)
+
+    def test_no_student_access(self):
+        # If I log in as a student, not staff
+        self.log_in(self.user)
+
+        # I get my own dashboard info while not masquerading
+        response = self.get()
+        assert response.status_code == 200
+        assert self.get_first_course_id(response) == str(
+            self.user_1_enrollment.course_id
+        )
+
+        # If I try to masquerade as another user I get a 403
+        response = self.get(self.user_2.username)
+        assert response.status_code == 403
+
+        # Even if I try to masquerade as myself I get a 403
+        response = self.get(self.user.username)
+        assert response.status_code == 403
+
+    def test_staff_user(self):
+        # If I log in as site staff
+        self.log_in(self.staff_user)
+
+        # I get my own dashboard info while not masquerading
+        response = self.get()
+        assert response.status_code == 200
+        assert self.get_first_course_id(response) == str(
+            self.staff_user_enrollment.course_id
+        )
+
+        # I can also get other users' dashboard info by masquerading
+        response = self.get(self.user.username)
+        assert response.status_code == 200
+        assert self.get_first_course_id(response) == str(
+            self.user_1_enrollment.course_id
+        )
+
+        response = self.get(self.user_2.username)
+        assert response.status_code == 200
+        assert self.get_first_course_id(response) == str(
+            self.user_2_enrollment.course_id
+        )
+
+    def test_nonexistent_user__staff(self):
+        # If I log in as course staff
+        self.log_in(self.staff_user)
+
+        # If I request to masquerade a nonexistent user I get a 404
+        response = self.get(str(uuid4()))
+        assert response.status_code == 404
+
+    def test_nonexistent_user__student(self):
+        # If I log in as a non-staff user
+        self.log_in(self.user)
+
+        # If I request to masquerade a nonexistent user I get a 403
+        response = self.get(str(uuid4()))
+        assert response.status_code == 403
+
+    def test_get_user_by_email(self):
+        # If log in as a staff user
+        self.log_in(self.staff_user)
+
+        # I can masquerade as a user by providing their email
+        response = self.get(self.user.email)
+        assert response.status_code == 200
+        assert self.get_first_course_id(response) == str(
+            self.user_1_enrollment.course_id
+        )
+
+        response = self.get(self.user_2.email)
+        assert response.status_code == 200
+        assert self.get_first_course_id(response) == str(
+            self.user_2_enrollment.course_id
+        )
+
+    def test_user_email_collision(self):
+        # If log in as a staff user
+        self.log_in(self.staff_user)
+
+        # and we have a user whose username is the same as another user's email
+        user_3 = UserFactory(username=self.user_2.email)
+        assert user_3.username == self.user_2.email
+        user_3_enrollment = create_test_enrollment(user_3)
+
+        # when a staff user masquerades as that value
+        response = self.get(user_3.username)
+
+        # username has priority in the lookup
+        assert response.status_code == 200
+        assert self.get_first_course_id(response) == str(user_3_enrollment.course_id)

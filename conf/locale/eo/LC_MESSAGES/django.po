@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-12 19:25+0000\n"
-"PO-Revision-Date: 2022-09-12 19:25:40.142540\n"
+"POT-Creation-Date: 2022-09-25 20:43+0000\n"
+"PO-Revision-Date: 2022-09-25 20:43:25.632671\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -8414,6 +8414,12 @@ msgid "Ordering of this topic in its learning context"
 msgstr ""
 "Ördérïng öf thïs töpïç ïn ïts léärnïng çöntéxt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
+msgstr ""
+"Àddïtïönäl çöntéxt för thïs töpïç, süçh äs ïts séçtïön, änd süßséçtïön "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""

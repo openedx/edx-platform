@@ -34,7 +34,7 @@ The scope can be protected using the already existing `JwtHasScope`_ DRF permiss
 The new filter permission class, ``JwtHasTpaProviderFilterForRequestedProvider``, will be implemented in edx-platform to start because it is only used by an edx-platform view, ``UserMappingView``.  Additionally, the permission class is used in conjunction with other legacy permissions and it is simpler to keep all the tests together.
 
 .. _More General Scope Filter Support: 0011-scope-filter-support.rst
-.. _JwtHasScope: https://github.com/edx/edx-drf-extensions/blob/64f831d715d14dc2db5a1046201ff14e92fa7c9f/edx_rest_framework_extensions/permissions.py#L70
+.. _JwtHasScope: https://github.com/openedx/edx-drf-extensions/blob/64f831d715d14dc2db5a1046201ff14e92fa7c9f/edx_rest_framework_extensions/permissions.py#L70
 
 Consequences
 ------------
@@ -43,4 +43,4 @@ Consequences
 
 * The complicated method of handling compound permissions, like `JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS`_ from edx-drf-extensions, needs to be duplicated in edx-platform to properly handle Restricted Applications and ``JwtHasTpaProviderFilterForRequestedProvider``. Simplifying this design is being left to a later decision.
 
-.. _JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS: https://github.com/edx/edx-drf-extensions/blob/64f831d715d14dc2db5a1046201ff14e92fa7c9f/edx_rest_framework_extensions/permissions.py#L171
+.. _JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS: https://github.com/openedx/edx-drf-extensions/blob/64f831d715d14dc2db5a1046201ff14e92fa7c9f/edx_rest_framework_extensions/permissions.py#L171

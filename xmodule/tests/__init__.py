@@ -50,19 +50,6 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem for testing
     """
-    def __init__(self, **kwargs):
-        course_id = kwargs['course_id']
-        id_manager = CourseLocationManager(course_id)
-        kwargs.setdefault('id_reader', id_manager)
-        kwargs.setdefault('id_generator', id_manager)
-
-        services = kwargs.get('services', {})
-        services.setdefault('cache', CacheService(DoNothingCache()))
-        services.setdefault('field-data', DictFieldData({}))
-        services.setdefault('sandbox', SandboxService(contentstore, course_id))
-        kwargs['services'] = services
-        super().__init__(**kwargs)
-
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):  # lint-amnesty, pylint: disable=arguments-differ
         return '{usage_id}/{handler}{suffix}?{query}'.format(
             usage_id=str(block.scope_ids.usage_id),
@@ -132,6 +119,8 @@ def get_test_system(
 
     descriptor_system = get_test_descriptor_system()
 
+    id_manager = CourseLocationManager(course_id)
+
     def get_module(descriptor):
         """Mocks module_system get_module function"""
 
@@ -149,7 +138,6 @@ def get_test_system(
         return descriptor
 
     return TestModuleSystem(
-        static_url='/static',
         track_function=Mock(name='get_test_system.track_function'),
         get_module=get_module,
         services={
@@ -163,10 +151,14 @@ def get_test_system(
                 waittime=10,
                 construct_callback=Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
             ),
-            'replace_urls': replace_url_service
+            'replace_urls': replace_url_service,
+            'cache': CacheService(DoNothingCache()),
+            'field-data': DictFieldData({}),
+            'sandbox': SandboxService(contentstore, course_id),
         },
-        course_id=course_id,
         descriptor_runtime=descriptor_system,
+        id_reader=id_manager,
+        id_generator=id_manager,
     )
 
 
@@ -182,7 +174,6 @@ def get_test_descriptor_system(render_template=None):
         error_tracker=Mock(name='get_test_descriptor_system.error_tracker'),
         render_template=render_template or mock_render_template,
         mixins=(InheritanceMixin, XModuleMixin),
-        field_data=field_data,
         services={'field-data': field_data},
     )
     descriptor_system.get_asides = lambda block: []

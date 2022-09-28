@@ -24,7 +24,7 @@ edx-platform. Therefore, they are not checked into the edx-platform repo.
 Rather, they are generated from the `edxapp playbook in the configuration
 repo`_ and available in the ``/edx/etc/`` folder on edX servers.
 
-.. _edxapp playbook in the configuration repo: https://github.com/edx/configuration/tree/master/playbooks/roles/edxapp
+.. _edxapp playbook in the configuration repo: https://github.com/openedx/configuration/tree/master/playbooks/roles/edxapp
 
 
 Feature Flags and Settings Guidelines

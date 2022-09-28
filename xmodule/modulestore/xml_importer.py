@@ -954,7 +954,7 @@ def _import_course_draft(
         error_tracker=errorlog.tracker,
         load_error_modules=False,
         mixins=xml_module_store.xblock_mixins,
-        field_data=KvsFieldData(kvs=DictKeyValueStore()),
+        services={'field-data': KvsFieldData(kvs=DictKeyValueStore())},
         target_course_id=target_id,
     )
 

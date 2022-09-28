@@ -10,4 +10,4 @@ on:
 
 jobs:
   version-check:
-    uses: edx/.github/.github/workflows/lockfileversion-check.yml@master
+    uses: openedx/.github/.github/workflows/lockfileversion-check.yml@master

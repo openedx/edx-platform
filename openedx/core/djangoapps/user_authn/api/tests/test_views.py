@@ -240,7 +240,8 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'error_message': '',
             }
         }
-        response = self.client.get(self.url)
+        self.query_params.update({'is_register_page': True})
+        response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
         assert response.data['optional_fields']['fields'] == expected_response
 
@@ -274,7 +275,8 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'type': 'text',
             }
         }
-        response = self.client.get(self.url)
+        self.query_params.update({'is_register_page': True})
+        response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
         assert response.data['optional_fields']['fields'] == expected_response
 
@@ -292,7 +294,8 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         Test that order of optional fields
         """
-        response = self.client.get(self.url)
+        self.query_params.update({'is_register_page': True})
+        response = self.client.get(self.url, self.query_params)
         assert response.status_code == status.HTTP_200_OK
         assert list(response.data['optional_fields']['fields'].keys()) == ['specialty', 'goals']
 

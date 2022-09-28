@@ -10,8 +10,10 @@ from openedx_events.learning.data import CourseDiscussionConfigurationData, Disc
 from openedx_events.learning.signals import COURSE_DISCUSSIONS_CHANGED
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from .config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 
-from .models import DiscussionsConfiguration
+from .models import DiscussionsConfiguration, Provider
+from .utils import get_accessible_discussion_xblocks_by_course_id
 
 log = logging.getLogger(__name__)
 
@@ -115,3 +117,68 @@ def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDisc
             contexts=contexts,
         )
     return config_data
+
+
+def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, user_id: int, force=False) -> None:
+    """
+    Migrate existing courses to the new mechanism for linking discussion to units.
+
+    This will iterate over an existing course's discussion xblocks and mark the units
+    they are in as discussable.
+
+    Args:
+        course_key (CourseKey): CourseKey for course.
+        user_id (int): User id for the user performing this operation.
+        force (bool): Force migration of data even if not using legacy provider
+
+    """
+    store = modulestore()
+    course = store.get_course(course_key)
+    provider = course.discussions_settings.get('provider', None)
+    # Only migrate to the new discussion provider if the current provider is the legacy provider.
+    if provider is not None and provider != Provider.LEGACY and not force:
+        return
+
+    log.info(f"Migrating legacy discussion config for {course_key}")
+
+    with store.bulk_operations(course_key):
+        discussion_blocks = get_accessible_discussion_xblocks_by_course_id(course_key, include_all=True)
+        discussible_units = {
+            discussion_block.parent
+            for discussion_block in discussion_blocks
+            if discussion_block.parent.block_type == 'vertical'
+        }
+        log.info(f"Found {len(discussible_units)} discussible unit(s) in {course_key}")
+        verticals = store.get_items(course_key, qualifiers={'block_type': 'vertical'})
+        graded_subsections = {
+            block.location
+            for block in store.get_items(course_key, qualifies={'block_type': 'sequential'}, settings={'graded': True})
+        }
+        subsections_with_discussions = set()
+        for vertical in verticals:
+            if vertical.location in discussible_units:
+                vertical.discussion_enabled = True
+                subsections_with_discussions.add(vertical.parent)
+            else:
+                vertical.discussion_enabled = False
+            store.update_item(vertical, user_id)
+
+    # If there are any graded subsections that have discussion units,
+    # then enable discussions for graded subsections for the course
+    enable_graded_subsections = bool(graded_subsections & subsections_with_discussions)
+
+    # If the new discussions experience is enabled globally,
+    # then also set up the new provider for the course.
+    if ENABLE_NEW_STRUCTURE_DISCUSSIONS.is_enabled():
+        log.info(f"New structure is enabled, also updating {course_key} to use new provider")
+        course = store.get_course(course_key)
+        provider = Provider.OPEN_EDX
+        course.discussions_settings['provider'] = provider
+        course.discussions_settings['enable_graded_units'] = enable_graded_subsections
+        course.discussions_settings['unit_level_visibility'] = True
+        discussion_config = DiscussionsConfiguration.get(course_key)
+        discussion_config.provider_type = provider
+        discussion_config.enable_graded_units = enable_graded_subsections
+        discussion_config.unit_level_visibility = True
+        store.update_item(course, user_id)
+        discussion_config.save()

@@ -164,6 +164,8 @@ def python_prereqs_installation():
     """
     Installs Python prerequisites
     """
+    # 	edx-platform installs some Python projects from within the edx-platform repo itself.
+    sh(f"pip install -e .")
     for req_file in PYTHON_REQ_FILES:
         pip_install_req_file(req_file)
 
@@ -356,5 +358,5 @@ def print_devstack_warning():  # lint-amnesty, pylint: disable=missing-function-
         print("* WARNING: Mac users should run this from both the lms and studio shells")
         print("* in docker devstack to avoid startup errors that kill your CPU.")
         print("* For more details, see:")
-        print("* https://github.com/edx/devstack#docker-is-using-lots-of-cpu-time-when-it-should-be-idle")
+        print("* https://github.com/openedx/devstack#docker-is-using-lots-of-cpu-time-when-it-should-be-idle")
         print("********************************************************************************")

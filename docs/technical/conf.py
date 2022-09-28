@@ -19,7 +19,7 @@ extensions = ["code_annotations.contrib.sphinx.extensions.featuretoggles", "code
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-edxplatform_repo_url = "https://github.com/edx/edx-platform"
+edxplatform_repo_url = "https://github.com/openedx/edx-platform"
 edxplatform_source_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..")
 )

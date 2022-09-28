@@ -57,7 +57,7 @@ User = get_user_model()  # pylint:disable=invalid-name
 #     makes DB queries that could cause site outages for a large enough Open edX installation.
 # .. toggle_use_cases: opt_in, open_edx
 # .. toggle_creation_date: 2018-08-01
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/18638
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/18638
 COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch('student.courseenrollment_admin', __name__)
 
 

@@ -13,14 +13,15 @@ class VideoBlockStreamPriorityTransformer(BlockStructureTransformer):
     Transformer to add stream priority for encoded_videos.
 
     If DEPRECATE_YOUTUBE waffle flag is on for a course, Youtube videos
-    have highest priority i.e. 0. Else, the default priority for videos
+    have lowest priority. Else, the default priority for videos
     is as shown in DEFAULT_VIDEO_STREAM_PRIORITY below.
+    With 0 being the highest stream priority.
     In case video_format not found in given, set stream_priority to -1.
     """
 
     WRITE_VERSION = 1
     READ_VERSION = 1
-    DEFAULT_VIDEO_STREAM_PRIORITY = {
+    DEPRECATE_YOUTUBE_VIDEO_STREAM_PRIORITY = {
         'hls': 0,
         'mobile_low': 1,
         'mobile_high': 2,
@@ -29,7 +30,7 @@ class VideoBlockStreamPriorityTransformer(BlockStructureTransformer):
         'fallback': 5,
         'youtube': 6,
     }
-    DEPRECATE_YOUTUBE_VIDEO_STREAM_PRIORITY = {
+    DEFAULT_VIDEO_STREAM_PRIORITY = {
         'youtube': 0,
         'hls': 1,
         'mobile_low': 2,

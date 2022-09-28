@@ -314,7 +314,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-04 20:42+0000\n"
+"POT-Creation-Date: 2022-09-12 12:15+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Alexandre DS <alexandre@cleverm8.com>, 2020\n"
 "Language-Team: French (https://www.transifex.com/open-edx/teams/6205/fr/)\n"
@@ -7785,6 +7785,10 @@ msgstr "Si ce sujet doit être présenté en contexte dans le cours."
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Ordering of this topic in its learning context"
 msgstr "Classement de ce sujet dans son contexte d'apprentissage"
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Additional context for this topic, such as its section, and subsection"
+msgstr ""
 
 #: openedx/core/djangoapps/discussions/plugins.py
 msgid ""

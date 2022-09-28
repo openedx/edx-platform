@@ -50,7 +50,7 @@ jobs:
     - name: Install Required Python Dependencies
       run: |
         pip install -r requirements/pip.txt
-        pip install -r requirements/edx/base.txt
+        make base-requirements
 
     - name: Initiate Mongo DB Service
       run: sudo systemctl start mongod

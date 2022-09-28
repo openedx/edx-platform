@@ -49,7 +49,7 @@ class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-metho
             error_tracker=error_tracker,
             load_error_modules=load_error_modules,
             mixins=(InheritanceMixin, XModuleMixin),
-            field_data=KvsFieldData(DictKeyValueStore()),
+            services={'field-data': KvsFieldData(DictKeyValueStore())},
         )
 
     def render_template(self, _template, _context):  # lint-amnesty, pylint: disable=method-hidden

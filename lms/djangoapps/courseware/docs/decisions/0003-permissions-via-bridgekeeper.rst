@@ -33,8 +33,8 @@ to the plan in `0002`_.
 We will update all uses of `has_access`_, and all `CourseMode`_ membership
 checks, to use `bridgekeeper`_ and named permissions.
 
-.. _`0002. Use django-rules for Permissions and Tracks`: https://github.com/edx/edx-platform/blob/master/lms/djangoapps/courseware/docs/decisions/0002-permissions-via-django-rules.rst
-.. _`0002`: https://github.com/edx/edx-platform/blob/master/lms/djangoapps/courseware/docs/decisions/0002-permissions-via-django-rules.rst
+.. _`0002. Use django-rules for Permissions and Tracks`: https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/courseware/docs/decisions/0002-permissions-via-django-rules.rst
+.. _`0002`: https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/courseware/docs/decisions/0002-permissions-via-django-rules.rst
 
 Plan of Action
 ==============
@@ -88,7 +88,7 @@ and can be parallelized. However, at present, there are ~150 calls to
 `has_access`_ in edx-platform, so this is not an insignificant amount of
 work.
 
-.. _has_access: https://github.com/edx/edx-platform/blob/master/lms/djangoapps/courseware/access.py#L103
+.. _has_access: https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/courseware/access.py#L103
 .. _user.has_perm: https://docs.djangoproject.com/en/2.1/ref/contrib/auth/#django.contrib.auth.models.User.has_perm
 
 Refactor contents of ``has_access``
@@ -135,7 +135,7 @@ It will also allow those conditions (predicates) to be written in
 a location that is central to the app they are responsible for, rather
 than requiring that they be added to `access.py`_.
 
-.. _access.py: https://github.com/edx/edx-platform/blob/master/lms/djangoapps/courseware/access.py
+.. _access.py: https://github.com/openedx/edx-platform/blob/master/lms/djangoapps/courseware/access.py
 
 When the conversion of `CourseMode`_ membership checks has been completed,
 it will be easier to add new `CourseMode`_ types with similar permissions

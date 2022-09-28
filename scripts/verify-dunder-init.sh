@@ -30,15 +30,6 @@ exclude+='^\.$'
 exclude+='|^xmodule/capa/safe_exec/tests/test_files/?.*$'
 exclude+='|^common/test/data/?.*$'
 
-# Exclude common/lib and its immediate child directories.
-# They are not Python packages, but instead are Python sub-projects (hence the setup.py
-# in each chlid directory).
-# However, we do NOT want to exclude the source directories *within* the sub-projects.
-# Example:
-#  * common/lib/capa -> EXCLUDE from check.
-#  * common/lib/capa/capa/safe_exec -> INCLUDE in check.
-exclude+='|^common/lib$'
-
 # xmodule data folder
 exclude+='|^xmodule/tests/data/xml-course-root/capa$'
 exclude+='|^xmodule/tests/data/xml-course-root/uploads/python_lib_zip$'

@@ -120,5 +120,5 @@ to test other grant types if they are substituted in the appropriate places.
 .. _OAuth2 standard: https://tools.ietf.org/html/rfc6749
 .. _Google's OAuth2 Playground: https://developers.google.com/oauthplayground
 .. _Authorization Code grant type: https://tools.ietf.org/html/rfc6749#section-4.1
-.. _Restricted Application: https://github.com/edx/edx-platform/blob/dd136b457bc8a25892445fc4362ce02838179472/openedx/core/djangoapps/oauth_dispatch/models.py#L12
+.. _Restricted Application: https://github.com/openedx/edx-platform/blob/dd136b457bc8a25892445fc4362ce02838179472/openedx/core/djangoapps/oauth_dispatch/models.py#L12
 .. _localtunnel: https://localtunnel.github.io/www/

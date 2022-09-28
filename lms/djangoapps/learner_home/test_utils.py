@@ -15,6 +15,11 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import (
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+def random_string():
+    """Test util for generating a random string"""
+    return str(uuid4())
+
+
 def random_bool():
     """Test util for generating a random boolean"""
     return bool(getrandbits(1))

@@ -411,10 +411,16 @@ def _check_user_auth_flow(site, user):
         if user_domain == allowed_domain and not AllowedAuthUser.objects.filter(site=site, email=user.email).exists():
             if not should_redirect_to_authn_microfrontend():
                 msg = _create_message(site, None, allowed_domain)
-            else:
-                root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
-                msg = _create_message(site, root_url, allowed_domain)
-            raise AuthFailedError(msg)
+                raise AuthFailedError(msg)
+
+            raise AuthFailedError(
+                error_code='allowed-domain-login-error',
+                context={
+                    'allowed_domain': allowed_domain,
+                    'provider': site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_PROVIDER'),
+                    'tpa_hint': site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_HINT'),
+                }
+            )
 
 
 @login_required

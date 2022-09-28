@@ -445,7 +445,10 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
         }
         assert actual == expected
 
-    def test_sort_key(self):
+    def test_sort_key_doesnot_work(self):
+        """
+        Test to check that providing sort_key doesn't change the sort order
+        """
         with self.store.bulk_operations(self.course.id, emit_signals=False):
             self.course.discussion_topics = {
                 "W": {"id": "non-courseware-1", "sort_key": "Z"},
@@ -486,10 +489,10 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 ),
             ],
             "non_courseware_topics": [
-                self.make_expected_tree("non-courseware-4", "Z"),
+                self.make_expected_tree("non-courseware-1", "W"),
                 self.make_expected_tree("non-courseware-2", "X"),
                 self.make_expected_tree("non-courseware-3", "Y"),
-                self.make_expected_tree("non-courseware-1", "W"),
+                self.make_expected_tree("non-courseware-4", "Z"),
             ],
         }
         assert actual == expected
@@ -1894,7 +1897,6 @@ class CreateThreadTest(
                 "close_reason_code",
                 "closed",
                 "copy_link",
-                "edit_reason_code",
                 "following",
                 "pinned",
                 "raw_body",
@@ -2249,14 +2251,13 @@ class CreateCommentTest(
         editable_fields = [
             "abuse_flagged",
             "anonymous",
-            "edit_reason_code",
             "raw_body",
             "voted",
         ]
         if parent_id:
             data["parent_id"] = parent_id
         else:
-            editable_fields.insert(3, "endorsed")
+            editable_fields.insert(2, "endorsed")
 
         _set_course_discussion_blackout(course=self.course, user_id=self.user.id)
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_MODERATOR)
@@ -2871,7 +2872,7 @@ class UpdateThreadTest(
         Test editing comments, specifying and retrieving edit reason codes.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
-        self.register_thread()
+        self.register_thread({"user_id": str(self.user.id + 1)})
         try:
             result = update_thread(self.request, "test_thread", {
                 "raw_body": "Edited body",
@@ -2888,7 +2889,8 @@ class UpdateThreadTest(
             assert request_body["edit_reason_code"] == ["test-edit-reason"]
         except ValidationError as error:
             assert role_name == FORUM_ROLE_STUDENT
-            assert error.message_dict == {"edit_reason_code": ["This field is not editable."]}
+            assert error.message_dict == {"edit_reason_code": ["This field is not editable."],
+                                          "raw_body": ["This field is not editable."]}
 
     @ddt.data(
         *itertools.product(
@@ -3371,7 +3373,7 @@ class UpdateCommentTest(
         Test editing comments, specifying and retrieving edit reason codes.
         """
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
-        self.register_comment()
+        self.register_comment({"user_id": str(self.user.id + 1)})
         try:
             result = update_comment(self.request, "test_comment", {
                 "raw_body": "Edited body",
@@ -3435,12 +3437,32 @@ class DeleteThreadTest(
         self.register_get_thread_response(cs_data)
         self.register_delete_thread_response(cs_data["id"])
 
-    def test_basic(self):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_basic(self, mock_emit):
         self.register_thread()
         with self.assert_signal_sent(api, 'thread_deleted', sender=None, user=self.user, exclude_args=('post',)):
             assert delete_thread(self.request, self.thread_id) is None
         assert urlparse(httpretty.last_request().path).path == f"/api/v1/threads/{self.thread_id}"  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
+
+        expected_event_name = 'edx.forum.thread.deleted'
+        expected_event_data = {
+            'body': 'dummy',
+            'content_type': 'Post',
+            'own_content': True,
+            'commentable_id': 'dummy',
+            'target_username': 'dummy',
+            'title_truncated': False,
+            'title': 'dummy',
+            'id': 'test_thread',
+            'url': '',
+            'user_forums_roles': ['Student'],
+            'user_course_roles': []
+        }
+
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
 
     def test_thread_id_not_found(self):
         self.register_get_thread_error_response("missing_thread", 404)
@@ -3577,12 +3599,30 @@ class DeleteCommentTest(
         self.register_get_comment_response(cs_comment_data)
         self.register_delete_comment_response(self.comment_id)
 
-    def test_basic(self):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_basic(self, mock_emit):
         self.register_comment_and_thread()
         with self.assert_signal_sent(api, 'comment_deleted', sender=None, user=self.user, exclude_args=('post',)):
             assert delete_comment(self.request, self.comment_id) is None
         assert urlparse(httpretty.last_request().path).path == f"/api/v1/comments/{self.comment_id}"  # lint-amnesty, pylint: disable=no-member
         assert httpretty.last_request().method == 'DELETE'
+
+        expected_event_name = 'edx.forum.response.deleted'
+        expected_event_data = {
+            'body': 'dummy',
+            'content_type': 'Response',
+            'own_content': True,
+            'commentable_id': 'dummy',
+            'target_username': self.user.username,
+            'id': 'test_comment',
+            'url': '',
+            'user_forums_roles': ['Student'],
+            'user_course_roles': []
+        }
+
+        actual_event_name, actual_event_data = mock_emit.call_args[0]
+        self.assertEqual(actual_event_name, expected_event_name)
+        self.assertEqual(actual_event_data, expected_event_data)
 
     def test_comment_id_not_found(self):
         self.register_get_comment_error_response("missing_comment", 404)

@@ -38,7 +38,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
             mixins=xml_import_data.xblock_mixins,
             select=xml_import_data.xblock_select,
             render_template=lambda template, context: pprint.pformat((template, context)),
-            field_data=KvsFieldData(DictKeyValueStore()),
+            services={'field-data': KvsFieldData(DictKeyValueStore())},
         )
 
     def process_xml(self, xml):  # pylint: disable=method-hidden
