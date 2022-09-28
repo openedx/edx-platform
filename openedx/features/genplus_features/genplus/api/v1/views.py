@@ -244,6 +244,10 @@ class JournalViewSet(GenzMixin, FlatMultipleModelMixin, viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         response = super(FlatMultipleModelMixin, self).list(request, args, kwargs)
         response.data['results'] = self._rename_entry_type(response.data['results'])
+        querylist = self.get_querylist()
+        queryset = querylist[0]['queryset']
+        skills_qs = Skill.objects.filter(pk__in=queryset.values_list('skill', flat=True))
+        response.data['skills'] = SkillSerializer(skills_qs, many=True).data
         return response
 
 
