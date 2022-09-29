@@ -256,7 +256,7 @@ class TestIndex(SiteMixin, TestCase):
         """ Set up a user """
         super().setUp()
 
-        patcher = mock.patch("common.djangoapps.student.models.tracker")
+        patcher = mock.patch("common.djangoapps.student.models.student.tracker")
         self.mock_tracker = patcher.start()
         self.user = UserFactory.create()
         self.user.set_password("password")
