@@ -85,11 +85,10 @@ def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDisc
 
     with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
         course = store.get_course(course_key)
-        provider = course.discussions_settings.get('provider', provider_type)
-        enable_in_context = course.discussions_settings.get('enable_in_context', True)
-        provider_config = course.discussions_settings.get(provider, {})
-        unit_level_visibility = course.discussions_settings.get('unit_level_visibility', True)
-        enable_graded_units = course.discussions_settings.get('enable_graded_units', False)
+        enable_in_context = discussions_config.enable_in_context
+        provider_config = discussions_config.plugin_configuration
+        unit_level_visibility = discussions_config.unit_level_visibility
+        enable_graded_units = discussions_config.enable_graded_units
         contexts = []
         if supports_in_context:
             sorted_topics = sorted(
@@ -112,7 +111,7 @@ def update_discussions_settings_from_course(course_key: CourseKey) -> CourseDisc
             enable_in_context=enable_in_context,
             enable_graded_units=enable_graded_units,
             unit_level_visibility=unit_level_visibility,
-            provider_type=provider,
+            provider_type=provider_type,
             plugin_configuration=provider_config,
             contexts=contexts,
         )
@@ -152,7 +151,11 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         verticals = store.get_items(course_key, qualifiers={'block_type': 'vertical'})
         graded_subsections = {
             block.location
-            for block in store.get_items(course_key, qualifies={'block_type': 'sequential'}, settings={'graded': True})
+            for block in store.get_items(
+                course_key,
+                qualifies={'block_type': 'sequential'},
+                settings={'graded': True}
+            )
         }
         subsections_with_discussions = set()
         for vertical in verticals:
@@ -176,9 +179,9 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         course.discussions_settings['provider'] = provider
         course.discussions_settings['enable_graded_units'] = enable_graded_subsections
         course.discussions_settings['unit_level_visibility'] = True
+        store.update_item(course, user_id)
         discussion_config = DiscussionsConfiguration.get(course_key)
         discussion_config.provider_type = provider
         discussion_config.enable_graded_units = enable_graded_subsections
         discussion_config.unit_level_visibility = True
-        store.update_item(course, user_id)
         discussion_config.save()
