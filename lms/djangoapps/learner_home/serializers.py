@@ -194,7 +194,7 @@ class EnrollmentSerializer(serializers.Serializer):
         resume_button_url = self.context.get("resume_course_urls", {}).get(
             enrollment.course_id
         )
-        return resume_button_url is not None
+        return bool(resume_button_url)
 
     def get_isVerified(self, enrollment):
         return enrollment.is_verified_enrollment()

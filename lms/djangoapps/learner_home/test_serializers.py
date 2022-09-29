@@ -372,7 +372,7 @@ class TestEnrollmentSerializer(LearnerDashboardBaseTest):
         output = EnrollmentSerializer(input_data, context=input_context).data
         assert output["canUpgrade"] is True
 
-    @ddt.data(None, "some_url")
+    @ddt.data(None, "", "some_url")
     def test_has_started(self, resume_url):
         # Given the presence or lack of a resume_course_url
         input_data = self.create_test_enrollment()
