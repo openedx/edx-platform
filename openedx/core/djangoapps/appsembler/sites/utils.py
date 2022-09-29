@@ -9,7 +9,7 @@ from django.apps import apps
 from datetime import timedelta
 
 import beeline
-from opaque_keys.edx.django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
 
 from urllib.parse import urlparse
 
@@ -497,7 +497,7 @@ def get_models_using_course_key():
             field_object = getattr(model_class, field_name, None)
             if field_object:
                 field_definition = getattr(field_object, 'field', None)
-                if field_definition and isinstance(field_definition, CourseKeyField):
+                if field_definition and isinstance(field_definition, (CourseKeyField, LearningContextKeyField)):
                     models_with_course_key.add(
                         (model_class, field_name,)
                     )

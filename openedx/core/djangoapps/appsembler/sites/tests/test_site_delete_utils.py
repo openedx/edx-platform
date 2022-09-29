@@ -8,6 +8,7 @@ from organizations.models import OrganizationCourse
 from status.models import CourseMessage
 from student.models import AnonymousUserId
 
+from lms.djangoapps.courseware.models import StudentModule
 from openedx.core.djangoapps.appsembler.api.tests.factories import (
     CourseOverviewFactory,
     OrganizationCourseFactory,
@@ -87,6 +88,7 @@ def test_get_models_using_course_key():
     assert AnonymousUserId in classes, 'Should include AnonymousUserId due to course_id field'
     assert CourseMessage in classes, 'Should include CourseMessage due to course_key field'
     assert OrganizationCourse in classes, 'Should include OrganizationCourse'
+    assert StudentModule in classes, 'Should include models with LearningContextKeyField'
 
 
 @pytest.mark.django_db
