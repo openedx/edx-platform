@@ -130,7 +130,7 @@ class StudentDashboardAPIView(APIView):
         gen_user = self.request.user.gen_user
         units_count = gen_class.program.units.count()
         average_progress = 0
-        program_data = ProgramSerializer(gen_class.program, context={'gen_user', gen_user}).data
+        program_data = ProgramSerializer(gen_class.program, context={'gen_user': gen_user}).data
         if program_data and units_count > 0:
             average_progress += sum(item['progress'] for item in program_data['units']) / units_count
 

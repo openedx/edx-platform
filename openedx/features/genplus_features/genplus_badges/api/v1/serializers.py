@@ -186,3 +186,9 @@ class BoosterBadgesTypeSerializer(serializers.ModelSerializer):
                                               many=True,
                                               read_only=True,
                                               context=self.context).data
+
+
+class JournalBoosterBadgeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoosterBadgeAward
+        fields = ('id', 'image_url', 'feedback', 'created')

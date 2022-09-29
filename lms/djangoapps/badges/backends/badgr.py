@@ -166,10 +166,12 @@ class BadgrBackend(BadgeBackend):
         """
         Register an assertion with the Badgr server for a particular user for a specific class.
         """
+        fernet = self._fernet_setup()
+        encrypted_email = fernet.encrypt(user.email.encode('utf-8')).decode('utf-8') if user.email else None
         data = {
             "recipient": {
-                "identity": user.email,
-                "type": "email"
+                "identity": f"{settings.GENPLUS_FRONTEND_URL}/{encrypted_email}",
+                "type": "url"
             },
             "evidence": [
                 {

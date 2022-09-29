@@ -151,7 +151,7 @@ class JournalPost(TimeStampedModel):
     title = models.CharField(max_length=128)
     skill = models.ForeignKey(Skill, on_delete=models.SET_NULL, null=True)
     description = models.TextField()
-    type = models.CharField(max_length=32, choices=JOURNAL_TYPE_CHOICES)
+    journal_type = models.CharField(max_length=32, choices=JOURNAL_TYPE_CHOICES)
 
 
 class ActivityManager(models.Manager):
