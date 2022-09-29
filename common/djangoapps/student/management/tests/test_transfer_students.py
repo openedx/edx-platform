@@ -42,7 +42,7 @@ class TestTransferStudents(ModuleStoreTestCase):
         super().setUp()
 
         UNENROLL_DONE.connect(self.assert_unenroll_signal)
-        patcher = patch('common.djangoapps.student.models.tracker')
+        patcher = patch('common.djangoapps.student.models.student.tracker')
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
         self.addCleanup(UNENROLL_DONE.disconnect, self.assert_unenroll_signal)

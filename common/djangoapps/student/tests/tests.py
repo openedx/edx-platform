@@ -637,8 +637,8 @@ class UserSettingsEventTestMixin(EventTestMixin):
 class EnrollmentEventTestMixin(EventTestMixin):
     """ Mixin with assertions for validating enrollment events. """
     def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
-        super().setUp('common.djangoapps.student.models.tracker')
-        segment_patcher = patch('common.djangoapps.student.models.segment')
+        super().setUp('common.djangoapps.student.models.student.tracker')
+        segment_patcher = patch('common.djangoapps.student.models.student.segment')
         self.mock_segment_tracker = segment_patcher.start()
         self.addCleanup(segment_patcher.stop)
 
@@ -1110,7 +1110,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
             mode_display_name='Honor Code',
         )
         self.user2 = UserFactory.create()
-        patcher = patch('common.djangoapps.student.models.tracker')
+        patcher = patch('common.djangoapps.student.models.student.tracker')
         patcher.start()
         self.addCleanup(patcher.stop)
 

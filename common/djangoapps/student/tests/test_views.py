@@ -151,13 +151,13 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
 
     def test_course_run_refund_status_successful(self):
         """ Assert that view:course_run_refund_status returns correct Json for successful refund call."""
-        with patch('common.djangoapps.student.models.CourseEnrollment.refundable', return_value=True):
+        with patch('common.djangoapps.student.models.student.CourseEnrollment.refundable', return_value=True):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
         assert json.loads(response.content.decode('utf-8')) == {'course_refundable_status': True}
         assert response.status_code == 200
 
-        with patch('common.djangoapps.student.models.CourseEnrollment.refundable', return_value=False):
+        with patch('common.djangoapps.student.models.student.CourseEnrollment.refundable', return_value=False):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
         assert json.loads(response.content.decode('utf-8')) == {'course_refundable_status': False}
