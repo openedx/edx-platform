@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 import tahoe_sites.api
 from django.contrib.auth import get_user_model
@@ -22,6 +24,14 @@ from openedx.core.djangoapps.appsembler.sites.utils import (
     get_models_using_course_key,
     delete_organization_courses,
 )
+
+
+def delete_site_with_patched_cms_imports(red_site):
+    """
+    Delete a site without running the CMS-related code.
+    """
+    with patch('openedx.core.djangoapps.appsembler.sites.utils.remove_course_creator_role'):
+        delete_site(red_site)
 
 
 @pytest.fixture
@@ -49,7 +59,7 @@ def test_delete_site(make_site):
     Test `delete_site` happy path.
     """
     red_site = make_site('red')
-    delete_site(red_site)
+    delete_site_with_patched_cms_imports(red_site)
 
     with pytest.raises(User.DoesNotExist):
         User.objects.get(username='red')
@@ -63,7 +73,7 @@ def test_delete_one_site_keeps_another(make_site):
     red_site = make_site('red')
     make_site('blue')
 
-    delete_site(red_site)
+    delete_site_with_patched_cms_imports(red_site)
 
     with pytest.raises(User.DoesNotExist):
         User.objects.get(username='red')

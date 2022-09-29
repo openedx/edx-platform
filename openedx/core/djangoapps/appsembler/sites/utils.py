@@ -481,6 +481,9 @@ def bootstrap_site(site, org_data=None, username=None):
 
 
 def get_models_using_course_key():
+    """
+    Get all course related model classes.
+    """
     course_key_field_names = {
         'course_key',
         'course_id',
@@ -506,6 +509,9 @@ def get_models_using_course_key():
 
 
 def delete_organization_courses(organization):
+    """
+    Delete all course related model instances.
+    """
     course_keys = []
 
     for course in get_organization_courses({'id': organization.id}):
@@ -519,6 +525,21 @@ def delete_organization_courses(organization):
         objects_to_delete.delete()
 
 
+def remove_course_creator_role(users):
+    """
+    Remove course creator role to fix `delete_site` issue.
+
+    This will fail in when running tests from within the LMS because the CMS migrations
+    don't run during tests. Patch this function to avoid such errors.
+    TODO: RED-2853 Remove this helper when AMC is removed
+          This helper is being replaced by `update_course_creator_role_for_cms` which has unit tests.
+    """
+    from cms.djangoapps.course_creators.models import CourseCreator  # Fix LMS->CMS imports.
+    from student.roles import CourseAccessRole  # Avoid circular import.
+    CourseCreator.objects.filter(user__in=users).delete()
+    CourseAccessRole.objects.filter(user__in=users).delete()
+
+
 @beeline.traced(name="delete_site")
 def delete_site(site):
     print('Deleting SiteConfiguration of', site)
@@ -529,9 +550,9 @@ def delete_site(site):
 
     organization = tahoe_sites.api.get_organization_by_site(site)
 
-    users = tahoe_sites.api.get_users_of_organization(organization, without_inactive_users=False)
-
     print('Deleting users of', site)
+    users = tahoe_sites.api.get_users_of_organization(organization, without_inactive_users=False)
+    remove_course_creator_role(users)
     users.delete()
 
     print('Deleting courses of', site)
