@@ -808,7 +808,7 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
             last_name='Person',
             email='some.user@example.com',
         )
-        with mock.patch('common.djangoapps.student.models.segment') as mock_segment:
+        with mock.patch('common.djangoapps.student.models.student.segment') as mock_segment:
             user._called_by_management_command = True  # pylint: disable=protected-access
             user.save()
 

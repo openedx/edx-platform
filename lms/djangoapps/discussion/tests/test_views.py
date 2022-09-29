@@ -91,7 +91,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('common.djangoapps.student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.student.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             password = 'test'
@@ -110,8 +110,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         config.enabled = True
         config.save()
 
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.student.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.student.cc.User.active_threads')
     def test_user_profile_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -127,8 +127,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         response = self.client.get(url)
         assert response.status_code == 404
 
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.subscribed_threads')
+    @patch('common.djangoapps.student.models.student.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.student.cc.User.subscribed_threads')
     def test_user_followed_threads_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -1661,7 +1661,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         assert self.client.login(username=username, password=password)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.student.cc.User.from_django_user')
     def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):
         """
         Test that XSS attack is prevented
@@ -1677,8 +1677,8 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         self.assertNotContains(resp, malicious_code)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('common.djangoapps.student.models.cc.User.from_django_user')
-    @patch('common.djangoapps.student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.student.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.student.cc.User.active_threads')
     def test_forum_user_profile_xss_prevent(self, malicious_code, mock_threads, mock_from_django_user, mock_request):
         """
         Test that XSS attack is prevented

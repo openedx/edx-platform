@@ -441,7 +441,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         )
         self.check_remove_event_emitted()
 
-    @patch('common.djangoapps.student.models.UserProfile.save')
+    @patch('common.djangoapps.student.models.student.UserProfile.save')
     def test_remove_failure(self, user_profile_save, mock_log):
         """
         Test that when remove validation fails, the proper HTTP response and
