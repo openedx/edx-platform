@@ -4,7 +4,6 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 
 import logging
 from functools import wraps
-from typing import Dict, Optional
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -51,7 +50,6 @@ from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserExc
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
-from openedx.core.djangoapps.discussions.url_helpers import get_discussions_mfe_url
 from openedx.core.djangoapps.discussions.utils import (
     available_division_schemes,
     get_discussion_categories_ids,
@@ -752,42 +750,6 @@ def followed_threads(request, course_key, user_id):
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
 
-def _discussions_mfe_context(query_params: Dict,
-                             course_key: CourseKey,
-                             is_educator_or_staff=False,
-                             legacy_only_view=False) -> Optional[Dict]:
-    """
-    Returns the context for rendering the MFE banner and MFE.
-
-    Args:
-        query_params (Dict): request query parameters
-        course_key (CourseKey): course for which to get URL
-
-    Returns:
-        A URL for the MFE experience if active for the current request or None
-    """
-    mfe_url = get_discussions_mfe_url(course_key)
-    if not mfe_url:
-        return {"show_banner": False, "show_mfe": False}
-    discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
-    show_mfe = (
-        query_params.get("discussions_experience", "").lower() != "legacy"
-        and discussions_mfe_enabled
-        and not legacy_only_view
-    )
-    forum_url = reverse("forum_form_discussion", args=[course_key])
-    return {
-        "show_mfe": show_mfe,
-        "legacy_url": f"{forum_url}?discussions_experience=legacy",
-        "mfe_url": f"{forum_url}?discussions_experience=new",
-        "share_feedback_url": settings.DISCUSSIONS_MFE_FEEDBACK_URL,
-        "course_key": course_key,
-        "show_banner": discussions_mfe_enabled and is_educator_or_staff,
-        "discussions_mfe_url": mfe_url,
-        "show_in_iframe": False,
-    }
-
-
 def is_course_staff(course_key: CourseKey, user: User):
     """
     Check if user has course instructor or course staff role.
@@ -856,19 +818,6 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         # Force using the legacy view if a user profile is requested or the URL contains a specific topic or thread
         force_legacy_view = (profile_page_context or thread_id or discussion_id)
         is_educator_or_staff = is_course_staff(course_key, request.user) or GlobalStaff().has_user(request.user)
-        mfe_context = _discussions_mfe_context(request.GET, course_key, is_educator_or_staff, force_legacy_view)
-        if mfe_context["show_mfe"]:
-            fragment = Fragment(render_to_string('discussion/discussion_mfe_embed.html', mfe_context))
-            fragment.add_css(
-                """
-                #discussions-mfe-tab-embed {
-                    width: 100%;
-                    min-height: 800px;
-                    border: none;
-                }
-                """
-            )
-            return fragment
         try:
             base_context = _create_base_discussion_view_context(request, course_key)
             # Note:
@@ -893,7 +842,6 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             context.update({
                 'course_expiration_fragment': course_expiration_fragment,
             })
-            context.update(mfe_context)
             if profile_page_context:
                 # EDUCATOR-2119: styles are hard to reconcile if the profile page isn't also a fragment
                 html = render_to_string('discussion/discussion_profile_page.html', profile_page_context)
