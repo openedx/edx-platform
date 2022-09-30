@@ -1,11 +1,10 @@
-name: Pylint checks
+name: Pylint Checks
 
 on:
   pull_request:
   push:
     branches:
       - master
-      - open-release/lilac.master
 
 jobs:
   run_pylint:
@@ -32,13 +31,13 @@ jobs:
 
     name: pylint ${{ matrix.module-name }}
     steps:
+    - name: Check out repo
+      uses: actions/checkout@v2
 
-    - uses: actions/checkout@v2
-
-    - name: Install Required System Packages
+    - name: Install required system packages
       run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
 
-    - name: Setup Python
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
@@ -56,13 +55,13 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
         restore-keys: ${{ runner.os }}-pip-
 
-    - name: Install Required Python Dependencies
+    - name: Install required Python dependencies
       run: |
         pip install -r requirements/pip.txt
         make dev-requirements
         pip uninstall -y mysqlclient
         pip install --no-binary mysqlclient mysqlclient
 
-    - name: Run Quality Tests
+    - name: Run quality tests
       run: |
-        pylint  ${{ matrix.path }}
+        pylint ${{ matrix.path }}
