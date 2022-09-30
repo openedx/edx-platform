@@ -213,7 +213,7 @@ class ProctoringFields:
         """
         Return course by course id.
         """
-        return self.runtime.modulestore.get_course(self.scope_ids.usage_id.context_key)  # pylint: disable=no-member
+        return self.runtime.modulestore.get_course(self.course_id)  # pylint: disable=no-member
 
     @property
     def is_timed_exam(self):
@@ -451,7 +451,7 @@ class SequenceBlock(
         content_type_gating_service = self.runtime.service(self, 'content_type_gating')
         if content_type_gating_service:
             self.gated_sequence_paywall = content_type_gating_service.check_children_for_content_type_gating_paywall(
-                self, self.scope_ids.usage_id.context_key
+                self, self.course_id
             )
 
     def student_view(self, context):
@@ -614,7 +614,7 @@ class SequenceBlock(
         if SHOW_PROGRESS_BAR.is_enabled() and getattr(settings, 'COMPLETION_AGGREGATOR_URL', ''):
             parent_block_id = self.get_parent().scope_ids.usage_id.block_id
             params['chapter_completion_aggregator_url'] = '/'.join(
-                [settings.COMPLETION_AGGREGATOR_URL, str(self.scope_ids.usage_id.context_key), parent_block_id]) + '/'
+                [settings.COMPLETION_AGGREGATOR_URL, str(self.course_id), parent_block_id]) + '/'
         fragment.add_content(self.runtime.service(self, 'mako').render_template("seq_module.html", params))
 
         self._capture_full_seq_item_metrics(display_items)
@@ -655,7 +655,7 @@ class SequenceBlock(
         if gating_service:
             user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
             fulfilled = gating_service.is_gate_fulfilled(
-                self.scope_ids.usage_id.context_key, self.location, user_id
+                self.course_id, self.location, user_id
             )
             return fulfilled
 
@@ -671,7 +671,7 @@ class SequenceBlock(
         gating_service = self.runtime.service(self, 'gating')
         if gating_service:
             milestone = gating_service.required_prereq(
-                self.scope_ids.usage_id.context_key, self.location, 'requires'
+                self.course_id, self.location, 'requires'
             )
             return milestone
 
@@ -810,7 +810,7 @@ class SequenceBlock(
             contains_content_type_gated_content = False
             if content_type_gating_service:
                 contains_content_type_gated_content = content_type_gating_service.check_children_for_content_type_gating_paywall(  # pylint:disable=line-too-long
-                    item, self.scope_ids.usage_id.context_key
+                    item, self.course_id
                 ) is not None
             iteminfo = {
                 'content': content,
@@ -931,7 +931,7 @@ class SequenceBlock(
             user_id = current_user.opt_attrs.get(ATTR_KEY_USER_ID)
             user_is_staff = current_user.opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
             user_role_in_course = 'staff' if user_is_staff else 'student'
-            course_id = self.scope_ids.usage_id.context_key
+            course_id = self.runtime.course_id
             content_id = self.location
 
             context = {

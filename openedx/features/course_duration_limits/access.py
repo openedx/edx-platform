@@ -249,7 +249,7 @@ def course_expiration_wrapper(user, block, view, frag, context):  # pylint: disa
         return frag
 
     course_expiration_fragment = generate_course_expired_fragment_from_key(
-        user, block.scope_ids.usage_id.context_key
+        user, block.course_id
     )
     if not course_expiration_fragment:
         return frag

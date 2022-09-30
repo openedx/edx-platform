@@ -296,7 +296,7 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
     def test_replace_urls(self):
         html = '<a href="/static/id">'
         assert self.runtime.replace_urls(html) == \
-            static_replace.replace_static_urls(html, course_id=self.course.id)
+            static_replace.replace_static_urls(html, course_id=self.runtime.course_id)
 
     def test_anonymous_user_id_preview(self):
         assert self.runtime.anonymous_student_id == 'student'

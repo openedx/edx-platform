@@ -69,10 +69,10 @@ def update_exam_completion_task(user_identifier: str, content_id: str, completio
     # Now evil modulestore magic to inflate our descriptor with user state and
     # permissions checks.
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        root_descriptor.scope_ids.usage_id.context_key, user, root_descriptor, read_only=True,
+        root_descriptor.course_id, user, root_descriptor, read_only=True,
     )
     root_module = get_module_for_descriptor(
-        user, request, root_descriptor, field_data_cache, root_descriptor.scope_ids.usage_id.context_key,
+        user, request, root_descriptor, field_data_cache, root_descriptor.course_id,
     )
     if not root_module:
         err_msg = err_msg_prefix + 'Module unable to be created from descriptor!'

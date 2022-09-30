@@ -79,10 +79,11 @@ class TestProblem:
     The purpose of this class is to imitate any problem.
     """
     def __init__(self, course, user=None):
-        self.scope_ids = MagicMock(usage_id=course.id.make_usage_key('test_problem', 'test_usage_id'))
+        self.system = MagicMock(is_author_mode=False)
+        self.scope_ids = MagicMock(usage_id="test_usage_id")
         user = user or UserFactory()
         user_service = StubUserService(user)
-        self.runtime = MagicMock(service=lambda _a, _b: user_service, is_author_mode=False)
+        self.runtime = MagicMock(course_id=course.id, service=lambda _a, _b: user_service)
         self.descriptor = MagicMock()
         self.descriptor.runtime.modulestore.get_course.return_value = course
 
@@ -135,7 +136,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
             "uid": "uid",
             "edxnotes_visibility": "true",
             "params": {
-                "usageId": problem.scope_ids.usage_id,
+                "usageId": "test_usage_id",
                 "courseId": course.id,
                 "token": "token",
                 "tokenUrl": "/tokenUrl",
@@ -166,7 +167,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         """
         Tests that get_html is not wrapped when problem is rendered in Studio.
         """
-        self.problem.runtime.is_author_mode = True
+        self.problem.system.is_author_mode = True
         assert 'original_get_html' == self.problem.get_html()
 
     def test_edxnotes_blockstore_runtime(self):

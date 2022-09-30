@@ -701,6 +701,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         self.descriptor.download_video = True
         self.descriptor.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
         self.descriptor.edx_video_id = edx_video_id
+        self.descriptor.runtime.course_id = MagicMock()
 
         xml = self.descriptor.definition_to_xml(self.file_system)
         parser = etree.XMLParser(remove_blank_text=True)
@@ -730,7 +731,7 @@ class VideoExportTestCase(VideoBlockTestBase):
             video_id=edx_video_id,
             static_dir=EXPORT_IMPORT_STATIC_DIR,
             resource_fs=self.file_system,
-            course_id=self.descriptor.scope_ids.usage_id.context_key,
+            course_id=str(self.descriptor.runtime.course_id.for_branch(None)),
         )
 
     @patch('xmodule.video_module.video_module.edxval_api')
@@ -739,6 +740,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         mock_val_api.ValVideoNotFoundError = _MockValVideoNotFoundError
         mock_val_api.export_to_xml = Mock(side_effect=mock_val_api.ValVideoNotFoundError)
         self.descriptor.edx_video_id = 'test_edx_video_id'
+        self.descriptor.runtime.course_id = MagicMock()
 
         xml = self.descriptor.definition_to_xml(self.file_system)
         parser = etree.XMLParser(remove_blank_text=True)
@@ -859,6 +861,7 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
         Ensure that student_view_data returns the expected results for video modules.
         """
         descriptor = instantiate_descriptor(**field_data)
+        descriptor.runtime.course_id = MagicMock()
         student_view_data = descriptor.student_view_data()
         assert student_view_data == expected_student_view_data
 
@@ -893,6 +896,7 @@ class VideoBlockStudentViewDataTestCase(unittest.TestCase):
         }
 
         descriptor = instantiate_descriptor(edx_video_id='example_id', only_on_web=False)
+        descriptor.runtime.course_id = MagicMock()
         descriptor.runtime.handler_url = MagicMock()
         student_view_data = descriptor.student_view_data()
         expected_video_data = {'hls': {'url': 'http://www.meowmix.com', 'file_size': 25556}}

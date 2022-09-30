@@ -211,6 +211,7 @@ def _preview_module_system(request, descriptor, field_data):
         track_function=lambda event_type, event: None,
         get_module=partial(_load_preview_module, request),
         mixins=settings.XBLOCK_MIXINS,
+        course_id=course_id,
 
         # Set up functions to modify the fragment produced by student_view
         wrappers=wrappers,

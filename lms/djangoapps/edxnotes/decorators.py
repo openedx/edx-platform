@@ -33,8 +33,8 @@ def edxnotes(cls):
         if not hasattr(runtime, 'modulestore'):
             return original_get_html(self, *args, **kwargs)
 
-        is_studio = getattr(self.runtime, "is_author_mode", False)
-        course = getattr(self, 'descriptor', self).runtime.modulestore.get_course(self.scope_ids.usage_id.context_key)
+        is_studio = getattr(self.system, "is_author_mode", False)
+        course = getattr(self, 'descriptor', self).runtime.modulestore.get_course(self.runtime.course_id)
 
         # Must be disabled when:
         # - in Studio
@@ -57,10 +57,10 @@ def edxnotes(cls):
                 ),
                 "params": {
                     # Use camelCase to name keys.
-                    "usageId": self.scope_ids.usage_id,
-                    "courseId": course.id,
+                    "usageId": str(self.scope_ids.usage_id),
+                    "courseId": str(self.runtime.course_id),
                     "token": get_edxnotes_id_token(user),
-                    "tokenUrl": get_token_url(course.id),
+                    "tokenUrl": get_token_url(self.runtime.course_id),
                     "endpoint": get_public_endpoint(),
                     "debug": settings.DEBUG,
                     "eventStringLimit": settings.TRACK_MAX_EVENT / 6,

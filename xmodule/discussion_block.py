@@ -73,6 +73,13 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):  # li
 
     @property
     def course_key(self):
+        """
+        :return: int course id
+
+        NB: The goal is to move this XBlock out of edx-platform, and so we use
+        scope_ids.usage_id instead of runtime.course_id so that the code will
+        continue to work with workbench-based testing.
+        """
         return getattr(self.scope_ids.usage_id, 'course_key', None)
 
     @property
