@@ -31,37 +31,37 @@ jobs:
 
     name: pylint ${{ matrix.module-name }}
     steps:
-    - name: Check out repo
-      uses: actions/checkout@v2
+      - name: Check out repo
+        uses: actions/checkout@v2
 
-    - name: Install required system packages
-      run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
+      - name: Install required system packages
+        run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-    - name: Get pip cache dir
-      id: pip-cache-dir
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
+      - name: Get pip cache dir
+        id: pip-cache-dir
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
 
-    - name: Cache pip dependencies
-      id: cache-dependencies
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.pip-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
+      - name: Cache pip dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
 
-    - name: Install required Python dependencies
-      run: |
-        pip install -r requirements/pip.txt
-        make dev-requirements
-        pip uninstall -y mysqlclient
-        pip install --no-binary mysqlclient mysqlclient
+      - name: Install required Python dependencies
+        run: |
+          pip install -r requirements/pip.txt
+          make dev-requirements
+          pip uninstall -y mysqlclient
+          pip install --no-binary mysqlclient mysqlclient
 
-    - name: Run quality tests
-      run: |
-        pylint ${{ matrix.path }}
+      - name: Run quality tests
+        run: |
+          pylint ${{ matrix.path }}
