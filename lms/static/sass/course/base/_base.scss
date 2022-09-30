@@ -257,4 +257,13 @@ body.view-in-mfe #discussion-alert {
     @include media-breakpoint-down(xs) {
         transform: translate(-50%, -50%) scale(.55);
     }
+
+    .inner-wrapper header h2 {
+        font-size: 22px;
+    }
+
+    #discussion-alert-message,
+    .discussion-alert-wrapper button {
+        font-size: 16px;
+    }
 }
