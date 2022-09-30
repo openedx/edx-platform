@@ -31,7 +31,7 @@ def test_quality_matrix_is_complete():
         quality_yaml = yaml.safe_load(fp)
 
         matrix_dirs = []
-        for matrix_item in quality_yaml['jobs']['run_pylint']['strategy']['matrix']['include']:
+        for matrix_item in quality_yaml['jobs']['run-pylint']['strategy']['matrix']['include']:
             matrix_dirs.extend(matrix_item['path'].split(' '))
 
         for module in ['lms', 'lms/djangoapps', 'openedx', 'openedx/core', 'openedx/core/djangoapps']:
