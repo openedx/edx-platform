@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-25 20:43+0000\n"
-"PO-Revision-Date: 2022-09-25 20:43:25.632671\n"
+"POT-Creation-Date: 2022-10-02 20:39+0000\n"
+"PO-Revision-Date: 2022-10-02 20:39:39.760247\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -9319,17 +9319,6 @@ msgid ""
 "category as the default for new posts in the Discussion page by setting its "
 "\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
 "\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
-msgstr ""
-
-#: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr ""
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
 msgstr ""
 
 #: xmodule/course_module.py

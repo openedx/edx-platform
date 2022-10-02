@@ -116,6 +116,7 @@
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdallah Nassif <a.nassif012@gmail.com>, 2013-2015
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
+# Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022
 # Ali Hasan <ahasan@qrf.org>, 2016
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013-2014
 # ahmed hai <a7medpeace@gmail.com>, 2017
@@ -180,6 +181,7 @@
 # Abdallah Nassif <a.nassif012@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdallah Nassif <a.nassif012@gmail.com>, 2013-2014
+# Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022
 # Ali Hasan <ahasan@qrf.org>, 2016
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015-2016
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
@@ -13817,7 +13819,7 @@ msgstr "المناقشة غير متاحة"
 msgid ""
 "The discussions are currently undergoing maintenance. We'll have them back "
 "up shortly!"
-msgstr "تخضع المناقشات حاليًّا لأعمال الصيانة. سنعيد تفعيلها قريبًا! "
+msgstr "المناقشات حاليا قيد الصيانة. سنعيدها تفعيلها بعد قليل!"
 
 #: lms/templates/_gated_content.html lms/templates/seq_module.html
 msgid "Content Locked"
@@ -14772,7 +14774,7 @@ msgstr "تنزيل النص"
 
 #: lms/templates/video.html
 msgid "Handouts"
-msgstr "الأوراق الموزّعة"
+msgstr "المطبوعات"
 
 #: lms/templates/video.html
 msgid "Download Handout"
@@ -21376,7 +21378,7 @@ msgstr "تعلّم المزيد عن إعدادات رؤية المحتوى."
 #: cms/templates/edit-tabs.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
 msgid "Pages & Resources"
-msgstr ""
+msgstr "الصفحات و الموارد"
 
 #. Translators: Custom Pages refer to the tabs that appear in the top
 #. navigation of each course.
@@ -24309,7 +24311,7 @@ msgstr "دخولك مسجَّل حاليًّا كـ:"
 
 #: cms/templates/widgets/user_dropdown.html
 msgid "Maintenance"
-msgstr "صيانة"
+msgstr "الصيانة"
 
 #: wiki/admin.py wiki/models/article.py
 msgid "created"
