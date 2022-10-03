@@ -68,7 +68,6 @@ attrs==22.1.0
     #   edx-ace
     #   jsonschema
     #   openedx-events
-    #   outcome
     #   pytest
 babel==2.10.3
     # via
@@ -579,7 +578,7 @@ edx-enterprise==3.57.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   learner-pathway-progress
-edx-event-bus-kafka==0.7.0
+edx-event-bus-kafka==1.0.0
     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.9.1
     # via
