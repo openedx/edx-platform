@@ -20,7 +20,7 @@ GTCS_LIST = [
     '3.2.3 - Professional Skills  and Abilities, The Learning Context',
     '3.2.4 - Professional Skills  and Abilities, The Learning Context',
     '3.3.1 - Professional Skills  and Abilities, The Learning Context, Professional Learning',
-    '3.3.2 - Professional Skills  and Abilities, The Learning Context, Professional Learning'
+    '3.3.2 - Professional Skills  and Abilities, The Learning Context, Professional Learning',
     '3.4.1 - Professional Skills  and Abilities, The Learning Context, Self-Evaluation',
     '3.4.2 - Professional Skills  and Abilities, The Learning Context, Self-Evaluation',
     '3.4.3 - Professional Skills  and Abilities, The Learning Context, Self-Evaluation',
@@ -43,8 +43,6 @@ def dump_gtcs(apps, schema_editor):
         MediaType.objects.create(name=media_type)
 
 
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -52,6 +50,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(dump_gtcs, migrations.RunPython.noop),
+        migrations.RunPython(dump_gtcs),
     ]
-

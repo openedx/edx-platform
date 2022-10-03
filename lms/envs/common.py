@@ -3179,7 +3179,7 @@ CSRF_TRUSTED_ORIGINS = []
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 
-RM_UNIFY_API = 'https://api.platform.rmunify.com/graph/'
+RM_UNIFY_URL = 'https://api.platform.rmunify.com/graph/'
 RM_UNIFY_KEY = 'place-rmunify-key-here'
 RM_UNIFY_SECRET = 'rmunify-secret'
 

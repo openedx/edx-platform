@@ -78,7 +78,7 @@ class ArticleSerializer(DynamicFieldsModelSerializer):
     def get_is_rated(self, instance):
         teacher = self.context.get('teacher')
         return instance.is_rated(teacher)
-    
+
     def get_rating(self, instance):
         teacher = self.context.get('teacher')
         try:
@@ -98,7 +98,7 @@ class ArticleSerializer(DynamicFieldsModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('id', 'title', 'cover', 'skills', 'gtcs', 'media_types', 'time',
+        fields = ('id', 'title', 'cover', 'skills', 'gtcs', 'media_types', 'time', 'summary',
                   'content', 'author', 'is_completed', 'is_rated', 'rating', 'reflections', 'answer', 'created')
 
 

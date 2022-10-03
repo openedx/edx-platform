@@ -37,7 +37,7 @@ class ClassColors:
 class JournalTypes:
 
     """
-    color choices for the classes
+    Journal choices for the classes
     """
     TEACHER_FEEDBACK = 'TeacherFeedback'
     STUDENT_POST = 'StudentReflection'
@@ -45,6 +45,34 @@ class JournalTypes:
     __ALL__ = (TEACHER_FEEDBACK, STUDENT_POST)
     __MODEL_CHOICES__ = (
         (journal_type, journal_type) for journal_type in __ALL__
+    )
+
+
+class SchoolTypes:
+
+    """
+    school types choices for the classes
+    """
+    RM_UNIFY = 'RmUnify'
+    PRIVATE = 'Private'
+
+    __ALL__ = (RM_UNIFY, PRIVATE)
+    __MODEL_CHOICES__ = (
+        (school_type, school_type) for school_type in __ALL__
+    )
+
+
+class ClassTypes:
+
+    """
+    class types choices for the classes
+    """
+    TEACHING_GROUP = 'TeachingGroup'
+    REGISTRATION_GROUP = 'RegistrationGroup'
+
+    __ALL__ = (TEACHING_GROUP, REGISTRATION_GROUP)
+    __MODEL_CHOICES__ = (
+        (class_type, class_type) for class_type in __ALL__
     )
 
 class ActivityTypes:
