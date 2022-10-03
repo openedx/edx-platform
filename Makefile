@@ -71,7 +71,7 @@ local-requirements:
 # 	edx-platform installs some Python projects from within the edx-platform repo itself.
 	pip install -e .
 
-dev-requirements: pre-requirements ## install development environment requirements
+dev-requirements: pre-requirements
 	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
 	@# of it if it does not.  Shell wildcarding can't do that with default options.
 	pip-sync -q requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
@@ -85,7 +85,7 @@ test-requirements: pre-requirements
 	pip-sync --pip-args="--exists-action=w" requirements/edx/testing.txt
 	make local-requirements
 
-requirements: dev-requirements
+requirements: dev-requirements ## install development environment requirements
 
 shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
 	docker run -it -e "NO_PYTHON_UNINSTALL=1" -e "PIP_INDEX_URL=https://pypi.python.org/simple" -e TERM \
