@@ -64,20 +64,24 @@ pull: ## update the Docker image used by "make shell"
 	docker pull edxops/edxapp:latest
 
 pre-requirements: ## install Python requirements for running pip-tools
+	pip install -qr requirements/pip.txt
 	pip install -qr requirements/edx/pip-tools.txt
 
 local-requirements:
 # 	edx-platform installs some Python projects from within the edx-platform repo itself.
 	pip install -e .
 
-dev-requirements: local-requirements
-	pip install -qr requirements/edx/development.txt
+dev-requirements: pre-requirements
+	pip-sync requirements/edx/development.txt
+	make local-requirements
 
-base-requirements: local-requirements
-	pip install -qr requirements/edx/base.txt
+base-requirements: pre-requirements
+	pip-sync requirements/edx/base.txt
+	make local-requirements
 
-test-requirements: local-requirements
-	pip install --exists-action='w' -qr requirements/edx/testing.txt
+test-requirements: pre-requirements
+	pip-sync --pip-args="--exists-action=w" requirements/edx/testing.txt
+	make local-requirements
 
 requirements: pre-requirements ## install development environment requirements
 	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
@@ -130,7 +134,7 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 		pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
 		export REBUILD=''; \
 	done
- 	# Let tox control the Django version for tests
+	# Let tox control the Django version for tests
 	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
