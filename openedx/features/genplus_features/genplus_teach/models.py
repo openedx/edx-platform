@@ -139,4 +139,12 @@ class ArticleViewLog(TimeStampedModel):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='view_logs')
     count = models.PositiveIntegerField(default=0, help_text='Views count on each article.')
-    engagement = models.PositiveIntegerField(default=0, help_text='Length of engagement (minutes/seconds)')
+    engagement = models.PositiveIntegerField(default=0, help_text='Length of engagement in seconds')
+
+    def __str__(self):
+        return '{} has view count {} of "{}" with engagement time of {} seconds'.format(
+            self.teacher.gen_user.user.username,
+            self.count,
+            self.article.title,
+            self.engagement
+        )

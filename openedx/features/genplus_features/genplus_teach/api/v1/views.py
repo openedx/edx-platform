@@ -152,11 +152,11 @@ class ArticleViewLogViewSet(viewsets.ViewSet, GenzMixin):
     serializer_class = ArticleViewLogSerializer
 
     @action(detail=True, methods=['put'])
-    def log(self, request, article_id=None):
+    def log(self, request, pk=None):
         """
         log views and engagement time on an article
         """
-        article = get_object_or_404(Article, pk=article_id)
+        article = get_object_or_404(Article, pk=pk)
         teacher = Teacher.objects.get(gen_user=self.gen_user)
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
@@ -166,10 +166,9 @@ class ArticleViewLogViewSet(viewsets.ViewSet, GenzMixin):
         engagement_time = serializer.data.get('engagement', 0)
         try:
             log = ArticleViewLog.objects.get(teacher=teacher, article=article)
-            log.udpate(
-                        count=F('count') + count_time,
-                        engagement=F('engagement') + engagement_time
-                       )
+            log.count += count_time
+            log.engagement += engagement_time
+            log.save()
         except ArticleViewLog.DoesNotExist:
             ArticleViewLog.objects.create(
                 teacher=teacher,
