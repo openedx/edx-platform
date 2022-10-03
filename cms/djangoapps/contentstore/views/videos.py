@@ -63,6 +63,7 @@ __all__ = [
     'videos_handler',
     'video_encodings_download',
     'video_images_handler',
+    'video_images_upload_enabled',
     'transcript_preferences_handler',
     'generate_video_upload_link_handler',
 ]
@@ -261,6 +262,18 @@ def video_images_handler(request, course_key_string, edx_video_id=None):
         )
 
     return JsonResponse({'image_url': image_url})
+
+@login_required
+@require_GET
+def video_images_upload_enabled(request):
+    """Function to check if images can be uploaded"""
+
+    print(VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled())
+    # respond with a 404 if image upload is not enabled.
+    if not VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled():
+        return JsonResponse({'allowThumbnailUpload': False})
+
+    return JsonResponse({'allowThumbnailUpload': True})
 
 
 def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnaround,
