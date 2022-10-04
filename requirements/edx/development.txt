@@ -1147,9 +1147,8 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/testing.txt
     #   olxcleaner
-pylint==2.14.5
+pylint==2.15.3
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-lint
     #   pylint-celery
