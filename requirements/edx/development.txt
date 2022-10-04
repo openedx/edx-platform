@@ -55,7 +55,7 @@ asn1crypto==1.5.1
     #   -r requirements/edx/testing.txt
     #   oscrypto
     #   snowflake-connector-python
-astroid==2.11.7
+astroid==2.12.10
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -268,7 +268,7 @@ distlib==0.3.6
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==3.2.15
+django==3.2.16
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.txt
@@ -1552,6 +1552,10 @@ tomli==2.0.1
     #   pylint
     #   pytest
     #   tox
+tomlkit==0.11.5
+    # via
+    #   -r requirements/edx/testing.txt
+    #   pylint
 tox==3.26.0
     # via
     #   -r requirements/edx/testing.txt
