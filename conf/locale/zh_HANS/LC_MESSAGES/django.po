@@ -9717,17 +9717,6 @@ msgstr ""
 "\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}。"
 
 #: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "讨论排序字母"
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr "请输入\"true\"或\"false\"。当输入\"true\"时，讨论类別和子类別会依字母排序。否则按时间顺序排序。"
-
-#: xmodule/course_module.py
 msgid "Discussions Plugin Settings"
 msgstr ""
 

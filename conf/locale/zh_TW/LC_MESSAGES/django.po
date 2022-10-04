@@ -9381,17 +9381,6 @@ msgid ""
 msgstr ""
 
 #: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "討論排序字母"
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr "請輸入\"true\"或\"false\"。當輸入\"true\"時，討論類別和子類別會依字母排序。否則按時間順序排序。"
-
-#: xmodule/course_module.py
 msgid "Discussions Plugin Settings"
 msgstr ""
 
