@@ -7,6 +7,7 @@ as the discovery happens during the initial setup of Django settings.
 import os
 
 from path import Path
+from functools import lru_cache
 
 
 def get_theme_base_dirs_from_settings(theme_base_dirs=None):
@@ -49,6 +50,7 @@ def get_themes_unchecked(themes_base_dirs, project_root=None):
     return themes
 
 
+@lru_cache
 def get_theme_dirs(themes_base_dir=None):
     """
     Get all the theme dirs directly under a given base dir.
