@@ -2067,7 +2067,7 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
         """
         original_usage_key = UsageKey.from_string('block-v1:A+B+C+type@problem+block@abcd1234')
         original_usage_version = ObjectId()
-        mock_get_original_usage = lambda _, key: (original_usage_key, original_usage_version)
+        mock_get_original_usage = lambda _, key: (original_usage_key, original_usage_version)  # pylint: disable=unnecessary-lambda-assignment
         with patch('xmodule.modulestore.mixed.MixedModuleStore.get_block_original_usage', mock_get_original_usage):
             module_info = self.handle_callback_and_get_module_info(mock_tracker)
             assert 'original_usage_key' in module_info

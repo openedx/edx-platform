@@ -799,7 +799,7 @@ def sort_by_announcement(courses):
     """
 
     # Sort courses by how far are they from they start day
-    key = lambda course: course.sorting_score
+    key = lambda course: course.sorting_score  # pylint: disable=unnecessary-lambda-assignment
     courses = sorted(courses, key=key)
 
     return courses

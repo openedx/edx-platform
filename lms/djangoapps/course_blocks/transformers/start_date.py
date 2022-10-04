@@ -96,7 +96,7 @@ class StartDateTransformer(FilteringTransformerMixin, BlockStructureTransformer)
 
         now = datetime.now(UTC)
 
-        removal_condition = lambda block_key: not check_start_date(
+        removal_condition = lambda block_key: not check_start_date(  # pylint: disable=unnecessary-lambda-assignment
             usage_info.user,
             block_structure.get_xblock_field(block_key, 'days_early_for_beta'),
             self._get_merged_start_date(block_structure, block_key),

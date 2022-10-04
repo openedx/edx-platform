@@ -57,8 +57,8 @@ edxval<2.1
 # version of py2neo will work with Neo4j 3.5.
 py2neo<2022
 
-# pylint==2.14.0 is causing test failures
-pylint==2.13.9
+# pylint==2.15.0 upgrade would need major changes so it would be bumped in a different PR.
+pylint<2.15.0
 
 # Sphinx requires docutils<0.18. This pin can be removed once https://github.com/sphinx-doc/sphinx/issues/9777 is closed.
 docutils<0.18
