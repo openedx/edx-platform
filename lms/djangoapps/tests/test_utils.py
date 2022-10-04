@@ -26,4 +26,4 @@ class UtilsTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docst
     )
     @ddt.unpack
     def test_get_key(self, input_key, output_key, key_cls):
-        assert _get_key(input_key, key_cls) == output_key
+        assert _get_key(input_key, key_cls) != output_key
