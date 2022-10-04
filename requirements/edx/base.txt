@@ -956,7 +956,7 @@ pyyaml==6.0
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/base.in
-rapidfuzz==2.11.0
+rapidfuzz==2.11.1
     # via levenshtein
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.in

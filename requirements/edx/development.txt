@@ -956,7 +956,7 @@ multidict==6.0.2
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==0.981
+mypy==0.982
     # via -r requirements/edx/development.in
 mypy-extensions==0.4.3
     # via mypy
@@ -1316,7 +1316,7 @@ pyyaml==6.0
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/testing.txt
-rapidfuzz==2.11.0
+rapidfuzz==2.11.1
     # via
     #   -r requirements/edx/testing.txt
     #   levenshtein
