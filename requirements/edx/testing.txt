@@ -68,6 +68,7 @@ attrs==22.1.0
     #   edx-ace
     #   jsonschema
     #   openedx-events
+    #   outcome
     #   pytest
 babel==2.10.3
     # via
@@ -1243,7 +1244,7 @@ pyyaml==6.0
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/base.txt
-rapidfuzz==2.11.0
+rapidfuzz==2.11.1
     # via
     #   -r requirements/edx/base.txt
     #   levenshtein
