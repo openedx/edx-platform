@@ -101,9 +101,9 @@ REQ_FILES = \
 	requirements/edx/doc \
 	requirements/edx/paver \
 	requirements/edx-sandbox/py38 \
-	requirements/edx/base \
-	requirements/edx/testing \
-	requirements/edx/development \
+	requirements/edx/base_layer \
+	requirements/edx/testing_layer \
+	requirements/edx/development_layer \
 	scripts/xblock/requirements
 
 define COMMON_CONSTRAINTS_TEMP_COMMENT
@@ -132,10 +132,7 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 		pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
 		export REBUILD=''; \
 	done
-	# Let tox control the Django version for tests
-	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
-	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
-	mv requirements/edx/testing.tmp requirements/edx/testing.txt
+	grep -e "^django==" requirements/edx/base_layer.txt > requirements/edx/django.txt
 
 upgrade: pre-requirements  ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"

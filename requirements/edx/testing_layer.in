@@ -14,8 +14,8 @@
 
 -c ../constraints.txt
 
--r base.txt               # Core edx-platform production dependencies
--r coverage.txt           # Utilities for calculating test coverage
+-c base.txt               # Core edx-platform production dependencies
+-c coverage.txt           # Utilities for calculating test coverage
 
 beautifulsoup4            # Library for extracting data from HTML and XML files
 bok-choy                  # Framework for browser automation tests, based on selenium
@@ -48,3 +48,5 @@ tox-battery               # Makes tox aware of requirements file changes
 unidiff                   # Required by coverage_pytest_plugin
 pylint-pytest==0.3.0      # A Pylint plugin to suppress pytest-related false positives.
 pact-python               # Library for contract testing
+tox-run-before            # Gives tox the abillity to run bash commands before making environments
+ 
