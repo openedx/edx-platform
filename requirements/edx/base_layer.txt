@@ -160,7 +160,7 @@ deprecated==1.2.13
     # via
     #   jwcrypto
     #   redis
-django==3.2.15
+django==3.2.16
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base_layer.in

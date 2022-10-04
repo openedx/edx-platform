@@ -9,9 +9,13 @@
 # update scripts/dependencies/development.txt accordingly.
 
 -c ../constraints.txt
-
 -c pip-tools.txt                        # pip-tools and its dependencies, for managing requirements files
--c testing.txt                          # Dependencies for running the various test suites
+
+-c github.in                            # Forks and other dependencies not yet on PyPI
+-c paver.txt                            # Requirements for running paver commands
+-c base_layer.txt                       # Base Layer requirements
+-c coverage.txt                         # Utilities for calculating test coverage
+-c testing_layer.txt 
 
 click                                   # Used for perf_tests utilities in modulestore
 django-debug-toolbar                    # A set of panels that display debug information about the current request/response

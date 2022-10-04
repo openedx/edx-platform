@@ -14,7 +14,9 @@
 
 -c ../constraints.txt
 
--c base.txt               # Core edx-platform production dependencies
+-c github.in              # Forks and other dependencies not yet on PyPI
+-c paver.txt              # Requirements for running paver commands
+-c base_layer.txt         # Base Layer requirements
 -c coverage.txt           # Utilities for calculating test coverage
 
 beautifulsoup4            # Library for extracting data from HTML and XML files
