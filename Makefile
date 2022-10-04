@@ -82,7 +82,7 @@ base-requirements: pre-requirements
 	make local-requirements
 
 test-requirements: pre-requirements
-	pip-sync --pip-args="--exists-action=w" requirements/edx/testing.txt
+	pip install --exists-action='w' -qr requirements/edx/testing.txt
 	make local-requirements
 
 requirements: dev-requirements ## install development environment requirements
