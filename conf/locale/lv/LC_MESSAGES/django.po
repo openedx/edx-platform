@@ -9873,20 +9873,6 @@ msgstr ""
 "MUS101-course-2015_T1\", \"default\": true}."
 
 #: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "Alfabētiska diskusiju kārtošana"
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr ""
-"Ievadīt kā patiesu vai nepatiesu. Ja patiess, tad diskusiju kategorijas un "
-"apakškategorijas tiek kārtotas alfabētiski. Ja nepatiess, tad tās tiek "
-"kārtotas hronoloģiski pēc izveidošanas datuma un laika."
-
-#: xmodule/course_module.py
 msgid "Discussions Plugin Settings"
 msgstr ""
 

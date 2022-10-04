@@ -9373,19 +9373,6 @@ msgstr ""
 "true}."
 
 #: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "アルファベット順のディスカッション　"
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr ""
-"true または false を入力してください。true "
-"の場合、ディスカッションカテゴリーおよびサブカテゴリーはアルファベット順に、falseの場合、日付順に並び替えられます。"
-
-#: xmodule/course_module.py
 msgid "Discussions Plugin Settings"
 msgstr ""
 
