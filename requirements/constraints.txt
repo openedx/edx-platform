@@ -52,9 +52,6 @@ django-webpack-loader==0.7.0
 # version of py2neo will work with Neo4j 3.5.
 py2neo<2022
 
-# pylint==2.14.0 is causing test failures
-pylint==2.13.9
-
 # scipy version 1.8 requires numpy>=1.17.3, we've pinned numpy to <1.17.0 in requirements/edx-sandbox/py38.in
 scipy<1.8.0
 
