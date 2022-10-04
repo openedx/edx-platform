@@ -8,11 +8,6 @@
 #   * run "make upgrade" to update the detailed requirements files
 #
 
--c ../constraints.txt
-
--r github.in              # Forks and other dependencies not yet on PyPI
--r paver.txt              # Requirements for running paver commands
-
 # Please follow these guidelines whenever you change this file:
 #
 # 1. When adding a new dependency, add a comment to the end of the line

@@ -1,0 +1,15 @@
+# Compile all dependencies together in one big computation so that we
+# don't "paint ourselves into a corner" by compiling in layers. The
+# output is only used as a constraints file for each layer, and isn't
+# meant to be installed.
+
+-c ../constraints.txt
+-r pip.in
+-r pip-tools.in
+-r coverage.in
+-r doc.in
+-r paver.in
+-r github.in
+-r base.in
+-r testing.in
+-r development.in

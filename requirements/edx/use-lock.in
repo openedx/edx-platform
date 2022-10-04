@@ -1,0 +1,4 @@
+# A layer of indirection that allows the lock-all.txt to be passed to
+# pip-compile as constraints, rather than requirements.
+
+-c lock-all.txt

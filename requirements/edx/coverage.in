@@ -10,7 +10,5 @@
 #   * run "make upgrade" to update the detailed requirements files
 #
 
--c ../constraints.txt
-
 coverage                            # Code coverage testing for Python
 diff-cover                          # Automatically find diff lines that need test coverage

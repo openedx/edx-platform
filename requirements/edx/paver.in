@@ -8,8 +8,6 @@
 #   * run "make upgrade" to update the detailed requirements files
 #
 
--c ../constraints.txt
-
 edx-opaque-keys                     # Create and introspect course and xblock identities
 lazy                                # Lazily-evaluated attributes for Python objects
 libsass==0.10.0                     # Python bindings for the LibSass CSS compiler

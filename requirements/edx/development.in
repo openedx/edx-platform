@@ -8,11 +8,6 @@
 # When adding a new dependency which is imported from edx-platform code as a library,
 # update scripts/dependencies/development.txt accordingly.
 
--c ../constraints.txt
-
--r pip-tools.txt                        # pip-tools and its dependencies, for managing requirements files
--r testing.txt                          # Dependencies for running the various test suites
-
 click                                   # Used for perf_tests utilities in modulestore
 django-debug-toolbar                    # A set of panels that display debug information about the current request/response
 edx-sphinx-theme                        # Documentation theme

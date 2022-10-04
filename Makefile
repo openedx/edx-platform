@@ -74,15 +74,15 @@ local-requirements:
 dev-requirements: pre-requirements
 	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
 	@# of it if it does not.  Shell wildcarding can't do that with default options.
-	pip-sync -q requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
+	(cd requirements/edx/; pip-sync -q paver.txt github.txt base.txt coverage.txt testing.txt development.txt $(wildcard private.txt))
 	make local-requirements
 
 base-requirements: pre-requirements
-	pip-sync requirements/edx/base.txt
+	(cd requirements/edx/; pip-sync paver.txt github.txt base.txt)
 	make local-requirements
 
 test-requirements: pre-requirements
-	pip-sync --pip-args="--exists-action=w" requirements/edx/testing.txt
+	(cd requirements/edx/; pip-sync --pip-args="--exists-action=w" paver.txt github.txt base.txt coverage.txt testing.txt)
 	make local-requirements
 
 requirements: dev-requirements ## install development environment requirements
@@ -94,18 +94,6 @@ shell: ## launch a bash shell in a Docker container with all edx-platform depend
 	-v edxapp_node_modules:/edx/app/edxapp/edx-platform/node_modules \
 	edxops/edxapp:latest /edx/app/edxapp/devstack.sh open
 
-# Order is very important in this list: files must appear after everything they include!
-REQ_FILES = \
-	requirements/edx/pip-tools \
-	requirements/edx/coverage \
-	requirements/edx/doc \
-	requirements/edx/paver \
-	requirements/edx-sandbox/py38 \
-	requirements/edx/base \
-	requirements/edx/testing \
-	requirements/edx/development \
-	scripts/xblock/requirements
-
 define COMMON_CONSTRAINTS_TEMP_COMMENT
 # This is a temporary solution to override the real common_constraints.txt\n# In edx-lint, until the pyjwt constraint in edx-lint has been removed.\n# See BOM-2721 for more details.\n# Below is the copied and edited version of common_constraints\n
 endef
@@ -116,35 +104,43 @@ $(COMMON_CONSTRAINTS_TXT):
 	wget -O "$(@)" https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt || touch "$(@)"
 	echo "$(COMMON_CONSTRAINTS_TEMP_COMMENT)" | cat - $(@) > temp && mv temp $(@)
 
+COMPILE_CMD=pip-compile -v --no-emit-trusted-host --no-emit-index-url
+PIPLOCK=requirements/edx/use-lock.in
+
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
-compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
+compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
 	@# This is a temporary solution to override the real common_constraints.txt
 	@# In edx-lint, until the pyjwt constraint in edx-lint has been removed.
 	@# See BOM-2721 for more details.
 	sed 's/Django<2.3//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 
+	@# Stage 1: All files that are compiled in isolation, including lock-all.txt (needed by stage 2).
 	pip install -q pip-tools
-	pip-compile --allow-unsafe --upgrade -o requirements/edx/pip.txt requirements/edx/pip.in
-
-	@ export REBUILD='--rebuild'; \
-	for f in $(REQ_FILES); do \
-		echo ; \
-		echo "== $$f ===============================" ; \
-		echo "pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in"; \
-		pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
-		export REBUILD=''; \
-	done
-
+	${COMPILE_CMD} ${COMPILE_OPTS} --allow-unsafe -o requirements/edx/pip.txt requirements/edx/pip.in
 	pip install -qr requirements/edx/pip.txt
+	${COMPILE_CMD} ${COMPILE_OPTS} -o requirements/edx/pip-tools.txt requirements/edx/pip-tools.in
 	pip install -qr requirements/edx/pip-tools.txt
+	${COMPILE_CMD} ${COMPILE_OPTS} -o requirements/edx/lock-all.txt requirements/edx/lock-all.in
+	${COMPILE_CMD} ${COMPILE_OPTS} -o requirements/edx-sandbox/py38.txt requirements/edx-sandbox/py38.in
+	${COMPILE_CMD} ${COMPILE_OPTS} -o scripts/xblock/requirements.txt scripts/xblock/requirements.in
+
+	@# Stage 2: Build all layer files using the generated constraints.
+	${COMPILE_CMD} ${COMPILE_OPTS} -o requirements/edx/doc.txt requirements/edx/doc.in ${PIPLOCK}
+	${COMPILE_CMD} ${COMPILE_OPTS} -o requirements/edx/paver.txt requirements/edx/paver.in ${PIPLOCK}
+	${COMPILE_CMD} ${COMPILE_OPTS} -o requirements/edx/github.txt requirements/edx/github.in ${PIPLOCK}
+	${COMPILE_CMD} ${COMPILE_OPTS} -o requirements/edx/base.txt requirements/edx/base.in ${PIPLOCK}
+	${COMPILE_CMD} ${COMPILE_OPTS} -o requirements/edx/coverage.txt requirements/edx/coverage.in ${PIPLOCK}
+	${COMPILE_CMD} ${COMPILE_OPTS} -o requirements/edx/testing.txt requirements/edx/testing.in ${PIPLOCK}
+	${COMPILE_CMD} ${COMPILE_OPTS} -o requirements/edx/development.txt requirements/edx/development.in ${PIPLOCK}
+	@# ^ Adding anything to this list? Make sure to add it to lock-all.in as well.
 
 	# Let tox control the Django version for tests
 	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
-upgrade: pre-requirements  ## update the pip requirements files to use the latest releases satisfying our constraints
+upgrade: ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
 check-types: ## run static type-checking tests

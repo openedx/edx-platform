@@ -12,11 +12,6 @@
 #   * run "make upgrade" to update the detailed requirements files
 #   * add an appropriate pattern to scripts/dependencies/testing.py
 
--c ../constraints.txt
-
--r base.txt               # Core edx-platform production dependencies
--r coverage.txt           # Utilities for calculating test coverage
-
 beautifulsoup4            # Library for extracting data from HTML and XML files
 bok-choy                  # Framework for browser automation tests, based on selenium
 code-annotations          # Perform code annotation checking, such as for PII annotations
