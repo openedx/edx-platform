@@ -736,8 +736,9 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/edx/base.in
     #   blockstore
-newrelic==8.2.0.181
+newrelic==8.1.0.180
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-django-utils
 nltk==3.7

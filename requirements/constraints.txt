@@ -101,3 +101,6 @@ pytz==2022.2.1
 # openedx-events>0.13.0 causes test failures due to breaking changes
 # These broken tests will be fixed in a separate PR
 openedx-events==0.13.0
+
+# newrelic==8.2.0 has broken instrumentation for confluent-kafka. This constraint can be removed once the issue is fixed.
+newrelic<8.2.0
