@@ -45,6 +45,7 @@ def plugin_settings(settings):
         # from the redirect mechanics.
         settings.MAIN_SITE_REDIRECT_ALLOWLIST = [
             '/api/',
+            '/user_api/',  # still used by EdxRestAPIClient in integrations
             '/admin',
             'oauth',  # TODO: Add slashes during Nutmeg upgrade since this requires a lot of QA
             'status',  # TODO: Add slashes during Nutmeg upgrade since this requires a lot of QA
