@@ -15,9 +15,10 @@ from ratelimit import ALL
 from ratelimit.decorators import ratelimit
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
-from openedx.core.djangoapps.oauth_dispatch import adapters
+from openedx.core.djangoapps.oauth_dispatch import adapters, JWT_DISABLED_FOR_MOBILE
 from openedx.core.djangoapps.oauth_dispatch.dot_overrides import views as dot_overrides_views
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_token_dict
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 
 class _DispatchingView(View):
@@ -104,8 +105,12 @@ class AccessTokenView(_DispatchingView):
         response = super().dispatch(request, *args, **kwargs)
         monitoring_utils.set_custom_attribute('oauth_grant_type', request.POST.get('grant_type', 'not-supplied'))
         token_type = _get_token_type(request)
+        is_jwt_disabled = False
 
-        if response.status_code == 200 and token_type == 'jwt':
+        if is_request_from_mobile_app(request):
+            is_jwt_disabled = JWT_DISABLED_FOR_MOBILE.is_enabled()
+
+        if response.status_code == 200 and token_type == 'jwt' and not is_jwt_disabled:
             response.content = self._get_jwt_content_from_access_token_content(request, response)
 
         return response
@@ -139,8 +144,12 @@ class AccessTokenExchangeView(_DispatchingView):
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
         token_type = _get_token_type(request)
+        is_jwt_disabled = False
 
-        if response.status_code == 200 and token_type == 'jwt':
+        if is_request_from_mobile_app(request):
+            is_jwt_disabled = JWT_DISABLED_FOR_MOBILE.is_enabled()
+
+        if response.status_code == 200 and token_type == 'jwt' and not is_jwt_disabled:
             response.data = self._get_jwt_data_from_access_token_data(request, response)
 
         return response

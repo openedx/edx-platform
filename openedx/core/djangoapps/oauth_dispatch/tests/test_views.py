@@ -13,11 +13,13 @@ from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_switch
 from jwkest import jwk
 from oauth2_provider import models as dot_models
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
+from openedx.core.djangoapps.oauth_dispatch import JWT_DISABLED_FOR_MOBILE
 
 from . import mixins
 
@@ -349,6 +351,55 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         """
         self._test_jwt_access_token('dot_app', token_type='jwt', grant_type='password', asymmetric_jwt=True)
 
+    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, False)
+    @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
+    def test_disable_jwt_waffle_switch_disabled_non_mobile(self, mock_is_request_from_mobile_app):
+        """
+        JWT_DISABLED_FOR_MOBILE disabled
+        Non-mobile request
+        Test JWT token is returned
+        """
+        mock_is_request_from_mobile_app.return_value = False
+        self._test_jwt_access_token('dot_app', token_type='jwt', grant_type='password')
+
+    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, True)
+    @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
+    def test_disable_jwt_waffle_switch_enabled_non_mobile(self, mock_is_request_from_mobile_app):
+        """
+        JWT_DISABLED_FOR_MOBILE enabled
+        Non-mobile request
+        Test JWT token is returned
+        """
+        mock_is_request_from_mobile_app.return_value = False
+        self._test_jwt_access_token('dot_app', token_type='jwt', grant_type='password')
+
+    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, True)
+    @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
+    def test_disable_jwt_waffle_switch_enabled_mobile(self, mock_is_request_from_mobile_app):
+        """
+        JWT_DISABLED_FOR_MOBILE enabled
+        Mobile request
+        Test JWT token is not returned, and that Bearer token is returned instead
+        """
+        mock_is_request_from_mobile_app.return_value = True
+        response = self._post_request(self.user, self.dot_app, token_type='jwt')
+        data = json.loads(response.content.decode('utf-8'))
+        access_token = data['access_token']
+        assert response.status_code == 200
+        assert data['token_type'] == "Bearer"
+        assert dot_models.AccessToken.objects.filter(token=access_token).exists() is True
+
+    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, False)
+    @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
+    def test_disable_jwt_waffle_switch_disabled_mobile(self, mock_is_request_from_mobile_app):
+        """
+        JWT_DISABLED_FOR_MOBILE disabled
+        Mobile request
+        Test JWT token is returned
+        """
+        mock_is_request_from_mobile_app.return_value = True
+        self._test_jwt_access_token('dot_app', token_type='jwt', grant_type='password')
+
 
 @ddt.ddt
 @httpretty.activate
@@ -375,6 +426,26 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
             body['asymmetric_jwt'] = asymmetric_jwt
 
         return body
+
+    def _test_jwt_access_token(self, client_attr, token_type=None, headers=None, grant_type=None, asymmetric_jwt=False):
+        client = getattr(self, client_attr)
+        self.oauth_client = client
+        self._setup_provider_response(success=True)
+        response = self._post_request(self.user, client, token_type=token_type,
+                                      headers=headers or {}, asymmetric_jwt=asymmetric_jwt)
+        assert response.status_code == 200
+        data = json.loads(response.content.decode('utf-8'))
+        assert 'expires_in' in data
+        assert data['expires_in'] > 0
+        assert data['token_type'] == 'JWT'
+
+        self.assert_valid_jwt_access_token(
+            data['access_token'],
+            self.user,
+            data['scope'].split(' '),
+            grant_type=grant_type,
+            should_be_asymmetric_key=asymmetric_jwt
+        )
 
     @ddt.data('dot_app')
     def test_access_token_exchange_calls_dispatched_view(self, client_attr):
@@ -434,6 +505,62 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         assert response.status_code == 403
         data = json.loads(response.content.decode('utf-8'))
         assert data['error'] == 'account_disabled'
+
+    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, False)
+    @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
+    @ddt.data('dot_app')
+    def test_disable_jwt_waffle_switch_disabled_non_mobile(self, client_attr, mock_is_request_from_mobile_app):
+        """
+        JWT_DISABLED_FOR_MOBILE disabled
+        Non-mobile request
+        Test JWT token is returned
+        """
+        mock_is_request_from_mobile_app.return_value = False
+        self._test_jwt_access_token(client_attr, token_type='jwt', grant_type='password')
+
+    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, True)
+    @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
+    @ddt.data('dot_app')
+    def test_disable_jwt_waffle_switch_enabled_non_mobile(self, client_attr, mock_is_request_from_mobile_app):
+        """
+        JWT_DISABLED_FOR_MOBILE enabled
+        Non-mobile request
+        Test JWT token is returned
+        """
+        mock_is_request_from_mobile_app.return_value = False
+        self._test_jwt_access_token(client_attr, token_type='jwt', grant_type='password')
+
+    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, True)
+    @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
+    @ddt.data('dot_app')
+    def test_disable_jwt_waffle_switch_enabled_mobile(self, client_attr, mock_is_request_from_mobile_app):
+        """
+        JWT_DISABLED_FOR_MOBILE enabled
+        Mobile request
+        Test JWT token is not returned, and that Bearer token is returned instead
+        """
+        mock_is_request_from_mobile_app.return_value = True
+        client = getattr(self, client_attr)
+        self.oauth_client = client
+        self._setup_provider_response(success=True)
+        response = self._post_request(self.user, client, token_type='jwt')
+        data = json.loads(response.content.decode('utf-8'))
+        access_token = data['access_token']
+        assert response.status_code == 200
+        assert data['token_type'] == "Bearer"
+        assert dot_models.AccessToken.objects.filter(token=access_token).exists() is True
+
+    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, False)
+    @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
+    @ddt.data('dot_app')
+    def test_disable_jwt_waffle_switch_disabled_mobile(self, client_attr, mock_is_request_from_mobile_app):
+        """
+        JWT_DISABLED_FOR_MOBILE disabled
+        Mobile request
+        Test JWT token is returned
+        """
+        mock_is_request_from_mobile_app.return_value = True
+        self._test_jwt_access_token(client_attr, token_type='jwt', grant_type='password')
 
 
 # pylint: disable=abstract-method
