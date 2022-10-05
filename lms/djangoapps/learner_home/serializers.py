@@ -462,7 +462,7 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         'Private' Serializer for the 'course' key data. This data comes from the pseudo session
         """
 
-        bannerImgSrc = serializers.URLField(source="image.src")
+        bannerImgSrc = serializers.URLField(source="image.src", default=None)
         courseName = serializers.CharField(source="title")
         courseNumber = serializers.CharField(source="key")
 

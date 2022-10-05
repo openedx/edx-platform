@@ -883,6 +883,36 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         assert output_data["courseProvider"] is not None
         assert output_data["programs"] == {"relatedPrograms": []}
 
+    def test_no_image(self):
+        # Given entitlements
+        (
+            unfulfilled_entitlement,
+            pseudo_sessions,
+            available_sessions,
+        ) = self.make_unfulfilled_entitlement()
+
+        # where pseudo sessions don't have images
+        for course_uuid in pseudo_sessions:
+            pseudo_session = pseudo_sessions[course_uuid]
+            pseudo_session["image"] = None
+
+        pseudo_session_course_overviews = self.make_pseudo_session_course_overviews(
+            unfulfilled_entitlement, pseudo_sessions
+        )
+
+        context = {
+            "unfulfilled_entitlement_pseudo_sessions": pseudo_sessions,
+            "course_entitlement_available_sessions": available_sessions,
+            "pseudo_session_course_overviews": pseudo_session_course_overviews,
+            "programs": {},
+        }
+
+        # When I serialize
+        UnfulfilledEntitlementSerializer(unfulfilled_entitlement, context=context).data
+
+        # Then I get None for bannerImgSrc instead of throwing an exception
+        pass
+
     def test_programs(self):
         (
             unfulfilled_entitlement,
