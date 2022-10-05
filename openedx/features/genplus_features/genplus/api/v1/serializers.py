@@ -50,10 +50,14 @@ class UserInfoSerializer(serializers.ModelSerializer):
                   'first_name', 'last_name', 'email', 'school')
 
 class TeacherSerializer(serializers.ModelSerializer):
+    user_id = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
     class Meta:
         model = Teacher
-        fields = ('id', 'name', 'profile_image')
+        fields = ('id', 'user_id', 'name', 'profile_image')
+    
+    def get_user_id(self, obj):
+        return obj.gen_user.user.id
 
     def get_name(self, obj):
         profile = UserProfile.objects.filter(user=obj.gen_user.user).first()

@@ -278,13 +278,13 @@ class JournalViewSet(GenzMixin, FlatMultipleModelMixin, viewsets.ModelViewSet):
             data['student'] = self.gen_user.student.id
             data['skill'] = request_data.get('skill')
         elif journal_type == JournalTypes.TEACHER_FEEDBACK:
-            data['student'] = self.request.query_params.get('student_id')
+            data['student'] = request_data.get('student_id')
             data['teacher'] = self.gen_user.teacher.id
 
         return data
 
-    def partial_update(self, request, *args, **kwargs):
-        journal_post = self.get_object()
+    def partial_update(self, request, pk=None, *args, **kwargs):
+        journal_post = get_object_or_404(JournalPost, pk=pk)
 
         if self.gen_user.is_student:
             success_message = SuccessMessages.STUDENT_POST_UPDATED
