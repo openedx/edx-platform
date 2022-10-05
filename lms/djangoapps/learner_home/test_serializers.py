@@ -908,10 +908,12 @@ class TestUnfulfilledEntitlementSerializer(LearnerDashboardBaseTest):
         }
 
         # When I serialize
-        UnfulfilledEntitlementSerializer(unfulfilled_entitlement, context=context).data
+        output_data = UnfulfilledEntitlementSerializer(
+            unfulfilled_entitlement, context=context
+        ).data
 
         # Then I get None for bannerImgSrc instead of throwing an exception
-        pass
+        self.assertIsNone(output_data["course"]["bannerImgSrc"])
 
     def test_programs(self):
         (
