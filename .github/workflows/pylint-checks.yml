@@ -65,13 +65,18 @@ jobs:
         run: |
           pylint ${{ matrix.path }}
 
+  # This job aggregates test results. It's the required check for branch protection.
+  # https://github.com/marketplace/actions/alls-green#why
+  # https://github.com/orgs/community/discussions/33579
   success:
-    name: Pylint successful
-    # A collection step to give a simple name for required status checks.
-    # https://github.com/orgs/community/discussions/33579
-    needs: run-pylint
+    name: Tests successful
+    if: always()
+    needs:
+      - run-pylint
     runs-on: ubuntu-latest
     steps:
-      - name: "Success"
-        run: |
-          echo Pylint successful
+      - name: Decide whether the needed jobs succeeded or failed
+        # uses: re-actors/alls-green@v1.2.1
+        uses: re-actors/alls-green@13b4244b312e8a314951e03958a2f91519a6a3c9
+        with:
+          jobs: ${{ toJSON(needs) }}
