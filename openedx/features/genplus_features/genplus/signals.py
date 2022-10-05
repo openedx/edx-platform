@@ -23,16 +23,14 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Teacher)
 def create_teacher(sender, instance, created, **kwargs):
-    if created:
-        classes = Class.objects.filter(school=instance.gen_user.school)
-        instance.classes.add(*classes)
+    classes = Class.objects.filter(school=instance.gen_user.school)
+    instance.classes.add(*classes)
 
 
 @receiver(post_save, sender=Class)
 def create_gen_class(sender, instance, created, **kwargs):
-    if created:
-        teachers = Teacher.objects.filter(gen_user__school=instance.school)
-        instance.teachers.add(*teachers)
+    teachers = Teacher.objects.filter(gen_user__school=instance.school)
+    instance.teachers.add(*teachers)
 
 
 # capturing activity of student during onboard character selection

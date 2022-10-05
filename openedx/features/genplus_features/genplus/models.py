@@ -139,6 +139,7 @@ class Class(TimeStampedModel):
 class Teacher(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='teacher')
     profile_image = models.ImageField(upload_to='gen_plus_teachers', null=True, blank=True)
+    # TODO : need to remove the through model
     classes = models.ManyToManyField(Class, related_name='teachers', through="genplus.TeacherClass")
 
     @property
