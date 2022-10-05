@@ -134,7 +134,6 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
     """
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, IsTeacher]
-    lookup_field = 'group_id'
 
     def get_queryset(self):
         return Class.visible_objects.filter(school=self.school)
@@ -153,7 +152,7 @@ class ClassViewSet(GenzMixin, viewsets.ModelViewSet):
         return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'])
-    def add_my_class(self, request, group_id=None):  # pylint: disable=unused-argument
+    def add_my_class(self, request, pk=None):  # pylint: disable=unused-argument
         """
         add classes to the my classes for teacher
         """

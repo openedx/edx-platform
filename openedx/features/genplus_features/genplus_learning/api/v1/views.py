@@ -60,18 +60,18 @@ class ClassStudentViewSet(mixins.ListModelMixin,
 
     def get_serializer_context(self):
         context = super(ClassStudentViewSet, self).get_serializer_context()
-        group_id = self.kwargs.get('group_id', None)
-        if group_id:
-            gen_class = get_object_or_404(Class, group_id=group_id)
+        class_id = self.kwargs.get('id', None)
+        if class_id:
+            gen_class = get_object_or_404(Class, pk=class_id)
             class_units = ClassUnit.objects.select_related('unit')
             context['class_units'] = class_units.filter(gen_class=gen_class)
             context['request'] = self.request
             return context
 
     def get_queryset(self):
-        group_id = self.kwargs.get('group_id', None)
+        class_id = self.kwargs.get('id', None)
         try:
-            gen_class = Class.objects.prefetch_related('students').get(group_id=group_id)
+            gen_class = Class.objects.prefetch_related('students').get(id=class_id)
         except Class.DoesNotExist:
             return Student.objects.none()
         return gen_class.students.select_related('gen_user__user').all()
@@ -82,9 +82,8 @@ class ClassSummaryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsTeacher]
     serializer_class = ClassSummarySerializer
     queryset = Class.visible_objects.all()
-    lookup_field = 'group_id'
 
-    def retrieve(self, request, group_id=None):  # pylint: disable=unused-argument
+    def retrieve(self, request, pk=None):  # pylint: disable=unused-argument
         """
         Returns the summary for a Class
         """

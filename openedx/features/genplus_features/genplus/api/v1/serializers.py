@@ -88,7 +88,7 @@ class ClassListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Class
-        fields = ('group_id', 'name', 'current_unit', 'lesson')
+        fields = ('id', 'name', 'group_id', 'current_unit', 'lesson')
 
 
 class ClassSummarySerializer(serializers.ModelSerializer):
