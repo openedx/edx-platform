@@ -82,8 +82,8 @@ base-requirements: pre-requirements
 	make local-requirements
 
 test-requirements: pre-requirements
-	@# pip-sync doesn't work with test.txt because it is not the output of pip-compile.
-	@# Instead we have to combine layers using all the requirements files with pip-sync.
+	@# pip-sync doesn't work with testing.txt because it is not the output of pip-compile.
+	@# Instead we generate a temporary requirements file from testing.txt and use pip-sync on that.
 	pip-compile -v --no-emit-trusted-host --no-emit-index-url --rebuild --upgrade -o requirements/edx/ci_temp.txt requirements/edx/testing.txt
 	pip-sync --pip-args="--exists-action=w" requirements/edx/ci_temp.txt
 	rm -rf requirements/edx/ci_temp.txt
