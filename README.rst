@@ -6,8 +6,8 @@ Open edX Platform
 .. |License: AGPL v3| image:: https://img.shields.io/badge/License-AGPL_v3-blue.svg
   :target: https://www.gnu.org/licenses/agpl-3.0
 
-.. |Python CI| image:: https://github.com/openedx/edx-platform/actions/workflows/ci.yml/badge.svg
-  :target: https://github.com/openedx/edx-platform/actions/workflows/ci.yml
+.. |Python CI| image:: https://github.com/openedx/edx-platform/actions/workflows/unit-tests.yml/badge.svg
+  :target: https://github.com/openedx/edx-platform/actions/workflows/unit-tests.yml
 
 .. |Status| image:: https://img.shields.io/badge/status-maintained-31c653
 
