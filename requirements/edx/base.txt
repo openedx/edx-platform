@@ -1,4 +1,4 @@
--r github.in              # Forks and other dependencies not yet on PyPI
+-r github.txt             # Forks and other dependencies not yet on PyPI
 -r paver.txt              # Requirements for running paver commands
 
 -r base_layer.txt         # Base Layer Requirements

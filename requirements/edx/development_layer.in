@@ -11,7 +11,7 @@
 -c ../constraints.txt
 -c pip-tools.txt                        # pip-tools and its dependencies, for managing requirements files
 
--c github.in                            # Forks and other dependencies not yet on PyPI
+-c github.txt                            # Forks and other dependencies not yet on PyPI
 -c paver.txt                            # Requirements for running paver commands
 -c base_layer.txt                       # Base Layer requirements
 -c coverage.txt                         # Utilities for calculating test coverage

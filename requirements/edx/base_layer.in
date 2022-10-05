@@ -10,7 +10,7 @@
 
 -c ../constraints.txt
 
--c github.in              # Forks and other dependencies not yet on PyPI
+-c github.txt              # Forks and other dependencies not yet on PyPI
 -c paver.txt              # Requirements for running paver commands
 
 # Please follow these guidelines whenever you change this file:
