@@ -765,9 +765,7 @@ class TestProgramsSerializer(TestCase):
         output_data = RelatedProgramSerializer(input_data).data
 
         # Test the output
-        self.assertEqual(
-            output_data['bannerImgSrc'], None
-        )
+        self.assertEqual(output_data["bannerImgSrc"], None)
 
     def test_empty_sessions(self):
         input_data = {"relatedPrograms": []}
