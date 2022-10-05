@@ -345,7 +345,7 @@ class EntitlementSerializer(serializers.Serializer):
 class RelatedProgramSerializer(serializers.Serializer):
     """Related programs information"""
 
-    bannerImgSrc = serializers.URLField(source="banner_image.small.url")
+    bannerImgSrc = serializers.URLField(source="banner_image.small.url", default=None)
     logoImgSrc = serializers.SerializerMethodField()
     numberOfCourses = serializers.SerializerMethodField()
     programType = serializers.CharField(source="type")

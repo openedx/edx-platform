@@ -752,6 +752,23 @@ class TestProgramsSerializer(TestCase):
             },
         )
 
+    def test_empty_source_programs_serializer(self):
+        """Test the ProgramsSerializer with empty data"""
+        # Given a program with empty test data
+        input_data = self.generate_test_related_program()
+
+        input_data["banner_image"] = None
+        input_data["title"] = None
+        input_data["type"] = None
+
+        # When I serialize the program
+        output_data = RelatedProgramSerializer(input_data).data
+
+        # Test the output
+        self.assertEqual(
+            output_data['bannerImgSrc'], None
+        )
+
     def test_empty_sessions(self):
         input_data = {"relatedPrograms": []}
         output_data = ProgramsSerializer(input_data).data
