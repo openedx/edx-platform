@@ -9652,20 +9652,6 @@ msgid ""
 msgstr ""
 
 #: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "განხილვის ანბანურად დაწყობა"
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr ""
-"შეიყვანეთ სწორი ან მცდარი. თუ სწორია, განხილვის კატეგორიები და "
-"ქვეკატეგორიები ანბანის მიხედვით დახარისხდება. თუ მცდარია, მათი დახარისხება "
-"ქრონოლოგიურად, შექმნის თარიღისა და დროის მიხედვით მოხდება."
-
-#: xmodule/course_module.py
 msgid "Discussions Plugin Settings"
 msgstr ""
 

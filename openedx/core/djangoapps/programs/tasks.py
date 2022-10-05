@@ -7,7 +7,7 @@ from celery import shared_task
 from celery.exceptions import MaxRetriesExceededError
 from celery.utils.log import get_task_logger
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -27,6 +27,8 @@ from openedx.core.djangoapps.credentials.utils import (
 )
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
+User = get_user_model()
 
 LOGGER = get_task_logger(__name__)
 # Maximum number of retries before giving up on awarding credentials.
@@ -290,14 +292,21 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
 
 def post_course_certificate_configuration(client, cert_config, certificate_available_date=None):
     """
-    POST to a course_certificates endpoint.
+    Make a POST request to the Credentials IDA's `course_certificates` endpoint (/api/v2/course_certificates/). This
+    endpoint manages the course certificate configurations within the Credentials IDA.
 
-    POST a configuration for a course certificate and the date the certificate will be available.
+    Args:
+        client(Session): An authenticated Credentials API Client
+        cert_config(Dict): A dictionary containing course metadata (course-run key and mode as Strings) important to the
+            Course Certificate Configuration.
+        certificate_available_date(Str): The desired Certificate Available Date for the Course Certificate Configuration
+            in the form of an ISO 8601 DateTime String.
     """
     credentials_api_base_url = get_credentials_api_base_url()
-    api_url = urljoin(f"{credentials_api_base_url}/", "course_certificates/")
+    credentials_api_url = urljoin(f"{credentials_api_base_url}/", "course_certificates/")
+
     response = client.post(
-        api_url,
+        credentials_api_url,
         json={
             "course_id": cert_config['course_id'],
             "certificate_type": cert_config['mode'],
@@ -305,6 +314,17 @@ def post_course_certificate_configuration(client, cert_config, certificate_avail
             "is_active": True
         }
     )
+
+    # Sometimes helpful error context is swallowed when calling `raise_for_status()`. We try to print out any additional
+    # error details here in the hope that it will save someone time when debugging an issue.
+    #
+    # Also... even though this endpoint does an `update_or_create()` on the Credentials side, it always passes back a
+    # 201 on a successful call.
+    if response.status_code != 201:
+        LOGGER.error(
+            "Error creating or updating a course certificate configuration in the Credentials IDA. Additional details: "
+            f"{response.text}"
+        )
     response.raise_for_status()
 
 
@@ -358,8 +378,8 @@ def update_credentials_course_certificate_configuration_available_date(
             not provided, it will be None.
     """
     LOGGER.info(
-        f"Running task update_credentials_course_certificate_configuration_available_date for course {course_key} \
-        with certificate_available_date {certificate_available_date}"
+        f"Running task `update_credentials_course_certificate_configuration_available_date` for course {course_key} "
+        f"with certificate_available_date {certificate_available_date}"
     )
     course_key = str(course_key)
     course_modes = CourseMode.objects.filter(course_id=course_key)
@@ -389,11 +409,13 @@ def update_credentials_course_certificate_configuration_available_date(
 @set_code_owner_attribute
 def award_course_certificate(self, username, course_run_key):
     """
-    This task is designed to be called whenever a student GeneratedCertificate is updated.
+    This task is designed to be called whenever a student GeneratedCertificate is updated, or when a course-run's
+    `certificate_available_date` value is updated.
+
     It can be called independently for a username and a course_run, but is invoked on each GeneratedCertificate.save.
 
-    If this function is moved, make sure to update it's entry in
-    EXPLICIT_QUEUES in the settings files so it runs in the correct queue.
+    If this function is moved, make sure to update it's entry in EXPLICIT_QUEUES in the settings files so it runs in the
+    correct queue.
 
     Arguments:
         username (str): The user to award the Credentials course cert to
@@ -417,7 +439,6 @@ def award_course_certificate(self, username, course_run_key):
     # feature, it may indicate a condition where processing of such tasks
     # has been temporarily disabled.  Since this is a recoverable situation,
     # mark this task for retry instead of failing it altogether.
-
     if not CredentialsApiConfig.current().is_learner_issuance_enabled:
         error_msg = (
             "Task award_course_certificate cannot be executed when credentials issuance is disabled in API config"
@@ -473,13 +494,12 @@ def award_course_certificate(self, username, course_run_key):
                 f"{course_key} with a visible date of {visible_date}"
             )
 
-            # If the certificate has an associated CertificateDateOverride, send
-            # it along
+            # If the certificate has an associated CertificateDateOverride, send it along
             try:
                 date_override = certificate.date_override.date
                 LOGGER.info(
-                    "Task award_course_certificate will award certificate for  "
-                    f"course {course_key} with a date override of {date_override}"
+                    "Task award_course_certificate will award certificate for course {course_key} with a date override "
+                    f"of {date_override}"
                 )
             except ObjectDoesNotExist:
                 date_override = None
@@ -706,64 +726,121 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
 @set_code_owner_attribute
 def update_certificate_visible_date_on_course_update(self, course_key):
     """
-    This task is designed to be called whenever a course is updated with
-    certificate_available_date so that visible_date is updated on credential
-    service as well.
+    This task is designed to be called whenever a course-run's `certificate_available_date` is updated.
 
-    It will get all users within the course that have a certificate and call
-    the credentials API to update all these certificates visible_date value
-    to keep certificates in sync on both sides.
+    When executed, this task will first get a list of all learners within the course-run that have earned a certificate.
+    Next, we will enqueue an additional `award_course_certificate` task for each learner in this list. These subtasks
+    will be responsible for updating the `visible_date` attribute on each certificate the Credentials IDA knows about.
 
-    If this function is moved, make sure to update it's entry in
-    EXPLICIT_QUEUES in the settings files so it runs in the correct queue.
+    If this function is moved, make sure to update it's entry in EXPLICIT_QUEUES in the settings files so it runs in the
+    correct queue.
 
     Arguments:
-        course_key (str): The course identifier
-
-    Returns:
-        None
-
+        course_key(str): The course identifier
     """
     countdown = 2 ** self.request.retries
-    # If the credentials config model is disabled for this
-    # feature, it may indicate a condition where processing of such tasks
-    # has been temporarily disabled.  Since this is a recoverable situation,
-    # mark this task for retry instead of failing it altogether.
+
+    # If the CredentialsApiConfig configuration model is disabled for this feature, it may indicate a condition where
+    # processing of such tasks has been temporarily disabled. Since this is a recoverable situation, mark this task for
+    # retry instead of failing it.
     if not CredentialsApiConfig.current().is_learner_issuance_enabled:
         error_msg = (
-            "Task update_certificate_visible_date_on_course_update cannot be executed when credentials issuance is "
-            "disabled in API config"
+            "Cannot execute the `update_certificate_visible_date_on_course_update` task. Issuing user credentials "
+            "through the Credentials IDA is disabled."
         )
-        LOGGER.info(error_msg)
+        LOGGER.warning(error_msg)
         exception = MaxRetriesExceededError(
-            f"Failed to update certificate availability date for course {course_key}. Reason: {error_msg}"
+            f"Failed to update the `visible_date` attribute for certificates in course {course_key}. Reason: "
+            f"{error_msg}"
         )
         raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)
 
-    # Update the CourseCertificate configuration in Credentials with the new
-    # certificate_available_date if:
-    # - The course is not self paced, AND
-    # - The certificates_display_behavior is "end_with_date"
+    # Retrieve a list of all usernames of learners who have a certificate record in this course-run. The
+    # Credentials IDA REST API still requires a username as the main identifier for the learner.
+    users_with_certificates_in_course = (
+        GeneratedCertificate
+        .eligible_available_certificates
+        .filter(course_id=course_key)
+        .values_list('user__username', flat=True)
+    )
+
+    LOGGER.info(
+        f"Resending course certificates for learners in course {course_key} to the Credentials service. Queueing "
+        f"{len(users_with_certificates_in_course)} `award_course_certificate` tasks."
+    )
+    for user in users_with_certificates_in_course:
+        award_course_certificate.delay(user, str(course_key))
+
+
+@shared_task(bind=True, ignore_result=True)
+@set_code_owner_attribute
+def update_certificate_available_date_on_course_update(self, course_key):
+    """
+    This task is designed to be called whenever a course-run's `certificate_available_date` is updated.
+
+    When executed, this task will determine if we need to enqueue an
+    `update_credentials_course_certificate_configuration_available_date` task associated with the specified course-run
+    key from this task. If so, this subtask is responsible for making a REST API call to the Credentials IDA to update
+    the specified course-run's Course Certificate configuration with the new `certificate_available_date` value.
+
+    Args:
+        course_key(str): The course identifier
+    """
+    countdown = 2 ** self.request.retries
+
+    # If the CredentialsApiConfig configuration model is disabled for this feature, it may indicate a condition where
+    # processing of such tasks has been temporarily disabled. Since this is a recoverable situation, mark this task for
+    # retry instead of failing it.
+    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+        error_msg = (
+            "Cannot execute the `update_certificate_visible_date_on_course_update` task. Issuing user credentials "
+            "through the Credentials IDA is disabled."
+        )
+        LOGGER.warning(error_msg)
+        exception = MaxRetriesExceededError(
+            "Failed to update the `certificate_available_date` in the Credentials service for course-run "
+            f"{course_key}. Reason: {error_msg}"
+        )
+        raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)
+
     course_overview = CourseOverview.get_from_id(course_key)
+    # Update the Credentials service's CourseCertificate configuration with the new `certificate_available_date` if:
+    #   - The course-run is instructor-paced, AND
+    #   - The `certificates_display_behavior` is set to "end_with_date",
     if (
+        course_overview and
         course_overview.self_paced is False and
         course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
     ):
+        LOGGER.info(
+            f"Queueing task to update the `certificate_available_date` of course-run {course_key} to "
+            f"[{course_overview.certificate_available_date}] in the Credentials service"
+        )
         update_credentials_course_certificate_configuration_available_date.delay(
             str(course_key),
             str(course_overview.certificate_available_date)
         )
-
-    # This code will update the visible_date in Credentials; we have moved away
-    # from relying on visible_date in favor of the above, but this still runs
-    # and visible_date is still updated
-    users_with_certificates_in_course = GeneratedCertificate.eligible_available_certificates.filter(
-        course_id=course_key
-    ).values_list('user__username', flat=True)
-
-    LOGGER.info(
-        "Task update_certificate_visible_date_on_course_update resending course certificates "
-        f"for {len(users_with_certificates_in_course)} users in course {course_key}."
-    )
-    for user in users_with_certificates_in_course:
-        award_course_certificate.delay(user, str(course_key))
+    # OR,
+    #   - The course-run is self-paced, AND
+    #   - The `certificate_available_date` is (now) None. (This task will be executed after an update to the course
+    #     overview)
+    # There are times when the CourseCertificate configuration of a self-paced course-run in Credentials can become
+    # associated with a `certificate_available_date`. This ends up causing learners' certificate to be incorrectly
+    # hidden. This is due to the Credentials IDA not understanding the concept of course pacing. Thus, we need a way
+    # to remove this value from self-paced courses in Credentials.
+    elif (
+        course_overview and
+        course_overview.self_paced is True and
+        course_overview.certificate_available_date is None
+    ):
+        LOGGER.info(
+            "Queueing task to remove the `certificate_available_date` in the Credentials service for course-run "
+            f"{course_key}"
+        )
+        update_credentials_course_certificate_configuration_available_date.delay(str(course_key), None)
+    # ELSE, we don't meet the criteria to update the course cert config in the Credentials IDA
+    else:
+        LOGGER.warning(
+            f"Skipping update of the `certificate_available_date` for course {course_key} in the Credentials service. "
+            "This course-run does not meet the required criteria for an update."
+        )

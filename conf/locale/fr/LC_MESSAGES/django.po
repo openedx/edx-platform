@@ -10898,20 +10898,6 @@ msgstr ""
 "MUS101-course-2015_T1\", \"default\": true}."
 
 #: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "Tri alphabétique des discussions"
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr ""
-"Entrez true ou false. Si true, les catégories et sous-catégories de "
-"discussion sont triées par ordre alphabétique. Si false, elles sont triées "
-"par ordre chronologique de date et heure de création."
-
-#: xmodule/course_module.py
 msgid "Discussions Plugin Settings"
 msgstr "Paramètres du plugin Discussions"
 

@@ -485,7 +485,7 @@ edx-enterprise==3.57.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   learner-pathway-progress
-edx-event-bus-kafka==0.7.0
+edx-event-bus-kafka==1.0.0
     # via -r requirements/edx/base.in
 edx-i18n-tools==0.9.1
     # via ora2
@@ -956,7 +956,7 @@ pyyaml==6.0
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/base.in
-rapidfuzz==2.11.0
+rapidfuzz==2.11.1
     # via levenshtein
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
