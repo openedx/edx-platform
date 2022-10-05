@@ -19,7 +19,7 @@ from oauth2_provider import models as dot_models
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
-from openedx.core.djangoapps.oauth_dispatch import JWT_DISABLED_FOR_MOBILE
+from openedx.core.djangoapps.oauth_dispatch import DISABLE_JWT_FOR_MOBILE
 
 from . import mixins
 
@@ -351,33 +351,33 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         """
         self._test_jwt_access_token('dot_app', token_type='jwt', grant_type='password', asymmetric_jwt=True)
 
-    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, False)
+    @override_waffle_switch(DISABLE_JWT_FOR_MOBILE, False)
     @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
     def test_disable_jwt_waffle_switch_disabled_non_mobile(self, mock_is_request_from_mobile_app):
         """
-        JWT_DISABLED_FOR_MOBILE disabled
+        DISABLE_JWT_FOR_MOBILE disabled
         Non-mobile request
         Test JWT token is returned
         """
         mock_is_request_from_mobile_app.return_value = False
         self._test_jwt_access_token('dot_app', token_type='jwt', grant_type='password')
 
-    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, True)
+    @override_waffle_switch(DISABLE_JWT_FOR_MOBILE, True)
     @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
     def test_disable_jwt_waffle_switch_enabled_non_mobile(self, mock_is_request_from_mobile_app):
         """
-        JWT_DISABLED_FOR_MOBILE enabled
+        DISABLE_JWT_FOR_MOBILE enabled
         Non-mobile request
         Test JWT token is returned
         """
         mock_is_request_from_mobile_app.return_value = False
         self._test_jwt_access_token('dot_app', token_type='jwt', grant_type='password')
 
-    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, True)
+    @override_waffle_switch(DISABLE_JWT_FOR_MOBILE, True)
     @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
     def test_disable_jwt_waffle_switch_enabled_mobile(self, mock_is_request_from_mobile_app):
         """
-        JWT_DISABLED_FOR_MOBILE enabled
+        DISABLE_JWT_FOR_MOBILE enabled
         Mobile request
         Test JWT token is not returned, and that Bearer token is returned instead
         """
@@ -389,11 +389,11 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         assert data['token_type'] == "Bearer"
         assert dot_models.AccessToken.objects.filter(token=access_token).exists() is True
 
-    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, False)
+    @override_waffle_switch(DISABLE_JWT_FOR_MOBILE, False)
     @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
     def test_disable_jwt_waffle_switch_disabled_mobile(self, mock_is_request_from_mobile_app):
         """
-        JWT_DISABLED_FOR_MOBILE disabled
+        DISABLE_JWT_FOR_MOBILE disabled
         Mobile request
         Test JWT token is returned
         """
@@ -509,36 +509,36 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         data = json.loads(response.content.decode('utf-8'))
         assert data['error'] == 'account_disabled'
 
-    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, False)
+    @override_waffle_switch(DISABLE_JWT_FOR_MOBILE, False)
     @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
     @ddt.data('dot_app')
     def test_disable_jwt_waffle_switch_disabled_non_mobile(self, client_attr, mock_is_request_from_mobile_app):
         """
-        JWT_DISABLED_FOR_MOBILE disabled
+        DISABLE_JWT_FOR_MOBILE disabled
         Non-mobile request
         Test JWT token is returned
         """
         mock_is_request_from_mobile_app.return_value = False
         self._test_jwt_access_token(client_attr, token_type='jwt', grant_type='password')
 
-    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, True)
+    @override_waffle_switch(DISABLE_JWT_FOR_MOBILE, True)
     @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
     @ddt.data('dot_app')
     def test_disable_jwt_waffle_switch_enabled_non_mobile(self, client_attr, mock_is_request_from_mobile_app):
         """
-        JWT_DISABLED_FOR_MOBILE enabled
+        DISABLE_JWT_FOR_MOBILE enabled
         Non-mobile request
         Test JWT token is returned
         """
         mock_is_request_from_mobile_app.return_value = False
         self._test_jwt_access_token(client_attr, token_type='jwt', grant_type='password')
 
-    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, True)
+    @override_waffle_switch(DISABLE_JWT_FOR_MOBILE, True)
     @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
     @ddt.data('dot_app')
     def test_disable_jwt_waffle_switch_enabled_mobile(self, client_attr, mock_is_request_from_mobile_app):
         """
-        JWT_DISABLED_FOR_MOBILE enabled
+        DISABLE_JWT_FOR_MOBILE enabled
         Mobile request
         Test JWT token is not returned, and that Bearer token is returned instead
         """
@@ -553,12 +553,12 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         assert data['token_type'] == "Bearer"
         assert dot_models.AccessToken.objects.filter(token=access_token).exists() is True
 
-    @override_waffle_switch(JWT_DISABLED_FOR_MOBILE, False)
+    @override_waffle_switch(DISABLE_JWT_FOR_MOBILE, False)
     @patch('openedx.core.djangoapps.oauth_dispatch.views.is_request_from_mobile_app')
     @ddt.data('dot_app')
     def test_disable_jwt_waffle_switch_disabled_mobile(self, client_attr, mock_is_request_from_mobile_app):
         """
-        JWT_DISABLED_FOR_MOBILE disabled
+        DISABLE_JWT_FOR_MOBILE disabled
         Mobile request
         Test JWT token is returned
         """
