@@ -62,7 +62,10 @@
             this.keydownHandler($(element).find('#sequence-list .tab'));
             this.base_page_title = ($('title').data('base-title') || '').trim();
             this.bind();
-            this.render(parseInt(this.el.data('position'), 10));
+            this.render(parseInt(this.el.data('position')), 10);
+            if (!(this.el.data('position'))) {
+                $('#seq-end-element-wrapper').hide()
+            }
         }
 
         Sequence.prototype.$ = function(selector) {
