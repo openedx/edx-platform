@@ -156,6 +156,7 @@
 # Translators:
 # 6e68c7971a89e50e680ae9444d303c8f, 2016
 # Abdallah Nassif <a.nassif012@gmail.com>, 2014
+# Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022
 # Ali Hasan <ahasan@qrf.org>, 2016
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
@@ -189,9 +190,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-18 20:42+0000\n"
+"POT-Creation-Date: 2022-09-25 20:50+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Roaa Nader <roaanader002005@gmail.com>, 2021\n"
+"Last-Translator: Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -3160,7 +3161,27 @@ msgid "loading"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
+msgid ""
+"Browse recently launched courses and see what's new in your favorite "
+"subjects."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
 msgid "Explore courses"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid "More opportunities for you"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid " to learn"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/Static2UCallouts.jsx
+msgid ""
+"We've added 500+ learning opportunities to create one of the world's most "
+"comprehensive free-to-degree online learning platforms."
 msgstr ""
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
@@ -10545,7 +10566,7 @@ msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
-msgstr "نشرات المساق"
+msgstr "مطبوعات المساق"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"

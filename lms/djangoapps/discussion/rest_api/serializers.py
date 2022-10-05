@@ -15,7 +15,8 @@ from rest_framework import serializers
 
 from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.student.roles import GlobalStaff
-from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_lock_unlock_event
+from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_lock_unlock_event, \
+    track_thread_edited_event, track_comment_edited_event
 from lms.djangoapps.discussion.django_comment_client.utils import (
     course_discussion_division_enabled,
     get_group_id_for_user,
@@ -437,26 +438,18 @@ class ThreadSerializer(_ContentSerializer):
             requesting_user_id = self.context["cc_requester"]["id"]
             if key == "closed" and val:
                 instance["closing_user_id"] = requesting_user_id
-                event_data = {
-                    'request': self.context['request'],
-                    'course': self.context['course'],
-                    'thread': instance,
-                    'close_reason_code': validated_data.get('close_reason_code')
-                }
-                track_thread_lock_unlock_event(**event_data)
+                track_thread_lock_unlock_event(self.context['request'], self.context['course'],
+                                               instance, validated_data.get('close_reason_code'))
 
             if key == "closed" and not val:
                 instance["closing_user_id"] = requesting_user_id
-                event_data = {
-                    'request': self.context['request'],
-                    'course': self.context['course'],
-                    'thread': instance,
-                    'close_reason_code': validated_data.get('close_reason_code')
-                }
-                track_thread_lock_unlock_event(**event_data, locked=False)
+                track_thread_lock_unlock_event(self.context['request'], self.context['course'],
+                                               instance, validated_data.get('close_reason_code'), locked=False)
 
             if key == "body" and val:
                 instance["editing_user_id"] = requesting_user_id
+                track_thread_edited_event(self.context['request'], self.context['course'],
+                                          instance, validated_data.get('edit_reason_code'))
         instance.save()
         return instance
 
@@ -601,6 +594,8 @@ class CommentSerializer(_ContentSerializer):
                 instance["endorsement_user_id"] = requesting_user_id
             if key == "body" and val:
                 instance["editing_user_id"] = requesting_user_id
+                track_comment_edited_event(self.context['request'], self.context['course'],
+                                           instance, validated_data.get('edit_reason_code'))
 
         instance.save()
         return instance

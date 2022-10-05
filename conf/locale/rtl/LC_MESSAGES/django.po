@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2022-09-25 20:43+0000\n"
-"PO-Revision-Date: 2022-09-25 20:43:25.632671\n"
+"POT-Creation-Date: 2022-10-04 20:32+0000\n"
+"PO-Revision-Date: 2022-10-04 20:32:23.253700\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -10277,20 +10277,6 @@ msgstr ""
 "ɔɐʇǝƃøɹʎ ɐs ʇɥǝ dǝɟɐnlʇ ɟøɹ nǝʍ døsʇs ᴉn ʇɥǝ Đᴉsɔnssᴉøn dɐƃǝ bʎ sǝʇʇᴉnƃ ᴉʇs "
 "\"dǝɟɐnlʇ\" ɐʇʇɹᴉbnʇǝ ʇø ʇɹnǝ. Føɹ ǝxɐɯdlǝ, \"Łʎdᴉɐn Mødǝ\": {\"id\": "
 "\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
-
-#: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "Đᴉsɔnssᴉøn Søɹʇᴉnƃ Ⱥldɥɐbǝʇᴉɔɐl"
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr ""
-"Ɇnʇǝɹ ʇɹnǝ øɹ ɟɐlsǝ. Ɨɟ ʇɹnǝ, dᴉsɔnssᴉøn ɔɐʇǝƃøɹᴉǝs ɐnd snbɔɐʇǝƃøɹᴉǝs ɐɹǝ "
-"søɹʇǝd ɐldɥɐbǝʇᴉɔɐllʎ. Ɨɟ ɟɐlsǝ, ʇɥǝʎ ɐɹǝ søɹʇǝd ɔɥɹønøløƃᴉɔɐllʎ bʎ ɔɹǝɐʇᴉøn"
-" dɐʇǝ ɐnd ʇᴉɯǝ."
 
 #: xmodule/course_module.py
 msgid "Discussions Plugin Settings"

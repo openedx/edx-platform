@@ -1,14 +1,13 @@
-name: Pylint checks
+name: Pylint Checks
 
 on:
   pull_request:
   push:
     branches:
       - master
-      - open-release/lilac.master
 
 jobs:
-  run_pylint:
+  run-pylint:
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
@@ -32,37 +31,47 @@ jobs:
 
     name: pylint ${{ matrix.module-name }}
     steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
 
-    - uses: actions/checkout@v2
+      - name: Install required system packages
+        run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
 
-    - name: Install Required System Packages
-      run: sudo apt-get update && sudo apt-get install libxmlsec1-dev
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
+      - name: Get pip cache dir
+        id: pip-cache-dir
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
 
-    - name: Get pip cache dir
-      id: pip-cache-dir
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
+      - name: Cache pip dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
 
-    - name: Cache pip dependencies
-      id: cache-dependencies
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.pip-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
-        restore-keys: ${{ runner.os }}-pip-
+      - name: Install required Python dependencies
+        run: |
+          make dev-requirements
+          pip uninstall -y mysqlclient
+          pip install --no-binary mysqlclient mysqlclient
 
-    - name: Install Required Python Dependencies
-      run: |
-        pip install -r requirements/pip.txt
-        make dev-requirements
-        pip uninstall -y mysqlclient
-        pip install --no-binary mysqlclient mysqlclient
+      - name: Run quality tests
+        run: |
+          pylint ${{ matrix.path }}
 
-    - name: Run Quality Tests
-      run: |
-        pylint  ${{ matrix.path }}
+  success:
+    name: Pylint successful
+    # A collection step to give a simple name for required status checks.
+    # https://github.com/orgs/community/discussions/33579
+    needs: run-pylint
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Success"
+        run: |
+          echo Pylint successful

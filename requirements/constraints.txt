@@ -88,3 +88,16 @@ markdown<3.4.0
 # pycodestyle==2.9.0 generates false positive error E275.
 # Constraint can be removed once the issue https://github.com/PyCQA/pycodestyle/issues/1090 is fixed.
 pycodestyle<2.9.0
+
+# pyopenssl>22.0.0 requires cryptography>=38.0 && conflicts with snowflak-connector-python requires cryptography<37
+# which causes the requirements upgrade job to fail due to constraint conflict
+# This constraint can be removed once https://github.com/snowflakedb/snowflake-connector-python/issues/1259 is resolved
+# and snowflake-connector-python>2.8.0 is released.
+pyopenssl==22.0.0
+
+# pytz>2022.2.1 causes test failures in edx-platform
+pytz==2022.2.1
+
+# openedx-events>0.13.0 causes test failures due to breaking changes
+# These broken tests will be fixed in a separate PR
+openedx-events==0.13.0

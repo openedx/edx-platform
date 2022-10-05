@@ -3065,6 +3065,8 @@ msgid ""
 "After the course ends, the course content will be archived and no longer "
 "active."
 msgstr ""
+"Ders sona erdikten sonra, ders içeriği arşivlenecek ve artık yayında "
+"olmayacaktır."
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -6873,7 +6875,7 @@ msgstr "open edx kullanıcısı"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "lti platform identifier"
-msgstr ""
+msgstr "lti platform tanımlayıcısı"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "The LTI platform identifier to which this profile belongs to."
@@ -10294,20 +10296,6 @@ msgstr ""
 "değerini true olarak atayarak belirleyebilirsiniz. Örneğin, \"Müzik "
 "Notaları\" için, {\"id\": \"i4x-UniversityX-MUS101-course-2015_T1\", "
 "\"default\": true}."
-
-#: xmodule/course_module.py
-msgid "Discussion Sorting Alphabetical"
-msgstr "Tartışma Alfabetik Sırada"
-
-#: xmodule/course_module.py
-msgid ""
-"Enter true or false. If true, discussion categories and subcategories are "
-"sorted alphabetically. If false, they are sorted chronologically by creation"
-" date and time."
-msgstr ""
-"True ya da False değerleriyle işaretleyin. True değeri girildiğinde, "
-"tartışma kategorileri ve alt kategorileri alfabetik olarak sıralanır. Değer "
-"False ise, oluşturma zamanı üzerinden kronolojik olarak sıralanır."
 
 #: xmodule/course_module.py
 msgid "Discussions Plugin Settings"

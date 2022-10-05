@@ -2186,7 +2186,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp('eventtracking.tracker')
+        super().setUp('lms.djangoapps.discussion.django_comment_client.base.views.tracker')
 
         self.course = CourseFactory.create(
             teams_configuration=TeamsConfig({
