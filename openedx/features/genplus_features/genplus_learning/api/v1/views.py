@@ -60,7 +60,7 @@ class ClassStudentViewSet(mixins.ListModelMixin,
 
     def get_serializer_context(self):
         context = super(ClassStudentViewSet, self).get_serializer_context()
-        class_id = self.kwargs.get('id', None)
+        class_id = self.kwargs.get('pk', None)
         if class_id:
             gen_class = get_object_or_404(Class, pk=class_id)
             class_units = ClassUnit.objects.select_related('unit')
@@ -69,9 +69,9 @@ class ClassStudentViewSet(mixins.ListModelMixin,
             return context
 
     def get_queryset(self):
-        class_id = self.kwargs.get('id', None)
+        class_id = self.kwargs.get('pk', None)
         try:
-            gen_class = Class.objects.prefetch_related('students').get(id=class_id)
+            gen_class = Class.objects.prefetch_related('students').get(pk=class_id)
         except Class.DoesNotExist:
             return Student.objects.none()
         return gen_class.students.select_related('gen_user__user').all()
