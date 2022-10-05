@@ -428,6 +428,9 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         return body
 
     def _test_jwt_access_token(self, client_attr, token_type=None, headers=None, grant_type=None, asymmetric_jwt=False):
+        """
+        Test response for JWT token.
+        """
         client = getattr(self, client_attr)
         self.oauth_client = client
         self._setup_provider_response(success=True)
