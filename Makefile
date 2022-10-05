@@ -84,8 +84,9 @@ base-requirements: pre-requirements
 test-requirements: pre-requirements
 	@# pip-sync doesn't work with test.txt because it is not the output of pip-compile.
 	@# Instead we have to combine layers using all the requirements files with pip-sync.
-	pip-sync --pip-args="--exists-action=w" requirements/edx/github.txt requirements/edx/paver.txt \
-		requirements/edx/base_layer.txt requirements/edx/coverage.txt requirements/edx/testing_layer.txt
+	pip-compile -v --no-emit-trusted-host --no-emit-index-url --rebuild --upgrade -o requirements/edx/ci_temp.txt requirements/edx/testing.txt
+	pip-sync --pip-args="--exists-action=w" requirements/edx/ci_temp.txt
+	rm -rf requirements/edx/ci_temp.txt
 	make local-requirements
 
 requirements: dev-requirements ## install development environment requirements

@@ -13,6 +13,7 @@ lms/envs/private.py
 cms/envs/private.py
 requirements/edx/tox_temp.txt
 requirements/edx/tox_temp.txt.tmp
+requirements/edx/ci_temp.txt
 # end-noclean
 
 ### Python artifacts
